@@ -50,7 +50,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
     val businessStructure = SoleProprietor
     val agentName = AgentName("test")
-    val agentCompanyName = AgentCompanyName("test")
+    val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
     val agentPartnership = AgentPartnership("test")
     val wdbd = WhatDoesYourBusinessDo(
       Set(
@@ -401,7 +401,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
   val businessStructure = SoleProprietor
   val agentName = AgentName("test")
-  val agentCompanyName = AgentCompanyName("test")
+  val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val agentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

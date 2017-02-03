@@ -380,6 +380,8 @@ hint.9.digits = For example: 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
+lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
+
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -682,6 +684,9 @@ tradingpremises.whatyouneed.agents.individual.info.text2 = your agent’s busine
 tradingpremises.whatyouneed.agents.circumstances.info.heading = Depending on your agent’s circumstances, you may also need:
 tradingpremises.whatyouneed.agents.circumstances.info.text1 = your agent’s company registration number
 tradingpremises.whatyouneed.agents.circumstances.info.text2 = your agent’s date of birth
+tradingpremises.youragent.company.details.title = Your agent’s company details
+tradingpremises.youragent.company.name = What is your agent’s registered company name?
+tradingpremises.youragent.crn = What is your agent’s company registration number?
 tradingpremises.youragent.title = Who is your agent?
 tradingpremises.youragent.paragraph1.text = An agent is an individual or business that works on behalf of your business to offer your services.
 tradingpremises.youragent.requiredinfo.heading = For each of your trading premises, you’ll need:
@@ -795,7 +800,6 @@ businessmatching.registerservices.servicename.details.06 = Trust or Company Serv
 businessmatching.registerservices.servicename.details.07 = Telecommunications, Digital and IT Payment Service Providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
 businessmatching.registrationnumber.title = What’s your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
-businessmatching.registrationnumber.example = It’s 8 characters and can be just numbers, or a mix of numbers and letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 businessmatching.typeofbusiness.title = What’s your type of business?
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust

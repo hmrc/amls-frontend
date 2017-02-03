@@ -60,7 +60,7 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
 
   private def resetAgentValues(tp:TradingPremises, data:RegisteringAgentPremises):TradingPremises = data.agentPremises match {
     case true => tp.registeringAgentPremises(data)
-    case false => tp.copy(agentName=None,businessStructure=None,agentCompanyName=None,agentPartnership=None, hasChanged=true)
+    case false => tp.copy(agentName=None,businessStructure=None,agentCompanyDetails=None,agentPartnership=None, hasChanged=true)
   }
 
 }

@@ -1,12 +1,12 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito._
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -15,11 +15,11 @@ import utils.AuthorisedFixture
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
-
+import org.scalatestplus.play.OneAppPerSuite
 
 import scala.concurrent.Future
 
-class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -30,7 +30,7 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar
     }
   }
 
-  "AgentCompanyNameController" when {
+  "AgentCompanyDetailsController" when {
 
     val emptyCache = CacheMap("", Map.empty)
 
@@ -43,29 +43,21 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-
-        val title = s"${Messages("tradingpremises.agentcompanyname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        document.title() must be(title)
-        document.select("input[type=text]").`val`() must be(empty)
       }
 
-      "display main Summary Page" in new Fixture {
+      "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyName("test")))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentcompanyname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        document.title() must be(title)
-        document.select("input[type=text]").`val`() must be("test")
+        document.select("input[type=text]").first().`val`() must be("test")
       }
+
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -188,7 +180,7 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
-            agentCompanyName = Some(AgentCompanyName("text")),
+            agentCompanyDetails = Some(AgentCompanyName("text")),
             agentPartnership = None
           ))))(any(), any(), any())
       }

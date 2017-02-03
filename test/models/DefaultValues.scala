@@ -21,7 +21,7 @@ object TradingPremisesSection {
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyName("test")
+  val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

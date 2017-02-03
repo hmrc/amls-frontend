@@ -17,9 +17,9 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar {
+class BusinessStructureControllerRelease7Spec extends GenericTestHelper with ScalaFutures with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -118,7 +118,7 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1, false).url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1, false).url)
     }
 
     "successfully submit and navigate to next page when user selects the option Partnership" in new Fixture {
@@ -158,7 +158,7 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1).url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option UnincorporatedBody without edit" in new Fixture {
@@ -215,7 +215,7 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
       val result = controller.post(1)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.AgentCompanyNameController.get(1, false).url))
+      redirectLocation(result) must be(Some(routes.AgentCompanyDetailsController.get(1, false).url))
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),

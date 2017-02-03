@@ -275,7 +275,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
             registeringAgentPremises = Some(RegisteringAgentPremises(false)),
             agentName=None,
             businessStructure=None,
-            agentCompanyName=None,
+            agentCompanyDetails=None,
             agentPartnership=None
           ))))(any(), any(), any())
       }

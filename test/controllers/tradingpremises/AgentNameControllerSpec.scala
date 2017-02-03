@@ -206,7 +206,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = Some(AgentName("text",None,Some(new LocalDate(1956,2,15)))),
-            agentCompanyName = None,
+            agentCompanyDetails = None,
             agentPartnership = None
           ))))(any(), any(), any())
       }
@@ -315,7 +315,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyName("test")
+  val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

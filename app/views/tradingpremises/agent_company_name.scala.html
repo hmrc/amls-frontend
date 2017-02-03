@@ -9,17 +9,17 @@
     @heading("tradingpremises.agentcompanyname.title", "summary.tradingpremises")
 }
 
-@main(
-    title = Messages("tradingpremises.agentcompanyname.title") + " - " + Messages("summary.tradingpremises"),
-    heading = header
-) {
+    @main(
+        title = Messages("tradingpremises.agentcompanyname.title") + " - " + Messages("summary.tradingpremises"),
+        heading = header
+    ) {
 
-    @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(index,edit)) {
+        @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(index,edit)) {
 
-        @input(
-            field = f("agentCompanyName"),
-            hintText = "tradingpremises.agentcompanyname.lbl.hint"
-        )
+            @input(
+                field = f("agentCompanyName"),
+                hintText = "tradingpremises.agentcompanyname.lbl.hint"
+            )
 
         @submit(edit)
     }
