@@ -98,7 +98,12 @@
                 question = Messages("tradingpremises.agentname.title"),
                 editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
             ) {
-                <p>@x.agentName</p>
+
+            <p>@x.agentName</p>
+            @x.agentDateOfBirth match {
+                case Some(y) => {<p>@DateHelper.formatDate(y)</p>}
+            }
+
             }
         }
 

@@ -1,5 +1,6 @@
 package models.tradingpremises
 
+import cats.data.Validated.Valid
 import models.FormTypes._
 import models.DateOfChange
 import jto.validation._
@@ -8,6 +9,7 @@ import jto.validation.forms.UrlFormEncoded
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json._
 import typeclasses.MongoKey
+import config.ApplicationConfig
 
 case class AgentName(agentName: String,
                      dateOfChange: Option[DateOfChange] = None,
@@ -34,7 +36,10 @@ object AgentName {
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "agentName").read(agentNameType) ~
-      (__ \ "agentDateOfBirth").read(optionR(localDateRule))) (AgentName.applyWithoutDateOfChange _)
+      {ApplicationConfig.release7 match {
+      case true => (__ \ "agentDateOfBirth").read(localDateRule).map(x=>Some(x))
+      case false => Rule[UrlFormEncoded, Option[LocalDate]](_ => Valid(None))
+    }}) (AgentName.applyWithoutDateOfChange _)
   }
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {
