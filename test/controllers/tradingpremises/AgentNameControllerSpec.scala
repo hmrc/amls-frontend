@@ -88,7 +88,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> "text"
+            "agentName" -> "text",
+            "agentDateOfBirth.day" -> "15",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1956"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -106,7 +109,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> "text"
+            "agentName" -> "text",
+            "agentDateOfBirth.day" -> "15",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1956"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -123,7 +129,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
         "edit is true and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> "text"
+            "agentName" -> "text",
+            "agentDateOfBirth.day" -> "15",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1956"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -176,7 +185,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
       }
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentName" -> "text")
+        val newRequest = request.withFormUrlEncodedBody("agentName" -> "text",
+          "agentDateOfBirth.day" -> "15",
+          "agentDateOfBirth.month" -> "2",
+          "agentDateOfBirth.year" -> "1956")
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
@@ -193,7 +205,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           any(),
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
-            agentName = Some(AgentName("text")),
+            agentName = Some(AgentName("text",None,Some(new LocalDate(1956,2,15)))),
             agentCompanyDetails = None,
             agentPartnership = None
           ))))(any(), any(), any())
@@ -211,7 +223,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> "someName")
+            "agentName" -> "someName",
+            "agentDateOfBirth.day" -> "15",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1956")
 
           val result = controller.post(1)(newRequest)
 

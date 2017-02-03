@@ -57,7 +57,7 @@ object Address {
           (__ \ "postcode").write[String]
         )(unlift(Address.unapplyWithoutDateOfChange))
     }
-  
+
   implicit val reads: Reads[Address] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
@@ -70,7 +70,7 @@ object Address {
         (__ \ "addressDateOfChange").readNullable[DateOfChange]
       )(Address.apply _)
   }
-  
+
   implicit val writes: Writes[Address] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
