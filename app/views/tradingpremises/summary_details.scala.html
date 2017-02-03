@@ -102,6 +102,7 @@
             <p>@x.agentName</p>
             @x.agentDateOfBirth match {
                 case Some(y) => {<p>@DateHelper.formatDate(y)</p>}
+                case None => {}
             }
 
             }
