@@ -61,6 +61,23 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
       }
 
+      "infer the value of usesForeignCurrencies correctly" when {
+        "deserializing from JSON and there is no value set" in {
+
+          val json = Json.toJson(WhichCurrencies(Seq("GBP", "USD"), None, Some(BankMoneySource("Some bank")), None, None))
+          val result = json.as[WhichCurrencies]
+
+          result.usesForeignCurrencies must be(Some(true))
+        }
+
+        "deserializing from JSON and there is some value set" in {
+          val json = Json.toJson(WhichCurrencies(Seq("GBP", "USD"), Some(false), Some(BankMoneySource("Some bank")), None, None))
+          val result = json.as[WhichCurrencies]
+
+          result.usesForeignCurrencies must be(Some(false))
+        }
+      }
+
     }
 
     "there is no foreignCurrency flag but contains foreign currency form data" should {
