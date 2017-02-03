@@ -33,7 +33,7 @@ object AgentName {
   }
   implicit val format = Json.format[AgentName]
 
-  implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
+  implicit def formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "agentName").read(agentNameType) ~
       {ApplicationConfig.release7 match {
