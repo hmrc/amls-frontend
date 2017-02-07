@@ -128,11 +128,13 @@
         }
 
         @model.agentCompanyDetails.map { x =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.youragent.crn"),
-                editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
-            ) {
-                <p>@x.companyRegistrationNumber</p>
+            @x.companyRegistrationNumber.map { crn =>
+                @checkYourAnswers(
+                    question = Messages("tradingpremises.youragent.crn"),
+                    editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+                ) {
+                    <p>@crn</p>
+                }
             }
         }
 

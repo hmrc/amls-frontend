@@ -105,8 +105,8 @@ object TradingPremises {
 
     def readAgentCompanyDetails = {
       (__ \ "agentCompanyDetails").read[AgentCompanyDetails].map[Option[AgentCompanyDetails]]{Some(_)} orElse
-        (__ \ "agentCompanyName").readNullable[String].map[Option[AgentCompanyDetails]]{
-          case Some(name) => Some(AgentCompanyDetails(name, None))
+        (__ \ "agentCompanyName").readNullable[AgentCompanyName].map[Option[AgentCompanyDetails]]{
+          case Some(agc) => Some(AgentCompanyName(agc.agentCompanyName))
           case _ => None
         }
     }

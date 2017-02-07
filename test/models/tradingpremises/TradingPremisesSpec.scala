@@ -52,30 +52,30 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
 
   )
 
   val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
-    Some(ytp), Some(businessStructure), Some(agentName),None, None, None, None)
+    Some(ytp), Some(businessStructure), Some(agentName), None, None, None, None)
 
-  val completeJson = Json.obj("registeringAgentPremises"-> Json.obj("agentPremises"->true),
-    "yourTradingPremises"-> Json.obj("tradingName" -> "foo",
-      "addressLine1" ->"1",
-      "addressLine2" ->"2",
-      "postcode" ->"asdfasdf",
-      "isResidential" ->true,
-      "startDate" ->"1990-02-24"),
-    "businessStructure" -> Json.obj("agentsBusinessStructure" ->"01"),
-    "agentName" -> Json.obj("agentName" ->"test"),
-    "agentCompanyDetails" -> Json.obj("agentCompanyName" ->"test", "companyRegistrationNumber" -> "12345678"),
-    "agentPartnership" -> Json.obj("agentPartnership" ->"test"),
-    "whatDoesYourBusinessDoAtThisAddress" ->Json.obj("activities" -> Json.arr("02","03","05")),
-    "msbServices" -> Json.obj("msbServices"-> Json.arr("01","02")),
-    "hasChanged" ->false,
-    "lineId" ->123456,
-    "status" ->"Added",
-    "endDate"-> Json.obj("endDate" ->"1999-01-01")
+  val completeJson = Json.obj("registeringAgentPremises" -> Json.obj("agentPremises" -> true),
+    "yourTradingPremises" -> Json.obj("tradingName" -> "foo",
+      "addressLine1" -> "1",
+      "addressLine2" -> "2",
+      "postcode" -> "asdfasdf",
+      "isResidential" -> true,
+      "startDate" -> "1990-02-24"),
+    "businessStructure" -> Json.obj("agentsBusinessStructure" -> "01"),
+    "agentName" -> Json.obj("agentName" -> "test"),
+    "agentCompanyDetails" -> Json.obj("agentCompanyName" -> "test", "companyRegistrationNumber" -> "12345678"),
+    "agentPartnership" -> Json.obj("agentPartnership" -> "test"),
+    "whatDoesYourBusinessDoAtThisAddress" -> Json.obj("activities" -> Json.arr("02", "03", "05")),
+    "msbServices" -> Json.obj("msbServices" -> Json.arr("01", "02")),
+    "hasChanged" -> false,
+    "lineId" -> 123456,
+    "status" -> "Added",
+    "endDate" -> Json.obj("endDate" -> "1999-01-01")
   )
 
   "TradingPremises" must {
@@ -95,7 +95,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     "return a tp model with the given 'agent company name' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.agentCompanyDetails(agentCompanyName)
-      newTP must be (tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
+      newTP must be(tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
     }
 
     "return a tp model with the given 'agent partnership' data" in {
@@ -142,13 +142,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
       TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
-    "Deserialise as expected with agentCompanyDetails"
-
-    "Deserialise as expected with agentCompanyName"
-
-    "Deserialise as expected with neither agentCompanyDetails nor agentCompanyName"
-
-      "isComplete" must {
+    "isComplete" must {
       "return true when tradingPremises contains complete data" in {
         completeModel.isComplete must be(true)
       }
@@ -171,8 +165,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
-            TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true))))
+          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true))))
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -186,7 +180,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
             completeModel)))
         val section = TradingPremises.section(mockCacheMap)
 
@@ -215,8 +209,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true),
-            TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true))))
+          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Updated), hasChanged = true),
+            TradingPremises(status = Some(StatusConstants.Updated), hasChanged = true))))
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -235,7 +229,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(TradingPremises())))
 
-        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
       }
     }
 
@@ -246,7 +240,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(incompleteModel, TradingPremises())))
 
-        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Started)
+        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Started)
       }
     }
 
@@ -257,7 +251,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, TradingPremises())))
 
-        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
 
@@ -281,106 +275,4 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     }
   }
 
-  "TradingPremises deserialisation" when {
-    "presented with Json written by version 2.4.4 of the service " when {
-      "the premises is not an agents presmises " must {
-        "Deserialise as expected" in {
-          val input = Json.parse(
-            """
-              |{
-              | "agentPremises":false,
-              | "tradingName":"trading1.1",
-              | "addressLine1":"add",
-              | "addressLine2":"add",
-              | "addressLine3":"add",
-              | "addressLine4":"add",
-              | "postcode":"PP2 3PP",
-              | "isResidential":true,
-              | "startDate":"1991-01-01",
-              | "activities":["03","06"]
-              |}
-            """.stripMargin)
-
-          TradingPremises.reads.reads(input) must be(JsSuccess(
-            TradingPremises(
-              Some(RegisteringAgentPremises(false)),
-              Some(YourTradingPremises(
-                "trading1.1",
-                Address("add", "add", Some("add"), Some("add"), "PP2 3PP"),
-                true,
-                new LocalDate(1991, 1, 1)
-              )),
-              None,
-              None,
-              None,
-              None,
-              Some(WhatDoesYourBusinessDo(Set(EstateAgentBusinessService, TrustAndCompanyServices))),
-              None,
-              false,
-              None,
-              None,
-              None
-            )
-          ))
-        }
-      }
-
-      "the premises is and agent's premises" must {
-        "deserialise as expected" in {
-          val input = Json.parse(
-            """
-              |{
-              | "agentPremises":true,
-              | "tradingName":"trading name",
-              | "addressLine1":"hfgdhfg",
-              | "addressLine2":"jhh",
-              | "addressLine4":"fjjghghjgh",
-              | "postcode":"hgjgh",
-              | "isResidential":false,
-              | "startDate":"1967-02-01",
-              | "agentsBusinessStructure":"02",
-              | "agentCompanyName":"REG Name Ltd.",
-              | "companyRegistrationNumber":"12345678",
-              | "activities":["03","07","02","05","01","06","04"],
-              | "msbServices":["01","02","03","04"]}
-            """.stripMargin)
-
-          TradingPremises.reads.reads(input) must be(JsSuccess(
-            TradingPremises(
-              Some(RegisteringAgentPremises(true)),
-              Some(YourTradingPremises(
-                "trading name",
-                Address("hfgdhfg", "jhh", None, Some("fjjghghjgh"), "hgjgh"),
-                false,
-                new LocalDate(1967, 2, 1)
-              )),
-              Some(LimitedLiabilityPartnership),
-              None,
-              Some(AgentCompanyDetails("REG Name Ltd.", None)),
-              None,
-              Some(WhatDoesYourBusinessDo(Set(
-                    AccountancyServices,
-                    BillPaymentServices,
-                    EstateAgentBusinessService,
-                    HighValueDealing,
-                    MoneyServiceBusiness,
-                    TrustAndCompanyServices,
-                    TelephonePaymentService
-              ))),
-              Some(MsbServices(Set(
-                TransmittingMoney,
-                CurrencyExchange,
-                ChequeCashingNotScrapMetal,
-                ChequeCashingScrapMetal
-              ))),
-              false,
-              None,
-              None,
-              None
-            )
-          ))
-        }
-      }
-    }
-  }
 }
