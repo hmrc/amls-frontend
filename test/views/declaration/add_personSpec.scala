@@ -7,6 +7,7 @@ import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.businessmatching.BusinessType
+import models.declaration.release7.RoleWithinBusinessRelease7
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -20,7 +21,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
   "add_person view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", BeneficialShareholder))
+      val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
 
       def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
@@ -30,7 +31,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", BeneficialShareholder))
+      val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
       def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
 

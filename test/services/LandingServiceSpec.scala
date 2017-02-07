@@ -8,6 +8,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -72,7 +73,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       tradingPremisesSection = None,
       aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
-      aboutYouSection = AddPerson("FirstName", None, "LastName", BeneficialShareholder ),
+      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = None,
       responsiblePeopleSection = None,
       tcspSection = None,

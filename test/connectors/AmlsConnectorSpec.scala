@@ -1,6 +1,7 @@
 package connectors
 
 import models._
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -51,7 +52,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     tradingPremisesSection = None,
     aboutTheBusinessSection = None,
     bankDetailsSection = Seq(None),
-    aboutYouSection = AddPerson("FirstName", None, "LastName", BeneficialShareholder ),
+    aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))),
     businessActivitiesSection = None,
     responsiblePeopleSection = None,
     tcspSection = None,
