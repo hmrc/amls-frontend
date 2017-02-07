@@ -198,15 +198,21 @@ object WhichCurrencies {
   implicit val jsonR: Reads[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
-
     (
       (__ \ "currencies").read[Seq[String]] and
         (__ \ "usesForeignCurrencies").readNullable[Boolean] and
         __.read[Option[BankMoneySource]] and
         __.read[Option[WholesalerMoneySource]] and
         (__ \ "customerMoneySource").readNullable(cmsReader)
-      )(WhichCurrencies.apply _)
+      )((currencies, usesForeignCurrencies, bms, wms, cms) => {
 
+      val flag = (ApplicationConfig.release7, usesForeignCurrencies) match {
+        case (true, None) => Some(bms.isDefined || wms.isDefined || cms.contains(true))
+        case (_, x) => x
+      }
+
+      WhichCurrencies(currencies, flag, bms, wms, cms)
+    })
   }
 
   implicit val jsonW: Writes[WhichCurrencies] = {
@@ -224,13 +230,3 @@ object WhichCurrencies {
 
   }
 }
-
-//object WhichCurrencies {
-//
-//  private object Cache extends WhichCurrencies0
-//
-//  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = Cache.formW
-//  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = Cache.formR
-//  implicit val jsonR: Reads[WhichCurrencies] = Cache.jsonR
-//  implicit val jsonW: Writes[WhichCurrencies] = Cache.jsonW
-//}
