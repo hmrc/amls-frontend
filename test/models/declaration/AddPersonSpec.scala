@@ -4,6 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.declaration.release7.RoleWithinBusinessRelease7
 import play.api.libs.json.{JsSuccess, Json}
 import play.api.test.FakeApplication
 
@@ -142,20 +143,18 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
         "roleWithinBusiness" -> "02"
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
     }
 
     "Write the json successfully from the AddPerson domain object created (preRelease7)" in {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))
 
       val json = Json.obj(
         "firstName" -> "John",
         "middleName" -> "Envy",
         "lastName" -> "Doe",
-        "roleWithinBusiness" -> "02"
+        "roleWithinBusiness" -> Json.arr("Director")
       )
 
       AddPerson.jsonWrites.writes(addPerson) must be(json)
@@ -179,8 +178,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           "lastName" -> Seq("Doe"),
           "roleWithinBusiness" -> Seq("BeneficialShareholder")
         )
-        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", Some("Envy"), "Doe",
-          models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
+        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
       }
 
       "a middle name is not provided (preRelease7)" in {
@@ -189,8 +187,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           "lastName" -> Seq("Doe"),
           "roleWithinBusiness" -> Seq("BeneficialShareholder")
         )
-        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", None, "Doe",
-          models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
+        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", None, "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
       }
     }
 
@@ -286,19 +283,17 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         "roleWithinBusiness" -> "02"
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("FNAME", None, "LNAME",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("FNAME", None, "LNAME", RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
     }
 
     "Read correctly from JSON when the MiddleName is missing " in {
       val json = Json.obj(
         "firstName" -> "FNAME",
         "lastName" -> "LNAME",
-        "roleWithinBusiness" -> "Director"
+        "roleWithinBusiness" -> Set("Director")
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("FNAME", None, "LNAME",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("FNAME", None, "LNAME", RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
     }
 
 
@@ -311,8 +306,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         "roleWithinBusiness" -> "02"
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.Director)))))
     }
 
     "Read the json and return the AddPerson domain object successfully " in {
@@ -324,18 +318,20 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         "roleWithinBusiness" -> Seq("Director","Partner","SoleProprietor")
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director,
-          models.declaration.release7.Partner,models.declaration.release7.SoleProprietor)))))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(
+        models.declaration.release7.Director,
+        models.declaration.release7.Partner,
+        models.declaration.release7.SoleProprietor)))))
     }
 
 
 
     "Write the json successfully from the AddPerson domain object created" in {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe",
-        models.declaration.release7.RoleWithinBusinessRelease7(Set(models.declaration.release7.Director,
-          models.declaration.release7.Partner,models.declaration.release7.SoleProprietor)))
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(
+        models.declaration.release7.Director,
+        models.declaration.release7.Partner,
+        models.declaration.release7.SoleProprietor)))
 
       val json = Json.obj(
         "firstName" -> "John",
