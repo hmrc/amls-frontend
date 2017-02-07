@@ -11,7 +11,8 @@
     rows: String = "",
     maxLength: String = "",
     charCount: Boolean = false,
-    largeWidth: Boolean = false
+    largeWidth: Boolean = false,
+    requiredField: Boolean = true
 )(implicit lang:Lang,  m: Messages)
 
 <div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
@@ -26,13 +27,13 @@
             <span class="error-notification">@field.error</span>
         }
         <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
-                  @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
-                  @if(cols.nonEmpty) { cols="@cols" }
-                  @if(rows.nonEmpty) { rows="@rows" }
-                  @if(maxLength.nonEmpty) { maxLength="@maxLength" }
-                @if(largeWidth) { class="textarea--3-4" }
-
-                  >@field.value</textarea>
+            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
+            @if(cols.nonEmpty) { cols="@cols" }
+            @if(rows.nonEmpty) { rows="@rows" }
+            @if(maxLength.nonEmpty) { maxlength="@maxLength" }
+            @if(largeWidth) { class="textarea--3-4" }
+            @if(requiredField) { aria-required="true" required="required"}
+            >@field.value</textarea>
         @if(charCount) {
             <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
         }

@@ -14,7 +14,9 @@
     attrType: String = "",
     attrMin: String = "",
     attrMax: String = "",
+    attrMaxlength: String = "",
     attrPattern: String = "",
+    attrTitle: String = "",
     attrDescribedBy: String = "",
     data: String = ""
 )(implicit lang:Lang,  m: Messages)
@@ -41,6 +43,8 @@
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
             @if(attrMin.nonEmpty) { min="@attrMin" }
             @if(attrMax.nonEmpty) { max="@attrMax" }
+            @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
+            @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
         />
 </div>

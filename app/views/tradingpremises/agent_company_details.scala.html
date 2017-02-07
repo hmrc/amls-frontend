@@ -32,7 +32,9 @@
             @input(
                 field = f("companyRegistrationNumber"),
                 labelText = "tradingpremises.youragent.crn",
-                hintText = "lbl.hint.crn"
+                hintText = "lbl.hint.crn",
+                attrMaxlength = "8",
+                attrPattern = "^[a-zA-Z0-9]{1,8}$"
             )
 
         }
