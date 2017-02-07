@@ -4,8 +4,9 @@ import models.FormTypes._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import jto.validation.ValidationError
-import play.api.libs.json._
+import play.api.libs.json.{JsError, _}
 import play.api.libs.json.Reads.StringReads
+import play.api.data.validation.{ValidationError => JsonValidationError}
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
@@ -96,8 +97,10 @@ object RoleWithinBusinessRelease7 {
       }
   }
 
+  val businessRolePathName = "roleWithinBusiness"
+  val businessRolePath = JsPath \ businessRolePathName
 
-  val preRelease7JsonRead =  (__ \ "roleWithinBusiness").read[String].flatMap[Set[RoleType]] {
+  val preRelease7JsonRead =  businessRolePath.read[String].flatMap[Set[RoleType]] {
     case "01" => Reads(_ => JsSuccess(Set(BeneficialShareholder)))
     case "02" => Reads(_ => JsSuccess(Set(Director)))
     case "03" => Reads(_ => JsSuccess(Set(ExternalAccountant)))
@@ -111,8 +114,13 @@ object RoleWithinBusinessRelease7 {
     case _ => play.api.data.validation.ValidationError("error.invalid")
   }
 
+  val fallback = Reads(x => (x \ businessRolePathName).getOrElse(JsNull) match {
+      case JsNull => JsError(businessRolePath -> JsonValidationError("error.path.missing"))
+      case _ => JsError(businessRolePath -> JsonValidationError("error.invalid"))
+    }) map identity[Set[RoleType]]
+
   implicit val jsonReads: Reads[RoleWithinBusinessRelease7] =
-    ((__ \ "roleWithinBusiness").read[Set[String]].flatMap { x: Set[String] =>
+    (__ \ "roleWithinBusiness").read[Set[String]].flatMap { x: Set[String] =>
       x.map {
         case "BeneficialShareholder" => Reads(_ => JsSuccess(BeneficialShareholder)) map identity[RoleType]
         case "Director" => Reads(_ => JsSuccess(Director)) map identity[RoleType]
@@ -123,9 +131,9 @@ object RoleWithinBusinessRelease7 {
         case "NominatedOfficer" => Reads(_ => JsSuccess(NominatedOfficer)) map identity[RoleType]
         case "DesignatedMember" => Reads(_ => JsSuccess(DesignatedMember)) map identity[RoleType]
         case "Other" =>
-          (JsPath \ "roleWithinBusinessOther").read[String].map(Other.apply _) map identity[RoleType]
+          (JsPath \ "roleWithinBusinessOther").read[String].map(Other.apply) map identity[RoleType]
         case _ =>
-          Reads(_ => JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
+          Reads(_ => JsError(businessRolePath -> JsonValidationError("error.invalid")))
       }.foldLeft[Reads[Set[RoleType]]](
         Reads[Set[RoleType]](_ => JsSuccess(Set.empty))
       ) {
@@ -136,16 +144,13 @@ object RoleWithinBusinessRelease7 {
             }
           }
       }
-    }).orElse(
-      preRelease7JsonRead
-    ) map (
-      x => RoleWithinBusinessRelease7(x)
-      )
+    }.orElse(preRelease7JsonRead).orElse(fallback)
+      .map(RoleWithinBusinessRelease7.apply)
 
   implicit val jsonWrite = Writes[RoleWithinBusinessRelease7] {
     case RoleWithinBusinessRelease7(transactions) =>
       Json.obj(
-        "roleWithinBusiness" -> (transactions map {
+        businessRolePathName -> (transactions map {
           _.value
         }).toSeq
       ) ++ transactions.foldLeft[JsObject](Json.obj()) {

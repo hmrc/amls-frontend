@@ -79,7 +79,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
         val (rep, model) = x
         s"represented by $rep" in {
           RoleWithinBusinessRelease7.formRule.validate(model) must
-            be(Invalid(List((Path \ "roleWithinBusiness", List(ValidationError("error.required.hvd.business.sell.atleast"))))))
+            be(Invalid(List((Path \ "roleWithinBusiness", List(ValidationError("error.required"))))))
         }
       }
     }
@@ -164,8 +164,8 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
       }
 
       "fail when on invalid data" in {
-        Json.fromJson[RoleWithinBusinessRelease7](Json.obj("roleWithinBusiness" -> Seq("invalid_data"))) must
-          be(JsError(((JsPath) \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
+        Json.fromJson[RoleWithinBusinessRelease7](Json.obj("roleWithinBusiness" -> Set("hello"))) must
+          be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {
