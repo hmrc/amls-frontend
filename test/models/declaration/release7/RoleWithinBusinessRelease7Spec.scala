@@ -67,7 +67,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
         "roleWithinBusinessOther" -> Seq("t"*256)
       )
       RoleWithinBusinessRelease7.formRule.validate(model) must
-        be(Invalid(List(( Path \ "roleWithinBusinessOther", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
+        be(Invalid(List(( Path \ "roleWithinBusinessOther", Seq(ValidationError("error.invalid.maxlength.255"))))))
     }
 
 
