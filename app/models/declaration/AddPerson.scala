@@ -33,7 +33,7 @@ object AddPerson {
 
 
   //TODO: Update these read types to use correct name types.
-  implicit val formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
+  implicit def formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
     import jto.validation.forms.Rules._
 
@@ -49,7 +49,7 @@ object AddPerson {
         (__ \ "middleName").read(optionR(declarationNameType)) ~
         (__ \ "lastName").read(declarationNameType) ~
         roleReader
-      ) (AddPerson.apply _)
+      ) (AddPerson.apply)
   }
 
   implicit val formWrites: Write[AddPerson, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
