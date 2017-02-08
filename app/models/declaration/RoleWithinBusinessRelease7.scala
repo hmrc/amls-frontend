@@ -49,7 +49,7 @@ object RoleWithinBusinessRelease7 {
 
   val maxDetailsLength = 255
   val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.hvd.business.sell.other.details") andThen
+    notEmpty.withMessage("error.required") andThen
     maxLength(maxDetailsLength).withMessage("error.invalid.hvd.business.sell.other.details")
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =

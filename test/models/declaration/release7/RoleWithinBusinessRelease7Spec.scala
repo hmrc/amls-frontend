@@ -36,7 +36,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
           "roleWithinBusinessOther" -> Seq(""))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required"))))))
       }
 
       "represented by a sequence of whitespace" in {
@@ -44,7 +44,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
           "roleWithinBusinessOther" -> Seq("  \t"))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required"))))))
       }
 
       "represented by a missing field" in {
