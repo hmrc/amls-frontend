@@ -30,7 +30,6 @@
                 field = f("registeredForCorporationTax")
             ) {
 
-
                 @radio(
                     f = f("registeredForCorporationTax"),
                     labelText = "lbl.yes",
@@ -56,7 +55,10 @@
                 field = f("corporationTaxReference"),
                 labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
                 hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-                bold = false
+                bold = false,
+                attrType = "tel",
+                attrMaxlength = "10",
+                attrPattern = "[0-9]{1,10}"
             )
         }
 
