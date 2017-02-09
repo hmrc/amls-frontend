@@ -23,7 +23,7 @@ object AgentCompanyDetails {
 
   val agentsRegisteredCompanyCRNType: Rule[String, String] =
     notEmpty.withMessage("error.required.bm.registration.number") compose
-      pattern("^[a-zA-Z0-9]{8}$".r).withMessage("error.invalid.bm.registration.number")
+      pattern("^[A-Z0-9]{8}$".r).withMessage("error.invalid.bm.registration.number")
 
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
     override def apply(): String = "agent-company-name"
