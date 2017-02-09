@@ -148,12 +148,12 @@ object RoleWithinBusinessRelease7 {
       .map(RoleWithinBusinessRelease7.apply)
 
   implicit val jsonWrite = Writes[RoleWithinBusinessRelease7] {
-    case RoleWithinBusinessRelease7(transactions) =>
+    case RoleWithinBusinessRelease7(roleTypes) =>
       Json.obj(
-        businessRolePathName -> (transactions map {
+        businessRolePathName -> (roleTypes map {
           _.value
         }).toSeq
-      ) ++ transactions.foldLeft[JsObject](Json.obj()) {
+      ) ++ roleTypes.foldLeft[JsObject](Json.obj()) {
         case (m, Other(name)) =>
           m ++ Json.obj("roleWithinBusinessOther" -> name)
         case (m, _) =>

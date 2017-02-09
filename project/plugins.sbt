@@ -21,4 +21,4 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 addSbtPlugin("org.brianmckenna" % "sbt-wartremover" % "0.11")
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.5")

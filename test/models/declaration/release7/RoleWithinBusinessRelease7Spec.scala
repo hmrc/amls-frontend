@@ -134,7 +134,10 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
       "successfully validate given all values" in {
         val json =  Json.obj(
           "roleWithinBusiness" -> Seq("BeneficialShareholder","Director","Partner","InternalAccountant","ExternalAccountant",
-            "SoleProprietor","NominatedOfficer","DesignatedMember"))
+            "SoleProprietor","NominatedOfficer","DesignatedMember", "Other"),
+        "roleWithinBusinessOther" -> "some other text")
+
+
 
         Json.fromJson[RoleWithinBusinessRelease7](json) must
           be(JsSuccess(RoleWithinBusinessRelease7(Set(
@@ -145,7 +148,8 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
             ExternalAccountant,
             SoleProprietor,
             NominatedOfficer,
-            DesignatedMember)), JsPath))
+            DesignatedMember,
+            Other("some other text"))), JsPath))
       }
 
       "successfully validate given values with option other details" in {
@@ -159,7 +163,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
 
       "fail when path is missing" in {
         Json.fromJson[RoleWithinBusinessRelease7](Json.obj(
-          "roleWithinBusin" -> Seq("BeneficialShareholder"))) must
+          "roleWithinBusinessOther" -> "other text")) must
           be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
@@ -169,7 +173,9 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
       }
 
       "write valid data in using json write" in {
-        Json.toJson[RoleWithinBusinessRelease7](RoleWithinBusinessRelease7(Set(SoleProprietor, Other("test657")))) must be (
+        val release = RoleWithinBusinessRelease7(Set(SoleProprietor, Other("test657")))
+
+        Json.toJson[RoleWithinBusinessRelease7](release) must be (
           Json.obj("roleWithinBusiness" -> Json.arr("SoleProprietor", "Other"),
             "roleWithinBusinessOther" -> "test657"
           ))
