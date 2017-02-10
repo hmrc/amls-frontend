@@ -2,7 +2,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, complete: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""

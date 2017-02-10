@@ -27,10 +27,6 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
     }
 
     val tradingPremises = mock[TradingPremises]
-    val yourTradingPremises = mock[YourTradingPremises]
-
-    when(tradingPremises.yourTradingPremises) thenReturn Some(yourTradingPremises)
-    when(yourTradingPremises.tradingName) thenReturn "My Company"
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())

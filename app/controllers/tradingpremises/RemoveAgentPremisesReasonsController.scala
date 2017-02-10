@@ -23,8 +23,7 @@ trait RemoveAgentPremisesReasonsController extends RepeatingSection with BaseCon
         tp <- getData[TradingPremises](index)
       } yield tp match {
         case (Some(tradingPremises)) => {
-          Ok(views.html.tradingpremises.remove_agent_premises_reasons(EmptyForm, index, complete,
-            tp.yourTradingPremises.fold("")(_.tradingName)))
+          Ok(views.html.tradingpremises.remove_agent_premises_reasons(EmptyForm, index, complete))
         }
         case _ => NotFound(notFoundView)
       }
@@ -35,7 +34,7 @@ trait RemoveAgentPremisesReasonsController extends RepeatingSection with BaseCon
       implicit authContext => implicit request =>
         Form2[AgentRemovalReason](request.body) match {
           case form: InvalidForm => Future.successful(
-            BadRequest(remove_agent_premises_reasons(form, index, complete, "")))
+            BadRequest(remove_agent_premises_reasons(form, index, complete)))
         }
     }
 
