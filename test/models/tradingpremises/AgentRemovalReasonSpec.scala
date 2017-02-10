@@ -11,21 +11,22 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
     "given a valid form" must {
 
-      "return the model" in {
+      "return the model" when {
 
-        val form = Map(
-          "removalReason" -> Seq("Other"),
-          "removalReasonOther" -> Seq("Some other reason")
+        "given 'Other' as a reason" in {
+
+          val form = Map(
+            "removalReason" -> Seq("Other"),
+            "removalReasonOther" -> Seq("Some other reason")
           )
 
-        val result = AgentRemovalReason.formReader.validate(form)
+          val result = AgentRemovalReason.formReader.validate(form)
 
-        result must be(Valid(AgentRemovalReason("Other", Some("Some other reason"))))
+          result must be(Valid(AgentRemovalReason("Other", Some("Some other reason"))))
 
-      }
+        }
 
-      "return the model" when {
-        "something other than 'Other' was given" in {
+        "something other than 'Other' was given as the reason" in {
 
           val form = Map(
             "removalReason" -> Seq("Serious compliance failures")
@@ -37,7 +38,6 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
         }
       }
-
     }
 
     "given an invalid form" must {
@@ -61,6 +61,19 @@ class AgentRemovalReasonSpec extends PlaySpec {
           val result = AgentRemovalReason.formReader.validate(form)
 
           result must be(Invalid(Seq(Path \ "removalReasonOther" -> Seq(ValidationError("error.required")))))
+
+        }
+
+        "the given reason for 'Other' is too long" in {
+
+          val form = Map(
+            "removalReason" -> Seq("Other"),
+            "removalReasonOther" -> Seq("a" * 300)
+          )
+
+          val result = AgentRemovalReason.formReader.validate(form)
+
+          result must be(Invalid(Seq(Path \ "removalReasonOther" -> Seq(ValidationError("tradingpremises.remove_reasons.agent.other.too_long")))))
 
         }
 

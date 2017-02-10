@@ -744,6 +744,7 @@ tradingpremises.remove_reasons.agent.premises.lbl.03 = Lack of profit from agent
 tradingpremises.remove_reasons.agent.premises.lbl.04 = Agent ceased trading
 tradingpremises.remove_reasons.agent.premises.lbl.05 = Requested by agent
 tradingpremises.remove_reasons.agent.premises.lbl.06 = Other
+tradingpremises.remove_reasons.agent.other.too_long = You can’t enter more than 255 characters
 
 estateagentbusiness.whatyouneed.subheading = For this section you’ll need:
 estateagentbusiness.whatyouneed.line_1 = a list of which services you provide

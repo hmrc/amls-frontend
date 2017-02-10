@@ -2,7 +2,7 @@ package models.tradingpremises
 
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
+import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.FormTypes._
 import play.api.libs.json.Json
 
@@ -16,7 +16,7 @@ object AgentRemovalReason {
 
   val otherDetailsLength = 255
   val otherDetailsType = notEmptyStrip andThen notEmpty andThen maxLength(otherDetailsLength).
-    withMessage("error.invalid.hvd.business.sell.other.details")
+    withMessage("tradingpremises.remove_reasons.agent.other.too_long")
 
   implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
     (__ \ "removalReason").read[String] flatMap { reason =>
