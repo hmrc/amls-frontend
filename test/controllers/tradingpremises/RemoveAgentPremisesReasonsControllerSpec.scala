@@ -2,7 +2,8 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.tradingpremises.{TradingPremises, YourTradingPremises}
-import org.mockito.Matchers._
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
@@ -57,6 +58,35 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
         status(result) must be(NOT_FOUND)
 
       }
+    }
+
+    "invoking the POST action" must {
+
+      "return the same page if there is a validation problem" in new Fixture {
+
+        val formRequest = request.withFormUrlEncodedBody(
+          "removalReason" -> "Other"
+        )
+
+        mockFetch(Some(Seq(tradingPremises)))
+
+        val result = controller.post(1)(formRequest)
+
+        status(result) must be(BAD_REQUEST)
+
+      }
+
+//      "temp" in {
+//        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+//        verify(controller.dataCacheConnector).save(eqTo(TradingPremises.key), captor.capture())(any(), any(), any())
+//
+//        captor.getValue match {
+//          case tp :: tail =>
+//            tp.removalReason must be("Other")
+//            tp.removalReasonOther must be("Some reason")
+//        }
+//      }
+
     }
   }
 

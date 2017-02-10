@@ -3,10 +3,13 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
-import models.tradingpremises.TradingPremises
+import forms.{EmptyForm, Form2, InvalidForm}
+import models.tradingpremises.{AgentRemovalReason, TradingPremises}
 import services.StatusService
 import utils.RepeatingSection
+import views.html.tradingpremises.remove_agent_premises_reasons
+
+import scala.concurrent.Future
 
 trait RemoveAgentPremisesReasonsController extends RepeatingSection with BaseController {
 
@@ -30,7 +33,10 @@ trait RemoveAgentPremisesReasonsController extends RepeatingSection with BaseCon
   def post(index: Int, complete: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
-        ???
+        Form2[AgentRemovalReason](request.body) match {
+          case form: InvalidForm => Future.successful(
+            BadRequest(remove_agent_premises_reasons(form, index, complete, "")))
+        }
     }
 
 }
