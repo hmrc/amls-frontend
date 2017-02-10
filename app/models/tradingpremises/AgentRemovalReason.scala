@@ -15,13 +15,13 @@ object AgentRemovalReason {
   implicit val formats = Json.format[AgentRemovalReason]
 
   val otherDetailsLength = 255
-  val otherDetailsType = notEmptyStrip andThen notEmpty andThen maxLength(otherDetailsLength).
+  val otherDetailsRule = notEmptyStrip andThen notEmpty andThen maxLength(otherDetailsLength).
     withMessage("tradingpremises.remove_reasons.agent.other.too_long")
 
   implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
     (__ \ "removalReason").read[String] flatMap { reason =>
       if (reason == "Other") {
-        (__ \ "removalReasonOther").read(otherDetailsType) map { o =>
+        (__ \ "removalReasonOther").read(otherDetailsRule) map { o =>
           AgentRemovalReason(reason, Some(o))
         }
       } else

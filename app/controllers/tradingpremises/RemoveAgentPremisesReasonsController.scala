@@ -3,7 +3,7 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
 import services.StatusService
 import utils.RepeatingSection
@@ -35,6 +35,14 @@ trait RemoveAgentPremisesReasonsController extends RepeatingSection with BaseCon
         Form2[AgentRemovalReason](request.body) match {
           case form: InvalidForm => Future.successful(
             BadRequest(remove_agent_premises_reasons(form, index, complete)))
+
+          case ValidForm(_, data) => updateDataStrict[TradingPremises](index) { _.copy(
+              removalReason = Some(data.removalReason),
+              removalReasonOther = data.removalReasonOther
+            )
+          } map { _ =>
+            Redirect(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete))
+          }
         }
     }
 

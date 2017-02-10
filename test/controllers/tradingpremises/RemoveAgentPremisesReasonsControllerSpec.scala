@@ -1,19 +1,21 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.tradingpremises.{TradingPremises, YourTradingPremises}
+import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with MockitoSugar{
+class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -22,15 +24,23 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
 
     val controller = new RemoveAgentPremisesReasonsController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+
       override protected def authConnector: AuthConnector = self.authConnector
+
       override val statusService: StatusService = mock[StatusService]
     }
 
-    val tradingPremises = mock[TradingPremises]
+    val tradingPremises = TradingPremises()
+    val cache = CacheMap("", Map.empty[String, JsValue])
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(model))
+
+    when(controller.dataCacheConnector.save(eqTo(TradingPremises.key), any())(any(), any(), any())).
+      thenReturn(Future.successful(cache))
+
+    mockFetch(Some(Seq(tradingPremises)))
   }
 
   "Remove agent premises reasons controller" when {
@@ -38,8 +48,6 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
     "invoking the GET action" must {
 
       "load the 'Why are you removing this trading premises?' page" in new Fixture {
-
-        mockFetch(Some(Seq(tradingPremises)))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -58,13 +66,11 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
 
     "invoking the POST action" must {
 
-      "return the same page if there is a validation problem" in new Fixture {
+      "return a bad request if there is a validation problem" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
           "removalReason" -> "Other"
         )
-
-        mockFetch(Some(Seq(tradingPremises)))
 
         val result = controller.post(1)(formRequest)
 
@@ -72,16 +78,39 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
 
       }
 
-//      "temp" in {
-//        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-//        verify(controller.dataCacheConnector).save(eqTo(TradingPremises.key), captor.capture())(any(), any(), any())
-//
-//        captor.getValue match {
-//          case tp :: tail =>
-//            tp.removalReason must be("Other")
-//            tp.removalReasonOther must be("Some reason")
-//        }
-//      }
+      "save the reason data to Save4Later" in new Fixture {
+
+        val formRequest = request.withFormUrlEncodedBody(
+          "removalReason" -> "Other",
+          "removalReasonOther" -> "Some reason"
+        )
+
+        val result = await(controller.post(1)(formRequest))
+
+        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+        verify(controller.dataCacheConnector).save(eqTo(TradingPremises.key), captor.capture())(any(), any(), any())
+
+        captor.getValue match {
+          case tp :: tail =>
+            tp.removalReason must be(Some("Other"))
+            tp.removalReasonOther must be(Some("Some reason"))
+        }
+
+      }
+
+      "redirect to the 'Remove trading premises' page" in new Fixture {
+
+        val formRequest = request.withFormUrlEncodedBody(
+          "removalReason" -> "Other",
+          "removalReasonOther" -> "Some reason"
+        )
+
+        val result = controller.post(1)(formRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url))
+
+      }
 
     }
   }
