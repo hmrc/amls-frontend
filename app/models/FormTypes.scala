@@ -1,10 +1,10 @@
 package models
 
-import org.joda.time.LocalDate
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import org.joda.time.LocalDate
 import utils.DateHelper.localDateOrdering
-import cats.data.Validated.{Invalid, Valid}
 
 import scala.util.matching.Regex
 
@@ -132,6 +132,13 @@ object FormTypes {
 
   /** Contact Details Rules **/
 
+  private val alternativeAddressNameRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u002d]{1,140}$".r
+  private val nameMaxLength = 140
+  private val nameRequired = required("error.required.yourname")
+  private val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
+  private val alternativeAddressNamePattern = regexWithMsg(alternativeAddressNameRegex, "error.invalid.punctuation")
+  val alternativeAddressNameType = nameRequired andThen nameType andThen alternativeAddressNamePattern
+
   private val phoneNumberRequired = required("error.required.rp.phone")
   private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.rp.phone")
   private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "error.invalid.rp.phone")
@@ -179,7 +186,7 @@ object FormTypes {
   val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule andThen futureDateRule
 
-  val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate]{
+  val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)
     case (None, d2) => Valid(d2)
     case (Some(activityStartDate), _) => Invalid(Seq(
@@ -192,7 +199,7 @@ object FormTypes {
       (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
   }
 
-  val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
+  val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
     case (d1, d2) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }

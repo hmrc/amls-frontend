@@ -42,6 +42,7 @@ error.required.otherfirstnames = Enter all other first names.
 error.required.otherlastnames = Enter all other last names.
 error.required.yourname = Enter your name.
 error.invalid.yourname = You can’t enter more than 140 characters for your name.
+error.invalid.punctuation = Only use letters A to Z, numbers 1 to 9, and basic punctuation
 
 error.required.vat.number = Enter a VAT registration number.
 error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers

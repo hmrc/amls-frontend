@@ -560,7 +560,27 @@ class FormTypesSpec extends PlaySpec {
         Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
       )
     }
+  }
 
+  "alternativeAddressNameType" must {
+    "successfully validate a valid name" in {
+      alternativeAddressNameType.validate("FirstName LastName") mustBe Valid("FirstName LastName")
+    }
+    "fail validation when given an invalid name" in {
+      alternativeAddressNameType.validate("FirstName LastName{}") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("error.invalid.punctuation"))
+      )))
+    }
+    "fail validation when given a name with more than 140 characters" in {
+      alternativeAddressNameType.validate("a" * 141) must be(Invalid(Seq(
+        Path -> Seq(ValidationError("error.invalid.yourname"))
+      )))
+    }
+    "fail validation when given nothing" in {
+      alternativeAddressNameType.validate("") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("error.required.yourname"))
+      )))
+    }
   }
 
 }

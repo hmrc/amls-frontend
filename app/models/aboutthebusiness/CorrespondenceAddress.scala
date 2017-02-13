@@ -65,7 +65,7 @@ object CorrespondenceAddress {
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
             (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
@@ -74,7 +74,7 @@ object CorrespondenceAddress {
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
         case false => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
             (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
