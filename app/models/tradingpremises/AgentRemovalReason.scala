@@ -3,7 +3,7 @@ package models.tradingpremises
 import cats.data.Validated.Valid
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Success, To, Write}
+import jto.validation.{From, Rule, To, Write}
 import models.FormTypes._
 import play.api.libs.json.Json
 
@@ -11,16 +11,18 @@ case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[
 
 object AgentRemovalReason {
 
-  import utils.MappingUtils.Implicits._
   import RemovalReasonConstants._
+  import utils.MappingUtils.Implicits._
 
   implicit val formats = Json.format[AgentRemovalReason]
 
   val otherDetailsLength = 255
 
+  val otherDetailsRegexRule = regexWithMsg("^[a-zA-Z0-9\u00C0-\u00FF &-]$".r, "tradingpremises.remove_reasons.agent.other.invalid")
+
   val otherDetailsRule = notEmptyStrip andThen
     notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
-    withMessage("error.invalid.maxlength.255")
+    withMessage("error.invalid.maxlength.255") andThen otherDetailsRegexRule
 
   def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
 
