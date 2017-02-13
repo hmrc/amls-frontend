@@ -5,11 +5,11 @@ import java.util.UUID
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService}
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -101,6 +101,33 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = summaryController.answers()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("summary.youranswers.title"))
+    }
+
+  }
+
+  "ModelHelpers" must {
+
+    import controllers.tradingpremises.ModelHelpers._
+
+    "return the correct removal url" when {
+
+      "the trading premises is an Agent trading premises" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        tradingPremises.removeUrl(1) must be(
+          controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1).url)
+
+      }
+
+      "the trading premises is not an Agent trading premises" in {
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(false)))
+
+        tradingPremises.removeUrl(1) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
+        )
+      }
+
     }
 
   }

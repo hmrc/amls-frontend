@@ -2,6 +2,7 @@
 @import forms2._
 @import models.tradingpremises._
 @import utils.StatusConstants
+@import controllers.tradingpremises.ModelHelpers._
 
 @(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -46,7 +47,7 @@
                 @checkYourAnswersListing(
                     item = ytp.tradingPremisesAddress.toLines.mkString(", ").toString,
                     editUrl = controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1).toString,
-                    removeUrl = controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add).toString
+                    removeUrl = tp.removeUrl(y + 1, add)
                 )
             }
         }
