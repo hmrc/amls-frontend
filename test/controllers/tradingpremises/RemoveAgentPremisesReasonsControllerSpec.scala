@@ -17,6 +17,8 @@ import scala.concurrent.Future
 
 class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with MockitoSugar {
 
+  import models.tradingpremises.RemovalReasonConstants._
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -69,7 +71,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
       "return a bad request if there is a validation problem" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
-          "removalReason" -> "Other"
+          "removalReason" -> Form.OTHER
         )
 
         val result = controller.post(1)(formRequest)
@@ -81,7 +83,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
       "save the reason data to Save4Later" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
-          "removalReason" -> "Other",
+          "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )
 
@@ -92,7 +94,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
 
         captor.getValue match {
           case tp :: tail =>
-            tp.removalReason must be(Some("Other"))
+            tp.removalReason must be(Some(Schema.OTHER))
             tp.removalReasonOther must be(Some("Some reason"))
         }
 
@@ -101,7 +103,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends GenericTestHelper with Mo
       "redirect to the 'Remove trading premises' page" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
-          "removalReason" -> "Other",
+          "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )
 

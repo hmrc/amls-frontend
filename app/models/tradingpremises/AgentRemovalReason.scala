@@ -1,8 +1,9 @@
 package models.tradingpremises
 
+import cats.data.Validated.Valid
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
+import jto.validation.{From, Rule, Success, To, Write}
 import models.FormTypes._
 import play.api.libs.json.Json
 
@@ -11,6 +12,7 @@ case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[
 object AgentRemovalReason {
 
   import utils.MappingUtils.Implicits._
+  import RemovalReasonConstants._
 
   implicit val formats = Json.format[AgentRemovalReason]
 
@@ -20,22 +22,73 @@ object AgentRemovalReason {
     notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
     withMessage("error.invalid.maxlength.255")
 
+  def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
+
   implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
-    (__ \ "removalReason").read[String] flatMap { reason =>
-      if (reason == "Other") {
+    (__ \ "removalReason").read[String] andThen toSchemaReasonR flatMap {
+      case reason@Schema.OTHER =>
         (__ \ "removalReasonOther").read(otherDetailsRule) map { o =>
           AgentRemovalReason(reason, Some(o))
         }
-      } else
+      case reason =>
         AgentRemovalReason(reason)
     }
   }
 
-  implicit val formWriter: Write[AgentRemovalReason, UrlFormEncoded] = Write { a =>
-    Map(
-      "removalReason" -> Seq(a.removalReason),
-      "removalReasonOther" -> Seq(a.removalReasonOther.getOrElse(""))
-    )
+  implicit val formWriter: Write[AgentRemovalReason, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Writes._
+    (
+      (__ \ "removalReason").write[String] ~
+        (__ \ "removalReasonOther").write[Option[String]]
+      ) (x => (Rules.fromSchemaReason(x.removalReason), x.removalReasonOther))
+  }
+
+}
+
+object RemovalReasonConstants {
+
+  object Form {
+    val MAJOR_COMPLIANCE_ISSUES = "01"
+    val MINOR_COMPLIANCE_ISSUES = "02"
+    val LACK_OF_PROFIT = "03"
+    val CEASED_TRADING = "04"
+    val REQUESTED_BY_AGENT = "05"
+    val OTHER = "06"
+  }
+
+  object Schema {
+    val MAJOR_COMPLIANCE_ISSUES = "Serious compliance failures"
+    val MINOR_COMPLIANCE_ISSUES = "Minor compliance failures"
+    val LACK_OF_PROFIT = "Lack of activity"
+    val CEASED_TRADING = "Agent ceased trading"
+    val REQUESTED_BY_AGENT = "Requested by agent"
+    val OTHER = "Other"
+  }
+
+  object Rules {
+
+    def toSchemaReason(reason: String): String = {
+      reason match {
+        case Form.MAJOR_COMPLIANCE_ISSUES => Schema.MAJOR_COMPLIANCE_ISSUES
+        case Form.MINOR_COMPLIANCE_ISSUES => Schema.MINOR_COMPLIANCE_ISSUES
+        case Form.LACK_OF_PROFIT => Schema.LACK_OF_PROFIT
+        case Form.CEASED_TRADING => Schema.CEASED_TRADING
+        case Form.REQUESTED_BY_AGENT => Schema.REQUESTED_BY_AGENT
+        case Form.OTHER => Schema.OTHER
+      }
+    }
+
+    def fromSchemaReason(reason: String): String = {
+      reason match {
+        case Schema.MAJOR_COMPLIANCE_ISSUES => Form.MAJOR_COMPLIANCE_ISSUES
+        case Schema.MINOR_COMPLIANCE_ISSUES => Form.MINOR_COMPLIANCE_ISSUES
+        case Schema.LACK_OF_PROFIT => Form.LACK_OF_PROFIT
+        case Schema.CEASED_TRADING => Form.CEASED_TRADING
+        case Schema.REQUESTED_BY_AGENT => Form.REQUESTED_BY_AGENT
+        case Schema.OTHER => Form.OTHER
+      }
+    }
+
   }
 
 }

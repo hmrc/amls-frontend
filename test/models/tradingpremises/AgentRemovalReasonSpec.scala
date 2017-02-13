@@ -4,8 +4,9 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-
 class AgentRemovalReasonSpec extends PlaySpec {
+
+  import models.tradingpremises.RemovalReasonConstants._
 
   "The AgentRemovalReason model" when {
 
@@ -16,7 +17,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
         "given 'Other' as a reason" in {
 
           val form = Map(
-            "removalReason" -> Seq("Other"),
+            "removalReason" -> Seq(Form.OTHER),
             "removalReasonOther" -> Seq("Some other reason")
           )
 
@@ -56,7 +57,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
         "there is no other removal reason when 'Other' is selected" in {
 
-          val form = Map("removalReason" -> Seq("Other"))
+          val form = Map("removalReason" -> Seq(Form.OTHER))
 
           val result = AgentRemovalReason.formReader.validate(form)
 
@@ -67,7 +68,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
         "the given reason for 'Other' is too long" in {
 
           val form = Map(
-            "removalReason" -> Seq("Other"),
+            "removalReason" -> Seq(Form.OTHER),
             "removalReasonOther" -> Seq("a" * 300)
           )
 
@@ -90,7 +91,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
         val result = AgentRemovalReason.formWriter.writes(model)
 
         result must be(Map(
-          "removalReason" -> Seq("Other"),
+          "removalReason" -> Seq(Form.OTHER),
           "removalReasonOther" -> Seq("Some other reason")
         ))
 
@@ -100,7 +101,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
         val model = AgentRemovalReason("Other", Some("Some other reason"))
 
         val json = Json.toJson(model) must be(Json.obj(
-          "removalReason" -> "Other",
+          "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some other reason"
         ))
       }

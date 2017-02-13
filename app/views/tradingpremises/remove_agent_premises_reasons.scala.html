@@ -21,17 +21,17 @@
     @form(f, controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.post(index, complete)) {
 
         @fieldset(
-            f = f("removeAgentPremisesReasons"),
+            f = f("removalReason"),
             legend = "tradingpremises.remove_reasons.agent.premises.title",
             bold = false,
             panel = false
         ) {
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.01", "01")
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.02", "02")
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.03", "03")
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.04", "04")
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.05", "05")
-            @radio(f("removeAgentPremisesReasons"), "tradingpremises.remove_reasons.agent.premises.lbl.06", "06", target = s"#$target")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.01", "01")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.02", "02")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.03", "03")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.04", "04")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.05", "05")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.06", "06", target = s"#$target")
         }
 
         @fieldset(
@@ -39,7 +39,7 @@
             legendHidden = true,
             f = f(target)
         ) {
-            @input(f("removeAgentPremisesReasonsOther"), "lbl.pleasespecify", bold = false)
+            @input(f("removalReasonOther"), "lbl.pleasespecify", bold = false)
         }
 
         @submit()
