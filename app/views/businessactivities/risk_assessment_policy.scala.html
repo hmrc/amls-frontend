@@ -3,6 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
+@target = @{
+    s"""${f("riskassessments").id}-fieldset"""
+}
+
 @header = {
     @errorSummary(f)
     @heading("businessactivities.riskassessment.policy.title", "summary.businessactivities")
@@ -26,7 +30,7 @@
                 labelText = "lbl.yes",
                 value = "true",
                 inline = true,
-                target = "#riskassessments"
+                target = s"#$target"
             )
             @radio(
                 f = f("hasPolicy"),
@@ -37,23 +41,26 @@
         }
 
         @fieldset(
-            f = f("riskassessments"),
+            f = f(s"$target"),
             legend = "businessactivities.paper.or.digital",
-            hint = "lbl.select.all"
+            hint = "lbl.select.all",
+            jsHidden = true
         ) {
-
-            @checkbox(
-                f = f("riskassessments[]"),
-                labelText = "businessactivities.RiskAssessmentType.lbl.01",
-                value = "01"
-            )
-            @checkbox(
-                f = f("riskassessments[]"),
-                labelText = "businessactivities.RiskAssessmentType.lbl.02",
-                value = "02"
-            )
+            @errorGroup(
+                field = f("riskassessments")
+            ) {
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                    value = "01"
+                )
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                    value = "02"
+                )
+            }
         }
-
 
         @submit(edit)
     }

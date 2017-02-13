@@ -50,13 +50,16 @@
             jsHidden = false,
             id = target
         ) {
-        @input(
-            field = f("vrnNumber"),
-            labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-            hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
-            bold = false
-        )
-    }
+            @input(
+                field = f("vrnNumber"),
+                labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
+                hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
+                bold = false,
+                attrType = "tel",
+                attrMaxlength = "9",
+                attrPattern = "[0-9]{1,9}"
+            )
+        }
 
         @submit(false)
     }

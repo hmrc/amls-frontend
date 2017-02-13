@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @target = @{
-s"""${f("franchiseName").id}-fieldset"""
+    s"""${f("franchiseName").id}-fieldset"""
 }
 
 @header = {
@@ -29,13 +29,17 @@ s"""${f("franchiseName").id}-fieldset"""
                 field = f("employeeCount"),
                 labelText = "businessactivities.employees.line1.text",
                 hintText = "businessactivities.employees.line1.hint",
-                bold = false
+                bold = false,
+                attrType = "number",
+                attrPattern = "[0-9]*"
             )
             @input(
                 field = f("employeeCountAMLSSupervision"),
                 labelText = "businessactivities.employees.line2.text",
                 hintText = "businessactivities.employees.line2.hint",
-                bold = false
+                bold = false,
+                attrType = "number",
+                attrPattern = "[0-9]*"
             )
         }
 

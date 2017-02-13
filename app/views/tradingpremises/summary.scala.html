@@ -18,17 +18,22 @@
     heading = header
 ) {
 
-
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ) {
-        @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))){
+    @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))) {
+        @panel(
+            wide = true,
+            jsHidden = false,
+            gutter = true
+        ) {
             <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
         }
+    }
 
-        @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0) {
+        @panel(
+            wide = true,
+            jsHidden = false,
+            gutter = true
+        ) {
             <p>@Messages("tradingpremises.summary.no.trading.premises")</p>
             <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
         }
