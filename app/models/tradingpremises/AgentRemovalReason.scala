@@ -27,7 +27,7 @@ object AgentRemovalReason {
   private def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
 
   implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
-    (__ \ "removalReason").read[String] andThen toSchemaReasonR flatMap {
+    (__ \ "removalReason").read[String].withMessage("tradingpremises.remove_reasons.missing") andThen toSchemaReasonR flatMap {
       case reason@Schema.OTHER =>
         (__ \ "removalReasonOther").read(otherDetailsRule) map { o =>
           AgentRemovalReason(reason, Some(o))
