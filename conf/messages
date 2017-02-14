@@ -21,6 +21,7 @@ err.notrequired = No item should be entered
 err.invalidLength = invalid length
 err.summary = There is a problem
 err.pleasespecify = Please specify
+err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 
 error.required.address.line1 = Enter the first line of the address.
 error.required.address.line2 = Enter the second line of the address.
@@ -737,6 +738,14 @@ tradingpremises.remove.trading.premises.title = Remove trading premises
 tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
 tradingpremises.remove.trading.premises.enddate.lbl = When did you stop trading from these premises?
 tradingpremises.remove.trading.premises.btn = Remove trading premises
+tradingpremises.remove_reasons.agent.premises.title = Why are you removing this trading premises
+tradingpremises.remove_reasons.agent.premises.lbl.01 = You suspect major compliance issues, such as fraud
+tradingpremises.remove_reasons.agent.premises.lbl.02 = You suspect minor compliance issues, such as general negligence
+tradingpremises.remove_reasons.agent.premises.lbl.03 = Lack of profit from agent premises
+tradingpremises.remove_reasons.agent.premises.lbl.04 = Agent ceased trading
+tradingpremises.remove_reasons.agent.premises.lbl.05 = Requested by agent
+tradingpremises.remove_reasons.agent.premises.lbl.06 = Other
+tradingpremises.remove_reasons.agent.other.missing = Enter a reason for removing this trading premises
 
 estateagentbusiness.whatyouneed.subheading = For this section you’ll need:
 estateagentbusiness.whatyouneed.line_1 = a list of which services you provide

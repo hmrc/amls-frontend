@@ -19,7 +19,9 @@ case class TradingPremises(
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
                             status: Option[String] = None,
-                            endDate:Option[ActivityEndDate] = None
+                            endDate:Option[ActivityEndDate] = None,
+                            removalReason: Option[String] = None,
+                            removalReasonOther: Option[String] = None
                           ) {
 
   def businessStructure(p: BusinessStructure): TradingPremises =
@@ -51,9 +53,9 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_) => true
-      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_,_) => true
-      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_,_,_) => true
+      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_,_,_,_) => true
+      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -123,7 +125,9 @@ object TradingPremises {
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "lineId").readNullable[Int] and
         (__ \ "status").readNullable[String] and
-        (__ \ "endDate").readNullable[ActivityEndDate]
+        (__ \ "endDate").readNullable[ActivityEndDate] and
+        (__ \ "removalReason").readNullable[String] and
+        (__ \ "removalReasonOther").readNullable[String]
       ) apply TradingPremises.apply _
   }
 

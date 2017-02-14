@@ -1,10 +1,9 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.BusinessMatching
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
 import views.html.tradingpremises._
@@ -37,6 +36,17 @@ trait SummaryController extends RepeatingSection with BaseController {
         case _ =>
           NotFound(notFoundView)
       }
+  }
+}
+
+object ModelHelpers {
+  implicit class removeUrl(model: TradingPremises) {
+    def removeUrl(index: Int, complete: Boolean = false): String = model.registeringAgentPremises match {
+      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 =>
+        controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
+      case _ =>
+        controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url
+    }
   }
 }
 

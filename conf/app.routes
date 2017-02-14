@@ -104,6 +104,9 @@ POST        /trading-premises/premises-registered/:index                controll
 GET         /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
 POST        /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
+GET         /trading-premises/remove/:index/reasons                     controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
+POST        /trading-premises/remove/:index/reasons                     controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
+
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
 
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
