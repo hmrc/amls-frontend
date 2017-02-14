@@ -32,7 +32,7 @@
             @if(rows.nonEmpty) { rows="@rows" }
             @if(maxLength.nonEmpty) { maxlength="@maxLength" }
             @if(largeWidth) { class="textarea--3-4" }
-            @if(requiredField) { aria-required="true" required="required"}
+            @if(requiredField) { aria-required="true"}
             >@field.value</textarea>
         @if(charCount) {
             <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>

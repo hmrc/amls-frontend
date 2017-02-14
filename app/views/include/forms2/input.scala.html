@@ -39,7 +39,7 @@
             value="@field.value" id="@field.id"
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
-            @if(requiredField) { aria-required="true" required="required" }
+            @if(requiredField) { aria-required="true" }
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
             @if(attrMin.nonEmpty) { min="@attrMin" }
             @if(attrMax.nonEmpty) { max="@attrMax" }
