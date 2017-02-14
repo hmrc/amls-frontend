@@ -30,7 +30,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
         "something other than 'Other' was given as the reason" in {
 
           val form = Map(
-            "removalReason" -> Seq("Serious compliance failures")
+            "removalReason" -> Seq("01")
           )
 
           val result = AgentRemovalReason.formReader.validate(form)
@@ -74,7 +74,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
           val result = AgentRemovalReason.formReader.validate(form)
 
-          result must be(Invalid(Seq(Path \ "removalReasonOther" -> Seq(ValidationError("tradingpremises.remove_reasons.agent.other.too_long")))))
+          result must be(Invalid(Seq(Path \ "removalReasonOther" -> Seq(ValidationError("error.invalid.maxlength.255")))))
 
         }
 
@@ -100,8 +100,8 @@ class AgentRemovalReasonSpec extends PlaySpec {
       "return the correct json" in {
         val model = AgentRemovalReason("Other", Some("Some other reason"))
 
-        val json = Json.toJson(model) must be(Json.obj(
-          "removalReason" -> Form.OTHER,
+        Json.toJson(model) must be(Json.obj(
+          "removalReason" -> Schema.OTHER,
           "removalReasonOther" -> "Some other reason"
         ))
       }

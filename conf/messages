@@ -21,6 +21,7 @@ err.notrequired = No item should be entered
 err.invalidLength = invalid length
 err.summary = There is a problem
 err.pleasespecify = Please specify
+err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 
 error.required.address.line1 = Enter the first line of the address.
 error.required.address.line2 = Enter the second line of the address.
