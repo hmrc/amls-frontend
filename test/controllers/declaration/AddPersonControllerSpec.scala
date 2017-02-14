@@ -29,6 +29,10 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.release7" -> false
+  ))
+
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
@@ -227,9 +231,77 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
 }
 
+class AddPersonRelease7Spec extends GenericTestHelper with MockitoSugar {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.release7" -> true
+  ))
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+
+    val addPersonController = new AddPersonController {
+      override val dataCacheConnector = mock[DataCacheConnector]
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+
+    val emptyCache = CacheMap("", Map.empty)
+
+    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+      (any(), any(), any())).thenReturn(Future.successful(Some(mock[BusinessMatching])))
+
+  }
+
+  "must pass on post with all the mandatory parameters supplied" when {
+    "status is pending" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "firstName" -> "John",
+        "lastName" -> "Doe",
+        "roleWithinBusiness[]" -> "BeneficialShareholder"
+      )
+
+      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      val result = addPersonController.post()(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
+    }
+    "status is pre-submission" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "firstName" -> "John",
+        "lastName" -> "Doe",
+        "roleWithinBusiness[]" -> "BeneficialShareholder"
+      )
+
+      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = addPersonController.post()(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+    }
+  }
+
+}
+
 class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.amendments" -> false,
+    "Test.microservice.services.feature-toggle.release7" -> false)
+  )
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -272,6 +344,54 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
           "firstName" -> "John",
           "lastName" -> "Doe",
           "roleWithinBusiness" -> "01"
+        )
+
+        when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        when(addPersonController.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.post()(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+      }
+    }
+  }
+
+}
+
+class AddPersonControllerWithoutAmendmentSpecRelease7 extends GenericTestHelper with MockitoSugar {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.amendments" -> false,
+    "Test.microservice.services.feature-toggle.release7" -> true)
+  )
+
+  val userId = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+
+    val addPersonController = new AddPersonController {
+      override val dataCacheConnector = mockDataCacheConnector
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+  }
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  "AddPersonController (release 7)" must {
+
+    "must pass on post with all the mandatory parameters supplied" when {
+      "status is pending" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "firstName" -> "John",
+          "lastName" -> "Doe",
+          "roleWithinBusiness[]" -> "BeneficialShareholder"
         )
 
         when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())

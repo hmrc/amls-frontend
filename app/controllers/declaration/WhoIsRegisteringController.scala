@@ -5,6 +5,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
 import models.status._
 import play.api.mvc.{Action, AnyContent, Request, Result}
@@ -50,17 +51,19 @@ trait WhoIsRegisteringController extends BaseController {
 
   }
 
-  implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusiness = {
+  implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
     import models.responsiblepeople._
 
-    positions.head match {
-      case BeneficialOwner => BeneficialShareholder
-      case Director => models.declaration.Director
-      case InternalAccountant => models.declaration.InternalAccountant
-      case NominatedOfficer => models.declaration.NominatedOfficer
-      case Partner => models.declaration.Partner
-      case SoleProprietor => models.declaration.SoleProprietor
+    RoleWithinBusinessRelease7(
+    positions.map {
+      case BeneficialOwner => models.declaration.release7.BeneficialShareholder
+      case Director => models.declaration.release7.Director
+      case InternalAccountant => models.declaration.release7.InternalAccountant
+      case NominatedOfficer => models.declaration.release7.NominatedOfficer
+      case Partner => models.declaration.release7.Partner
+      case SoleProprietor => models.declaration.release7.SoleProprietor
     }
+    )
   }
 
   def post: Action[AnyContent] = Authorised.async {
