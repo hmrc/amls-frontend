@@ -16,15 +16,15 @@ object AgentRemovalReason {
 
   implicit val formats = Json.format[AgentRemovalReason]
 
-  val otherDetailsLength = 255
+  private val otherDetailsLength = 255
 
-  val otherDetailsRegexRule = regexWithMsg("^[a-zA-Z0-9\\u00C0-\\u00FF !#$%&'‘’\\\"“”«»()*+,./:;=?@\\\\[\\\\]|~£€¥\\\\u005C\\u2014\\u2013\\u2010\\u002d]{1,255}$".r, "err.text.validation")
+  private val otherDetailsRegexRule = regexWithMsg("^[a-zA-Z0-9\\u00C0-\\u00FF !#$%&'‘’\\\"“”«»()*+,./:;=?@\\\\[\\\\]|~£€¥\\\\u005C\\u2014\\u2013\\u2010\\u002d]{1,255}$".r, "err.text.validation")
 
-  val otherDetailsRule = notEmptyStrip andThen
+  private val otherDetailsRule = notEmptyStrip andThen
     notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
     withMessage("error.invalid.maxlength.255") andThen otherDetailsRegexRule
 
-  def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
+  private def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
 
   implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
     (__ \ "removalReason").read[String] andThen toSchemaReasonR flatMap {
