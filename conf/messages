@@ -497,6 +497,7 @@ progress.visuallyhidden.completed = This section has been completed.
 progress.visuallyhidden.start.approx = This section needs starting and will take approximately
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
+progress.visuallyhidden.view.amend = View and amend your information
 
 #### Amendment page ####
 amendment.title = Update your information
@@ -506,7 +507,6 @@ amendment.text.2 = There will be an additional fee to pay if you increase the nu
 amendment.sidebar.heading = Submit amended application
 amendment.sidebar.text = You don’t need to re-submit your application until you’ve made changes to it.
 amendment.sidebar.button.text = Submit amendment
-amendment.view-and-amend = View and amend your information
 
 #### Confirmation page ####
 confirmation.title = You’ve submitted your application
