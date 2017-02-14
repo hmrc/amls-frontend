@@ -1,6 +1,6 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
@@ -42,7 +42,7 @@ trait SummaryController extends RepeatingSection with BaseController {
 object ModelHelpers {
   implicit class removeUrl(model: TradingPremises) {
     def removeUrl(index: Int, complete: Boolean = false): String = model.registeringAgentPremises match {
-      case Some(RegisteringAgentPremises(true)) =>
+      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 =>
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
       case _ =>
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url
