@@ -1,5 +1,6 @@
 package views.tradingpremises
 
+import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -29,7 +30,7 @@ class summarySpec extends ViewTestHelper {
 
     "redirect to the 'remove trading premises' page when 'delete' is clicked" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary(tradingPremises, true)
+      def view = views.html.tradingpremises.summary(tradingPremises, true, SubmissionDecisionApproved)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1, true).url
@@ -49,7 +50,7 @@ class summarySpecRelease7 extends ViewTestHelper {
 
     "redirect to the 'remove trading premises' page when 'delete' is clicked" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary(tradingPremises, true)
+      def view = views.html.tradingpremises.summary(tradingPremises, true, SubmissionDecisionApproved)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1, true).url
