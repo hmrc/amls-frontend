@@ -51,7 +51,7 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
           val result = AgentRemovalReason.formReader.validate(form)
 
-          result must be(Invalid(Seq((Path \ "removalReason", Seq(ValidationError("error.required"))))))
+          result must be(Invalid(Seq((Path \ "removalReason", Seq(ValidationError("tradingpremises.remove_reasons.missing"))))))
 
         }
 
