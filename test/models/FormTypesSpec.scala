@@ -558,7 +558,17 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
         Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
       )
     }
+  }
 
+  "basicPunctuation140CharsPattern" must {
+    "successfully validate a valid name" in {
+      basicPunctuationPattern.validate("FirstName LastName") mustBe Valid("FirstName LastName")
+    }
+    "fail validation when given an invalid name" in {
+      basicPunctuationPattern.validate("FirstName LastName{}") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+    }
   }
 
 }

@@ -13,16 +13,16 @@ object AgentRemovalReason {
 
   import RemovalReasonConstants._
   import utils.MappingUtils.Implicits._
+  import models.FormTypes._
 
   implicit val formats = Json.format[AgentRemovalReason]
 
   private val otherDetailsLength = 255
 
-  private val otherDetailsRegexRule = regexWithMsg("^[a-zA-Z0-9\\u00C0-\\u00FF !#$%&'‘’\\\"“”«»()*+,./:;=?@\\\\[\\\\]|~£€¥\\\\u005C\\u2014\\u2013\\u2010\\u002d]{1,255}$".r, "err.text.validation")
 
   private val otherDetailsRule = notEmptyStrip andThen
     notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
-    withMessage("error.invalid.maxlength.255") andThen otherDetailsRegexRule
+    withMessage("error.invalid.maxlength.255") andThen basicPunctuationPattern
 
   private def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
 
