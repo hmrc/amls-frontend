@@ -1,5 +1,6 @@
 package models.aboutthebusiness
 
+import jto.validation.forms.Rules._
 import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Path, From, Rule, Write}
@@ -62,10 +63,12 @@ object CorrespondenceAddress {
       val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
       val businessNameMaxLength = 120
       val businessNameType =  maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business")
+      val alternativeAddressNameType = notEmptyStrip andThen nameRequired andThen nameType andThen maxLength(nameMaxLength).
+        withMessage("error.invalid.yourname") andThen basicPunctuationPattern
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
             (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
@@ -74,7 +77,7 @@ object CorrespondenceAddress {
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
         case false => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
             (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
