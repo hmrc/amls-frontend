@@ -28,10 +28,10 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
       } yield (tp, status) match {
         case (Some(tradingPremises), SubmissionDecisionApproved) => {
           Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-            tp.yourTradingPremises.fold("")(_.tradingName), true))
+            tp.yourTradingPremises.fold("")(_.tradingName), showDateField = true))
         }
         case (Some(tradingPremises), _) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-          tp.yourTradingPremises.fold("")(_.tradingName), false))
+          tp.yourTradingPremises.fold("")(_.tradingName), showDateField = false))
         case _ => NotFound(notFoundView)
       }
   }

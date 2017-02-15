@@ -1,13 +1,16 @@
 package models.declaration
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.test.FakeApplication
 
 
-class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
+class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
 
   "When the user inputs the data that is posted in the form, the role within business" must {
 
@@ -268,3 +271,5 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
 
 
 }
+
+

@@ -2,15 +2,16 @@ package controllers.declaration
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, InternalAccountant}
-import models.status.{SubmissionReadyForReview, NotCompleted}
+import models.status.{NotCompleted, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -44,7 +45,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
     )
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
-    val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
+    val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
   }
 
   "Declaration get" must {
@@ -153,7 +154,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
     )
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
-    val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
+    val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
   }
 
   "Declaration get" must {
