@@ -88,8 +88,7 @@ error.invalid.bm.business.type = Enter a valid type of business. You can’t ent
 
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
-error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
-error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
+error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
 error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
