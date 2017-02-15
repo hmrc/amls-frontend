@@ -3,7 +3,7 @@ package controllers.tradingpremises
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionStatus}
+import models.status._
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -48,7 +48,7 @@ trait SummaryController extends RepeatingSection with BaseController {
 object ModelHelpers {
   implicit class removeUrl(model: TradingPremises) {
 
-    private def isSubmission(status: SubmissionStatus) = !Seq(SubmissionDecisionApproved, SubmissionDecisionRejected).contains(status)
+    private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 
     def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
       case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) =>
@@ -64,5 +64,6 @@ object SummaryController extends SummaryController {
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
   override val statusService = StatusService
+  // $COVERAGE-ON$
 }
 
