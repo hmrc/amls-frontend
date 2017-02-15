@@ -26,6 +26,19 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
           BusinessAppliedForPSRNumber.formRule.validate(map) must be(Valid(BusinessAppliedForPSRNumberNo))
         }
+
+        "given letters, numbers, spaces and hyphens" in {
+
+          val regNumber = "67-s G"
+
+          val form = Map(
+            "appliedFor" -> Seq("true"),
+            "regNumber" -> Seq(regNumber)
+          )
+
+          BusinessAppliedForPSRNumber.formRule.validate(form) must be(Valid(BusinessAppliedForPSRNumberYes(regNumber)))
+
+        }
       }
 
       "fail validation" when {
@@ -50,28 +63,23 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
             Seq(ValidationError("error.required"))))))
         }
 
-        "given a 'yes' value with an invalid psr number with too many numbers" in {
+        "given a 'yes' value with an invalid psr number with too many characters" in {
           val map = Map("appliedFor" -> Seq("true"),
-            "regNumber" -> Seq("1" * 7))
+            "regNumber" -> Seq("a" * 7))
 
           BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.invalid.msb.psr.number"))))))
         }
 
-        "given a 'yes' value with an invalid psr number with too few numbers" in {
-          val map = Map("appliedFor" -> Seq("true"),
-            "regNumber" -> Seq("1" * 5))
+        "given a 'yes' value with invalid characters in the PSR number" in {
+          val form = Map(
+            "appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("$£%0")
+          )
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
-            Seq(ValidationError("error.invalid.msb.psr.number"))))))
-        }
-
-        "given a 'yes' value with an invalid psr number of the correct length but containing non-numeric characters" in {
-          val map = Map("appliedFor" -> Seq("true"),
-            "regNumber" -> Seq("12ab34"))
-
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
-            Seq(ValidationError("error.invalid.msb.psr.number"))))))
+          BusinessAppliedForPSRNumber.formRule.validate(form) must be(
+            Invalid(Seq(Path \ "regNumber" -> Seq(ValidationError("error.invalid.msb.psr.number"))))
+          )
         }
       }
 
