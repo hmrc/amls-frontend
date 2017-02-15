@@ -18,10 +18,12 @@ object PreviouslyRegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
+
+    val mlrRegNoRegex = "^([0-9]{8})$".r
+
     (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
       case true =>
-        (__ \ "prevMLRRegNo").read(notEmpty.withMessage("error.required.atb.mlr.number")
-          andThen pattern("^([0-9]{8}|[0-9]{15})$".r).withMessage("error.invalid.atb.mlr.number")) map PreviouslyRegisteredYes.apply
+        (__ \ "prevMLRRegNo").read(pattern(mlrRegNoRegex).withMessage("error.invalid.atb.mlr.number")) map PreviouslyRegisteredYes.apply
       case false => Rule.fromMapping { _ => Valid(PreviouslyRegisteredNo) }
     }
   }
