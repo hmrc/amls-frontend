@@ -254,7 +254,7 @@ a.progress-step,
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
-    background-color: #28a197;
+    background-color: #006435;
     border-bottom-color: #088277;
 }
 
@@ -841,7 +841,7 @@ fieldset.panel-indent legend {
 }
 
 .status-list .status-list--complete {
-  background-color: #28a197;
+  background-color: #006435;
   background-position: 96%;
   background-size: 12%;
   color: #fff;
