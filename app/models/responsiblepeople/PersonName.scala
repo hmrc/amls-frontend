@@ -35,7 +35,7 @@ object PersonName {
       (
         (__ \ "firstName").read(firstNameType) ~
         (__ \ "middleName").read(optionR(middleNameType)) ~
-        (__ \ "lastName").read(lastNameType) ~
+        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name")) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>
             (__ \ "previous").read[PreviousName] map Some.apply

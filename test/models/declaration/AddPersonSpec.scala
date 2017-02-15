@@ -59,7 +59,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
-            (Path \ "lastName") -> Seq(ValidationError("error.required")),
+            (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
       }
@@ -213,7 +213,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
-            (Path \ "lastName") -> Seq(ValidationError("error.required")),
+            (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
       }

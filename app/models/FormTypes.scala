@@ -59,7 +59,6 @@ object FormTypes {
   val passportRegex = "^[0-9]{9}+$".r
   private val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u002d]+$".r
 
-
   /** Helper Functions **/
 
   def maxWithMsg(length: Int, msg: String) = maxLength(length).withMessage(msg)
@@ -100,15 +99,18 @@ object FormTypes {
 
   /** Name Rules **/
 
+  private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]{1,35}$".r
+
   private val firstNameRequired = required("error.required.firstname")
   private val firstNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.firstname")
   private val middleNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.middlename")
   private val lastNameRequired = required("error.required.lastname")
-  private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
+//  private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
+  private val lastNameRegexRule = regexWithMsg(commonNameRegex, "err.text.validation")
 
   val firstNameType = firstNameRequired andThen firstNameLength
   val middleNameType = notEmpty andThen middleNameLength
-  val lastNameType = lastNameRequired andThen lastNameLength
+  val lastNameType = lastNameRequired andThen lastNameRegexRule
 
   /** VAT Registration Number Rules **/
 
@@ -236,7 +238,6 @@ object FormTypes {
     .withMessage("error.invalid.bankdetails.sortcode")
     .andThen(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
 
-
   val ukBankAccountNumberType = notEmpty
     .withMessage("error.bankdetails.accountnumber")
     .andThen(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
@@ -261,6 +262,7 @@ object FormTypes {
   val declarationNameType = notEmptyStrip
     .andThen(notEmpty)
     .andThen(maxLength(maxNameTypeLength))
+    .andThen(regexWithMsg(commonNameRegex, "err.text.validation"))
 
   val roleWithinBusinessOtherType = notEmptyStrip
     .andThen(notEmpty)
@@ -269,6 +271,9 @@ object FormTypes {
   val typeOfBusinessType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.required.bm.businesstype.type"))
     .andThen(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
+
+  def genericNameRule(requiredMsg: String) =
+    notEmptyStrip andThen notEmpty.withMessage(requiredMsg) andThen maxLength(maxNameTypeLength) andThen regexWithMsg(commonNameRegex, "err.text.validation")
 
   /** Personal Identification Rules **/
 

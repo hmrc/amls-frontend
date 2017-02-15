@@ -40,8 +40,8 @@ class FormTypesSpec extends PlaySpec {
   }
 
   "fail validation if the last name is more than 35 characters" in {
-    lastNameType.validate("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe") must
-      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
+    lastNameType.validate("a" * 36) must
+      be(Invalid(Seq(Path -> Seq(ValidationError("err.text.validation")))))
   }
 
   "validPostCodeType" must {
@@ -481,12 +481,12 @@ class FormTypesSpec extends PlaySpec {
       declarationNameType.validate(" ") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
     }
 
-    "pass validation if name supplied is 255 characters" in {
-      declarationNameType.validate("1" * maxNameTypeLength) must be(Valid("1" * maxNameTypeLength))
+    "pass validation if name supplied is at, but no more than max length" in {
+      declarationNameType.validate("a" * maxNameTypeLength) must be(Valid("a" * maxNameTypeLength))
     }
 
     "validate other value length supplied" in {
-      declarationNameType.validate("1" * (maxNameTypeLength + 1)) must be(
+      declarationNameType.validate("a" * (maxNameTypeLength + 1)) must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", maxNameTypeLength)))))
     }
   }
