@@ -83,6 +83,18 @@ class BusinessFranchiseControllerSpec extends GenericTestHelper with MockitoSuga
       document.select("span").html() must include(Messages("error.required.ba.is.your.franchise"))
     }
 
+    "on post with invalid data _" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "businessFranchise" -> "true",
+        "franchiseName" -> "test_test1"
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("error-notification").html() must include(Messages("err.text.validation"))
+    }
 
     "on post with valid data in edit mode" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
