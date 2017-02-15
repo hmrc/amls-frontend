@@ -255,7 +255,7 @@ a.progress-step,
 .progress-step__complete:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
     background-color: #006435;
-    border-bottom-color: #088277;
+    border-bottom-color: #01552e;
 }
 
 @media screen and (max-width: 480px) {
