@@ -137,7 +137,7 @@ object FormTypes {
   private val nameRequired = required("error.required.yourname")
   private val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
   private val alternativeAddressNamePattern = regexWithMsg(alternativeAddressNameRegex, "error.invalid.punctuation")
-  val alternativeAddressNameType = nameRequired andThen nameType andThen alternativeAddressNamePattern
+  val alternativeAddressNameType = notEmptyStrip andThen nameRequired andThen nameType andThen alternativeAddressNamePattern
 
   private val phoneNumberRequired = required("error.required.rp.phone")
   private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.rp.phone")
