@@ -5,7 +5,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
-class FormTypesSpec extends PlaySpec {
+class FormTypesSpec extends PlaySpec with CharacterSets {
 
   import FormTypes._
 
@@ -93,8 +93,6 @@ class FormTypesSpec extends PlaySpec {
         )))
     }
   }
-
-
 
   "phoneNumberType" must {
     "successfully validate" in {
