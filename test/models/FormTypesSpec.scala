@@ -565,13 +565,12 @@ class FormTypesSpec extends PlaySpec {
   "basicPunctuation140CharsPattern" must {
 
     "successfully validate a valid name" in {
-      basicPunctuationPattern.validate("FirstName LastName") mustBe Valid("FirstName LastName")
+      basicPunctuationPattern.validate("FirstName LastName^") mustBe Valid("FirstName LastName^")
     }
 
     "successfully validate a valid name with special chars" in {
       basicPunctuationPattern.validate("& - +=1234567890ABCDEZMN.,*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,*%£:;~@")
     }
-
 
     "fail validation when given an invalid name" in {
       basicPunctuationPattern.validate("FirstName LastName{}") must be(Invalid(Seq(
