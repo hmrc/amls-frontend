@@ -215,7 +215,13 @@ a.progress-step,
 }
 
 .progress-step--status-time {
+
     padding: 15px 0 0;
+}
+
+.progress-step--status-time p span {
+  display: block;
+  margin: 0;
 }
 
 /* -- Progress Step: not started -- */
