@@ -18,8 +18,10 @@ object BusinessFranchise {
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
 
-  val maxFranchiseName = 140
-  val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
+  private val maxFranchiseName = 140
+  private val regexPattern = "^[0-9a-zA-Z_]+$".r
+  private val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
+    pattern(regexPattern).withMessage("err.text.validation") andThen
     maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name")
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
