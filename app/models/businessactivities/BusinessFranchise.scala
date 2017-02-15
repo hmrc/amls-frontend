@@ -19,9 +19,8 @@ object BusinessFranchise {
   import utils.MappingUtils.Implicits._
 
   private val maxFranchiseName = 140
-  private val regexPattern = "^[0-9a-zA-Z_]+$".r
   private val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
-    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name") andThen
+    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name") andThen basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._
