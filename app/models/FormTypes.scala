@@ -140,7 +140,6 @@ object FormTypes {
   private val nameMaxLength = 140
   val nameRequired = required("error.required.yourname")
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
-//  val alternativeAddressNameType = notEmptyStrip andThen nameRequired andThen nameType andThen basicPunctuation140CharsPattern
 
   private val phoneNumberRequired = required("error.required.rp.phone")
   private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.rp.phone")
