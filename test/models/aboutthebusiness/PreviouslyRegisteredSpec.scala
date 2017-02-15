@@ -27,25 +27,14 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         PreviouslyRegistered.formRule.validate(data) must
           be(Valid(PreviouslyRegisteredYes("1" * 8)))
       }
-
-      "successfully validate given an `Yes` value with 15 characters" in {
-
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 15)
-        )
-
-        PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes("1" * 15)))
-      }
     }
 
     "fail validation" when {
 
-      "given a 'yes' value with more than 15 characters" in {
+      "given a 'yes' value with more than 8 characters" in {
         val data = Map(
           "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 20)
+          "prevMLRRegNo" -> Seq("1" * 9)
         )
 
         be(Invalid(Seq(
@@ -100,7 +89,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
           PreviouslyRegistered.formRule.validate(data) must
             be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.required.atb.mlr.number"))
+              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
             )))
         }
 
