@@ -15,9 +15,10 @@ object BusinessAppliedForPSRNumber {
 
   import utils.MappingUtils.Implicits._
 
-  private val regNumberRegex = regexWithMsg("^[0-9]{6}$".r, "error.invalid.msb.psr.number")
-  private val registrationNumberType = notEmptyStrip andThen
-    notEmpty.withMessage("error.invalid.msb.psr.number") andThen regNumberRegex
+  private val registrationNumberType = notEmptyStrip
+      .andThen(notEmpty.withMessage("error.invalid.msb.psr.number"))
+      .andThen(maxLength(6).withMessage("error.invalid.msb.psr.number"))
+      .andThen(extendedReferenceNumberRule("error.invalid.msb.psr.number"))
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessAppliedForPSRNumber] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
