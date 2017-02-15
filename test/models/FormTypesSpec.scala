@@ -585,4 +585,26 @@ class FormTypesSpec extends PlaySpec {
     }
   }
 
+  "basicTelephoneNumberPattern1" must {
+
+    "successfully validate a telephone number" in {
+      phoneNumberPattern.validate("(541) 754-3010") must be(Valid("(541) 754-3010"))
+      phoneNumberPattern.validate("+1-541-754-3010") must be(Valid("+1-541-754-3010"))
+      phoneNumberPattern.validate("1-541-754-3010") must be(Valid("1-541-754-3010"))
+      phoneNumberPattern.validate("001-541-754-3010") must be(Valid("001-541-754-3010"))
+      phoneNumberPattern.validate("+44 22 2222 2222") must be(Valid("+44 22 2222 2222"))
+    }
+
+    "fail validation on invalid number" in {
+      phoneNumberPattern.validate("(541) *754-3010") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.invalid.phone.number"))
+      )))
+
+      phoneNumberPattern.validate("AAAAAA_&^G") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.invalid.phone.number"))
+      )))
+    }
+
+  }
+
 }

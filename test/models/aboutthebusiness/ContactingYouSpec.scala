@@ -87,7 +87,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
 
         ContactingYouForm.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.phone"))
+            (Path \ "phoneNumber") -> Seq(ValidationError("err.invalid.phone.number"))
           )))
       }
     }

@@ -80,7 +80,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         )
         ContactDetails.formReads.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.phone"))
+            (Path \ "phoneNumber") -> Seq(ValidationError("err.invalid.phone.number"))
           )))
       }
 
