@@ -569,7 +569,7 @@ class FormTypesSpec extends PlaySpec {
     }
 
     "successfully validate a valid name with special chars" in {
-      basicPunctuationPattern.validate("& - +=1234567890ABCDEZMN.,*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,*%£:;~@")
+      basicPunctuationPattern.validate("& - +=1234567890ABCDEZMN.,_*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,_*%£:;~@")
     }
 
     "fail validation when given an invalid name" in {
@@ -580,12 +580,6 @@ class FormTypesSpec extends PlaySpec {
 
     "fail validation when given an invalid name with <>" in {
       basicPunctuationPattern.validate("FirstName LastName<>") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
-    }
-
-    "fail validation when given an invalid name with _" in {
-      basicPunctuationPattern.validate("test_test1") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
     }
