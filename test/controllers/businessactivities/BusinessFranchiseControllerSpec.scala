@@ -86,7 +86,7 @@ class BusinessFranchiseControllerSpec extends GenericTestHelper with MockitoSuga
     "on post with invalid data _" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "businessFranchise" -> "true",
-        "franchiseName" -> "test_test1"
+        "franchiseName" -> "test{}test1"
       )
 
       val result = controller.post()(newRequest)
