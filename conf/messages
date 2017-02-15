@@ -433,7 +433,7 @@ status.submissiondecisionapproved.description2 = Your business is now registered
 status.submissiondecisionrejected.heading = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
-status.amendment.edit = update your information
+status.amendment.edit = update or view your information
 status.fee.link = If you haven’t paid the fee
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
@@ -500,7 +500,7 @@ progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
 
 #### Amendment page ####
-amendment.title = Update your information
+amendment.title = Update or view your information
 amendment.section-heading = Your registration
 amendment.text.1 = If something has changed in your business which is relevant to Money Laundering Regulations, you must amend and re-submit your application for anti-money laudering supervision.
 amendment.text.2 = There will be an additional fee to pay if you increase the number of responsible people or trading premises.
