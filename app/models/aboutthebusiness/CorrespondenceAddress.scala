@@ -1,5 +1,6 @@
 package models.aboutthebusiness
 
+import jto.validation.forms.Rules._
 import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Path, From, Rule, Write}
@@ -62,6 +63,8 @@ object CorrespondenceAddress {
       val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
       val businessNameMaxLength = 120
       val businessNameType =  maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business")
+      val alternativeAddressNameType = notEmptyStrip andThen nameRequired andThen nameType andThen maxLength(nameMaxLength).
+        withMessage("error.invalid.yourname") andThen basicPunctuationPattern
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
