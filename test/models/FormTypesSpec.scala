@@ -372,13 +372,18 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
   "accountName" must {
 
-    "must be mandatory" in {
+    "be mandatory" in {
       accountNameType.validate("") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
     }
 
-    "be not more than 40 characters" in {
-      accountNameType.validate("This name is definitely longer than 40 characters.") must be(
+    "accept all characters from the allowed set" in {
+      println(">>>>>" + tradingNames.size)
+      accountNameType.validate(tradingNames.toString) must be(Valid(tradingNames.toString))
+    }
+
+    "be not more than 171 characters" in {
+      accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
       )
     }
