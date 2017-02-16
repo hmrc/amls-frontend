@@ -54,6 +54,20 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
+    "show an error with a missing details value" in {
+      val form = Map("services[]" -> Seq("08"), "details" -> Seq(""))
+      val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("error.required.tcsp.provided_services.details"))))
+
+      ProvidedServices.formReads.validate(form) must be(expectedResult)
+    }
+
+    "show an error with an invalid details value" in {
+      val form = Map("services[]" -> Seq("08"), "details" -> Seq("$3<>7485/45"))
+      val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("err.text.validation"))))
+
+      ProvidedServices.formReads.validate(form) must be(expectedResult)
+    }
+
 
   }
 
