@@ -103,15 +103,8 @@ object FormTypes {
   private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]{1,35}$".r
   val commonNameRegexRule = regexWithMsg(commonNameRegex, "err.text.validation")
 
-//  private val firstNameRequired = required("error.required.firstname")
-//  private val firstNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.firstname")
   private val middleNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.middlename")
-//  private val lastNameRequired = required("error.required.rp.last_name")
-//  private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
-
-//  val firstNameType = firstNameRequired andThen firstNameLength andThen commonNameRegexRule
   val middleNameType = notEmpty andThen middleNameLength
-//  val lastNameType = lastNameRequired andThen lastNameLength andThen commonNameRegexRule
 
   /** VAT Registration Number Rules **/
 
