@@ -5,7 +5,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
-class FormTypesSpec extends PlaySpec {
+class FormTypesSpec extends PlaySpec with CharacterSets {
 
   import FormTypes._
 
@@ -366,14 +366,31 @@ class FormTypesSpec extends PlaySpec {
 
   "accountName" must {
 
-    "must be mandatory" in {
+    "be mandatory" in {
       accountNameType.validate("") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
     }
 
+    "accept all characters from the allowed set" in {
+      accountNameType.validate(digits.mkString("")) must be(Valid(digits.mkString("")))
+      accountNameType.validate(alphaUpper.mkString("")) must be(Valid(alphaUpper.mkString("")))
+      accountNameType.validate(alphaLower.mkString("")) must be(Valid(alphaLower.mkString("")))
+      accountNameType.validate(extendedAlphaUpper.mkString("")) must be(Valid(extendedAlphaUpper.mkString("")))
+      accountNameType.validate(extendedAlphaLower.mkString("")) must be(Valid(extendedAlphaLower.mkString("")))
+      accountNameType.validate(symbols1.mkString("")) must be(Valid(symbols1.mkString("")))
+      accountNameType.validate(symbols2.mkString("")) must be(Valid(symbols2.mkString("")))
+      accountNameType.validate(symbols6.mkString("")) must be(Valid(symbols6.mkString("")))
+    }
+
     "be not more than 40 characters" in {
-      accountNameType.validate("This name is definitely longer than 40 characters.") must be(
+      accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
+      )
+    }
+
+    "not allow characters from other sets" in {
+      accountNameType.validate(symbols5.mkString("")) must be (
+        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
       )
     }
   }
