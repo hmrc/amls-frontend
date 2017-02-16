@@ -204,6 +204,7 @@ error.required.rp.otherfirstnames = Enter all other first names.
 error.required.rp.otherlastnames = Enter all other last names.
 error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
 error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
+error.required.rp.first_name = Enter the responsible person’'s first name
 error.required.rp.last_name = Enter the responsible person''s last name
 error.rp.previous.invalid = Enter responsible person'’s previous name
 error.required.rp.otherNames = Enter an alternative name.
@@ -286,6 +287,7 @@ error.required.hvd.percentage = Select how much of your turnover you expect to c
 
 ################################# Declaration #####################################
 error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’.
+error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 
 ########################################################################################################################

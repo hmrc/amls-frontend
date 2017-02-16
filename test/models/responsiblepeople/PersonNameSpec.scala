@@ -79,7 +79,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "hasOtherNames" -> Seq("")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
           (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name")),
           (Path \ "hasPreviousName") -> Seq(ValidationError("error.required.rp.hasPreviousName")),
           (Path \ "hasOtherNames") -> Seq(ValidationError("error.required.rp.hasOtherNames"))
@@ -103,7 +103,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "otherNames" -> Seq("")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
           (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name")),
           (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
           (Path \ "previous" \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
@@ -114,7 +114,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
     "fail to validate because of input length" in {
 
       val data = Map(
-        "firstName" -> Seq("John" * 20),
+        "firstName" -> Seq("John" * 36),
         "middleName" -> Seq("John" * 20),
         "lastName" -> Seq("Doe" * 36),
         "hasPreviousName" -> Seq("true"),
@@ -132,10 +132,10 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         equal(Invalid(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
           (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "lastName") -> Seq(ValidationError("error.maxLength", maxNameTypeLength)),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname", maxNameTypeLength)),
           (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
           (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.maxLength", maxNameTypeLength)),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname", maxNameTypeLength)),
           (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
         )))
     }

@@ -58,7 +58,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
         )
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.required")),
+            (Path \ "firstName") -> Seq(ValidationError("error.required.declaration.first_name")),
             (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
@@ -113,8 +113,8 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
-            (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname", 35)),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname", 35))
           )))
       }
     }
@@ -212,7 +212,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         )
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.required")),
+            (Path \ "firstName") -> Seq(ValidationError("error.required.declaration.first_name")),
             (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
@@ -267,8 +267,8 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
-            (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname", 35)),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname", 35))
           )))
       }
     }

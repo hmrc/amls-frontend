@@ -9,19 +9,6 @@ class FormTypesSpec extends PlaySpec {
 
   import FormTypes._
 
-  "successfully validate the first name" in {
-    firstNameType.validate("John") must be(Valid("John"))
-  }
-
-  "fail validation if the first name is not provided" in {
-    firstNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
-  }
-
-  "fail validation if the first name is more than 35 characters" in {
-    firstNameType.validate("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohn") must
-      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
-  }
-
   "successfully validate the middle name" in {
     middleNameType.validate("John") must be(Valid("John"))
   }
@@ -29,19 +16,6 @@ class FormTypesSpec extends PlaySpec {
   "fail validation if the middle name is more than 35 characters" in {
     middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
       be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
-  }
-
-  "successfully validate the last name" in {
-    lastNameType.validate("Doe") must be(Valid("Doe"))
-  }
-
-  "fail validation if the last name is not provided" in {
-    lastNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
-  }
-
-  "fail validation if the last name is more than 35 characters" in {
-    lastNameType.validate("a" * 36) must
-      be(Invalid(Seq(Path -> Seq(ValidationError("err.text.validation")))))
   }
 
   "validPostCodeType" must {

@@ -101,17 +101,17 @@ object FormTypes {
   /** Name Rules **/
 
   private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]{1,35}$".r
+  val commonNameRegexRule = regexWithMsg(commonNameRegex, "err.text.validation")
 
-  private val firstNameRequired = required("error.required.firstname")
-  private val firstNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.firstname")
+//  private val firstNameRequired = required("error.required.firstname")
+//  private val firstNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.firstname")
   private val middleNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.middlename")
-  private val lastNameRequired = required("error.required.lastname")
+//  private val lastNameRequired = required("error.required.rp.last_name")
 //  private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
-  private val lastNameRegexRule = regexWithMsg(commonNameRegex, "err.text.validation")
 
-  val firstNameType = firstNameRequired andThen firstNameLength
+//  val firstNameType = firstNameRequired andThen firstNameLength andThen commonNameRegexRule
   val middleNameType = notEmpty andThen middleNameLength
-  val lastNameType = lastNameRequired andThen lastNameRegexRule
+//  val lastNameType = lastNameRequired andThen lastNameLength andThen commonNameRegexRule
 
   /** VAT Registration Number Rules **/
 
@@ -273,8 +273,12 @@ object FormTypes {
     .andThen(notEmpty.withMessage("error.required.bm.businesstype.type"))
     .andThen(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
 
-  def genericNameRule(requiredMsg: String) =
-    notEmptyStrip andThen notEmpty.withMessage(requiredMsg) andThen maxLength(maxNameTypeLength) andThen regexWithMsg(commonNameRegex, "err.text.validation")
+
+  def genericNameRule(requiredMsg: String, maxLengthMsg: String = "error.maxLength") =
+    notEmptyStrip
+      .andThen(notEmpty.withMessage(requiredMsg))
+      .andThen(maxLength(maxNameTypeLength).withMessage(maxLengthMsg))
+      .andThen(commonNameRegexRule)
 
   /** Personal Identification Rules **/
 

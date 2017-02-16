@@ -55,9 +55,9 @@ object PreviousName {
       }
 
       (((
-        (__ \ "firstName").read(optionR(firstNameType)) ~
+        (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name", "error.invalid.length.firstname"))) ~
         (__ \ "middleName").read(optionR(middleNameType)) ~
-        (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
+        (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name", "error.invalid.length.lastname")))
       ).tupled andThen iR) ~ (
         (__ \ "date").read(localDateRule)
       ))(builder)
