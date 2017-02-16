@@ -34,8 +34,9 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
           "United Kingdom"))
       }
     }
+  }
 
-    "Form validation" must {
+    "CorrespondenceAddress Form validation" must {
       "throw error when mandatory fields are missing" in {
         CorrespondenceAddress.formRule.validate(Map.empty) must be
         Invalid(Seq(
@@ -133,7 +134,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
             )))
         }
 
-        "fail to validation for not filling non UK mandatory field represented by empty string" in {
+        "fail validation for not filling non UK mandatory field represented by empty string" in {
           val data = Map(
             "isUK" -> Seq("false"),
             "yourName" -> Seq(""),
@@ -195,7 +196,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
 
     }
 
-  }
+
 
   val DefaultYourName = "Default Your Name"
   val DefaultBusinessName = "Default Business Name"
