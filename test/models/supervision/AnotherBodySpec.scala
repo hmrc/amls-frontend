@@ -51,6 +51,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         )
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
+
       "given invalid characters" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
@@ -67,6 +68,27 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         val expected = Invalid(
               Seq((Path \ "endingReason") -> Seq(ValidationError("err.text.validation")))
           )
+
+        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
+
+      }
+
+      "given only spaces" in {
+        val urlFormEncoded = Map(
+          "anotherBody" -> Seq("true"),
+          "supervisorName" -> Seq("Name"),
+          "startDate.day" -> Seq("24"),
+          "startDate.month" -> Seq("2"),
+          "startDate.year" -> Seq("1990"),
+          "endDate.day" -> Seq("24"),
+          "endDate.month" -> Seq("2"),
+          "endDate.year" -> Seq("1998"),
+          "endingReason" -> Seq("  ")
+        )
+
+        val expected = Invalid(
+          Seq((Path \ "endingReason") -> Seq(ValidationError("error.required.supervision.reason")))
+        )
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
 
