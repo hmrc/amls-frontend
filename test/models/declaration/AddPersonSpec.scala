@@ -120,6 +120,23 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
           )))
       }
 
+      "firstName, middle name or lastName contain invalid characters" in {
+
+        val urlFormEncoded = Map(
+          "firstName" -> Seq("(SDF904)"),
+          "lastName" -> Seq("$()%LKDf"),
+          "middleName" -> Seq("89548594"),
+          "roleWithinBusiness" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(urlFormEncoded) must
+          be(Invalid(Seq(
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+          )))
+      }
+
     }
   }
 

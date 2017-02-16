@@ -148,9 +148,9 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "hasOtherNames" -> Seq("false")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "middleName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "lastName") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
         )))
 
     }
@@ -172,12 +172,12 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "otherNames" -> Seq("false")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "middleName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "lastName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "previous" \ "firstName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "previous" \ "middleName") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "previous" \ "lastName") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
         )))
     }
   }
