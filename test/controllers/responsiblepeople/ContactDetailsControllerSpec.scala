@@ -74,6 +74,26 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(1).url))
     }
 
+     "fail submission on invalid phone number" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "phoneNumber" -> "<077>02745869",
+        "emailAddress" -> "test@test.com"
+      )
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+      when(controller.dataCacheConnector.save[ContactDetails](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1)(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("error-notification").html() must include(Messages("err.invalid.phone.number"))
+    }
+
     "on post with missing phone data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -110,7 +130,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      contentAsString(result) must include(Messages("error.invalid.rp.phone"))
+      contentAsString(result) must include(Messages("err.invalid.phone.number"))
     }
 
     "on post with invalid email data" in new Fixture {
@@ -137,7 +157,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#phoneNumber]").text() must include(Messages("error.max.length.rp.phone"))
+      document.select("a[href=#phoneNumber]").text() must include(Messages("error.max.length.phone"))
     }
 
     "on post with greater than max length email data" in new Fixture {

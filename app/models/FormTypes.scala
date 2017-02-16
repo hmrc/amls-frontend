@@ -33,7 +33,7 @@ object FormTypes {
   /** Regex **/
 
   val vrnTypeRegex = "^[0-9]{9}$".r
-  val phoneNumberRegex = "[0-9()+\\- ]+".r
+  val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
   val emailRegex = ("^.+" + //Any character 1 or more times
     "@" + //@ symbol
     "(" + //start of DNS label group
@@ -139,8 +139,8 @@ object FormTypes {
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
 
   private val phoneNumberRequired = required("error.required.rp.phone")
-  private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.rp.phone")
-  private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "error.invalid.rp.phone")
+  private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.phone")
+  val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 
   private val emailRequired = required("error.required.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")

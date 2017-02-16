@@ -72,6 +72,9 @@ error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
 error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
 
+error.required.rp.phone = Enter a contact phone number.
+err.invalid.phone.number = Enter a valid contact phone number
+error.max.length.phone = You can’t enter more than 24 characters for the phone number.
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 
@@ -185,9 +188,6 @@ error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
-error.required.rp.phone = Enter a contact phone number.
-error.invalid.rp.phone = You’ve used an invalid character in this phone number. You can only use numbers, spaces, brackets, plus(+)  and dash(-) .
-error.max.length.rp.phone = You can’t enter more than 24 characters for the phone number.
 error.required.rp.email = Enter an email address.
 error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.

@@ -4,12 +4,14 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, RegisteredOfficeUK}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -108,6 +110,28 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
+      }
+
+      "fail validation on invalid phone number" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "phoneNumber" -> "+44 (0)123 456_7890",
+          "email" -> "test@test.com",
+          "website" -> "website",
+          "letterToThisAddress" -> "true"
+        )
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document  = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("error-notification").html() must include(Messages("err.invalid.phone.number"))
       }
 
 
