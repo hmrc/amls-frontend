@@ -68,8 +68,6 @@ class FormTypesSpec extends PlaySpec {
     }
   }
 
-
-
   "phoneNumberType" must {
     "successfully validate" in {
 
@@ -92,6 +90,26 @@ class FormTypesSpec extends PlaySpec {
           Path -> Seq(ValidationError("error.max.length.rp.phone"))
         )))
     }
+  }
+
+  "generic common name rule" must {
+
+    "pass with a normal name" in {
+      genericNameRule("required error", "length error").validate("Joe Bloggs") must be(Valid("Joe Bloggs"))
+    }
+
+    "fail with a name with invalid characters" in {
+      genericNameRule("required error", "length error").validate("*($£OKFDF") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+      )
+    }
+
+    "fail with a name that's too long" in {
+      genericNameRule("required error", "length error").validate("d" * 36) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("length error"))))
+      )
+    }
+
   }
 
   "emailType" must {
