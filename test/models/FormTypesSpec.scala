@@ -100,7 +100,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "fail with a name with invalid characters" in {
       genericNameRule("required error", "length error").validate("*($£OKFDF") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.common_name.validation"))))
       )
     }
 

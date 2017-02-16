@@ -46,9 +46,9 @@ object AddPerson {
     }
 
     (
-      (__ \ "firstName").read(genericNameRule("error.required.declaration.first_name", "error.invalid.length.firstname")) ~
-        (__ \ "middleName").read(optionR(declarationNameType)) ~
-        (__ \ "lastName").read(genericNameRule("error.required.declaration.last_name", "error.invalid.length.lastname")) ~
+      (__ \ "firstName").read(genericNameRule("error.required.declaration.first_name")) ~
+        (__ \ "middleName").read(optionR(genericNameRule())) ~
+        (__ \ "lastName").read(genericNameRule("error.required.declaration.last_name")) ~
         roleReader
       ) (AddPerson.apply)
   }

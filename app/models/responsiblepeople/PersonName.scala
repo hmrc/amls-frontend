@@ -33,9 +33,9 @@ object PersonName {
           maxWithMsg(otherNamesLength, "error.invalid.length.otherNames")
 
       (
-        (__ \ "firstName").read(genericNameRule("error.required.rp.first_name", "error.invalid.length.firstname")) ~
-        (__ \ "middleName").read(optionR(middleNameType)) ~
-        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name", "error.invalid.length.lastname")) ~
+        (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~
+        (__ \ "middleName").read(optionR(genericNameRule())) ~
+        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name")) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>
             (__ \ "previous").read[PreviousName] map Some.apply
