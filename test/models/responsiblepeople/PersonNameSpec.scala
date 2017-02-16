@@ -1,11 +1,9 @@
 package models.responsiblepeople
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import models.FormTypes._
 
 @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class PersonNameSpec extends PlaySpec with MockitoSugar {
@@ -115,11 +113,11 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "firstName" -> Seq("John" * 36),
-        "middleName" -> Seq("John" * 20),
+        "middleName" -> Seq("John" * 36),
         "lastName" -> Seq("Doe" * 36),
         "hasPreviousName" -> Seq("true"),
-        "previous.firstName" -> Seq("Marty" * 20),
-        "previous.middleName" -> Seq("Mc" * 20),
+        "previous.firstName" -> Seq("Marty" * 36),
+        "previous.middleName" -> Seq("Mc" * 36),
         "previous.lastName" -> Seq("Fly" * 36),
         "hasOtherNames" -> Seq("true"),
         "otherNames" -> Seq("D" * 141),
@@ -137,6 +135,49 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
           (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
           (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
           (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
+        )))
+    }
+
+    "fail validation when fields have invalid characters (minimal)" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq("(£*$"),
+        "middleName" -> Seq("£*$(£IOKd"),
+        "lastName" -> Seq("(£$ *(£ $"),
+        "hasPreviousName" -> Seq("false"),
+        "hasOtherNames" -> Seq("false")
+      )) must
+        equal(Invalid(Seq(
+          (Path \ "firstName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("err.text.validation"))
+        )))
+
+    }
+
+    "fail validation when fields have invalid characters (full)" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq("92)(OELer"),
+        "middleName" -> Seq("£*($*)(ERKLFD "),
+        "lastName" -> Seq("9*£@$"),
+        "hasPreviousName" -> Seq("true"),
+        "hasOtherNames" -> Seq("true"),
+        "previous.date.year" -> Seq("2005"),
+        "previous.date.month" -> Seq("1"),
+        "previous.date.day" -> Seq("1"),
+        "previous.firstName" -> Seq("($£*£$"),
+        "previous.middleName" -> Seq(")£(@$)$( "),
+        "previous.lastName" -> Seq("$&£@$*&$%&$"),
+        "otherNames" -> Seq("false")
+      )) must
+        equal(Invalid(Seq(
+          (Path \ "firstName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("err.text.validation"))
         )))
     }
   }

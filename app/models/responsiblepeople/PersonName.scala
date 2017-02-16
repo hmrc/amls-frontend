@@ -34,7 +34,7 @@ object PersonName {
 
       (
         (__ \ "firstName").read(genericNameRule("error.required.rp.first_name", "error.invalid.length.firstname")) ~
-        (__ \ "middleName").read(optionR(middleNameType)) ~
+        (__ \ "middleName").read(optionR(genericNameRule(maxLengthMsg = "error.invalid.length.middlename"))) ~
         (__ \ "lastName").read(genericNameRule("error.required.rp.last_name", "error.invalid.length.lastname")) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>

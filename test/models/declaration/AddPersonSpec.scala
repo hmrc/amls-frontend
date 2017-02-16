@@ -103,17 +103,19 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
           )))
       }
 
-      "firstName or lastName are more than the required length (preRelease7)" in {
+      "firstName, middle name or lastName are more than the required length (preRelease7)" in {
 
         val urlFormEncoded = Map(
           "firstName" -> Seq("a" * 36),
           "lastName" -> Seq("b" * 36),
+          "middleName" -> Seq("c" * 36),
           "roleWithinBusiness" -> Seq("01")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
             (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
           )))
       }
@@ -258,17 +260,19 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           )))
       }
 
-      "firstName or lastName are more than the required length" in {
+      "firstName, middle name or lastName are more than the required length" in {
 
         val urlFormEncoded = Map(
           "firstName" -> Seq("a" * 36),
           "lastName" -> Seq("b" * 36),
+          "middleName" -> Seq("c" * 36),
           "roleWithinBusiness" -> Seq("BeneficialShareholder")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
             (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
           )))
       }
