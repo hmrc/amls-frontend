@@ -13,7 +13,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import scala.collection.JavaConversions._
 import play.api.test.Helpers.{status => hstatus, _}
