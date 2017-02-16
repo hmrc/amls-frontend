@@ -75,8 +75,7 @@ error.survey.satisfaction.required = Select one option to answer the question: h
 
 error.required.rp.phone = Enter a contact phone number.
 err.invalid.phone.number = Enter a valid contact phone number
-#err.invalid.phone.number = You’ve used an invalid character in this phone number. You can only use numbers, spaces, brackets, plus(+)  and dash(-) .
-error.max.length.rp.phone = You can’t enter more than 24 characters for the phone number.
+error.max.length.phone = You can’t enter more than 24 characters for the phone number.
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 

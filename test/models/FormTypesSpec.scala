@@ -115,7 +115,7 @@ class FormTypesSpec extends PlaySpec {
 
       phoneNumberType.validate("1" * 31) must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.max.length.rp.phone"))
+          Path -> Seq(ValidationError("error.max.length.phone"))
         )))
     }
   }
