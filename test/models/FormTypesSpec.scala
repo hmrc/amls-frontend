@@ -9,19 +9,6 @@ class FormTypesSpec extends PlaySpec {
 
   import FormTypes._
 
-  "successfully validate the first name" in {
-    firstNameType.validate("John") must be(Valid("John"))
-  }
-
-  "fail validation if the first name is not provided" in {
-    firstNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
-  }
-
-  "fail validation if the first name is more than 35 characters" in {
-    firstNameType.validate("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohn") must
-      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
-  }
-
   "successfully validate the middle name" in {
     middleNameType.validate("John") must be(Valid("John"))
   }
@@ -29,19 +16,6 @@ class FormTypesSpec extends PlaySpec {
   "fail validation if the middle name is more than 35 characters" in {
     middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
       be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
-  }
-
-  "successfully validate the last name" in {
-    lastNameType.validate("Doe") must be(Valid("Doe"))
-  }
-
-  "fail validation if the last name is not provided" in {
-    lastNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
-  }
-
-  "fail validation if the last name is more than 35 characters" in {
-    lastNameType.validate("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe") must
-      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
   }
 
   "validPostCodeType" must {
@@ -94,8 +68,6 @@ class FormTypesSpec extends PlaySpec {
     }
   }
 
-
-
   "phoneNumberType" must {
     "successfully validate" in {
 
@@ -118,6 +90,26 @@ class FormTypesSpec extends PlaySpec {
           Path -> Seq(ValidationError("error.max.length.rp.phone"))
         )))
     }
+  }
+
+  "generic common name rule" must {
+
+    "pass with a normal name" in {
+      genericNameRule("required error", "length error").validate("Joe Bloggs") must be(Valid("Joe Bloggs"))
+    }
+
+    "fail with a name with invalid characters" in {
+      genericNameRule("required error", "length error").validate("*($£OKFDF") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+      )
+    }
+
+    "fail with a name that's too long" in {
+      genericNameRule("required error", "length error").validate("d" * 36) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("length error"))))
+      )
+    }
+
   }
 
   "emailType" must {
@@ -481,12 +473,12 @@ class FormTypesSpec extends PlaySpec {
       declarationNameType.validate(" ") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
     }
 
-    "pass validation if name supplied is 255 characters" in {
-      declarationNameType.validate("1" * maxNameTypeLength) must be(Valid("1" * maxNameTypeLength))
+    "pass validation if name supplied is at, but no more than max length" in {
+      declarationNameType.validate("a" * maxNameTypeLength) must be(Valid("a" * maxNameTypeLength))
     }
 
     "validate other value length supplied" in {
-      declarationNameType.validate("1" * (maxNameTypeLength + 1)) must be(
+      declarationNameType.validate("a" * (maxNameTypeLength + 1)) must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", maxNameTypeLength)))))
     }
   }
