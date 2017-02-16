@@ -114,9 +114,26 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
+          )))
+      }
+
+      "firstName, middle name or lastName contain invalid characters" in {
+
+        val urlFormEncoded = Map(
+          "firstName" -> Seq("(SDF904)"),
+          "lastName" -> Seq("$()%LKDf"),
+          "middleName" -> Seq("89548594"),
+          "roleWithinBusiness" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(urlFormEncoded) must
+          be(Invalid(Seq(
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
           )))
       }
 
@@ -271,9 +288,9 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
     }
