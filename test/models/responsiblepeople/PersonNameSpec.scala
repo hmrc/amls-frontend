@@ -1,10 +1,9 @@
 package models.responsiblepeople
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 
 @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class PersonNameSpec extends PlaySpec with MockitoSugar {
@@ -78,8 +77,8 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "hasOtherNames" -> Seq("")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
-          (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
+          (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name")),
           (Path \ "hasPreviousName") -> Seq(ValidationError("error.required.rp.hasPreviousName")),
           (Path \ "hasOtherNames") -> Seq(ValidationError("error.required.rp.hasOtherNames"))
         )))
@@ -102,8 +101,8 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "otherNames" -> Seq("")
       )) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
-          (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
+          (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name")),
           (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
           (Path \ "previous" \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
           (Path \ "otherNames") -> Seq(ValidationError("error.required.rp.otherNames"))
@@ -113,13 +112,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
     "fail to validate because of input length" in {
 
       val data = Map(
-        "firstName" -> Seq("John" * 20),
-        "middleName" -> Seq("John" * 20),
-        "lastName" -> Seq("Doe" * 20),
+        "firstName" -> Seq("John" * 36),
+        "middleName" -> Seq("John" * 36),
+        "lastName" -> Seq("Doe" * 36),
         "hasPreviousName" -> Seq("true"),
-        "previous.firstName" -> Seq("Marty" * 20),
-        "previous.middleName" -> Seq("Mc" * 20),
-        "previous.lastName" -> Seq("Fly" * 20),
+        "previous.firstName" -> Seq("Marty" * 36),
+        "previous.middleName" -> Seq("Mc" * 36),
+        "previous.lastName" -> Seq("Fly" * 36),
         "hasOtherNames" -> Seq("true"),
         "otherNames" -> Seq("D" * 141),
         "previous.date.year" -> Seq("1990"),
@@ -129,13 +128,56 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
       PersonName.formRule.validate(data) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-          (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
-          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length")),
           (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
+        )))
+    }
+
+    "fail validation when fields have invalid characters (minimal)" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq("(£*$"),
+        "middleName" -> Seq("£*$(£IOKd"),
+        "lastName" -> Seq("(£$ *(£ $"),
+        "hasPreviousName" -> Seq("false"),
+        "hasOtherNames" -> Seq("false")
+      )) must
+        equal(Invalid(Seq(
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+        )))
+
+    }
+
+    "fail validation when fields have invalid characters (full)" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq("92)(OELer"),
+        "middleName" -> Seq("£*($*)(ERKLFD "),
+        "lastName" -> Seq("9*£@$"),
+        "hasPreviousName" -> Seq("true"),
+        "hasOtherNames" -> Seq("true"),
+        "previous.date.year" -> Seq("2005"),
+        "previous.date.month" -> Seq("1"),
+        "previous.date.day" -> Seq("1"),
+        "previous.firstName" -> Seq("($£*£$"),
+        "previous.middleName" -> Seq(")£(@$)$( "),
+        "previous.lastName" -> Seq("$&£@$*&$%&$"),
+        "otherNames" -> Seq("false")
+      )) must
+        equal(Invalid(Seq(
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
         )))
     }
   }

@@ -59,17 +59,24 @@ object CorrespondenceAddress {
       import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
+
       val nameMaxLength = 140
-      val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
       val businessNameMaxLength = 120
-      val businessNameType =  maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business")
-      val alternativeAddressNameType = notEmptyStrip andThen nameRequired andThen nameType andThen maxLength(nameMaxLength).
-        withMessage("error.invalid.yourname") andThen basicPunctuationPattern
+
+      val alternativeAddressNameType = notEmptyStrip andThen
+        nameRequired andThen
+        maxLength(nameMaxLength).withMessage("error.invalid.yourname") andThen
+        basicPunctuationPattern
+
+      val alternativeAddressTradingNameType = notEmptyStrip andThen
+        required("error.required.name.of.business") andThen
+        maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
+        basicPunctuationPattern
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
             (__ \ "yourName").read(alternativeAddressNameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "businessName").read(alternativeAddressTradingNameType) ~
             (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
@@ -78,7 +85,7 @@ object CorrespondenceAddress {
           )(UKCorrespondenceAddress.apply _)
         case false => (
             (__ \ "yourName").read(alternativeAddressNameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "businessName").read(alternativeAddressTradingNameType) ~
             (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~

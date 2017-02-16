@@ -58,8 +58,8 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
         )
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.required")),
-            (Path \ "lastName") -> Seq(ValidationError("error.required")),
+            (Path \ "firstName") -> Seq(ValidationError("error.required.declaration.first_name")),
+            (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
       }
@@ -103,20 +103,40 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
           )))
       }
 
-      "firstName or lastName are more than the required length (preRelease7)" in {
+      "firstName, middle name or lastName are more than the required length (preRelease7)" in {
 
         val urlFormEncoded = Map(
           "firstName" -> Seq("a" * 36),
           "lastName" -> Seq("b" * 36),
+          "middleName" -> Seq("c" * 36),
           "roleWithinBusiness" -> Seq("01")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
-            (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
+
+      "firstName, middle name or lastName contain invalid characters" in {
+
+        val urlFormEncoded = Map(
+          "firstName" -> Seq("(SDF904)"),
+          "lastName" -> Seq("$()%LKDf"),
+          "middleName" -> Seq("89548594"),
+          "roleWithinBusiness" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(urlFormEncoded) must
+          be(Invalid(Seq(
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+          )))
+      }
+
     }
   }
 
@@ -212,8 +232,8 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         )
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.required")),
-            (Path \ "lastName") -> Seq(ValidationError("error.required")),
+            (Path \ "firstName") -> Seq(ValidationError("error.required.declaration.first_name")),
+            (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
           )))
       }
@@ -257,18 +277,20 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           )))
       }
 
-      "firstName or lastName are more than the required length" in {
+      "firstName, middle name or lastName are more than the required length" in {
 
         val urlFormEncoded = Map(
           "firstName" -> Seq("a" * 36),
           "lastName" -> Seq("b" * 36),
+          "middleName" -> Seq("c" * 36),
           "roleWithinBusiness" -> Seq("BeneficialShareholder")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
-            (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
     }
