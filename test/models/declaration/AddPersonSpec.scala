@@ -114,9 +114,9 @@ class AddPersonSpec extends PlaySpec with MockitoSugar with OneAppPerSuite{
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
 
@@ -288,9 +288,9 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
     }

@@ -35,15 +35,13 @@ error.required.nationality = Select the nationality of the responsible person.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
 error.required.firstname = Enter a first name.
-error.invalid.length.firstname = You can’t enter more than 35 characters
-error.invalid.length.middlename = You can’t enter more than 35 characters
-error.invalid.length.lastname = You can’t enter more than 35 characters
 error.required.lastname = Enter a last name.
 error.required.otherfirstnames = Enter all other first names.
 error.required.otherlastnames = Enter all other last names.
 error.required.yourname = Enter your name
 error.invalid.yourname = You can’t enter more than 140 characters for your name
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
+error.invalid.common_name.length = You can’t enter more than 35 characters
 
 error.required.vat.number = Enter a VAT registration number.
 error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers

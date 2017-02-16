@@ -269,7 +269,7 @@ object FormTypes {
     .andThen(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
 
 
-  def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.maxLength") =
+  def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length") =
     notEmptyStrip
       .andThen(notEmpty.withMessage(requiredMsg))
       .andThen(maxLength(maxNameTypeLength).withMessage(maxLengthMsg))

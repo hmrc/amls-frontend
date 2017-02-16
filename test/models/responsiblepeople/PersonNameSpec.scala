@@ -128,12 +128,12 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
       PersonName.formRule.validate(data) must
         equal(Invalid(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-          (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
-          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
-          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length")),
           (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
         )))
     }
