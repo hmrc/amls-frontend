@@ -607,4 +607,37 @@ class FormTypesSpec extends PlaySpec {
 
   }
 
+  "basicAddressTypeValidationPattern8" must {
+
+    "successfully validate a address lines" in {
+      validateAddress.validate("1st block") must be(Valid("1st block"))
+      validateAddress.validate("second cross(2nd cross),test") must be(Valid("second cross(2nd cross),test"))
+      validateAddress.validate("some road.Oh!") must be(Valid("some road.Oh!"))
+      validateAddress.validate("third street-") must be(Valid("third street-"))
+      validateAddress.validate("2222") must be(Valid("2222"))
+    }
+
+    "fail validation on invalid number" in {
+      validateAddress.validate("second bock & 3rd cross") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+
+      validateAddress.validate("HHHHHH%") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+
+      validateAddress.validate("$$$$$$$") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+
+      validateAddress.validate("#######") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+      validateAddress.validate("***********") must be(Invalid(Seq(
+        Path -> Seq(ValidationError("err.text.validation"))
+      )))
+    }
+
+  }
+
 }
