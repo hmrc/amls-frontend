@@ -115,7 +115,7 @@ error.required.bankdetails.register.another.bank = Select yes or no to the quest
 
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: is your business involved in any other activities?
-error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
+error.required.ba.involved.in.other.text = Give details of the other activities your business is involved in
 error.invalid.ba.involved.in.other.text = You can’t enter more than 255 characters
 error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
 error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
