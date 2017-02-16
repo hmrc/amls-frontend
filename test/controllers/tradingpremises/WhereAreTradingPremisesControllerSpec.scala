@@ -6,13 +6,16 @@ import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
+import scala.collection.JavaConversions._
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -50,7 +53,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
     "get is called" must {
       "respond with OK and show the form with data when there is data" in new Fixture {
 
-        val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
+        val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now())
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
@@ -100,7 +103,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "NE98 1ZZ",
+            "postcode" -> "AA1 1AA",
             "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
@@ -118,6 +121,38 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
         }
+        
+        "fail submission on invalid uk address" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "tradingName" -> "Trading Name",
+            "addressLine1" -> "Address **1",
+            "addressLine2" -> "Address **2",
+            "addressLine3" -> "Address **3",
+            "addressLine4" -> "Address **4",
+            "postcode" -> "AA1 1AA",
+            "isResidential" -> "true",
+            "startDate.day" -> "01",
+            "startDate.month" -> "02",
+            "startDate.year" -> "2010"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(RecordId1, false)(newRequest)
+
+          val document: Document  = Jsoup.parse(contentAsString(result))
+          val errorCount = 4
+          val elementsWithError : Elements = document.getElementsByClass("error-notification")
+          elementsWithError.size() must be(errorCount)
+          for (ele: Element <- elementsWithError) {
+            ele.html() must include(Messages("err.text.validation"))
+          }
+        }
 
         "edit mode is true, and redirect to WhatDoesYourBusinessDo Controller" in new Fixture {
 
@@ -125,7 +160,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "NE98 1ZZ",
+            "postcode" -> "AA1 1AA",
             "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
@@ -170,7 +205,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "NE98 1ZZ",
+            "postcode" -> "AA1 1AA",
             "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
@@ -198,7 +233,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "NE98 1ZZ",
+            "postcode" -> "AA1 1AA",
             "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
@@ -224,7 +259,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           "tradingName" -> "Trading Name",
           "addressLine1" -> "Address 1",
           "addressLine2" -> "Address 2",
-          "postcode" -> "NE98 1ZZ",
+          "postcode" -> "AA1 1AA",
           "isResidential" -> "true",
           "startDate.day" -> "01",
           "startDate.month" -> "02",
@@ -259,14 +294,14 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
+        "postcode" -> "AA1 1AA",
         "isResidential" -> "true",
         "startDate.day" -> "01",
         "startDate.month" -> "02",
         "startDate.year" -> "2010"
       )
 
-      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
+      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, LocalDate.now())
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -292,14 +327,14 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
+        "postcode" -> "AA1 1AA",
         "isResidential" -> "true",
         "startDate.day" -> "01",
         "startDate.month" -> "02",
         "startDate.year" -> "2010"
       )
 
-      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2007, 2, 1))
 
 
@@ -326,14 +361,14 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
+        "postcode" -> "AA1 1AA",
         "isResidential" -> "true",
         "startDate.day" -> "01",
         "startDate.month" -> "02",
         "startDate.year" -> "2010"
       )
 
-      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, new LocalDate(2007, 2, 1))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -366,7 +401,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "dateOfChange.day" -> "01"
       )
 
-      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ", Some(DateOfChange(new LocalDate(2010, 10, 1))))
+      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = true, new LocalDate(2001, 1, 1), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))

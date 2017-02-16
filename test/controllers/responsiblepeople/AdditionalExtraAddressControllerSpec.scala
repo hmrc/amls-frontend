@@ -6,11 +6,13 @@ import models.Country
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import scala.collection.JavaConversions._
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -72,7 +74,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
     "on get() display the previous home address with UK fields populated" in new Fixture {
 
-      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
       val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
       val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
       val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -89,7 +91,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("input[name=addressLine2]").`val` must be("Line 2")
       document.select("input[name=addressLine3]").`val` must be("Line 3")
       document.select("input[name=addressLine4]").`val` must be("")
-      document.select("input[name=postcode]").`val` must be("NE17YH")
+      document.select("input[name=postcode]").`val` must be("AA1 1AA")
       document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
     }
 
@@ -122,7 +124,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "NE17YH",
+        "postCode" -> "AA1 1AA",
         "timeAtAddress" -> "01"
       )
 
@@ -156,6 +158,33 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
+    }
+
+    "fail submission on invalid non uk address" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "false",
+        "addressLineNonUK1" -> "Line #1",
+        "addressLineNonUK2" -> "Line #2",
+        "country" -> "ES",
+        "timeAtAddress" -> "02"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+      val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      val errorCount = 2
+      val elementsWithError : Elements = document.getElementsByClass("error-notification")
+      elementsWithError.size() must be(errorCount)
+      for (ele: Element <- elementsWithError) {
+        ele.html() must include(Messages("err.text.validation"))
+      }
     }
 
     "must fail on post if isUK field not supplied" in new Fixture {
@@ -215,7 +244,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "NE17YH",
+        "postCode" -> "AA1 1AA",
         "timeAtAddress" -> "01"
       )
 
@@ -231,13 +260,40 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
     }
 
+    "fail submission on invalid uk address in edit mode" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "true",
+        "addressLine1" -> "Line &1",
+        "addressLine2" -> "Line &2",
+        "postCode" -> "AA1 1AA",
+        "timeAtAddress" -> "01"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+      val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      val errorCount = 2
+      val elementsWithError : Elements = document.getElementsByClass("error-notification")
+      elementsWithError.size() must be(errorCount)
+      for (ele: Element <- elementsWithError) {
+        ele.html() must include(Messages("err.text.validation"))
+      }
+    }
+
     "must go to the correct location when edit mode is off" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "NE17YH",
+        "postCode" -> "AA1 1AA",
         "timeAtAddress" -> "01"
       )
 

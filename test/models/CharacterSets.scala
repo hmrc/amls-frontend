@@ -26,7 +26,7 @@ trait CharacterSets {
 
   val symbols7 = Set(" ", "'", "‘", "’", "-", "-", "–", "—")
 
-  val symbols8 = Set(" ", "!", "'", "‘", "’", "\"", "“", "”", "(", ")", ",", "-", "-", "–", "—", ".", "/")
+  val symbols8 = Set(" ", "!", "'", "‘", "’", "\"", "“", "”", "(", ")", ",", "-", "-", "–", "—", ".", "/").mkString("")
 
   val telephone = digits ++ symbols3
 
@@ -40,6 +40,6 @@ trait CharacterSets {
 
   val individualNames = alphaUpper ++ alphaLower ++ extendedAlphaUpper ++ extendedAlphaLower ++ symbols7
 
-  val addresses = digits ++ alphaUpper ++ alphaLower ++ symbols8
+  val addresses = (digits ++ alphaUpper ++ alphaLower ++ symbols8).mkString("")
 
 }

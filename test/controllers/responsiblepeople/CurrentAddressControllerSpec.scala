@@ -7,13 +7,15 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonth
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
+import scala.collection.JavaConversions._
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -86,7 +88,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "display the previous home address with UK fields populated" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -103,7 +105,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         document.select("input[name=addressLine2]").`val` must be("Line 2")
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("NE17YH")
+        document.select("input[name=postcode]").`val` must be("AA1 1AA")
         document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
       }
 
@@ -140,10 +142,10 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
-            "postCode" -> "NE17YH",
+            "postCode" -> "AA1 1AA",
             "timeAtAddress" -> "04"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -160,6 +162,38 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
         }
 
+        "fail submission on invalid address" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line &1",
+            "addressLine2" -> "Line *2",
+            "postCode" -> "AA1 1AA",
+            "timeAtAddress" -> "04"
+          )
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = currentAddressController.post(RecordId)(requestWithParams)
+          val document: Document  = Jsoup.parse(contentAsString(result))
+          val errorCount = 2
+          val elementsWithError : Elements = document.getElementsByClass("error-notification")
+          elementsWithError.size() must be(errorCount)
+          for (ele: Element <- elementsWithError) {
+            ele.html() must include(Messages("err.text.validation"))
+          }
+        }
+
+
         "all the mandatory non-UK parameters are supplied" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -169,7 +203,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "country" -> "ES",
             "timeAtAddress" -> "02"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -264,10 +298,10 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
-            "postCode" -> "NE17YH",
+            "postCode" -> "AA1 1AA",
             "timeAtAddress" -> "01"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -295,10 +329,10 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "01"
               )
-              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
               val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -324,10 +358,10 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "03"
               )
-              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
               val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -352,10 +386,10 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "04"
               )
-              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
               val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
@@ -384,7 +418,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "01"
               )
               val responsiblePeople = ResponsiblePeople()
@@ -410,7 +444,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "03"
               )
               val responsiblePeople = ResponsiblePeople()
@@ -436,7 +470,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "isUK" -> "true",
                 "addressLine1" -> "Line 1",
                 "addressLine2" -> "Line 2",
-                "postCode" -> "NE17YH",
+                "postCode" -> "AA1 1AA",
                 "timeAtAddress" -> "04"
               )
               val responsiblePeople = ResponsiblePeople()
@@ -697,7 +731,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           "isUK" -> "true",
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
-          "postCode" -> "NE17YH",
+          "postCode" -> "AA1 1AA",
           "timeAtAddress" -> "04"
         )
 

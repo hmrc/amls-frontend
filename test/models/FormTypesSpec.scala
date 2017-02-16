@@ -556,7 +556,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
           Path -> Seq(ValidationError("error.invalid.nino"))
         )))
     }
-
   }
 
   "Uk passport number" must {
@@ -594,44 +593,46 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
     }
   }
 
-  "basicTelephoneNumberPattern1" must {
+  "basicTelephoneNumberType1" must {
 
     "successfully validate a telephone number" in {
-      phoneNumberPattern.validate("(541) 754-3010") must be(Valid("(541) 754-3010"))
-      phoneNumberPattern.validate("+1-541-754-3010") must be(Valid("+1-541-754-3010"))
-      phoneNumberPattern.validate("1-541-754-3010") must be(Valid("1-541-754-3010"))
-      phoneNumberPattern.validate("001-541-754-3010") must be(Valid("001-541-754-3010"))
-      phoneNumberPattern.validate("+44 22 2222 2222") must be(Valid("+44 22 2222 2222"))
+      phoneNumberType.validate("(541) 754-3010") must be(Valid("(541) 754-3010"))
+      phoneNumberType.validate("+1-541-754-3010") must be(Valid("+1-541-754-3010"))
+      phoneNumberType.validate("1-541-754-3010") must be(Valid("1-541-754-3010"))
+      phoneNumberType.validate("001-541-754-3010") must be(Valid("001-541-754-3010"))
+      phoneNumberType.validate("+44 22 2222 2222") must be(Valid("+44 22 2222 2222"))
     }
 
     "fail validation on invalid number" in {
-      phoneNumberPattern.validate("(541) *754-3010") must be(Invalid(Seq(
+      phoneNumberType.validate("(541) *754-3010") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.invalid.phone.number"))
       )))
 
-      phoneNumberPattern.validate("AAAAAA_&^G") must be(Invalid(Seq(
+      phoneNumberType.validate("AAAAAA_&^G") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.invalid.phone.number"))
       )))
     }
-
   }
 
   "basicAddressTypeValidationPattern8" must {
 
     "successfully validate a address lines" in {
-      validateAddress.validate("1st block") must be(Valid("1st block"))
+      validateAddress.validate(symbols8) must be(Valid(symbols8))
       validateAddress.validate("second cross(2nd cross),test") must be(Valid("second cross(2nd cross),test"))
       validateAddress.validate("some road.Oh!") must be(Valid("some road.Oh!"))
-      validateAddress.validate("third street-") must be(Valid("third street-"))
-      validateAddress.validate("2222") must be(Valid("2222"))
+
     }
 
     "fail validation on invalid number" in {
+      validateAddress.validate(addresses) must be(Invalid(Seq(
+        Path -> Seq(ValidationError("error.max.length.address.line"))
+      )))
+
       validateAddress.validate("second bock & 3rd cross") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
 
-      validateAddress.validate("HHHHHH%") must be(Invalid(Seq(
+      validateAddress.validate("%%") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
 
@@ -642,11 +643,10 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
       validateAddress.validate("#######") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
-      validateAddress.validate("***********") must be(Invalid(Seq(
+      validateAddress.validate("******") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
     }
-
   }
 
 }
