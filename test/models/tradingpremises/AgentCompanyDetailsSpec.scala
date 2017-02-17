@@ -70,6 +70,13 @@ class AgentCompanyDetailsSpec extends PlaySpec with OneAppPerSuite{
         ))))
       }
 
+      "input has invalid data" in {
+        val formInput = Map("agentCompanyName" -> Seq("<sometest>"), "companyRegistrationNumber" -> Seq("12345678"))
+        AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
+          Path \ "agentCompanyName") -> Seq(ValidationError("err.text.validation")
+        ))))
+      }
+
     }
 
     "validate form write" in {
