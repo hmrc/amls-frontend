@@ -26,6 +26,19 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
         be(Valid(ServicesOfAnotherTCSPYes("12345678")))
     }
 
+    "successfully validate given an alphanumeric mlr number" in {
+
+      val data = Map(
+        "servicesOfAnotherTCSP" -> Seq("true"),
+        "mlrRefNumber" -> Seq("i9w9834ubkid89n")
+      )
+
+      ServicesOfAnotherTCSP.formRule.validate(data) must be {
+        Valid(ServicesOfAnotherTCSPYes("i9w9834ubkid89n"))
+      }
+
+    }
+
     "fail when mandatory fields are missing" in {
       ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
         be(Invalid(Seq(
@@ -54,9 +67,8 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
         "mlrRefNumber" -> Seq("123qed")
       )
 
-      ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.tcsp.mlr.reference.number"))
+      ServicesOfAnotherTCSP.formRule.validate(data) must be(
+        Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.tcsp.mlr.reference.number"))
         )))
     }
 

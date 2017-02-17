@@ -222,8 +222,8 @@ error.required.tcsp.service.providers = Select at least one kind of Trust or Com
 error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
 error.required.tcsp.complex.corporate.structures = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
 error.required.tcsp.services.another.tcsp = Select yes or no to the question: does your business use the services of another Trust or Company Service Provider?
-error.required.tcsp.mlr.reference.number = Please enter a valid 8-digit or 15-digit number
-error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation Reference Number. It must be 8 or 15 characters long, and can only be numbers.
+error.required.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation registration number
+error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation registration number
 
 ############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
