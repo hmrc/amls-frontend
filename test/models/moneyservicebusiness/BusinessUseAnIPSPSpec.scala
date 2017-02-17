@@ -73,7 +73,7 @@ class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
           BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.required.msb.ipsp.name"))),
             (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number"))))))
         }
-        
+
         "name is too long" in {
           val map = Map(
             "useAnIPSP" -> Seq("true"),
@@ -95,6 +95,7 @@ class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
             (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
           )))
         }
+
         "reference is neither 8 nor 15 in length" in {
           val ref = "9876765435432"
           val formData = Map(
@@ -106,6 +107,7 @@ class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
             (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
           )))
         }
+        
         "reference contains invalid characters" in {
           val ref = symbols1.mkString("").take(8)
           val formData = Map(

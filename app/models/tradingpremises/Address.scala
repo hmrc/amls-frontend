@@ -37,8 +37,8 @@ object Address {
       import models.FormTypes._
       import jto.validation.forms.Rules._
       (
-        (__ \ "addressLine1").read(notEmptyStrip.withMessage("error.required.address.line1") andThen validateAddress) ~
-          (__ \ "addressLine2").read(notEmptyStrip.withMessage("error.required.address.line2") andThen validateAddress) ~
+        (__ \ "addressLine1").read(notEmptyStrip andThen notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+          (__ \ "addressLine2").read(notEmptyStrip andThen notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
           (__ \ "addressLine3").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "addressLine4").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "postcode").read(postcodeType)
