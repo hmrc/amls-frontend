@@ -138,7 +138,7 @@ object FormTypes {
   val nameRequired = required("error.required.yourname")
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
 
-  private val phoneNumberRequired = required("error.required.rp.phone")
+  private val phoneNumberRequired = required("error.required.phone.number")
   private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.phone")
   private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 

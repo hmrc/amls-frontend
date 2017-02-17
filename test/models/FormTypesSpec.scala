@@ -79,7 +79,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
       phoneNumberType.validate("") must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.required.rp.phone"))
+          Path -> Seq(ValidationError("error.required.phone.number"))
         )))
     }
 
