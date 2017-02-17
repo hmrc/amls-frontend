@@ -96,6 +96,9 @@ object FormTypes {
 
   val basicPunctuationPattern = regexWithMsg(basicPunctuationRegex, "err.text.validation")
 
+  val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}""".r
+  def referenceNumberRule(msg: String = "error.required.tcsp.mlr.reference.number") = regexWithMsg(referenceNumberRegex, msg)
+
   val extendedReferenceNumberRegex = """^[A-Za-z0-9\-\s]+$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
