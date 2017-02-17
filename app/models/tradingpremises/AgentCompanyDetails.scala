@@ -18,11 +18,12 @@ object AgentCompanyDetails {
 
   val maxAgentRegisteredCompanyNameLength = 140
   val agentsRegisteredCompanyNameType: Rule[String, String] =
-    notEmptyStrip compose notEmpty.withMessage("error.required.tp.agent.registered.company.name") compose
-      maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.registered.company.name")
+    notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.registered.company.name") andThen
+      maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.registered.company.name") andThen
+      basicPunctuationPattern
 
   val agentsRegisteredCompanyCRNType: Rule[String, String] =
-    notEmpty.withMessage("error.required.bm.registration.number") compose
+    notEmpty.withMessage("error.required.bm.registration.number") andThen
       pattern("^[A-Z0-9]{8}$".r).withMessage("error.invalid.bm.registration.number")
 
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {

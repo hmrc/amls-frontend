@@ -32,6 +32,11 @@ class AgentNameSpec extends PlaySpec with OneAppPerSuite {
       AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName") -> Seq(ValidationError("error.invalid.tp.agent.name")))))
     }
 
+    "throw error when name input has invalid data" in {
+      val formInput = Map("agentName" -> Seq("<sometesttexttest>"))
+      AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName") -> Seq(ValidationError("err.text.validation")))))
+    }
+
     "validate form write" in {
       AgentName.formWrites.writes(AgentName("sometext")) must be(Map("agentName" -> Seq("sometext")))
     }
