@@ -50,6 +50,19 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
+    "fail to validate given text with invalid characters" in {
+
+      val data = Map(
+        "involvedInOther" -> Seq("true"),
+        "details" -> Seq("{}<>")
+      )
+
+      InvolvedInOther.formRule.validate(data) must
+        be(Invalid(Seq(
+          (Path \ "details") -> Seq(ValidationError("err.text.validation"))
+        )))
+    }
+
     "fail to validate mandatory field" in {
 
       InvolvedInOther.formRule.validate(Map.empty) must
