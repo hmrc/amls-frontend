@@ -33,7 +33,8 @@ object FormTypes {
   /** Regex **/
 
   val vrnTypeRegex = "^[0-9]{9}$".r
-  val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
+  private val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
+  private val addressTypeRegex = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$".r
   val emailRegex = ("^.+" + //Any character 1 or more times
     "@" + //@ symbol
     "(" + //start of DNS label group
@@ -118,14 +119,13 @@ object FormTypes {
 
   private val corporationTaxRequired = required("error.required.atb.corporation.tax.number")
   private val corporationTaxPattern = regexWithMsg(corporationTaxRegex, "error.invalid.atb.corporation.tax.number")
+  private val addressTypePattern = regexWithMsg(addressTypeRegex, "err.text.validation")
 
   val corporationTaxType = corporationTaxRequired andThen corporationTaxPattern
 
   /** Address Rules **/
 
-  val addressType = notEmpty andThen maxLength(maxAddressLength)
-
-  val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line")
+  val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
 
   private val postcodeRequired = required("error.required.postcode")
   private val postcodeLength = maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
@@ -138,9 +138,9 @@ object FormTypes {
   val nameRequired = required("error.required.yourname")
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
 
-  private val phoneNumberRequired = required("error.required.rp.phone")
+  private val phoneNumberRequired = required("error.required.phone.number")
   private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.phone")
-  val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
+  private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 
   private val emailRequired = required("error.required.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")

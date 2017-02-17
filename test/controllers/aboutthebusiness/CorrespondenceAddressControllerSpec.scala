@@ -1,15 +1,18 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{UKCorrespondenceAddress, AboutTheBusiness}
+import models.aboutthebusiness.{AboutTheBusiness, UKCorrespondenceAddress}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import scala.collection.JavaConversions._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -75,7 +78,7 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
           "addressLine2" -> "Add Line 2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "postCode" -> "NE17UX"
+          "postCode" -> "AA1 1AA"
         )
 
         when(controller.dataConnector.fetch[AboutTheBusiness](any())
@@ -90,21 +93,52 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
 
       }
 
+      "fail submission on invalid address" in new Fixture {
+
+        val fetchResult = Future.successful(None)
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "yourName" -> "Name",
+          "businessName" -> "Business Name",
+          "isUK"         -> "true",
+          "addressLine1" -> "Add Line 1 & 3",
+          "addressLine2" -> "Add Line 2 *",
+          "addressLine3" -> "$$$",
+          "addressLine4" -> "##",
+          "postCode" -> "AA1 1AA"
+        )
+
+        when(controller.dataConnector.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(fetchResult)
+
+        when(controller.dataConnector.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(false)(newRequest)
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document  = Jsoup.parse(contentAsString(result))
+        val errorCount = 4
+        val elementsWithError : Elements = document.getElementsByClass("error-notification")
+        elementsWithError.size() must be(errorCount)
+        for (ele: Element <- elementsWithError) {
+          ele.html() must include(Messages("err.text.validation"))
+        }
+      }
+
       "an invalid form request is sent in the body" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "invalid" -> "NE17UX"
+          "invalid" -> "AA1 1AA"
         )
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)
 
       }
-
     }
-
   }
 
 }

@@ -104,7 +104,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      contentAsString(result) must include(Messages("error.required.rp.phone"))
+      contentAsString(result) must include(Messages("error.required.phone.number"))
     }
 
     "on post with missing email data" in new Fixture {

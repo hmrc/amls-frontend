@@ -2,14 +2,16 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.{Country, DateOfChange}
 import models.aboutthebusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import org.mockito.Matchers.{eq => eqTo, _}
+import scala.collection.JavaConversions._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -103,6 +105,32 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
       redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
     }
 
+    "fail submission on invalid address" in new Fixture {
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
+
+      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
+        "addressLine1"->"line1 &",
+        "addressLine2"->"line2 *",
+        "addressLine3"->"",
+        "addressLine4"->"",
+        "postCode"->"AA1 1AA")
+      val result = controller.post()(newRequest)
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      val errorCount = 2
+      val elementsWithError : Elements = document.getElementsByClass("error-notification")
+      elementsWithError.size() must be(errorCount)
+      for (ele: Element <- elementsWithError) {
+        ele.html() must include(Messages("err.text.validation"))
+      }
+    }
+
     "respond with BAD_REQUEST" when {
 
       "form validation fails" in new Fixture {
@@ -115,7 +143,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "postCode" -> "NE7 7DS")
+          "postCode" -> "AA1 1AA")
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("err.summary"))
@@ -140,7 +168,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "postCode" -> "NE7 7DS")
+          "postCode" -> "AA1 1AA")
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -188,7 +216,7 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "postCode" -> "NE7 7DS")
+          "postCode" -> "AA1 1AA")
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)

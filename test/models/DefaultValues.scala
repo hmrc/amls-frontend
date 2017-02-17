@@ -7,7 +7,7 @@ import org.joda.time.LocalDate
 
 object TradingPremisesSection {
 
-  val address = Address("Address 1", "Address 2",None,None,"NE98 1ZZ")
+  val address = Address("Address 1", "Address 2",None,None,"AA1 1AA")
   val year = 2010
   val month = 2
   val day = 1
