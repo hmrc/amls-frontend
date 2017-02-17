@@ -23,9 +23,9 @@ err.summary = There is a problem
 err.pleasespecify = Please specify
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 
-error.required.address.line1 = Enter the first line of the address.
-error.required.address.line2 = Enter the second line of the address.
-error.max.length.address.line = You can’t enter more than 35 characters.
+error.required.address.line1 = Enter the first line of the address
+error.required.address.line2 = Enter the second line of the address
+error.max.length.address.line = You can’t enter more than 35 characters
 error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
@@ -72,9 +72,9 @@ error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
 error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
 
-error.required.phone.number = Enter a contact phone number.
+error.required.phone.number = Enter a contact phone number
 err.invalid.phone.number = Enter a valid contact phone number
-error.max.length.phone = You can’t enter more than 24 characters for the phone number.
+error.max.length.phone = You can’t enter more than 24 characters for the phone number
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 
