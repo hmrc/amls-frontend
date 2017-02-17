@@ -1,10 +1,11 @@
 package models.tcsp
 
+import cats.data.Validated.Valid
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes.referenceNumberRule
 import play.api.libs.json._
-import cats.data.Validated.{Invalid, Valid}
 
 sealed trait ServicesOfAnotherTCSP
 
@@ -16,11 +17,8 @@ object ServicesOfAnotherTCSP {
 
   import utils.MappingUtils.Implicits._
 
-  private val mlrPattern = "^([0-9]{8}|[0-9]{15})$".r
-
-  val service = notEmpty
-    .withMessage("error.required.tcsp.mlr.reference.number")
-    .andThen(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
+  val service = notEmpty.withMessage("error.required.tcsp.mlr.reference.number")
+    .andThen(referenceNumberRule())
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._
