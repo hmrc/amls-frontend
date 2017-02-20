@@ -49,7 +49,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
           case ValidForm(_, data) => {
             def personalTaxRouter = {
               (data.personalTax, edit) match {
-                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
                 case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
                 case _ => Redirect(routes.VATRegisteredController.get(index, edit))
               }
@@ -62,7 +61,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
             } yield {
               if (hasNominatedOfficer(rpSeqOption)) {
                 personalTaxRouter
-              } else Redirect(routes.AreTheyNominatedOfficerController.get(index))
+              } else {
+                Redirect(routes.AreTheyNominatedOfficerController.get(index))
+              }
             }
 
           }.recoverWith {
