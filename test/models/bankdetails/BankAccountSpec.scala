@@ -122,7 +122,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         )
 
         Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
-          (Path \ "IBANNumber") -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
+          (Path \ "IBANNumber") -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
       }
       "a non UK account is selected and the IBAN given has an incorrect pattern" in {
         val urlFormEncoded = Map(
@@ -144,7 +144,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         )
 
         Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
-          (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.max.length.bankdetails.account")))))
+          (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.invalid.bankdetails.account")))))
       }
       "a non UK account is selected and the non UK account number given has an incorrect pattern" in {
         val urlFormEncoded = Map(

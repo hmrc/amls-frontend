@@ -22,8 +22,16 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate" in {
 
-      postcodeType.validate("177A") must
-        be(Valid("177A"))
+      postcodeType.validate("AA03 5BB") must
+        be(Valid("AA03 5BB"))
+    }
+
+    "fail to validate given an invalid postcode" in {
+
+      postcodeType.validate("XXXXX") must
+        be(Invalid(Seq(
+          Path -> Seq(ValidationError("error.invalid.postcode"))
+        )))
     }
 
     "fail to validate an empty string" in {
@@ -364,67 +372,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
     }
   }
 
-  "accountName" must {
-
-    "be mandatory" in {
-      accountNameType.validate("") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
-    }
-
-    "accept all characters from the allowed set" in {
-      accountNameType.validate(digits.mkString("")) must be(Valid(digits.mkString("")))
-      accountNameType.validate(alphaUpper.mkString("")) must be(Valid(alphaUpper.mkString("")))
-      accountNameType.validate(alphaLower.mkString("")) must be(Valid(alphaLower.mkString("")))
-      accountNameType.validate(extendedAlphaUpper.mkString("")) must be(Valid(extendedAlphaUpper.mkString("")))
-      accountNameType.validate(extendedAlphaLower.mkString("")) must be(Valid(extendedAlphaLower.mkString("")))
-      accountNameType.validate(symbols1.mkString("")) must be(Valid(symbols1.mkString("")))
-      accountNameType.validate(symbols2.mkString("")) must be(Valid(symbols2.mkString("")))
-      accountNameType.validate(symbols6.mkString("")) must be(Valid(symbols6.mkString("")))
-    }
-
-    "be not more than 40 characters" in {
-      accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
-      )
-    }
-
-    "not allow characters from other sets" in {
-      accountNameType.validate(symbols5.mkString("")) must be (
-        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
-      )
-    }
-  }
-
-  "sortCode must" must {
-
-    "validate when 6 digits are supplied without - " in {
-      sortCodeType.validate("654321") must be(Valid("654321"))
-    }
-
-    "fail validation when more than 6 digits are supplied without - " in {
-      sortCodeType.validate("87654321") must be(
-      Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
-    }
-
-    "fail when 8 non digits are supplied with - " in {
-      sortCodeType.validate("ab-cd-ef") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
-    }
-
-    "pass validation when dashes are used to seperate number groups" in {
-      sortCodeType.validate("65-43-21") must be(Valid("654321"))
-    }
-    "pass validation when spaces are used to seperate number groups" in {
-      sortCodeType.validate("65 43 21") must be(Valid("654321"))
-    }
-
-    "fail validation for sort code with any other pattern" in {
-      sortCodeType.validate("8712341241431243124124654321") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
-      )
-    }
-  }
-
   "removeCharacterRule" must {
     "strip the character from the incoming string" in {
       val inputStr = "=AAAA==BBBB==CCCC=="
@@ -445,44 +392,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
       removeSpacesRule.validate(inputStr)  must be (Valid("AAAABBBBCCCC"))    }
   }
 
-  "UK Bank Account must successfully" must {
-
-    "validate when 8 digits are supplied " in {
-      ukBankAccountNumberType.validate("87654321") must be(Valid("87654321"))
-    }
-
-    "fail validation when less than 8 characters are supplied" in {
-      ukBankAccountNumberType.validate("123456") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
-    }
-
-    "fail validation when more than 8 characters are supplied" in {
-      ukBankAccountNumberType.validate("1234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
-    }
-  }
-
-  "For the Overseas Bank Account" must {
-
-    "validate IBAN supplied " in {
-      ibanType.validate("IBAN_4323268686686") must be(Valid("IBAN_4323268686686"))
-    }
-
-    "fail validation if IBAN is longer than the permissible length" in {
-      ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
-    }
-
-    "validate Non UK Account supplied " in {
-      nonUKBankAccountNumberType.validate("IND22380310500093") must be(Valid("IND22380310500093"))
-    }
-
-    "fail validation if Non UK Account is longer than the permissible length" in {
-      nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.account")))))
-    }
-
-  }
 
   "For the Declaration Add Persons 'name' fields" must {
 

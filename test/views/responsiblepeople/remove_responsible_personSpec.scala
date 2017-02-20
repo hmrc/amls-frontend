@@ -42,6 +42,8 @@ class remove_responsible_personSpec extends GenericTestHelper with MustMatchers 
 
       def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, true)
 
+      form.html() must include (Messages("responsiblepeople.remove.responsible.person.enddate.lbl"))
+
     }
 
     "hide date form if boolean is set to false" in new ViewFixture {
@@ -49,6 +51,8 @@ class remove_responsible_personSpec extends GenericTestHelper with MustMatchers 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
       def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, false)
+
+      form.html() must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
     }
 
