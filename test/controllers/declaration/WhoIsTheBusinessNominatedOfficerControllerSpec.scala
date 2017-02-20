@@ -104,7 +104,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
       "selected option is a valid responsible person" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("person" -> "firstNamemiddleNamelastName")
+        val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
@@ -123,31 +123,29 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
       "selected option is 'Register someone else'" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
+        val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.WhatYouNeedController.get(1).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url))
       }
     }
 
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("person" -> "")
-
+        val newRequest = request.withFormUrlEncodedBody("value" -> "")
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
 
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(rp.copy(positions = Some(positions.copy(positions
-          = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))))))(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        val document: Document  = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("error-notification").html() must include(Messages("error.required.declaration.nominated.officer"))
+        contentAsString(result) must include(Messages("error.required.declaration.nominated.officer"))
       }
     }
   }

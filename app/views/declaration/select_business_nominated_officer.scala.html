@@ -31,7 +31,7 @@
         ) {
             @model.map { people =>
                 @people.personName.map { obj =>
-                    @radio(f("person"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace)
+                    @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace)
                 }
             }
             <p class="form-block">@Messages("lbl.or")</p>

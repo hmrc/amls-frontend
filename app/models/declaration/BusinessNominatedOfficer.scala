@@ -15,11 +15,11 @@ object BusinessNominatedOfficer {
   implicit val formRule: Rule[UrlFormEncoded, BusinessNominatedOfficer] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "person").read[String].withMessage("error.required.declaration.nominated.officer") map BusinessNominatedOfficer.apply
+      (__ \ "value").read[String].withMessage("error.required.declaration.nominated.officer") map BusinessNominatedOfficer.apply
     }
   implicit val formWrites: Write[BusinessNominatedOfficer, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    (__ \ "person").write[String] contramap{x =>x.value}
+    (__ \ "value").write[String] contramap{x =>x.value}
   }
 
   implicit val format = Json.format[BusinessNominatedOfficer]
