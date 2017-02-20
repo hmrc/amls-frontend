@@ -26,8 +26,7 @@ err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctua
 error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
-error.required.postcode = Enter a postcode.
-error.invalid.postcode = Enter valid postcode.
+error.invalid.postcode = Enter a valid postcode
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.country.name = Enter at least one country.
@@ -110,10 +109,13 @@ error.bankdetails.accountnumber = Enter the account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
 error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
 error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
-error.invalid.bankdetails.iban = Enter a valid IBAN number. It must only be numbers or letters, and it can’t be more than 34 characters long. Do not enter punctuation or other characters.
+
+error.invalid.bankdetails.iban = Enter a valid IBAN number
+error.invalid.bankdetails.account = Enter a valid account number
+# to delete:
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
-error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.max.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+
 error.required.bankdetails.register.another.bank = Select yes or no to the question: do you want to register another bank account?
 
 ###############################  Business Activities ###############################
