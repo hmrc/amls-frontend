@@ -38,7 +38,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value with less than 8 characters" in {
@@ -48,7 +48,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value with between 9 and 14 characters" in {
@@ -58,7 +58,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value non-numeric characters" in {
@@ -68,7 +68,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
 
@@ -89,7 +89,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
           PreviouslyRegistered.formRule.validate(data) must
             be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
             )))
         }
 
@@ -101,7 +101,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
           PreviouslyRegistered.formRule.validate(data) must
             be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
+              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
             )))
         }
 

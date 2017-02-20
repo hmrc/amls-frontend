@@ -56,7 +56,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
       ServicesOfAnotherTCSP.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "mlrRefNumber") -> Seq(ValidationError("error.required.tcsp.mlr.reference.number"))
+          (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
     }
 
@@ -68,7 +68,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfAnotherTCSP.formRule.validate(data) must be(
-        Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.tcsp.mlr.reference.number"))
+        Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
     }
 

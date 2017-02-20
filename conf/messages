@@ -78,6 +78,8 @@ error.max.length.phone = You can’t enter more than 24 characters for the phone
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 
+error.invalid.mlr.number = Enter a valid Money Laundering Regulation registration number
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
@@ -90,7 +92,6 @@ error.invalid.bm.business.type = Enter a valid type of business. You can’t ent
 
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
-error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
 error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
@@ -222,8 +223,6 @@ error.required.tcsp.service.providers = Select at least one kind of Trust or Com
 error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
 error.required.tcsp.complex.corporate.structures = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
 error.required.tcsp.services.another.tcsp = Select yes or no to the question: does your business use the services of another Trust or Company Service Provider?
-error.required.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation registration number
-error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation registration number
 
 ############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
@@ -249,9 +248,7 @@ error.required.msb.throughput = Select how much throughput you expect in the nex
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
 error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
-error.required.msb.ipsp.reference = Enter a valid Intermediary Payment Service Provider’s anti-money laundering registration number. It must be up to 15 characters, and can only be numbers.
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
-error.required.msb.ipsp.reference = Enter a valid Intermediary Payment Service Provider's anti-money laundering registration number. It must be up to 15 characters, and can only be numbers.
 error.required.msb.linked.txn = Select yes or no to the question: can your systems identify linked transactions?
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number

@@ -22,11 +22,8 @@ object BusinessUseAnIPSP {
     notEmpty.withMessage("error.required.msb.ipsp.name") andThen
     maxLength(maxNameTypeLength).withMessage("error.invalid.msb.ipsp.name")
 
-  val referenceTypeRegex = "^[0-9]{15}$".r
-  private val referenceNumRegex = regexWithMsg(referenceTypeRegex, "error.required.msb.ipsp.reference")
-
   val referenceType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.msb.ipsp.reference") andThen referenceNumRegex
+    notEmpty.withMessage("error.invalid.mlr.number") andThen referenceNumberRule("error.invalid.mlr.number")
 
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessUseAnIPSP] = From[UrlFormEncoded] { __ =>

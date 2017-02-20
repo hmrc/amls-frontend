@@ -75,7 +75,7 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.tcsp.mlr.reference.number"))
+      document.select("span").html() must include(Messages("error.invalid.mlr.number"))
 
     }
 
@@ -103,7 +103,7 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.tcsp.mlr.reference.number"))
+      document.select("span").html() must include(Messages("error.invalid.mlr.number"))
     }
 
     "on post with valid data in edit mode" in new Fixture {

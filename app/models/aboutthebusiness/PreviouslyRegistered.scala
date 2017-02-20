@@ -23,7 +23,7 @@ object PreviouslyRegistered {
 
     (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
       case true =>
-        (__ \ "prevMLRRegNo").read(pattern(mlrRegNoRegex).withMessage("error.invalid.atb.mlr.number")) map PreviouslyRegisteredYes.apply
+        (__ \ "prevMLRRegNo").read(pattern(mlrRegNoRegex).withMessage("error.invalid.mlr.number")) map PreviouslyRegisteredYes.apply
       case false => Rule.fromMapping { _ => Valid(PreviouslyRegisteredNo) }
     }
   }
