@@ -47,9 +47,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
   val RecordId = 1
 
   private val startDate: Option[LocalDate] = Some(new LocalDate())
-  "PositionWithinBusinessController" must {
+  "PositionWithinBusinessController" when {
 
-    "on get()" must {
+    "get is called" must {
 
       "display position within the business page" in new Fixture {
         val mockCacheMap = mock[CacheMap]
@@ -238,235 +238,243 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
     }
 
-    "submit with valid data as a partnership" in new Fixture {
+    "post is called" must {
+      "respond with BAD_REQUEST" when {
+        "year field is given too few numbers" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "90")
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "05", "positions" -> "04",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
+          val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
+          when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(mockBusinessMatching)))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
-    }
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
-    "submit with valid data as a sole proprietor" in new Fixture {
+          val result = controller.post(RecordId)(newRequest)
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        }
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        "year field is given too many characters" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "19905")
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
-    }
+          val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
+          when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(mockBusinessMatching)))
 
-    "submit with valid data and redirect as no Nominated Officer" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-    }
-
-    "submit with valid data and redirect as no Nominated Officer when there are Responsible People" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-    }
-
-    "show error with year field too short" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "90")
-
-      val mockBusinessMatching : BusinessMatching = mock[BusinessMatching]
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(mockBusinessMatching)))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
-
-      val result = controller.post(RecordId)(newRequest)
-
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    }
-
-    "show error with year field too long" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "19905")
-
-      val mockBusinessMatching : BusinessMatching = mock[BusinessMatching]
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(mockBusinessMatching)))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    }
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        }
 
-    "submit with all other valid data types" in new Fixture {
+        "positionWithinBusiness field is given an empty string" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
 
-      for (i <- 1 to 4) {
-        val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i",
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+
+        }
+
+        "the date fields are given empty strings" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.body().html() must include(Messages("error.expected.jodadate.format"))
+        }
+
+        "positionWithinBusiness is given an invalid string code" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "10")
+          val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+            Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          val businessMatching = BusinessMatching(Some(reviewDtls))
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+        }
+      }
+
+      "submit with valid data as a partnership" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "05", "positions" -> "04",
           "startDate.day" -> "24",
           "startDate.month" -> "2",
           "startDate.year" -> "1990")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
         val result = controller.post(RecordId)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ExperienceTrainingController.get(RecordId).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
       }
-    }
 
-    "submit with mixture of data types selected" in new Fixture {
+      "submit with valid data as a sole proprietor" in new Fixture {
 
-      val positions = Positions(Set(Director,NominatedOfficer), startDate)
-      val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "positions" -> "06",
-        "positions" -> "01",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990"
-      )
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+      }
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+      "submit with valid data and redirect as no Nominated Officer" in new Fixture {
 
-    }
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
 
-    "fail submission on empty string" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+      }
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      "submit with valid data and redirect as no Nominated Officer when there are Responsible People" in new Fixture {
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
 
-    }
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-    "fail with missing date" in new Fixture {
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+      }
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.body().html() must include(Messages("error.expected.jodadate.format"))
-    }
+      "submit with all other valid data types" in new Fixture {
 
-    "fail submission on invalid string" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "10")
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
-      val businessMatching = BusinessMatching(Some(reviewDtls))
+        for (i <- 1 to 4) {
+          val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990")
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+        }
+      }
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+      "submit with mixture of data types selected" in new Fixture {
 
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
-    }
+        val positions = Positions(Set(Director, NominatedOfficer), startDate)
+        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
 
-    "submit with valid personal tax data and with edit mode" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "positions" -> "06",
+          "positions" -> "01",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990"
+        )
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "05",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
 
-      val result = controller.post(RecordId, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId, true).url))
-    }
+      }
 
-    "submit with valid non-personal tax data with edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "01",
-        "startDate.day" -> "24",
-        "startDate.month" -> "2",
-        "startDate.year" -> "1990")
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+      "submit with valid personal tax data and with edit mode" in new Fixture {
 
-      val result = controller.post(RecordId, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "05",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(RecordId, true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId, true).url))
+      }
+
+      "submit with valid non-personal tax data with edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("positions" -> "01",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+        val mockCacheMap = mock[CacheMap]
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(RecordId, true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+      }
     }
   }
 
