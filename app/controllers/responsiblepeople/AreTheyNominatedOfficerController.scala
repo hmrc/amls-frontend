@@ -8,7 +8,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
 import jto.validation.{From, Rule, Write}
 import jto.validation.forms._
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.are_they_nominated_officer
 
@@ -28,6 +28,7 @@ object BooleanFormReadWrite {
   }
 }
 
+//noinspection ScalaStyle
 trait AreTheyNominatedOfficerController extends RepeatingSection with BaseController {
 
 
@@ -42,7 +43,6 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
 
         Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
     }
-
 
   def post(index: Int, edit: Boolean = false) =
     Authorised.async {
@@ -66,10 +66,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
-              rpSeqOption match {
-                case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq)
-                case _ => NotFound(notFoundView)
-              }
+              redirectDependingOnEdit(index, edit, rpSeqOption)(request)
             }
 
           }.recoverWith {
@@ -78,26 +75,15 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
         }
     }
 
-
-  private def personalTaxRouter(index: Int, edit: Boolean, rpSeq: Seq[ResponsiblePeople])(implicit request: Request[_]): Result = {
-    rpSeq.lift(index - 1) match {
-      case Some(x) => (isPersonalTax(x), edit) match {
-        case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
-        case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
+  private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePeople]])(implicit request: Request[AnyContent]) = {
+    rpSeqOption match {
+      case Some(rpSeq) => edit match {
+        case true => Redirect(routes.DetailedAnswersController.get(index))
         case _ => Redirect(routes.VATRegisteredController.get(index, edit))
-
       }
       case _ => NotFound(notFoundView)
     }
   }
-
-  private def isPersonalTax(responsiblePeople: ResponsiblePeople) = {
-    responsiblePeople.positions match {
-      case Some(p) => p.personalTax
-      case _ => false
-    }
-  }
-
 }
 
 object AreTheyNominatedOfficerController extends AreTheyNominatedOfficerController {
