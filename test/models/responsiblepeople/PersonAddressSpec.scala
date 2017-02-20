@@ -131,7 +131,7 @@ class PersonAddressSpec extends PlaySpec {
           be(Invalid(Seq(
             (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
             (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
-            (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
+            (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
           )))
       }
 

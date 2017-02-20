@@ -38,7 +38,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
       postcodeType.validate("") must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.required.postcode"))
+          Path -> Seq(ValidationError("error.invalid.postcode"))
         )))
     }
 
