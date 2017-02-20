@@ -213,7 +213,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
       document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
-      document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
+      document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
       document.select("a[href=#timeAtAddress]").html() must include(Messages("error.required.timeAtAddress"))
     }
 
