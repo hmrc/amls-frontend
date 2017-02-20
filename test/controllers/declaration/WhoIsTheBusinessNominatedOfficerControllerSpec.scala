@@ -136,7 +136,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("value" -> "")
+        val newRequest = request.withFormUrlEncodedBody()
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
 
