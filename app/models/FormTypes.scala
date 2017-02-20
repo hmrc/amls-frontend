@@ -95,7 +95,7 @@ object FormTypes {
 
   val basicPunctuationPattern = regexWithMsg(basicPunctuationRegex, "err.text.validation")
 
-  val extendedReferenceNumberRegex = """^[A-Za-z0-9\-\s]+$""".r
+  val extendedReferenceNumberRegex = """^[0-9]{6}+$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
   /** Name Rules **/
