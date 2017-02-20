@@ -110,7 +110,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
       "application status is approved" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -183,7 +183,29 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
       }
     }
 
+    "not show the date field for an amendment or variation when the trading premises is new" in new Fixture {
+
+      val tradingPremises = TradingPremises(lineId = None, yourTradingPremises = Some(ytp))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).
+        thenReturn(Future.successful(Some(Seq(tradingPremises))))
+
+      when(controller.statusService.getStatus(any(), any(), any())).
+        thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.get(1)(request)
+
+      status(result) must be(OK)
+
+      val doc = Jsoup.parse(contentAsString(result))
+
+      Option(doc.getElementById("endDate")).isDefined must be(false)
+
+    }
+
+
   }
+
   it when {
     "remove is called" must {
       "respond with SEE_OTHER" when {
@@ -385,6 +407,8 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
     }
   }
+
+
 
   val ytp = YourTradingPremises(
     "foo",

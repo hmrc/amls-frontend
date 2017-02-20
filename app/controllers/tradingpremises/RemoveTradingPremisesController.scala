@@ -26,12 +26,14 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         tp <- getData[TradingPremises](index)
         status <- statusService.getStatus
       } yield (tp, status) match {
-        case (Some(tradingPremises), SubmissionDecisionApproved) => {
+
+        case (Some(_), SubmissionDecisionApproved) =>
           Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-            tp.yourTradingPremises.fold("")(_.tradingName), showDateField = true))
-        }
-        case (Some(tradingPremises), _) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
+            tp.yourTradingPremises.fold("")(_.tradingName), showDateField = tp.lineId.isDefined))
+
+        case (Some(_), _) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
           tp.yourTradingPremises.fold("")(_.tradingName), showDateField = false))
+
         case _ => NotFound(notFoundView)
       }
   }
@@ -44,7 +46,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
           Redirect(routes.SummaryController.get(complete))
         }
         case SubmissionReadyForReview => for {
-          result <- updateDataStrict[TradingPremises](index) { tp =>
+          _ <- updateDataStrict[TradingPremises](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield Redirect(routes.SummaryController.get(complete))
