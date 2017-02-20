@@ -26,7 +26,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
           BusinessAppliedForPSRNumber.formRule.validate(map) must be(Valid(BusinessAppliedForPSRNumberNo))
         }
-        
+
       }
 
       "fail validation" when {
