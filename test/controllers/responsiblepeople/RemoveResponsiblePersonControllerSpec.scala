@@ -208,6 +208,28 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             CompleteResponsiblePeople3
           )))(any(), any(), any())
         }
+
+        "removing a responsible person from an application with no date" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "",
+            "endDate.month" -> "",
+            "endDate.year" -> ""
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1.copy(lineId = None)))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(SEE_OTHER)
+
+        }
+
       }
 
       "respond with BAD_REQUEST" when {

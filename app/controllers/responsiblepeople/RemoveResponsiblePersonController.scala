@@ -38,46 +38,46 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       }
   }
 
-  def redirectAppropriately(isYourAnswer: Boolean):Result = {
-    isYourAnswer match {
-      case true => Redirect(routes.YourAnswersController.get())
-      case false => Redirect(routes.CheckYourAnswersController.get())
-    }
-  }
-
   def remove(index: Int, complete: Boolean = false, personName: String) = Authorised.async {
     implicit authContext => implicit request =>
 
-      statusService.getStatus flatMap {
-        case NotCompleted | SubmissionReady => removeDataStrict[ResponsiblePeople](index) map { _ =>
-          redirectAppropriately(complete)
+        def redirectAppropriately = complete match {
+          case true => Redirect(routes.YourAnswersController.get())
+          case false => Redirect(routes.CheckYourAnswersController.get())
         }
-        case SubmissionReadyForReview => for {
-          result <- updateDataStrict[ResponsiblePeople](index) { tp =>
-            tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-          }
-        } yield redirectAppropriately(complete)
-        case _ =>
-          getData[ResponsiblePeople](index) flatMap { people =>
-            val extraFields = Map(
-              "positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString("yyyy-MM-dd")),
-              "userName" -> Seq(personName)
-            )
 
-            Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
-              case f: InvalidForm =>
-                Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
-              case ValidForm(_, data) => {
-                for {
-                  result <- updateDataStrict[ResponsiblePeople](index) { tp =>
-                    tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
-                  }
-                } yield redirectAppropriately(complete)
+        def removeWithoutDate = removeDataStrict[ResponsiblePeople](index) map { _ =>
+          redirectAppropriately
+        }
+
+        statusService.getStatus flatMap {
+          case NotCompleted | SubmissionReady => removeWithoutDate
+          case SubmissionReadyForReview => for {
+            result <- updateDataStrict[ResponsiblePeople](index) { tp =>
+              tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+            }
+          } yield redirectAppropriately
+          case _ =>
+            getData[ResponsiblePeople](index) flatMap { people =>
+              val extraFields = Map(
+                "positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString("yyyy-MM-dd")),
+                "userName" -> Seq(personName)
+              )
+
+              Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
+                case f: InvalidForm if people.get.lineId.isDefined =>
+                  Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
+                case ValidForm(_, data) => {
+                  for {
+                    result <- updateDataStrict[ResponsiblePeople](index) { tp =>
+                      tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                    }
+                  } yield redirectAppropriately
+                }
+                case _ => removeWithoutDate
               }
             }
-
-          }
-      }
+        }
   }
 }
 
