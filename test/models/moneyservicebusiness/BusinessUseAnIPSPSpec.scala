@@ -107,7 +107,7 @@ class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
             (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
           )))
         }
-        
+
         "reference contains invalid characters" in {
           val ref = symbols1.mkString("").take(8)
           val formData = Map(
