@@ -127,7 +127,7 @@ object FormTypes {
 
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
 
-  private val postcodeRequired = required("error.required.postcode")
+  private val postcodeRequired = required("error.invalid.postcode")
 
   val postcodeType = postcodeRequired andThen postcodePattern
 
