@@ -11,6 +11,7 @@ POST        /subscribe                                                  controll
 GET         /unauthorised                                               controllers.AmlsController.unauthorised
 
 GET         /registration-progress                                      controllers.RegistrationProgressController.get()
+POST        /registration-progress                                      controllers.RegistrationProgressController.post()
 
 GET         /application-status                                         controllers.StatusController.get()
 
@@ -215,6 +216,11 @@ GET         /declaration/who-is-registering                             controll
 POST        /declaration/who-is-registering                             controllers.declaration.WhoIsRegisteringController.post()
 
 GET         /amend-application/who-is-registering                       controllers.declaration.WhoIsRegisteringController.getWithAmendment()
+
+GET         /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
+POST        /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
+
+GET         /amend-application/nominated-officer                        controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 
 GET         /declaration/add-person                                     controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                     controllers.declaration.AddPersonController.post()
