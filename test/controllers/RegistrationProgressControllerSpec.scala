@@ -4,6 +4,8 @@ import connectors.DataCacheConnector
 import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
+import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
@@ -14,7 +16,7 @@ import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import utils.{GenericTestHelper, AuthorisedFixture}
+import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
@@ -222,6 +224,45 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+      }
+    }
+
+    "redirect to 'Who is registering this business?'" when {
+
+      "at least one of the person in responsible people is nominated officer" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
+          .thenReturn(Future.successful(Some(respinsiblePeople)))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+      }
+
+      "no respnsible people" in new Fixture {
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
+          .thenReturn(Future.successful(None))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+      }
+    }
+
+    "redirect to 'Who is the business’s nominated officer?'" when {
+      "no one is nominated officer in responsible people" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
+          thenReturn(Future.successful(Some(respinsiblePeople)))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
       }
     }
   }

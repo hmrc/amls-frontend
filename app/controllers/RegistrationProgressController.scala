@@ -2,10 +2,10 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
-import play.api.mvc.Request
+import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
+import play.api.mvc.{Action, AnyContent, Request}
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -74,7 +74,6 @@ trait RegistrationProgressController extends BaseController {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
     } yield bm.isComplete match {
       case (true) => {
-        val sections = service.sections(cache)
         enrolmentsService.amlsRegistrationNumber map {
           case Some(_) => Some(true)
           case None => Some(false)
@@ -84,6 +83,19 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
+  def post: Action[AnyContent] = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+        case Some(rps) => {
+          val hasNominatedOfficer = rps.exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
+          hasNominatedOfficer match {
+            case true => Redirect(declaration.routes.WhoIsRegisteringController.get())
+            case false => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+          }
+        }
+        case _ => Redirect(declaration.routes.WhoIsRegisteringController.get())
+      }
+    }
 }
 
 object RegistrationProgressController extends RegistrationProgressController {
