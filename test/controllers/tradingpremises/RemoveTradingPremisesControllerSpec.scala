@@ -6,10 +6,11 @@ import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady,
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -310,6 +311,35 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
             completeTradingPremises2,
             completeTradingPremises3
           )))(any(), any(), any())
+        }
+
+        "removing a new trading premises (no line id) in an amendment or variation" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.remove(1, false, "Some trading name")(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+          val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
+
+          captor.getValue match {
+            case tp :: _ =>
+              tp.endDate must be(None)
+              tp.status must be(Some(StatusConstants.Deleted))
+              tp.hasChanged must be(true)
+          }
+
         }
       }
 

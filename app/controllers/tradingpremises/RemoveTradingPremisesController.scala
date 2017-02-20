@@ -52,19 +52,31 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         } yield Redirect(routes.SummaryController.get(complete))
         case _ =>
           getData[TradingPremises](index) flatMap { premises =>
-            val extraFields = Map(
-              "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.toString("yyyy-MM-dd"))
-            )
-            Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
-              case f: InvalidForm =>
-                Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, true)))
-              case ValidForm(_, data) => {
-                for {
-                  result <- updateDataStrict[TradingPremises](index) { tp =>
-                    tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+
+            premises.lineId match {
+              case Some(_) =>
+                val extraFields = Map(
+                  "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.toString("yyyy-MM-dd"))
+                )
+
+                Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
+                  case f: InvalidForm =>
+                    Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, true)))
+                  case ValidForm(_, data) => {
+                    for {
+                      _ <- updateDataStrict[TradingPremises](index) { tp =>
+                        tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                      }
+                    } yield Redirect(routes.SummaryController.get(complete))
                   }
-                } yield Redirect(routes.SummaryController.get(complete))
-              }
+                }
+
+              case _ =>
+                updateDataStrict[TradingPremises](index) {
+                  _.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+                } map { _ =>
+                  Redirect(routes.SummaryController.get(complete))
+                }
             }
           }
       }
