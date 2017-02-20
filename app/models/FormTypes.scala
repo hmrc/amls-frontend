@@ -18,7 +18,6 @@ object FormTypes {
   val maxNameTypeLength = 35
   val maxDescriptionTypeLength = 140
   val maxAddressLength = 35
-  val maxPostCodeTypeLength = 10
   val maxPhoneNumberLength = 24
   val maxEmailLength = 100
   val maxAccountName = 40
@@ -60,6 +59,7 @@ object FormTypes {
   val passportRegex = "^[0-9]{9}+$".r
 
   private val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u002d]+$".r
+  private val postcodeRegex = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$".r
 
   /** Helper Functions **/
 
@@ -96,6 +96,7 @@ object FormTypes {
   val removeDashRule: Rule[String, String] = removeCharacterRule('-')
 
   val basicPunctuationPattern = regexWithMsg(basicPunctuationRegex, "err.text.validation")
+  val postcodePattern = regexWithMsg(postcodeRegex, "error.invalid.postcode")
 
   val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}$""".r
   def referenceNumberRule(msg: String = "error.invalid.tcsp.mlr.reference.number") = regexWithMsg(referenceNumberRegex, msg)
@@ -131,9 +132,8 @@ object FormTypes {
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
 
   private val postcodeRequired = required("error.required.postcode")
-  private val postcodeLength = maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
 
-  val postcodeType = postcodeRequired andThen postcodeLength
+  val postcodeType = postcodeRequired andThen postcodePattern
 
   /** Contact Details Rules **/
 

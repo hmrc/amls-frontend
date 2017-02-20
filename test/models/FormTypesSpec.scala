@@ -22,8 +22,16 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate" in {
 
-      postcodeType.validate("177A") must
-        be(Valid("177A"))
+      postcodeType.validate("AA03 5BB") must
+        be(Valid("AA03 5BB"))
+    }
+
+    "fail to validate given an invalid postcode" in {
+
+      postcodeType.validate("XXXXX") must
+        be(Invalid(Seq(
+          Path -> Seq(ValidationError("error.invalid.postcode"))
+        )))
     }
 
     "fail to validate an empty string" in {
