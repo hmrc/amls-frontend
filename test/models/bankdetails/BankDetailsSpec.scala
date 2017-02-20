@@ -1,5 +1,7 @@
 package models.bankdetails
 
+import jto.validation._
+import models.CharacterSets
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -10,7 +12,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
 
-class BankDetailsSpec extends PlaySpec with MockitoSugar {
+class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
   val cache = mock[CacheMap]
   val emptyBankDetails: Option[BankDetails] = None
@@ -241,7 +243,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     val completeModel = BankDetails(Some(PersonalAccount), Some(BankAccount("ACCOUNTNAME", UKAccount("ACCOUNTNUMBER", "SORTCODE"))))
     val incompleteModel = BankDetails(Some(PersonalAccount), None)
 
-    "the section consistes of just 1 empty Bank details" must {
+    "the section consists of just 1 empty Bank details" must {
       "return a result indicating NotStarted" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -361,4 +363,122 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
+
+  "ibanType" must {
+    "validate IBAN supplied " in {
+      Account.ibanType.validate("IBAN_4323268686686") must be(Valid("IBAN_4323268686686"))
+    }
+
+    "fail validation if IBAN is longer than the permissible length" in {
+      Account.ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+
+    "fail validation if IBAN contains invalid characters" in {
+      Account.ibanType.validate("ab{}kfg  ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+    "fail validation if IBAN contains only whitespace" in {
+      Account.ibanType.validate("    ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+  }
+
+  "nonUKBankAccountNumberType" must {
+    "validate Non UK Account supplied " in {
+      Account.nonUKBankAccountNumberType.validate("IND22380310500093") must be(Valid("IND22380310500093"))
+    }
+
+    "fail validation if Non UK Account is longer than the permissible length" in {
+      Account.nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+    "fail validation if Non UK Account no contains invalid characters" in {
+      Account.nonUKBankAccountNumberType.validate("ab{}kfg  ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+    "fail validation if Non UK Account no contains only whitespace" in {
+      Account.nonUKBankAccountNumberType.validate("    ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+  }
+
+  "ukBankAccountNumberType" must {
+
+    "validate when 8 digits are supplied " in {
+      Account.ukBankAccountNumberType.validate("87654321") must be(Valid("87654321"))
+    }
+
+    "fail validation when less than 8 characters are supplied" in {
+      Account.ukBankAccountNumberType.validate("123456") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+    }
+
+    "fail validation when more than 8 characters are supplied" in {
+      Account.ukBankAccountNumberType.validate("1234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
+    }
+  }
+
+  "sortCodeType" must {
+
+    "validate when 6 digits are supplied without - " in {
+      Account.sortCodeType.validate("654321") must be(Valid("654321"))
+    }
+
+    "fail validation when more than 6 digits are supplied without - " in {
+      Account.sortCodeType.validate("87654321") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+    }
+
+    "fail when 8 non digits are supplied with - " in {
+      Account.sortCodeType.validate("ab-cd-ef") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+    }
+
+    "pass validation when dashes are used to seperate number groups" in {
+      Account.sortCodeType.validate("65-43-21") must be(Valid("654321"))
+    }
+    "pass validation when spaces are used to seperate number groups" in {
+      Account.sortCodeType.validate("65 43 21") must be(Valid("654321"))
+    }
+
+    "fail validation for sort code with any other pattern" in {
+      Account.sortCodeType.validate("8712341241431243124124654321") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
+      )
+    }
+  }
+
+  "accountNameType" must {
+
+    "be mandatory" in {
+      BankAccount.accountNameType.validate("") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
+    }
+
+    "accept all characters from the allowed set" in {
+      BankAccount.accountNameType.validate(digits.mkString("")) must be(Valid(digits.mkString("")))
+      BankAccount.accountNameType.validate(alphaUpper.mkString("")) must be(Valid(alphaUpper.mkString("")))
+      BankAccount.accountNameType.validate(alphaLower.mkString("")) must be(Valid(alphaLower.mkString("")))
+      BankAccount.accountNameType.validate(extendedAlphaUpper.mkString("")) must be(Valid(extendedAlphaUpper.mkString("")))
+      BankAccount.accountNameType.validate(extendedAlphaLower.mkString("")) must be(Valid(extendedAlphaLower.mkString("")))
+      BankAccount.accountNameType.validate(symbols1.mkString("")) must be(Valid(symbols1.mkString("")))
+      BankAccount.accountNameType.validate(symbols2.mkString("")) must be(Valid(symbols2.mkString("")))
+      BankAccount.accountNameType.validate(symbols6.mkString("")) must be(Valid(symbols6.mkString("")))
+    }
+
+    "be not more than 40 characters" in {
+      BankAccount.accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
+      )
+    }
+
+    "not allow characters from other sets" in {
+      BankAccount.accountNameType.validate(symbols5.mkString("")) must be (
+        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+      )
+    }
+  }
+
 }
