@@ -74,7 +74,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
          case ValidForm(_, data) => {
              data.value match {
                case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)))
-               case _ => for {
+               case x if(x.nonEmpty) => for {
                  responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
                  rp <-  updateNominatedOfficer(responsiblePeople, data)
                  _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
