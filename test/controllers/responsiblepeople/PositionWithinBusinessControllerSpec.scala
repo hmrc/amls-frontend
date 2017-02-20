@@ -328,153 +328,106 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         }
       }
 
-      "submit with valid data as a partnership" in new Fixture {
+      "when edit is false" must {
+        "redirect to the VAT Registered Controller when Nominated Officer is selected" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "05", "positions" -> "04",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
-      }
-
-      "submit with valid data as a sole proprietor" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
-      }
-
-      "submit with valid data and redirect as no Nominated Officer" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-      }
-
-      "submit with valid data and redirect as no Nominated Officer when there are Responsible People" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-      }
-
-
-
-      "submit with all other valid data types" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        for (i <- 1 to 4) {
-          val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i",
+          val newRequest = request.withFormUrlEncodedBody(
+            "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
         }
+
+        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+        }
+
+        "redirect to VATRegisteredController when another position is selected in addition to the nomindated Officer" in new Fixture {
+
+          val positions = Positions(Set(Director, NominatedOfficer), startDate)
+          val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "positions" -> "06",
+            "positions" -> "01",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+
+        }
       }
 
-      "submit with mixture of data types selected" in new Fixture {
+      "when edit is true" must {
+        "redirect to the VAT Registered Controller when Nominated Officer is selected" in new Fixture {
 
-        val positions = Positions(Set(Director, NominatedOfficer), startDate)
-        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+          val newRequest = request.withFormUrlEncodedBody(
+            "positions" -> "04",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990")
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "positions" -> "06",
-          "positions" -> "01",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990"
-        )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          val result = controller.post(RecordId, true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+        }
 
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected" in new Fixture {
 
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(RecordId, true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+        }
       }
 
 
 
-      "submit with valid personal tax data and with edit mode" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "05",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId, true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId, true).url))
-      }
-
-      "submit with valid non-personal tax data with edit mode" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("positions" -> "01",
-          "startDate.day" -> "24",
-          "startDate.month" -> "2",
-          "startDate.year" -> "1990")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        val mockCacheMap = mock[CacheMap]
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(RecordId, true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-      }
     }
   }
 
