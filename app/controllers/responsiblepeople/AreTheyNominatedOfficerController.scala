@@ -36,21 +36,22 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised {
       implicit authContext => implicit request =>
 
-        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
+        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, fromDeclaration))
     }
 
-  def post(index: Int, edit: Boolean = false) =
+
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
 
-            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index)))
+            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index, fromDeclaration)))
 
           case ValidForm(_, data) => {
 
@@ -65,6 +66,10 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
+              rpSeqOption match {
+                case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq, fromDeclaration)
+                case _ => NotFound(notFoundView)
+              }
               redirectDependingOnEdit(index, edit, rpSeqOption)(request)
             }
 
