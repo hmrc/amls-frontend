@@ -35,7 +35,7 @@ object FormTypes {
   val vrnTypeRegex = "^[0-9]{9}$".r
   private val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
   private val addressTypeRegex = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$".r
-  val emailRegex = ("^.+" + //Any character 1 or more times
+  val emailRegex = ("^[^,@]+" + //Any character 1 or more times
     "@" + //@ symbol
     "(" + //start of DNS label group
     "(?!\\-)" + //does not start with hyphen
