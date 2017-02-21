@@ -97,7 +97,7 @@ object FormTypes {
   val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}$""".r
   def referenceNumberRule(msg: String = "error.invalid.mlr.number") = regexWithMsg(referenceNumberRegex, msg)
 
-  val extendedReferenceNumberRegex = """^[A-Za-z0-9\-\s]+$""".r
+  val extendedReferenceNumberRegex = """^[0-9]{6}$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
   /** Name Rules **/
