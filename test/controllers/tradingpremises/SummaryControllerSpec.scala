@@ -118,7 +118,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "the trading premises is an Agent trading premises" in {
 
-        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)))
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), lineId = Some(1234))
 
         tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
           controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1).url)
@@ -138,6 +138,16 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)))
 
         tradingPremises.removeUrl(1, status = SubmissionReady) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
+        )
+
+      }
+
+      "the status is an amendment or variation but the trading premises has no line Id" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), lineId = None)
+
+        tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
           controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
         )
 

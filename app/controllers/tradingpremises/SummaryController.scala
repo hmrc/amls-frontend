@@ -51,7 +51,7 @@ object ModelHelpers {
     private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 
     def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
-      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) =>
+      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) && model.lineId.isDefined =>
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
       case _ =>
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url
