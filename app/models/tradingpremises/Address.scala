@@ -41,7 +41,7 @@ object Address {
           (__ \ "addressLine2").read(notEmptyStrip andThen notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
           (__ \ "addressLine3").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "addressLine4").read(optionR(notEmptyStrip andThen validateAddress)) ~
-          (__ \ "postcode").read(postcodeType)
+          (__ \ "postcode").read(notEmptyStrip andThen postcodeType)
         )(Address.applyWithoutDateOfChange _)
     }
 
