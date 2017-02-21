@@ -16,8 +16,6 @@ object BusinessAppliedForPSRNumber {
   import utils.MappingUtils.Implicits._
 
   private val registrationNumberType = notEmptyStrip
-      .andThen(notEmpty.withMessage("error.invalid.msb.psr.number"))
-      .andThen(maxLength(6).withMessage("error.invalid.msb.psr.number"))
       .andThen(extendedReferenceNumberRule("error.invalid.msb.psr.number"))
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessAppliedForPSRNumber] = From[UrlFormEncoded] { __ =>
