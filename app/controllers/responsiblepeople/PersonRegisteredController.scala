@@ -14,7 +14,7 @@ trait PersonRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int) =
+  def get(index: Int, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
@@ -23,21 +23,21 @@ trait PersonRegisteredController extends BaseController {
               !x.status.contains(StatusConstants.Deleted) &&
               x.personName.isDefined
             })
-            Ok(person_registered(EmptyForm, count))
-          case _ => Ok(person_registered(EmptyForm, index))
+            Ok(person_registered(EmptyForm, count, fromDeclaration))
+          case _ => Ok(person_registered(EmptyForm, index, fromDeclaration))
         }
   }
 
-  def post(index: Int) =
+  def post(index: Int, fromDeclaration: Boolean = false) =
       Authorised.async {
         implicit authContext => implicit request =>
           Form2[PersonRegistered](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(person_registered(f, index)))
+              Future.successful(BadRequest(person_registered(f, index, fromDeclaration)))
             case ValidForm(_, data) =>
                data.registerAnotherPerson match {
                 case true => Future.successful(Redirect(routes.ResponsiblePeopleAddController.get(false)))
-                case false => Future.successful(Redirect(routes.CheckYourAnswersController.get()))
+                case false => Future.successful(Redirect(routes.CheckYourAnswersController.get(fromDeclaration)))
               }
           }
       }

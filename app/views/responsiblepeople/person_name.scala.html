@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -13,7 +13,7 @@
     title = Messages("responsiblepeople.personName.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-    @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit)) {
+    @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit, fromDeclaration)) {
 
         @fieldset(
             panel = false,

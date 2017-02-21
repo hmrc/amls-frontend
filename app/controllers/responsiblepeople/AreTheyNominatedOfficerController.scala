@@ -36,22 +36,22 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised {
       implicit authContext => implicit request =>
 
-        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
+        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, fromDeclaration))
     }
 
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
 
-            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index)))
+            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index, fromDeclaration)))
 
           case ValidForm(_, data) => {
 
@@ -67,7 +67,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
               rpSeqOption match {
-                case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq)
+                case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq, fromDeclaration)
                 case _ => NotFound(notFoundView)
               }
             }
@@ -79,12 +79,13 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
     }
 
 
-  private def personalTaxRouter(index: Int, edit: Boolean, rpSeq: Seq[ResponsiblePeople])(implicit request: Request[_]): Result = {
+  private def personalTaxRouter(index: Int, edit: Boolean, rpSeq: Seq[ResponsiblePeople],
+                                fromDeclaration: Boolean = false)(implicit request: Request[_]): Result = {
     rpSeq.lift(index - 1) match {
       case Some(x) => (isPersonalTax(x), edit) match {
-        case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
+        case (false, false) => Redirect(routes.ExperienceTrainingController.get(index, false, fromDeclaration))
         case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+        case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
 
       }
       case _ => NotFound(notFoundView)

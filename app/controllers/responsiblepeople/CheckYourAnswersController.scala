@@ -2,21 +2,44 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, declaration}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import services.StatusService
 import views.html.responsiblepeople._
+
+import scala.concurrent.Future
 
 trait CheckYourAnswersController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService : StatusService
 
-  def get =
+  def get(fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-          case Some(data) => Ok(check_your_answers(data))
+          case Some(data) => Ok(check_your_answers(data, fromDeclaration))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }
+    }
+
+  def post(fromDeclaration: Boolean = false) =
+    Authorised.async {
+      implicit authContext => implicit request =>
+        fromDeclaration match {
+          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          case true => {
+            for {
+              status <- statusService.getStatus
+            } yield status match {
+              case SubmissionReady | NotCompleted | SubmissionReadyForReview =>
+                Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+              case _ => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
+            }
+          }
+        }
+
     }
 }
 
@@ -24,4 +47,5 @@ object CheckYourAnswersController extends CheckYourAnswersController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
+  override val statusService = StatusService
 }

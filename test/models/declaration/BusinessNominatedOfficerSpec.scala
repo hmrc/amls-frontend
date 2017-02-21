@@ -10,7 +10,7 @@ class BusinessNominatedOfficerSpec extends PlaySpec {
 
     "successfully validate" when {
       "successfully validate given a valid person name" in {
-        val data = Map("person" -> Seq("PersonName"))
+        val data = Map("value" -> Seq("PersonName"))
         val result = BusinessNominatedOfficer.formRule.validate(data)
         result mustBe Valid(BusinessNominatedOfficer("PersonName"))
       }
@@ -19,27 +19,27 @@ class BusinessNominatedOfficerSpec extends PlaySpec {
     "fail validation" when {
       "fail validation for missing data represented by an empty Map" in {
         val result = BusinessNominatedOfficer.formRule.validate(Map.empty)
-        result mustBe Invalid(Seq((Path \ "person", Seq(ValidationError("error.required.declaration.nominated.officer")))))
+        result mustBe Invalid(Seq((Path \ "value", Seq(ValidationError("error.required.declaration.nominated.officer")))))
       }
     }
 
     "write correct data from true value" in {
       val result = BusinessNominatedOfficer.formWrites.writes(BusinessNominatedOfficer("PersonName"))
-      result must be(Map("person" -> Seq("PersonName")))
+      result must be(Map("value" -> Seq("PersonName")))
     }
   }
 
   "JSON validation" must {
 
     "successfully validate given an model value" in {
-      val json = Json.obj("person" -> "PersonName")
+      val json = Json.obj("value" -> "PersonName")
       Json.fromJson[BusinessNominatedOfficer](json) must
-        be(JsSuccess(BusinessNominatedOfficer("PersonName"), JsPath \ "person"))
+        be(JsSuccess(BusinessNominatedOfficer("PersonName"), JsPath \ "value"))
     }
 
     "successfully validate json read write" in {
       Json.toJson(BusinessNominatedOfficer("PersonName")) must
-        be(Json.obj("person" -> "PersonName"))
+        be(Json.obj("value" -> "PersonName"))
     }
   }
 
