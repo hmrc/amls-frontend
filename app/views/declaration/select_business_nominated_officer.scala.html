@@ -24,7 +24,7 @@
         }
 
         @fieldset(
-            f = f("person"),
+            f = f("value"),
             legend = "declaration.who.is.registering.title",
             legendHidden = true,
             panel = false
@@ -35,7 +35,7 @@
                 }
             }
             <p class="form-block">@Messages("lbl.or")</p>
-            @radio(f("person"), Messages("lbl.register.some.one.else"), "-1")
+            @radio(f("value"), Messages("lbl.register.some.one.else"), "-1")
         }
         @submit()
     }

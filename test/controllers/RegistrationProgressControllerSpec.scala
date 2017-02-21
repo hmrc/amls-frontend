@@ -1,28 +1,25 @@
 package controllers
 
 import connectors.DataCacheConnector
-import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.responsiblepeople._
+import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, OneServerPerSuite}
 import play.api.mvc.Call
 import play.api.test.FakeApplication
-import services.{AuthEnrolmentsService, ProgressService}
+import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
 import org.mockito.Matchers.any
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import play.api.i18n.Messages
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,6 +33,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
       override protected[controllers] val service: ProgressService = mock[ProgressService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService : StatusService = mock[StatusService]
     }
 
     protected val mockCacheMap = mock[CacheMap]
@@ -235,6 +233,8 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
         val respinsiblePeople = Seq(john, mark)
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
           .thenReturn(Future.successful(Some(respinsiblePeople)))
         val result = controller.post()(request)
@@ -242,9 +242,26 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
       }
 
+      "at least one of the person in responsible people is nominated officer and status id amendment" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
+          .thenReturn(Future.successful(Some(respinsiblePeople)))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url)
+      }
+
       "no respnsible people" in new Fixture {
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
           .thenReturn(Future.successful(None))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
@@ -258,11 +275,30 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
         val respinsiblePeople = Seq(john, mark)
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
           thenReturn(Future.successful(Some(respinsiblePeople)))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
+      }
+
+      "no one is nominated officer in responsible people and status is amendment" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
+          thenReturn(Future.successful(Some(respinsiblePeople)))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment().url)
       }
     }
   }
@@ -276,6 +312,7 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHel
       override protected[controllers] val service: ProgressService = mock[ProgressService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService : StatusService = mock[StatusService]
     }
 
     protected val mockCacheMap = mock[CacheMap]

@@ -3,10 +3,8 @@ package controllers.declaration
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople._
-import models.status.{SubmissionReady, SubmissionReadyForReview}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
-import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -102,12 +100,36 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     "successfully redirect 'Who is registering this business?' page" when {
 
+      "selected option is a valid responsible person in amendment mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
+          = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
+
+        when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.getWithAmendment().url))
+      }
+
       "selected option is a valid responsible person" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
 
         val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
           = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
@@ -125,6 +147,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
       "selected option is 'Register someone else'" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
 
@@ -139,6 +164,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
         val newRequest = request.withFormUrlEncodedBody()
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReady))

@@ -220,7 +220,7 @@ GET         /amend-application/who-is-registering                       controll
 GET         /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 POST        /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
-GET         /amend-application/nominated-officer                        controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
+GET         /amend-application/nominated-officer                        controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
 
 GET         /declaration/add-person                                     controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                     controllers.declaration.AddPersonController.post()
