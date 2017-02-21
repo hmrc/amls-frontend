@@ -2,6 +2,7 @@
 @import include._
 @import include.forms2._
 @import models.registrationprogress.Section
+@import views.html.helper.CSRF
 
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_],m:Messages)
 
@@ -32,7 +33,8 @@
         @* Sidebar *@
         <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
             <div class="application-submit">
-                <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment.url">
+                <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+                    @CSRF.formField
                     <fieldset>
                         @include.forms2.legend("amendment.sidebar.heading", false, true, "", false)
                         <p>
