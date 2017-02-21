@@ -48,7 +48,7 @@ trait SummaryController extends RepeatingSection with BaseController {
 object ModelHelpers {
   implicit class removeUrl(model: TradingPremises) {
 
-    private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
+    private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady, SubmissionReadyForReview).contains(status)
 
     def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
       case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) && model.lineId.isDefined =>
