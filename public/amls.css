@@ -477,8 +477,6 @@ th.numeric {
 
 
 /* postcode */
-
-
 /* TODO, determine if there's a class in Assets Frontend for this
  * …
  * seems there is: `.form-control-1-4`
@@ -992,7 +990,6 @@ fieldset.panel-indent legend {
     background-size: 100%;
   }
 }
-
 
 /* Temp override */
 
