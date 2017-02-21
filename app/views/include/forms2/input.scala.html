@@ -9,12 +9,13 @@
     panel: Boolean = false,
     jsHidden: Boolean = false,
     labelHidden: Boolean = false,
-    requiredField: Boolean = true,
     parentDateAttr: String = "",
     attrType: String = "",
     attrMin: String = "",
     attrMax: String = "",
+    attrMinlength: String = "",
     attrMaxlength: String = "",
+    attrPattern: String = "",
     attrTitle: String = "",
     attrDescribedBy: String = "",
     data: String = ""
@@ -38,11 +39,12 @@
             value="@field.value" id="@field.id"
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
-            @if(requiredField) { aria-required="true" }
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
             @if(attrMin.nonEmpty) { min="@attrMin" }
             @if(attrMax.nonEmpty) { max="@attrMax" }
+            @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
             @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
+            @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
             @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
         />
 </div>

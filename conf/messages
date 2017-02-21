@@ -360,10 +360,10 @@ lbl.1200.character.limit=1200 character limit
 lbl.give.details = Please give details
 
 legend.address = Address
-lbl.address.line1 = Address
+lbl.address.line1 = Address line 1
 lbl.address.line2 = Address line 2
-lbl.address.line3 = Address line 3
-lbl.address.line4 = Address line 4
+lbl.address.line3 = Address line 3 (optional)
+lbl.address.line4 = Address line 4 (optional)
 lbl.address.postcode = Postcode
 
 businessType.lbl.02 = Limited company

@@ -215,7 +215,6 @@ a.progress-step,
 }
 
 .progress-step--status-time {
-
     padding: 15px 0 0;
 }
 
@@ -265,10 +264,10 @@ a.progress-step,
 }
 
 @media screen and (max-width: 480px) {
-    .progress-step--status,
+  .progress-step--status,
   .no-svg .progress-step--status {
-        background-position: 90% 90%;
-    }
+    background-position: 90% 90%;
+  }
 }
 
 @media screen and (max-width: 640px) {
@@ -289,6 +288,11 @@ a.progress-step,
 
     .progress-step--status {
         background-size: 20%;
+    }
+
+    /* bump down for smaller screens */
+    .progress-step--status-time .heading-medium {
+      font-size: 18px;
     }
 }
 
@@ -436,40 +440,45 @@ th.numeric {
 }
 
 /* postcode */
-/* TODO, determine if there's a class in Assets Frontend for this */
+/* TODO, determine if there's a class in Assets Frontend for this
+ * …
+ * seems there is: `.form-control-1-4`
+ * http://govuk-elements.herokuapp.com/form-elements/example-form-elements/
+*/
 form input[type=text].form-control.postcode {
-    width: 20%;
+  width: 20%;
 }
 
 /* select box for countries */
 select {
-    border: 2px solid #6f777b;
-    margin: 0;
-    padding: 4px;
-    width: 50%;
+  border: 2px solid #6f777b;
+  margin: 0;
+  padding: 4px;
+  width: 50%;
 }
 
 /* form errors */
 .amls-error-summary {
-    background-color: #fff;
-    border: 4px solid #b10e1e;
+  background-color: #fff;
+  border: 4px solid #b10e1e;
 }
 
 .amls-error-summary li {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .amls-error-summary li > a {
-    color: #b10e1e;
+  color: #b10e1e;
 }
 
 .form-field--error {
-    border-left-width: 4px;
-    border-color: #b10e1e;
+  border-color: #b10e1e;
+  border-left-width: 4px;
 }
 
 .form-field--error span.error-notification {
-    font-weight: bold;
+  font-size: 19px;
+  font-weight: bold;
 }
 
 /* forms */
@@ -480,6 +489,7 @@ select {
   .button,
   .button--get-started {
     box-sizing: border-box;
+    text-align: center;
     width: 100%;
   }
 }
@@ -935,12 +945,6 @@ fieldset.panel-indent legend {
     background-image: url("/anti-money-laundering/assets/images/icon-important-2x.png");
     background-size: 100%;
   }
-}
-
-.form-control {
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  appearance: textfield;
 }
 
 /* Temp override */
