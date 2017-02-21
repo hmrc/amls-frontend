@@ -1,4 +1,5 @@
 @import forms.{Field, Form2}
+@import utils.HtmlElementHelpers._
 
 @(
     field: Field,
@@ -18,8 +19,10 @@
     attrPattern: String = "",
     attrTitle: String = "",
     attrDescribedBy: String = "",
-    data: String = ""
+    data: String = "",
+    dataAttrs: Map[String, String] = Map.empty[String, String]
 )(implicit lang:Lang,  m: Messages)
+
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}"@if(data){ data-reveal="@data"}>
     <label class="form-label@if(bold){-bold}" for="@field.id">
@@ -46,5 +49,6 @@
             @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
             @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
+            @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
         />
 </div>
