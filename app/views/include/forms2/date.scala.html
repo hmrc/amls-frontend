@@ -36,6 +36,7 @@
         attrType = "number",
         attrMin = "1",
         attrMax = "31",
+        attrPattern = "[0-9]{2}",
         attrDescribedBy = s"${hintId}"
     )
     @input(
@@ -46,7 +47,8 @@
         parentDateAttr = "month",
         attrType = "number",
         attrMin = "1",
-        attrMax = "12"
+        attrMax = "12",
+        attrPattern = "[0-9]{2}"
     )
     @input(
         labelText = "lbl.year",
@@ -54,6 +56,7 @@
         bold = false,
         classes = Seq("input--no-spinner"),
         parentDateAttr = "year",
-        attrType = "number"
+        attrType = "number",
+        attrPattern = "[1-9][0-9]{3}"
     )
 </fieldset>

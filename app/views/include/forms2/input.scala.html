@@ -16,6 +16,7 @@
     attrMax: String = "",
     attrMinlength: String = "",
     attrMaxlength: String = "",
+    attrPattern: String = "",
     attrTitle: String = "",
     attrDescribedBy: String = "",
     data: String = "",
@@ -46,6 +47,7 @@
             @if(attrMax.nonEmpty) { max="@attrMax" }
             @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
             @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
+            @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
             @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
             @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
         />
