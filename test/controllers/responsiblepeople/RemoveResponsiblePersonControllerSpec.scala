@@ -1,6 +1,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import forms.EmptyForm
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
@@ -14,11 +15,10 @@ import org.scalatest.{MustMatchers, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{GenericTestHelper, StatusConstants, AuthorisedFixture}
+import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => meq, _}
 import play.api.i18n.Messages
-
 
 import scala.concurrent.Future
 
@@ -70,7 +70,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -87,6 +87,45 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           val result = controller.get(100, false)(request)
 
           status(result) must be(NOT_FOUND)
+
+        }
+        "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
+
+          val rp = ResponsiblePeople(
+            Some(PersonName("firstName", None, "lastName", None, None))
+          )
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(rp))))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(OK)
+
+          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
+        }
+      }
+      "the submission status is SubmissionReadyForReview" must {
+        "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
+
+          val rp = ResponsiblePeople(
+            Some(PersonName("firstName", None, "lastName", None, None))
+          )
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(rp))))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(OK)
+
+          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
         }
       }
@@ -208,6 +247,28 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             CompleteResponsiblePeople3
           )))(any(), any(), any())
         }
+
+        "removing a responsible person from an application with no date" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "",
+            "endDate.month" -> "",
+            "endDate.year" -> ""
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1.copy(lineId = None)))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(SEE_OTHER)
+
+        }
+
       }
 
       "respond with BAD_REQUEST" when {

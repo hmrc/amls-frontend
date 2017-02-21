@@ -14,15 +14,7 @@
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    )   {
-        <p>@Messages("responsiblepeople.wherepersonlives.need.to.know")</p>
-    }
-
-    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit,fromDeclaration)) {
 
         <div class="form-group">
             @fieldset(

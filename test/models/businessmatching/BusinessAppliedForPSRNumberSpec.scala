@@ -27,18 +27,6 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           BusinessAppliedForPSRNumber.formRule.validate(map) must be(Valid(BusinessAppliedForPSRNumberNo))
         }
 
-        "given letters, numbers, spaces and hyphens" in {
-
-          val regNumber = "67-s G"
-
-          val form = Map(
-            "appliedFor" -> Seq("true"),
-            "regNumber" -> Seq(regNumber)
-          )
-
-          BusinessAppliedForPSRNumber.formRule.validate(form) must be(Valid(BusinessAppliedForPSRNumberYes(regNumber)))
-
-        }
       }
 
       "fail validation" when {

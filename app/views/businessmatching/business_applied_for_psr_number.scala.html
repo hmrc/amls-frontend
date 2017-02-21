@@ -1,5 +1,6 @@
 @import include._
 @import forms2._
+@import utils.HtmlElementHelpers._
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
@@ -53,6 +54,7 @@
             @input(
                 field = f("regNumber"),
                 bold = false,
+                dataAttrs = digitsOnlyAttributes,
                 labelText = "businessmatching.psr.number.lbl",
                 hintText = "businessmatching.psr.number.hint"
             )
