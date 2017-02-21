@@ -18,7 +18,6 @@ object FormTypes {
   val maxNameTypeLength = 35
   val maxDescriptionTypeLength = 140
   val maxAddressLength = 35
-  val maxPostCodeTypeLength = 10
   val maxPhoneNumberLength = 24
   val maxEmailLength = 100
   val maxAccountName = 40
@@ -52,14 +51,11 @@ object FormTypes {
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegex = "((19|20)\\d\\d)".r
   val corporationTaxRegex = "^[0-9]{10}$".r
-  val sortCodeRegex = "^[0-9]{6}".r
-  val ukBankAccountNumberRegex = "^[0-9]{8}$".r
-  val nonUKBankAccountNumberRegex = "^[0-9a-zA-Z_]+$".r
-  val ibanRegex = "^[0-9a-zA-Z_]+$".r
   val ninoRegex = "(AA|AB|AE|AH|AK|AL|AM|AP|AR|AS|AT|AW|AX|AY|AZ|BA|BB|BE|BH|BK|BL|BM|BT|CA|CB|CE|CH|CK|CL|CR|EA|EB|EE|EH|EK|EL|EM|EP|ER|ES|ET|EW|EX|EY|EZ|GY|HA|HB|HE|HH|HK|HL|HM|HP|HR|HS|HT|HW|HX|HY|HZ|JA|JB|JC|JE|JG|JH|JJ|JK|JL|JM|JN|JP|JR|JS|JT|JW|JX|JY|JZ|KA|KB|KE|KH|KK|KL|KM|KP|KR|KS|KT|KW|KX|KY|KZ|LA|LB|LE|LH|LK|LL|LM|LP|LR|LS|LT|LW|LX|LY|LZ|MA|MW|MX|NA|NB|NE|NH|NL|NM|NP|NR|NS|NW|NX|NY|NZ|OA|OB|OE|OH|OK|OL|OM|OP|OR|OS|OX|PA|PB|PC|PE|PG|PH|PJ|PK|PL|PM|PN|PP|PR|PS|PT|PW|PX|PY|RA|RB|RE|RH|RK|RM|RP|RR|RS|RT|RW|RX|RY|RZ|SA|SB|SC|SE|SG|SH|SJ|SK|SL|SM|SN|SP|SR|SS|ST|SW|SX|SY|SZ|TA|TB|TE|TH|TK|TL|TM|TN|TP|TR|TS|TT|TW|TX|TY|TZ|WA|WB|WE|WK|WL|WM|WP|YA|YB|YE|YH|YK|YL|YM|YP|YR|YS|YT|YW|YX|YY|YZ|ZA|ZB|ZE|ZH|ZK|ZL|ZM|ZP|ZR|ZS|ZT|ZW|ZX|ZY)[0-9]{6}[A-D]".r
   val passportRegex = "^[0-9]{9}+$".r
 
   private val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u002d]+$".r
+  private val postcodeRegex = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$".r
 
   /** Helper Functions **/
 
@@ -96,16 +92,17 @@ object FormTypes {
   val removeDashRule: Rule[String, String] = removeCharacterRule('-')
 
   val basicPunctuationPattern = regexWithMsg(basicPunctuationRegex, "err.text.validation")
+  val postcodePattern = regexWithMsg(postcodeRegex, "error.invalid.postcode")
 
   val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}$""".r
-  def referenceNumberRule(msg: String = "error.invalid.tcsp.mlr.reference.number") = regexWithMsg(referenceNumberRegex, msg)
+  def referenceNumberRule(msg: String = "error.invalid.mlr.number") = regexWithMsg(referenceNumberRegex, msg)
 
-  val extendedReferenceNumberRegex = """^[A-Za-z0-9\-\s]+$""".r
+  val extendedReferenceNumberRegex = """^[0-9]{6}$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
   /** Name Rules **/
 
-  private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]{1,35}$".r
+  private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$".r
   val commonNameRegexRule = regexWithMsg(commonNameRegex, "error.invalid.common_name.validation")
 
   private val middleNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.middlename")
@@ -130,10 +127,9 @@ object FormTypes {
 
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
 
-  private val postcodeRequired = required("error.required.postcode")
-  private val postcodeLength = maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
+  private val postcodeRequired = required("error.invalid.postcode")
 
-  val postcodeType = postcodeRequired andThen postcodeLength
+  val postcodeType = postcodeRequired andThen postcodePattern
 
   /** Contact Details Rules **/
 
@@ -224,31 +220,6 @@ object FormTypes {
       (__ \ "userName").read[String]).tupled.andThen(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
-  /** Bank details Rules **/
-
-  //TODO: Add error messages
-
-  val accountNameType = notEmptyStrip
-    .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
-    .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
-    .andThen(pattern(basicPunctuationRegex).withMessage("err.text.validation"))
-
-  val sortCodeType = (removeDashRule andThen removeSpacesRule andThen notEmpty)
-    .withMessage("error.invalid.bankdetails.sortcode")
-    .andThen(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
-
-  val ukBankAccountNumberType = notEmpty
-    .withMessage("error.bankdetails.accountnumber")
-    .andThen(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
-    .andThen(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
-
-  val nonUKBankAccountNumberType = notEmpty
-    .andThen(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.account"))
-    .andThen(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
-
-  val ibanType = notEmpty
-    .andThen(maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban"))
-    .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
 
   /** Business Identifier Rules */
 
@@ -275,8 +246,8 @@ object FormTypes {
   def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length") =
     notEmptyStrip
       .andThen(notEmpty.withMessage(requiredMsg))
-      .andThen(maxLength(maxNameTypeLength).withMessage(maxLengthMsg))
       .andThen(commonNameRegexRule)
+      .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
 
   /** Personal Identification Rules **/
 

@@ -17,7 +17,7 @@ object ServicesOfAnotherTCSP {
 
   import utils.MappingUtils.Implicits._
 
-  val service = notEmpty.withMessage("error.required.tcsp.mlr.reference.number")
+  val service = notEmpty.withMessage("error.invalid.mlr.number")
     .andThen(referenceNumberRule())
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>

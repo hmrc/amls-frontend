@@ -1,5 +1,6 @@
 package models.bankdetails
 
+import jto.validation.forms.Rules._
 import models.FormTypes._
 import jto.validation.ValidationError
 import play.api.libs.json._
@@ -12,10 +13,35 @@ sealed trait Account
 object Account {
 
   import utils.MappingUtils.Implicits._
+  import models.FormTypes._
+
+  val sortCodeRegex = "^[0-9]{6}".r
+  val ukBankAccountNumberRegex = "^[0-9]{8}$".r
+  val nonUKBankAccountNumberRegex = "^[0-9a-zA-Z_]+$".r
+  val ibanRegex = "^[0-9a-zA-Z_]+$".r
+
+  val sortCodeType = (removeDashRule andThen removeSpacesRule andThen notEmpty)
+    .withMessage("error.invalid.bankdetails.sortcode")
+    .andThen(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
+
+  val ukBankAccountNumberType = notEmpty
+    .withMessage("error.bankdetails.accountnumber")
+    .andThen(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
+    .andThen(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
+
+  val nonUKBankAccountNumberType = notEmpty
+    .andThen(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.invalid.bankdetails.account"))
+    .andThen(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
+
+  val ibanType = notEmpty
+    .andThen(maxLength(maxIBANLength).withMessage("error.invalid.bankdetails.iban"))
+    .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
+
 
   implicit val formRead: Rule[UrlFormEncoded, Account] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
+
       (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
@@ -112,10 +138,14 @@ case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
 case class BankAccount(accountName: String, account: Account)
 
 object BankAccount {
-
   import utils.MappingUtils.Implicits._
 
   val key = "bank-account"
+
+  val accountNameType = notEmptyStrip
+    .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
+    .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
+    .andThen(basicPunctuationPattern)
 
   implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

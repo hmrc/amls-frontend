@@ -1,24 +1,55 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Invalid, Valid}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.CharacterSets
 import play.api.libs.json.{JsPath, JsSuccess}
+
 import scala.collection.Seq
 
-class BusinessUseAnIPSPSpec extends PlaySpec {
+class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
 
   "BusinessUseAnIPSP" should {
 
+    val formData = Map(
+      "useAnIPSP" -> Seq("true"),
+      "name" -> Seq("TEST"),
+      "referenceNumber" -> Seq("09876543")
+    )
+
     "FormValidation" must {
 
-      val formData = Map("useAnIPSP" -> Seq("true"),
-        "name" -> Seq("TEST"),
-        "referenceNumber" -> Seq("123456789123456"))
+      "Successfully read form data option yes" when {
 
-      "Successfully read form data option yes" in {
+        "reference number is 8 digits" in {
+          val ref = "98765432"
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Valid(BusinessUseAnIPSPYes("TEST", ref)))
+        }
+        "reference number is 15 digits" in {
+          val ref = "123456789123456"
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Valid(BusinessUseAnIPSPYes("TEST", ref)))
+        }
+        "reference number is 15 alphanumeric with upper and lower" in {
+          val ref = "AB3456789123xyz"
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Valid(BusinessUseAnIPSPYes("TEST", ref)))
+        }
 
-        BusinessUseAnIPSP.formRule.validate(formData) must be(Valid(BusinessUseAnIPSPYes("TEST", "123456789123456")))
       }
 
       "Successfully read form data option no" in {
@@ -27,35 +58,72 @@ class BusinessUseAnIPSPSpec extends PlaySpec {
         BusinessUseAnIPSP.formRule.validate(map) must be(Valid(BusinessUseAnIPSPNo))
       }
 
-      "Throw an error message on missing mandatory field" in {
+      "Throw an error message" when {
 
-        BusinessUseAnIPSP.formRule.validate(Map.empty) must be(Invalid(Seq((Path \ "useAnIPSP", Seq(ValidationError("error.required.msb.ipsp"))))))
+        "missing mandatory field" in {
+          BusinessUseAnIPSP.formRule.validate(Map.empty) must be(Invalid(Seq((Path \ "useAnIPSP", Seq(ValidationError("error.required.msb.ipsp"))))))
+        }
+
+        "missing mandatory field for option yes" in {
+          val map = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq(""),
+            "referenceNumber" -> Seq("1234567891")
+          )
+          BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.required.msb.ipsp.name"))),
+            (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number"))))))
+        }
+
+        "name is too long" in {
+          val map = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("abcd" * 100),
+            "referenceNumber" -> Seq("1234567891")
+          )
+          BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.invalid.msb.ipsp.name"))),
+            (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number"))))))
+        }
+
+        "reference is 8 alphanumerics" in {
+          val ref = "alpha123"
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Invalid(Seq(
+            (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
+          )))
+        }
+
+        "reference is neither 8 nor 15 in length" in {
+          val ref = "9876765435432"
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Invalid(Seq(
+            (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
+          )))
+        }
+
+        "reference contains invalid characters" in {
+          val ref = symbols1.mkString("").take(8)
+          val formData = Map(
+            "useAnIPSP" -> Seq("true"),
+            "name" -> Seq("TEST"),
+            "referenceNumber" -> Seq(ref)
+          )
+          BusinessUseAnIPSP.formRule.validate(formData) must be(Invalid(Seq(
+            (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number")))
+          )))
+        }
+
       }
-
-      "Throw an error message on missing mandatory field for option yes" in {
-
-        val map = Map("useAnIPSP" -> Seq("true"),
-          "name" -> Seq(""),
-          "referenceNumber" -> Seq("1234567891"))
-
-        BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.required.msb.ipsp.name"))),
-          (Path \ "referenceNumber", Seq(ValidationError("error.required.msb.ipsp.reference"))))))
-      }
-
-
-      "Throw an error message on invalid data" in {
-        val map = Map("useAnIPSP" -> Seq("true"),
-          "name" -> Seq("abcd" * 100),
-          "referenceNumber" -> Seq("1234567891"))
-
-        BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.invalid.msb.ipsp.name"))),
-          (Path \ "referenceNumber", Seq(ValidationError("error.required.msb.ipsp.reference"))))))
-
-      }
-
       "Successfully write form data" in {
 
-        val obj = BusinessUseAnIPSPYes("TEST", "123456789123456")
+        val obj = BusinessUseAnIPSPYes("TEST", "09876543")
         BusinessUseAnIPSP.formWrites.writes(obj) must be(formData)
 
       }
@@ -71,13 +139,13 @@ class BusinessUseAnIPSPSpec extends PlaySpec {
 
       "Successfully read the Json value" in {
         val data = BusinessUseAnIPSPYes("TEST", "123456789123456")
-        BusinessUseAnIPSP.jsonReads.reads(BusinessUseAnIPSP.jsonWrites.writes(data)) must be (JsSuccess(data, JsPath))
+        BusinessUseAnIPSP.jsonReads.reads(BusinessUseAnIPSP.jsonWrites.writes(data)) must be(JsSuccess(data, JsPath))
 
       }
 
       "Successfully read the Json value for option no" in {
         val data = BusinessUseAnIPSPNo
-        BusinessUseAnIPSP.jsonReads.reads(BusinessUseAnIPSP.jsonWrites.writes(data)) must be (JsSuccess(data, JsPath))
+        BusinessUseAnIPSP.jsonReads.reads(BusinessUseAnIPSP.jsonWrites.writes(data)) must be(JsSuccess(data, JsPath))
 
       }
     }

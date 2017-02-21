@@ -56,7 +56,7 @@ object AccountantsAddress {
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
-            (__ \ "postCode").read(postcodeType)
+            (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
           ) (UkAccountantsAddress.apply _)
       case false =>
         (
