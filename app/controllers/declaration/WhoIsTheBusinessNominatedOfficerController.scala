@@ -55,7 +55,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
         val updatedList = rpSeq.filter(!_.status.contains(StatusConstants.Deleted)).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
             case true => {
-              val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions.+(NominatedOfficer), p.startDate)))
+              val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions. + (NominatedOfficer), p.startDate)))
               responsiblePerson.copy(positions = position)
             }
             case false => responsiblePerson
@@ -77,7 +77,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
           }
           case ValidForm(_, data) => {
             data.value match {
-              case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)))
+              case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, true)))
               case _ => for {
                 serviceStatus <- statusService.getStatus
                 responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)

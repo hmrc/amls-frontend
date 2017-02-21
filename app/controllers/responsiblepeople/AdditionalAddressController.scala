@@ -19,35 +19,35 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)), _, _, _, _, _, _, _,_,_,_))
-              => Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index))
+              => Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, fromDeclaration))
             case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_,_))
-              => Ok(additional_address(Form2(DefaultAddressHistory), edit, index))
+              => Ok(additional_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration))
             case _
               => NotFound(notFoundView)
           }
       }
 
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
       Authorised.async {
         implicit authContext => implicit request => {
           (Form2[ResponsiblePersonAddress](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(additional_address(f, edit, index)))
+              Future.successful(BadRequest(additional_address(f, edit, index, fromDeclaration)))
             case ValidForm(_, data) =>
               doUpdate(index, data).map { _ =>
                 (data.timeAtAddress, edit) match {
-                  case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
-                  case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
-                  case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+                  case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+                  case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+                  case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
                   case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
                   case (OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
-                  case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+                  case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
                 }
               }
           }).recoverWith {

@@ -14,26 +14,26 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(_, _, Some(name), _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(contact_details(Form2[ContactDetails](name), edit, index))
+          => Ok(contact_details(Form2[ContactDetails](name), edit, index, fromDeclaration))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(contact_details(EmptyForm, edit, index))
+          => Ok(contact_details(EmptyForm, edit, index, fromDeclaration))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
 
         Form2[ContactDetails](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index)))
+            Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, fromDeclaration)))
           case ValidForm(_, data) => {
             for {
               result <- updateDataStrict[ResponsiblePeople](index) { rp =>
@@ -41,7 +41,7 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.CurrentAddressController.get(index, edit))
+              case false => Redirect(routes.CurrentAddressController.get(index, edit, fromDeclaration))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

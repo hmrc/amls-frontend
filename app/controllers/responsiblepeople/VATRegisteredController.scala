@@ -14,28 +14,30 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(_, _, _, _, _, _, Some(vat), _, _, _, _, _, _, _)) => Ok(vat_registered(Form2[VATRegistered](vat), edit, index))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _)) => Ok(vat_registered(EmptyForm, edit, index))
+          case Some(ResponsiblePeople(_, _, _, _, _, _, Some(vat), _, _, _, _, _, _, _)) => Ok(vat_registered(Form2[VATRegistered](vat),
+            edit, index, fromDeclaration))
+          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _)) => Ok(vat_registered(EmptyForm,
+            edit, index, fromDeclaration))
           case _ => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         Form2[VATRegistered](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(vat_registered(f, edit, index)))
+            Future.successful(BadRequest(vat_registered(f, edit, index, fromDeclaration)))
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.vatRegistered(data)
               }
-            } yield Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
+            } yield Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }

@@ -14,25 +14,25 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromYourAnswers: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(_, _, _, _, _, Some(person), _, _, _, _, _, _, _, _))
-          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index))
+          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromYourAnswers))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(registered_for_self_assessment(EmptyForm, edit, index))
+          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromYourAnswers))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromYourAnswers: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
+            Future.successful(BadRequest(registered_for_self_assessment(f, edit, index, fromYourAnswers)))
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
@@ -40,7 +40,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               }
             } yield {
               edit match {
-                case false => Redirect(routes.ExperienceTrainingController.get(index, edit))
+                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, fromYourAnswers))
                 case true => Redirect(routes.DetailedAnswersController.get(index))
               }
             }
