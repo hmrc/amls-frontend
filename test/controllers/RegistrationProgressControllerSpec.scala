@@ -264,7 +264,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           .thenReturn(Future.successful(SubmissionReady))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
       }
     }
 

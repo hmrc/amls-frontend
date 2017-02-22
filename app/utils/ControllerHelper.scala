@@ -1,12 +1,13 @@
 package utils
 
 import models.businessmatching._
-import models.status.{SubmissionReadyForReview, NotCompleted, SubmissionReady}
+import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object ControllerHelper {
@@ -57,6 +58,13 @@ object ControllerHelper {
     statusService.getStatus map {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
+    }
+  }
+
+  def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
+    eventualMaybePeoples map {
+      case Some(rps) =>  rps.exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
+      case _ =>  false
     }
   }
 }

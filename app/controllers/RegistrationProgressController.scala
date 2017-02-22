@@ -14,6 +14,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -118,18 +119,10 @@ trait RegistrationProgressController extends BaseController {
       implicit request =>
         for {
           amendmentFlow <- isAmendment(statusService.getStatus)
-          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-        } yield {
-          responsiblePeople match {
-            case Some(rps) => {
-              val hasNominatedOfficer = rps.exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
-              hasNominatedOfficer match {
-                case true => redirectWhoIsRegistering(amendmentFlow)
-                case false => redirectBusinessNominatedOfficer(amendmentFlow)
-              }
-            }
-            case _ => redirectWhoIsRegistering(amendmentFlow)
-          }
+          hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+        } yield hasNominatedOfficer match {
+          case true => redirectWhoIsRegistering(amendmentFlow)
+          case false => redirectBusinessNominatedOfficer(amendmentFlow)
         }
   }
 }
