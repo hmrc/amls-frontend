@@ -21,7 +21,7 @@ trait NationalityController extends RepeatingSection with BaseController {
             case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _,_, _))
             => residencyType.nationality match {
                 case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration))
-                case _ => Ok(nationality(EmptyForm, edit, index))
+                case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
               }
             case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_, _))
             => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
