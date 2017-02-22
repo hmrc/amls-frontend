@@ -2,10 +2,11 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.{BaseController, declaration}
+import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
+import utils.ControllerHelper
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
@@ -32,10 +33,20 @@ trait CheckYourAnswersController extends BaseController {
           case true => {
             for {
               status <- statusService.getStatus
+              hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             } yield status match {
-              case SubmissionReady | NotCompleted | SubmissionReadyForReview =>
-                Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-              case _ => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
+              case SubmissionReady | NotCompleted | SubmissionReadyForReview => {
+                hasNominatedOfficer match {
+                  case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
+                  case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+                }
+              }
+              case _ => {
+                hasNominatedOfficer match {
+                  case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
+                  case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
+                }
+              }
             }
           }
         }
