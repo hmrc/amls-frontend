@@ -8,13 +8,15 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
-import uk.gov.hmrc.http.cache.client.SessionCache
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits._
 
 class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+
+  val emptyCache = CacheMap("", Map.empty)
 
   object KeystoreConnector extends KeystoreConnector {
     override private[connectors] val dataCache: SessionCache = mock[SessionCache]
@@ -95,6 +97,30 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       whenReady(KeystoreConnector.confirmationStatus) { result =>
         result mustBe ConfirmationStatus(None)
+      }
+
+    }
+
+    "save the confirmation status into the keystore" in {
+
+      when {
+        KeystoreConnector.dataCache.cache(any(), any())(any(), any())
+      } thenReturn Future.successful(emptyCache)
+
+      whenReady(KeystoreConnector.setConfirmationStatus) { _ =>
+        verify(KeystoreConnector.dataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(Some(true))))(any(), any())
+      }
+
+    }
+
+    "remove the confirmation status from the keystore" in {
+
+      when {
+        KeystoreConnector.dataCache.cache(any(), any())(any(), any())
+      } thenReturn Future.successful(emptyCache)
+
+      whenReady(KeystoreConnector.resetConfirmation) { _ =>
+        verify(KeystoreConnector.dataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(None)))(any(), any())
       }
 
     }

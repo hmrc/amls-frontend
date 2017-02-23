@@ -40,6 +40,12 @@ trait KeystoreConnector {
       case Some(s) => Future.successful(s)
       case _ => Future.successful(ConfirmationStatus(None))
     }
+
+  def setConfirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.cache(ConfirmationStatus.key, ConfirmationStatus(Some(true)))
+
+  def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None))
 }
 
 object KeystoreConnector extends KeystoreConnector {
