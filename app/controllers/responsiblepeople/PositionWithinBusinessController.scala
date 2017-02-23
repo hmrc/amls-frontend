@@ -15,7 +15,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration:Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetchAll map { optionalCache =>
@@ -25,9 +25,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
             getData[ResponsiblePeople](cache, index) match {
               case Some(ResponsiblePeople(_, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _))
-              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt))
+              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, fromDeclaration))
               case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(position_within_business(EmptyForm, edit, index, bt))
+              => Ok(position_within_business(EmptyForm, edit, index, bt, fromDeclaration))
               case _
               => NotFound(notFoundView)
             }
@@ -35,7 +35,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
@@ -44,7 +44,8 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             } yield {
-              BadRequest(position_within_business(f, edit, index, ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor)))
+              BadRequest(position_within_business(f, edit, index,
+                ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor), fromDeclaration))
             }
           case ValidForm(_, data) => {
             for {
@@ -56,10 +57,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
                 }
               } else {
-                Redirect(routes.AreTheyNominatedOfficerController.get(index))
+                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit, fromDeclaration))
               }
             }
           }.recoverWith {

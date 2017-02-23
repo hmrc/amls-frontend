@@ -2,13 +2,15 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.bankdetails._
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople._
+import models.status.{SubmissionDecisionApproved, SubmissionReady}
+import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
+import services.StatusService
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -21,6 +23,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     val controller = new CheckYourAnswersController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -49,5 +52,85 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
     }
+  }
+
+  "Post" must {
+
+    "successfully redirect to 'registration progress page'" when {
+      "'fromDeclaration flat set to false'" in  new Fixture {
+        val result = controller.post(false)(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+      }
+    }
+
+    "successfully redirect to 'Who is the business’s nominated officer?'" when {
+      "'fromDeclaration flat set to true and status is pending'" in  new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
+          thenReturn(Future.successful(Some(respinsiblePeople)))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
+        val result = controller.post(true)(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get.url))
+      }
+    }
+
+    "successfully redirect to 'Who is the business’s nominated officer?'" when {
+      "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+        val respinsiblePeople = Seq(john, mark)
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())).
+          thenReturn(Future.successful(Some(respinsiblePeople)))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        val result = controller.post(true)(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment().url))
+      }
+    }
+
+
+      "successfully redirect to 'Who is registering this business?'" when {
+        "'fromDeclaration flat set to true and status is pending'" in  new Fixture {
+          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+          val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+          val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+          val respinsiblePeople = Seq(john, mark)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
+            thenReturn(Future.successful(Some(respinsiblePeople)))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+          val result = controller.post(true)(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get.url))
+        }
+      }
+
+      "successfully redirect to 'Who is registering this business?'" when {
+        "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in  new Fixture {
+          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+          val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
+          val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
+          val respinsiblePeople = Seq(john, mark)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
+            thenReturn(Future.successful(Some(respinsiblePeople)))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          val result = controller.post(true)(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url))
+        }
+      }
   }
 }

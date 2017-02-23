@@ -17,6 +17,7 @@ case class PersonName(
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+  val fullNameWithoutSpace = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
 
 }
 
@@ -40,7 +41,7 @@ object PersonName {
           case true =>
             (__ \ "previous").read[PreviousName] map Some.apply
           case false =>
-            Rule(_ => Valid(None)) 
+            Rule(_ => Valid(None))
         } ~
         (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
           case true =>

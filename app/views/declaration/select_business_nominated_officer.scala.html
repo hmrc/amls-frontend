@@ -1,0 +1,42 @@
+@import include._
+@import models.responsiblepeople._
+@import forms2._
+
+@(content: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("declaration.who.is.business.nominated.officer", content)
+}
+
+@main(
+    title = Messages("declaration.who.is.business.nominated.officer"),
+    heading = header
+) {
+    @form(f, controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.post()) {
+
+        @panel(
+            wide = true,
+            jsHidden = false,
+            gutter = true
+        ) {
+            <p>@Messages("declaration.who.is.business.nominated.officer.text")</p>
+        }
+
+        @fieldset(
+            f = f("value"),
+            legend = "declaration.who.is.registering.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @model.map { people =>
+                @people.personName.map { obj =>
+                    @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace)
+                }
+            }
+            <p class="form-block">@Messages("lbl.or")</p>
+            @radio(f("value"), Messages("lbl.register.some.one.else"), "-1")
+        }
+        @submit()
+    }
+}

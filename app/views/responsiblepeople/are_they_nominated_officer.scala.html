@@ -3,7 +3,7 @@
 @import include.forms2._
 @import models.responsiblepeople.Positions
 
-@(f: Form2[_], edit: Boolean = false, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean = false, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -24,7 +24,7 @@
     }
 
 
-    @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index,edit)) {
+    @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index, edit, fromDeclaration)) {
 
         <div class="form-field">
             @fieldset(
