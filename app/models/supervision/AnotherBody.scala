@@ -38,8 +38,8 @@ object AnotherBody {
     (__ \ "anotherBody").read[Boolean].withMessage("error.required.supervision.anotherbody") flatMap {
       case true => (
         (__ \ "supervisorName").read(supervisorRule) ~
-          (__ \ "startDate").read(localDateRule) ~
-          (__ \ "endDate").read(localDateRule) ~
+          __.read(supervisionStartDateRule) ~
+          __.read(supervisionEndDateRule) ~
           (__ \ "endingReason").read(reasonRule)
         ) (AnotherBodyYes.apply _)
 
