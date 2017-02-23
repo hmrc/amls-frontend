@@ -78,6 +78,22 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
   }
 
+  "otherDetailsType" must {
+    "pass validation if value length supplied is 255 characters" in {
+      RoleWithinBusiness.otherDetailsType.validate("1" * 255) must be(Valid("1" * 255))
+    }
+
+    "validate other value length supplied" in {
+      RoleWithinBusiness.otherDetailsType.validate("1" * 256) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.maxLength")))))
+    }
+
+    "fail validation if business type field is not selected" in {
+      RoleWithinBusiness.otherDetailsType.validate("") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+  }
+
   "When the user loads the page and that is posted to the form, the role within business" must {
 
     "load the correct value in the form for Beneficial Shareholder" in {

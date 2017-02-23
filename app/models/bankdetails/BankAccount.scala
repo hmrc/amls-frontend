@@ -19,6 +19,9 @@ object Account {
   val ukBankAccountNumberRegex = "^[0-9]{8}$".r
   val nonUKBankAccountNumberRegex = "^[0-9a-zA-Z_]+$".r
   val ibanRegex = "^[0-9a-zA-Z_]+$".r
+  val maxNonUKBankAccountNumberLength = 40
+  val maxUKBankAccountNumberLength = 8
+  val maxIBANLength = 34
 
   val sortCodeType = (removeDashRule andThen removeSpacesRule andThen notEmpty)
     .withMessage("error.invalid.bankdetails.sortcode")
@@ -141,6 +144,7 @@ object BankAccount {
   import utils.MappingUtils.Implicits._
 
   val key = "bank-account"
+  val maxAccountName = 40
 
   val accountNameType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.bankdetails.accountname"))

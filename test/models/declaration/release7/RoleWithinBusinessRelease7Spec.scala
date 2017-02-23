@@ -1,6 +1,7 @@
 package models.declaration.release7
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.declaration.RoleWithinBusiness
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -180,6 +181,22 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
             "roleWithinBusinessOther" -> "test657"
           ))
       }
+    }
+  }
+
+  "otherDetailsType" must {
+    "pass validation if value length supplied is 255 characters" in {
+      RoleWithinBusinessRelease7.otherDetailsType.validate("1" * 255) must be(Valid("1" * 255))
+    }
+
+    "validate other value length supplied" in {
+      RoleWithinBusinessRelease7.otherDetailsType.validate("1" * 256) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.maxlength.255")))))
+    }
+
+    "fail validation if business type field is not selected" in {
+      RoleWithinBusinessRelease7.otherDetailsType.validate("") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
     }
   }
 }

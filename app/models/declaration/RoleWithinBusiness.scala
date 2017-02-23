@@ -1,8 +1,10 @@
 package models.declaration
 
 import jto.validation._
+import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.FormTypes._
 import play.api.libs.json._
 
 sealed trait RoleWithinBusiness
@@ -27,10 +29,18 @@ object RoleWithinBusiness {
 
   import utils.MappingUtils.Implicits._
 
+  val maxDetailsLength = 255
+
+  val otherDetailsType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required") andThen
+    maxLength(maxDetailsLength).withMessage("error.invalid.maxLength") andThen
+    basicPunctuationPattern
+
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
       import models.FormTypes._
       import jto.validation.forms.Rules._
+
       (readerURLFormEncoded \ "roleWithinBusiness").read[String] flatMap {
         case "01" => BeneficialShareholder
         case "02" => Director
@@ -40,7 +50,7 @@ object RoleWithinBusiness {
         case "06" => Partner
         case "07" => SoleProprietor
         case "08" =>
-          (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) map Other.apply
+          (readerURLFormEncoded \ "roleWithinBusinessOther").read(otherDetailsType) map Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
       }
