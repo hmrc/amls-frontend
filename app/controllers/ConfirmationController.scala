@@ -1,8 +1,10 @@
 package controllers
 
 import config.AMLSAuthConnector
+import connectors.AuthenticatorConnector
 import models.confirmation.{BreakdownRow, Currency}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import play.api.Play
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -16,25 +18,30 @@ trait ConfirmationController extends BaseController {
 
   val statusService: StatusService
 
+  lazy val authenticatorConnector = Play.current.injector.instanceOf(classOf[AuthenticatorConnector])
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      statusService.getStatus flatMap {
-        case SubmissionReadyForReview => {
-          getAmendmentFees map {
-            case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
-            case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
+
+      authenticatorConnector.refreshProfile flatMap { _ =>
+        statusService.getStatus flatMap {
+          case SubmissionReadyForReview => {
+            getAmendmentFees map {
+              case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
+              case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
+            }
           }
-        }
-        case SubmissionDecisionApproved => {
-          getVariationFees map {
-            case Some((payRef, total, rows)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
-            case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
+          case SubmissionDecisionApproved => {
+            getVariationFees map {
+              case Some((payRef, total, rows)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
+              case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
+            }
           }
-        }
-        case _ => {
-          submissionService.getSubscription flatMap {
-            case (paymentRef, total, rows) =>
-              Future.successful(Ok(views.html.confirmation.confirmation(paymentRef, total, rows)))
+          case _ => {
+            submissionService.getSubscription flatMap {
+              case (paymentRef, total, rows) =>
+                Future.successful(Ok(views.html.confirmation.confirmation(paymentRef, total, rows)))
+            }
           }
         }
       }

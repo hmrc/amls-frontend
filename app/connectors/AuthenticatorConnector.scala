@@ -17,7 +17,7 @@ class DesAuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig
 
   def refreshProfile(implicit hc: HeaderCarrier) = {
 
-    http.POSTEmpty(s"${config.baseUrl("authenticator")}/refresh-profile")
+    http.POSTEmpty(s"${config.baseUrl("authenticator")}/authenticator/refresh-profile")
 
   }
 
