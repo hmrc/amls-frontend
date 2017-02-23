@@ -63,7 +63,7 @@ object ControllerHelper {
 
   def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
     eventualMaybePeoples map {
-      case Some(rps) =>  rps.exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
+      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
       case _ =>  false
     }
   }
