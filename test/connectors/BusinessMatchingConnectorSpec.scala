@@ -4,6 +4,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Play
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 import utils.AuthorisedFixture
@@ -43,6 +44,8 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
   trait Fixture extends AuthorisedFixture { self =>
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector {
+      override protected def app = Play.current
+
       override val httpGet = mock[HttpGet]
     }
 

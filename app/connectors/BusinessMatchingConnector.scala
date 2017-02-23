@@ -1,10 +1,11 @@
 package connectors
 
 import config.WSHttp
-import play.api.Logger
+import play.api.{Logger, Play}
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -71,5 +72,7 @@ trait BusinessMatchingConnector extends ServicesConfig {
 }
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
+  override protected def app = Play.current
+
   override val httpGet = WSHttp
 }

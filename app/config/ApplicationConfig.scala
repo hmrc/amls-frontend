@@ -19,6 +19,8 @@ trait ApplicationConfig {
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
+  override protected def app = Play.current
+
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
