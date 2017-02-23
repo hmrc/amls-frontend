@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.AuthenticatorConnector
+import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.confirmation.{BreakdownRow, Currency}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.Play
@@ -15,6 +15,7 @@ import scala.concurrent.Future
 trait ConfirmationController extends BaseController {
 
   private[controllers] def submissionService: SubmissionService
+  private[controllers] val keystoreConnector: KeystoreConnector
 
   val statusService: StatusService
 
@@ -24,23 +25,25 @@ trait ConfirmationController extends BaseController {
     implicit authContext => implicit request =>
 
       authenticatorConnector.refreshProfile flatMap { _ =>
-        statusService.getStatus flatMap {
-          case SubmissionReadyForReview => {
-            getAmendmentFees map {
-              case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
-              case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
+        keystoreConnector.setConfirmationStatus flatMap { _ =>
+          statusService.getStatus flatMap {
+            case SubmissionReadyForReview => {
+              getAmendmentFees map {
+                case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
+                case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
+              }
             }
-          }
-          case SubmissionDecisionApproved => {
-            getVariationFees map {
-              case Some((payRef, total, rows)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
-              case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
+            case SubmissionDecisionApproved => {
+              getVariationFees map {
+                case Some((payRef, total, rows)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
+                case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
+              }
             }
-          }
-          case _ => {
-            submissionService.getSubscription flatMap {
-              case (paymentRef, total, rows) =>
-                Future.successful(Ok(views.html.confirmation.confirmation(paymentRef, total, rows)))
+            case _ => {
+              submissionService.getSubscription flatMap {
+                case (paymentRef, total, rows) =>
+                  Future.successful(Ok(views.html.confirmation.confirmation(paymentRef, total, rows)))
+              }
             }
           }
         }
@@ -78,4 +81,5 @@ object ConfirmationController extends ConfirmationController {
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val submissionService = SubmissionService
   override val statusService: StatusService = StatusService
+  override private[controllers] val keystoreConnector = KeystoreConnector
 }

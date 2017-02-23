@@ -3,6 +3,7 @@ package connectors
 import config.{AmlsSessionCache, BusinessCustomerSessionCache}
 import models.businesscustomer.ReviewDetails
 import models.status.ConfirmationStatus
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.SessionCache
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 

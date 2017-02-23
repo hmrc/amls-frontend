@@ -39,7 +39,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override protected val authConnector = self.authConnector
       override private[controllers] val submissionService = mock[SubmissionService]
       override val statusService: StatusService = mock[StatusService]
-      override def keystoreConnector = mock[KeystoreConnector]
+      override val keystoreConnector = mock[KeystoreConnector]
     }
 
     val paymentRefNo = "XA111123451111"
@@ -58,6 +58,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
+
+    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful(mockCacheMap)
 
   }
 
@@ -78,11 +80,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "write a confirmation value to Keystore" in new Fixture {
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = controller.get()(request)
 
       status(result) mustBe OK
 
-//      verify(controller.keystoreConnector).
+      verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
 
     }
 
