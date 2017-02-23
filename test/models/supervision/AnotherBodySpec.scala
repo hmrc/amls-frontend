@@ -52,6 +52,27 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
 
+      "supervision enddate is before supervision startdate" in {
+        val urlFormEncoded = Map(
+          "anotherBody" -> Seq("true"),
+          "supervisorName" -> Seq("Name"),
+          "startDate.day" -> Seq("25"),
+          "startDate.month" -> Seq("2"),
+          "startDate.year" -> Seq("1998"),
+          "endDate.day" -> Seq("24"),
+          "endDate.month" -> Seq("2"),
+          "endDate.year" -> Seq("1998"),
+          "endingReason" -> Seq("reason")
+        )
+
+        val expected = Invalid(
+          Seq((Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.date.after.start")),
+          (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.date.after.start")))
+        )
+
+        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
+      }
+
       "given invalid characters" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),

@@ -243,6 +243,7 @@ error.required.supervision.business.a.member = Select yes or no to the question:
 error.required.supervision.one.professional.body = Select at least one professional body
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
+error.expected.supervision.date.after.start = The date your supervision ended can’t be before the date it started
 
 ############################### Money Services Business ###############################
 error.required.msb.services = Select at least one service that your business provides.

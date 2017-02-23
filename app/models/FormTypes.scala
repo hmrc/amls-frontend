@@ -201,7 +201,7 @@ object FormTypes {
     case (d1, d2) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
-
+  
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
