@@ -287,6 +287,7 @@ error.required.hvd.percentage = Select how much of your turnover you expect to c
 error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’.
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
+error.required.declaration.specify.role = Specify your role in the business
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################

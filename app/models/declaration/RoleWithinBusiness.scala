@@ -32,13 +32,12 @@ object RoleWithinBusiness {
   val maxDetailsLength = 255
 
   val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required") andThen
-    maxLength(maxDetailsLength).withMessage("error.invalid.maxLength") andThen
+    notEmpty.withMessage("error.required.declaration.specify.role") andThen
+    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
     basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      import models.FormTypes._
       import jto.validation.forms.Rules._
 
       (readerURLFormEncoded \ "roleWithinBusiness").read[String] flatMap {

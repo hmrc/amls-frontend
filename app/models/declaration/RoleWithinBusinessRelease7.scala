@@ -55,15 +55,10 @@ object RoleWithinBusinessRelease7 {
 
   import utils.MappingUtils.Implicits._
 
-  //  val maxDetailsLength = 255
-  //  val otherDetailsType = notEmptyStrip andThen
-  //    notEmpty.withMessage("error.required") andThen
-  //    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255")
-
   val maxDetailsLength = 255
 
   val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required") andThen
+    notEmpty.withMessage("error.required.declaration.specify.role") andThen
     maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
     basicPunctuationPattern
 
