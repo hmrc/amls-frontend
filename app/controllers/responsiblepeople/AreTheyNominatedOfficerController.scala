@@ -36,21 +36,21 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised {
       implicit authContext => implicit request =>
 
-        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
+        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, fromDeclaration))
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
 
-            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index)))
+            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index, fromDeclaration)))
 
           case ValidForm(_, data) => {
 
@@ -65,7 +65,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
-              redirectDependingOnEdit(index, edit, rpSeqOption)(request)
+              redirectDependingOnEdit(index, edit, rpSeqOption, fromDeclaration)(request)
             }
 
           }.recoverWith {
@@ -74,11 +74,12 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
         }
     }
 
-  private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePeople]])(implicit request: Request[AnyContent]) = {
+  private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePeople]],
+                                      fromDeclaration: Boolean = false)(implicit request: Request[AnyContent]) = {
     rpSeqOption match {
       case Some(rpSeq) => edit match {
         case true => Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+        case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
       }
       case _ => NotFound(notFoundView)
     }

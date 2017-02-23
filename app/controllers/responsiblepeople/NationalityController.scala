@@ -14,29 +14,29 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _,_, _))
             => residencyType.nationality match {
-                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index))
-                case _ => Ok(nationality(EmptyForm, edit, index))
+                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration))
+                case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
               }
             case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_, _))
-            => Ok(nationality(EmptyForm, edit, index))
+            => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
             case _
             => NotFound(notFoundView)
           }
       }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
       Authorised.async {
         implicit authContext => implicit request =>
 
           Form2[Nationality](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(nationality(f, edit, index)))
+              Future.successful(BadRequest(nationality(f, edit, index, fromDeclaration)))
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
@@ -45,7 +45,7 @@ trait NationalityController extends RepeatingSection with BaseController {
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit))
+                case false => Redirect(routes.ContactDetailsController.get(index, edit, fromDeclaration))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], index: Int)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
+    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index, fromDeclaration)) {
 
         @panel(
             jsHidden = false,

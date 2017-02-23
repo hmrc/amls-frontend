@@ -1,6 +1,7 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import views.html.helper.CSRF
 @import models.registrationprogress.Section
 
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_],m:Messages)
@@ -41,7 +42,8 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
                         @Messages("progress.declarationunavailable")
                     }
                 </p>
-                <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.get.url">
+                <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+                    @CSRF.formField
                     <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
                         @Messages("progress.submit")
                     </button>
