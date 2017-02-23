@@ -15,20 +15,20 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index))
+          => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, fromDeclaration))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(person_residence_type(EmptyForm, edit, index))
+          => Ok(person_residence_type(EmptyForm, edit, index, fromDeclaration))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
 
@@ -44,7 +44,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.NationalityController.get(index, edit))
+              case false => Redirect(routes.NationalityController.get(index, edit, fromDeclaration))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

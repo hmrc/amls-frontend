@@ -1,9 +1,10 @@
 @import include._
 @import forms2._
 @import models.responsiblepeople._
+@import views.html.helper.CSRF
 @import utils.StatusConstants
 
-@(model: Seq[ResponsiblePeople])(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Seq[ResponsiblePeople], fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("responsiblepeople.summary.responsible.people", "summary.responsiblepeople")
@@ -38,9 +39,10 @@
         </ul>
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    <form method="post" action="@controllers.responsiblepeople.routes.CheckYourAnswersController.post(fromDeclaration).url">
+        @CSRF.formField
+        <button type="submit" name="submit" class="button">
+            @Messages("button.checkyouranswers.acceptandcomplete")
+        </button>
+    </form>
 }

@@ -19,32 +19,32 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _))
-          => Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index))
+          => Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, fromDeclaration))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index))
+          => Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration))
           case _
           => NotFound(notFoundView)
         }
     }
 
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
 
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(additional_extra_address(f, edit, index)))
+            Future.successful(BadRequest(additional_extra_address(f, edit, index, fromDeclaration)))
           case ValidForm(_, data) =>
             doUpdate(index, data).map { _ =>
               edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.PositionWithinBusinessController.get(index, edit))
+                case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
               }
             }
         }).recoverWith {

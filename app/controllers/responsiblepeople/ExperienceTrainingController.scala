@@ -34,30 +34,30 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
     }
   }
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         businessActivitiesData flatMap {
           activities =>
             getData[ResponsiblePeople](index) map {
               case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _, _, _))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, fromDeclaration))
               case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(experience_training(EmptyForm, activities, edit, index))
+              => Ok(experience_training(EmptyForm, activities, edit, index, fromDeclaration))
               case _
               => NotFound(notFoundView)
             }
         }
     }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
         businessActivitiesData flatMap {
           activities =>
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
-                Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
+                Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, fromDeclaration)))
               case ValidForm(_, data) => {
                 for {
                   result <- updateDataStrict[ResponsiblePeople](index) { rp =>
@@ -65,7 +65,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                   }
                 } yield edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case false => Redirect(routes.TrainingController.get(index, edit))
+                  case false => Redirect(routes.TrainingController.get(index, edit, fromDeclaration))
                 }
               }.recoverWith {
                 case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
