@@ -28,7 +28,6 @@ object BooleanFormReadWrite {
   }
 }
 
-//noinspection ScalaStyle
 trait AreTheyNominatedOfficerController extends RepeatingSection with BaseController {
 
 
