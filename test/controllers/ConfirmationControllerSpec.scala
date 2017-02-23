@@ -1,6 +1,6 @@
 package controllers
 
-import connectors.AuthenticatorConnector
+import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -39,6 +39,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override protected val authConnector = self.authConnector
       override private[controllers] val submissionService = mock[SubmissionService]
       override val statusService: StatusService = mock[StatusService]
+      override def keystoreConnector = mock[KeystoreConnector]
     }
 
     val paymentRefNo = "XA111123451111"
@@ -72,6 +73,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       status(result) mustBe OK
 
       verify(authenticatorConnector).refreshProfile(any())
+
+    }
+
+    "write a confirmation value to Keystore" in new Fixture {
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+//      verify(controller.keystoreConnector).
 
     }
 

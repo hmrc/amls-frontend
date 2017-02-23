@@ -2,6 +2,7 @@ package connectors
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
+import models.status.ConfirmationStatus
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -71,5 +72,32 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
           result mustBe a[NotFoundException]
       }
     }
+  }
+
+  "confirmationIndicator" must {
+
+    "return a successful future when the value is found" in {
+
+      when {
+        KeystoreConnector.dataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any())
+      } thenReturn Future.successful(Some(ConfirmationStatus(Some(true))))
+
+      whenReady(KeystoreConnector.confirmationStatus) { result =>
+        result mustBe ConfirmationStatus(Some(true))
+      }
+
+    }
+
+    "return an empty successful future when the value is not found" in {
+      when {
+        KeystoreConnector.dataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any())
+      } thenReturn Future.successful(None)
+
+      whenReady(KeystoreConnector.confirmationStatus) { result =>
+        result mustBe ConfirmationStatus(None)
+      }
+
+    }
+
   }
 }
