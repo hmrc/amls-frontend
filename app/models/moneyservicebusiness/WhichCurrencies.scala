@@ -1,16 +1,15 @@
 package models.moneyservicebusiness
 
+import cats.data.Validated.{Invalid, Valid}
 import config.ApplicationConfig
-import models._
-import config.ApplicationConfig
-import models._
 import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models._
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
-import cats.data.Validated.{Invalid, Valid}
+import models.FormTypes.basicPunctuationPattern
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[Boolean],
@@ -33,7 +32,8 @@ object WhichCurrencies {
 
   private def nameType(fieldName: String) = {
     minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
-      maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
+      maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long") andThen
+      basicPunctuationPattern
   }
 
   private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
