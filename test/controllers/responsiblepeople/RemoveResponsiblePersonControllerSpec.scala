@@ -128,6 +128,26 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
         }
+        "respond with OK without showing endDate form when RP does have lineId" in new Fixture{
+
+          val rp = ResponsiblePeople(
+            personName = Some(PersonName("firstName", None, "lastName", None, None)),
+            lineId = Some(4444)
+          )
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(rp))))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(OK)
+
+          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
+
+        }
       }
     }
 
