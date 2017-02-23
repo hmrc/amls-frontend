@@ -201,28 +201,11 @@ object FormTypes {
     case (d1, d2) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
-
-  val supervisionEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
-    case (d1, d2) if !d2.isBefore(d1) => Valid(d2)
-    case (_, _) => Invalid(Seq(ValidationError("error.expected.supervision.date.after.start")))
-  }
-
+  
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
       (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
-  val supervisionEndDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "startDate").read(localDateRule) ~
-      (__ \ "endDate").read(localDateRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
-  val supervisionStartDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "startDate").read(localDateRule) ~
-      (__ \ "endDate").read(localDateRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "startDate")
   }
 
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
