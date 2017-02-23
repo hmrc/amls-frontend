@@ -289,6 +289,7 @@ error.required.declaration.nominated.officer = Select your nominated officer or 
 error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
+error.required.declaration.specify.role = Specify your role in the business
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
