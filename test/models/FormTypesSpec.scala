@@ -413,23 +413,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
     }
   }
 
-  "For the Declaration Add Persons page, business activity 'other' field" must {
-
-    "pass validation if value length supplied is 255 characters" in {
-      roleWithinBusinessOtherType.validate("1" * 255) must be(Valid("1" * 255))
-    }
-
-    "validate other value length supplied" in {
-      roleWithinBusinessOtherType.validate("1" * 256) must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", maxRoleWithinBusinessOtherType)))))
-    }
-
-    "fail validation if business type field is not selected" in {
-      roleWithinBusinessOtherType.validate("") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
-    }
-  }
-
   "nino" must {
 
     "successfully validate" in {
