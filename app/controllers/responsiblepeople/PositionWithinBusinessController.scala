@@ -48,13 +48,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor), fromDeclaration))
             }
           case ValidForm(_, data) => {
-            def personalTaxRouter = {
-              (data.personalTax, edit) match {
-                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index, false, fromDeclaration))
-                case (false, true) => Redirect(routes.DetailedAnswersController.get(index, false))
-                case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
-              }
-            }
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.positions(data)
@@ -62,10 +55,14 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
               if (hasNominatedOfficer(rpSeqOption)) {
-                personalTaxRouter
-              } else Redirect(routes.AreTheyNominatedOfficerController.get(index, false, fromDeclaration))
+                edit match {
+                  case true => Redirect(routes.DetailedAnswersController.get(index))
+                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+                }
+              } else {
+                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit, fromDeclaration))
+              }
             }
-
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }

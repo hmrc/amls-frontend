@@ -47,9 +47,9 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
   val RecordId = 1
 
   private val startDate: Option[LocalDate] = Some(new LocalDate())
-  "AreTheyNominatedOfficerController" must {
+  "AreTheyNominatedOfficerController" when {
 
-    "on get()" must {
+    "get is called" must {
 
       "display nominated officer fields" in new Fixture {
         val mockCacheMap = mock[CacheMap]
@@ -77,106 +77,112 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
         document.select("input[value=false]") must not be(null)
 
         document.body().html() must include(Messages("responsiblepeople.aretheynominatedofficer.title"))
-
       }
     }
 
-    "post" must {
-      "submit with valid data as a partnership" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(withPartnerShip)))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+    "post is called" must {
+      "when edit is true" must {
+        "redirect to the detailed answers controller" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(hasNominatedOfficer)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+          val result = controller.post(RecordId,true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+        }
       }
+      "when edit is false" must {
+        "redirect to the vat registered controller when partnership is selected" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(withPartnerShip)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      "submit with valid data as another type" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(noNominatedOfficer)))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(noNominatedOfficer))))
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+        }
 
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ExperienceTrainingController.get(RecordId).url))
-      }
+        "redirect to the vat registered controller when another type is selected" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(noNominatedOfficer)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(noNominatedOfficer))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      "submit with valid data as another type and edit mode" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(hasNominatedOfficer)))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+        }
 
-        val result = controller.post(RecordId,true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-      }
-
-      "fail submission on empty string" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#isNominatedOfficer]").html() must include(Messages("error.required.rp.nominated_officer"))
 
       }
 
-      "return not found when no rps" in new Fixture {
+      "respond with BAD_REQUEST" when {
+        "fail submission on empty string" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(NOT_FOUND)
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#isNominatedOfficer]").html() must include(Messages("error.required.rp.nominated_officer"))
 
+        }
       }
 
-      "return not found when index out of bounds" in new Fixture {
+      "respond with NOT_FOUND" when {
+        "return not found when no rps" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.failed(new IndexOutOfBoundsException))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-        val result = controller.post(RecordId)(newRequest)
-        status(result) must be(NOT_FOUND)
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(NOT_FOUND)
 
-      }
+        }
 
-      "return not found" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
-        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(withPartnerShip)))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        "return not found when index out of bounds" in new Fixture {
 
-        val result = controller.post(0)(newRequest)
-        status(result) must be(NOT_FOUND)
-       
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.failed(new IndexOutOfBoundsException))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(NOT_FOUND)
+
+        }
+
+        "return not found" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(withPartnerShip)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(0)(newRequest)
+          status(result) must be(NOT_FOUND)
+
+        }
       }
     }
   }
-
-
 }
