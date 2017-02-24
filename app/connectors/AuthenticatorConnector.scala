@@ -1,20 +1,14 @@
 package connectors
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
-import com.google.inject.ImplementedBy
-import config.ApplicationConfig
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.Future
 
-@ImplementedBy(classOf[DesAuthenticatorConnector])
-trait AuthenticatorConnector {
-  def refreshProfile(implicit hc: HeaderCarrier): Future[HttpResponse]
-}
-
-class DesAuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) extends AuthenticatorConnector {
+@Singleton
+class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
   def refreshProfile(implicit hc: HeaderCarrier) = {
 
