@@ -8,7 +8,9 @@ case class SubscriptionResponse(
                                  amlsRefNo: String,
                                  registrationFee: BigDecimal,
                                  fpFee: Option[BigDecimal],
+                                 fpFeeRate: Option[BigDecimal],
                                  premiseFee: BigDecimal,
+                                 premiseFeeRate: Option[BigDecimal],
                                  totalFees: BigDecimal,
                                  paymentReference: String
                                ) extends SubmissionResponse
