@@ -40,8 +40,8 @@ object AnotherBody {
   val validationRule: ValidationRule[ValidationRuleType] = Rule[ValidationRuleType, ValidationRuleType] {
     case x@(_, d1, d2, _) if !d1.isAfter(d2) => Valid(x)
     case _ => Invalid(Seq(
-      (Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.date.after.start")),
-      (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.date.after.start"))
+      (Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
+      (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))
     ))
   }
 
