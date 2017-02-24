@@ -31,7 +31,9 @@ class ConfirmationControllerSpec extends GenericTestHelper {
       amlsRefNo = "",
       registrationFee = 0,
       fpFee = None,
+      fpFeeRate = None,
       premiseFee = 0,
+      premiseFeeRate = None,
       totalFees = 0,
       paymentReference = paymentRefNo
     )

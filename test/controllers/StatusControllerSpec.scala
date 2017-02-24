@@ -273,7 +273,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, 0, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -322,7 +322,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
         when(cacheMap.getEntry[AmendVariationResponse](Matchers.contains(AmendVariationResponse.key))(any()))
-          .thenReturn(Some(AmendVariationResponse("", "", 0, None, 0, 0, None, Some(0.0))))
+          .thenReturn(Some(AmendVariationResponse("", "", 0, None, None, 0, None, 0, None, Some(0.0))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -369,7 +369,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           Some(BusinessMatching(Some(reviewDtls), None)))
 
         when(cacheMap.getEntry[AmendVariationResponse](Matchers.contains(AmendVariationResponse.key))(any())).thenReturn(
-          Some(AmendVariationResponse("", "", 0, None, 0, 0, None, Some(0.0))))
+          Some(AmendVariationResponse("", "", 0, None, None, 0, None, 0, None, Some(0.0))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsRegNo")))
 
@@ -411,7 +411,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, 0, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
