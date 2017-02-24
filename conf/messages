@@ -90,20 +90,20 @@ error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 
 ###############################  About the Business ###############################
-error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
-error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
-error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
-error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
-error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
+error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
+error.required.atb.confirm.office = Select yes if this is the address of your registered office
+error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
+error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
-error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
+error.required.rightaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
-error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
+error.bankdetails.accounttype = Select one option to show what kind of account your business uses
 error.bankdetails.accountname = Enter a bank account name
 error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
-error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
+error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter the account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
@@ -116,33 +116,33 @@ error.invalid.bankdetails.account = Enter a valid account number
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
 error.max.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
-error.required.bankdetails.register.another.bank = Select yes or no to the question: do you want to register another bank account?
+error.required.bankdetails.register.another.bank = Select yes if you want to register another bank account
 
 ###############################  Business Activities ###############################
-error.required.ba.involved.in.other = Select yes or no to the question: is your business involved in any other activities?
+error.required.ba.involved.in.other = Select yes if your business is involved in other activities
 error.required.ba.involved.in.other.text = Give details of the other activities your business is involved in
 error.invalid.ba.involved.in.other.text = You can’t enter more than 255 characters
-error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
-error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
-error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
+error.required.ba.business.turnover = Select one option to show how much net profit your business expects in the next 12 months
+error.required.ba.turnover.from.mlr = Select one option to show how much net profit your business expects in the next 12 months from activities covered by the Money Laundering Regulations
+error.required.ba.is.your.franchise = Select yes if your business is a franchise
 error.required.ba.franchise.name = Enter the franchisor’s name
 error.max.length.ba.franchise.name = You can’t enter more than 140 characters for the franchisor’s name.
 error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
 error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
 error.max.length.ba.employee.count = You can’t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
-error.required.ba.select.country = Select yes or no to the question: do you have customers who live or work outside of the UK?
+error.required.ba.select.country = Select yes if you have customers who live or work outside the UK
 error.invalid.ba.select.country = Enter at least one country.
-error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
-error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
+error.required.ba.select.transaction.record = Select yes if you keep records of all your transaction with customers
+error.required.ba.atleast.one.transaction.record = Select one or more options to show how you record transactions
 error.required.ba.software.package.name = Enter the name of the software package.
 error.max.length.ba.software.package.name = You can’t enter more than 40 characters for the names of the software packages.
-error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
-error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a documented risk assessment policy and procedure?
-error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
-error.required.ba.business.use.accountant = Select yes or no to the question: does your business receive advice on Money Laundering Regulations and due diligence?
-error.required.ba.suspicious.activity = Select yes or no to the question: does your business have written guidance for staff on how to identify and report suspicious activity?
-error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+error.required.ba.select.nca = Select yes if your business is registered online with the National Crime Agency
+error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
+error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
+error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
+error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
+error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
