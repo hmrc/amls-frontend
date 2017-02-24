@@ -44,8 +44,6 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
   trait Fixture extends AuthorisedFixture { self =>
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector {
-      override protected def app = Play.current
-
       override val httpGet = mock[HttpGet]
     }
 

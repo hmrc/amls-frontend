@@ -72,7 +72,5 @@ trait BusinessMatchingConnector extends ServicesConfig {
 }
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
-  override protected def app = Play.current
-
   override val httpGet = WSHttp
 }

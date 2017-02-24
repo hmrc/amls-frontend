@@ -24,8 +24,6 @@ object AMLSControllerConfig extends ControllerConfig {
 }
 
 object BusinessCustomerSessionCache extends SessionCache with AppName with ServicesConfig{
-  override protected def app = Play.current
-
   override lazy val http = WSHttp
   override lazy val defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
 
@@ -36,8 +34,6 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
 object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
   override def http = WSHttp
 
-  override protected def app = Play.current
-
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
 
   override def baseUri = baseUrl("cachable.session-cache")
@@ -46,8 +42,6 @@ object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
 }
 
 object AMLSAuditConnector extends AuditConnector with RunMode {
-  override protected def app = Play.current
-
   override lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"$env.auditing")
 }
 
@@ -57,8 +51,6 @@ object AMLSAuthConnector extends AuthConnector {
 }
 
 object AMLSAuditFilter extends FrontendAuditFilter with AppName with MicroserviceFilterSupport{
-  override protected def app = Play.current
-
 
   override lazy val maskedFormFields: Seq[String] = Nil
 
@@ -76,8 +68,6 @@ object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSu
 }
 
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode  with HttpAuditing {
-  override protected def app = Play.current
-
   override lazy val auditConnector: AuditConnector = AMLSAuditConnector
   override val hooks = Seq(AuditingHook)
 }
@@ -87,8 +77,6 @@ object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever 
 }
 
 object AmlsShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with ServicesConfig {
-  override protected def app = Play.current
-
   override lazy val http = WSHttp
   override lazy val defaultSource = appName
   override lazy val baseUri = baseUrl("cachable.short-lived-cache")
