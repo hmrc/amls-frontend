@@ -44,10 +44,10 @@ trait KeystoreConnector {
     }
 
   def setConfirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
-    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(Some(true)))
+    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(Some(true))) flatMap { _ => Future.successful() }
 
   def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
-    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None))
+    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None)) flatMap { _ => Future.successful() }
 }
 
 object KeystoreConnector extends KeystoreConnector {

@@ -3,7 +3,7 @@ package controllers
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -59,7 +59,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
-    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful(mockCacheMap)
+    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
   }
 
