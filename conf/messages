@@ -145,7 +145,7 @@ error.required.ba.suspicious.activity = Select yes if your business has written 
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 
 ###############################  Trading premises ###############################
-error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
+error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
@@ -156,12 +156,12 @@ error.required.tp.month = Enter a month.
 error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
 error.required.tp.year = Enter a year.
 error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
-error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
+error.required.tp.residential.address = Select yes if you’re registering an agent’s premises
 error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
 error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
-error.required.tp.select.business.structure = Select one option: what is your agent’s business structure?
+error.required.tp.select.business.structure = Select one option to show your agent’s business structure
 error.required.tp.agent.premises = Select yes or no to the question: Are you registering an agent’s premises?
 error.required.tp.agent.registered.company.name = Enter your agent’s registered company name.
 error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters for the registered company name.
@@ -169,7 +169,7 @@ error.required.tp.agent.name = Enter your agent’s name.
 error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
 error.required.tp.agent.partnership = Enter your agent’s partners.
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
-error.required.tp.register.another.premises = Select yes or no to the question: do you want to register another trading premises?
+error.required.tp.register.another.premises = Select yes if you want to register another trading premises
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 
