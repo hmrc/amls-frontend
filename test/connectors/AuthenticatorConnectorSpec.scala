@@ -4,11 +4,12 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.play.config.ServicesConfig
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
+import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import utils.Strings._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -18,7 +19,6 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
   trait TestFixture {
 
     val http = mock[HttpPost]
-    val serviceConfig = mock[ServicesConfig]
 
     implicit val hc = HeaderCarrier()
 
@@ -32,7 +32,9 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
     lazy val connector = app.injector.instanceOf(classOf[AuthenticatorConnector])
 
-    when(serviceConfig.baseUrl(any())) thenReturn "authenticator.service"
+    lazy val config = app.injector.instanceOf(classOf[ServicesConfig])
+
+    lazy val configKey = config.baseUrl("authenticator")
   }
 
   "The Authenticator connector" must {
@@ -47,7 +49,7 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       result.status must be(200)
 
-      verify(http).POSTEmpty(eqTo("http://localhost:9905/authenticator/refresh-profile"))(any(), any())
+      verify(http).POSTEmpty(eqTo(s"$configKey/authenticator/refresh-profile"))(any(), any())
 
     }
 
