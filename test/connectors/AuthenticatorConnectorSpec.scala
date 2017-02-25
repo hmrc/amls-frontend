@@ -9,7 +9,6 @@ import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
-import utils.Strings._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}

@@ -3,7 +3,7 @@ package utils
 object Strings {
 
   implicit class ConsoleHelpers(s: String) {
-    def withColour(colour: String) =s"$colour$s${Console.RESET}"
+    def in(colour: String) =s"$colour$s${Console.RESET}"
   }
 
 }
