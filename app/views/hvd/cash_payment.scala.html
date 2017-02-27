@@ -28,7 +28,7 @@
                 labelText = "lbl.yes",
                 value = "true",
                 inline = true,
-                target = s".paymentDate-fieldset"
+                target = s"#paymentDate-fieldset"
             )
             @radio(
                 f = f("acceptedAnyPayment"),
@@ -38,12 +38,9 @@
             )
         }
 
-        @fieldset(
-            legend = "hvd.cash.payment.data.text",
-            legendHidden = true,
+        @panel(
             jsHidden = true,
-            classes = Seq("paymentDate-fieldset"),
-            f = f("paymentDate-fieldset")
+            field = Some(f("paymentDate-fieldset"))
         ) {
             @date(
                 f = f,
