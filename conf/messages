@@ -262,22 +262,22 @@ error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical for
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
-error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
-error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
-error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
+error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €15,000 or more
+error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
+error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
 error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
-error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
-error.required.hvd.receive.cash.payments = Select yes or no to the question: do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
+error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €15,000 or more
+error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €15,000 from customers you’ve not met in person
 error.required.hvd.describe = Please describe how you expect to receive these payments.
 error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
-error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
+error.required.hvd.percentage = Select one option to show the proportion of turnover you expect to come from cash payments over €15,000
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
-error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’
+error.required.declaration.who.is.registering = Select one option to show who is registering the business
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Specify your role in the business
