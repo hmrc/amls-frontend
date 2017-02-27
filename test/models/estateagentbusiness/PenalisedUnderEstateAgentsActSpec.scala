@@ -26,6 +26,20 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
         be(Valid(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before")))
     }
 
+    "fail to validate an invalid string" in {
+      val data = Map(
+        "penalisedUnderEstateAgentsAct" -> Seq("true"),
+        "penalisedUnderEstateAgentsActDetails" -> Seq("{}")
+      )
+
+
+      PenalisedUnderEstateAgentsAct.formRule.validate(data) must
+        be(Invalid(Seq(
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("err.text.validation"))
+        )))
+    }
+
+
     "fail to validate given mandatory field" in {
 
       PenalisedUnderEstateAgentsAct.formRule.validate(Map.empty) must
