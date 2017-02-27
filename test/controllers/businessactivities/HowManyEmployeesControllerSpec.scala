@@ -9,11 +9,9 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import models.status.{Renewal, SubmissionReady, SubmissionStatus}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -27,7 +25,6 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
     val controller = new HowManyEmployeesController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -74,51 +71,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.CustomersOutsideUKController.get().url))
-    }
-
-    "successfully redirect to CusomerOutSideUK page" when {
-     "submission status is Renewal" in
-      new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "456",
-          "employeeCountAMLSSupervision" -> "123"
-        )
-
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(Renewal))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.CustomersOutsideUKController.get().url))
-      }
-    }
-
-    "successfully redirect to CusomerOutSideUK page" when {
-      "submission status not Renewal" in
-        new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "employeeCount" -> "456",
-            "employeeCountAMLSSupervision" -> "123"
-          )
-
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
-
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
-        }
+      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
     }
 
     "on post without data" in new Fixture {
@@ -163,7 +116,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
       val resultFalse = controller.post(false)(newRequest)
       //status(resultFalse) must be(SEE_OTHER)
-      redirectLocation(resultFalse) must be(Some(routes.CustomersOutsideUKController.get().url))
+      redirectLocation(resultFalse) must be(Some(routes.TransactionRecordController.get().url))
     }
   }
 }
