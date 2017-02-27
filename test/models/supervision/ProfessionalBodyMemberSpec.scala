@@ -11,93 +11,107 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
 
   "ProfessionalBodyMember" must {
 
-    "validate model with few check box selected" in {
+    "pass validation" when {
+      "more than one check box is selected" in {
 
-      val model = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("01", "02" ,"14"),
-        "specifyOtherBusiness" -> Seq("test")
-      )
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("01", "02", "14"),
+          "specifyOtherBusiness" -> Seq("test")
+        )
 
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
 
+      }
+
+      "'No' is selected" in {
+
+        val model = Map(
+          "isAMember" -> Seq("false")
+        )
+
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Valid(ProfessionalBodyMemberNo))
+
+      }
     }
 
-    "validate model with option No selected" in {
+    "fail validation" when {
+      "'isAMember' field field is missing" in {
 
-      val model = Map(
-        "isAMember" -> Seq("false")
-      )
+        val model = Map(
+          "businessType[]" -> Seq("01", "02", "03"),
+          "specifyOtherBusiness" -> Seq("")
+        )
 
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Valid(ProfessionalBodyMemberNo))
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Invalid(List((Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
 
+      }
+
+      "'isAMember is set to 'true' and 'Other' is selected, but specifyOtherBusiness is an empty string" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("01", "02", "14"),
+          "specifyOtherBusiness" -> Seq("")
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
+      }
+
+      "specifyOtherBusiness exceeds max length" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("01", "02", "14"),
+          "specifyOtherBusiness" -> Seq("test" * 200)
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
+      }
+
+      "'isAMember is set to 'true' but businessType[] is empty" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq(),
+          "specifyOtherBusiness" -> Seq("test")
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Invalid(List((Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
+      }
+
+      "given no data represented by an empty Map" in {
+
+        ProfessionalBodyMember.formRule.validate(Map.empty) must
+          be(Invalid(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
+
+      }
+
+      "given invalid businessType[] selection" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("01", "20")
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+          be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
+
+      }
+
+      "given invalid characters in specifyOther" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("14"),
+          "specifyOtherBusiness" -> Seq("{}{}")
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+        be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
+      }
     }
-
-    "fail validation when field member of professional not selected" in {
-
-      val model = Map(
-        "businessType[]" -> Seq("01", "02" ,"03"),
-        "specifyOtherBusiness" -> Seq("")
-      )
-
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(List(( Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
-
-    }
-
-    "fail validation when field is business a member of professional body selected and specifyOtherBusiness is empty" in {
-
-      val model = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("01", "02" ,"14"),
-        "specifyOtherBusiness" -> Seq("")
-      )
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
-    }
-
-    "fail validation when field is business a member of professional body selected and specifyOther exceeds max length" in {
-
-      val model = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("01", "02" ,"14"),
-        "specifyOtherBusiness" -> Seq("test"*200)
-      )
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
-    }
-
-    "fail validation when none of the check boxes selected" in {
-
-      val model = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq(),
-        "specifyOtherBusiness" -> Seq("test")
-      )
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(List(( Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
-    }
-
-    "fail to validate on empty Map" in {
-
-      ProfessionalBodyMember.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
-
-    }
-
-    "fail to validate invalid data" in {
-
-      val model = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("01", "20")
-      )
-      ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
-
-    }
-
     "validate form write for valid transaction record" in {
 
       val map = Map(
