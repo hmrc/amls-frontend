@@ -180,8 +180,8 @@ error.required.eab.redress.scheme.name = Enter the name of the redress scheme
 error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters for the name of the redress scheme.
 error.required.eab.business.services = Select at least one service that your business provides.
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
-error.required.eab.info.about.penalty = Enter some information about the penalty received.
-error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters for information about the penalty received.
+error.required.eab.info.about.penalty = Give a brief description of what the penalty was, and when it occurred
+error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 ############################### Responsible People ###############################
@@ -243,7 +243,8 @@ error.required.supervision.business.a.member = Select yes or no to the question:
 error.required.supervision.one.professional.body = Select at least one professional body
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
-error.expected.supervision.date.after.start = The date your supervision ended can’t be before the date it started
+error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
+error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
 
 ############################### Money Services Business ###############################
 error.required.msb.services = Select at least one service that your business provides.

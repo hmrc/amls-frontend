@@ -127,6 +127,7 @@ object FormTypes {
 
   val postcodeType = postcodeRequired andThen postcodePattern
 
+
   /** Contact Details Rules **/
 
   private val nameMaxLength = 140
