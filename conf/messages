@@ -226,11 +226,11 @@ error.required.asp.business.services = Select one or more options to show the se
 ############################### Supervision ###############################
 error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
-error.required.supervision.anotherbody = Select yes if you’re registered with HMRC to handle other business’s tax matters
+error.required.supervision.anotherbody = Select yes if your business has previously been registered with another supervising body
 error.invalid.supervision.supervisor = You can’t enter more than 140 characters
 error.invalid.supervision.reason = You can’t enter more than 255 characters
-error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
-error.required.supervision.one.professional.body = Select at least one professional body
+error.required.supervision.business.a.member = Select yes if your business is a member of a professional body
+error.required.supervision.one.professional.body = Select one or more options to show which professional bodies your business is a member of
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
 error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
