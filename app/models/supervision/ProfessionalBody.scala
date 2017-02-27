@@ -5,6 +5,7 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
+import models.FormTypes._
 
 sealed trait ProfessionalBody
 
@@ -18,7 +19,8 @@ object ProfessionalBody {
 
   val maxPenalisedTypeLength = 255
   val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty") andThen
+    basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
@@ -51,3 +53,4 @@ object ProfessionalBody {
     case ProfessionalBodyNo => Json.obj("penalised" -> false)
   }
 }
+
