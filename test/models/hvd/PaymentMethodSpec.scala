@@ -32,5 +32,16 @@ class PaymentMethodSpec extends PlaySpec {
       )
       PaymentMethods.formR.validate(data) mustEqual Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.required.hvd.describe"))))
     }
+
+    "fail to validate when invalid characters are specified in 'other details'" in {
+      val data = Map(
+        "other" -> Seq("true"),
+        "details" -> Seq("¡<>{}")
+      )
+
+      PaymentMethods.formR.validate(data) must be(
+        Invalid(Seq((Path \ "details") -> Seq(ValidationError("err.text.validation"))))
+      )
+    }
   }
 }

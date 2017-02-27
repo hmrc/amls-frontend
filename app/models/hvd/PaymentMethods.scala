@@ -16,9 +16,7 @@ case class PaymentMethods(
 
 sealed trait PaymentMethods0 {
 
-  // This could be made more generic...
-  import JsonMapping._
-  import utils.MappingUtils.MonoidImplicits._
+  import models.FormTypes._
 
   private implicit def rule[A]
   (implicit
@@ -48,7 +46,8 @@ sealed trait PaymentMethods0 {
 
       val detailsR: Rule[String, String] =
         (minLengthR(minLength) withMessage "error.required.hvd.describe") andThen
-          (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255")
+        (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255") andThen
+        basicPunctuationPattern
 
       val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
 
