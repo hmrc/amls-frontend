@@ -18,7 +18,6 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
-import play.api.Logger
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -35,11 +34,14 @@ trait SubmissionService extends DataCacheService {
 
   private case class RowEntity(message: String, feePer: BigDecimal)
 
-  private val Submission = RowEntity("confirmation.submission", ApplicationConfig.regFee)
-  private val Premises = RowEntity("confirmation.tradingpremises", ApplicationConfig.premisesFee)
-  private val PremisesHalfYear = RowEntity("confirmation.tradingpremises.half", Premises.feePer / 2)
+  private def submissionRowEntity(response :SubmissionResponse) = RowEntity("confirmation.submission", response.registrationFee)
+  private def premisesRowEntity(response :SubmissionResponse) = RowEntity("confirmation.tradingpremises",
+    response.premiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
+  private def premisesHalfYear(response :SubmissionResponse) = RowEntity("confirmation.tradingpremises.half",
+    premisesRowEntity(response).feePer / 2)
   private val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
-  private val People = RowEntity("confirmation.responsiblepeople", ApplicationConfig.peopleFee)
+  private def peopleRowEntity(response :SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
+    response.fpFeeRate.getOrElse(ApplicationConfig.peopleFee))
   private val UnpaidPeople = RowEntity("confirmation.unpaidpeople", 0)
 
   def subscribe
@@ -207,11 +209,11 @@ trait SubmissionService extends DataCacheService {
       }
     }
 
-    def rpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeople, People, getPeopleFee)
+    def rpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeople, peopleRowEntity(variation), getPeopleFee)
     def fpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeopleFitAndProper, UnpaidPeople, getFitAndProperDeduction)
 
-    def tpFullYearRow: Seq[BreakdownRow] = variationRow(variation.addedFullYearTradingPremises, Premises, getFullPremisesFee)
-    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(variation.halfYearlyTradingPremises, PremisesHalfYear, getHalfYearPremisesFee)
+    def tpFullYearRow: Seq[BreakdownRow] = variationRow(variation.addedFullYearTradingPremises, premisesRowEntity(variation), getFullPremisesFee)
+    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(variation.halfYearlyTradingPremises, premisesHalfYear(variation), getHalfYearPremisesFee)
     def tpZeroRow: Seq[BreakdownRow] = variationRow(variation.zeroRatedTradingPremises, PremisesZero, getZeroPremisesFee)
 
     rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
@@ -219,18 +221,18 @@ trait SubmissionService extends DataCacheService {
   }
 
   private def getTotalPremisesFee(variation: AmendVariationResponse): BigDecimal =
-    (Premises.feePer * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
+    (premisesRowEntity(variation).feePer * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
 
   private def getFullPremisesFee(variation: AmendVariationResponse): BigDecimal =
-    Premises.feePer * variation.addedFullYearTradingPremises
+    premisesRowEntity(variation).feePer * variation.addedFullYearTradingPremises
 
   private def getHalfYearPremisesFee(variation: AmendVariationResponse): BigDecimal =
-    PremisesHalfYear.feePer * variation.halfYearlyTradingPremises
+    premisesHalfYear(variation).feePer * variation.halfYearlyTradingPremises
 
   private def getZeroPremisesFee(variation: AmendVariationResponse): BigDecimal = 0
 
   private def getPeopleFee(variation: AmendVariationResponse): BigDecimal =
-    People.feePer * variation.addedResponsiblePeople
+    peopleRowEntity(variation).feePer * variation.addedResponsiblePeople
 
   private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal = 0
 
@@ -240,9 +242,10 @@ trait SubmissionService extends DataCacheService {
    people: Seq[ResponsiblePeople],
    businessActivities: BusinessSevices,
    subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)) ++
+    Seq(BreakdownRow(submissionRowEntity(submission).message, subQuantity,
+      submissionRowEntity(submission).feePer, subQuantity * submissionRowEntity(submission).feePer)) ++
       responsiblePeopleRows(people, submission, businessActivities) ++
-      Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, submission.premiseFee))
+      Seq(BreakdownRow(premisesRowEntity(submission).message, premises.size, premisesRowEntity(submission).feePer, submission.premiseFee))
   }
 
   private def safeId(cache: CacheMap): Future[String] = {
@@ -291,7 +294,8 @@ trait SubmissionService extends DataCacheService {
 
       people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
         case (b, a) =>
-          Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
+          Seq(BreakdownRow(peopleRowEntity(subscription).message, a.size, peopleRowEntity(subscription).feePer,
+            Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
             (if (b.nonEmpty) {
               Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
             } else {

@@ -45,13 +45,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     val paymentRefNo = "XA111123451111"
 
     val response = SubscriptionResponse(
-        etmpFormBundleNumber = "",
-        amlsRefNo = "",
-        registrationFee = 0,
-        fpFee = None,
-        premiseFee = 0,
-        totalFees = 0,
-        paymentReference = paymentRefNo
+      etmpFormBundleNumber = "",
+      amlsRefNo = "",
+      registrationFee = 0,
+      fpFee = None,
+      fpFeeRate = None,
+      premiseFee = 0,
+      premiseFeeRate = None,
+      totalFees = 0,
+      paymentReference = paymentRefNo
     )
 
     protected val mockCacheMap = mock[CacheMap]
