@@ -100,6 +100,17 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
           be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
 
       }
+
+      "given invalid characters in specifyOther" in {
+
+        val model = Map(
+          "isAMember" -> Seq("true"),
+          "businessType[]" -> Seq("14"),
+          "specifyOtherBusiness" -> Seq("{}{}")
+        )
+        ProfessionalBodyMember.formRule.validate(model) must
+        be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
+      }
     }
     "validate form write for valid transaction record" in {
 
