@@ -23,8 +23,8 @@ error.invalid.postcode = Enter a valid postcode
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.country.name = Enter at least one country.
-error.required.nationality = Select the nationality of the responsible person.
-error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+error.required.nationality = Select one or more options to show this person’s nationality
+error.required.uk.or.overseas = Select yes if this is a UK address
 
 error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.
@@ -51,18 +51,18 @@ error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’
 
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
-error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
+error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
-error.required.rp.nominated_officer = Select yes or not to the question: Is this person the nominated officer for the business?
+error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
 
 error.not-found.title = Not Found
 error.not-found.heading = Item not found
-error.not-found.message = Please check that you have entered the correct web address.
+error.not-found.message = Check that you have entered the correct web address.
 
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
-error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
+error.survey.satisfaction.required = Select one option to show how you feel about using the service
 
 error.required.phone.number = Enter a contact phone number
 err.invalid.phone.number = Enter a valid contact phone number
