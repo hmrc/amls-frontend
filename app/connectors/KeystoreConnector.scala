@@ -1,15 +1,18 @@
 package connectors
 
-import config.BusinessCustomerSessionCache
+import config.{AmlsSessionCache, BusinessCustomerSessionCache}
 import models.businesscustomer.ReviewDetails
+import models.status.ConfirmationStatus
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier}
+import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait KeystoreConnector {
 
-  private[connectors] def dataCache: SessionCache
+  private[connectors] def businessCustomerDataCache: SessionCache
+  private[connectors] def amlsDataCache: SessionCache
 
   private val key = "BC_Business_Details"
 
@@ -18,14 +21,14 @@ trait KeystoreConnector {
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): Future[Option[ReviewDetails]] =
-    dataCache.fetchAndGetEntry[ReviewDetails](key)
+    businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](key)
 
   def reviewDetails
   (implicit
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): Future[ReviewDetails] =
-    dataCache.fetchAndGetEntry[ReviewDetails](key) flatMap {
+    businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](key) flatMap {
       case Some(reviewDetails) =>
         Future.successful(reviewDetails)
       case None =>
@@ -33,9 +36,22 @@ trait KeystoreConnector {
           new NotFoundException("No review details found for Session")
         }
     }
+
+  def confirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    amlsDataCache.fetchAndGetEntry[ConfirmationStatus](ConfirmationStatus.key) flatMap {
+      case Some(s) => Future.successful(s)
+      case _ => Future.successful(ConfirmationStatus(None))
+    }
+
+  def setConfirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(Some(true))) flatMap { _ => Future.successful() }
+
+  def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None)) flatMap { _ => Future.successful() }
 }
 
 object KeystoreConnector extends KeystoreConnector {
   // $COVERAGE-OFF$
-  override private[connectors] def dataCache: SessionCache = BusinessCustomerSessionCache
+  override private[connectors] def businessCustomerDataCache: SessionCache = BusinessCustomerSessionCache
+  override private[connectors] def amlsDataCache: SessionCache = AmlsSessionCache
 }

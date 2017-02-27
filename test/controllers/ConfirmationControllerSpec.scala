@@ -1,39 +1,57 @@
 package controllers
 
+import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import play.api.{Application, Mode}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{GenericTestHelper, AuthorisedFixture}
+import uk.gov.hmrc.play.http.HttpResponse
+import utils.{AuthorisedFixture, GenericTestHelper}
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends GenericTestHelper {
+class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
+
+  val authenticatorConnector = mock[AuthenticatorConnector]
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .bindings(bindModules:_*).in(Mode.Test)
+    .bindings(bind[AuthenticatorConnector].to(authenticatorConnector))
+    .build()
+
+  when(authenticatorConnector.refreshProfile(any())) thenReturn Future.successful(HttpResponse(200))
 
   trait Fixture extends AuthorisedFixture {
+
     self => val request = addToken(authRequest)
+
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
       override private[controllers] val submissionService = mock[SubmissionService]
       override val statusService: StatusService = mock[StatusService]
+      override val keystoreConnector = mock[KeystoreConnector]
     }
 
     val paymentRefNo = "XA111123451111"
 
     val response = SubscriptionResponse(
-      etmpFormBundleNumber = "",
-      amlsRefNo = "",
-      registrationFee = 0,
-      fpFee = None,
-      premiseFee = 0,
-      totalFees = 0,
-      paymentReference = paymentRefNo
+        etmpFormBundleNumber = "",
+        amlsRefNo = "",
+        registrationFee = 0,
+        fpFee = None,
+        premiseFee = 0,
+        totalFees = 0,
+        paymentReference = paymentRefNo
     )
 
     protected val mockCacheMap = mock[CacheMap]
@@ -41,9 +59,37 @@ class ConfirmationControllerSpec extends GenericTestHelper {
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
+    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
+
   }
 
   "ConfirmationController" must {
+
+    "refresh the user's auth profile" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      verify(authenticatorConnector).refreshProfile(any())
+
+    }
+
+    "write a confirmation value to Keystore" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
+
+    }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
 
