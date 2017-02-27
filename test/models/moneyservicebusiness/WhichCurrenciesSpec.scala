@@ -1,13 +1,14 @@
 package models.moneyservicebusiness
 
 import org.scalatest.{MustMatchers, WordSpec}
-import jto.validation.{Path, Invalid, Valid}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import org.scalatestplus.play.{OneAppPerSuite}
+import models.CharacterSets
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 
-class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
@@ -188,6 +189,70 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       "fail validation " in {
         WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
       }
+    }
+
+    "bankNames contains symbols outside the Trading Names pattern" should {
+
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq(symbols5.mkString("")),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("wholesaler names"),
+        "customerMoneySource" -> Seq("Yes"),
+        "usesForeignCurrencies" -> Seq("Yes")
+      )
+
+      "fail validation" in {
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("err.text.validation")))))
+      }
+
+    }
+
+    "bankNames contains standard UK alpha characters" should {
+
+      val alpha = (alphaLower.take(4) ++ alphaUpper.take(4)).mkString("")
+
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq(alpha),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("wholesaler names"),
+        "customerMoneySource" -> Seq("Yes"),
+        "usesForeignCurrencies" -> Seq("Yes")
+      )
+
+      "pass validation" in {
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(alpha)),Some(WholesalerMoneySource("wholesaler names")),Some(true))))
+      }
+
+    }
+
+    "bankNames contains accented characters" should {
+
+      val accentedAlpha = (extendedAlphaLower.take(4) ++ extendedAlphaUpper.take(4)).mkString("")
+
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq(accentedAlpha),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("wholesaler names"),
+        "customerMoneySource" -> Seq("Yes"),
+        "usesForeignCurrencies" -> Seq("Yes")
+      )
+
+      "pass validation" in {
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(accentedAlpha)),Some(WholesalerMoneySource("wholesaler names")),Some(true))))
+      }
+
     }
 
     "currencies are sent as blank strings" should {
