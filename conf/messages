@@ -176,46 +176,45 @@ error.invalid.eab.info.about.penalty = You can’t enter more than 255 character
 error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
-error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
-error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
+error.required.rp.is.uk.resident = Select yes if this person is a UK resident
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
-error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
-error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
+error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
+error.required.rp.register.another.person = Select yes if you want to register another responsible person
 error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
-error.required.rp.experiencetraining = Select yes or no to the question: Does this person have previous experience in these activities?
+error.required.rp.experiencetraining = Select yes if this person has experience in these activities
 error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
 error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
-error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
+error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
 error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
-error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?
+error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
-error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
+error.required.rp.isknownbyothernames = Select yes if this person is known by another name
 error.required.rp.otherfirstnames = Enter all other first names.
 error.required.rp.otherlastnames = Enter all other last names.
-error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
-error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
+error.required.rp.hasPreviousName = Select yes if this person has ever changed their name
+error.required.rp.hasOtherNames = Select yes if this person is known by another name
 error.required.rp.first_name = Enter the responsible person’s first name
 error.required.rp.last_name = Enter the responsible person’s last name
 error.rp.previous.invalid = Enter responsible person’s previous name
 error.required.rp.otherNames = Enter an alternative name.
 error.invalid.length.otherNames = You can’t enter more than 140 characters for the alternative name.
-error.required.timeAtAddress = Select how long this person lived at this address.
-error.required.positionWithinBusiness = Select at least one position within the business.
-error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+error.required.timeAtAddress = Select one option to show how long this person lived at this address
+error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
+error.required.rp.wherepersonlives.howlonglived = Select one option to show how long this person lived at this address
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 
 ############################### Trust and company service providers ###############################
 
-error.required.tcsp.provided_services.services = Select at least one service that your business provides.
+error.required.tcsp.provided_services.services = Select one or more options to show the services your business provides
 error.required.tcsp.provided_services.details = Describe the services that your business provides
-error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
-error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
-error.required.tcsp.complex.corporate.structures = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
-error.required.tcsp.services.another.tcsp = Select yes or no to the question: does your business use the services of another Trust or Company Service Provider?
+error.required.tcsp.service.providers = Select one or more options to show the kind of Trust or Company Service Provider you are
+error.required.tcsp.off.the.shelf.companies = Select yes if you only sell off-the-shelf companies
+error.required.tcsp.complex.corporate.structures = Select yes if you create complex corporate structures for clients, or plan to
+error.required.tcsp.services.another.tcsp = Select yes if you use the services of another Trust or Company Service Provider
 
 ############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
