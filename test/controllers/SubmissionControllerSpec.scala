@@ -1,18 +1,14 @@
 package controllers
 
-import connectors.AmlsConnector
-import models.{AmendVariationResponse, SubscriptionResponse}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.{AmendVariationResponse, SubscriptionResponse}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import  utils.GenericTestHelper
-import play.api.libs.json.JsString
 import play.api.test.Helpers._
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HttpResponse
-import utils.AuthorisedFixture
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -32,7 +28,9 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
     amlsRefNo = "",
     registrationFee = 0,
     fpFee = None,
+    fpFeeRate = None,
     premiseFee = 0,
+    premiseFeeRate = None,
     totalFees = 0,
     paymentReference = ""
   )
@@ -42,7 +40,9 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
     etmpFormBundleNumber = "",
     registrationFee = 0,
     fpFee = Some(0),
+    fpFeeRate = Some(0),
     premiseFee = 0,
+    premiseFeeRate = None,
     totalFees = 0,
     paymentReference = Some(""),
     difference = Some(0)

@@ -79,7 +79,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("", "", 1.00, None, 1.00, 1.00, "")))
+            .thenReturn(Some(SubscriptionResponse("", "", 1.00,None, None, 1.00, None, 1.00, "")))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
 
@@ -300,7 +300,9 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
           "TESTAMLSREFNNO",
           100.45,
           None,
+          None,
           123.78,
+          None,
           17623.76,
           "TESTPAYMENTREF"
       )
