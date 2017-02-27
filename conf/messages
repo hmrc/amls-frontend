@@ -234,7 +234,7 @@ error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
 ############################### Supervision ###############################
-error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.supervisor = Enter the name of your last supervising body
 error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
 error.invalid.supervision.supervisor = You can’t enter more than 140 characters
