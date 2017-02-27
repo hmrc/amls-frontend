@@ -12,15 +12,8 @@
 ##################################       Generic Error Messages     ####################################################
 ########################################################################################################################
 
-err.titleNotEntered.first_name = Enter the first name
-err.titleNotEntered.last_name = Enter the last name
-err.invalidLength = invalid length
-err.required = Please enter an item
-err.invalid = Please enter a valid item
-err.notrequired = No item should be entered
-err.invalidLength = invalid length
+
 err.summary = There is a problem
-err.pleasespecify = Please specify
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 
 error.required.address.line1 = Enter the first line of the address
