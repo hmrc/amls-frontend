@@ -20,12 +20,7 @@ object FormTypes {
   val maxAddressLength = 35
   val maxPhoneNumberLength = 24
   val maxEmailLength = 100
-  val maxAccountName = 40
-  val maxIBANLength = 34
-  val maxNonUKBankAccountNumberLength = 40
-  val maxUKBankAccountNumberLength = 8
   val minAccountantRefNoTypeLength = 11
-  val maxRoleWithinBusinessOtherType = 255
   val maxTypeOfBusinessLength = 40
   val maxNonUKPassportLength = 40
 
@@ -100,6 +95,7 @@ object FormTypes {
   val extendedReferenceNumberRegex = """^[0-9]{6}$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
+
   /** Name Rules **/
 
   private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$".r
@@ -130,6 +126,7 @@ object FormTypes {
   private val postcodeRequired = required("error.invalid.postcode")
 
   val postcodeType = postcodeRequired andThen postcodePattern
+
 
   /** Contact Details Rules **/
 
@@ -201,7 +198,7 @@ object FormTypes {
     case (d1, d2) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
-
+  
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
@@ -233,10 +230,6 @@ object FormTypes {
     .andThen(notEmpty)
     .andThen(maxLength(maxNameTypeLength))
     .andThen(regexWithMsg(commonNameRegex, "err.text.validation"))
-
-  val roleWithinBusinessOtherType = notEmptyStrip
-    .andThen(notEmpty)
-    .andThen(maxLength(maxRoleWithinBusinessOtherType))
 
   val typeOfBusinessType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.required.bm.businesstype.type"))

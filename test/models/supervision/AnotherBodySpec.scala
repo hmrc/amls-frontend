@@ -52,10 +52,31 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
 
-      "given invalid characters" in {
+      "supervision enddate is before supervision startdate" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
           "supervisorName" -> Seq("Name"),
+          "startDate.day" -> Seq("25"),
+          "startDate.month" -> Seq("2"),
+          "startDate.year" -> Seq("1998"),
+          "endDate.day" -> Seq("24"),
+          "endDate.month" -> Seq("2"),
+          "endDate.year" -> Seq("1998"),
+          "endingReason" -> Seq("reason")
+        )
+
+        val expected = Invalid(
+          Seq((Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
+          (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate")))
+        )
+
+        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
+      }
+
+      "given invalid characters in endingReason and supervisorName" in {
+        val urlFormEncoded = Map(
+          "anotherBody" -> Seq("true"),
+          "supervisorName" -> Seq("invalid {} <>"),
           "startDate.day" -> Seq("24"),
           "startDate.month" -> Seq("2"),
           "startDate.year" -> Seq("1990"),
@@ -66,17 +87,18 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         )
 
         val expected = Invalid(
-              Seq((Path \ "endingReason") -> Seq(ValidationError("err.text.validation")))
+              Seq((Path \ "supervisorName") -> Seq(ValidationError("err.text.validation")),
+                (Path \ "endingReason") -> Seq(ValidationError("err.text.validation")))
           )
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
 
       }
 
-      "given only spaces" in {
+      "given only spaces in endingReason and supervisorName" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("Name"),
+          "supervisorName" -> Seq("  "),
           "startDate.day" -> Seq("24"),
           "startDate.month" -> Seq("2"),
           "startDate.year" -> Seq("1990"),
@@ -87,7 +109,8 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         )
 
         val expected = Invalid(
-          Seq((Path \ "endingReason") -> Seq(ValidationError("error.required.supervision.reason")))
+          Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required.supervision.supervisor")),
+            (Path \ "endingReason") -> Seq(ValidationError("error.required.supervision.reason")))
         )
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)

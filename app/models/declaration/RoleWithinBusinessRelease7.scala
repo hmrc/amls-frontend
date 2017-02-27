@@ -1,20 +1,20 @@
 package models.declaration.release7
 
-import models.FormTypes._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
-import play.api.libs.json.{JsError, _}
-import play.api.libs.json.Reads.StringReads
-import play.api.data.validation.{ValidationError => JsonValidationError}
-import jto.validation.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, _}
+import jto.validation.forms.Rules.{minLength => _, _}
+import jto.validation.forms.UrlFormEncoded
+import models.FormTypes._
+import play.api.data.validation.{ValidationError => JsonValidationError}
+import play.api.libs.json.Reads.StringReads
+import play.api.libs.json.{JsError, _}
+import utils.TraversableValidators.minLengthR
+
 //import models.declaration.Other
 
 case class RoleWithinBusinessRelease7(items: Set[RoleType]) {
   def sorted = {
-    items.toSeq.sortBy( it => it.value)
+    items.toSeq.sortBy(it => it.value)
   }
 }
 
@@ -34,23 +34,33 @@ sealed trait RoleType {
 }
 
 case object BeneficialShareholder extends RoleType
+
 case object Director extends RoleType
+
 case object Partner extends RoleType
+
 case object InternalAccountant extends RoleType
+
 case object ExternalAccountant extends RoleType
+
 case object SoleProprietor extends RoleType
+
 case object NominatedOfficer extends RoleType
+
 case object DesignatedMember extends RoleType
-case class Other(details:String) extends RoleType
+
+case class Other(details: String) extends RoleType
 
 object RoleWithinBusinessRelease7 {
 
   import utils.MappingUtils.Implicits._
 
   val maxDetailsLength = 255
+
   val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required") andThen
-    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255")
+    notEmpty.withMessage("error.required.declaration.specify.role") andThen
+    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
+    basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
@@ -80,8 +90,8 @@ object RoleWithinBusinessRelease7 {
               }
             }
         } map RoleWithinBusinessRelease7.apply
-        }
       }
+    }
 
   implicit def formWrites = Write[RoleWithinBusinessRelease7, UrlFormEncoded] {
     case RoleWithinBusinessRelease7(transactions) =>
@@ -100,7 +110,7 @@ object RoleWithinBusinessRelease7 {
   val businessRolePathName = "roleWithinBusiness"
   val businessRolePath = JsPath \ businessRolePathName
 
-  val preRelease7JsonRead =  businessRolePath.read[String].flatMap[Set[RoleType]] {
+  val preRelease7JsonRead = businessRolePath.read[String].flatMap[Set[RoleType]] {
     case "01" => Reads(_ => JsSuccess(Set(BeneficialShareholder)))
     case "02" => Reads(_ => JsSuccess(Set(Director)))
     case "03" => Reads(_ => JsSuccess(Set(ExternalAccountant)))
@@ -115,9 +125,9 @@ object RoleWithinBusinessRelease7 {
   }
 
   val fallback = Reads(x => (x \ businessRolePathName).getOrElse(JsNull) match {
-      case JsNull => JsError(businessRolePath -> JsonValidationError("error.path.missing"))
-      case _ => JsError(businessRolePath -> JsonValidationError("error.invalid"))
-    }) map identity[Set[RoleType]]
+    case JsNull => JsError(businessRolePath -> JsonValidationError("error.path.missing"))
+    case _ => JsError(businessRolePath -> JsonValidationError("error.invalid"))
+  }) map identity[Set[RoleType]]
 
   implicit val jsonReads: Reads[RoleWithinBusinessRelease7] =
     (__ \ "roleWithinBusiness").read[Set[String]].flatMap { x: Set[String] =>

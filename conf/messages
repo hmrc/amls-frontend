@@ -180,8 +180,8 @@ error.required.eab.redress.scheme.name = Enter the name of the redress scheme
 error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters for the name of the redress scheme.
 error.required.eab.business.services = Select at least one service that your business provides.
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
-error.required.eab.info.about.penalty = Enter some information about the penalty received.
-error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters for information about the penalty received.
+error.required.eab.info.about.penalty = Give a brief description of the penalty and when it occurred
+error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 ############################### Responsible People ###############################
@@ -234,15 +234,17 @@ error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
 ############################### Supervision ###############################
-error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.supervisor = Enter the name of your last supervising body
 error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
 error.invalid.supervision.supervisor = You can’t enter more than 140 characters
 error.invalid.supervision.reason = You can’t enter more than 255 characters
 error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
 error.required.supervision.one.professional.body = Select at least one professional body
-error.required.supervision.business.details = Enter the name of the professional body
+error.required.supervision.business.details = Enter the name of the professional body your business is a member of
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
+error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
+error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
 
 ############################### Money Services Business ###############################
 error.required.msb.services = Select at least one service that your business provides.
@@ -288,6 +290,7 @@ error.required.declaration.nominated.officer = Select your nominated officer or 
 error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
+error.required.declaration.specify.role = Specify your role in the business
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -760,7 +763,7 @@ estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or a
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
 estateagentbusiness.penalisedunderestateagentsact.banned = being banned from taking part in estate agency activities
-estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
+estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Give a brief overview of the penalty and when it occurred
 estateagentbusiness.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
 estateagentbusiness.penalisedbyprofessional.heading = Has the business, or anyone in the business, ever been penalised by a professional body?
 estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agency business activities. Examples of a penalty include:
@@ -768,7 +771,7 @@ estateagentbusiness.penalisedbyprofessional.line_1 = a fine
 estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
-estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
+estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Give a brief overview of the penalty and when it occurred
 estateagentbusiness.services.title = Which services does your business provide?
 estateagentbusiness.service.lbl.01 = Residential estate agency services
 estateagentbusiness.service.lbl.02 = Commercial estate agency services

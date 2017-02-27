@@ -5,8 +5,11 @@ import org.joda.time.LocalDate
 import jto.validation.forms.Rules._
 import jto.validation._
 import jto.validation.forms._
-import play.api.libs.json.{Json, Writes, Reads}
+import play.api.libs.json.{Json, Reads, Writes}
 import cats.data.Validated.{Invalid, Valid}
+import models.ValidationRule
+
+
 
 sealed trait AnotherBody
 
@@ -25,23 +28,39 @@ object AnotherBody {
   private val supervisorMaxLength = 140
   private val reasonMaxLength = 255
 
-  private val supervisorRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.supervisor") andThen
-    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor")
+  private val supervisorRule = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.supervision.supervisor") andThen
+    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor") andThen
+    basicPunctuationPattern
 
   private val reasonRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.reason") andThen
     maxLength(reasonMaxLength).withMessage("error.invalid.maxlength.255") andThen
     basicPunctuationPattern
 
+  type ValidationRuleType = (String, LocalDate, LocalDate, String)
+
+  val validationRule: ValidationRule[ValidationRuleType] = Rule[ValidationRuleType, ValidationRuleType] {
+    case x@(_, d1, d2, _) if !d1.isAfter(d2) => Valid(x)
+    case _ => Invalid(Seq(
+      (Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
+      (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))
+    ))
+  }
+
   implicit val formRule: Rule[UrlFormEncoded, AnotherBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
     (__ \ "anotherBody").read[Boolean].withMessage("error.required.supervision.anotherbody") flatMap {
-      case true => (
-        (__ \ "supervisorName").read(supervisorRule) ~
+      case true =>
+
+        val r = (__ \ "supervisorName").read(supervisorRule) ~
           (__ \ "startDate").read(localDateRule) ~
           (__ \ "endDate").read(localDateRule) ~
           (__ \ "endingReason").read(reasonRule)
-        ) (AnotherBodyYes.apply _)
+
+        r.tupled andThen validationRule andThen Rule.fromMapping[ValidationRuleType, AnotherBody]( x => {
+          Valid(AnotherBodyYes(x._1, x._2, x._3, x._4))
+        })
 
       case false => Rule.fromMapping { _ => Valid(AnotherBodyNo) }
 

@@ -1,6 +1,7 @@
 package models.declaration.release7
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.declaration.RoleWithinBusiness
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -36,7 +37,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
           "roleWithinBusinessOther" -> Seq(""))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required"))))))
+          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.declaration.specify.role"))))))
       }
 
       "represented by a sequence of whitespace" in {
@@ -44,7 +45,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
           "roleWithinBusinessOther" -> Seq("  \t"))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required"))))))
+          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.declaration.specify.role"))))))
       }
 
       "represented by a missing field" in {
@@ -179,6 +180,33 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
           Json.obj("roleWithinBusiness" -> Json.arr("SoleProprietor", "Other"),
             "roleWithinBusinessOther" -> "test657"
           ))
+      }
+    }
+  }
+
+  "otherDetailsType" must {
+    "pass validation" when {
+      "255 valid characters are entered" in {
+        RoleWithinBusinessRelease7.otherDetailsType.validate("1" * 255) must be(Valid("1" * 255))
+      }
+    }
+
+    "fail validation" when {
+      "more than 255 characters are entered" in {
+        RoleWithinBusinessRelease7.otherDetailsType.validate("1" * 256) must be(
+          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.maxlength.255")))))
+      }
+      "given an empty string" in {
+        RoleWithinBusinessRelease7.otherDetailsType.validate("") must be(
+          Invalid(Seq(Path -> Seq(ValidationError("error.required.declaration.specify.role")))))
+      }
+      "given whitespace only" in {
+        RoleWithinBusinessRelease7.otherDetailsType.validate("     ") must be(
+          Invalid(Seq(Path -> Seq(ValidationError("error.required.declaration.specify.role")))))
+      }
+      "given invalid characters" in {
+        RoleWithinBusinessRelease7.otherDetailsType.validate("{}") must be(
+          Invalid(Seq(Path -> Seq(ValidationError("err.text.validation")))))
       }
     }
   }

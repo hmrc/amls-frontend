@@ -17,7 +17,6 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
   val dataCacheConnector: DataCacheConnector
 
   private[controllers] def statusService: StatusService
-
   private[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
@@ -28,7 +27,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       } yield rp match {
         case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
           def isDateRequired = status match {
-            case SubmissionDecisionApproved | SubmissionReadyForReview if rp.get.lineId.isDefined => true
+            case SubmissionDecisionApproved if rp.get.lineId.isDefined => true
             case _ => false
           }
           Ok(views.html.responsiblepeople.remove_responsible_person(
@@ -53,9 +52,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         statusService.getStatus flatMap {
           case NotCompleted | SubmissionReady => removeWithoutDate
           case SubmissionReadyForReview => for {
-            _ <- updateDataStrict[ResponsiblePeople](index) { tp =>
-              tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-            }
+            _ <- updateDataStrict[ResponsiblePeople](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
           } yield redirectAppropriately
           case _ =>
             getData[ResponsiblePeople](index) flatMap { people =>
