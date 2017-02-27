@@ -167,6 +167,24 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
         be(Valid("1934"))
     }
 
+    "penalisedType" must {
+      "successfully validate" in {
+
+        penalisedType.validate("Do not remember why penalised before") must
+          be(Valid("Do not remember why penalised before"))
+      }
+
+      "fail to validate an invalid string" in {
+
+        penalisedType.validate("{}") must
+          be(Invalid(Seq(
+            Path -> Seq(ValidationError("err.text.validation"))
+          )))
+      }
+    }
+
+
+
     "fail to validate an empty string" in {
 
       yearType.validate("") must
