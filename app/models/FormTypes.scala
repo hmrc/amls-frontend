@@ -95,6 +95,7 @@ object FormTypes {
   val extendedReferenceNumberRegex = """^[0-9]{6}$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
 
+
   /** Name Rules **/
 
   private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$".r
