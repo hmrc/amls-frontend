@@ -1,20 +1,21 @@
 package config
 
 import com.typesafe.config.Config
+import config.BusinessCustomerSessionCache.getConfString
 import play.api.Play
 import play.api.mvc.Call
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.HttpAuditing
-import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
+import uk.gov.hmrc.play.audit.http.config.{AuditingConfig, LoadAuditingConfig}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.{ServicesConfig, ControllerConfig, AppName, RunMode}
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
-import uk.gov.hmrc.play.http.ws.{WSGet, WSPut, WSPost, WSDelete}
+import uk.gov.hmrc.play.http.ws.{WSDelete, WSGet, WSPost, WSPut}
 import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 import uk.gov.hmrc.whitelist.AkamaiWhitelistFilter
 
@@ -28,6 +29,16 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
 
   override lazy val baseUri = baseUrl("cachable.session-cache")
   override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+}
+
+object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
+  override def http = WSHttp
+
+  override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
+
+  override def baseUri = baseUrl("cachable.session-cache")
+
+  override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 }
 
 object AMLSAuditConnector extends AuditConnector with RunMode {

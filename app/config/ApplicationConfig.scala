@@ -14,6 +14,8 @@ trait ApplicationConfig {
   def businessMatchingDetailsToggle: Boolean
 
   def release7: Boolean
+
+  def refreshProfileToggle: Boolean
 }
 
 
@@ -84,5 +86,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     val value = getConfBool("feature-toggle.release7", false)
     value
   }
+
+  override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
+
 
 }

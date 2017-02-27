@@ -28,8 +28,10 @@ object AnotherBody {
   private val supervisorMaxLength = 140
   private val reasonMaxLength = 255
 
-  private val supervisorRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.supervisor") andThen
-    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor")
+  private val supervisorRule = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.supervision.supervisor") andThen
+    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor") andThen
+    basicPunctuationPattern
 
   private val reasonRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.reason") andThen
     maxLength(reasonMaxLength).withMessage("error.invalid.maxlength.255") andThen
