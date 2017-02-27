@@ -5,11 +5,11 @@ import config.ApplicationConfig
 import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes.basicPunctuationPattern
 import models._
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
-import models.FormTypes.basicPunctuationPattern
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[Boolean],
