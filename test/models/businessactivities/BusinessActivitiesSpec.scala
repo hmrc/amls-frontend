@@ -64,6 +64,22 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     taxMatters = Some(DefaultTaxMatters),
     hasChanged = false
   )
+  val completeModelWithoutCustUK = BusinessActivities(
+    involvedInOther = Some(DefaultInvolvedInOther),
+    expectedBusinessTurnover = Some(DefaultBusinessTurnover),
+    expectedAMLSTurnover = Some(DefaultAMLSTurnover),
+    businessFranchise = Some(DefaultBusinessFranchise),
+    transactionRecord = Some(DefaultTransactionRecord),
+    customersOutsideUK = None,
+    ncaRegistered = Some(DefaultNCARegistered),
+    accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+    riskAssessmentPolicy = Some(DefaultRiskAssessments),
+    howManyEmployees = Some(DefaultHowManyEmployees),
+    identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
+    whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
+    taxMatters = Some(DefaultTaxMatters),
+    hasChanged = false
+  )
 
   val completeJson = Json.obj(
     "involvedInOther" -> true,
@@ -125,6 +141,10 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
     "return true when the model is complete" in {
       completeModel.isComplete must be(true)
+    }
+
+    "return true when the CustomersOutsideUK is none" in {
+      completeModelWithoutCustUK.isComplete must be(true)
     }
   }
 
