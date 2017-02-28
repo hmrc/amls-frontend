@@ -1,18 +1,25 @@
 package models.businessmatching
 
-import models.FormTypes._
-import jto.validation.{Write, From, Rule}
 import jto.validation.forms.UrlFormEncoded
-import play.api.libs.json.Json
+import jto.validation.{From, Rule, Write}
+import play.api.libs.json._
+import models.FormTypes._
 
 case class TypeOfBusiness(typeOfBusiness: String)
 
 object TypeOfBusiness{
 
+
   implicit val format = Json.format[TypeOfBusiness]
 
   implicit val formRead:Rule[UrlFormEncoded, TypeOfBusiness] = From[UrlFormEncoded] {__ =>
     import jto.validation.forms.Rules._
+
+    val maxTypeOfBusinessLength = 40
+    val typeOfBusinessLength = maxWithMsg(maxTypeOfBusinessLength, "error.max.length.bm.businesstype.type")
+    val typeOfBusinessRequired = required("error.required.bm.businesstype.type")
+    val typeOfBusinessType = notEmptyStrip andThen typeOfBusinessRequired andThen typeOfBusinessLength andThen basicPunctuationPattern
+
     (__ \ "typeOfBusiness").read(typeOfBusinessType) map TypeOfBusiness.apply
   }
 
@@ -21,4 +28,3 @@ object TypeOfBusiness{
   }
 
 }
-

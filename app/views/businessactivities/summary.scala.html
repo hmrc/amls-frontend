@@ -91,23 +91,6 @@
         }
     }
 
-    @model.customersOutsideUK.map { boa =>
-        @checkYourAnswers(
-            question = Messages("businessactivities.customer.outside.uk.title"),
-            editUrl = controllers.businessactivities.routes.CustomersOutsideUKController.get(true).toString
-        ) {
-            @boa.countries.fold {
-                <p>@Messages("lbl.no")</p>
-            } { branches =>
-                <ul class="list list-bullet">
-                @branches.map { country =>
-                    <li>@country</li>
-                }
-                </ul>
-            }
-        }
-    }
-
     @checkYourAnswers(
         question = Messages("businessactivities.keep.customer.records.title"),
         editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString

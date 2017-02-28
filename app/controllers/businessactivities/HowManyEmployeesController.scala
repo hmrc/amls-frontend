@@ -40,7 +40,7 @@ trait HowManyEmployeesController extends BaseController {
               businessActivities.howManyEmployees(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.CustomersOutsideUKController.get())
+            case false => Redirect(routes.TransactionRecordController.get())
           }
       }
     }

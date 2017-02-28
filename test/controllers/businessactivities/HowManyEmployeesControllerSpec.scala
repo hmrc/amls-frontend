@@ -71,7 +71,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.CustomersOutsideUKController.get().url))
+      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
     }
 
     "on post without data" in new Fixture {
@@ -116,7 +116,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
       val resultFalse = controller.post(false)(newRequest)
       //status(resultFalse) must be(SEE_OTHER)
-      redirectLocation(resultFalse) must be(Some(routes.CustomersOutsideUKController.get().url))
+      redirectLocation(resultFalse) must be(Some(routes.TransactionRecordController.get().url))
     }
   }
 }

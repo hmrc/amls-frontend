@@ -40,7 +40,7 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
     "redirect to the landing controller when the submission has been set" in new TestFixture {
 
       val filter = app.injector.instanceOf[ConfirmationFilter]
-      val rh = FakeRequest()
+      val rh = FakeRequest().withSession(("sessionId", "SOME_SESSION_ID"))
       val action = Action(Ok("success"))
 
       val result = filter(action)(rh).run()
