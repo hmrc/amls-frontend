@@ -2,12 +2,13 @@ package connectors
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
+import models.status.ConfirmationStatus
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
-import uk.gov.hmrc.http.cache.client.SessionCache
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
 import scala.concurrent.Future
@@ -15,8 +16,11 @@ import scala.concurrent.ExecutionContext.Implicits._
 
 class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
+  val emptyCache = CacheMap("", Map.empty)
+
   object KeystoreConnector extends KeystoreConnector {
-    override private[connectors] val dataCache: SessionCache = mock[SessionCache]
+    override private[connectors] val businessCustomerDataCache: SessionCache = mock[SessionCache]
+    override private[connectors] val amlsDataCache: SessionCache = mock[SessionCache]
   }
 
   implicit val hc = mock[HeaderCarrier]
@@ -26,7 +30,7 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "return a `Future[Option[ReviewDetails]`" in {
       when {
-        KeystoreConnector.dataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
+        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
       } thenReturn Future.successful(None)
       whenReady (KeystoreConnector.optionalReviewDetails) {
         result =>
@@ -54,7 +58,7 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
       )
 
       when {
-        KeystoreConnector.dataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
+        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
       } thenReturn Future.successful(Some(model))
       whenReady (KeystoreConnector.reviewDetails) {
         result =>
@@ -64,12 +68,63 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "return a failed future when review details return `None`" in {
       when {
-        KeystoreConnector.dataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
+        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
       } thenReturn Future.successful(None)
       whenReady (KeystoreConnector.reviewDetails.failed) {
         result =>
           result mustBe a[NotFoundException]
       }
     }
+  }
+
+  "confirmationIndicator" must {
+
+    "return a successful future when the value is found" in {
+
+      when {
+        KeystoreConnector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any())
+      } thenReturn Future.successful(Some(ConfirmationStatus(Some(true))))
+
+      whenReady(KeystoreConnector.confirmationStatus) { result =>
+        result mustBe ConfirmationStatus(Some(true))
+      }
+
+    }
+
+    "return an empty successful future when the value is not found" in {
+      when {
+        KeystoreConnector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any())
+      } thenReturn Future.successful(None)
+
+      whenReady(KeystoreConnector.confirmationStatus) { result =>
+        result mustBe ConfirmationStatus(None)
+      }
+
+    }
+
+    "save the confirmation status into the keystore" in {
+
+      when {
+        KeystoreConnector.amlsDataCache.cache(any(), any())(any(), any())
+      } thenReturn Future.successful(emptyCache)
+
+      whenReady(KeystoreConnector.setConfirmationStatus) { _ =>
+        verify(KeystoreConnector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(Some(true))))(any(), any())
+      }
+
+    }
+
+    "remove the confirmation status from the keystore" in {
+
+      when {
+        KeystoreConnector.amlsDataCache.cache(any(), any())(any(), any())
+      } thenReturn Future.successful(emptyCache)
+
+      whenReady(KeystoreConnector.resetConfirmation) { _ =>
+        verify(KeystoreConnector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(None)))(any(), any())
+      }
+
+    }
+
   }
 }

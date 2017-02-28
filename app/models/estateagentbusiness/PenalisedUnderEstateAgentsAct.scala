@@ -5,6 +5,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Success, Write}
 import cats.data.Validated.{Invalid, Valid}
 import play.api.libs.json._
+import models.FormTypes._
 
 sealed trait PenalisedUnderEstateAgentsAct
 
@@ -16,12 +17,13 @@ object PenalisedUnderEstateAgentsAct {
 
   import utils.MappingUtils.Implicits._
 
-  val maxPenalisedTypeLength = 255
-  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
-
   implicit val formRule: Rule[UrlFormEncoded, PenalisedUnderEstateAgentsAct] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
+
+    val penalisedMaxLength = 255
+    val penalisedLength = maxWithMsg(penalisedMaxLength, "error.invalid.eab.info.about.penalty")
+    val penalisedRequired = required("error.required.eab.info.about.penalty")
+    val penalisedType = penalisedRequired andThen penalisedLength andThen basicPunctuationPattern
 
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
       case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) map PenalisedUnderEstateAgentsActYes.apply

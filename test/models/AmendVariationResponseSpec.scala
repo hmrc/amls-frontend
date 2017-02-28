@@ -6,7 +6,7 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class AmendVariationResponseSpec extends PlaySpec {
 
-  val response = AmendVariationResponse("pdate", "12345", 115.0, Some(125.0), 0, 240.0, Some("ref"), None)
+  val response = AmendVariationResponse("pdate", "12345", 115.0, Some(125.0), Some(115.0), 0, None, 240.0, Some("ref"), None)
 
   "AmendVariationResponse" must {
 
@@ -18,6 +18,7 @@ class AmendVariationResponseSpec extends PlaySpec {
   "etmpFormBundleNumber" : "12345",
   "registrationFee" : 115.0,
   "fPFee" : 125.0,
+  "fpFeeRate" : 115.0,
   "premiseFee" : 0,
   "totalFees" : 240.0,
   "paymentReference" : "ref",
@@ -51,7 +52,7 @@ class AmendVariationResponseSpec extends PlaySpec {
   "zeroRatedTradingPremises" : 0
 }"""
 
-      AmendVariationResponse.reads.reads(Json.parse(json)) must be(JsSuccess(response))
+      AmendVariationResponse.reads.reads(Json.parse(json)) must be(JsSuccess(response.copy(fpFeeRate = None)))
 
     }
 
@@ -72,7 +73,7 @@ class AmendVariationResponseSpec extends PlaySpec {
   "zeroRatedTradingPremises" : 0
 }"""
 
-      AmendVariationResponse.reads.reads(Json.parse(json)) must be(JsSuccess(response.copy(fpFee = None)))
+      AmendVariationResponse.reads.reads(Json.parse(json)) must be(JsSuccess(response.copy(fpFee = None, fpFeeRate = None)))
 
     }
   }

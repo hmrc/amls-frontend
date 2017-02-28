@@ -45,6 +45,16 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         Products.formRule.validate(model) must
           be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required"))))))
       }
+
+      "contains invalid characters in the 'other details' field" in {
+        val model = Map(
+          "products[]" -> Seq("12"),
+          "otherDetails" -> Seq("¡93u4jk<>{}"))
+
+        Products.formRule.validate(model) must be(
+          Invalid(List((Path \ "otherDetails", Seq(ValidationError("err.text.validation")))))
+        )
+      }
     }
 
     "fail validation when field otherDetails exceeds maximum length" in {

@@ -10,7 +10,7 @@ import play.filters.csrf.{CSRFFilter, CSRFConfigProvider}
 
 trait GenericTestHelper extends PlaySpec with OneAppPerSuite {
 
-  private val bindModules: Seq[GuiceableModule] = Seq()
+  protected val bindModules: Seq[GuiceableModule] = Seq()
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .bindings(bindModules:_*).in(Mode.Test)

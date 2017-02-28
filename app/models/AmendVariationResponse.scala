@@ -1,6 +1,5 @@
 package models
 
-import models.supervision.{AnotherBody, ProfessionalBody, ProfessionalBodyMember}
 import play.api.libs.json.{Json, Reads}
 
 case class AmendVariationResponse (
@@ -8,7 +7,9 @@ case class AmendVariationResponse (
                                     etmpFormBundleNumber: String,
                                     registrationFee: BigDecimal,
                                     fpFee: Option[BigDecimal],
+                                    fpFeeRate: Option[BigDecimal],
                                     premiseFee: BigDecimal,
+                                    premiseFeeRate: Option[BigDecimal],
                                     totalFees: BigDecimal,
                                     paymentReference: Option[String],
                                     difference: Option[BigDecimal],
@@ -32,7 +33,9 @@ object AmendVariationResponse {
         (__ \ "etmpFormBundleNumber").read[String] and
         (__ \ "registrationFee").read[BigDecimal] and
         (__ \ "fpFee").read(Reads.optionWithNull[BigDecimal]).orElse((__ \ "fPFee").read(Reads.optionWithNull[BigDecimal])).orElse(Reads.pure(None)) and
+        (__ \ "fpFeeRate").readNullable[BigDecimal] and
         (__ \ "premiseFee").read[BigDecimal] and
+        (__ \ "premiseFeeRate").readNullable[BigDecimal] and
         (__ \ "totalFees").read[BigDecimal] and
         (__ \ "paymentReference").readNullable[String] and
         (__ \ "difference").readNullable[BigDecimal] and

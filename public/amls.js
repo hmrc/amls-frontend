@@ -181,13 +181,13 @@ $(function () {
   // Prevent the user from typing anything other than digits
   $('#wrapper').on('keydown', '[data-digits=true]', function(e) {
       if (!e.shiftKey
-          && ((e.keyCode >= 48 && e.keyCode < 58)   // digits
-          || e.keyCode == 13)                       // return
-          || (e.keyCode >= 37 && e.keyCode < 41)    // arrow keys
-          || e.keyCode == 8                         // backspace
-          || e.keyCode == 9                         // tab
-          || e.keyCode == 46                        // OSX delete (might be problematic)
-          || e.keyCode == 127)                      // delete
+          && (/[0-9]/.test(String.fromCharCode(e.keyCode)))   // digits
+          || e.keyCode == 13                                  // return
+          || (e.keyCode >= 37 && e.keyCode < 41)              // arrow keys
+          || e.keyCode == 8                                   // backspace
+          || e.keyCode == 9                                   // tab
+          || e.keyCode == 46                                  // OSX delete (might be problematic)
+          || e.keyCode == 127)                                // delete
         return true;
       else
         e.preventDefault();

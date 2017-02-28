@@ -74,6 +74,23 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       ProfessionalBody.formWrites.writes(ProfessionalBodyYes("details")) must
         be(Map("penalised" -> Seq("true"), "professionalBody" -> Seq("details")))
     }
+
+    "fail validation" when {
+
+      "invalid characters were given for the reason field" in {
+
+        val formData = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("¡[]<>948734")
+        )
+
+        ProfessionalBody.formRule.validate(formData) must be(
+          Invalid(Seq((Path \ "professionalBody") -> Seq(ValidationError("err.text.validation"))))
+        )
+
+      }
+
+    }
   }
 
   "JSON validation" must {
