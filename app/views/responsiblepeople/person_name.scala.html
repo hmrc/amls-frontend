@@ -1,6 +1,6 @@
 @import forms.Form2
 @import include._
-@import include.forms2._
+@import forms2._
 
 @(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -20,7 +20,7 @@
             legend = "responsiblepeople.personName.title",
             legendHidden = true,
             jsHidden = false,
-             f = f("redundantvalue")
+            f = f("redundantvalue")
         ) {
 
             @input(
@@ -45,8 +45,19 @@
             legend = "responsiblepeople.personName.isknownbyothernames",
             panel=false
         ) {
-            @radio(f("hasPreviousName"), "lbl.yes", "true", target = "#previous-panel", inline=true)
-            @radio(f("hasPreviousName"), "lbl.no", "false", inline=true)
+            @radio(
+                f = f("hasPreviousName"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = "#previous-panel",
+                inline = true
+            )
+            @radio(
+                f = f("hasPreviousName"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @panel(
@@ -55,13 +66,16 @@
         ) {
             @fieldset(
                 legend = "responsiblepeople.personName.isknownbyothernames",
-                jsHidden = true,
-                f = f("previous"),
-                legendHidden = true
+                f = f("previous-fieldset"),
+                legendHidden = true,
+                panel = false,
+                classes = Seq("form-group")
             ) {
-                @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
-                @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
-                @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                @errorGroup(f("previous")) {
+                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                }
             }
             @date(
                 f = f,
