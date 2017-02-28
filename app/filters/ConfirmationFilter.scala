@@ -22,19 +22,24 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(imp
 
     implicit val headerCarrier = HeaderCarrier.fromHeadersAndSession(rh.headers, Some(rh.session))
 
-    rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
-      case false =>
-        keystoreConnector.confirmationStatus flatMap {
-          case x@ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
+    if (headerCarrier.sessionId.isEmpty) {
+      nextFilter(rh)
+    }
+    else {
+      rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
+        case false =>
+          keystoreConnector.confirmationStatus flatMap {
+            case x@ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
 
-            keystoreConnector.resetConfirmation map { _ =>
-              Redirect(controllers.routes.LandingController.get().url)
-            }
+              keystoreConnector.resetConfirmation map { _ =>
+                Redirect(controllers.routes.LandingController.get().url)
+              }
 
-          case _ => nextFilter(rh)
-        }
+            case _ => nextFilter(rh)
+          }
 
-      case _ => nextFilter(rh)
+        case _ => nextFilter(rh)
+      }
     }
   }
 }

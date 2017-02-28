@@ -86,8 +86,8 @@ error.invalid.mlr.number = Enter a valid Money Laundering Regulation registratio
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
-error.required.bm.businesstype.type = Enter your type of business.
-error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
+error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
+error.max.length.bm.businesstype.type = You can't enter more than 40 characters
 
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
@@ -275,11 +275,11 @@ error.required.countries.msb.most.transactions = Enter at least one country.
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
 error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
 error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
-error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
+error.required.hvd.business.sell.other.details = Enter a description of what your business will sell
 error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
 error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
 error.required.hvd.receive.cash.payments = Select yes or no to the question: do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
-error.required.hvd.describe = Please describe how you expect to receive these payments.
+error.required.hvd.describe = Enter details of how you expect to receive these payments
 error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
