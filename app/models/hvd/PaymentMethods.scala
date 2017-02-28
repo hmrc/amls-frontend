@@ -16,6 +16,8 @@ case class PaymentMethods(
 
 sealed trait PaymentMethods0 {
 
+  import JsonMapping._
+  import utils.MappingUtils.MonoidImplicits._
   import models.FormTypes._
 
   private implicit def rule[A]
