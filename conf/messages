@@ -86,8 +86,8 @@ error.invalid.mlr.number = Enter a valid Money Laundering Regulation registratio
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
-error.required.bm.businesstype.type = Enter your type of business.
-error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
+error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
+error.max.length.bm.businesstype.type = You can't enter more than 40 characters
 
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?

@@ -21,7 +21,6 @@ object FormTypes {
   val maxPhoneNumberLength = 24
   val maxEmailLength = 100
   val minAccountantRefNoTypeLength = 11
-  val maxTypeOfBusinessLength = 40
   val maxNonUKPassportLength = 40
 
   /** Regex **/
@@ -126,6 +125,7 @@ object FormTypes {
 
   val postcodeType = postcodeRequired andThen postcodePattern
 
+
   /** Contact Details Rules **/
 
   private val nameMaxLength = 140
@@ -196,7 +196,7 @@ object FormTypes {
     case (d1, d2) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
-  
+
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
@@ -229,9 +229,7 @@ object FormTypes {
     .andThen(maxLength(maxNameTypeLength))
     .andThen(regexWithMsg(commonNameRegex, "err.text.validation"))
 
-  val typeOfBusinessType = notEmptyStrip
-    .andThen(notEmpty.withMessage("error.required.bm.businesstype.type"))
-    .andThen(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
+
 
 
   def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length") =

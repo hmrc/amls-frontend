@@ -20,12 +20,24 @@ class TypeOfBusinessSpec extends PlaySpec {
 
     "throw error when input exceeds max length" in {
       val formInput = Map("typeOfBusiness" -> Seq("sometext"*10))
-      TypeOfBusiness.formRead.validate(formInput) must be(Invalid(Seq((Path \ "typeOfBusiness") -> Seq(ValidationError("error.invalid.bm.business.type")))))
+      TypeOfBusiness.formRead.validate(formInput) must be(Invalid(Seq((Path \ "typeOfBusiness") -> Seq(ValidationError("error.max.length.bm.businesstype.type")))))
+    }
+
+    "throw error given invalid characters" in {
+      val formInput = Map("typeOfBusiness" -> Seq("abc{}abc"))
+      TypeOfBusiness.formRead.validate(formInput) must be (Invalid(Seq((Path \ "typeOfBusiness", Seq(ValidationError("err.text.validation"))))))
+    }
+
+    "trow error given whitespace only" in {
+      val formInput = Map("typeOfBusiness" -> Seq("     "))
+      TypeOfBusiness.formRead.validate(formInput) must be (Invalid(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.required.bm.businesstype.type"))))))
     }
 
     "validate form write" in {
       TypeOfBusiness.formWrite.writes(TypeOfBusiness("sometext")) must be(Map("typeOfBusiness" -> Seq("sometext")))
     }
+
+
 
   }
 }
