@@ -108,7 +108,7 @@ class TypeOfBusinessControllerSpec extends GenericTestHelper with MockitoSugar w
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.bm.business.type"))
+      contentAsString(result) must include(Messages("error.max.length.bm.businesstype.type"))
 
     }
 
