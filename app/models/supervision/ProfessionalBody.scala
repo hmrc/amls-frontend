@@ -18,13 +18,13 @@ object ProfessionalBody {
   import utils.MappingUtils.Implicits._
 
   val maxPenalisedTypeLength = 255
-  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty") andThen
+  val penalisedType = notEmpty.withMessage("error.required.professionalbody.info.about.penalty") andThen
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.professionalbody.info.about.penalty") andThen
     basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "penalised").read[Boolean].withMessage("error.required.eab.penalised.by.professional.body") flatMap {
+    (__ \ "penalised").read[Boolean].withMessage("error.required.professionalbody.penalised.by.professional.body") flatMap {
       case true =>
         (__ \ "professionalBody").read(penalisedType) map ProfessionalBodyYes.apply
       case false => Rule.fromMapping { _ => Valid(ProfessionalBodyNo) }
