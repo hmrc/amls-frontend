@@ -34,7 +34,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
         Form2[PersonResidenceType](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(person_residence_type(f, edit, index)))
+            getData[ResponsiblePeople](index) map {x =>
+              BadRequest(person_residence_type(f, edit, index, fromDeclaration, x.fold("")(_.personName.fold("")(_.titleName))))
+            }
           case ValidForm(_, data) => {
             for {
               result <- updateDataStrict[ResponsiblePeople](index) { rp =>
