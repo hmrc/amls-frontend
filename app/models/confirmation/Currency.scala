@@ -16,4 +16,6 @@ object Currency {
 
   implicit def currencyToDouble(c: Currency): Double = c.value.toDouble
 
+  implicit def currencyToFloat(c: Currency): Float = c.value.toFloat
+
 }

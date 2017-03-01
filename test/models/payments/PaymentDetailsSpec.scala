@@ -1,6 +1,5 @@
 package models.payments
 
-import models.confirmation.Currency
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 

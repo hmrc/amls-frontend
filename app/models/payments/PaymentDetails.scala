@@ -1,6 +1,5 @@
 package models.payments
 
-import models.confirmation.Currency
 import play.api.libs.json.Json
 
 case class PaymentDetails(reference: String, amount: Double)

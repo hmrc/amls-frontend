@@ -62,7 +62,8 @@ trait ConfirmationController extends BaseController {
   }
 
   private def savePaymentDetails(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] = data match {
-    case Some((ref, total, _, _)) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, total)))
+    case Some((ref, _, _, Some(difference))) =>
+      keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, difference)))
     case _ => Future.successful()
   }
 
