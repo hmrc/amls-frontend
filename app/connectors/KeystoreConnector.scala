@@ -2,6 +2,7 @@ package connectors
 
 import config.{AmlsSessionCache, BusinessCustomerSessionCache}
 import models.businesscustomer.ReviewDetails
+import models.payments.PaymentDetails
 import models.status.ConfirmationStatus
 import play.api.Logger
 import uk.gov.hmrc.http.cache.client.SessionCache
@@ -48,6 +49,13 @@ trait KeystoreConnector {
 
   def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None)) flatMap { _ => Future.successful() }
+
+  def savePaymentConfirmation(details: Option[PaymentDetails])(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    amlsDataCache.cache(PaymentDetails.cacheKey, details)
+
+  def getPaymentConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PaymentDetails]] =
+    amlsDataCache.fetchAndGetEntry[PaymentDetails](PaymentDetails.cacheKey)
+
 }
 
 object KeystoreConnector extends KeystoreConnector {
