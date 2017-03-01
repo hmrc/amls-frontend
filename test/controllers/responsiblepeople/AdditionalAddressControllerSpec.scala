@@ -38,11 +38,17 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
 
   "AdditionalAddressController" when {
 
+    val pageTitle = Messages("responsiblepeople.additional_address.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+
     "get is called" must {
 
-      "display the persons page when no existing data in keystore" in new Fixture {
+      "display the persons page when no existing data in save4later" in new Fixture {
 
-        val responsiblePeople = ResponsiblePeople()
+        val responsiblePeople = ResponsiblePeople(personName)
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -52,6 +58,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
         document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
         document.select("input[name=addressLine1]").`val` must be("")
@@ -75,7 +82,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -84,6 +91,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
         document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
         document.select("input[name=addressLine1]").`val` must be("Line 1")
         document.select("input[name=addressLine2]").`val` must be("Line 2")
@@ -98,7 +106,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
         val additionalAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -156,7 +164,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(personName = personName,addressHistory = Some(history))
 
           when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -166,6 +174,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           val result = additionalAddressController.post(RecordId)(requestWithParams)
 
           val document: Document  = Jsoup.parse(contentAsString(result))
+          document.title must be(pageTitle)
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
