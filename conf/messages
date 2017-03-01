@@ -66,6 +66,7 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
 
+error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
@@ -143,6 +144,7 @@ error.required.ba.risk.assessment.format = Select at least one format for your f
 error.required.ba.business.use.accountant = Select yes or no to the question: does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question: does your business have written guidance for staff on how to identify and report suspicious activity?
 error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+error.required.ba.advisor.name = Enter your professional adviser’s name
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.

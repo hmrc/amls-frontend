@@ -1,8 +1,9 @@
 package models.businessactivities
 
-import org.scalatest.{MustMatchers, Matchers, WordSpec}
-import jto.validation.Valid
-import play.api.libs.json.{JsPath, Json, JsSuccess}
+import org.scalatest.{Matchers, MustMatchers, WordSpec}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
@@ -53,6 +54,41 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         ) should be (Valid(WhoIsYourAccountant(DefaultName,
                             DefaultTradingName,
                             DefaultUKAddress)))
+      }
+
+      "fail to validate given an empty name" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("",
+          DefaultTradingName,
+          DefaultUKAddress)
+
+        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        ) should be (Invalid(Seq(
+          (Path \ "name") -> Seq(ValidationError("error.required.ba.advisor.name"))
+        )))
+      }
+
+      "fail to validate given a name with too many characters" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("zxzxcz"*50,
+          DefaultTradingName,
+          DefaultUKAddress)
+
+        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        ) should be (Invalid(Seq(
+          (Path \ "name") -> Seq(ValidationError("error.invalid.maxlength.140"))
+        )))
+      }
+
+      "fail to validate given a name with invalid characters" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("sasdasd{}sdfsdf",
+          DefaultTradingName,
+          DefaultUKAddress)
+
+        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        ) should be (Invalid(Seq(
+          (Path \ "name") -> Seq(ValidationError("err.text.validation"))
+        )))
+
+
       }
     }
   }
