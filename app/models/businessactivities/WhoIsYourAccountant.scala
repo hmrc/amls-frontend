@@ -64,14 +64,19 @@ object WhoIsYourAccountant {
       import utils.MappingUtils.Implicits._
 
       val nameTypeLength = 140
+      val tradingNameTypeLength = 120
 
       val nameType = notEmptyStrip andThen
       notEmpty.withMessage("error.required.ba.advisor.name") andThen
       maxLength(nameTypeLength).withMessage("error.invalid.maxlength.140") andThen
       basicPunctuationPattern
 
+      val tradingNameType = notEmptyStrip andThen
+        maxLength(tradingNameTypeLength).withMessage("error.invalid.maxlength.120") andThen
+        basicPunctuationPattern
+
       ((__ \ "name").read(nameType) ~
-        (__ \ "tradingName").read(optionR(nameType)) ~
+        (__ \ "tradingName").read(optionR(tradingNameType)) ~
         __.read[AccountantsAddress])(WhoIsYourAccountant.apply _)
     }
 }

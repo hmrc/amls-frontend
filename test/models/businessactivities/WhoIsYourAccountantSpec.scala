@@ -87,8 +87,29 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         ) should be (Invalid(Seq(
           (Path \ "name") -> Seq(ValidationError("err.text.validation"))
         )))
+      }
 
+      "fail to validate given a trading name with too many characters" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
+          Some("zxzxcz"*50),
+          DefaultUKAddress
+        )
 
+        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        ) should be (Invalid(Seq(
+          (Path \ "tradingName") -> Seq(ValidationError("error.invalid.maxlength.120"))
+        )))
+      }
+
+      "fail to validate given a trading name with invalid characters" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
+          Some("sasdasd{}sdfsdf"),
+          DefaultUKAddress)
+
+        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        ) should be (Invalid(Seq(
+          (Path \ "tradingName") -> Seq(ValidationError("err.text.validation"))
+        )))
       }
     }
   }
