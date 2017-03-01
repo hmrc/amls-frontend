@@ -19,8 +19,10 @@ case class YourTradingPremises(
 object YourTradingPremises {
 
   val maxLengthPremisesTradingName = 120
-  val premisesTradingNameType = FormTypes.notEmptyStrip andThen notEmpty.withMessage("error.required.tp.trading.name") andThen
-    maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
+  val premisesTradingNameType = FormTypes.notEmptyStrip andThen
+    notEmpty.withMessage("error.required.tp.trading.name") andThen
+    maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name") andThen
+    FormTypes.basicPunctuationPattern
 
   implicit val reads: Reads[YourTradingPremises] = {
     import play.api.libs.functional.syntax._

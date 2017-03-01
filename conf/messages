@@ -145,9 +145,9 @@ error.required.ba.suspicious.activity = Select yes or no to the question: does y
 error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
 
 ###############################  Trading premises ###############################
-error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
-error.required.tp.trading.name = Enter a trading name.
-error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
+error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises
+error.required.tp.trading.name = Enter the trading name you use for this premises
+error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
