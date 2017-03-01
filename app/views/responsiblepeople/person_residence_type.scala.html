@@ -1,15 +1,15 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName : String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.person.a.resident.title", "summary.responsiblepeople")
+    @heading(("responsiblepeople.person.a.resident.title",personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.person.a.resident.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.person.a.resident.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
 

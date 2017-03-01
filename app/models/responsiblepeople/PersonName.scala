@@ -17,6 +17,7 @@ case class PersonName(
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+  val titleName = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
   val fullNameWithoutSpace = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
 
 }
