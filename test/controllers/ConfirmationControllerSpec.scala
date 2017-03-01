@@ -3,9 +3,10 @@ package controllers
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
+import models.payments.PaymentDetails
 import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.{Application, Mode}
@@ -63,6 +64,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
+    when {
+      controller.keystoreConnector.savePaymentConfirmation(any())(any(), any())
+    } thenReturn Future.successful(mockCacheMap)
+
   }
 
   "ConfirmationController" must {
@@ -90,6 +95,26 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       status(result) mustBe OK
 
       verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
+
+    }
+
+    "writes the confirmation payment details to Keystore" when {
+
+      "confirming an amendment" in new Fixture {
+
+        when(controller.submissionService.getAmendment(any(), any(), any()))
+          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(Some(PaymentDetails(paymentRefNo, 100))))(any(), any())
+
+      }
 
     }
 

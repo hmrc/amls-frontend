@@ -2,7 +2,9 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.{AuthenticatorConnector, KeystoreConnector}
+import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
+import models.payments.PaymentDetails
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
@@ -11,7 +13,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ConfirmationController extends BaseController {
 
@@ -22,6 +24,8 @@ trait ConfirmationController extends BaseController {
   val statusService: StatusService
 
   lazy val authenticatorConnector = Play.current.injector.instanceOf(classOf[AuthenticatorConnector])
+
+  type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -35,14 +39,17 @@ trait ConfirmationController extends BaseController {
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {
     case SubmissionReadyForReview => {
-      getAmendmentFees map {
+      for {
+        fees <- getAmendmentFees
+        _ <- savePaymentDetails(fees)
+      } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
       }
     }
     case SubmissionDecisionApproved => {
       getVariationFees map {
-        case Some((payRef, total, rows)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
+        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
       }
     }
@@ -54,7 +61,12 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  private def savePaymentDetails(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] = data match {
+    case Some((ref, total, _, _)) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, total)))
+    case _ => Future.successful()
+  }
+
+  private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionService.getAmendment flatMap {
       case Some((paymentRef, total, rows, difference)) =>
         (difference, paymentRef) match {
@@ -65,12 +77,12 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[(String, Currency, Seq[BreakdownRow])]] = {
+  private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionService.getVariation flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
           case Some(payRef) if total.value > 0 =>
-            Future.successful(Some(payRef, total, rows))
+            Future.successful(Some((payRef, total, rows, None)))
           case _ =>
             Future.successful(None)
         }
