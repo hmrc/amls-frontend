@@ -26,10 +26,10 @@ trait ConfirmationController extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       for {
-          _ <- authenticatorConnector.refreshProfile
-          _ <- keystoreConnector.setConfirmationStatus
           status <- statusService.getStatus
           result <- resultFromStatus(status)
+          _ <- authenticatorConnector.refreshProfile
+          _ <- keystoreConnector.setConfirmationStatus
       } yield result
   }
 
