@@ -31,10 +31,14 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
   val emptyCache = CacheMap("", Map.empty)
 
   "NationalityController" must {
+    val pageTitle = Messages("responsiblepeople.nationality.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
     "successfully load nationality page" in new Fixture {
 
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePeople(personName)
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -44,6 +48,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
       contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
@@ -67,7 +72,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
     "successfully load nationality page when nationality is none" in new Fixture {
 
       val pResidenceType = PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), None)
-      val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
+      val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -77,6 +82,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
       contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
@@ -85,7 +91,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
     "successfully pre-populate UI with data from sav4later" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
         Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
           Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
 
@@ -104,7 +110,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
       )
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -112,6 +118,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
     }
 

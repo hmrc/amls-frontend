@@ -3,10 +3,10 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.Country
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople}
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
 import scala.concurrent.Future
@@ -34,8 +34,8 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
         Form2[PersonResidenceType](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map {x =>
-              BadRequest(person_residence_type(f, edit, index, fromDeclaration, x.fold("")(_.personName.fold("")(_.titleName))))
+            getData[ResponsiblePeople](index) map {rp =>
+              BadRequest(person_residence_type(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
