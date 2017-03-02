@@ -47,7 +47,13 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
   val RecordId = 1
 
   private val startDate: Option[LocalDate] = Some(new LocalDate())
+
   "PositionWithinBusinessController" when {
+
+    val pageTitle = Messages("responsiblepeople.position_within_business.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
     "get is called" must {
 
@@ -59,7 +65,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+          .thenReturn(Some(Seq(ResponsiblePeople(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
         val result = controller.get(RecordId)(request)
@@ -67,7 +73,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=02]").isEmpty must be(true)
         document.select("input[value=03]").isEmpty must be(true)
         document.select("input[value=04]").isEmpty must be(false)
@@ -86,7 +92,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+          .thenReturn(Some(Seq(ResponsiblePeople(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -97,7 +103,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=04]").hasAttr("checked") must be(false)
         document.select("input[value=06]").hasAttr("checked") must be(false)
       }
@@ -110,7 +116,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+          .thenReturn(Some(Seq(ResponsiblePeople(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -121,7 +127,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=04]").hasAttr("checked") must be(false)
         document.select("input[value=05]").hasAttr("checked") must be(false)
       }
@@ -134,7 +140,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+          .thenReturn(Some(Seq(ResponsiblePeople(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -145,7 +151,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=01]").hasAttr("checked") must be(false)
         document.select("input[value=02]").hasAttr("checked") must be(false)
         document.select("input[value=04]").hasAttr("checked") must be(false)
@@ -157,7 +163,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
           Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
         val positions = Positions(Set(BeneficialOwner, Director, NominatedOfficer, DesignatedMember), startDate)
-        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+        val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
@@ -172,7 +178,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=01]").hasAttr("checked") must be(true)
         document.select("input[value=02]").hasAttr("checked") must be(true)
         document.select("input[value=04]").hasAttr("checked") must be(true)
@@ -182,7 +188,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "Prepopulate form with a single saved data" in new Fixture {
 
         val positions = Positions(Set(BeneficialOwner), startDate)
-        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+        val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
@@ -198,7 +204,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=01]").hasAttr("checked") must be(true)
         document.select("input[value=02]").hasAttr("checked") must be(false)
         document.select("input[value=03]").hasAttr("checked") must be(false)
@@ -214,7 +220,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "Prepopulate form with multiple saved data" in new Fixture {
 
         val positions = Positions(Set(Director), startDate)
-        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+        val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
@@ -231,7 +237,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.position_within_business.title"))
+        document.title must include(pageTitle)
         document.select("input[value=01]").hasAttr("checked") must be(false)
         document.select("input[value=02]").hasAttr("checked") must be(true)
         document.select("input[value=04]").hasAttr("checked") must be(false)
@@ -247,19 +253,23 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
             "startDate.year" -> "90")
 
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
-          when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(mockBusinessMatching)))
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
           val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(mockBusinessMatching))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
 
           status(result) must be(BAD_REQUEST)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.title must include(pageTitle)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
         }
 
@@ -270,14 +280,14 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
             "startDate.year" -> "19905")
 
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
-          when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(mockBusinessMatching)))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
           val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(mockBusinessMatching))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -288,8 +298,15 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
           val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
+
+          val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(mockBusinessMatching))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -302,9 +319,15 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
           val newRequest = request.withFormUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
+          val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(mockBusinessMatching))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
           val document: Document = Jsoup.parse(contentAsString(result))
@@ -318,8 +341,13 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
             Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
           val businessMatching = BusinessMatching(Some(reviewDtls))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+          val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(businessMatching))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
