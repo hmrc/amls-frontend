@@ -68,7 +68,7 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = data match {
+  private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[String] = data match {
     case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
     case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total)
     case _ =>
@@ -76,8 +76,8 @@ trait ConfirmationController extends BaseController {
       Future.successful(ApplicationConfig.paymentsUrl)
   }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
-    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, controllers.routes.LandingController.get().url)) map {
+  private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[String] =
+    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, controllers.routes.LandingController.get().absoluteURL())) map {
       case Some(redirect) => redirect.url
       case _ => ApplicationConfig.paymentsUrl
     }

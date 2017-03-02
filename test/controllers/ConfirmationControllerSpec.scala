@@ -38,7 +38,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
 
     self =>
-    val request = addToken(authRequest)
+
+    val baseUrl = "http://localhost"
+
+    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
@@ -74,7 +77,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
 
-    val defaultPaymentsReturnUrl = controllers.routes.LandingController.get().url
+    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
 
   }
 
@@ -151,8 +154,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = await(controller.get()(request))
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
-
-
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
