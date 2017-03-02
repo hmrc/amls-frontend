@@ -36,7 +36,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
       "given valid payment details" in new TestFixture {
 
         when {
-          http.POSTString[HttpResponse](any(), any(), any())(any(), any())
+          http.POST[PaymentRedirectRequest, HttpResponse](any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(SEE_OTHER, responseHeaders = Map("Location" -> Seq("/pay-online/card-selection"))))
 
         val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
