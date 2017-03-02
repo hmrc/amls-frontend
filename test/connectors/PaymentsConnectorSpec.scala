@@ -22,6 +22,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
     val http = mock[HttpPost]
 
     val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[HttpPost].to(http))
       .build()
 
