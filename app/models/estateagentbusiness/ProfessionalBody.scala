@@ -3,6 +3,7 @@ package models.estateagentbusiness
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes._
 import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
 
@@ -17,8 +18,10 @@ object ProfessionalBody {
   import utils.MappingUtils.Implicits._
 
   val maxPenalisedTypeLength = 255
-  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
+  val penalisedType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty") andThen
+    basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
