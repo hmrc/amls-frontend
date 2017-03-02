@@ -186,12 +186,12 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any()))
-        .thenReturn(Future.successful(Some(PaymentServiceRedirect("/payments"))))
-
-      val result = await(controller.get()(request))
+      val result = controller.get()(request)
+      val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
     "query the payments service for the payments url for a variation" in new Fixture {
@@ -202,9 +202,12 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = await(controller.get()(request))
+      val result = controller.get()(request)
+      val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
     "return the default configured url for payments if none was returned by the payments service" in new Fixture {
@@ -220,6 +223,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = await(controller.get()(request))
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

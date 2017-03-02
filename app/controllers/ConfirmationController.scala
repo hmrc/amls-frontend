@@ -48,7 +48,7 @@ trait ConfirmationController extends BaseController {
         _ <- savePaymentDetails(fees)
         paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
-        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
+        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsUrl))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
       }
     }
@@ -58,7 +58,7 @@ trait ConfirmationController extends BaseController {
         _ <- savePaymentDetails(fees)
         paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
-        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
+        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsUrl))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
       }
     }
