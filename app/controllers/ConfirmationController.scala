@@ -6,7 +6,7 @@ import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.PaymentRedirectRequest
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
-import play.api.Play
+import play.api.{Logger, Play}
 import play.api.mvc.{AnyContent, Request}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -71,7 +71,9 @@ trait ConfirmationController extends BaseController {
   private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = data match {
     case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
     case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total)
-    case _ => Future.successful(ApplicationConfig.paymentsUrl)
+    case _ =>
+      Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
+      Future.successful(ApplicationConfig.paymentsUrl)
   }
 
   private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
