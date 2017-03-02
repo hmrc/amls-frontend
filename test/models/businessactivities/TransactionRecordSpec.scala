@@ -68,7 +68,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test"*20)
       )
       TransactionRecord.formRule.validate(model) must
-        be(Invalid(List(( Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
+        be(Invalid(List(( Path \ "name", Seq(ValidationError("error.invalid.maxlength.40"))))))
     }
 
     "fail validation when field is recorded selected and software name contains invalid characters" in {
