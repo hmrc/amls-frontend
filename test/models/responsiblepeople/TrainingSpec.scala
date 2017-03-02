@@ -30,7 +30,15 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
 
         Training.informationType.validate("A" * 256) must
           be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.invalid.length.rp.training.information"))
+            Path -> Seq(ValidationError("error.invalid.maxlength.255"))
+          )))
+      }
+
+      "fail to validate a string with invlaid characters" in {
+
+        Training.informationType.validate("AAA{}AAA") must
+          be(Invalid(Seq(
+            Path -> Seq(ValidationError("err.text.validation"))
           )))
       }
     }
