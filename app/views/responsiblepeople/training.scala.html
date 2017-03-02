@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("information").id}-fieldset"""
@@ -10,11 +10,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.training.title", "summary.responsiblepeople")
+    @heading(Messages("responsiblepeople.training.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.training.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.training.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 

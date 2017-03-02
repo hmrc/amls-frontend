@@ -3,14 +3,15 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
-import models.businessmatching._
-import models.responsiblepeople.{ResponsiblePeople, ExperienceTrainingNo, ExperienceTrainingYes}
+import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePeople}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,6 +38,12 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
 
   "ExperienceTrainingController" must {
 
+    val pageTitle = Messages("responsiblepeople.experiencetraining.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
       "use correct services" in new Fixture {
         ExperienceTrainingController.authConnector must be(AMLSAuthConnector)
         ExperienceTrainingController.dataCacheConnector must be(DataCacheConnector)
@@ -52,7 +59,7 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
         val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -89,7 +96,7 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
 
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       val result = controller.get(RecordId)(request)
 
@@ -115,10 +122,10 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
 
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingNo))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
-      contentAsString(result) must not include ("I do not remember when I did the training")
+      contentAsString(result) must not include "I do not remember when I did the training"
     }
 
 
@@ -142,7 +149,7 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -168,9 +175,14 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+
       val result = controller.post(RecordId)(newRequest)
 
       status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
     }
 
 

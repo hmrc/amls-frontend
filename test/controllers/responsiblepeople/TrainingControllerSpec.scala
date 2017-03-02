@@ -2,14 +2,14 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{ResponsiblePeople, TrainingNo, TrainingYes}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +36,12 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
 
   "TrainingController" must {
 
-      "use correct services" in new Fixture {
+    val pageTitle = Messages("responsiblepeople.training.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+    "use correct services" in new Fixture {
         TrainingController.authConnector must be(AMLSAuthConnector)
         TrainingController.dataCacheConnector must be(DataCacheConnector)
       }
@@ -45,25 +50,28 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
 
       "load the page" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.training.title"))
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
       }
     }
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(training = Some(TrainingYes("I do not remember when I did the training")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,training = Some(TrainingYes("I do not remember when I did the training")))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       contentAsString(result) must include ("I do not remember when I did the training")
     }
 
 
     "on get display the page with pre populated data with No Data for the information" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(training = Some(TrainingNo))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingNo))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
       contentAsString(result) must not include ("I do not remember when I did the training")
@@ -91,8 +99,13 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
       val newRequest = request.withFormUrlEncodedBody(
         "training" -> "not a boolean value"
       )
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
     }
 
 
