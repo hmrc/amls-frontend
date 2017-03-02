@@ -236,6 +236,9 @@ error.invalid.supervision.business.details = You can’t enter more than 255 cha
 error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
 error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
 
+error.required.professionalbody.info.about.penalty = Enter some information about the penalty received
+error.required.professionalbody.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+
 ############################### Money Services Business ###############################
 error.required.msb.services = Select one or more options to show the services your business provides
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
