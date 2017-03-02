@@ -132,6 +132,36 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       }
 
+      "there are no amendment fees to pay" in new Fixture {
+
+        when(controller.submissionService.getAmendment(any(), any(), any()))
+          .thenReturn(Future.successful(Some(None, Currency.fromInt(0), Seq(), Some(Currency.fromInt(0)))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(None))(any(), any())
+      }
+
+      "there are no variation fees to pay" in new Fixture {
+
+        when(controller.submissionService.getVariation(any(), any(), any()))
+          .thenReturn(Future.successful(Some(None, Currency.fromInt(0), Seq())))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(None))(any(), any())
+      }
+
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
