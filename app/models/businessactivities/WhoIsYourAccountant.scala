@@ -2,6 +2,7 @@ package models.businessactivities
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes._
 import play.api.libs.functional.syntax._
 
 case class WhoIsYourAccountant(accountantsName: String,
@@ -60,12 +61,22 @@ object WhoIsYourAccountant {
   implicit val formRule: Rule[UrlFormEncoded, WhoIsYourAccountant] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
+      import utils.MappingUtils.Implicits._
 
       val nameTypeLength = 140
-      val nameType = notEmpty andThen maxLength(nameTypeLength)
+      val tradingNameTypeLength = 120
+
+      val nameType = notEmptyStrip andThen
+      notEmpty.withMessage("error.required.ba.advisor.name") andThen
+      maxLength(nameTypeLength).withMessage("error.invalid.maxlength.140") andThen
+      basicPunctuationPattern
+
+      val tradingNameType = notEmptyStrip andThen
+        maxLength(tradingNameTypeLength).withMessage("error.invalid.maxlength.120") andThen
+        basicPunctuationPattern
 
       ((__ \ "name").read(nameType) ~
-        (__ \ "tradingName").read(optionR(nameType)) ~
+        (__ \ "tradingName").read(optionR(tradingNameType)) ~
         __.read[AccountantsAddress])(WhoIsYourAccountant.apply _)
     }
 }
