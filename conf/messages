@@ -66,6 +66,7 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
 
+error.invalid.maxlength.40 = You can’t enter more than 40 characters
 error.invalid.maxlength.120 = You can’t enter more than 120 characters
 error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
@@ -137,8 +138,7 @@ error.required.ba.select.country = Select yes or no to the question: do you have
 error.invalid.ba.select.country = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
-error.required.ba.software.package.name = Enter the name of the software package.
-error.max.length.ba.software.package.name = You can’t enter more than 40 characters for the names of the software packages.
+error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
 error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
 error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a documented risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
