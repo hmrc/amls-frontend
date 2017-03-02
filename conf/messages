@@ -199,7 +199,6 @@ error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
 error.required.rp.experiencetraining = Select yes or no to the question: Does this person have previous experience in these activities?
 error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience in these activities
-error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
 error.required.rp.training.information = Enter a brief description of this person's training
 error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?

@@ -30,7 +30,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
 
         ExperienceTraining.experienceInformationType.validate("A" * 256) must
           be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.invalid.length.rp.experiencetraining.information"))
+            Path -> Seq(ValidationError("error.invalid.maxlength.255"))
           )))
       }
 
