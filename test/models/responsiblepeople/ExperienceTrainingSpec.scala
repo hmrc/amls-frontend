@@ -33,6 +33,22 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
             Path -> Seq(ValidationError("error.invalid.length.rp.experiencetraining.information"))
           )))
       }
+
+      "fail to validate a string represented by only whitespace" in {
+
+        ExperienceTraining.experienceInformationType.validate("   ") must
+          be(Invalid(Seq(
+            Path -> Seq(ValidationError("error.required.rp.experiencetraining.information"))
+          )))
+      }
+
+      "fail to validate a string containing invalid characters" in {
+
+        ExperienceTraining.experienceInformationType.validate("{}{}") must
+          be(Invalid(Seq(
+            Path -> Seq(ValidationError("err.text.validation"))
+          )))
+      }
     }
 
     "successfully validate given an enum value" in {

@@ -2,6 +2,7 @@ package models.responsiblepeople
 
 import jto.validation._
 import jto.validation.forms.Rules._
+import models.FormTypes._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import jto.validation.forms.UrlFormEncoded
@@ -20,8 +21,10 @@ object ExperienceTraining {
 
   val maxInformationTypeLength = 255
 
-  val experienceInformationType = notEmpty.withMessage("error.required.rp.experiencetraining.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.experiencetraining.information")
+  val experienceInformationType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.rp.experiencetraining.information") andThen
+    maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.experiencetraining.information") andThen
+    basicPunctuationPattern
 
 
   implicit val formRule: Rule[UrlFormEncoded, ExperienceTraining] = From[UrlFormEncoded] { __ =>
