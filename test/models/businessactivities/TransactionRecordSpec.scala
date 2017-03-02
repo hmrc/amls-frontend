@@ -71,6 +71,17 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         be(Invalid(List(( Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
     }
 
+    "fail validation when field is recorded selected and software name contains invalid characters" in {
+
+      val model = Map(
+        "isRecorded" -> Seq("true"),
+        "transactions[]" -> Seq("01", "02" ,"03"),
+        "name" -> Seq("abc{}abc")
+      )
+      TransactionRecord.formRule.validate(model) must
+        be(Invalid(List(( Path \ "name", Seq(ValidationError("err.text.validation"))))))
+    }
+
     "fail validation when none of the check boxes selected" in {
 
       val model = Map(
