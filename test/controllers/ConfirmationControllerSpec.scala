@@ -1,9 +1,9 @@
 package controllers
 
-import connectors.{AuthenticatorConnector, KeystoreConnector}
+import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
-import models.payments.PaymentDetails
+import models.payments.{PaymentDetails, PaymentRedirectRequest, PaymentServiceRedirect}
 import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -24,17 +24,21 @@ import scala.concurrent.Future
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val authenticatorConnector = mock[AuthenticatorConnector]
+  val paymentsConnector = mock[PaymentsConnector]
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .bindings(bindModules:_*).in(Mode.Test)
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[AuthenticatorConnector].to(authenticatorConnector))
+    .bindings(bind[PaymentsConnector].to(paymentsConnector))
     .build()
 
   when(authenticatorConnector.refreshProfile(any())) thenReturn Future.successful(HttpResponse(200))
 
   trait Fixture extends AuthorisedFixture {
 
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
@@ -68,6 +72,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       controller.keystoreConnector.savePaymentConfirmation(any())(any(), any())
     } thenReturn Future.successful(mockCacheMap)
 
+    val defaultPaymentsReturnUrl = controllers.routes.LandingController.get().url
+
   }
 
   "ConfirmationController" must {
@@ -98,7 +104,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     }
 
-    "writes the confirmation payment details to Keystore" when {
+    "write the confirmation payment details to Keystore" ignore {
 
       "confirming an amendment" in new Fixture {
 
@@ -162,6 +168,22 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(None))(any(), any())
       }
 
+    }
+
+    "query the payments service for the payments url for an amendment" in new Fixture {
+
+      when(controller.submissionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any()))
+        .thenReturn(Future.successful(Some(PaymentServiceRedirect("/payments"))))
+
+      val result = await(controller.get()(request))
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

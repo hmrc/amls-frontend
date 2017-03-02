@@ -1,10 +1,10 @@
 package controllers
 
-import config.AMLSAuthConnector
-import connectors.{AuthenticatorConnector, KeystoreConnector}
+import config.{AMLSAuthConnector, ApplicationConfig}
+import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentDetails
+import models.payments.{PaymentDetails, PaymentRedirectRequest, PaymentServiceRedirect}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
@@ -21,20 +21,24 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
+  private[controllers] lazy val authenticatorConnector = Play.current.injector.instanceOf[AuthenticatorConnector]
+
+  private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PaymentsConnector]
+
   val statusService: StatusService
 
-  lazy val authenticatorConnector = Play.current.injector.instanceOf(classOf[AuthenticatorConnector])
 
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      for {
+    implicit authContext =>
+      implicit request =>
+        for {
           status <- statusService.getStatus
           result <- resultFromStatus(status)
           _ <- authenticatorConnector.refreshProfile
           _ <- keystoreConnector.setConfirmationStatus
-      } yield result
+        } yield result
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {
@@ -42,6 +46,7 @@ trait ConfirmationController extends BaseController {
       for {
         fees <- getAmendmentFees
         _ <- savePaymentDetails(fees)
+        paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
@@ -69,6 +74,18 @@ trait ConfirmationController extends BaseController {
     case Some((ref, total, _, None)) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, total)))
     case _ => keystoreConnector.savePaymentConfirmation(None)
   }
+
+  private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = data match {
+    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
+    case Some((ref, total, _, None)) => Future.successful("")
+    case _ => Future.successful("")
+  }
+
+  private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
+    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, controllers.routes.LandingController.get().url)) map {
+      case Some(redirect) => redirect.url
+      case _ => ApplicationConfig.paymentsUrl
+    }
 
   private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionService.getAmendment flatMap {

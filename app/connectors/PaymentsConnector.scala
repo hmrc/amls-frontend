@@ -13,7 +13,7 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
   val baseUrl = config.baseUrl("payments-frontend")
 
-  def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PaymentServiceRedirect] = {
+  def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PaymentServiceRedirect]] = {
 
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
@@ -24,8 +24,8 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
     http.POST(url, request, headers) map { r =>
       r.redirectLocation match {
-        case Some(location) => PaymentServiceRedirect(s"$baseUrl$location")
-        case _ => throw new Exception("No redirect url was returned from payments")
+        case Some(location) => Some(PaymentServiceRedirect(s"$baseUrl$location"))
+        case _ => None
       }
     }
   }

@@ -43,7 +43,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
         val result = await(connector.requestPaymentRedirectUrl(model))
 
-        result mustBe PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection")
+        result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection"))
 
       }
 
