@@ -4,7 +4,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.{PaymentDetails, PaymentRedirectRequest, PaymentServiceRedirect}
+import models.payments.PaymentRedirectRequest
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
@@ -45,7 +45,6 @@ trait ConfirmationController extends BaseController {
     case SubmissionReadyForReview => {
       for {
         fees <- getAmendmentFees
-        _ <- savePaymentDetails(fees)
         paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsUrl))
@@ -55,7 +54,6 @@ trait ConfirmationController extends BaseController {
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        _ <- savePaymentDetails(fees)
         paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsUrl))
@@ -68,12 +66,6 @@ trait ConfirmationController extends BaseController {
           Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
       }
     }
-  }
-
-  private def savePaymentDetails(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] = data match {
-    case Some((ref, _, _, Some(difference))) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, difference)))
-    case Some((ref, total, _, None)) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, total)))
-    case _ => keystoreConnector.savePaymentConfirmation(None)
   }
 
   private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = data match {

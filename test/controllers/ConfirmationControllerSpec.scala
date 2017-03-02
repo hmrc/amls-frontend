@@ -1,25 +1,23 @@
 package controllers
 
-import config.ApplicationConfig
 import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
-import models.payments.{PaymentDetails, PaymentRedirectRequest, PaymentServiceRedirect}
-import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import play.api.{Application, Mode}
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.HttpResponse
 import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
@@ -73,10 +71,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
     when {
-      controller.keystoreConnector.savePaymentConfirmation(any())(any(), any())
-    } thenReturn Future.successful(mockCacheMap)
-
-    when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
 
@@ -109,72 +103,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       status(result) mustBe OK
 
       verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
-
-    }
-
-    "write the confirmation payment details to Keystore" ignore {
-
-      "confirming an amendment" in new Fixture {
-
-        when(controller.submissionService.getAmendment(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
-
-        val result = controller.get()(request)
-
-        status(result) mustBe OK
-
-        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(Some(PaymentDetails(paymentRefNo, 100))))(any(), any())
-
-      }
-
-      "confirming a variation" in new Fixture {
-
-        when(controller.submissionService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(250), Seq()))))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-
-        status(result) mustBe OK
-
-        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(Some(PaymentDetails(paymentRefNo, 250))))(any(), any())
-
-      }
-
-      "there are no amendment fees to pay" in new Fixture {
-
-        when(controller.submissionService.getAmendment(any(), any(), any()))
-          .thenReturn(Future.successful(Some(None, Currency.fromInt(0), Seq(), Some(Currency.fromInt(0)))))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
-
-        val result = controller.get()(request)
-
-        status(result) mustBe OK
-
-        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(None))(any(), any())
-      }
-
-      "there are no variation fees to pay" in new Fixture {
-
-        when(controller.submissionService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(None, Currency.fromInt(0), Seq())))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-
-        status(result) mustBe OK
-
-        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(None))(any(), any())
-      }
 
     }
 

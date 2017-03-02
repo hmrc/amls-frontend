@@ -2,19 +2,18 @@ package connectors
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.payments.PaymentDetails
 import models.status.ConfirmationStatus
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.scalatest.BeforeAndAfter
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.Future
 
 class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with BeforeAndAfter {
 
@@ -129,34 +128,6 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       whenReady(KeystoreConnector.resetConfirmation) { _ =>
         verify(KeystoreConnector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(None)))(any(), any())
-      }
-
-    }
-
-    "save payment details" in {
-
-      val model = PaymentDetails("a reference number", 100)
-
-      when {
-        KeystoreConnector.amlsDataCache.cache(any(), any())(any(), any())
-      } thenReturn Future.successful(emptyCache)
-
-      whenReady(KeystoreConnector.savePaymentConfirmation(Some(model))) { _ =>
-        verify(KeystoreConnector.amlsDataCache).cache(eqTo(PaymentDetails.cacheKey), eqTo(Some(model)))(any(), any())
-      }
-
-    }
-
-    "read payment details" in {
-
-      val model = PaymentDetails("a reference number", 100)
-
-      when {
-        KeystoreConnector.amlsDataCache.fetchAndGetEntry[PaymentDetails](any())(any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      whenReady(KeystoreConnector.getPaymentConfirmation) { _ =>
-        verify(KeystoreConnector.amlsDataCache).fetchAndGetEntry[PaymentDetails](any())(any(), any())
       }
 
     }
