@@ -3,15 +3,15 @@
 @import include.forms2._
 @import models.responsiblepeople.Positions
 
-@(f: Form2[_], edit: Boolean = false, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean = false, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.aretheynominatedofficer.title", "summary.responsiblepeople")
+    @heading(Messages("responsiblepeople.aretheynominatedofficer.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.aretheynominatedofficer.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.aretheynominatedofficer.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
