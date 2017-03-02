@@ -184,7 +184,6 @@ error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characte
 error.required.eab.business.services = Select at least one service that your business provides.
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 error.required.eab.info.about.penalty = Give a brief description of the penalty and when it occurred
-error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 ############################### Responsible People ###############################
