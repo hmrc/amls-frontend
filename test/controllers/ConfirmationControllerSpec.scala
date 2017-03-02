@@ -1,5 +1,6 @@
 package controllers
 
+import config.ApplicationConfig
 import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
@@ -8,6 +9,7 @@ import models.status.{ConfirmationStatus, SubmissionDecisionApproved, Submission
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import play.api.{Application, Mode}
 import play.api.i18n.Messages
@@ -63,6 +65,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     protected val mockCacheMap = mock[CacheMap]
 
+    reset(paymentsConnector)
+
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
@@ -71,6 +75,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     when {
       controller.keystoreConnector.savePaymentConfirmation(any())(any(), any())
     } thenReturn Future.successful(mockCacheMap)
+
+    when {
+      paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
 
     val defaultPaymentsReturnUrl = controllers.routes.LandingController.get().url
 
@@ -184,6 +192,34 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = await(controller.get()(request))
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
+    }
+
+    "query the payments service for the payments url for a variation" in new Fixture {
+
+      when(controller.submissionService.getVariation(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = await(controller.get()(request))
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+    }
+
+    "return the default configured url for payments if none was returned by the payments service" in new Fixture {
+
+      when(controller.submissionService.getVariation(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())) thenReturn Future.successful(None)
+
+      val result = await(controller.get()(request))
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

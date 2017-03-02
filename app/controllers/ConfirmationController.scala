@@ -56,6 +56,7 @@ trait ConfirmationController extends BaseController {
       for {
         fees <- getVariationFees
         _ <- savePaymentDetails(fees)
+        paymentsUrl <- requestPaymentsUrl(fees)
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
@@ -77,8 +78,8 @@ trait ConfirmationController extends BaseController {
 
   private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = data match {
     case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
-    case Some((ref, total, _, None)) => Future.successful("")
-    case _ => Future.successful("")
+    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total)
+    case _ => Future.successful(ApplicationConfig.paymentsUrl)
   }
 
   private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
