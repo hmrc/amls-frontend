@@ -20,7 +20,7 @@ object ProfessionalBody {
   val maxPenalisedTypeLength = 255
   val penalisedType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty") andThen
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.maxlength.255") andThen
     basicPunctuationPattern
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
