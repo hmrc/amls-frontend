@@ -116,6 +116,22 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       }
 
+      "confirming a variation" in new Fixture {
+
+        when(controller.submissionService.getVariation(any(), any(), any()))
+          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(250), Seq()))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(controller.keystoreConnector).savePaymentConfirmation(eqTo(Some(PaymentDetails(paymentRefNo, 250))))(any(), any())
+
+      }
+
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

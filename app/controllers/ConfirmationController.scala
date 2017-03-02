@@ -48,7 +48,10 @@ trait ConfirmationController extends BaseController {
       }
     }
     case SubmissionDecisionApproved => {
-      getVariationFees map {
+      for {
+        fees <- getVariationFees
+        _ <- savePaymentDetails(fees)
+      } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows))
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
       }
@@ -62,8 +65,8 @@ trait ConfirmationController extends BaseController {
   }
 
   private def savePaymentDetails(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] = data match {
-    case Some((ref, _, _, Some(difference))) =>
-      keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, difference)))
+    case Some((ref, _, _, Some(difference))) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, difference)))
+    case Some((ref, total, _, None)) => keystoreConnector.savePaymentConfirmation(Some(PaymentDetails(ref, total)))
     case _ => Future.successful()
   }
 
