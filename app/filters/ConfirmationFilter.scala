@@ -29,7 +29,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(imp
       rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
         case false =>
           keystoreConnector.confirmationStatus flatMap {
-            case x@ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
+            case ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
 
               keystoreConnector.resetConfirmation map { _ =>
                 Redirect(controllers.routes.LandingController.get().url)
