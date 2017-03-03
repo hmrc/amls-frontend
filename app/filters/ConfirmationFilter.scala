@@ -5,6 +5,7 @@ import javax.inject.Inject
 import akka.stream.Materializer
 import connectors.KeystoreConnector
 import models.status.ConfirmationStatus
+import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Results.Redirect
@@ -17,7 +18,8 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(imp
     val exclusionSet = Set(
       controllers.routes.LandingController.get().url,
       controllers.routes.LandingController.start().url,
-      controllers.routes.ConfirmationController.get().url
+      controllers.routes.ConfirmationController.get().url,
+      "/pay-online/other-taxes"
     )
 
     implicit val headerCarrier = HeaderCarrier.fromHeadersAndSession(rh.headers, Some(rh.session))
@@ -31,9 +33,11 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(imp
           keystoreConnector.confirmationStatus flatMap {
             case ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
 
-              keystoreConnector.resetConfirmation map { _ =>
-                Redirect(controllers.routes.LandingController.get().url)
-              }
+              val targetUrl = controllers.routes.LandingController.get().url
+
+              Logger.info(s"[ConfirmationFilter] Filter activated when trying to fetch ${rh.path}, redirecting to $targetUrl")
+
+              keystoreConnector.resetConfirmation map (_ => Redirect(targetUrl))
 
             case _ => nextFilter(rh)
           }
