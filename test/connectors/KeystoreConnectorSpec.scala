@@ -3,24 +3,30 @@ package connectors
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.status.ConfirmationStatus
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.Future
 
-class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with BeforeAndAfter {
 
   val emptyCache = CacheMap("", Map.empty)
 
   object KeystoreConnector extends KeystoreConnector {
     override private[connectors] val businessCustomerDataCache: SessionCache = mock[SessionCache]
     override private[connectors] val amlsDataCache: SessionCache = mock[SessionCache]
+  }
+
+  before {
+    reset(KeystoreConnector.amlsDataCache)
+    reset(KeystoreConnector.businessCustomerDataCache)
   }
 
   implicit val hc = mock[HeaderCarrier]

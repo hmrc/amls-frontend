@@ -3,7 +3,6 @@ package connectors
 import config.{AmlsSessionCache, BusinessCustomerSessionCache}
 import models.businesscustomer.ReviewDetails
 import models.status.ConfirmationStatus
-import play.api.Logger
 import uk.gov.hmrc.http.cache.client.SessionCache
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
@@ -48,6 +47,7 @@ trait KeystoreConnector {
 
   def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None)) flatMap { _ => Future.successful() }
+
 }
 
 object KeystoreConnector extends KeystoreConnector {
