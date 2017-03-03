@@ -149,7 +149,7 @@ object BankAccount {
   val accountNameType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
     .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
-    .andThen(basicPunctuationPattern)
+    .andThen(basicPunctuationPattern())
 
   implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

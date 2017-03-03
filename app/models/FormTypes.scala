@@ -84,7 +84,7 @@ object FormTypes {
   val removeSpacesRule: Rule[String, String] = removeCharacterRule(' ')
   val removeDashRule: Rule[String, String] = removeCharacterRule('-')
 
-  val basicPunctuationPattern = regexWithMsg(basicPunctuationRegex, "err.text.validation")
+  def basicPunctuationPattern(msg: String = "err.text.validation") = regexWithMsg(basicPunctuationRegex, msg)
   val postcodePattern = regexWithMsg(postcodeRegex, "error.invalid.postcode")
 
   val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}$""".r
@@ -92,7 +92,6 @@ object FormTypes {
 
   val extendedReferenceNumberRegex = """^[0-9]{6}$""".r
   def extendedReferenceNumberRule(msg: String) = regexWithMsg(extendedReferenceNumberRegex, msg)
-
 
   /** Name Rules **/
 
@@ -241,10 +240,6 @@ object FormTypes {
   private val ninoPattern = regexWithMsg(ninoRegex, "error.invalid.nino")
   private val ninoTransforms = removeSpacesRule andThen removeDashRule andThen transformUppercase
 
-  private val nonUKPassportRequired = required("error.required.non.uk.passport")
-  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
-
   val ninoType = ninoTransforms andThen ninoRequired andThen ninoPattern
 
-  val noUKPassportType = nonUKPassportRequired andThen nonUkPassportLength andThen basicPunctuationPattern
 }

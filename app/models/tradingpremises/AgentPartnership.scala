@@ -20,7 +20,7 @@ object AgentPartnership {
 
   private val agentsPartnershipType =  notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.partnership") andThen
     maxLength(maxAgentPartnershipLength).withMessage("error.invalid.tp.agent.partnership") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   implicit val mongoKey = new MongoKey[AgentPartnership] {
     override def apply(): String = "agent-partnership"

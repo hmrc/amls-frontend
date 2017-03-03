@@ -32,7 +32,7 @@ object PersonName {
       val otherNamesType = notEmptyStrip andThen
         notEmpty.withMessage("error.required.rp.otherNames") andThen
         maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
-        basicPunctuationPattern
+        basicPunctuationPattern()
 
       (
         (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~

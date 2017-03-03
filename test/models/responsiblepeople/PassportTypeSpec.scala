@@ -42,6 +42,36 @@ class PassportTypeSpec extends PlaySpec {
       }
     }
   }
+  "NonUk passport number" must {
+    "pass validation" when {
+      "given the correct number of numbers" in {
+        PassportType.noUKPassportType.validate("ab3456789") mustBe Valid("ab3456789")
+      }
+    }
+
+    "fail validation" when {
+      "the passport number has too many characters" in {
+        PassportType.noUKPassportType.validate("a" * 50) mustBe Invalid(
+          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport")))
+        )
+      }
+      "the passport number includes invalid characters (letters, punctuation etc)" in {
+        PassportType.noUKPassportType.validate("123abc7{}") mustBe Invalid(
+          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport")))
+        )
+      }
+      "the passport number is an empty string" in {
+        PassportType.noUKPassportType.validate("") mustBe Invalid(
+          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport")))
+        )
+      }
+      "the passport number is given a sequence of whitespace" in {
+        PassportType.noUKPassportType.validate("    ") mustBe Invalid(
+          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport")))
+        )
+      }
+    }
+  }
 
   "PassportType" must {
 

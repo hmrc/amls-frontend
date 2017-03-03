@@ -23,7 +23,7 @@ object PenalisedUnderEstateAgentsAct {
     val penalisedMaxLength = 255
     val penalisedLength = maxWithMsg(penalisedMaxLength, "error.invalid.maxlength.255")
     val penalisedRequired = required("error.required.eab.info.about.penalty")
-    val penalisedType = penalisedRequired andThen penalisedLength andThen basicPunctuationPattern
+    val penalisedType = penalisedRequired andThen penalisedLength andThen basicPunctuationPattern()
 
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
       case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) map PenalisedUnderEstateAgentsActYes.apply

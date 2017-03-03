@@ -21,7 +21,12 @@ object PassportType {
   private val passportRegex = "^[0-9]{9}$".r
   private val passportRequired = required("error.required.uk.passport")
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
+
+  private val nonUKPassportRequired = required("error.required.non.uk.passport")
+  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
+
   val ukPassportType = notEmptyStrip andThen passportRequired andThen passportPattern
+  val noUKPassportType = notEmptyStrip andThen nonUKPassportRequired andThen nonUkPassportLength andThen basicPunctuationPattern("error.invalid.non.uk.passport")
 
   implicit val formRule: Rule[UrlFormEncoded, PassportType] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
