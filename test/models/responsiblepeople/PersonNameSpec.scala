@@ -85,6 +85,22 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
     }
 
+    "fail validation when otherNames field is given only spaces" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq(""),
+        "lastName" -> Seq(""),
+        "hasPreviousName" -> Seq("false"),
+        "hasOtherNames" -> Seq("true"),
+        "otherNames" -> Seq("      ")
+      )) must
+        equal(Invalid(Seq(
+          (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
+          (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name")),
+          (Path \ "otherNames") -> Seq(ValidationError("error.required.rp.otherNames"))
+        )))
+    }
+
     "fail validation when fields are missing (full)" in {
 
       PersonName.formRule.validate(Map(
@@ -169,7 +185,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "previous.firstName" -> Seq("($£*£$"),
         "previous.middleName" -> Seq(")£(@$)$( "),
         "previous.lastName" -> Seq("$&£@$*&$%&$"),
-        "otherNames" -> Seq("false")
+        "otherNames" -> Seq("ABC{}ABC")
       )) must
         equal(Invalid(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
@@ -177,7 +193,8 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
           (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation")),
           (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
           (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
-          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+          (Path \ "otherNames") -> Seq(ValidationError("err.text.validation"))
         )))
     }
   }
