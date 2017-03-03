@@ -134,7 +134,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
           (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
           (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
           (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length")),
-          (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
+          (Path \ "otherNames") -> Seq(ValidationError("error.invalid.maxlength.140"))
         )))
     }
 
