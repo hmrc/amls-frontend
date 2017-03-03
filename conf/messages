@@ -53,7 +53,7 @@ error.invalid.nino = Enter a valid National Insurance number
 
 error.required.uk.passport = Enter a valid passport number
 error.invalid.uk.passport = Enter a valid passport number
-error.required.non.uk.passport = Enter the non-UK passport number
+error.required.non.uk.passport = Enter a valid passport number
 error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
 
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number

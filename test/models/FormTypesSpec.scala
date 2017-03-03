@@ -396,7 +396,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
       removeSpacesRule.validate(inputStr)  must be (Valid("AAAABBBBCCCC"))    }
   }
 
-
   "For the Declaration Add Persons 'name' fields" must {
 
     "fail validation if blank value is supplied for the name" in {

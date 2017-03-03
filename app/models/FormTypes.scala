@@ -253,5 +253,5 @@ object FormTypes {
 
   val ninoType = ninoTransforms andThen ninoRequired andThen ninoPattern
   val ukPassportType = passportRequired andThen passportPattern
-  val noUKPassportType = nonUKPassportRequired andThen nonUkPassportLength
+  val noUKPassportType = nonUKPassportRequired andThen nonUkPassportLength andThen basicPunctuationPattern
 }
