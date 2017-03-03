@@ -2,17 +2,14 @@ package utils
 
 import uk.gov.hmrc.play.http.HttpResponse
 import play.api.http.Status
+import play.api.libs.ws.WSResponse
 
 object HttpUtils {
 
-  implicit class HttpResponseUtils(response: HttpResponse) {
+  implicit class HttpResponseUtils(response: WSResponse) {
 
-    def redirectLocation: Option[String] = (response.status, response.allHeaders) match {
-      case (Status.SEE_OTHER, headers) if headers.get("Location").isDefined =>
-        headers.get("Location") match {
-          case Some(location :: _) => Some(location)
-          case _ => None
-        }
+    def redirectLocation: Option[String] = (response.status, response.header("Location")) match {
+      case (Status.SEE_OTHER, Some(header)) => Some(header)
       case _ => None
     }
 
