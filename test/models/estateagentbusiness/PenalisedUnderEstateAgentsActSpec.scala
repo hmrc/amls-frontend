@@ -64,12 +64,12 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
     "fail to validate given a `Yes` but max details provided" in {
       val data = Map(
         "penalisedUnderEstateAgentsAct" -> Seq("true"),
-        "penalisedUnderEstateAgentsActDetails" -> Seq("zxzxcz"*50)
+        "penalisedUnderEstateAgentsActDetails" -> Seq("a"*256)
       )
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.eab.info.about.penalty"))
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.maxlength.255"))
         )))
     }
 

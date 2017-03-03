@@ -21,7 +21,7 @@ object PenalisedUnderEstateAgentsAct {
     import jto.validation.forms.Rules._
 
     val penalisedMaxLength = 255
-    val penalisedLength = maxWithMsg(penalisedMaxLength, "error.invalid.eab.info.about.penalty")
+    val penalisedLength = maxWithMsg(penalisedMaxLength, "error.invalid.maxlength.255")
     val penalisedRequired = required("error.required.eab.info.about.penalty")
     val penalisedType = penalisedRequired andThen penalisedLength andThen basicPunctuationPattern
 
