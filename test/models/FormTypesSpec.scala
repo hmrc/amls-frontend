@@ -454,17 +454,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
     }
   }
 
-  "Uk passport number" must {
-    "successfully validate numbers" in {
-      ukPassportType.validate("123456789") mustBe Valid("123456789")
-    }
 
-    "fail when the passport number includes letters" in {
-      ukPassportType.validate("123abc789") mustBe Invalid(
-        Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
-      )
-    }
-  }
 
   "basicPunctuation140CharsPattern" must {
 

@@ -52,7 +52,7 @@ error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
 error.required.uk.passport = Enter a valid passport number
-error.invalid.uk.passport = Enter a valid passport number
+error.invalid.uk.passport = Only use numbers 0 to 9, with no spaces or other characters
 error.required.non.uk.passport = Enter the non-UK passport number
 error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
 

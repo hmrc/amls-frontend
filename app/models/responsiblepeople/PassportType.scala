@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import models.FormTypes
 import models.estateagentbusiness.Other
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
@@ -15,6 +16,12 @@ case object NoPassport extends PassportType
 object PassportType {
 
   import utils.MappingUtils.Implicits._
+  import FormTypes._
+
+  private val passportRegex = "^[0-9]{9}$".r
+  private val passportRequired = required("error.required.uk.passport")
+  private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
+  val ukPassportType = notEmptyStrip andThen passportRequired andThen passportPattern
 
   implicit val formRule: Rule[UrlFormEncoded, PassportType] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
