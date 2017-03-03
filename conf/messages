@@ -59,6 +59,9 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Check that you have entered the correct web address.
 
+error.invalid.maxlength.40 = You can’t enter more than 40 characters
+error.invalid.maxlength.120 = You can’t enter more than 120 characters
+error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
@@ -137,10 +140,11 @@ error.required.ba.risk.assessment.format = Select one or more options to show wh
 error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
 error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
+error.required.ba.advisor.name = Enter your professional adviser’s name
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
-error.required.tp.trading.name = Enter a trading name.
+error.required.tp.trading.name = Enter a trading name
 error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 error.future.date = Enter a valid date. The date cannot be in the future.
@@ -173,7 +177,6 @@ error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characte
 error.required.eab.business.services = Select one or more options to show the services your business provides
 error.required.eab.penalised.under.act = Select yes if the business, or anyone in it, have ever been penalised under the Estate Agents Act 1979
 error.required.eab.info.about.penalty = Enter some information about the penalty received.
-error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters for information about the penalty received.
 error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
@@ -187,7 +190,6 @@ error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
 error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
-error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
 error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
 error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
@@ -236,9 +238,10 @@ error.required.supervision.business.details = Enter the name of the professional
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
 error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
 error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
-
 error.required.professionalbody.info.about.penalty = Enter some information about the penalty received
+error.invalid.professionalbody.info.about.penalty = You can’t enter more than 255 characters
 error.required.professionalbody.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+
 
 ############################### Money Services Business ###############################
 error.required.msb.services = Select one or more options to show the services your business provides
