@@ -22,7 +22,7 @@ object AgentRemovalReason {
 
   private val otherDetailsRule = notEmptyStrip andThen
     notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
-    withMessage("error.invalid.maxlength.255") andThen basicPunctuationPattern
+    withMessage("error.invalid.maxlength.255") andThen basicPunctuationPattern()
 
   private def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
 

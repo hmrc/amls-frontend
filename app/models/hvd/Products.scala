@@ -66,7 +66,7 @@ object Products{
   val otherDetailsType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.hvd.business.sell.other.details") andThen
     maxLength(maxDetailsLength).withMessage("error.invalid.hvd.business.sell.other.details") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, Products] =
     From[UrlFormEncoded] { __ =>

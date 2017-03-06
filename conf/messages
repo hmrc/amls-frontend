@@ -51,8 +51,9 @@ error.invalid.name.of.business = You can’t enter more than 120 characters for 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
-error.required.uk.passport = Enter a valid passport number
-error.invalid.uk.passport = Enter a valid passport number
+error.required.uk.passport = Enter a valid 9-digit passport number
+error.required.non.uk.passport = Enter a valid passport number
+error.invalid.uk.passport = Only use numbers 0 to 9, with no spaces or other characters
 error.required.non.uk.passport = Enter the non-UK passport number
 error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
 
@@ -66,6 +67,9 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
 
+error.invalid.maxlength.40 = You can’t enter more than 40 characters
+error.invalid.maxlength.120 = You can’t enter more than 120 characters
+error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
@@ -135,19 +139,19 @@ error.required.ba.select.country = Select yes or no to the question: do you have
 error.invalid.ba.select.country = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
-error.required.ba.software.package.name = Enter the name of the software package.
-error.max.length.ba.software.package.name = You can’t enter more than 40 characters for the names of the software packages.
+error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
 error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
 error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a documented risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
 error.required.ba.business.use.accountant = Select yes or no to the question: does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question: does your business have written guidance for staff on how to identify and report suspicious activity?
 error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+error.required.ba.advisor.name = Enter your professional adviser’s name
 
 ###############################  Trading premises ###############################
-error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
-error.required.tp.trading.name = Enter a trading name.
-error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
+error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises
+error.required.tp.trading.name = Enter the trading name you use for this premises
+error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
@@ -181,7 +185,6 @@ error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characte
 error.required.eab.business.services = Select at least one service that your business provides.
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 error.required.eab.info.about.penalty = Give a brief description of the penalty and when it occurred
-error.invalid.eab.info.about.penalty = You can’t enter more than 255 characters
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 ############################### Responsible People ###############################
@@ -195,10 +198,9 @@ error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
 error.required.rp.experiencetraining = Select yes or no to the question: Does this person have previous experience in these activities?
-error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
-error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
+error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience in these activities
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
-error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.training.information = Enter a brief description of this person's training
 error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
@@ -209,7 +211,7 @@ error.required.rp.hasOtherNames = Select yes or no to the question: is this pers
 error.required.rp.first_name = Enter the responsible person’s first name
 error.required.rp.last_name = Enter the responsible person’s last name
 error.rp.previous.invalid = Enter responsible person’s previous name
-error.required.rp.otherNames = Enter an alternative name.
+error.required.rp.otherNames = Enter responsible person’s alternative name
 error.invalid.length.otherNames = You can’t enter more than 140 characters for the alternative name.
 error.required.timeAtAddress = Select how long this person lived at this address.
 error.required.positionWithinBusiness = Select at least one position within the business.
@@ -254,9 +256,7 @@ error.required.professionalbody.penalised.by.professional.body = Select yes or n
 error.required.msb.services = Select at least one service that your business provides.
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
-error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
+error.required.msb.ipsp.name = Enter your IPSP’s name
 error.required.msb.linked.txn = Select yes or no to the question: can your systems identify linked transactions?
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number
@@ -269,9 +269,7 @@ error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the quest
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
-error.invalid.msb.wc.bankNames.too-long = You can’t enter more than 140 characters
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
-error.invalid.msb.wc.wholesalerNames.too-long = You can’t enter more than 140 characters for the wholesaler names
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
 error.required.countries.msb.most.transactions = Enter at least one country.
 

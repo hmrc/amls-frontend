@@ -48,7 +48,7 @@
                             jsHidden = true,
                             classes = Seq("ukPassportNumber-fieldset")
                         ) {
-                           @input(f("ukPassportNumber"), "lbl.passport.number", bold = false)
+                           @input(field = f("ukPassportNumber"),labelText = "lbl.passport.number", hintText = "hint.9.digits", bold = false)
                         }
 
                         @radio(f("passportType"), "responsiblepeople.non.uk.passport.lbl", "02", target = ".nonUKPassportNumber-fieldset")

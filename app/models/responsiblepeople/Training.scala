@@ -6,6 +6,7 @@ import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import jto.validation.forms.UrlFormEncoded
 import cats.data.Validated.{Invalid, Valid}
+import models.FormTypes._
 
 sealed trait Training
 
@@ -18,10 +19,10 @@ object Training {
   import play.api.libs.json._
 
   val maxInformationTypeLength = 255
-
-  val informationType = notEmpty.withMessage("error.required.rp.training.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.training.information")
-
+  val informationType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.rp.training.information") andThen
+    maxLength(maxInformationTypeLength).withMessage("error.invalid.maxlength.255") andThen
+    basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, Training] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

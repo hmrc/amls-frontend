@@ -11,55 +11,86 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
 
 
-    "successfully validate given an enum value" in {
+    "pass validation" when {
+      "given a valid enum value" in {
 
-      ProfessionalBody.formRule.validate(Map("penalised" -> Seq("false"))) must
-        be(Valid(ProfessionalBodyNo))
+        ProfessionalBody.formRule.validate(Map("penalised" -> Seq("false"))) must
+          be(Valid(ProfessionalBodyNo))
+      }
+
+      "given a `Yes` value" in {
+
+        val data = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("details")
+        )
+
+        ProfessionalBody.formRule.validate(data) must
+          be(Valid(ProfessionalBodyYes("details")))
+      }
     }
 
-    "successfully validate given an `Yes` value" in {
+    "fail validation" when {
 
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("details")
-      )
+      "missing mandatory value" in {
 
-      ProfessionalBody.formRule.validate(data) must
-        be(Valid(ProfessionalBodyYes("details")))
-    }
+        ProfessionalBody.formRule.validate(Map.empty) must
+          be(Invalid(Seq(
+            (Path \ "penalised") -> Seq(ValidationError("error.required.eab.penalised.by.professional.body"))
+          )))
+      }
 
-    "fail to validate missing mandatory value" in {
+      "given a `Yes` with an empty string" in {
 
-      ProfessionalBody.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "penalised") -> Seq(ValidationError("error.required.eab.penalised.by.professional.body"))
-        )))
-    }
+        val data = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("")
+        )
 
-    "fail to validate given an `Yes` with no value" in {
+        ProfessionalBody.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "professionalBody") -> Seq(ValidationError("error.required.eab.info.about.penalty"))
+          )))
+      }
 
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("")
-      )
+      "given a `Yes` with whitespace only" in {
 
-      ProfessionalBody.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.required.eab.info.about.penalty"))
-        )))
-    }
+        val data = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("    ")
+        )
 
-    "fail to validate given an `Yes` with max value" in {
+        ProfessionalBody.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "professionalBody") -> Seq(ValidationError("error.required.eab.info.about.penalty"))
+          )))
+      }
 
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("zzxczxczx"*50)
-      )
+      "given a `Yes` with too many characters" in {
 
-      ProfessionalBody.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.info.about.penalty"))
-        )))
+        val data = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("zzxczxczx" * 50)
+        )
+
+        ProfessionalBody.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          )))
+      }
+
+      "given a `Yes` with invalid characters" in {
+
+        val data = Map(
+          "penalised" -> Seq("true"),
+          "professionalBody" -> Seq("{}{}}")
+        )
+
+        ProfessionalBody.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "professionalBody") -> Seq(ValidationError("err.text.validation"))
+          )))
+      }
     }
 
     "write correct data from enum value" in {

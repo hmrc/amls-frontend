@@ -173,7 +173,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       }
     }
 
-    "bankNames > 140 characters" should {
+    "bankNames and wholesalerNames > 140 characters" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
@@ -181,17 +181,20 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(buildString(141)),
         "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq("wholesaler names"),
+        "wholesalerNames" -> Seq(buildString(141)),
         "customerMoneySource" -> Seq("Yes"),
         "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.maxlength.140")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.maxlength.140"))
+        )))
       }
     }
 
-    "bankNames contains symbols outside the Trading Names pattern" should {
+    "bankNames and wholesalerNames contain symbols outside the Trading Names pattern" should {
 
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
@@ -200,18 +203,44 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(symbols5.mkString("")),
         "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq("wholesaler names"),
+        "wholesalerNames" -> Seq(symbols5.mkString("")),
         "customerMoneySource" -> Seq("Yes"),
         "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("err.text.validation")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+          (Path \ "bankNames") -> Seq(ValidationError("err.text.validation")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("err.text.validation"))
+        )))
       }
 
     }
 
-    "bankNames contains standard UK alpha characters" should {
+    "bankNames and wholesalerNames contain whitespace only" should {
+
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq("   "),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("   "),
+        "customerMoneySource" -> Seq("Yes"),
+        "usesForeignCurrencies" -> Seq("Yes")
+      )
+
+      "fail validation" in {
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames"))
+        )))
+      }
+
+    }
+
+    "bankNames and wholesalerNames contain standard UK alpha characters" should {
 
       val alpha = (alphaLower.take(4) ++ alphaUpper.take(4)).mkString("")
 
@@ -222,18 +251,18 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(alpha),
         "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq("wholesaler names"),
+        "wholesalerNames" -> Seq(alpha),
         "customerMoneySource" -> Seq("Yes"),
         "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "pass validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(alpha)),Some(WholesalerMoneySource("wholesaler names")),Some(true))))
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(alpha)),Some(WholesalerMoneySource(alpha)),Some(true))))
       }
 
     }
 
-    "bankNames contains accented characters" should {
+    "bankNames and wholesalerNames contain accented characters" should {
 
       val accentedAlpha = (extendedAlphaLower.take(4) ++ extendedAlphaUpper.take(4)).mkString("")
 
@@ -244,13 +273,13 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(accentedAlpha),
         "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq("wholesaler names"),
+        "wholesalerNames" -> Seq(accentedAlpha),
         "customerMoneySource" -> Seq("Yes"),
         "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "pass validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(accentedAlpha)),Some(WholesalerMoneySource("wholesaler names")),Some(true))))
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(accentedAlpha)),Some(WholesalerMoneySource(accentedAlpha)),Some(true))))
       }
 
     }
@@ -270,24 +299,6 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
       "fail validation" in {
         WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
-      }
-    }
-
-    "wholesalerNames > 140 characters" should {
-      val formData = Map(
-        "currencies[0]" -> Seq("USD"),
-        "currencies[1]" -> Seq("CHF"),
-        "currencies[2]" -> Seq("EUR"),
-        "bankMoneySource" -> Seq("Yes"),
-        "bankNames" -> Seq("Nak names"),
-        "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq(buildString(141)),
-        "customerMoneySource" -> Seq("Yes"),
-        "usesForeignCurrencies" -> Seq("Yes")
-      )
-
-      "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
       }
     }
 

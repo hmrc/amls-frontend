@@ -20,18 +20,18 @@ object BusinessUseAnIPSP {
   private val maxNameTypeLength = 140
   private val nameType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.msb.ipsp.name") andThen
-    maxLength(maxNameTypeLength).withMessage("error.invalid.msb.ipsp.name")
+    maxLength(maxNameTypeLength).withMessage("error.invalid.maxlength.140") andThen
+    basicPunctuationPattern()
 
-  val referenceType = notEmptyStrip andThen
-    notEmpty.withMessage("error.invalid.mlr.number") andThen referenceNumberRule("error.invalid.mlr.number")
-
+  private val referenceType = notEmptyStrip andThen
+    notEmpty.withMessage("error.invalid.mlr.number") andThen referenceNumberRule()
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessUseAnIPSP] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (__ \ "useAnIPSP").read[Boolean].withMessage("error.required.msb.ipsp") flatMap {
       case true =>
         ((__ \ "name").read(nameType) ~
-          (__ \ "referenceNumber").read(referenceType)) (BusinessUseAnIPSPYes.apply _)
+          (__ \ "referenceNumber").read(referenceType)) (BusinessUseAnIPSPYes.apply)
       case false => Rule.fromMapping { _ => Valid(BusinessUseAnIPSPNo) }
     }
   }

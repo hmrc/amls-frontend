@@ -30,9 +30,10 @@ object PersonName {
     From[UrlFormEncoded] { __ =>
 
       val otherNamesLength = 140
-      val otherNamesType =
-        required("error.required.rp.otherNames") andThen
-          maxWithMsg(otherNamesLength, "error.invalid.length.otherNames")
+      val otherNamesType = notEmptyStrip andThen
+        notEmpty.withMessage("error.required.rp.otherNames") andThen
+        maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
+        basicPunctuationPattern()
 
       (
         (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~

@@ -66,12 +66,12 @@ object CorrespondenceAddress {
       val alternativeAddressNameType = notEmptyStrip andThen
         nameRequired andThen
         maxLength(nameMaxLength).withMessage("error.invalid.yourname") andThen
-        basicPunctuationPattern
+        basicPunctuationPattern()
 
       val alternativeAddressTradingNameType = notEmptyStrip andThen
         required("error.required.name.of.business") andThen
         maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
-        basicPunctuationPattern
+        basicPunctuationPattern()
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (

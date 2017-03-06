@@ -48,8 +48,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       )))
     }
 
-
-    "fail vaidation when trading name is exceeds maxlength" in {
+    "fail validation when trading name is exceeds maxlength" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foooo"*50),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
@@ -61,7 +60,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       )))
     }
 
-    "fail vaidation when trading name is empty" in {
+    "fail validation when trading name is empty" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq(""),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
@@ -69,11 +68,11 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
       )))
     }
 
-    "fail vaidation when trading name contains only spaces" in {
+    "fail validation when trading name contains only spaces" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("   "),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
@@ -81,7 +80,19 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
+      )))
+    }
+
+    "fail validation when trading name contains invalid characters" in {
+      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("{}{}}"),
+        "addressLine1" -> Seq("1"),
+        "addressLine2" -> Seq("2"),
+        "postcode" -> Seq("AA03 5BB"),
+        "isResidential" -> Seq("true"),
+        "startDate.day" -> Seq("24"),
+        "startDate.month" -> Seq("02"),
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("err.text.validation"))
       )))
     }
 

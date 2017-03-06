@@ -396,7 +396,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
       removeSpacesRule.validate(inputStr)  must be (Valid("AAAABBBBCCCC"))    }
   }
 
-
   "For the Declaration Add Persons 'name' fields" must {
 
     "fail validation if blank value is supplied for the name" in {
@@ -454,36 +453,26 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
     }
   }
 
-  "Uk passport number" must {
-    "successfully validate numbers" in {
-      ukPassportType.validate("123456789") mustBe Valid("123456789")
-    }
 
-    "fail when the passport number includes letters" in {
-      ukPassportType.validate("123abc789") mustBe Invalid(
-        Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
-      )
-    }
-  }
 
   "basicPunctuation140CharsPattern" must {
 
     "successfully validate a valid name" in {
-      basicPunctuationPattern.validate("FirstName LastName^") mustBe Valid("FirstName LastName^")
+      basicPunctuationPattern().validate("FirstName LastName^") mustBe Valid("FirstName LastName^")
     }
 
     "successfully validate a valid name with special chars" in {
-      basicPunctuationPattern.validate("& - +=1234567890ABCDEZMN.,_*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,_*%£:;~@")
+      basicPunctuationPattern().validate("& - +=1234567890ABCDEZMN.,_*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,_*%£:;~@")
     }
 
     "fail validation when given an invalid name" in {
-      basicPunctuationPattern.validate("FirstName LastName{}") must be(Invalid(Seq(
+      basicPunctuationPattern().validate("FirstName LastName{}") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
     }
 
     "fail validation when given an invalid name with <>" in {
-      basicPunctuationPattern.validate("FirstName LastName<>") must be(Invalid(Seq(
+      basicPunctuationPattern().validate("FirstName LastName<>") must be(Invalid(Seq(
         Path -> Seq(ValidationError("err.text.validation"))
       )))
     }
