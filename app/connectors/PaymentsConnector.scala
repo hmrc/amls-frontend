@@ -18,13 +18,14 @@ import utils.Strings._
 class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
   val baseUrl = config.baseUrl("payments-frontend")
+  lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
 
   def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PaymentServiceRedirect]] = {
 
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
     val headers = Seq(
-      "Custom-Payment" -> "1234567890"
+      "Custom-Payment" -> customPaymentId
     )
 
     http.POST(url, request, headers) map { r =>
