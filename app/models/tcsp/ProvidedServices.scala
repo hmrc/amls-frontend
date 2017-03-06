@@ -60,7 +60,7 @@ object ProvidedServices {
   val serviceDetailsType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.tcsp.provided_services.details") andThen
     maxWithMsg(serviceDetailsMaxLength, "error.invalid.maxlength.255") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
 

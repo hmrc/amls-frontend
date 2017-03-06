@@ -34,7 +34,7 @@ object WhichCurrencies {
     notEmptyStrip andThen
       minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
       maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long") andThen
-      basicPunctuationPattern
+      basicPunctuationPattern()
   }
 
   private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen

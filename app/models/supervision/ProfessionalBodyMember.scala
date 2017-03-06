@@ -73,7 +73,7 @@ object ProfessionalBodyMember {
   val specifyOtherType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.supervision.business.details") andThen
     maxLength(maxSpecifyDetailsLength).withMessage("error.invalid.supervision.business.details") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodyMember] =
     From[UrlFormEncoded] { __ =>

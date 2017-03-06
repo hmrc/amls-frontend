@@ -21,7 +21,7 @@ object InvolvedInOther {
   val OtherBusinessActivityType = notEmptyStrip andThen
                                   notEmpty.withMessage("error.required.ba.involved.in.other.text") andThen
                                   maxWithMsg(maxOtherBusinessActivityTypeLength, "error.invalid.maxlength.255") andThen
-                                  basicPunctuationPattern
+                                  basicPunctuationPattern()
 
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
