@@ -269,9 +269,7 @@ error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the quest
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
-error.invalid.msb.wc.bankNames.too-long = You can’t enter more than 140 characters
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
-error.invalid.msb.wc.wholesalerNames.too-long = You can’t enter more than 140 characters for the wholesaler names
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
 error.required.countries.msb.most.transactions = Enter at least one country.
 
