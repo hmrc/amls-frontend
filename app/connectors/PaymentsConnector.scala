@@ -5,14 +5,13 @@ import javax.inject._
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import play.api.Logger
 import play.api.http.Status
+import play.api.mvc.Request
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.hooks.HttpHook
-import uk.gov.hmrc.play.http.ws.WSPost
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 import utils.HttpUtils._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import utils.Strings._
 
 @Singleton
 class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
@@ -20,12 +19,17 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
 
-  def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PaymentServiceRedirect]] = {
+  def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, httpRequest: Request[_]): Future[Option[PaymentServiceRedirect]] = {
+
+    import utils.Strings._
 
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
+    println(httpRequest.headers.get("Cookie").toString in Console.RED)
+
     val headers = Seq(
-      "Custom-Payment" -> customPaymentId
+      "Custom-Payment" -> customPaymentId,
+      "Cookie" -> httpRequest.headers.get("Cookie").getOrElse("")
     )
 
     http.POST(url, request, headers) map { r =>
