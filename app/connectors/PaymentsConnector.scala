@@ -33,7 +33,7 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
           r.redirectLocation match {
             case Some(location) =>
-              Some(PaymentServiceRedirect(s"$baseUrl$location"))
+              Some(PaymentServiceRedirect(location))
             case _ =>
               Logger.warn("[PaymentsConnector] No redirect url was returned")
               None
