@@ -17,12 +17,12 @@ class PassportTypeSpec extends PlaySpec {
     "fail validation" when {
       "the passport number has too many characters" in {
         PassportType.ukPassportType.validate("a" * 10) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
         )
       }
       "the passport number has too few characters" in {
         PassportType.ukPassportType.validate("a" * 8) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
         )
       }
       "the passport number includes invalid characters (letters, punctuation etc)" in {
