@@ -188,8 +188,8 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
       "fail validation " in {
         WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
-          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")),
-          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long"))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.maxlength.140")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.maxlength.140"))
         )))
       }
     }
