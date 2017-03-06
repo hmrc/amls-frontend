@@ -29,11 +29,10 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
     http.POST(url, request, headers) map { r =>
       r.status match {
-        case Status.SEE_OTHER =>
+        case Status.CREATED =>
 
           r.redirectLocation match {
             case Some(location) =>
-              println(s"$baseUrl$location" in Console.RED)
               Some(PaymentServiceRedirect(s"$baseUrl$location"))
             case _ =>
               Logger.warn("[PaymentsConnector] No redirect url was returned")
