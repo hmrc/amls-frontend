@@ -1,5 +1,5 @@
 @import forms.Form2
-@import include.{main, heading}
+@import include.{main, headingWithPlaceholder}
 @import include.forms2._
 @import models.responsiblepeople.Positions
 
@@ -7,7 +7,7 @@
 
 @header = {
     @errorSummary(f)
-    @heading(Messages("responsiblepeople.aretheynominatedofficer.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.aretheynominatedofficer.title", personName), "summary.responsiblepeople")
 }
 
 @main(

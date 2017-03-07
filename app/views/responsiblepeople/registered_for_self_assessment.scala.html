@@ -9,7 +9,7 @@ s"""${f("utrNumber").id}-fieldset"""
 
 @header = {
     @errorSummary(f)
-    @heading(Messages("responsiblepeople.registeredforselfassessment.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.title", personName), "summary.responsiblepeople")
 }
 
 @main(
