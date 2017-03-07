@@ -4,11 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @target = @{
-    s"""${f("transactions").id}-panel"""
-}
-
-@target1 = @{
-    s"""${f("name").id}-panel"""
+    s"""${f("transactions").id}"""
 }
 
 @header = {
@@ -32,7 +28,7 @@
                 f = f("isRecorded"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s".$target",
+                target = s".transactions-fieldset",
                 inline = true
             )
             @radio(
@@ -47,7 +43,7 @@
             f = f("transactions"),
             legend = "businessactivities.do.keep.records",
             hint = "businessactivities.do.keep.records.hint",
-            classes = Seq(s"$target")
+            classes = Seq("transactions-fieldset")
         ) {
             @checkbox(
                 f = f("transactions[]"),
@@ -63,16 +59,13 @@
                 f = f("transactions[]"),
                 labelText = "businessactivities.transactiontype.lbl.03",
                 value = "03",
-                target = s"#$target"
+                target = s".form-group:has(*[name='name'])"
             )
-        }
 
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
             @input(
                 field = f("name"),
-                labelText = "businessactivities.name.software.pkg.lbl"
+                labelText = "businessactivities.name.software.pkg.lbl",
+                jsHidden = true
             )
         }
 
