@@ -23,17 +23,13 @@ import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  val authenticatorConnector = mock[AuthenticatorConnector]
   val paymentsConnector = mock[PaymentsConnector]
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
-    .bindings(bind[AuthenticatorConnector].to(authenticatorConnector))
     .bindings(bind[PaymentsConnector].to(paymentsConnector))
     .build()
-
-  when(authenticatorConnector.refreshProfile(any())) thenReturn Future.successful(HttpResponse(200))
 
   trait Fixture extends AuthorisedFixture {
 
@@ -82,20 +78,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "ConfirmationController" must {
-
-    "refresh the user's auth profile" in new Fixture {
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReady))
-
-      val result = controller.get()(request)
-
-      status(result) mustBe OK
-
-      verify(authenticatorConnector).refreshProfile(any())
-
-    }
-
+    
     "write a confirmation value to Keystore" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
