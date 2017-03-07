@@ -5,6 +5,7 @@ import javax.inject.Inject
 import akka.stream.Materializer
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
+import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Results.Redirect

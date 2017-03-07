@@ -28,7 +28,6 @@ trait ConfirmationController extends BaseController {
       for {
           status <- statusService.getStatus
           result <- resultFromStatus(status)
-          _ <- authenticatorConnector.refreshProfile
           _ <- keystoreConnector.setConfirmationStatus
       } yield result
   }
