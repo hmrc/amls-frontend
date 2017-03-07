@@ -21,8 +21,6 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
-  private[controllers] lazy val authenticatorConnector = Play.current.injector.instanceOf[AuthenticatorConnector]
-
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PaymentsConnector]
 
   val statusService: StatusService
@@ -36,7 +34,6 @@ trait ConfirmationController extends BaseController {
         for {
           status <- statusService.getStatus
           result <- resultFromStatus(status)
-          _ <- authenticatorConnector.refreshProfile
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
   }
