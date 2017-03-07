@@ -42,6 +42,10 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
           Logger.warn(s"[PaymentsConnector] A $s status was returned when trying to retrieve the payment url")
           None
       }
+    } recover {
+      case ex =>
+        Logger.warn(s"[PaymentsConnector] An exception was thrown while trying to retrieve the payments url: ${ex.getMessage}")
+        None
     }
   }
 }
