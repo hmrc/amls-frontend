@@ -3,7 +3,7 @@ package filters
 import javax.inject.Inject
 
 import akka.stream.Materializer
-import connectors.KeystoreConnector
+import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
 import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
@@ -12,7 +12,7 @@ import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
     val exclusionSet = Set(
@@ -28,16 +28,23 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)(imp
       nextFilter(rh)
     }
     else {
+      //noinspection SimplifyBooleanMatch
       rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
         case false =>
           keystoreConnector.confirmationStatus flatMap {
             case ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
 
-              val targetUrl = controllers.routes.LandingController.get().url
+              for {
+                _ <- authenticator.refreshProfile
+                _ <- keystoreConnector.resetConfirmation
+              } yield {
 
-              Logger.info(s"[ConfirmationFilter] Filter activated when trying to fetch ${rh.path}, redirecting to $targetUrl")
+                val targetUrl = controllers.routes.LandingController.get().url
 
-              keystoreConnector.resetConfirmation map (_ => Redirect(targetUrl))
+                Logger.info(s"[ConfirmationFilter] Filter activated when trying to fetch ${rh.path}, redirecting to $targetUrl")
+
+                Redirect(targetUrl)
+              }
 
             case _ => nextFilter(rh)
           }
