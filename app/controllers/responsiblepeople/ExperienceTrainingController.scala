@@ -9,7 +9,7 @@ import models.responsiblepeople.{ExperienceTraining, ResponsiblePeople}
 import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
@@ -40,10 +40,10 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
         businessActivitiesData flatMap {
           activities =>
             getData[ResponsiblePeople](index) map {
-              case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _, _, _))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, fromDeclaration))
-              case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(experience_training(EmptyForm, activities, edit, index, fromDeclaration))
+              case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(experienceTraining), _, _, _, _, _, _))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, fromDeclaration, personName.titleName))
+              case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))
+              => Ok(experience_training(EmptyForm, activities, edit, index, fromDeclaration, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
@@ -57,7 +57,9 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
           activities =>
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
-                Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, fromDeclaration)))
+                getData[ResponsiblePeople](index) map {rp =>
+                  BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                }
               case ValidForm(_, data) => {
                 for {
                   result <- updateDataStrict[ResponsiblePeople](index) { rp =>

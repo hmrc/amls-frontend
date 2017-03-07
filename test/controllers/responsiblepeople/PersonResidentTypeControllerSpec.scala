@@ -8,7 +8,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -34,13 +34,13 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
   "PersonResidentTypeController" must {
 
     "display person a UK resident page" in new Fixture {
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("responsiblepeople.person.a.resident.title"))
+      contentAsString(result) must include(Messages("responsiblepeople.person.a.resident.title", "firstname lastname"))
     }
 
     "load 'not found' error page" when {
@@ -91,7 +91,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         "countryOfBirth" -> "GB",
         "nationality" -> "GB"
       )
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -100,7 +100,12 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
+      val pageTitle = Messages("responsiblepeople.person.a.resident.title", "firstname lastname") + " - " +
+        Messages("summary.responsiblepeople") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
       status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
@@ -108,7 +113,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
-          None,
+          Some(PersonName("firstname", None, "lastname", None, None)),
           Some(PersonResidenceType(
             NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
             Country("United Kingdom", "GB"),
@@ -119,7 +124,12 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
+      val pageTitle = Messages("responsiblepeople.person.a.resident.title", "firstname lastname") + " - " +
+        Messages("summary.responsiblepeople") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
       val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("input[name=ukPassportNumber]").`val`() must include("12346464646")
     }
 

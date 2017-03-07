@@ -30,18 +30,19 @@ object BooleanFormReadWrite {
 
 trait AreTheyNominatedOfficerController extends RepeatingSection with BaseController {
 
-
   val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "isNominatedOfficer"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
-    Authorised {
+    Authorised.async {
       implicit authContext => implicit request =>
-
-        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, fromDeclaration))
+        getData[ResponsiblePeople](index) map {rp =>
+          Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+        }
     }
+
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
@@ -49,9 +50,9 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
-
-            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index, fromDeclaration)))
-
+            getData[ResponsiblePeople](index) map { rp =>
+              BadRequest(are_they_nominated_officer(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
 
             for {

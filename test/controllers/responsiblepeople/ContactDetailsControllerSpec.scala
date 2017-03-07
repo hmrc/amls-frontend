@@ -31,19 +31,24 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
 
   "ContactDetailsController" must {
 
+    val pageTitle = Messages("responsiblepeople.contact_details.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
     "on get display the contact details page" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("responsiblepeople.contact_details.title"))
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
     }
-
 
     "on get display the contact details page with pre populated data" in new Fixture {
 
       val contact = ContactDetails("07702745869", "test@test.com")
-      val res = ResponsiblePeople(contactDetails = Some(contact))
+      val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(res))))
@@ -52,6 +57,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("input[name=phoneNumber]").`val` must be("07702745869")
       document.select("input[name=emailAddress]").`val` must be("test@test.com")
     }
@@ -82,7 +88,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       )
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       when(controller.dataCacheConnector.save[ContactDetails](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -91,6 +97,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       status(result) must be(BAD_REQUEST)
 
       val document: Document  = Jsoup.parse(contentAsString(result))
+       document.title must be(pageTitle)
       document.getElementsByClass("error-notification").html() must include(Messages("err.invalid.phone.number"))
     }
 
@@ -100,6 +107,9 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "phoneNumber" -> "",
         "emailAddress" -> "test@test.com"
       )
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -113,6 +123,8 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "phoneNumber" -> "07702745869",
         "emailAddress" -> ""
       )
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -127,6 +139,9 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "emailAddress" -> "test@test.com"
       )
 
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
 
@@ -140,6 +155,9 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "emailAddress" -> "invalid-email.com"
       )
 
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
 
@@ -152,6 +170,9 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "phoneNumber" -> "1234567890123456789012345678901",
         "emailAddress" -> "test@test.com"
       )
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -167,6 +188,9 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "emailAddress" -> ("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz@" +
                            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz.com")
       )
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)

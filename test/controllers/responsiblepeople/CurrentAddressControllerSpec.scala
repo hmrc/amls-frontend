@@ -45,6 +45,12 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   "CurrentAddressController" when {
 
+    val pageTitle = Messages("responsiblepeople.wherepersonlives.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
     "get is called" must {
 
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
@@ -57,9 +63,9 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(NOT_FOUND)
       }
 
-      "display the persons page when no existing data in keystore" in new Fixture {
+      "display the persons page when no existing data in save4later" in new Fixture {
 
-        val responsiblePeople = ResponsiblePeople()
+        val responsiblePeople = ResponsiblePeople(personName)
 
         when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -68,6 +74,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
         document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
         document.select("input[name=addressLine1]").`val` must be("")
@@ -91,7 +98,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(personName = personName,addressHistory = Some(history))
 
         when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -100,6 +107,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
         document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
         document.select("input[name=addressLine1]").`val` must be("Line 1")
         document.select("input[name=addressLine2]").`val` must be("Line 2")
@@ -114,7 +122,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
         val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, SixToElevenMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
         when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -174,7 +182,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -185,6 +193,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
           val document: Document  = Jsoup.parse(contentAsString(result))
+          document.title must be(pageTitle)
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)

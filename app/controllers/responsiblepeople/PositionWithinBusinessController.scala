@@ -24,10 +24,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               .getOrElse(BusinessType.SoleProprietor)
 
             getData[ResponsiblePeople](cache, index) match {
-              case Some(ResponsiblePeople(_, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _))
-              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, fromDeclaration))
-              case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(position_within_business(EmptyForm, edit, index, bt, fromDeclaration))
+              case Some(ResponsiblePeople(Some(personName), _, _, _, Some(positions), _, _, _, _, _, _, _, _, _))
+              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, fromDeclaration, personName.titleName))
+              case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))
+              => Ok(position_within_business(EmptyForm, edit, index, bt, fromDeclaration, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
@@ -41,11 +41,14 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
       implicit authContext => implicit request =>
         Form2[Positions](request.body) match {
           case f: InvalidForm =>
-            for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            } yield {
-              BadRequest(position_within_business(f, edit, index,
-                ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor), fromDeclaration))
+            dataCacheConnector.fetchAll map { optionalCache =>
+              (optionalCache map { cache =>
+                val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                  .getOrElse(BusinessType.SoleProprietor)
+                getData[ResponsiblePeople](cache, index) match {
+                  case rp => BadRequest(position_within_business(f, edit, index, bt, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                }
+              }).getOrElse(NotFound(notFoundView))
             }
           case ValidForm(_, data) => {
             for {

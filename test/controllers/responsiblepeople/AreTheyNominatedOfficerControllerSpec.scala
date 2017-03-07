@@ -36,10 +36,10 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
-
-    val noNominatedOfficer = ResponsiblePeople(None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val withPartnerShip = ResponsiblePeople(None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val noNominatedOfficer = ResponsiblePeople(personName, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficer = ResponsiblePeople(personName, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val withPartnerShip = ResponsiblePeople(personName, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)), None, None, None, None, Some(true), false, Some(1), Some("test"))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -49,29 +49,20 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
   private val startDate: Option[LocalDate] = Some(new LocalDate())
   "AreTheyNominatedOfficerController" when {
 
+    val pageTitle = Messages("responsiblepeople.aretheynominatedofficer.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+
     "get is called" must {
 
       "display nominated officer fields" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
-        val businessMatching = BusinessMatching(Some(reviewDtls))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(businessMatching))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
         val result = controller.get(RecordId)(request)
 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-
-        val pageTitle = Messages("responsiblepeople.aretheynominatedofficer.title") + " - " +
-          Messages("summary.responsiblepeople") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
         document.title mustBe(pageTitle)
         document.select("input[value=true]") must not be(null)
         document.select("input[value=false]") must not be(null)
@@ -134,11 +125,12 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
           val document: Document = Jsoup.parse(contentAsString(result))
+          document.title mustBe(pageTitle)
           document.select("a[href=#isNominatedOfficer]").html() must include(Messages("error.required.rp.nominated_officer"))
 
         }

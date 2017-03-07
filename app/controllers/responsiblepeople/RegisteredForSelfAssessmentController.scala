@@ -4,8 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{SaRegistered, ResponsiblePeople}
-import utils.RepeatingSection
+import models.responsiblepeople.{ResponsiblePeople, SaRegistered}
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
@@ -18,10 +18,10 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(_, _, _, _, _, Some(person), _, _, _, _, _, _, _, _))
-          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromYourAnswers))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromYourAnswers))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, Some(person), _, _, _, _, _, _, _, _))
+          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromYourAnswers, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromYourAnswers, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -32,7 +32,9 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       implicit authContext => implicit request =>
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(registered_for_self_assessment(f, edit, index, fromYourAnswers)))
+            getData[ResponsiblePeople](index) map {rp =>
+              BadRequest(registered_for_self_assessment(f, edit, index, fromYourAnswers, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
