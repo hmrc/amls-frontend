@@ -70,7 +70,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
     when {
-      paymentsConnector.requestPaymentRedirectUrl(any())(any())
+      paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
 
     val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
@@ -103,7 +103,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       val body = contentAsString(result)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
@@ -119,7 +119,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       val body = contentAsString(result)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
@@ -132,11 +132,11 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      when(paymentsConnector.requestPaymentRedirectUrl(any())(any())) thenReturn Future.successful(None)
+      when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())) thenReturn Future.successful(None)
 
       val result = await(controller.get()(request))
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

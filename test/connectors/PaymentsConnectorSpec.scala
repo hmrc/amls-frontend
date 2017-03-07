@@ -1,15 +1,16 @@
 package connectors
 
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
-import org.mockito.Matchers._
+import org.apache.http.client.HttpResponseException
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -20,27 +21,25 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
   trait TestFixture {
 
-    val http = mock[WSClient]
-    val request = mock[WSRequest]
+    val http = mock[HttpPost]
 
-    when(http.url(any())) thenReturn request
-    when(request.withFollowRedirects(any())) thenReturn request
-    when(request.withHeaders(any())) thenReturn request
-
-    val app = new GuiceApplicationBuilder()
+    val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[WSClient].to(http))
-      .build()
+      .configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> true)
+      .overrides(bind[HttpPost].to(http))
+
+    val builder = defaultBuilder
+
+    lazy val app = builder.build()
 
     lazy val connector = app.injector.instanceOf[PaymentsConnector]
 
-    def createResponse(status: Int, locationHeader: Option[String] = None) = {
-      val response = mock[WSResponse]
+    implicit val request = FakeRequest()
 
-      when(response.header("Location")) thenReturn locationHeader
-      when(response.status) thenReturn status
-
-      response
+    def createResponse(f: () => Future[HttpResponse]) = {
+      when {
+        http.POST[PaymentRedirectRequest, HttpResponse](any(), any(), any())(any(), any(), any())
+      } thenReturn f()
     }
 
   }
@@ -51,11 +50,9 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
       "given valid payment details" in new TestFixture {
 
-        val response = createResponse(SEE_OTHER, Some("/pay-online/card-selection"))
-
-        when {
-          request.post[String](any())(any())
-        } thenReturn Future.successful(response)
+        createResponse { () =>
+          Future.successful(HttpResponse(CREATED, responseHeaders = Map("Location" -> Seq("http://localhost:9050/pay-online/card-selection"))))
+        }
 
         val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
 
@@ -63,8 +60,33 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
         result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection"))
 
+        verify(http).POST(any(), any(), any())(any(), any(), any())
+
+      }
+    }
+
+    "returns None when the http request failed" in new TestFixture {
+
+      createResponse { () =>
+        Future.failed(new HttpResponseException(400, "The request failed"))
       }
 
+      val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+
+      val result = await(connector.requestPaymentRedirectUrl(model))
+
+      result mustBe None
+    }
+
+    "not contact the payments api if the feature toggle is switched off" in new TestFixture {
+
+      override val builder = defaultBuilder.configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> false)
+
+      val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+
+      val result = await(connector.requestPaymentRedirectUrl(model))
+
+      result mustBe None
     }
 
   }
