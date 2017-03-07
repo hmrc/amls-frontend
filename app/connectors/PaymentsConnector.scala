@@ -26,26 +26,31 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
       "Custom-Payment" -> customPaymentId
     )
 
-    http.POST(url, request, headers) map { r =>
-      r.status match {
-        case Status.CREATED =>
+    if (config.getConfBool("feature-toggle.payments-url-lookup", false)) {
 
-          r.redirectLocation match {
-            case Some(location) =>
-              Some(PaymentServiceRedirect(location))
-            case _ =>
-              Logger.warn("[PaymentsConnector] No redirect url was returned")
-              None
-          }
+      http.POST(url, request, headers) map { r =>
+        r.status match {
+          case Status.CREATED =>
 
-        case s =>
-          Logger.warn(s"[PaymentsConnector] A $s status was returned when trying to retrieve the payment url")
+            r.redirectLocation match {
+              case Some(location) =>
+                Some(PaymentServiceRedirect(location))
+              case _ =>
+                Logger.warn("[PaymentsConnector] No redirect url was returned")
+                None
+            }
+
+          case s =>
+            Logger.warn(s"[PaymentsConnector] A $s status was returned when trying to retrieve the payment url")
+            None
+        }
+      } recover {
+        case ex =>
+          Logger.warn(s"[PaymentsConnector] An exception was thrown while trying to retrieve the payments url: ${ex.getMessage}")
           None
       }
-    } recover {
-      case ex =>
-        Logger.warn(s"[PaymentsConnector] An exception was thrown while trying to retrieve the payments url: ${ex.getMessage}")
-        None
+    } else {
+      Future.successful(None)
     }
   }
 }

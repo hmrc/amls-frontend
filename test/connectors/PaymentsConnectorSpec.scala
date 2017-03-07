@@ -23,10 +23,14 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
     val http = mock[HttpPost]
 
-    val app = new GuiceApplicationBuilder()
+    val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> true)
       .overrides(bind[HttpPost].to(http))
-      .build()
+
+    val builder = defaultBuilder
+
+    lazy val app = builder.build()
 
     lazy val connector = app.injector.instanceOf[PaymentsConnector]
 
@@ -66,6 +70,17 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
       createResponse { () =>
         Future.failed(new HttpResponseException(400, "The request failed"))
       }
+
+      val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+
+      val result = await(connector.requestPaymentRedirectUrl(model))
+
+      result mustBe None
+    }
+
+    "not contact the payments api if the feature toggle is switched off" in new TestFixture {
+
+      override val builder = defaultBuilder.configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> false)
 
       val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
 
