@@ -23,7 +23,8 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
     val headers = Seq(
-      "Custom-Payment" -> customPaymentId
+      "Custom-Payment" -> customPaymentId,
+      "Csrf-Token" -> "nocheck"
     )
 
     if (config.getConfBool("feature-toggle.payments-url-lookup", false)) {
