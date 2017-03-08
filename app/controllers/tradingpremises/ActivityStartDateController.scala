@@ -1,6 +1,6 @@
 package controllers.tradingpremises
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -12,6 +12,7 @@ import utils.RepeatingSection
 
 import scala.concurrent.Future
 
+@Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
                                             val authConnector: AuthConnector,
                                             val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {

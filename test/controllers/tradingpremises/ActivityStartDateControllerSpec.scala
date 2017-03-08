@@ -55,9 +55,9 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         document.title mustBe pageTitle
-        println(document)
-    
-
+        document.select("input[name=startDate.day]").`val` must include("10")
+        document.select("input[name=startDate.month]").`val` must include("10")
+        document.select("input[name=startDate.year]").`val` must include("2010")
       }
     }
 
