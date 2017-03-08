@@ -22,12 +22,9 @@ import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  val paymentsConnector = mock[PaymentsConnector]
-
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
-    .bindings(bind[PaymentsConnector].to(paymentsConnector))
     .build()
 
   trait Fixture extends AuthorisedFixture {
