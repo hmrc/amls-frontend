@@ -40,14 +40,17 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
       implicit request =>
         Form2[ActivityStartDate](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.business_structure(f, index, edit)))
+            Future.successful(BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit)))
           case ValidForm(_, data) =>
             for {
               _ <- updateDataStrict[TradingPremises](index) { tp =>
                 val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
                 tp.copy(yourTradingPremises = ytp)
               }
-            } yield Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+            } yield edit match {
+              case true => Redirect(routes.SummaryController.getIndividual(index))
+              case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+            }
         }
   }
 }
