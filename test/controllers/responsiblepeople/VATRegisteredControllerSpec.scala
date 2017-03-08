@@ -1,8 +1,9 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{ResponsiblePeople, VATRegisteredNo}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -29,27 +30,34 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val emptyCache = CacheMap("", Map.empty)
 
+  val pageTitle = Messages("responsiblepeople.registeredforvat.title", "firstname lastname") + " - " +
+    Messages("summary.responsiblepeople") + " - " +
+    Messages("title.amls") + " - " + Messages("title.gov")
+  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
   "BusinessRegisteredForVATController" when {
 
     "get is called" must {
       "on get display the registered for VAT page" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
         val result = controller.get(1)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.registeredforvat.title"))
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
       }
 
 
       "on get display the registered for VAT page with pre populated data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
         document.select("input[value=false]").hasAttr("checked") must be(true)
       }
     }
@@ -60,9 +68,13 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         val newRequest = request.withFormUrlEncodedBody(
           "registeredForVATYes" -> "1234567890"
         )
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
 
         contentAsString(result) must include(Messages("error.required.atb.registered.for.vat"))
       }

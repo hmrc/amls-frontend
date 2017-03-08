@@ -4,11 +4,11 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessmatching.{TrustAndCompanyServices, MoneyServiceBusiness, BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople, Training}
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -20,10 +20,10 @@ trait TrainingController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, Some(training), _, _, _, _, _))
-          => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, fromDeclaration))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, fromDeclaration))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, Some(training), _, _, _, _, _))
+          => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -34,7 +34,9 @@ trait TrainingController extends RepeatingSection with BaseController {
       implicit authContext => implicit request => {
         Form2[Training](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.responsiblepeople.training(f, edit, index, fromDeclaration)))
+            getData[ResponsiblePeople](index) map {rp =>
+              BadRequest(views.html.responsiblepeople.training(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
             for {
               cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>

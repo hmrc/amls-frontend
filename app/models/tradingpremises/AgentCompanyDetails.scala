@@ -20,7 +20,7 @@ object AgentCompanyDetails {
   val agentsRegisteredCompanyNameType: Rule[String, String] =
     notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.registered.company.name") andThen
       maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.registered.company.name") andThen
-      basicPunctuationPattern
+      basicPunctuationPattern()
 
   val agentsRegisteredCompanyCRNType: Rule[String, String] =
     notEmpty.withMessage("error.required.bm.registration.number") andThen

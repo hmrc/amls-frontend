@@ -69,11 +69,11 @@ object WhoIsYourAccountant {
       val nameType = notEmptyStrip andThen
       notEmpty.withMessage("error.required.ba.advisor.name") andThen
       maxLength(nameTypeLength).withMessage("error.invalid.maxlength.140") andThen
-      basicPunctuationPattern
+      basicPunctuationPattern()
 
       val tradingNameType = notEmptyStrip andThen
         maxLength(tradingNameTypeLength).withMessage("error.invalid.maxlength.120") andThen
-        basicPunctuationPattern
+        basicPunctuationPattern()
 
       ((__ \ "name").read(nameType) ~
         (__ \ "tradingName").read(optionR(tradingNameType)) ~

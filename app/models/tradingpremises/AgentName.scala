@@ -27,7 +27,7 @@ object AgentName {
 
   private val agentNameType = notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.name") andThen
     maxLength(maxAgentNameLength).withMessage("error.invalid.tp.agent.name") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   implicit val mongoKey = new MongoKey[AgentName] {
     override def apply(): String = "agent-name"

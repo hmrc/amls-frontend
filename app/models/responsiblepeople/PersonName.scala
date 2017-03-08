@@ -17,6 +17,7 @@ case class PersonName(
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+  val titleName = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
   val fullNameWithoutSpace = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
 
 }
@@ -32,7 +33,7 @@ object PersonName {
       val otherNamesType = notEmptyStrip andThen
         notEmpty.withMessage("error.required.rp.otherNames") andThen
         maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
-        basicPunctuationPattern
+        basicPunctuationPattern()
 
       (
         (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~

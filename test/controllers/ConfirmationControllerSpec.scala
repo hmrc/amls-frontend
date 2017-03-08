@@ -1,39 +1,43 @@
 package controllers
 
-import connectors.{AuthenticatorConnector, KeystoreConnector}
+import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.confirmation.Currency
-import models.status.{ConfirmationStatus, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.{Application, Mode}
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.HttpResponse
 import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  val authenticatorConnector = mock[AuthenticatorConnector]
+  val paymentsConnector = mock[PaymentsConnector]
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .bindings(bindModules:_*).in(Mode.Test)
-    .bindings(bind[AuthenticatorConnector].to(authenticatorConnector))
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[PaymentsConnector].to(paymentsConnector))
     .build()
-
-  when(authenticatorConnector.refreshProfile(any())) thenReturn Future.successful(HttpResponse(200))
 
   trait Fixture extends AuthorisedFixture {
 
-    self => val request = addToken(authRequest)
+    self =>
+
+    val baseUrl = "http://localhost"
+
+    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
@@ -58,28 +62,23 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     protected val mockCacheMap = mock[CacheMap]
 
+    reset(paymentsConnector)
+
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
+    when {
+      paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
+
+    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+
   }
 
   "ConfirmationController" must {
-
-    "refresh the user's auth profile" in new Fixture {
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReady))
-
-      val result = controller.get()(request)
-
-      status(result) mustBe OK
-
-      verify(authenticatorConnector).refreshProfile(any())
-
-    }
-
+    
     "write a confirmation value to Keystore" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -91,6 +90,53 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
 
+    }
+
+    "query the payments service for the payments url for an amendment" in new Fixture {
+
+      when(controller.submissionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
+    "query the payments service for the payments url for a variation" in new Fixture {
+
+      when(controller.submissionService.getVariation(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
+    "return the default configured url for payments if none was returned by the payments service" in new Fixture {
+
+      when(controller.submissionService.getVariation(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())) thenReturn Future.successful(None)
+
+      val result = await(controller.get()(request))
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {

@@ -31,11 +31,11 @@ object AnotherBody {
   private val supervisorRule = notEmptyStrip andThen
     notEmpty.withMessage("error.required.supervision.supervisor") andThen
     maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   private val reasonRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.reason") andThen
     maxLength(reasonMaxLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   type ValidationRuleType = (String, LocalDate, LocalDate, String)
 

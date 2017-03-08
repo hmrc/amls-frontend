@@ -4,8 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{Nationality, PersonResidenceType, ResponsiblePeople}
-import utils.RepeatingSection
+import models.responsiblepeople.{Nationality, ResponsiblePeople}
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
 
 import scala.concurrent.Future
@@ -18,13 +18,13 @@ trait NationalityController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _,_, _))
+            case Some(ResponsiblePeople(Some(personName), Some(residencyType), _, _, _, _, _, _, _, _, _, _,_, _))
             => residencyType.nationality match {
-                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration))
-                case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
+                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration, personName.titleName))
+                case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
               }
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_, _))
-            => Ok(nationality(EmptyForm, edit, index, fromDeclaration))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _,_, _))
+            => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
             case _
             => NotFound(notFoundView)
           }
@@ -36,7 +36,9 @@ trait NationalityController extends RepeatingSection with BaseController {
 
           Form2[Nationality](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(nationality(f, edit, index, fromDeclaration)))
+              getData[ResponsiblePeople](index) map {rp =>
+                BadRequest(nationality(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              }
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>

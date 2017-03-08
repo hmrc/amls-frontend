@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.responsiblepeople.ResponsiblePeople
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -20,10 +20,10 @@ trait FitAndProperController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _,_, _))
-              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, fromDeclaration))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_, _))
-              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, fromDeclaration))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _,_, _))
+              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, fromDeclaration, personName.titleName))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _,_, _))
+              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, fromDeclaration, personName.titleName))
             case _
               => NotFound(notFoundView)
           }
@@ -34,7 +34,9 @@ trait FitAndProperController extends RepeatingSection with BaseController {
         implicit authContext => implicit request => {
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, fromDeclaration)))
+              getData[ResponsiblePeople](index) map {rp =>
+                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              }
             case ValidForm(_, data) =>{
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>

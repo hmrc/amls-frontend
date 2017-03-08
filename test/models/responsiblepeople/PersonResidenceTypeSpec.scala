@@ -105,7 +105,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         PersonResidenceType.formRule.validate(ukModel) must
           be(Invalid(Seq(
             Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
-            Path \ "ukPassportNumber" -> Seq(ValidationError("error.invalid.uk.passport")))))
+            Path \ "ukPassportNumber" -> Seq(ValidationError("error.required.uk.passport")))))
       }
 
       "fail to validate when non uk  missing uk passport number" in {
