@@ -119,7 +119,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           val result = controller.post(RecordId1, false)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
         }
         
         "fail submission on invalid uk address" in new Fixture {
@@ -275,7 +275,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         val result = controller.post(1)(newRequest)
 
         hstatus(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
+        redirectLocation(result) must be(Some(routes.ActivityStartDateController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
@@ -352,7 +352,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val result = controller.post(1)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
     }
 
     "the trading premises instance is brand new" in new Fixture {

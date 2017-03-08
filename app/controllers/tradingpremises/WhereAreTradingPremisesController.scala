@@ -53,7 +53,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
               Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+              case false => Redirect(routes.ActivityStartDateController.get(index, edit))
             }
           }
 
