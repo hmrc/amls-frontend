@@ -192,8 +192,6 @@ trait SubmissionService extends DataCacheService {
           val totalFees: BigDecimal = peopleFee + premisesFee
           val rows = getVariationBreakdown(variation, peopleFee)
           val paymentRef = variation.paymentReference
-          println("================"+variation)
-          println("====================================>"+Some((paymentRef, Currency(totalFees), rows)))
           Future.successful(Some((paymentRef, Currency(totalFees), rows)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }

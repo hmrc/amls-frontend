@@ -54,7 +54,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       "respond with OK and show the form with data when there is data" in new Fixture {
 
         val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
-        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now())
+        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -281,7 +281,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           any(),
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
-            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, true, TradingPremisesSection.date))
+            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, Some(true), Some(TradingPremisesSection.date)))
           ))))(any(), any(), any())
       }
     }
@@ -302,7 +302,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       )
 
       val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, LocalDate.now())
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
@@ -335,7 +335,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       )
 
       val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2007, 2, 1))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(new LocalDate(2007, 2, 1)))
 
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -369,7 +369,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       )
 
       val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, new LocalDate(2007, 2, 1))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(new LocalDate(2007, 2, 1)))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
@@ -403,7 +403,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
       val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = true, new LocalDate(2001, 1, 1), None)
+      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = Some(true), Some(new LocalDate(2001, 1, 1)), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
       val expectedResult = yourPremises.copy(
@@ -437,7 +437,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
       val postRequest = request.withFormUrlEncodedBody()
 
@@ -455,7 +455,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
       val postRequest = request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "1",
@@ -480,7 +480,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       "dateOfChange.day" -> "01"
     )
 
-    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
+    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(new LocalDate(2008, 1, 1)), None)
     val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
     when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))

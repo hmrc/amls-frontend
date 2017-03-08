@@ -30,7 +30,7 @@
             question = Messages("tradingpremises.summary.tradingstartdate"),
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
-            <p>@DateHelper.formatDate(yta.startDate)</p>
+            <p>@DateHelper.formatDate(yta.startDate.get)</p>
         }
 
         @checkYourAnswers(
@@ -38,8 +38,8 @@
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
             <p>@yta.isResidential match {
-                case true => { @Messages("lbl.yes") }
-                case false => { @Messages("lbl.no") }
+                case Some(true) => { @Messages("lbl.yes") }
+                case Some(false) => { @Messages("lbl.no") }
             }</p>
         }
 
