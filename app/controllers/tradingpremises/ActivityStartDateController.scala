@@ -20,17 +20,18 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[TradingPremises](index) map {
-          response =>
-            val form = (for {
-              tp <- response
-              services <- tp.yourTradingPremises
-              startDate <- services.startDate
-            } yield Form2[ActivityStartDate](ActivityStartDate(startDate))).getOrElse(EmptyForm)
 
-            println("form==========================="+form)
+        getData[TradingPremises](index) map {
+          case Some(tp) => {
+            val form = tp.yourTradingPremises match {
+              case Some(data) => println("======================"+data);Form2[ActivityStartDate](ActivityStartDate(data.startDate.get))
+              case None => EmptyForm
+            }
             Ok(views.html.tradingpremises.activity_start_date(form, index, edit))
+          }
+          case None => NotFound(notFoundView)
         }
+
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
