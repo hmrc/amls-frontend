@@ -1,10 +1,8 @@
 package controllers
 
-import javax.inject.Inject
-
 import config.ApplicationConfig
 import controllers.auth.AmlsRegime
-import play.api.i18n.{MessagesApi, I18nSupport, Messages}
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
