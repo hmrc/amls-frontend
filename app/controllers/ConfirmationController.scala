@@ -58,9 +58,11 @@ trait ConfirmationController extends BaseController {
       }
     }
     case _ => {
-      submissionService.getSubscription map {
-        case (paymentRef, total, rows) =>
-          Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
+      for {
+        (paymentRef, total, rows) <- submissionService.getSubscription
+        paymentsUrl <- requestPaymentsUrl(Some((paymentRef, total, rows, None)))
+      } yield {
+        Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsUrl))
       }
     }
   }

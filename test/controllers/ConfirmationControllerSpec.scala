@@ -124,6 +124,19 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
+    "query the payments service for the payments url for a new submission" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any())
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
     "return the default configured url for payments if none was returned by the payments service" in new Fixture {
 
       when(controller.submissionService.getVariation(any(), any(), any()))
