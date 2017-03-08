@@ -51,9 +51,9 @@ trait ConfirmationController extends BaseController {
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        paymentRedirect <- requestPaymentsUrl(fees)
+        paymentsRedirect <- requestPaymentsUrl(fees)
       } yield fees match {
-        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentRedirect.url))
+        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
       }
     }

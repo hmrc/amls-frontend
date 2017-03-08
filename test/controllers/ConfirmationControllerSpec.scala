@@ -62,6 +62,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     )
 
     protected val mockCacheMap = mock[CacheMap]
+    val paymentCookie = Cookie("test", "test-value")
 
     reset(paymentsConnector)
 
@@ -72,7 +73,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
-    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(Cookie("test", "test-value")))))
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
     val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
 
@@ -106,7 +107,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
 
-      cookies(result) must contain(Cookie("test", "test-value"))
+      cookies(result) must contain(paymentCookie)
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
@@ -123,6 +124,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
