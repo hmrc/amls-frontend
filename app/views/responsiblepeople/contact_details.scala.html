@@ -3,15 +3,15 @@
 @import include.forms2._
 @import models.aboutthebusiness._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromYourAnswers: Boolean = false)(implicit request: Request[_],m:Messages, lang:Lang)
+@(f: Form2[_], edit: Boolean, index: Int, fromYourAnswers: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang:Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.contact_details.title", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.contact_details.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.contact_details.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.contact_details.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 

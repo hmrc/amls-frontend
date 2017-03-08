@@ -67,4 +67,6 @@ object ControllerHelper {
       case _ =>  false
     }
   }
+
+  def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 }

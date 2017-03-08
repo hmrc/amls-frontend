@@ -2,14 +2,14 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{SaRegisteredYes, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, SaRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,7 +34,13 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
 
   "RegisteredForSelfAssessmentController" must {
 
-      "use correct services" in new Fixture {
+    val pageTitle = Messages("responsiblepeople.registeredforselfassessment.title", "firstname lastname") + " - " +
+      Messages("summary.responsiblepeople") + " - " +
+      Messages("title.amls") + " - " + Messages("title.gov")
+    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+
+    "use correct services" in new Fixture {
         RegisteredForSelfAssessmentController.authConnector must be(AMLSAuthConnector)
         RegisteredForSelfAssessmentController.dataCacheConnector must be(DataCacheConnector)
       }
@@ -43,18 +49,21 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
 
       "load the page" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.registeredforselfassessment.title"))
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
       }
     }
 
     "on get display the page with pre populated data" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(saRegistered = Some(SaRegisteredYes("0123456789")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, saRegistered = Some(SaRegisteredYes("0123456789")))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       contentAsString(result) must include ("0123456789")
     }
 
@@ -79,11 +88,14 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
       val newRequest = request.withFormUrlEncodedBody(
         "saRegistered" -> "test"
       )
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document  = Jsoup.parse(contentAsString(result))
+      document.title must be(pageTitle)
       document.select("span").html() must include(Messages("error.required.sa.registration"))
     }
 

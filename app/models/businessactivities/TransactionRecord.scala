@@ -40,7 +40,7 @@ object TransactionRecord {
   val softwareNameType =  notEmptyStrip andThen
                           notEmpty.withMessage("error.required.ba.software.package.name") andThen
                           maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
-                          basicPunctuationPattern
+                          basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, TransactionRecord] =
     From[UrlFormEncoded] { __ =>

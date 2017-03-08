@@ -60,7 +60,7 @@ object RoleWithinBusinessRelease7 {
   val otherDetailsType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.declaration.specify.role") andThen
     maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =
     From[UrlFormEncoded] { readerURLFormEncoded =>

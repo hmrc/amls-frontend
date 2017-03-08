@@ -21,7 +21,7 @@ object BusinessUseAnIPSP {
   private val nameType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.msb.ipsp.name") andThen
     maxLength(maxNameTypeLength).withMessage("error.invalid.maxlength.140") andThen
-    basicPunctuationPattern
+    basicPunctuationPattern()
 
   private val referenceType = notEmptyStrip andThen
     notEmpty.withMessage("error.invalid.mlr.number") andThen referenceNumberRule()

@@ -174,7 +174,7 @@ $(function () {
   $('body').on('keypress','[role="button"]', function(e) {
     if ((e.which === 13) || (e.which === 32)) {
       e.preventDefault();
-      $(this).trigger('click');
+      this.click();
     }
   });
 

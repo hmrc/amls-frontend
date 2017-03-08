@@ -18,7 +18,7 @@ object TypeOfBusiness{
     val maxTypeOfBusinessLength = 40
     val typeOfBusinessLength = maxWithMsg(maxTypeOfBusinessLength, "error.max.length.bm.businesstype.type")
     val typeOfBusinessRequired = required("error.required.bm.businesstype.type")
-    val typeOfBusinessType = notEmptyStrip andThen typeOfBusinessRequired andThen typeOfBusinessLength andThen basicPunctuationPattern
+    val typeOfBusinessType = notEmptyStrip andThen typeOfBusinessRequired andThen typeOfBusinessLength andThen basicPunctuationPattern()
 
     (__ \ "typeOfBusiness").read(typeOfBusinessType) map TypeOfBusiness.apply
   }

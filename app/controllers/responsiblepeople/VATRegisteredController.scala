@@ -4,8 +4,8 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.{VATRegistered, ResponsiblePeople}
-import utils.RepeatingSection
+import models.responsiblepeople.{ResponsiblePeople, VATRegistered}
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
@@ -18,10 +18,10 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(_, _, _, _, _, _, Some(vat), _, _, _, _, _, _, _)) => Ok(vat_registered(Form2[VATRegistered](vat),
-            edit, index, fromDeclaration))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _)) => Ok(vat_registered(EmptyForm,
-            edit, index, fromDeclaration))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, Some(vat), _, _, _, _, _, _, _)) => Ok(vat_registered(Form2[VATRegistered](vat),
+            edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)) => Ok(vat_registered(EmptyForm,
+            edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }
     }
@@ -31,7 +31,9 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
       implicit authContext => implicit request =>
         Form2[VATRegistered](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(vat_registered(f, edit, index, fromDeclaration)))
+            getData[ResponsiblePeople](index) map {rp =>
+              BadRequest(vat_registered(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>

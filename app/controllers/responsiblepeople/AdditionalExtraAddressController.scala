@@ -3,12 +3,12 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.Empty
-import models.responsiblepeople.{ResponsiblePersonAddressHistory, ResponsiblePeople, PersonAddressUK, ResponsiblePersonAddress}
+import models.responsiblepeople.{PersonAddressUK, ResponsiblePeople, ResponsiblePersonAddress, ResponsiblePersonAddressHistory}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_extra_address
 
 import scala.concurrent.Future
@@ -23,10 +23,11 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _))
-          => Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, fromDeclaration))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration))
+          case Some(ResponsiblePeople(Some(personName), _, _,
+          Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _))
+          => Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -39,7 +40,9 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(additional_extra_address(f, edit, index, fromDeclaration)))
+            getData[ResponsiblePeople](index) map { rp =>
+              BadRequest(additional_extra_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) =>
             doUpdate(index, data).map { _ =>
               edit match {

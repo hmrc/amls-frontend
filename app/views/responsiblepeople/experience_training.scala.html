@@ -4,15 +4,15 @@
 @import models.businessmatching._
 
 
-@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.experiencetraining.title", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.experiencetraining.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.experiencetraining.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.experiencetraining.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
