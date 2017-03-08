@@ -18,49 +18,57 @@
   @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
 
     @fieldset(
-        f = f("receivePayments"),
+        f = f("receivePayments-fieldset"),
         legend = "hvd.receiving.title",
         legendHidden = true,
         panel = false
     ) {
-        @radio(
-            f = f("receivePayments"),
-            labelText = "lbl.yes",
-            value = "true",
-            inline = true,
-            target = s".paymentMethods-fieldset"
-        )
-        @radio(
-            f = f("receivePayments"),
-            labelText = "lbl.no",
-            value = "false",
-            inline = true
-        )
+        @errorGroup(
+            field = f("receivePayments")
+        ) {
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.yes",
+              value = "true",
+              inline = true,
+              target = s".paymentMethods-fieldset"
+          )
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.no",
+              value = "false",
+              inline = true
+          )
+        }
     }
 
     @fieldset(
-          f = f("paymentMethods"),
+          f = f("paymentMethods-fieldset"),
           legend = "hvd.receiving.expect.to.receive",
           legendHidden = true,
           classes = Seq("paymentMethods-fieldset"),
           hint = "lbl.select.all"
       ) {
-          @checkbox(
-            f = f("paymentMethods.courier"),
-            labelText = "hvd.receiving.option.01",
-            value = "true"
-          )
-          @checkbox(
-            f = f("paymentMethods.direct"),
-            labelText = "hvd.receiving.option.02",
-            value = "true"
-          )
-          @checkbox(
-            f = f("paymentMethods.other"),
-            labelText = "hvd.receiving.option.03",
-            value = "true",
-            target = s".receive-payments-other-fieldset"
-          )
+        @errorGroup(
+            field = f("paymentMethods")
+        ) {
+            @checkbox(
+                f = f("paymentMethods.courier"),
+                labelText = "hvd.receiving.option.01",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.direct"),
+                labelText = "hvd.receiving.option.02",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.other"),
+                labelText = "hvd.receiving.option.03",
+                value = "true",
+                target = s".receive-payments-other-fieldset"
+            )
+        }
     }
 
     @fieldset(
@@ -72,6 +80,7 @@
         f = f("paymentMethods-details-fieldset")
     ) {
         @panel(
+            field = Some(f("paymentMethods-details")),
             jsHidden = false
         ) {
             @input(

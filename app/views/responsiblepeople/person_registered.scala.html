@@ -28,22 +28,26 @@
         }
 
         @fieldset(
-            f = f("registerAnotherPerson"),
+            f = f("registerAnotherPerson-fieldset"),
             legend = "responsiblepeople.want.to.register.another.person",
             panel = false
         ) {
-            @radio(
-                f = f("registerAnotherPerson"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("registerAnotherPerson"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("registerAnotherPerson")
+            ) {
+                @radio(
+                    f = f("registerAnotherPerson"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("registerAnotherPerson"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit()

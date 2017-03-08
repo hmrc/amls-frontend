@@ -33,24 +33,28 @@
         )
 
         @fieldset(
-            f = f("isUK"),
+            f = f("isUK-fieldset"),
             legend = "bankdetails.bankaccount.accounttype",
             panel = false
         ) {
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s"#$target"
-            )
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true,
-                target = s"#$target1"
-            )
+            @errorGroup(
+                field = f("isUK")
+            ) {
+                @radio(
+                    f = f("isUK"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s"#$target"
+                )
+                @radio(
+                    f = f("isUK"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true,
+                    target = s"#$target1"
+                )
+            }
         }
 
         @panel(
