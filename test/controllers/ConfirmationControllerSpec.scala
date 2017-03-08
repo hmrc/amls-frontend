@@ -12,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
@@ -71,7 +72,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
-    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(Cookie("test", "test-value")))))
 
     val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
 
@@ -105,6 +106,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
 
+      cookies(result) must contain(Cookie("test", "test-value"))
+
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
@@ -133,6 +136,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any())
+
+//      cookies(result) must contain("some cookie value")
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }

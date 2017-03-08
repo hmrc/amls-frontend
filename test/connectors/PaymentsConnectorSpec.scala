@@ -8,6 +8,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{Cookie, Cookies}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
@@ -50,15 +51,19 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
       "given valid payment details" in new TestFixture {
 
+        val cookies = Seq(Cookie("test", "some_value"))
+
         createResponse { () =>
-          Future.successful(HttpResponse(CREATED, responseHeaders = Map("Location" -> Seq("http://localhost:9050/pay-online/card-selection"))))
+          Future.successful(HttpResponse(CREATED, responseHeaders = Map(
+            "Location" -> Seq("http://localhost:9050/pay-online/card-selection"),
+            "Set-Cookie" -> Seq(Cookies.encodeSetCookieHeader(cookies)))))
         }
 
         val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
 
         val result = await(connector.requestPaymentRedirectUrl(model))
 
-        result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection"))
+        result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection", cookies))
 
         verify(http).POST(any(), any(), any())(any(), any(), any())
 

@@ -1,3 +1,5 @@
 package models.payments
 
-case class PaymentServiceRedirect(url: String)
+import play.api.mvc.Cookie
+
+case class PaymentServiceRedirect(url: String, responseCookies: Seq[Cookie] = Seq.empty)
