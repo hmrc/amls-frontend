@@ -11,8 +11,8 @@ import utils.MappingUtils.Implicits._
 case class YourTradingPremises(
                                 tradingName: String,
                                 tradingPremisesAddress: Address,
-                                isResidential: Boolean,
-                                startDate: LocalDate,
+                                isResidential: Option[Boolean],
+                                startDate: Option[LocalDate],
                                 tradingNameChangeDate: Option[DateOfChange] = None
                               )
 
@@ -30,8 +30,8 @@ object YourTradingPremises {
     (
       (__ \ "tradingName").read[String] and
         __.read[Address] and
-        (__ \ "isResidential").read[Boolean] and
-        (__ \ "startDate").read[LocalDate] and
+        (__ \ "isResidential").readNullable[Boolean] and
+        (__ \ "startDate").readNullable[LocalDate] and
         (__ \ "tradingNameChangeDate").readNullable[DateOfChange]
       ) (YourTradingPremises.apply _)
   }
@@ -42,8 +42,8 @@ object YourTradingPremises {
     (
       (__ \ "tradingName").write[String] and
         __.write[Address] and
-        (__ \ "isResidential").write[Boolean] and
-        (__ \ "startDate").write[LocalDate] and
+        (__ \ "isResidential").writeNullable[Boolean] and
+        (__ \ "startDate").writeNullable[LocalDate] and
         (__ \ "tradingNameChangeDate").writeNullable[DateOfChange]
       ) (unlift(YourTradingPremises.unapply))
   }
@@ -55,15 +55,11 @@ object YourTradingPremises {
       (
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
-          (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address") ~
-          (__ \ "startDate").read(localDateRule)
-        ) ((tradingName: String, address: Address, isResidential: Boolean, startDate: LocalDate) =>
-        YourTradingPremises(tradingName, address, isResidential, startDate))
+          (__ \ "isResidential").read[Option[Boolean]] ~
+          (__ \ "startDate").read(optionR(localDateRule)) ~
+          (__ \ "tradingNameChangeDate").read[Option[DateOfChange]]
+        ) (YourTradingPremises.apply)
     }
-
-  def unapplyWithoutDateOfChange(data: YourTradingPremises) = {
-    Some((data.tradingName, data.tradingPremisesAddress,data.isResidential, data.startDate))
-  }
 
   implicit val formW: Write[YourTradingPremises, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -73,9 +69,10 @@ object YourTradingPremises {
       (
         (__ \ "tradingName").write[String] ~
           __.write[Address] ~
-          (__ \ "isResidential").write[Boolean] ~
-          (__ \ "startDate").write(localDateWrite)
-        ) (unlift(YourTradingPremises.unapplyWithoutDateOfChange))
+          (__ \ "isResidential").write[Option[Boolean]] ~
+          (__ \ "startDate").write(optionW(localDateWrite)) ~
+          (__ \ "tradingNameChangeDate").write[Option[DateOfChange]]
+        ) (unlift(YourTradingPremises.unapply))
     }
 
   implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {

@@ -29,8 +29,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       None,
       "AA03 5BB"
     ),
-    true,
-    new LocalDate(1990, 2, 24)
+    Some(true),
+    Some(new LocalDate(1990, 2, 24))
   )
 
   "YourTradingPremises" must {
