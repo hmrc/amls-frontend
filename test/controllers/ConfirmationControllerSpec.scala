@@ -140,7 +140,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any())
 
-//      cookies(result) must contain("some cookie value")
+      cookies(result) must contain(paymentCookie)
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }

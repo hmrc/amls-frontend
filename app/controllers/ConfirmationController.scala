@@ -62,7 +62,7 @@ trait ConfirmationController extends BaseController {
         (paymentRef, total, rows) <- submissionService.getSubscription
         paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)))
       } yield {
-        Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsRedirect.url))
+        Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
       }
     }
   }
