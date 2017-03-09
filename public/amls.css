@@ -507,9 +507,11 @@ select {
 
 .amls-error-summary li,
 .form-field--error span.error-notification  {
-    font-weight: bold;
-.amls-error-summary li {
   font-weight: bold;
+}
+
+.form-field--error span.error-notification {
+  font-size: 19px;
 }
 
 .error-notification,
@@ -526,10 +528,6 @@ select {
 .form-field--error:after {
   content: '';
   display: table;
-}
-
-.form-field--error span.error-notification {
-  font-size: 19px;
 }
 
 .form-field--error:after {
