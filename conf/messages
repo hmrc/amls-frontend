@@ -563,6 +563,8 @@ confirmation.variation.title = You’ve submitted your updated information
 confirmation.variation.lede = You’ve submitted your updated information
 confirmation.variation.summary = This shows your total fees for each item.
 
+confirmation.payment.title = You’ve submitted and paid
+
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
