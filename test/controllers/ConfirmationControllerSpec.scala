@@ -139,12 +139,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     "query the payments service for the payments url for a new submission" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReady))
+      .thenReturn(Future.successful(SubmissionReady))
+
+      val paymentsRedirectUrl = controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).absoluteURL(request.secure, request.host)
 
       val result = controller.get()(request)
       val body = contentAsString(result)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, paymentsRedirectUrl)))(any(), any())
 
       cookies(result) must contain(paymentCookie)
 

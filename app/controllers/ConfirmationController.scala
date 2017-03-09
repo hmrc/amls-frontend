@@ -55,7 +55,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionReadyForReview => {
       for {
         fees <- getAmendmentFees
-        paymentsRedirect <- requestPaymentsUrl(fees)
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
@@ -64,7 +64,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        paymentsRedirect <- requestPaymentsUrl(fees)
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
@@ -73,21 +73,21 @@ trait ConfirmationController extends BaseController {
     case _ => {
       for {
         (paymentRef, total, rows) <- submissionService.getSubscription
-        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)))
+        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).absoluteURL())
       } yield {
         Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
       }
     }
   }
 
-  private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] = data match {
-    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
-    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total)
+  private def requestPaymentsUrl(data: Option[ViewData], returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] = data match {
+    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl)
+    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total, returnUrl)
     case _ => Future.successful(PaymentServiceRedirect(ApplicationConfig.paymentsUrl))
   }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] =
-    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, controllers.routes.LandingController.get().absoluteURL())) map {
+  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] =
+    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, returnUrl)) map {
       case Some(redirect) => redirect
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
