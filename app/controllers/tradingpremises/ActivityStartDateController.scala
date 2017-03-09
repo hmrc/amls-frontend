@@ -17,7 +17,6 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
                                             val authConnector: AuthConnector,
                                             val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
-
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -25,14 +24,13 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
         getData[TradingPremises](index) map {
           case Some(tp) => {
             val form = tp.yourTradingPremises match {
-              case Some(data) => println("======================"+data);Form2[ActivityStartDate](ActivityStartDate(data.startDate.get))
-              case None => EmptyForm
+              case Some(YourTradingPremises(_,_,_,Some(date),_)) => Form2[ActivityStartDate](ActivityStartDate(date))
+              case _ => EmptyForm
             }
             Ok(views.html.tradingpremises.activity_start_date(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
-
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
