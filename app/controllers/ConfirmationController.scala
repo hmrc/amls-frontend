@@ -1,7 +1,8 @@
 package controllers
 
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
@@ -22,6 +23,8 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
+  private[controllers] val dataCacheConnector: DataCacheConnector
+
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PaymentsConnector]
 
   val statusService: StatusService
@@ -40,7 +43,12 @@ trait ConfirmationController extends BaseController {
 
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(payment_confirmation("", reference)))
+        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+          case Some(bm) if bm.reviewDetails.isDefined =>
+            Ok(payment_confirmation(bm.reviewDetails.get.businessName, reference))
+          case _ =>
+            Ok(payment_confirmation("", reference))
+        }
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {
@@ -118,4 +126,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val submissionService = SubmissionService
   override val statusService: StatusService = StatusService
   override private[controllers] val keystoreConnector = KeystoreConnector
+  override private[controllers] val dataCacheConnector = DataCacheConnector
 }
