@@ -18,24 +18,28 @@
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
         @fieldset(
+            f = f("useAnIPSP-fieldset"),
             legend = "msb.ipsp.text",
-            f = f("useAnIPSP"),
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("useAnIPSP"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#${f("name").id}-fieldset",
-                inline = true
-            )
-            @radio(
-                f = f("useAnIPSP"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("useAnIPSP")
+            ) {
+                @radio(
+                    f = f("useAnIPSP"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#${f("name").id}-fieldset",
+                    inline = true
+                )
+                @radio(
+                    f = f("useAnIPSP"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(

@@ -16,23 +16,27 @@
     @form(f, controllers.msb.routes.SendMoneyToOtherCountryController.post(edit)) {
 
         @fieldset(
-            f = f("money"),
+            f = f("money-fieldset"),
             legend = "msb.send.money.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("money"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("money"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("money")
+            ) {
+                @radio(
+                    f = f("money"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("money"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit(edit)

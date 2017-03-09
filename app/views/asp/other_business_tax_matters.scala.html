@@ -18,23 +18,27 @@
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
         @fieldset(
-            f = f("otherBusinessTaxMatters"),
+            f = f("otherBusinessTaxMatters-fieldset"),
             legend = "asp.other.business.tax.matters.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("otherBusinessTaxMatters"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("otherBusinessTaxMatters"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("otherBusinessTaxMatters")
+            ) {
+                @radio(
+                    f = f("otherBusinessTaxMatters"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("otherBusinessTaxMatters"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit(edit)

@@ -26,13 +26,28 @@
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, fromDeclaration)) {
 
         @fieldset(
-            f = f("experienceTraining"),
+            f = f("experienceTraining-fieldset"),
             legend = "responsiblepeople.experiencetraining.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(f("experienceTraining"), "lbl.yes", "true", target = ".more-information", inline=true)
-            @radio(f("experienceTraining"), "lbl.no", "false", inline=true)
+            @errorGroup(
+                field = f("experienceTraining")
+            ) {
+                @radio(
+                    f("experienceTraining"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = ".more-information",
+                    inline = true
+                )
+                @radio(
+                    f = f("experienceTraining"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(

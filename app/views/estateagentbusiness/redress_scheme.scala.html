@@ -20,52 +20,60 @@
         </span>
 
         @fieldset(
-            f = f("isRedress"),
+            f = f("isRedress-fieldset"),
             legend = "estateagentbusiness.registered.redress.title",
             panel = false,
             legendHidden = true
         ) {
-            @radio(
-                f = f("isRedress"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s".propertyRedress-fieldset"
-            )
-            @radio(
-                f = f("isRedress"),
-                labelText = "lbl.no",
-                inline = true,
-                value = "false"
-            )
+            @errorGroup(
+                field = f("isRedress")
+            ) {
+                @radio(
+                    f = f("isRedress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".propertyRedress-fieldset"
+                )
+                @radio(
+                    f = f("isRedress"),
+                    labelText = "lbl.no",
+                    inline = true,
+                    value = "false"
+                )
+            }
         }
 
         @fieldset(
+            f = f("propertyRedressScheme-fieldset"),
             legend = "estateagentbusiness.which.redress.scheme.lbl",
-            classes = Seq("propertyRedress-fieldset"),
-            f = f("propertyRedressScheme")
+            classes = Seq("propertyRedress-fieldset")
         ) {
-            @radio(
-                f = f("propertyRedressScheme"),
-                labelText = "estateagentbusiness.redress.lbl.01",
-                value = "01"
-            )
-            @radio(
-                f = f("propertyRedressScheme"),
-                labelText = "estateagentbusiness.redress.lbl.02",
-                value = "02"
-            )
-            @radio(
-                f = f("propertyRedressScheme"),
-                labelText = "estateagentbusiness.redress.lbl.03",
-                value = "03"
-            )
-            @radio(
-                f = f("propertyRedressScheme"),
-                labelText = "estateagentbusiness.redress.lbl.04",
-                value = "04",
-                target = s".other-fieldset"
-            )
+            @errorGroup(
+                field = f("propertyRedressScheme")
+            ) {
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.04",
+                    value = "04",
+                    target = s".other-fieldset"
+                )
+            }
         }
 
         @fieldset(

@@ -18,29 +18,34 @@
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 
         @fieldset(
-            f = f("acceptedAnyPayment"),
+            f = f("acceptedAnyPayment-fieldset"),
             legend = "hvd.cash.payment.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("acceptedAnyPayment"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s"#paymentDate-fieldset"
-            )
-            @radio(
-                f = f("acceptedAnyPayment"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("acceptedAnyPayment")
+            ) {
+                @radio(
+                    f = f("acceptedAnyPayment"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".paymentDate-fieldset"
+                )
+                @radio(
+                    f = f("acceptedAnyPayment"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @panel(
             jsHidden = true,
-            field = Some(f("paymentDate-fieldset"))
+            field = Some(f("paymentDate-fieldset")),
+            classes = Seq("paymentDate-fieldset")
         ) {
             @date(
                 f = f,

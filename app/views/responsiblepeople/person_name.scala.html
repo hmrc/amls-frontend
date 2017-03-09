@@ -20,7 +20,7 @@
             legend = "responsiblepeople.personName.title",
             legendHidden = true,
             jsHidden = false,
-            f = f("redundantvalue")
+            f = f("personname-fieldset")
         ) {
 
             @input(
@@ -41,37 +41,44 @@
 
         <div class="form-group">
         @fieldset(
-            f = f("hasPreviousName"),
+            f = f("hasPreviousName-fieldset"),
             legend = "responsiblepeople.personName.isknownbyothernames",
             panel=false
         ) {
-            @radio(
-                f = f("hasPreviousName"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = "#previous-panel",
-                inline = true
-            )
-            @radio(
-                f = f("hasPreviousName"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("hasPreviousName")
+            ) {
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = "#previous-panel",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @panel(
-            jsHidden = true,
-            field = Some(f("previous-panel"))
+            field = Some(f("previous-panel")),
+            panel = false,
+            jsHidden = true
         ) {
             @fieldset(
-                legend = "responsiblepeople.personName.isknownbyothernames",
                 f = f("previous-fieldset"),
+                legend = "responsiblepeople.personName.isknownbyothernames",
                 legendHidden = true,
-                panel = false,
-                classes = Seq("form-group")
+                panel = false
             ) {
-                @errorGroup(f("previous")) {
+                @errorGroup(
+                    f("previous"),
+                    classes = Seq("section")
+                ) {
                     @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
                     @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
                     @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
@@ -87,13 +94,28 @@
         </div>
 
         @fieldset(
-            f = f("hasOtherNames"),
+            f = f("hasOtherNames-fieldset"),
             legend = "responsiblepeople.personName.hasOtherNames",
             panel = false
 
         ) {
-            @radio(f("hasOtherNames"), "lbl.yes", "true", target = ".otherNames-fieldset", inline=true)
-            @radio(f("hasOtherNames"), "lbl.no", "false", inline=true)
+            @errorGroup(
+                field = f("hasOtherNames")
+            ) {
+                @radio(
+                    f = f("hasOtherNames"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = ".otherNames-fieldset",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasOtherNames"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(

@@ -18,14 +18,18 @@
     @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
 
         @fieldset(
+            f = f("mostTransactionsCountries-fieldset"),
             legend = "msb.most.transactions.list.countries",
-            f = f("mostTransactionsCountries"),
             legendHidden = true,
             panel = false
         ) {
-            @country(f("mostTransactionsCountries[0]"))
-            @country(f("mostTransactionsCountries[1]"))
-            @country(f("mostTransactionsCountries[2]"))
+            @errorGroup(
+                field = f("mostTransactionsCountries")
+            ) {
+                @country(f("mostTransactionsCountries[0]"))
+                @country(f("mostTransactionsCountries[1]"))
+                @country(f("mostTransactionsCountries[2]"))
+            }
         }
         @submit(edit)
     }

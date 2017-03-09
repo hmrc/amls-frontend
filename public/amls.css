@@ -505,10 +505,14 @@ select {
   border: 4px solid #b10e1e;
 }
 
+.amls-error-summary li,
+.form-field--error span.error-notification  {
+    font-weight: bold;
 .amls-error-summary li {
   font-weight: bold;
 }
 
+.error-notification,
 .amls-error-summary li > a {
   color: #b10e1e;
 }
@@ -518,9 +522,22 @@ select {
   border-left-width: 4px;
 }
 
+.form-field--error:before,
+.form-field--error:after {
+  content: '';
+  display: table;
+}
+
 .form-field--error span.error-notification {
   font-size: 19px;
-  font-weight: bold;
+}
+
+.form-field--error:after {
+  clear: both;
+}
+
+.form-field--error {
+  *zoom: 1;
 }
 
 

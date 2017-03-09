@@ -18,16 +18,20 @@
     @form(f, controllers.tradingpremises.routes.BusinessStructureController.post(index, edit)) {
 
         @fieldset(
-            f = f("agentsBusinessStructure"),
+            f = f("agentsBusinessStructure-fieldset"),
             legend = "tradingpremises.businessStructure.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(f("agentsBusinessStructure"), "businessType.lbl.02", "02")
-            @radio(f("agentsBusinessStructure"), "businessType.lbl.01", "01")
-            @radio(f("agentsBusinessStructure"), "businessType.lbl.03", "03")
-            @radio(f("agentsBusinessStructure"), "businessType.lbl.04", "04")
-            @radio(f("agentsBusinessStructure"), "businessType.lbl.05", "05")
+            @errorGroup(
+                field = f("agentsBusinessStructure")
+            ) {
+                @radio(f("agentsBusinessStructure"), "businessType.lbl.02", "02")
+                @radio(f("agentsBusinessStructure"), "businessType.lbl.01", "01")
+                @radio(f("agentsBusinessStructure"), "businessType.lbl.03", "03")
+                @radio(f("agentsBusinessStructure"), "businessType.lbl.04", "04")
+                @radio(f("agentsBusinessStructure"), "businessType.lbl.05", "05")
+            }
         }
 
         @submit(false)

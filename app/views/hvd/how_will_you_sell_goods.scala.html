@@ -15,32 +15,34 @@
     heading = header
 ) {
 
-
     <span class="form-hint">@Messages("lbl.select.all")</span>
 
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
         @fieldset(
-            f = f("salesChannels"),
+            f = f("salesChannels-fieldset"),
             legend = "hvd.how-will-you-sell-goods.title",
             legendHidden = true,
             panel = false
         ) {
-
-            @checkbox(
-                f = f("salesChannels[]"),
-                labelText = "hvd.how-will-you-sell-goods.channels.auction",
-                value = "Auction"
-            )
-            @checkbox(
-                f = f("salesChannels[]"),
-                labelText = "hvd.how-will-you-sell-goods.channels.retail" ,
-                value = "Retail"
-            )
-            @checkbox(
-                f = f("salesChannels[]"),
-                labelText = "hvd.how-will-you-sell-goods.channels.wholesale" ,
-                value = "Wholesale"
-            )
+            @errorGroup(
+                field = f("salesChannels")
+            ) {
+                @checkbox(
+                    f = f("salesChannels[]"),
+                    labelText = "hvd.how-will-you-sell-goods.channels.auction",
+                    value = "Auction"
+                )
+                @checkbox(
+                    f = f("salesChannels[]"),
+                    labelText = "hvd.how-will-you-sell-goods.channels.retail" ,
+                    value = "Retail"
+                )
+                @checkbox(
+                    f = f("salesChannels[]"),
+                    labelText = "hvd.how-will-you-sell-goods.channels.wholesale" ,
+                    value = "Wholesale"
+                )
+            }
         }
 
         @submit(edit)

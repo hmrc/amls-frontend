@@ -16,25 +16,30 @@
     @form(f, controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit, fromDeclaration)) {
 
         <div class="form-group">
-            @fieldset(f = f("isUKResidence"),
+            @fieldset(
+                f = f("isUKResidence-fieldset"),
                 legend = "responsiblepeople.person.a.resident.title",
                 legendHidden = true,
-                panel = false) {
-
-                @radio(
-                    f = f("isUKResidence"),
-                    labelText = "lbl.yes",
-                    venue = "true",
-                    target = ".ukResident-fieldset",
-                    inline = true
-                )
-                @radio(
-                    f = f("isUKResidence"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    target = ".nonUkResident-fieldset",
-                    inline = true
-                )
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("isUKResidence")
+                ) {
+                    @radio(
+                        f = f("isUKResidence"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        target = ".ukResident-fieldset",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("isUKResidence"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        target = ".nonUkResident-fieldset",
+                        inline = true
+                    )
+                }
             }
 
             @panel(
@@ -54,54 +59,64 @@
                 jsHidden = true,
                 classes = Seq("nonUkResident-fieldset")
             ) {
-
                 @fieldset(
-                    f = f("passportType"),
+                    f = f("passportType-fieldset"),
                     legend = "responsiblepeople.passporttype.lbl",
+                    classes = Seq("form-field-group"), // :-/
                     panel = false
                 ) {
-                    @radio(
-                        f = f("passportType"),
-                        labelText = "responsiblepeople.uk.passport.lbl",
-                        value = "01",
-                        target = ".ukPassportNumber-fieldset"
-                    )
-                    @panel(
-                        jsHidden = true,
-                        classes = Seq("ukPassportNumber-fieldset")
+                    @errorGroup(
+                        field = f("passportType")
                     ) {
-                        @input(
-                            field = f("ukPassportNumber"),
-                            labelText = "lbl.passport.number",
-                            hintText = "hint.9.digits",
-                            bold = false
+                        @radio(
+                            f = f("passportType"),
+                            labelText = "responsiblepeople.uk.passport.lbl",
+                            value = "01",
+                            target = ".ukPassportNumber-fieldset"
+                        )
+
+                        @panel(
+                            jsHidden = true,
+                            classes = Seq("ukPassportNumber-fieldset")
+                        ) {
+                            @input( // we know this one is just digits…
+                                field = f("ukPassportNumber"),
+                                labelText = "lbl.passport.number",
+                                hintText = "hint.9.digits",
+                                attrMaxlength = "9",
+                                attrMin = "0",
+                                attrPattern = "[0-9]{1,9}",
+                                attrStep = "1",
+                                bold = false
+                            )
+                        }
+
+                        @radio(
+                            f = f("passportType"),
+                            labelText = "responsiblepeople.non.uk.passport.lbl",
+                            value = "02",
+                            target = ".nonUKPassportNumber-fieldset"
+                        )
+
+                        @panel(
+                            jsHidden = true,
+                            classes = Seq("nonUKPassportNumber-fieldset")
+                        ) {
+                            @input( // …but international passports are all kinds of things
+                                field = f("nonUKPassportNumber"),
+                                labelText = "lbl.passport.number",
+                                bold = false
+                            )
+                        }
+
+                        @radio(
+                            f = f("passportType"),
+                            labelText = "responsiblepeople.no.passport.lbl",
+                            value = "03"
                         )
                     }
-
-                    @radio(
-                        f = f("passportType"),
-                        labelText = "responsiblepeople.non.uk.passport.lbl",
-                        value = "02",
-                        target = ".nonUKPassportNumber-fieldset"
-                    )
-
-                    @panel(
-                        jsHidden = true,
-                        classes = Seq("nonUKPassportNumber-fieldset")
-                    ) {
-                        @input(
-                            field = f("nonUKPassportNumber"),
-                            labelText = "lbl.passport.number",
-                            bold = false
-                        )
-                    }
-
-                    @radio(
-                        f = f("passportType"),
-                        labelText = "responsiblepeople.no.passport.lbl",
-                        value = "03"
-                    )
                 }
+
                 @date(
                     f = f,
                     p = "dateOfBirth",
@@ -110,7 +125,6 @@
                     example = false,
                     jsHidden = true
                 )
-
             }
         </div>
 

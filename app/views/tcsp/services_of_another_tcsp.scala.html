@@ -22,26 +22,28 @@
     @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
         @fieldset(
+            f = f("servicesOfAnotherTCSP-fieldset"),
             legend = "tcsp.servicesOfAnotherTcsp.title",
             legendHidden = true,
-            f = f("servicesOfAnotherTCSP"),
             panel = false
         ) {
-
-            @radio(
-                f = f("servicesOfAnotherTCSP"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("servicesOfAnotherTCSP"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-
+            @errorGroup(
+                field = f("servicesOfAnotherTCSP")
+            ) {
+                @radio(
+                    f = f("servicesOfAnotherTCSP"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("servicesOfAnotherTCSP"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(
