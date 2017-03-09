@@ -12,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
@@ -61,6 +62,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     )
 
     protected val mockCacheMap = mock[CacheMap]
+    val paymentCookie = Cookie("test", "test-value")
 
     reset(paymentsConnector)
 
@@ -71,7 +73,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
-    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
     val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
 
@@ -105,6 +107,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
 
+      cookies(result) must contain(paymentCookie)
+
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
@@ -120,6 +124,23 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
+    "query the payments service for the payments url for a new submission" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
