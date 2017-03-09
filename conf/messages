@@ -564,6 +564,7 @@ confirmation.variation.lede = You’ve submitted your updated information
 confirmation.variation.summary = This shows your total fees for each item.
 
 confirmation.payment.title = You’ve submitted and paid
+confirmation.payment.lede = You’ve submitted and paid
 
 
 ############################### Individual pages ###############################
