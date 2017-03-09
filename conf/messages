@@ -12,15 +12,8 @@
 ##################################       Generic Error Messages     ####################################################
 ########################################################################################################################
 
-err.titleNotEntered.first_name = Enter the first name
-err.titleNotEntered.last_name = Enter the last name
-err.invalidLength = invalid length
-err.required = Please enter an item
-err.invalid = Please enter a valid item
-err.notrequired = No item should be entered
-err.invalidLength = invalid length
+
 err.summary = There is a problem
-err.pleasespecify = Please specify
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 
 error.required.address.line1 = Enter the first line of the address
@@ -30,8 +23,8 @@ error.invalid.postcode = Enter a valid postcode
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.country.name = Enter at least one country.
-error.required.nationality = Select the nationality of the responsible person.
-error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+error.required.nationality = Select one or more options to show this person’s nationality
+error.required.uk.or.overseas = Select yes if this is a UK address
 
 error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.
@@ -59,13 +52,13 @@ error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’
 
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
-error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
+error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
-error.required.rp.nominated_officer = Select yes or not to the question: Is this person the nominated officer for the business?
+error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
 
 error.not-found.title = Not Found
 error.not-found.heading = Item not found
-error.not-found.message = Please check that you have entered the correct web address.
+error.not-found.message = Check that you’ve entered the correct web address
 
 error.invalid.maxlength.40 = You can’t enter more than 40 characters
 error.invalid.maxlength.120 = You can’t enter more than 120 characters
@@ -73,7 +66,7 @@ error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
-error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
+error.survey.satisfaction.required = Select one option to show how you feel about using the service
 
 error.required.phone.number = Enter a contact phone number
 err.invalid.phone.number = Enter a valid contact phone number
@@ -90,24 +83,25 @@ error.invalid.mlr.number = Enter a valid Money Laundering Regulation registratio
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
-error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
+error.required.bm.businesstype.type = Enter your type of business.
+error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
 
 ###############################  About the Business ###############################
-error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
-error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
-error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
-error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
-error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
+error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
+error.required.atb.confirm.office = Select yes if this is the address of your registered office
+error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
+error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
-error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
+error.required.rightaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
-error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
+error.bankdetails.accounttype = Select one option to show what kind of account your business uses
 error.bankdetails.accountname = Enter a bank account name
 error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
-error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
+error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter the account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
@@ -120,38 +114,39 @@ error.invalid.bankdetails.account = Enter a valid account number
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
 error.max.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
-error.required.bankdetails.register.another.bank = Select yes or no to the question: do you want to register another bank account?
+error.required.bankdetails.register.another.bank = Select yes if you want to register another bank account
 
 ###############################  Business Activities ###############################
-error.required.ba.involved.in.other = Select yes or no to the question: is your business involved in any other activities?
+error.required.ba.involved.in.other = Select yes if your business is involved in other activities
 error.required.ba.involved.in.other.text = Give details of the other activities your business is involved in
 error.invalid.ba.involved.in.other.text = You can’t enter more than 255 characters
-error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
-error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
-error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
+error.required.ba.business.turnover = Select one option to show how much net profit your business expects in the next 12 months
+error.required.ba.turnover.from.mlr = Select one option to show how much net profit your business expects in the next 12 months from activities covered by the Money Laundering Regulations
+error.required.ba.is.your.franchise = Select yes if your business is a franchise
 error.required.ba.franchise.name = Enter the franchisor’s name
 error.max.length.ba.franchise.name = You can’t enter more than 140 characters for the franchisor’s name.
 error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
 error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
 error.max.length.ba.employee.count = You can’t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
-error.required.ba.select.country = Select yes or no to the question: do you have customers who live or work outside of the UK?
+error.required.ba.select.country = Select yes if you have customers who live or work outside the UK
 error.invalid.ba.select.country = Enter at least one country.
-error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
-error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
-error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
-error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
-error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a documented risk assessment policy and procedure?
-error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
-error.required.ba.business.use.accountant = Select yes or no to the question: does your business receive advice on Money Laundering Regulations and due diligence?
-error.required.ba.suspicious.activity = Select yes or no to the question: does your business have written guidance for staff on how to identify and report suspicious activity?
-error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+error.required.ba.select.transaction.record = Select yes if you keep records of all your transaction with customers
+error.required.ba.atleast.one.transaction.record = Select one or more options to show how you record transactions
+error.required.ba.software.package.name = Enter the name of the software package.
+error.max.length.ba.software.package.name = You can’t enter more than 40 characters for the names of the software packages.
+error.required.ba.select.nca = Select yes if your business is registered online with the National Crime Agency
+error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
+error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
+error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
+error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
+error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 error.required.ba.advisor.name = Enter your professional adviser’s name
 
 ###############################  Trading premises ###############################
-error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises
-error.required.tp.trading.name = Enter the trading name you use for this premises
-error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name
+error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
+error.required.tp.trading.name = Enter a trading name
+error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
@@ -160,112 +155,111 @@ error.required.tp.month = Enter a month.
 error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
 error.required.tp.year = Enter a year.
 error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
-error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
-error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
+error.required.tp.residential.address = Select yes if this is also a residential address
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
 error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
-error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
-error.required.tp.select.business.structure = Select one option: what is your agent’s business structure?
-error.required.tp.agent.premises = Select yes or no to the question: Are you registering an agent’s premises?
+error.required.tp.select.business.structure = Select one option to show your agent’s business structure
+error.required.tp.agent.premises = Select yes if you’re registering an agent’s premises
 error.required.tp.agent.registered.company.name = Enter your agent’s registered company name.
 error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters for the registered company name.
 error.required.tp.agent.name = Enter your agent’s name.
 error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
 error.required.tp.agent.partnership = Enter your agent’s partners.
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
-error.required.tp.register.another.premises = Select yes or no to the question: do you want to register another trading premises?
+error.required.tp.register.another.premises = Select yes if you want to register another trading premises
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 
 ###############################  Estate Agency Business ###############################
-error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
-error.required.eab.which.redress.scheme = Select which redress scheme.
+error.required.eab.redress.scheme = Select yes if the business is registered with a redress scheme
+error.required.eab.which.redress.scheme = Select one option to show the redress scheme the business is registered with
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
 error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters for the name of the redress scheme.
-error.required.eab.business.services = Select at least one service that your business provides.
-error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
-error.required.eab.info.about.penalty = Give a brief description of the penalty and when it occurred
-error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
+error.required.eab.business.services = Select one or more options to show the services your business provides
+error.required.eab.penalised.under.act = Select yes if the business, or anyone in it, have ever been penalised under the Estate Agents Act 1979
+error.required.eab.info.about.penalty = Enter some information about the penalty received.
+error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
-error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
-error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
+error.required.rp.is.uk.resident = Select yes if this person is a UK resident
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
-error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
-error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
+error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
+error.required.rp.register.another.person = Select yes if you want to register another responsible person
 error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
-error.required.rp.experiencetraining = Select yes or no to the question: Does this person have previous experience in these activities?
-error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience in these activities
-error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
-error.required.rp.training.information = Enter a brief description of this person's training
-error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?
+error.required.rp.experiencetraining = Select yes if this person has experience in these activities
+error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
+error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
+error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
-error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
+error.required.rp.isknownbyothernames = Select yes if this person is known by another name
 error.required.rp.otherfirstnames = Enter all other first names.
 error.required.rp.otherlastnames = Enter all other last names.
-error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
-error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
+error.required.rp.hasPreviousName = Select yes if this person has ever changed their name
+error.required.rp.hasOtherNames = Select yes if this person is known by another name
 error.required.rp.first_name = Enter the responsible person’s first name
 error.required.rp.last_name = Enter the responsible person’s last name
-error.rp.previous.invalid = Enter responsible person’s previous name
-error.required.rp.otherNames = Enter responsible person’s alternative name
+error.rp.previous.invalid = Enter the responsible person’s previous name
+error.required.rp.otherNames = Enter the responsible person’s alternative name
 error.invalid.length.otherNames = You can’t enter more than 140 characters for the alternative name.
-error.required.timeAtAddress = Select how long this person lived at this address.
-error.required.positionWithinBusiness = Select at least one position within the business.
-error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+error.required.timeAtAddress = Select one option to show how long this person lived at this address
+error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
+error.required.rp.wherepersonlives.howlonglived = Select one option to show how long this person lived at this address
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 
 ############################### Trust and company service providers ###############################
 
-error.required.tcsp.provided_services.services = Select at least one service that your business provides.
+error.required.tcsp.provided_services.services = Select one or more options to show the services your business provides
 error.required.tcsp.provided_services.details = Describe the services that your business provides
-error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
-error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
-error.required.tcsp.complex.corporate.structures = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
-error.required.tcsp.services.another.tcsp = Select yes or no to the question: does your business use the services of another Trust or Company Service Provider?
+error.required.tcsp.service.providers = Select one or more options to show the kind of Trust or Company Service Provider you are
+error.required.tcsp.off.the.shelf.companies = Select yes if you only sell off-the-shelf companies
+error.required.tcsp.complex.corporate.structures = Select yes if you create complex corporate structures for clients, or plan to
+error.required.tcsp.services.another.tcsp = Select yes if you use the services of another Trust or Company Service Provider
 
 ############################### Accountancy service provide ###############################
-error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
+error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other business’s tax matters
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
-error.required.asp.business.services = Select at least one service that your business provides.
+error.required.asp.business.services = Select one or more options to show the services your business provides
 
 ############################### Supervision ###############################
-error.required.supervision.supervisor = Enter the name of your last supervising body
+error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
-error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
+error.required.supervision.anotherbody = Select yes if your business has previously been registered with another supervising body
 error.invalid.supervision.supervisor = You can’t enter more than 140 characters
 error.invalid.supervision.reason = You can’t enter more than 255 characters
-error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
-error.required.supervision.one.professional.body = Select at least one professional body
-error.required.supervision.business.details = Enter the name of the professional body your business is a member of
+error.required.supervision.business.a.member = Select yes if your business is a member of a professional body
+error.required.supervision.one.professional.body = Select one or more options to show which professional bodies your business is a member of
+error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
 error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
 error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
-error.required.professionalbody.info.about.penalty = Give a brief description of the penalty and when it occurred
+error.required.professionalbody.info.about.penalty = Enter some information about the penalty received
 error.invalid.professionalbody.info.about.penalty = You can’t enter more than 255 characters
-error.required.professionalbody.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
+error.required.professionalbody.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select at least one service that your business provides.
-error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
-error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
-error.required.msb.ipsp.name = Enter your IPSP’s name
-error.required.msb.linked.txn = Select yes or no to the question: can your systems identify linked transactions?
-error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
+error.required.msb.services = Select one or more options to show the services your business provides
+error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
+error.required.msb.ipsp = Select yes if your business uses an IPSP
+error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
+error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
+error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
+error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
+error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
-error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
 error.invalid.msb.transactions.in.12months = Enter a valid number. It must be 11 characters long.
-error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
+error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
-error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
+error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
@@ -274,22 +268,22 @@ error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical for
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
-error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
-error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
-error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
-error.required.hvd.business.sell.other.details = Enter a description of what your business will sell
+error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €15,000 or more
+error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
+error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
+error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
-error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
-error.required.hvd.receive.cash.payments = Select yes or no to the question: do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
-error.required.hvd.describe = Enter details of how you expect to receive these payments
+error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €15,000 or more
+error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €15,000 from customers you’ve not met in person
+error.required.hvd.describe = Please describe how you expect to receive these payments.
 error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
-error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
-error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
+error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
+error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
-error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ’Someone else’
+error.required.declaration.who.is.registering = Select one option to show who is registering the business
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Specify your role in the business
@@ -1023,7 +1017,7 @@ responsiblepeople.personName.hasOtherNames = Is this person known by any other n
 responsiblepeople.personName.otherfirstnames = Previous first names
 responsiblepeople.personName.othermiddlenames = Previous middle names
 responsiblepeople.personName.otherlastnames = Previous last names
-responsiblepeople.personName.previous.date.lbl = When did the name legally change?
+responsiblepeople.personName.previous.date.lbl = When did their name legally change?
 responsiblepeople.personName.alternativeName = Alternative name
 responsiblepeople.registeredforselfassessment.title = Is {0} registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2015 HM Revenue & Customs
  *
@@ -15,9 +14,8 @@
  * limitations under the License.
  */
 
-
 a.block-link {
-    display: block;
+  display: block;
 }
 
 .flash .heading-medium {
@@ -26,6 +24,7 @@ a.block-link {
 }
 
 /* new-style page headers */
+
 .page-header {
   clear: both;
   display: table;
@@ -55,42 +54,48 @@ a.block-link {
   }
 }
 
+
 /* -- application progress page -- */
+
 .grid-layout {
-    table-layout: fixed;
+  table-layout: fixed;
 }
 
+
 /* -- Progress Step -- */
+
 .progress-steps {
-    margin-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .progress-steps li {
-    margin-bottom: 0;
-    margin-top: 12px;
+  margin-bottom: 0;
+  margin-top: 12px;
 }
 
 .progress-steps li:first-child,
 .progress-steps__amend li:first-child + li {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .progress-steps__amend li:first-child {
-    display: none;
-    visibility: hidden;
+  display: none;
+  visibility: hidden;
 }
+
 
 /* -- Progress Step: assets (tick & chevrons) -- */
+
 .progress-step--status,
 .no-svg .progress-step--status {
-    background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
-    background-position: 90%;
-    background-repeat: no-repeat;
-    background-size: 33%;
+  background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
+  background-position: 90%;
+  background-repeat: no-repeat;
+  background-size: 33%;
 }
 
 .no-svg .progress-step--status {
-    background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
 }
 
 .progress-step__started .progress-step--status,
@@ -99,7 +104,7 @@ a.block-link {
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
-    background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
 }
 
 .no-svg .progress-step__started .progress-step--status,
@@ -108,7 +113,7 @@ a.block-link {
 .no-svg .progress-step__started:focus .progress-step--status,
 .no-svg .progress-step__started:hover .progress-step--status,
 .no-svg .progress-steps__amend .progress-step_changed {
-    background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
 }
 
 .no-svg .progress-step--status,
@@ -118,7 +123,7 @@ a.block-link {
 .no-svg .progress-step__started:focus .progress-step--status,
 .no-svg .progress-step__started:hover .progress-step--status,
 .no-svg .progress-step__completed {
-    background-repeat: no-repeat;
+  background-repeat: no-repeat;
 }
 
 .status-list .status-list--complete,
@@ -126,83 +131,95 @@ a.block-link {
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
 .no-svg .progress-step__complete .progress-step--status {
-    background-image: url("/anti-money-laundering/assets/icons/tick.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 33%;
+  background-image: url("/anti-money-laundering/assets/icons/tick.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 33%;
 }
 
 .no-svg .status-list .status-list--complete,
 .no-svg .progress-step__complete .progress-step--status,
 .no-svg .progress-step__complete:hover .progress-step--status {
-    background-image: url("/anti-money-laundering/assets/icons/tick.png");
+  background-image: url("/anti-money-laundering/assets/icons/tick.png");
 }
+
 
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */
+
 a.progress-step {
-    background-color: #dee0e2;
-    color: #0b0c0c;
-    display: block;
- /* for IE8 */
-    display: flex;
- /* for everything else */
-    margin-bottom: 0;
-    padding: 0;
-    overflow: hidden;
- /* fix for firefox focus bug */
-    position: relative;
-    text-decoration: none;
-    transition: .25s ease-in;
-    transition-property: background-color, outline;
+  background-color: #dee0e2;
+  color: #0b0c0c;
+  display: block;
+  /* for IE8 */
+  display: flex;
+  /* for everything else */
+  margin-bottom: 0;
+  padding: 0;
+  overflow: hidden;
+  /* fix for firefox focus bug */
+  position: relative;
+  text-decoration: none;
+  transition: .25s ease-in;
+  transition-property: background-color, outline;
 }
+
 
 /* give the whole step component a focus outline */
+
 .progress-step:focus {
-    outline: 3px solid #ffbf47;
+  outline: 3px solid #ffbf47;
 }
 
+
 /* mimic the anchor colours inside this block-level component */
+
 .progress-step__edit {
-    color: #005ea5;
+  color: #005ea5;
 }
 
 .progress-step__edit:focus,
 .progress-step__edit:hover {
-    color: #2e8aca;
+  color: #2e8aca;
 }
 
 a.progress-step,
 .progress-step--status,
 .progress-step--details {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
+
 
 /* `display:block` fixes a layout issue in IE & Firefox */
+
 .progress-step--status,
 .progress-step--details {
-    display: block;
+  display: block;
 }
 
+
 /* -- Progress Step: details -- */
+
 .progress-step--details {
-    background-color: #f8f8f8;
-    border-bottom: 3px solid #dee0e2;
-    padding: 5px 10px 15px;
+  background-color: #f8f8f8;
+  border-bottom: 3px solid #dee0e2;
+  padding: 5px 10px 15px;
 }
 
 .progress-step--details p {
-    margin: 0;
-    padding-bottom: 10px;
+  margin: 0;
+  padding-bottom: 10px;
 }
 
+
 /* -- Progress Step: status -- */
+
 .progress-step--status {
-    border-bottom: 3px solid #cdcdcd;
-    color: #364747;
-    padding: 5px 10px;
-    position: relative;
-    transition: .25s ease-in;
+  border-bottom: 3px solid #cdcdcd;
+  color: #364747;
+  padding: 5px 10px;
+  position: relative;
+  transition: .25s ease-in;
 }
 
 .progress-step__started .progress-step--status,
@@ -211,12 +228,11 @@ a.progress-step,
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
-    color: #fff;
+  color: #fff;
 }
 
 .progress-step--status-time {
-
-    padding: 15px 0 0;
+  padding: 15px 0 0;
 }
 
 .progress-step--status-time p span {
@@ -224,80 +240,87 @@ a.progress-step,
   margin: 0;
 }
 
+
 /* -- Progress Step: not started -- */
+
 .progress-step:focus .progress-step--status,
 .progress-step:hover .progress-step--status,
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status {
-    background-color: #006435;
-    border-bottom-color: #01552e;
+  background-color: #006435;
+  border-bottom-color: #01552e;
 }
 
+
 /* -- Progress Step: started -- */
+
 .progress-step__started .progress-step--status {
-    background-color: #f47738;
-    border-bottom-color: #f9641a;
+  background-color: #f47738;
+  border-bottom-color: #f9641a;
 }
 
 .progress-step__started .progress-step--status,
 .progress-steps__amend .progress-step .progress-step--status {
-    display: flex;
+  display: flex;
 }
 
 .progress-step__started .progress-step--status-time,
 .progress-steps__amend .progress-step .progress-step--status-time {
-    align-self: center;
-    padding-bottom: 15px;
+  align-self: center;
+  padding-bottom: 15px;
 }
 
 .progress-step__started .progress-step--status-time .font-xsmall,
 .progress-steps__amend .progress-step .progress-step--status-time .font-xsmall {
-    margin: 0;
+  margin: 0;
 }
 
+
 /* -- Progress Step: completed -- */
+
 .progress-step__complete .progress-step--status,
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
-    background-color: #006435;
-    border-bottom-color: #01552e;
+  background-color: #006435;
+  border-bottom-color: #01552e;
 }
 
 @media screen and (max-width: 480px) {
-    .progress-step--status,
+  .progress-step--status,
   .no-svg .progress-step--status {
-        background-position: 90% 90%;
-    }
+    background-position: 90% 90%;
+  }
 }
 
 @media screen and (max-width: 640px) {
-
-    .progress-step {
-        margin: 0 -0.78947em 12px;
-    }
-
-    .progress-step .grid-layout__column--1-3 {
-        float: left;
-        width: 33.33333%;
-    }
-
-    .progress-step .grid-layout__column--2-3 {
-        float: left;
-        width: 66.66667%;
-    }
-
-    .progress-step--status {
-        background-size: 20%;
-    }
+  .progress-step {
+    margin: 0 -0.78947em 12px;
+  }
+  .progress-step .grid-layout__column--1-3 {
+    float: left;
+    width: 33.33333%;
+  }
+  .progress-step .grid-layout__column--2-3 {
+    float: left;
+    width: 66.66667%;
+  }
+  .progress-step--status {
+    background-size: 20%;
+  }
+  /* bump down for smaller screens */
+  .progress-step--status-time .heading-medium {
+    font-size: 18px;
+  }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
-    .progress-step--status {
-        background-position: 90% 90%;
-        background-size: 25%;
-    }
+  .progress-step--status {
+    background-position: 90% 90%;
+    background-size: 25%;
+  }
 }
+
 
 /* -- TODO: fix this – IE10+ needs a chevron kick
 @media all and
@@ -312,19 +335,20 @@ a.progress-step,
   (-ms-high-contrast: none),
   (-ms-high-contrast: active) {
   /* IE10+ hacks here */
-    .progress-step--status {
-        background-position: 140%;
-        background-size: 66%;
-    }
-
-    .progress-step--status__completed {
-        background-position: 50%;
-        background-size: 50%;
-    }
+  .progress-step--status {
+    background-position: 140%;
+    background-size: 66%;
+  }
+  .progress-step--status__completed {
+    background-position: 50%;
+    background-size: 50%;
+  }
 }
+
 
 /* Having to specify these widths for IE8 until a better fix appears.
    We can get away with this because IE8 isn't responsive */
+
 .lte-ie8 .progress-step:before,
 .lte-ie8 .progress-step:after {
   content: '';
@@ -364,17 +388,26 @@ a.progress-step,
   float: left;
 }
 
+
 /* -- // application progress page -- */
 
+
 /* vvv added the below until we update assets-frontend vvv */
+
+
 /********************************************************************/
+
+
 /* add back some margins */
+
 .list {
   margin-bottom: 1.05263em;
   margin-top: 5px;
 }
 
+
 /* Fixes the indent with the grids - not sure if there is any other way around this at present */
+
 div.grid-layout {
   margin: 0;
 }
@@ -383,10 +416,11 @@ div.grid-layout {
   border-left: solid 10px #bfc1c3;
 }
 
+
 /********************************************************************/
+
+
 /* ^^^ added the above until we update assets-frontend ^^^ */
-
-
 
 .application-submit,
 .user-attention {
@@ -404,12 +438,16 @@ div.grid-layout {
   }
 }
 
+
 /* required as js-hidden in assets frontend is !important */
+
 .amls-js-hidden {
   display: none;
 }
 
+
 /* Confirmation */
+
 .confirmation {
   background-color: #28a197;
   color: #fff;
@@ -427,79 +465,93 @@ th.numeric {
   text-align: right;
 }
 
+
 /* adding this for now
  * TODO: we really need to re-jig the markup for this */
+
 @media screen and (max-width: 640px) {
   .user-attention {
     margin: 0;
   }
 }
 
+
 /* postcode */
-/* TODO, determine if there's a class in Assets Frontend for this */
+/* TODO, determine if there's a class in Assets Frontend for this
+ * …
+ * seems there is: `.form-control-1-4`
+ * http://govuk-elements.herokuapp.com/form-elements/example-form-elements/
+*/
+
 form input[type=text].form-control.postcode {
-    width: 20%;
+  width: 20%;
 }
+
 
 /* select box for countries */
+
 select {
-    border: 2px solid #6f777b;
-    margin: 0;
-    padding: 4px;
-    width: 50%;
+  border: 2px solid #6f777b;
+  margin: 0;
+  padding: 4px;
+  width: 50%;
 }
 
+
 /* form errors */
+
 .amls-error-summary {
-    background-color: #fff;
-    border: 4px solid #b10e1e;
+  background-color: #fff;
+  border: 4px solid #b10e1e;
 }
 
 .amls-error-summary li {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .amls-error-summary li > a {
-    color: #b10e1e;
+  color: #b10e1e;
 }
 
 .form-field--error {
-    border-left-width: 4px;
-    border-color: #b10e1e;
+  border-color: #b10e1e;
+  border-left-width: 4px;
 }
 
 .form-field--error span.error-notification {
-    font-weight: bold;
+  font-size: 19px;
+  font-weight: bold;
 }
+
 
 /* forms */
 
+
 /* full-width buttons for smaller screens, until they're in assets-frontend */
+
 @media (max-width: 640px) {
   button,
   .button,
   .button--get-started {
     box-sizing: border-box;
+    text-align: center;
     width: 100%;
   }
 }
+
 
 /*.form-group {
     padding-top: 0;
     padding-bottom: 0;
 }*/
 
+
 /* Add some space under the last fieldset in a .panel-indent,
    otherwise it butts up against the submit button.
    I'd rather not have to do this. */
 
 
-
 /* These are all prefixed with `form` to override some stuff (apparently) */
-form .form-control {
-  border: 2px solid #6f777b;
-  width: 50%;
-}
 
 .form-date .form-group-year {
   width: 70px;
@@ -560,7 +612,9 @@ form .inline .block-label {
   width: 1px;
 }
 
+
 /* summary styles */
+
 table.summary-title {
   width: 88%;
 }
@@ -612,7 +666,9 @@ fieldset .panel-indent {
   word-break: break-word;
 }
 
+
 /* class for older browsers; pseudo-class for modern browsers */
+
 .check-your-answers__last,
 .check-your-answers:last-of-type,
 .check-your-answers__listing:last-of-type {
@@ -661,10 +717,12 @@ fieldset .panel-indent {
 }
 
 .list--listing .check-your-answers__footer {
-  text-align:  left;
+  text-align: left;
 }
 
+
 /* cheap fix before S&T */
+
 .check-your-answers .question {
   word-break: break-word;
 }
@@ -675,7 +733,7 @@ fieldset .panel-indent {
 
 @media (max-width: 640px) {
   .check-your-answers .grid-layout--stacked .grid-layout__column {
-      display: table-cell;
+    display: table-cell;
   }
   .check-your-answers dd,
   .check-your-answers dt,
@@ -715,77 +773,74 @@ fieldset .panel-indent {
   content: '';
 }
 
-
-
-
-
 .icon-confirmed {
   /* we're using the same tick as the progress page,
      which is HUGE, so we need to resize it */
-background-size: cover;
+  background-size: cover;
   height: 55px;
   margin: -15px 0 -15px -15px;
   width: 55px;
 }
 
-
 .touchevents .date-of-birth {
-display: block;
+  display: block;
 }
 
 .summary-table a:link,
 .summary-table a:visited,
 .summary-table a:hover {
-color: #005ea5;
+  color: #005ea5;
 }
 
 .summary-table a:link,
 .summary-table a:visited {
-text-decoration: none;
+  text-decoration: none;
 }
 
 .summary-table a:hover {
-text-decoration: underline;
+  text-decoration: underline;
 }
 
 .summary-table .first-section {
-border-top: 1px solid #bfc1c3;
+  border-top: 1px solid #bfc1c3;
 }
 
 .summary-table th {
-font-size: 24px;
-padding-bottom: 10px;
-padding-top: 15px;
+  font-size: 24px;
+  padding-bottom: 10px;
+  padding-top: 15px;
 }
 
 .login-name {
-float: right;
-font-size: 16px;
-margin-top: 10px;
-margin: 0;
-padding: 10px 0 10px 0;
-text-align: right;
+  float: right;
+  font-size: 16px;
+  margin-top: 10px;
+  margin: 0;
+  padding: 10px 0 10px 0;
+  text-align: right;
 }
 
 .heading-secondary {
-font-weight: 400;
-line-height: 1.25;
-margin-top: 0;
-padding-bottom: 0;
-padding-top: 9px;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 9px;
 }
 
 .locked,
 .heading-secondary {
-color: #6f777b;
+  color: #6f777b;
 }
 
 .panel-border-wide {
-border-left-width: 10px;
+  border-left-width: 10px;
 }
+
 
 /* style the selects as close to inputs as possible,
  * because they'll flash on the screen before being replaced. */
+
 .js [data-auto-complete],
 .js .custom-combobox-input,
 .js .ui-autocomplete-input {
@@ -814,21 +869,23 @@ fieldset.panel-indent legend {
   margin: 0;
 }
 
+
 /* status page */
+
 .status-list {
-    margin-left: 0;
-    padding-left: 0;
+  margin-left: 0;
+  padding-left: 0;
 }
 
 .status-list li {
-    line-height: 1.25;
-    list-style-position: inside;
-    padding: 18px 55px 10px 10px;
-    position: relative;
+  line-height: 1.25;
+  list-style-position: inside;
+  padding: 18px 55px 10px 10px;
+  position: relative;
 }
 
 .status-list--start {
-    border-top: 3px solid #bfc1c3;
+  border-top: 3px solid #bfc1c3;
 }
 
 .status-list--end {
@@ -836,16 +893,16 @@ fieldset.panel-indent legend {
 }
 
 .status-list--upcoming {
-    background: #bfc1c3;
-    color: #fff;
+  background: #bfc1c3;
+  color: #fff;
 }
 
-.status-detail{
-    margin-left: 30px;
+.status-detail {
+  margin-left: 30px;
 }
 
 @media screen and (max-width: 640px) {
-  .status-detail{
+  .status-detail {
     margin-left: 0;
   }
 }
@@ -858,27 +915,29 @@ fieldset.panel-indent legend {
 }
 
 .declaration {
-    background: #f8f8f8;
-    border-bottom: #dee0e2 solid 3px;
-    margin: 0;
-    padding: 20px;
+  background: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin: 0;
+  padding: 20px;
 }
 
 .panel-border-wide {
-    border-left-width: 10px;
+  border-left-width: 10px;
 }
 
 .progress-steps__amend .progress-step--status {
-    display: flex;
+  display: flex;
 }
 
 .progress-steps__amend .progress-step--status-time {
-    align-self: center;
-    flex: 1;
-    padding-bottom: 15px;
+  align-self: center;
+  flex: 1;
+  padding-bottom: 15px;
 }
 
+
 /* -- What you need: column source order is different on this page -- */
+
 .what-you-need > .grid-layout__column--1-3 {
   float: right;
 }
@@ -891,13 +950,14 @@ fieldset.panel-indent legend {
   .what-you-need > .grid-layout__column--1-3 {
     margin: 0 auto 15px;
   }
-
   .declaration p {
     margin: 0;
   }
 }
 
+
 /* Bits from Gov Elements */
+
 .notice {
   position: relative;
   margin-bottom: 40px;
@@ -928,26 +988,15 @@ fieldset.panel-indent legend {
   background-image: url("/anti-money-laundering/assets/images/icon-important.png");
 }
 
-@media
-  only screen and (-webkit-min-device-pixel-ratio: 2),
-  only screen and (min--moz-device-pixel-ratio: 2),
-  only screen and (-o-min-device-pixel-ratio: 20 / 10),
-  only screen and (min-device-pixel-ratio: 2),
-  only screen and (min-resolution: 192dpi),
-  only screen and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   .icon-important {
     background-image: url("/anti-money-laundering/assets/images/icon-important-2x.png");
     background-size: 100%;
   }
 }
 
-.form-control {
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
 /* Temp override */
+
 .details__inner li {
   margin-bottom: 20px;
 }
@@ -957,7 +1006,9 @@ fieldset.panel-indent legend {
   margin-bottom: 0;
 }
 
+
 /* -- notifications -- */
+
 table.notifications thead th {
   background-color: #005ea5;
   color: #fff;
@@ -1024,15 +1075,18 @@ table.notifications thead th {
 
 
 /* Overrides the stupid Assets Frontend - what were they thinking! */
-button, .button, .button--get-started {
+
+button,
+.button,
+.button--get-started {
   line-height: 1.25em;
   padding: 0.5em 0.6em 0.3em 0.6em;
   font-size: 1em;
 }
 
 .button--get-started {
-    padding-right: 40px;
-    font-size: 24px;
+  padding-right: 40px;
+  font-size: 24px;
 }
 
 #wrapper {
@@ -1040,21 +1094,22 @@ button, .button, .button--get-started {
 }
 
 @media (min-width: 769px) {
-    #wrapper {
-        padding-bottom: 0;
-    }
+  #wrapper {
+    padding-bottom: 0;
+  }
 }
 
 .form-hint {
-    margin-top: 0;
+  margin-top: 0;
 }
 
-.form-field, .form-field-group {
-    margin-bottom: 30px;
+.form-field,
+.form-field-group {
+  margin-bottom: 30px;
 }
 
 details {
-    margin: 0;
+  margin: 0;
 }
 
 .form-group-footer {
@@ -1066,5 +1121,72 @@ details {
 }
 
 .panel-indent .form-control {
-  width : 50%;
+  width: 50%;
 }
+
+
+/* more GDS stuff overridden by Assets Frontend D: */
+
+.form-control {
+  -webkit-appearance: none;
+  background-color: #fff;
+  border-radius: 0;
+  border: 2px solid #6f777b;
+  box-sizing: border-box;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.31579;
+  padding: 4px;
+  text-transform: none;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .form-control {
+    font-size: 16px;
+    line-height: 1.25
+  }
+}
+
+@media (min-width: 641px) {
+  .form-control {
+    width: 50%
+  }
+}
+
+/* yes, twice to override shady assets frontend nonsense *facepalm* */
+
+.form-control-3-4,
+.form-control-3-4.form-control-3-4 {
+  width: 100%
+}
+
+@media (min-width: 641px) {
+  .form-control-3-4,
+  .form-control-3-4.form-control-3-4 {
+    width: 75%
+  }
+}
+
+.form-control-1-2,
+.form-control-1-2.form-control-1-2 {
+  width: 100%
+}
+
+@media (min-width: 641px) {
+  .form-control-1-2,
+  .form-control-1-2.form-control-1-2 {
+    width: 50%
+  }
+}
+
+.form-control-1-4,
+.form-control-1-4.form-control-1-4 {
+  width: 25%
+}
+
+.form-control-1-8,
+.form-control-1-8.form-control-1-8 {
+  width: 12.5%
+}
+

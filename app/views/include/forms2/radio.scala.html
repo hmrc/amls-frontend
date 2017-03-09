@@ -4,13 +4,11 @@
     value: String,
     target: String = "",
     inline: Boolean = false
-)(implicit lang:Lang,  m: Messages)
+)(implicit lang:Lang, m: Messages)
 
 <label class="block-label@if(inline){ block-label--inline}" for="@{f.id}-@value">
     <input
             type="radio"
-            required="required"
-            aria-required="true"
             name="@f.name"
             id="@{f.id}-@value"
             value="@value"
