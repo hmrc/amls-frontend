@@ -11,6 +11,7 @@ import play.api.mvc.{AnyContent, Request}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,7 +26,6 @@ trait ConfirmationController extends BaseController {
 
   val statusService: StatusService
 
-
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
   def get() = Authorised.async {
@@ -36,6 +36,11 @@ trait ConfirmationController extends BaseController {
           result <- resultFromStatus(status)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
+  }
+
+  def paymentConfirmation(reference: String) = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(payment_confirmation("", reference)))
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {

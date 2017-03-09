@@ -282,5 +282,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
     }
+
+    "be able to show the payments confirmation page" in new Fixture {
+
+      val paymentReference = "XMHSG357567686"
+      val result = controller.paymentConfirmation(paymentReference)(request)
+
+      status(result) must be(OK)
+
+      contentAsString(result) must include(paymentReference)
+
+    }
   }
 }
