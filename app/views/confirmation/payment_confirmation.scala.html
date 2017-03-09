@@ -6,6 +6,23 @@
 
     <div class="confirmation">
         <h1 class="heading-large">@Messages("confirmation.payment.lede")</h1>
+        <p>
+            @companyName
+            <br>
+            @messages("confirmation.payment.reference_header", paymentReference)
+        </p>
     </div>
+
+    <p>@messages("confirmation.payment.info.hmrc_review")</p>
+
+    <h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
+
+    <p>@messages("confirmation.payment.info.keep_up_to_date")</p>
+
+    <ul>
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item2")</li>
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
+    </ul>
 
 }

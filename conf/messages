@@ -565,7 +565,13 @@ confirmation.variation.summary = This shows your total fees for each item.
 
 confirmation.payment.title = You’ve submitted and paid
 confirmation.payment.lede = You’ve submitted and paid
-
+confirmation.payment.reference_header = Payment reference: {0}
+confirmation.payment.info.hmrc_review = Your application will be reviewed by HM Revenue and Customs. You can sign into this service at any time to see the status of your application.
+confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
+confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details. For example, you’ll need to update if:
+confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
+confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
+confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration

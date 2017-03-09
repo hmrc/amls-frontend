@@ -31,6 +31,16 @@ class PaymentConfirmedViewSpec extends GenericTestHelper with MustMatchers {
 
     }
 
+    "show the company name and reference in the heading" in new ViewFixture {
+
+      val headingContainer = doc.select(".confirmation")
+
+      headingContainer.text must include(businessName)
+      headingContainer.text must include(Messages("confirmation.payment.reference_header", paymentReference))
+
+    }
+
+
   }
 
 }
