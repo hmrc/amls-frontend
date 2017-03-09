@@ -42,12 +42,10 @@
             }
         }
 
-        @fieldset(
-            legend = "hvd.cash.payment.data.text",
-            legendHidden = true,
+        @panel(
             jsHidden = true,
-            classes = Seq("paymentDate-fieldset"),
-            f = f("paymentDate-fieldset")
+            field = Some(f("paymentDate-fieldset")),
+            classes = Seq("paymentDate-fieldset")
         ) {
             @date(
                 f = f,

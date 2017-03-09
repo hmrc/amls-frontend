@@ -61,23 +61,23 @@
             field = Some(f(s"$target"))
         ) {
             @input(
-                field = f("sortCode"),
-                labelText = "bankdetails.bankaccount.sortcode",
-                hintText = "bankdetails.bankaccount.sortcode.hint",
-                bold = false,
                 attrMaxlength = "8",
                 attrPattern = "([0-9]{2}(\\s?|-?)[0-9]{2}(\\s?|-?)[0-9]{2})",
-                attrTitle = "bankdetails.bankaccount.sortcode.hint"
+                attrTitle = "bankdetails.bankaccount.sortcode.hint",
+                attrType = "text",
+                bold = false,
+                field = f("sortCode"),
+                hintText = "bankdetails.bankaccount.sortcode.hint",
+                labelText = "bankdetails.bankaccount.sortcode"
             )
             @input(
-                field = f("accountNumber"),
-                labelText = "bankdetails.bankaccount.accountnumber",
-                hintText = "bankdetails.bankaccount.accountnumber.hint",
-                bold = false,
-                attrType = "tel",
                 attrMaxlength = "8",
-                attrPattern = "[0-9]{1,8}",
-                attrTitle = "bankdetails.bankaccount.accountnumber.hint"
+                attrTitle = "bankdetails.bankaccount.accountnumber.hint",
+                attrType = "tel",
+                bold = false,
+                field = f("accountNumber"),
+                hintText = "bankdetails.bankaccount.accountnumber.hint",
+                labelText = "bankdetails.bankaccount.accountnumber"
             )
         }
 

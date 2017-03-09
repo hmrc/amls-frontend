@@ -2,8 +2,10 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, declaration}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import services.StatusService
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import utils.ControllerHelper

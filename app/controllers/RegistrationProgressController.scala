@@ -47,13 +47,13 @@ trait RegistrationProgressController extends BaseController {
   }
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
-
-     if (AmendmentsToggle.feature) {
-       getWithAmendments
-     } else {
-       getWithoutAmendments
-     }
+    implicit authContext =>
+      implicit request =>
+        if (AmendmentsToggle.feature) {
+          getWithAmendments
+        } else {
+          getWithoutAmendments
+        }
   }
 
   private def getWithAmendments(implicit hc: HeaderCarrier, ac: AuthContext, r: Request[_]) = {

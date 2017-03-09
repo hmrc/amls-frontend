@@ -51,6 +51,13 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               }).getOrElse(NotFound(notFoundView))
             }
           case ValidForm(_, data) => {
+            def personalTaxRouter = {
+              (data.personalTax, edit) match {
+                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index, false, fromDeclaration))
+                case (false, true) => Redirect(routes.DetailedAnswersController.get(index, false))
+                case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+              }
+            }
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.positions(data)
@@ -60,10 +67,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+                  case _ => Redirect(routes.VATRegisteredController.get(index, edit))
                 }
               } else {
-                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit, fromDeclaration))
+                Redirect(routes.AreTheyNominatedOfficerController.get(index))
               }
             }
           }.recoverWith {

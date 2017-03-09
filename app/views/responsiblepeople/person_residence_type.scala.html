@@ -47,10 +47,11 @@
                 classes = Seq("ukResident-fieldset")
             ) {
                 @input(
+                    bold = false,
+                    classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
                     field = f("nino"),
-                    labelText = "lbl.nino",
                     hintText = "lbl.nino.hint",
-                    bold = false
+                    labelText = "lbl.nino"
                 )
             }
 
