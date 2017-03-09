@@ -572,6 +572,7 @@ confirmation.payment.info.keep_up_to_date = If any of your information changes y
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
 confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
+confirmation.payment.status_button.text = View your current status
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
