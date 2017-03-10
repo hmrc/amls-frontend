@@ -510,10 +510,6 @@ select {
   font-weight: bold;
 }
 
-.form-field--error span.error-notification {
-  font-size: 19px;
-}
-
 .error-notification,
 .amls-error-summary li > a {
   color: #b10e1e;
