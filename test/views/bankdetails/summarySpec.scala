@@ -194,28 +194,27 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
           val accountNameGen: Gen[String] = Gen.alphaStr //map (_.take(8))
 
-          val genUKAccount: Gen[UKAccount] = for {
+          val genUKAccount: Gen[BankAccount] = for {
             accountNumber <- Gen.numStr suchThat(_.length == 8)
-            accountName <- accountNameGen
+            accountName <- accountNameGen suchThat(_.length == 8)
             sortCode <- Gen.numStr suchThat(_.length == 6)
           } yield {
-            UKAccount(accountNumber, sortCode)
+            BankAccount(accountName, UKAccount(accountNumber, sortCode))
           }
 
-          implicit val arbB: Arbitrary[UKAccount] = Arbitrary {
+          implicit val arbB: Arbitrary[BankAccount] = Arbitrary {
             genUKAccount
           }
 
-          forAll{ (aName: String, uk: UKAccount) =>
+          forAll{ (ba: BankAccount) =>
             whenever(
-              aName.length > 0 && uk.sortCode.length > 0
+              ba.accountName.length > 0
             ) {
               new ViewFixture {
 
-                println(">>>>>>" + BankAccount(aName, uk))
+                println(">>>>>>" + ba)
 
-                val ukBankAccount = BankAccount(aName, uk)
-                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount(aName, uk))))
+                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(ba)))
 
                 def view = views.html.bankdetails.summary(testdata, true, true, true)
 
