@@ -514,9 +514,12 @@ amendment.sidebar.button.text = Submit amendment
 
 #### Confirmation page ####
 confirmation.title = You’ve submitted your application
+confirmation.header = Application fee and reference
+confirmation.header.secondary = Submit registration
 confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
+confirmation.submission.info = Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.notice = You must make a note of this reference number and registration fee. You will need them to make the payment.
 confirmation.reference.notice = You must make a note of this reference number.
 confirmation.fee = Your fee
@@ -560,6 +563,16 @@ confirmation.variation.title = You’ve submitted your updated information
 confirmation.variation.lede = You’ve submitted your updated information
 confirmation.variation.summary = This shows your total fees for each item.
 
+confirmation.payment.title = You’ve submitted and paid
+confirmation.payment.lede = You’ve submitted and paid
+confirmation.payment.reference_header = Payment reference: {0}
+confirmation.payment.info.hmrc_review = Your application will be reviewed by HM Revenue and Customs. You can sign into this service at any time to see the status of your application.
+confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
+confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details. For example, you’ll need to update if:
+confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
+confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
+confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
+confirmation.payment.status_button.text = View your current status
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
