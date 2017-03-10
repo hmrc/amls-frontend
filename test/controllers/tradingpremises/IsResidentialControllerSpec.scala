@@ -23,10 +23,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new IsResidentialController{
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new IsResidentialController(messagesApi, self.authConnector, self.cache)
   }
 
   "IsResidentialController" must {
@@ -49,6 +46,15 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         val document = Jsoup.parse(contentAsString(result))
         document.title mustBe pageTitle
 
+      }
+
+      "redirect  to not found page when YourTradingPremises is None" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get(1, false)(request)
+        status(result) must be(NOT_FOUND)
       }
 
       "successfully load is residential page with pre - populated data form" in new Fixture {
