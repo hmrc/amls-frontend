@@ -51,7 +51,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
       "given valid payment details" in new TestFixture {
 
-        val cookies = Seq(Cookie("test", "some_value"))
+        val cookies = Seq(Cookie("mdtpp", "some_value"))
 
         createResponse { () =>
           Future.successful(HttpResponse(CREATED, responseHeaders = Map(

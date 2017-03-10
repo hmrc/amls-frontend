@@ -40,7 +40,7 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
                 val cookies = (r.header(SET_COOKIE) match {
                   case value@Some(_) => Cookies.fromSetCookieHeader(value)
                   case _ => Seq.empty[Cookie]
-                }).toSeq
+                }).toSeq.filter(c => c.name == "mdtpp")
 
                 Some(PaymentServiceRedirect(location, cookies))
               case _ =>
