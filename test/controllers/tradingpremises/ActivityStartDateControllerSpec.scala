@@ -27,7 +27,9 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
   }
 
   "ActivityStartDateController" must {
-    val ytp = Some(YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None))
+    val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+    val ytp = Some(ytpModel)
+
     val emptyCache = CacheMap("", Map.empty)
     "GET:" must {
 
@@ -38,13 +40,22 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
       "successfully load activity start page with empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(startDate = None)))))))
 
-        val result = controller.get(0, false)(request)
+        val result = controller.get(1, false)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         document.title mustBe pageTitle
 
+      }
+
+      "redirect  to not found page when YourTradingPremises is None" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get(1, false)(request)
+        status(result) must be(NOT_FOUND)
       }
 
       "successfully load activity start page with pre - populated data form" in new Fixture {
