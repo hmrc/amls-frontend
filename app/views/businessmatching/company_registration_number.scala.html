@@ -18,11 +18,15 @@
     @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
 
             @input(
+                attrMaxlength = "8",
+                attrPattern = "[0-9]{1,8}",
+                attrType = "tel",
+                bold = false,
+                classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
                 field = f("companyRegistrationNumber"),
-                labelText = "businessmatching.registrationnumber.lbl",
-                labelHidden = true,
                 hintText = "lbl.hint.crn",
-                bold = false
+                labelHidden = true,
+                labelText = "businessmatching.registrationnumber.lbl"
             )
 
         @submit(edit)

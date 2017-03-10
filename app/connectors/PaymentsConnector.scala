@@ -5,9 +5,10 @@ import javax.inject._
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import play.api.Logger
 import play.api.http.Status
+import play.api.mvc.{Cookie, Cookies}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
-import utils.HttpUtils._
+import play.api.http.HeaderNames._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,9 +34,15 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
         r.status match {
           case Status.CREATED =>
 
-            r.redirectLocation match {
+            r.header(LOCATION) match {
               case Some(location) =>
-                Some(PaymentServiceRedirect(location))
+
+                val cookies = (r.header(SET_COOKIE) match {
+                  case value@Some(_) => Cookies.fromSetCookieHeader(value)
+                  case _ => Seq.empty[Cookie]
+                }).toSeq.filter(c => c.name == "mdtpp")
+
+                Some(PaymentServiceRedirect(location, cookies))
               case _ =>
                 Logger.warn("[PaymentsConnector] No redirect url was returned")
                 None

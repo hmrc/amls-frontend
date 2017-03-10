@@ -19,53 +19,57 @@
     @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
 
         @fieldset(
+            f = f("hasCountries-fieldset"),
             legend = "msb.branchesoragents.legend",
-            f = f("hasCountries"),
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("hasCountries"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#hasCountries-fieldset",
-                inline = true
-            )
-            @radio(
-                f = f("hasCountries"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("hasCountries")
+            ) {
+                @radio(
+                    f = f("hasCountries"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#countries-fieldset",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasCountries"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
-
         @panel(
-            field = Some(f("hasCountries-fieldset")),
+            field = Some(f("countries-fieldset")),
             jsHidden = false,
             data = Seq("data-toggle-new")
         ) {
 
-        @hint(
-            hint = "msb.branchesoragents.hint"
-        )
+            @hint(
+                hint = "msb.branchesoragents.hint"
+            )
 
             @errorGroup(f("countries")) {
                 @addRemove("lbl.add.another.country") {
                     @for(i <- 0 until 10) {
-                    @defining(
-                        f(s"countries[$i]")
-                    ) { field =>
-                    @country(field, classes = field match {
-                    case f: ValidField => Seq("")
-                    case f: InvalidField => Seq("js-hidden")
-                    })
-                }
+                        @defining(
+                            f(s"countries[$i]")
+                        ) { field =>
+                        @country(field, classes = field match {
+                            case f: ValidField => Seq("")
+                            case f: InvalidField => Seq("js-hidden")
+                            })
+                        }
+                    }
                 }
             }
         }
-      }
 
         @submit(edit)
+
     }
 }

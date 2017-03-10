@@ -13,16 +13,13 @@
     heading = header
 ) {
 
-    <p>@Messages("tradingpremises.activity.start.date.text")</p>
-
     @form(f, controllers.tradingpremises.routes.ActivityStartDateController.post(index, edit)) {
 
         @date(
             f = f,
             p = "startDate",
-            labelText = "tradingpremises.startDate.title",
-            example = true,
-            legendHidden = true
+            hintId = "dob",
+            labelText = "tradingpremises.yourtradingpremises.startdate"
         )
 
         @submit(false)

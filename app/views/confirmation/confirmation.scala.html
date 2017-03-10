@@ -3,33 +3,27 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_],m:Messages)
+@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @main(
     title = Messages("confirmation.title")
 ) {
 
-    <div class="confirmation">
-        <h1 class="heading-large">@Messages("confirmation.lede")</h1>
+    <header class="page-header">
+        <h1 class="heading-xlarge">@Messages("confirmation.header")</h1>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("confirmation.header.secondary")</p>
+    </header>
+
+    <div class="panel-indent panel-indent--gutter panel-border-wide">
+        @Messages("confirmation.submission.info")
     </div>
 
-    <p>@Messages("confirmation.thankyou.p")</p>
 
-    @notice(
-        notice = Messages("confirmation.notice")
-    )
-
-    <div class="panel-indent panel-indent--gutter panel-border-wide reg-online--pay-fee">
-        <div class="grid-layout">
-            <div class="grid-layout__column grid-layout__column--1-3">
+    <div class="reg-online--pay-fee">
                 @Messages("confirmation.fee")
-                <p class="heading-large">@total</p>
-            </div>
-            <div class="grid-layout__column grid-layout__column--2-3">
+                <p class="heading-large push--top">@total</p>
                 @Messages("confirmation.sidebar.code")
-                <p class="heading-large">@Messages(paymentRef)</p>
-            </div>
-        </div>
+                <p class="heading-large push--top">@Messages(paymentRef)</p>
     </div>
 
 
@@ -71,10 +65,6 @@
 
         }
 
-
-
-
-
-    <p><a class="button" href="@ApplicationConfig.paymentsUrl">@Messages("button.payfee")</a></p>
+    <p><a class="button" href="@paymentsUrl">@Messages("button.payfee")</a></p>
 
 }

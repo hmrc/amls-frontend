@@ -59,13 +59,11 @@
                 @input(
                     field = f("addressLine3"),
                     labelText = "lbl.address.line3",
-                    requiredField = false,
                     labelHidden = true
                 )
                 @input(
                     field = f("addressLine4"),
                     labelText = "lbl.address.line4",
-                    requiredField = false,
                     labelHidden = true
                 )
                 @input(
@@ -94,13 +92,11 @@
             @input(
                 field = f("addressLineNonUK3"),
                 labelText = "lbl.address.line3",
-                requiredField = false,
                 labelHidden = true
             )
             @input(
                 field = f("addressLineNonUK4"),
                 labelText = "lbl.address.line4",
-                requiredField = false,
                 labelHidden = true
             )
             @country(
@@ -112,32 +108,36 @@
         </div>
 
         @fieldset(
-            f = f("timeAtAddress"),
+            f = f("timeAtAddress-fieldset"),
             legend = "responsiblepeople.wherepersonlives.address_history",
             jsHidden = false,
             panel = false,
             id = s"""${f("address-history").id}-fieldset"""
         ) {
-            @radio(
-                f = f("timeAtAddress"),
-                labelText = "responsiblepeople.wherepersonlives.5_months_history",
-                value = "01"
-            )
-            @radio(
-                f = f("timeAtAddress"),
-                labelText = "responsiblepeople.wherepersonlives.11_months_history",
-                value = "02"
-            )
-            @radio(
-                f = f("timeAtAddress"),
-                labelText = "responsiblepeople.wherepersonlives.3_years_history",
-                value = "03"
-            )
-            @radio(
-                f = f("timeAtAddress"),
-                labelText = "responsiblepeople.wherepersonlives.more_years_history",
-                value = "04"
-            )
+            @errorGroup(
+                field = f("timeAtAddress")
+            ) {
+                @radio(
+                    f = f("timeAtAddress"),
+                    labelText = "responsiblepeople.wherepersonlives.5_months_history",
+                    value = "01"
+                )
+                @radio(
+                    f = f("timeAtAddress"),
+                    labelText = "responsiblepeople.wherepersonlives.11_months_history",
+                    value = "02"
+                )
+                @radio(
+                    f = f("timeAtAddress"),
+                    labelText = "responsiblepeople.wherepersonlives.3_years_history",
+                    value = "03"
+                )
+                @radio(
+                    f = f("timeAtAddress"),
+                    labelText = "responsiblepeople.wherepersonlives.more_years_history",
+                    value = "04"
+                )
+            }
         }
 
         @submit(edit, Some("button.saveandcontinue"))

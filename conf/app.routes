@@ -239,6 +239,7 @@ GET         /declaration/declaration                                    controll
 GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
+GET         /confirmation/payment-complete                              controllers.ConfirmationController.paymentConfirmation(reference: String)
 
 GET         /responsible-people/add                                     controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, fromDeclaration:Boolean ?= false)
 

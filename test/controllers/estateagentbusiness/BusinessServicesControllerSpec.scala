@@ -6,7 +6,7 @@ import models.estateagentbusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import  utils.GenericTestHelper
@@ -50,17 +50,20 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
     "submit with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "services" -> "02",
-        "services" -> "08"
+        "services[0]" -> "02",
+        "services[1]" -> "08"
       )
+      val eab = EstateAgentBusiness(Some(Services(Set(Residential))), Some(ThePropertyOmbudsman), None, None)
+
+      val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development),None)),None,None,None,true)
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eabWithoutRedress)))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -123,19 +126,19 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "services[0]" -> "01",
         "services[2]" -> "03"
       )
-
+      val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), None, None, None)
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eab)))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
     }
 
     "submit with valid data with Residential option from business services" in new Fixture {
@@ -146,13 +149,15 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "services[2]" -> "03"
       )
 
+      val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), Some(ThePropertyOmbudsman), None, None)
+
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eab)))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)

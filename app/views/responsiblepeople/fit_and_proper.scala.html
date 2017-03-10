@@ -17,25 +17,30 @@
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, fromDeclaration)) {
 
         @fieldset(
+            f = f("hasAlreadyPassedFitAndProper-fieldset"),
             legend = "responsiblepeople.fit_and_proper.title",
             legendHidden = true,
-            f = f("fit_and_proper"),
             panel = false
         ) {
-            @radio(
-                f = f("hasAlreadyPassedFitAndProper"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("hasAlreadyPassedFitAndProper"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("hasAlreadyPassedFitAndProper")
+            ) {
+                @radio(
+                    f = f("hasAlreadyPassedFitAndProper"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasAlreadyPassedFitAndProper"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
-    @submit(edit)
-  }
+        @submit(edit)
+
+    }
 }

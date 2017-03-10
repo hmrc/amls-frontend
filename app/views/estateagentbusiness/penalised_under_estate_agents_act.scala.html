@@ -26,24 +26,28 @@
     @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
         @fieldset(
-            f = f("penalisedUnderEstateAgentsAct"),
+            f = f("penalisedUnderEstateAgentsAct-fieldset"),
             legend = "estateagentbusiness.penalisedunderestateagentsact.title",
             legendHidden = true,
             panel = false
-        ){
-            @radio(
-                f = f("penalisedUnderEstateAgentsAct"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s".professionalBodyAct-fieldset"
-            )
-            @radio(
-                f = f("penalisedUnderEstateAgentsAct"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+        ) {
+            @errorGroup(
+                field = f("penalisedUnderEstateAgentsAct")
+            ) {
+                @radio(
+                    f = f("penalisedUnderEstateAgentsAct"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".professionalBodyAct-fieldset"
+                )
+                @radio(
+                    f = f("penalisedUnderEstateAgentsAct"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(

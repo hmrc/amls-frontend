@@ -16,23 +16,27 @@
     @form(f, controllers.hvd.routes.ExciseGoodsController.post(edit)) {
 
         @fieldset(
-            f = f("exciseGoods"),
+            f = f("exciseGoods-fieldset"),
             legend = "hvd.excise.goods.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("exciseGoods"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("exciseGoods"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("exciseGoods")
+            ) {
+                @radio(
+                    f = f("exciseGoods"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("exciseGoods"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit(edit)

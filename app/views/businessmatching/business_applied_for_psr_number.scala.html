@@ -21,7 +21,7 @@
     @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
         @fieldset(
-            f = f("redundantvalue"),
+            f = f("appliedfor-fieldset"),
             legend = "businessmatching.psr.number.title",
             legendHidden = true,
             panel = false
@@ -52,11 +52,15 @@
             id = target
         ) {
             @input(
-                field = f("regNumber"),
+                attrMaxlength = "6",
+                attrPattern = "[0-9]{1,6}",
+                attrType = "tel",
                 bold = false,
+                classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
                 dataAttrs = digitsOnlyAttributes,
-                labelText = "businessmatching.psr.number.lbl",
-                hintText = "businessmatching.psr.number.hint"
+                field = f("regNumber"),
+                hintText = "businessmatching.psr.number.hint",
+                labelText = "businessmatching.psr.number.lbl"
             )
         }
 

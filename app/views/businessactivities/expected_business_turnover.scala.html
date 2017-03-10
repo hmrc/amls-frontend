@@ -16,46 +16,50 @@
     @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
 
         @fieldset(
-            f = f("expectedBusinessTurnover"),
+            f = f("expectedBusinessTurnover-fieldset"),
             legend = "businessactivities.business-turnover.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.01",
-                value = "01"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.02",
-                value = "02"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.03",
-                value = "03"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.04",
-                value = "04"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.05",
-                value = "05"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.06",
-                value = "06"
-            )
-            @radio(
-                f = f("expectedBusinessTurnover"),
-                labelText = "businessactivities.business-turnover.lbl.07",
-                value = "07"
-            )
+            @errorGroup(
+                 field = f("expectedBusinessTurnover")
+            ) {
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.05",
+                    value = "05"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.06",
+                    value = "06"
+                )
+                @radio(
+                    f = f("expectedBusinessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.07",
+                    value = "07"
+                )
+            }
         }
 
         @submit(false)

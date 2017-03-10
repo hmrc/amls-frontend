@@ -20,24 +20,28 @@
     @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit, fromDeclaration)) {
 
         @fieldset(
-            f = f("registeredForVAT"),
+            f = f("registeredForVAT-fieldset"),
             legend = "responsiblepeople.registeredforvat.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("registeredForVAT"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s"#$target"
-            )
-            @radio(
-                f = f("registeredForVAT"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("registeredForVAT")
+            ) {
+                @radio(
+                    f = f("registeredForVAT"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s"#$target"
+                )
+                @radio(
+                    f = f("registeredForVAT"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(
@@ -45,7 +49,13 @@
             legend = "responsiblepeople.registeredforvat.lbl.vatNumber",
             legendHidden = true
         ) {
-            @input(f("vrnNumber"), "responsiblepeople.registeredforvat.lbl.vatNumber", bold = false)
+            @input(
+                field = f("vrnNumber"),
+                labelText = "responsiblepeople.registeredforvat.lbl.vatNumber",
+                attrMaxlength = "9",
+                attrPattern = "[0-9]{1,9}",
+                bold = false
+            )
         }
 
         @submit()

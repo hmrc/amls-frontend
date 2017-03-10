@@ -17,23 +17,27 @@
     @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
         @fieldset(
-            f = f("linkedCashPayments"),
+            f = f("linkedCashPayments-fieldset"),
             legend = "hvd.identify.linked.cash.payment.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("linkedCashPayments"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("linkedCashPayments"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("linkedCashPayments")
+            ) {
+                @radio(
+                    f = f("linkedCashPayments"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("linkedCashPayments"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit(edit)

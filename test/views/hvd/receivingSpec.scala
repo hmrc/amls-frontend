@@ -43,7 +43,7 @@ class receivingSpec extends GenericTestHelper with MustMatchers  {
         Seq(
           (Path \ "receivePayments") -> Seq(ValidationError("not a message Key")),
           (Path \ "paymentMethods") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "paymentMethods" \ "details") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "paymentMethods-details-fieldset") -> Seq(ValidationError("third not a message Key"))
         ))
 
       def view = views.html.hvd.receiving(form2, true)

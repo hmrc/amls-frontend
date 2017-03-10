@@ -22,16 +22,20 @@
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
         @fieldset(
-            f = f("serviceProviders"),
+            f = f("serviceProviders-fieldset"),
             legend = "tcsp.kind.of.service.provider.title",
             legendHidden = true,
             panel = false
         ) {
-            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
-            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
-            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
-            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
-            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#$target")
+            @errorGroup(
+                field = f("serviceProviders")
+            ) {
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#$target")
+            }
         }
 
         @panel(

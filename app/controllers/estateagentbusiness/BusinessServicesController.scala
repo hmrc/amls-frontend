@@ -30,6 +30,26 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
       }
   }
 
+  private def redirectToNextPage(edit: Boolean, data: Services) = {
+    if(data.services.contains(Residential)) {
+      Redirect(routes.ResidentialRedressSchemeController.get(edit))
+    } else {
+      if(edit) {
+        Redirect(routes.SummaryController.get())
+      } else  {
+        Redirect(routes.PenalisedUnderEstateAgentsActController.get())
+      }
+    }
+  }
+
+  def updateData(business: EstateAgentBusiness, data: Services) : EstateAgentBusiness = {
+    if(data.services.contains(Residential)) {
+      business
+    } else {
+      business.copy(redressScheme = None)
+    }
+  }
+
   def post(edit: Boolean = false) = Authorised.async {
     import jto.validation.forms.Rules._
     implicit authContext => implicit request =>
@@ -40,22 +60,12 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
           for {
             estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
             _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
-              estateAgentBusiness.services(data))
+              updateData(estateAgentBusiness.services(data), data))
             status <- statusService.getStatus
           } yield status match {
             case SubmissionDecisionApproved if redirectToDateOfChange[Services](estateAgentBusiness.services, data) =>
               Redirect(routes.ServicesDateOfChangeController.get())
-            case _ => edit match {
-              case true =>
-                Redirect(routes.SummaryController.get())
-              case false => {
-                if (data.services.contains(Residential)) {
-                  Redirect(routes.ResidentialRedressSchemeController.get())
-                } else {
-                  Redirect(routes.PenalisedUnderEstateAgentsActController.get())
-                }
-              }
-            }
+            case _ => redirectToNextPage(edit, data)
           }
       }
   }

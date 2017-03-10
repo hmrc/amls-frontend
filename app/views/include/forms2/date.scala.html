@@ -13,7 +13,7 @@
 
 @field = @{ f(p) }
 
-<fieldset class="form-field form-date @if(field.hasErrors) {form-field--error}" id="@field.id">
+<fieldset class="form-field form-date" id="@field.id">
     @legend(
         legend = labelText,
         legendHidden = legendHidden
@@ -25,7 +25,8 @@
         <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
     }
     @if(field.hasErrors) {
-        <span class="error-notification">@field.error</span>
+        <div class="form-field--error">
+            <span class="error-notification">@field.error</span>
     }
     @input(
         labelText = "lbl.day",
@@ -37,6 +38,7 @@
         attrMin = "1",
         attrMax = "31",
         attrPattern = "[0-9]{2}",
+        attrStep = "1",
         attrDescribedBy = s"${hintId}"
     )
     @input(
@@ -48,6 +50,7 @@
         attrType = "number",
         attrMin = "1",
         attrMax = "12",
+        attrStep = "1",
         attrPattern = "[0-9]{2}"
     )
     @input(
@@ -57,6 +60,9 @@
         classes = Seq("input--no-spinner"),
         parentDateAttr = "year",
         attrType = "number",
+        attrMin = "1900",
+        attrStep = "1",
         attrPattern = "[1-9][0-9]{3}"
     )
+    @if(field.hasErrors) {</div>}
 </fieldset>

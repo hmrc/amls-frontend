@@ -1,7 +1,9 @@
 package controllers
 
-import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessMatching
 import models.confirmation.Currency
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -12,11 +14,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.http.HttpResponse
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -35,8 +39,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     self =>
 
-    val baseUrl = "http://localhost"
+    implicit val authContext = mock[AuthContext]
+    implicit val headerCarrier = HeaderCarrier()
 
+    val baseUrl = "http://localhost"
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new ConfirmationController {
@@ -44,6 +50,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override private[controllers] val submissionService = mock[SubmissionService]
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
+      override val dataCacheConnector = mock[DataCacheConnector]
     }
 
     val paymentRefNo = "XA111123451111"
@@ -61,6 +68,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     )
 
     protected val mockCacheMap = mock[CacheMap]
+    val paymentCookie = Cookie("test", "test-value")
 
     reset(paymentsConnector)
 
@@ -71,7 +79,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
-    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments")))
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
     val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
 
@@ -105,6 +113,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
 
+      cookies(result) must contain(paymentCookie)
+
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
@@ -120,6 +130,25 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val body = contentAsString(result)
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
+    "query the payments service for the payments url for a new submission" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
+
+      val paymentsRedirectUrl = controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).absoluteURL(request.secure, request.host)
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, paymentsRedirectUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
 
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
@@ -261,5 +290,27 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
     }
+
+    "be able to show the payments confirmation page" in new Fixture {
+
+      val paymentReference = "XMHSG357567686"
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
+
+      val result = controller.paymentConfirmation(paymentReference)(request)
+
+      status(result) must be(OK)
+
+      contentAsString(result) must include(paymentReference)
+      contentAsString(result) must include(companyName)
+    }
+
   }
 }

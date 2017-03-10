@@ -29,25 +29,29 @@
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
-            f = f("involvedInOther"),
+            f = f("involvedInOther-fieldset"),
             legend = "businessactivities.involved.other.title",
             legendHidden = true,
             panel = false,
             hint = "businessactivities.involved.other.hint"
         ) {
-            @radio(
-                f = f("involvedInOther"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("involvedInOther"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @errorGroup(
+                field = f("involvedInOther")
+            ) {
+                @radio(
+                    f = f("involvedInOther"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("involvedInOther"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @panel(
