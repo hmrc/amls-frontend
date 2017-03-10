@@ -45,7 +45,6 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             _ <- updateDataStrict[TradingPremises](index) { tp =>
               val updatedYtp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x =>
                 Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential)))
-
               TradingPremises(tp.registeringAgentPremises,
                 updatedYtp, tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
                 tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
