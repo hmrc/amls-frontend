@@ -67,10 +67,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
                 }
               } else {
-                Redirect(routes.AreTheyNominatedOfficerController.get(index))
+                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
               }
             }
           }.recoverWith {
