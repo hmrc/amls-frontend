@@ -2,16 +2,17 @@ package views.bankdetails
 
 import models.bankdetails._
 import org.jsoup.nodes.Element
-import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.MustMatchers
+import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
+import utils.GenericTestHelper
 import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
+class summarySpec extends GenericTestHelper with MustMatchers with PropertyChecks {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -64,16 +65,13 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
   }
 
   def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
-    val texts = parent.select("li").toSet.map((el: Element) => el.text())
-
-    texts.tail must be(keysToFind.map(k => Messages(k)))
+    parent.select("li").toSet.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
     true
   }
 
   def checkElementTextIncludes(el: Element, keys: String*) = {
-    val t = el.text()
     keys.foreach { k =>
-      t must include(Messages(k))
+      el.text() must include(Messages(k))
     }
     true
   }
@@ -91,14 +89,14 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
       )
 
-      val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
+      private val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
         ("title key", "check"),
         (title, checkElementTextIncludes(_,
           "12-34-56",
           "1234567890",
           "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.yes",
           "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-          ), (title, checkListContainsItems(_, bankDetailsSet))
+        ), (title, checkListContainsItems(_, bankDetailsSet))
       )
 
       def view = {
@@ -107,11 +105,11 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
         views.html.bankdetails.summary(testdata, true, true, true)
       }
 
-      forAll(sectionCheckstestUKBankDetails) { (key, check) => {
+      forAll(sectionCheckstestUKBankDetails) { (_, check) => {
         val hTwos = doc.select("li.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == title)
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("li").first()
         check(section) must be(true)
       }
@@ -134,7 +132,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           "56789",
           "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.no",
           "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-          ), (title, checkListContainsItems(_, bankDetailsSet))
+        ), (title, checkListContainsItems(_, bankDetailsSet))
       )
 
       def view = {
@@ -170,7 +168,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           "890834561",
           "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.no",
           "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-          ), (title, checkListContainsItems(_, bankDetailsSet))
+        ), (title, checkListContainsItems(_, bankDetailsSet))
       )
 
       def view = {
@@ -189,5 +187,67 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       }
       }
     }
+
+    "hide the first six numbers of a UKAccount number" when {
+      "complete" when {
+        "user is making an amendment" in {
+
+          val accountNameGen: Gen[String] = Gen.alphaStr //map (_.take(8))
+
+          val genUKAccount: Gen[UKAccount] = for {
+            accountNumber <- Gen.numStr suchThat(_.length == 8)
+            accountName <- accountNameGen
+            sortCode <- Gen.numStr suchThat(_.length == 6)
+          } yield {
+            UKAccount(accountNumber, sortCode)
+          }
+
+          implicit val arbB: Arbitrary[UKAccount] = Arbitrary {
+            genUKAccount
+          }
+
+          forAll{ (aName: String, uk: UKAccount) =>
+            whenever(
+              aName.length > 0 && uk.sortCode.length > 0
+            ) {
+              new ViewFixture {
+
+                println(">>>>>>" + BankAccount(aName, uk))
+
+                val ukBankAccount = BankAccount(aName, uk)
+                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount(aName, uk))))
+
+                def view = views.html.bankdetails.summary(testdata, true, true, true)
+
+                val section = doc.select("li.check-your-answers ul").first().select("li").eq(1).first()
+
+                section.text() must be("")
+
+              }
+            }
+          }
+
+        }
+        "user is making a variation" in {
+
+        }
+        "user is making a renewal" in {
+
+        }
+      }
+    }
+
+    "hide the first six numbers of a NonUKAccountNumber" when {
+      "complete" in {
+
+      }
+    }
+
+    "hide the first six numbers of a NonUKIBANNumber" when {
+      "complete" in {
+
+      }
+    }
+
   }
 }
