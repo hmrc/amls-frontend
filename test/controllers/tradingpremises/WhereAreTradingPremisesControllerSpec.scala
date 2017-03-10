@@ -25,7 +25,7 @@ import scala.concurrent.Future
 
 class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar with BeforeAndAfter {
 
-  val mockDataCacheConnector = mock[DataCacheConnector]
+  private val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
