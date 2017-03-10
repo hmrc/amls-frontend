@@ -9,6 +9,7 @@ case class IsResidential (isresidential: Boolean)
 object IsResidential {
 
   implicit val format =  Json.format[IsResidential]
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, IsResidential] =
     From[UrlFormEncoded] { __ =>
