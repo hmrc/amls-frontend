@@ -30,7 +30,8 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
   }
 
   "IsResidentialController" must {
-    val ytp = Some(YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None))
+    val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
+    val ytp = Some(ytpModel)
     val emptyCache = CacheMap("", Map.empty)
     "GET:" must {
 
@@ -38,12 +39,12 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      "successfully load activity start page with empty form" in new Fixture {
+      "successfully load is residential page with empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(isResidential = None)))))))
 
-        val result = controller.get(0, false)(request)
+        val result = controller.get(1, false)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         document.title mustBe pageTitle
@@ -65,7 +66,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
     "POST:" must {
       "successfully redirect to next page on valid input" in new Fixture {
         val postRequest = request.withFormUrlEncodedBody(
-          "isResidential" -> "false"
+          "isResidential" -> "true"
         )
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
@@ -83,7 +84,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
           "isResidential" -> "false"
         )
         val updatedYtp = Some(YourTradingPremises("foo",
-          Address("1","2",None,None,"AA1 1BB",None), Some(false), Some(new LocalDate(2014, 5, 20)), None))
+          Address("1","2",None,None,"AA1 1BB",None), Some(false), Some(new LocalDate(2010, 10, 10)), None))
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
         val tp = TradingPremises(yourTradingPremises = ytp)

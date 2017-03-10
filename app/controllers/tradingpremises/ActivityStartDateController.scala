@@ -47,7 +47,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
               }
             } yield edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+              case false => Redirect(routes.IsResidentialController.get(index, edit))
             }
         }
   }

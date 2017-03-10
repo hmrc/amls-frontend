@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.tradingpremises.{IsResidential, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{ActivityStartDate, IsResidential, TradingPremises, YourTradingPremises}
 import utils.RepeatingSection
 
 import scala.concurrent.Future
@@ -19,8 +19,8 @@ trait IsResidentialController extends RepeatingSection with BaseController{
         getData[TradingPremises](index) map {
           case Some(tp) => {
             val form = tp.yourTradingPremises match {
-              case Some(data) => Form2[IsResidential](IsResidential(data.isResidential.get))
-              case None => EmptyForm
+              case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
+              case _ => EmptyForm
             }
             Ok(views.html.tradingpremises.is_residential(form, index, edit))
           }
@@ -37,7 +37,7 @@ trait IsResidentialController extends RepeatingSection with BaseController{
           case ValidForm(_, data) =>
             for {
               _ <- updateDataStrict[TradingPremises](index) { tp =>
-                val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(isResidential = Some(data.isresidential))))
+                val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(isResidential = Some(data.isResidential))))
                 tp.copy(yourTradingPremises = ytp)
               }
             } yield edit match {

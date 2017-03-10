@@ -58,7 +58,7 @@ class IsResidentialSpec extends PlaySpec {
     }
 
     "write successfully" in {
-      IsResidential.format.writes(IsResidential(true)) must be(Json.obj("isResidential" -> "true"))
+      IsResidential.format.writes(IsResidential(true)) must be(Json.obj("isResidential" -> true))
     }
   }
 }

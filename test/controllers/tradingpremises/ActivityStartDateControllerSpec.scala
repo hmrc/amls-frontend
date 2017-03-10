@@ -87,7 +87,7 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
 
         val result = controller.post(1, false)(postRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
+        redirectLocation(result) must be(Some(routes.IsResidentialController.get(1, false).url))
       }
 
       "successfully redirect to next page on valid input in edit mode" in new Fixture {

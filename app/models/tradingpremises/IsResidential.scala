@@ -4,7 +4,7 @@ import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class IsResidential (isresidential: Boolean)
+case class IsResidential (isResidential: Boolean)
 
 object IsResidential {
 
