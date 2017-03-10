@@ -37,7 +37,7 @@
         @yta.isResidential.map {residential =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.residential"),
-                editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
+                editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
             ) {
                 <p>@residential match {
                     case true => { @Messages("lbl.yes") }
