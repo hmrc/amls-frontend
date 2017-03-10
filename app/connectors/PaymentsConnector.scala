@@ -37,14 +37,9 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
             r.header(LOCATION) match {
               case Some(location) =>
 
-                Logger.debug(s"[PaymentsConnector] Cookies returned: ${r.header(SET_COOKIE)}")
-
-                val cookies = (r.header(SET_COOKIE) match {
-                  case value@Some(_) => Cookies.fromSetCookieHeader(value)
-                  case _ => Seq.empty[Cookie]
-                }).toSeq.filter(c => c.name == "mdtpp")
-
-                Logger.debug(s"[PaymentsConnector] Cookies after processing: $cookies")
+                val cookies = r.allHeaders("Set-Cookie")
+                  .map(c => Cookies.fromSetCookieHeader(Some(c)))
+                  .flatMap(_.filter(_.name == "mdtpp"))
 
                 Some(PaymentServiceRedirect(location, cookies))
               case _ =>
