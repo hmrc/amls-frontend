@@ -1,17 +1,21 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.tradingpremises.{ActivityStartDate, IsResidential, TradingPremises, YourTradingPremises}
+import forms._
+import models.tradingpremises._
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait IsResidentialController extends RepeatingSection with BaseController{
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class  IsResidentialController @Inject()(override val messagesApi: MessagesApi,
+                                         val authConnector: AuthConnector,
+                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async{
     implicit authContext =>
@@ -46,10 +50,4 @@ trait IsResidentialController extends RepeatingSection with BaseController{
             }
         }
   }
-}
-
-object IsResidentialController extends IsResidentialController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
