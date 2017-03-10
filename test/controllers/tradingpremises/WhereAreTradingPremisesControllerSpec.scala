@@ -103,11 +103,8 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010"
+            "postcode" -> "AA1 1AA"
+
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
