@@ -2,7 +2,6 @@ package models.tradingpremises
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
@@ -54,7 +53,7 @@ class IsResidentialSpec extends PlaySpec {
     "Read and write successfully" in {
 
       IsResidential.format.reads(IsResidential.format.writes(IsResidential(true))) must be(
-        JsSuccess(IsResidential(true)), JsPath \ "isResidential")
+        JsSuccess(IsResidential(true), JsPath \ "isResidential"))
     }
 
     "write successfully" in {
