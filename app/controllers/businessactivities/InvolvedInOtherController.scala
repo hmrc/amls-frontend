@@ -45,7 +45,12 @@ trait InvolvedInOtherController extends BaseController {
     implicit authContext => implicit request => {
       Form2[InvolvedInOther](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(involved_in_other_name(f, edit, None, None)))
+          for {
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+          } yield businessMatching match {
+            case Some(x) => BadRequest(involved_in_other_name(f, edit, None, businessTypes(businessMatching)))
+            case None => BadRequest(involved_in_other_name(f, edit, None, None))
+          }
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
