@@ -18,12 +18,12 @@ private object AppDependencies {
 
   private val playHealthVersion = "2.0.0"
   private val logbackJsonLoggerVersion = "3.1.0"
-  private val frontendBootstrapVersion = "7.11.0"
-  private val govukTemplateVersion = "5.0.0"
-  private val playUiVersion = "6.0.0"
-  private val playPartialsVersion = "5.2.0"
-  private val playAuthorisedFrontendVersion = "6.2.0"
-  private val playConfigVersion = "4.2.0"
+  private val frontendBootstrapVersion = "7.16.0"
+  private val govukTemplateVersion = "5.1.0"
+  private val playUiVersion = "7.0.0"
+  private val playPartialsVersion = "5.3.0"
+  private val playAuthorisedFrontendVersion = "6.3.0"
+  private val playConfigVersion = "4.3.0"
 
   private val httpCachingClientVersion = "6.1.0"
   private val playWhitelistFilterVersion = "2.0.0"

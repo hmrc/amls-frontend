@@ -322,7 +322,33 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
-    "on post with invalid data" in new Fixture {
+    "on post with invalid data with business activities" in new Fixture {
+
+      val businessMatching = BusinessMatching(
+        activities = Some(BMActivities(Set(AccountancyServices)))
+      )
+
+      val mockCacheMap = mock[CacheMap]
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "involvedInOther" -> "test"
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.01"))
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
+    }
+
+    "on post with invalid data without business activities" in new Fixture {
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
       val newRequest = request.withFormUrlEncodedBody(
         "involvedInOther" -> "test"
@@ -335,7 +361,16 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
       document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
     }
 
-    "on post with required field not filled" in new Fixture {
+    "on post with required field not filled with business activities" in new Fixture {
+
+      val businessMatching = BusinessMatching(
+        activities = Some(BMActivities(Set(AccountancyServices)))
+      )
+
+      val mockCacheMap = mock[CacheMap]
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
       val newRequest = request.withFormUrlEncodedBody(
         "involvedInOther" -> "true",
@@ -344,6 +379,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.01"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
