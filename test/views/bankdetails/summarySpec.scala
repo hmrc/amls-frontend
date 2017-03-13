@@ -1,6 +1,7 @@
 package views.bankdetails
 
 import models.bankdetails._
+import models.status.SubmissionDecisionApproved
 import org.jsoup.nodes.Element
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.MustMatchers
@@ -22,20 +23,20 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     "section is incomplete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
 
         doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
 
         heading.html must be(Messages("title.cya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
 
         doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
       }
@@ -44,20 +45,20 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     "section is complete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
 
         doc.title must startWith(Messages("title.ya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
 
         heading.html must be(Messages("title.ya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
 
         doc.getElementsByClass("button").html must include(Messages("button.confirmandcontinue"))
       }
@@ -102,7 +103,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "123456")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (_, check) => {
@@ -138,7 +139,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -174,7 +175,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("890834561")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -196,33 +197,26 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
           val accountNumberLength = 8
 
           val genUKAccount: Gen[UKAccount] = for {
-            accountNumber <- Gen.listOfN[String](accountNumberLength,Gen.numStr).map(_.mkString(""))
-            sortCode <- Gen.listOfN[String](sortCodeLength,Gen.numStr).map(_.mkString(""))
+            accountNumber <- Gen.listOfN[Char](accountNumberLength,Gen.numChar).map(_.mkString(""))
+            sortCode <- Gen.listOfN[Char](sortCodeLength,Gen.numChar).map(_.mkString(""))
           } yield {
             UKAccount(accountNumber, sortCode)
           }
 
-          val genAccountName: Gen[String] = Gen.listOfN[String](accountNumberLength,Gen.alphaStr).map(_.mkString(""))
+          val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength,Gen.alphaChar).map(_.mkString(""))
 
           forAll(genAccountName, genUKAccount){ (accountName: String, uk: UKAccount) =>
-            println(">>>>>>" + uk)
             whenever(
-              uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
+              accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
             ) {
               new ViewFixture {
-
                 val bankAccount = BankAccount(accountName, uk)
-
-                println(">" + bankAccount)
-
                 val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
 
-                def view = views.html.bankdetails.summary(testdata, true, true, true)
+                def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
 
                 val section = doc.select("li.check-your-answers ul").first().select("li").eq(1).first()
-
                 section.text() must be("")
-
               }
             }
           }
