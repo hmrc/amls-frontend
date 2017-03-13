@@ -109,8 +109,9 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         Some(true),
         Some(new LocalDate(1990, 2, 24))
       )
+
       "respond with SEE_OTHER" when {
-        "edit mode is false, and redirect to the 'what does your business do' page" in new Fixture {
+        "edit mode is false, and redirect to the 'Activity Start Date' page" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
@@ -162,7 +163,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           }
         }
 
-        "edit mode is true, and redirect to WhatDoesYourBusinessDo Controller" in new Fixture {
+        "redirect to the 'Activity Start Date' page when no data in save4later" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
@@ -170,11 +171,35 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "addressLine2" -> "Address 2",
             "postcode" -> "AA1 1AA"
           )
+          val newYtp = Some(YourTradingPremises(tradingName = "Trading Name",
+            tradingPremisesAddress = Address("Address 1", "Address 2", None, None, "AA1 1AA")))
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), meq(Seq(TradingPremises(yourTradingPremises = newYtp,  hasChanged = true))))(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+
+          val result = controller.post(RecordId1, false)(newRequest)
+
+          hstatus(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1, false).url))
+        }
+
+        "edit mode is true, and redirect to check your answer page" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "tradingName" -> "Trading Name",
+            "addressLine1" -> "Address 1",
+            "addressLine2" -> "Address 2",
+            "postcode" -> "AA1 1AA"
+          )
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
 

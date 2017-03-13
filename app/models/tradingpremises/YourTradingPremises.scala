@@ -11,8 +11,8 @@ import utils.MappingUtils.Implicits._
 case class YourTradingPremises(
                                 tradingName: String,
                                 tradingPremisesAddress: Address,
-                                isResidential: Option[Boolean],
-                                startDate: Option[LocalDate],
+                                isResidential: Option[Boolean] = None,
+                                startDate: Option[LocalDate] = None,
                                 tradingNameChangeDate: Option[DateOfChange] = None
                               )
 
