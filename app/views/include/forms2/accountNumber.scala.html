@@ -2,11 +2,12 @@
 
 @(
     value: String,
+    label: String,
     complete: Boolean,
     status: SubmissionStatus
 )(implicit lang:Lang,  m: Messages)
 
 @{status match {
-    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => { s"******${value.takeRight(2)}" }
-    case _ => value
+    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => s"$label: ******${value.takeRight(2)}"
+    case _ => s"$label: $value"
 }}
