@@ -450,7 +450,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
           val result = controller.post(RecordId, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId, true).url))
         }
       }
 
