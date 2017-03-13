@@ -190,20 +190,21 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     }
 
     "hide the first six numbers of a UKAccount number" when {
+
+      val sortCodeLength = 6
+      val accountNumberLength = 8
+
+      val genUKAccount: Gen[UKAccount] = for {
+        accountNumber <- Gen.listOfN[Char](accountNumberLength,Gen.numChar).map(_.mkString(""))
+        sortCode <- Gen.listOfN[Char](sortCodeLength,Gen.numChar).map(_.mkString(""))
+      } yield {
+        UKAccount(accountNumber, sortCode)
+      }
+
+      val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength,Gen.alphaChar).map(_.mkString(""))
+
       "complete" when {
         "user is making an amendment" in {
-
-          val sortCodeLength = 6
-          val accountNumberLength = 8
-
-          val genUKAccount: Gen[UKAccount] = for {
-            accountNumber <- Gen.listOfN[Char](accountNumberLength,Gen.numChar).map(_.mkString(""))
-            sortCode <- Gen.listOfN[Char](sortCodeLength,Gen.numChar).map(_.mkString(""))
-          } yield {
-            UKAccount(accountNumber, sortCode)
-          }
-
-          val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength,Gen.alphaChar).map(_.mkString(""))
 
           forAll(genAccountName, genUKAccount){ (accountName: String, uk: UKAccount) =>
             whenever(
@@ -215,8 +216,10 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
                 def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
 
-                val section = doc.select("li.check-your-answers ul").first().select("li").eq(1).first()
-                section.text() must be("")
+                private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+
+                accountNumberField.takeRight(8).take(6) must be("******")
+                accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
               }
             }
           }

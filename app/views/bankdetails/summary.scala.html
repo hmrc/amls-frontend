@@ -78,7 +78,7 @@
                             canEdit
                         ) {
                             <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @accountNumber(f.accountNumber, complete, status)</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
