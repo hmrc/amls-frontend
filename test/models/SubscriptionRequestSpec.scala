@@ -19,8 +19,8 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
       None,
       "asdfasdf"
     ),
-    true,
-    new LocalDate(1990, 2, 24)
+    Some(true),
+    Some(new LocalDate(1990, 2, 24))
   )
 
   val businessStructure = SoleProprietor

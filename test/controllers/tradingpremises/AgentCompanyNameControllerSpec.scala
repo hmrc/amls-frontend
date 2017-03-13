@@ -193,10 +193,10 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
   val day = 24
   val date = new LocalDate(year, month, day)
 
-  val ytp = YourTradingPremises("tradingName1", address, true, date)
-  val ytp1 = YourTradingPremises("tradingName2", address, true, date)
-  val ytp2 = YourTradingPremises("tradingName3", address, true, date)
-  val ytp3 = YourTradingPremises("tradingName3", address, true, date)
+  val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
+  val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))
+  val ytp2 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
+  val ytp3 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
 
 
   val businessStructure = SoleProprietor

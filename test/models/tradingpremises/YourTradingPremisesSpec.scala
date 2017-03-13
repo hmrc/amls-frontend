@@ -29,23 +29,19 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       None,
       "AA03 5BB"
     ),
-    true,
-    new LocalDate(1990, 2, 24)
+    Some(true),
+    Some(new LocalDate(1990, 2, 24))
   )
 
   "YourTradingPremises" must {
 
-    "fail validation when isresidential not selected" in {
+    "return valid response when isResidential and startDate are empty" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foo"),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB"),
-        "isResidential" -> Seq(""),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990")
-      )) must be (Invalid(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
-      )))
+        "postcode" -> Seq("AA03 5BB")
+      )) must be (Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA03 5BB",None),None,None,None)))
+
     }
 
     "fail validation when trading name is exceeds maxlength" in {

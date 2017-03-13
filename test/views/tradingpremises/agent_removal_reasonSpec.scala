@@ -68,8 +68,6 @@ class remove_agent_premises_reasonsSpec extends GenericTestHelper {
 
         def view = views.html.tradingpremises.remove_agent_premises_reasons(invalidForm, 0, false)
 
-        println(html)
-
         errorSummary.html() must include(Messages(errorKey))
         doc.getElementById(field).parent().getElementsByClass("error-notification").first().html() must include(Messages(errorKey))
       }

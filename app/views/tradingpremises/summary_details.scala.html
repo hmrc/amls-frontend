@@ -26,21 +26,24 @@
             }</p>
         }
 
-        @checkYourAnswers(
-            question = Messages("tradingpremises.summary.tradingstartdate"),
-            editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
-        ) {
-            <p>@DateHelper.formatDate(yta.startDate)</p>
+        @yta.startDate.map {startDate =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.summary.tradingstartdate"),
+                editUrl = controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).toString
+            ) {
+                <p>@DateHelper.formatDate(startDate)</p>
+            }
         }
-
-        @checkYourAnswers(
-            question = Messages("tradingpremises.summary.residential"),
-            editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
-        ) {
-            <p>@yta.isResidential match {
-                case true => { @Messages("lbl.yes") }
-                case false => { @Messages("lbl.no") }
-            }</p>
+        @yta.isResidential.map {residential =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.summary.residential"),
+                editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
+            ) {
+                <p>@residential match {
+                    case true => { @Messages("lbl.yes") }
+                    case false => { @Messages("lbl.no") }
+                }</p>
+            }
         }
 
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
