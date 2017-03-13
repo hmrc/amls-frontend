@@ -52,11 +52,10 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         } yield Redirect(routes.SummaryController.get(complete))
         case _ =>
           getData[TradingPremises](index) flatMap { premises =>
-
             premises.lineId match {
               case Some(_) =>
                 val extraFields = Map(
-                  "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.toString("yyyy-MM-dd"))
+                  "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.get.toString("yyyy-MM-dd"))
                 )
 
                 Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {

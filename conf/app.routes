@@ -61,6 +61,14 @@ GET         /trading-premises/add                                       controll
 
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/is-residential/:index                     @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/is-residential/:index                     @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
+
+
 GET         /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
 POST        /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
@@ -231,6 +239,7 @@ GET         /declaration/declaration                                    controll
 GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
+GET         /confirmation/payment-complete                              controllers.ConfirmationController.paymentConfirmation(reference: String)
 
 GET         /responsible-people/add                                     controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, fromDeclaration:Boolean ?= false)
 

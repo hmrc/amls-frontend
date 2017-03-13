@@ -1,0 +1,27 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], index:Int, edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("tradingpremises.startDate.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.startDate.title") + " - " + Messages("summary.tradingpremises"),
+    heading = header
+) {
+
+    @form(f, controllers.tradingpremises.routes.ActivityStartDateController.post(index, edit)) {
+
+        @date(
+            f = f,
+            p = "startDate",
+            hintId = "dob",
+            labelText = "tradingpremises.yourtradingpremises.startdate"
+        )
+
+        @submit(false)
+    }
+}

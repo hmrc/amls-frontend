@@ -66,28 +66,19 @@
                 f = f("paymentMethods.other"),
                 labelText = "hvd.receiving.option.03",
                 value = "true",
-                target = s".receive-payments-other-fieldset"
+                target = s"#paymentMethods-details-fieldset"
             )
         }
     }
 
-    @fieldset(
-        legend = "hvd.receiving.give.details",
-        legendHidden = true,
-        jsHidden = true,
-        panel = false,
-        classes = Seq("receive-payments-other-fieldset"),
-        f = f("paymentMethods-details-fieldset")
+    @panel(
+        field = Some(f("paymentMethods-details-fieldset")),
+        jsHidden = true
     ) {
-        @panel(
-            field = Some(f("paymentMethods-details")),
-            jsHidden = false
-        ) {
-            @input(
-                field = f("paymentMethods.details"),
-                labelText = "hvd.receiving.give.details.lbl"
-            )
-        }
+        @input(
+            field = f("paymentMethods.details"),
+            labelText = "hvd.receiving.give.details.lbl"
+        )
     }
 
     @submit(edit)

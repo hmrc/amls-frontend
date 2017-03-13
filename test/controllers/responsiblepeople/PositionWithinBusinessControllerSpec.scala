@@ -13,7 +13,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -40,6 +40,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
     val noNominatedOfficer = ResponsiblePeople(None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
     val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -392,6 +393,23 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
         }
 
+        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected and status is Deleted" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+            "startDate.day" -> "24",
+            "startDate.month" -> "2",
+            "startDate.year" -> "1990")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficerButDeleted))))
+          val mockCacheMap = mock[CacheMap]
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(RecordId)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+        }
+
         "redirect to VATRegisteredController when another position is selected in addition to the nomindated Officer" in new Fixture {
 
           val positions = Positions(Set(Director, NominatedOfficer), startDate)
@@ -450,7 +468,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
           val result = controller.post(RecordId, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId, true).url))
         }
       }
 

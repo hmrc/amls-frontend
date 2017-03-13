@@ -25,8 +25,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
       None,
       "asdfasdf"
     ),
-    true,
-    new LocalDate(1990, 2, 24)
+    Some(true),
+    Some(new LocalDate(1990, 2, 24))
   )
 
   val businessStructure = SoleProprietor

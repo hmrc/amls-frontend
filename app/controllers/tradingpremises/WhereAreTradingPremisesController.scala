@@ -43,8 +43,10 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
           for {
             tradingPremises <- getData[TradingPremises](index)
             _ <- updateDataStrict[TradingPremises](index) { tp =>
+              val updatedYtp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](Some(ytp))(x =>
+                Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential)))
               TradingPremises(tp.registeringAgentPremises,
-                Some(ytp), tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
+                updatedYtp, tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
                 tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
@@ -53,7 +55,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
               Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+              case false => Redirect(routes.ActivityStartDateController.get(index, edit))
             }
           }
 

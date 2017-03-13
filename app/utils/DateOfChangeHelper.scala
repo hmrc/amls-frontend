@@ -22,7 +22,7 @@ trait DateOfChangeHelper {
 
   implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises]) extends DateOfChangeHelper {
 
-    def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => Some(ytp.startDate))
+    def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
 
     def startDateValidationMessage =
       Messages("error.expected.tp.dateofchange.after.startdate", startDate.fold("")(_.toString("dd-MM-yyyy")))

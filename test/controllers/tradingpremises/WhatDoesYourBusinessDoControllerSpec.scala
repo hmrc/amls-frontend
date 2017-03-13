@@ -354,7 +354,7 @@ class WhatDoesYourBusinessDoControllerSpec extends GenericTestHelper with Mockit
         val expectedData = WhatDoesYourBusinessDo(data.activities, dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
         val yourPremises = mock[YourTradingPremises]
-        when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
+        when(yourPremises.startDate) thenReturn Some(new LocalDate(2005, 1, 1))
 
         val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
 

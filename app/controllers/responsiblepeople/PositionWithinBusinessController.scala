@@ -4,9 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
@@ -67,10 +67,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
                 }
               } else {
-                Redirect(routes.AreTheyNominatedOfficerController.get(index))
+                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
               }
             }
           }.recoverWith {
@@ -81,8 +81,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePeople]]): Boolean = {
     rpSeqOption match {
-
-      case Some(rps) => rps.exists {
+      case Some(rps) => rps.filterNot(_.status.contains(StatusConstants.Deleted)).exists {
         rp => rp.positions match {
           case Some(position) => position.isNominatedOfficer
           case _ => false

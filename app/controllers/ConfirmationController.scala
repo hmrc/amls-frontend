@@ -1,16 +1,18 @@
 package controllers
 
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AuthenticatorConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentRedirectRequest
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.{Logger, Play}
 import play.api.mvc.{AnyContent, Request}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,10 +23,11 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
+  private[controllers] val dataCacheConnector: DataCacheConnector
+
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PaymentsConnector]
 
   val statusService: StatusService
-
 
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
@@ -38,45 +41,57 @@ trait ConfirmationController extends BaseController {
         } yield result
   }
 
+  def paymentConfirmation(reference: String) = Authorised.async {
+    implicit authContext => implicit request =>
+        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+          case Some(bm) if bm.reviewDetails.isDefined =>
+            Ok(payment_confirmation(bm.reviewDetails.get.businessName, reference))
+          case _ =>
+            Ok(payment_confirmation("", reference))
+        }
+  }
+
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {
     case SubmissionReadyForReview => {
       for {
         fees <- getAmendmentFees
-        paymentsUrl <- requestPaymentsUrl(fees)
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
       } yield fees match {
-        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsUrl))
+        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
       }
     }
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        paymentsUrl <- requestPaymentsUrl(fees)
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
       } yield fees match {
-        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsUrl))
+        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
       }
     }
     case _ => {
-      submissionService.getSubscription map {
-        case (paymentRef, total, rows) =>
-          Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
+      for {
+        (paymentRef, total, rows) <- submissionService.getSubscription
+        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).absoluteURL())
+      } yield {
+        Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
       }
     }
   }
 
-  private def requestPaymentsUrl(data: Option[ViewData])(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[String] = data match {
-    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference)
-    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total)
-    case _ => Future.successful(ApplicationConfig.paymentsUrl)
+  private def requestPaymentsUrl(data: Option[ViewData], returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] = data match {
+    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl)
+    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total, returnUrl)
+    case _ => Future.successful(PaymentServiceRedirect(ApplicationConfig.paymentsUrl))
   }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[String] =
-    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, controllers.routes.LandingController.get().absoluteURL())) map {
-      case Some(redirect) => redirect.url
+  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] =
+    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, returnUrl)) map {
+      case Some(redirect) => redirect
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
-        ApplicationConfig.paymentsUrl
+        PaymentServiceRedirect(ApplicationConfig.paymentsUrl)
     }
 
   private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
@@ -111,4 +126,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val submissionService = SubmissionService
   override val statusService: StatusService = StatusService
   override private[controllers] val keystoreConnector = KeystoreConnector
+  override private[controllers] val dataCacheConnector = DataCacheConnector
 }
