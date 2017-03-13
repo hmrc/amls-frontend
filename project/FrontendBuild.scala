@@ -17,7 +17,7 @@ private object AppDependencies {
 
 
   private val playHealthVersion = "2.0.0"
-  private val playJsonLoggerVersion = "3.0.0"
+  private val logbackJsonLoggerVersion = "3.1.0"
   private val frontendBootstrapVersion = "7.11.0"
   private val govukTemplateVersion = "5.0.0"
   private val playUiVersion = "6.0.0"
@@ -42,7 +42,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "play-authorised-frontend" % playAuthorisedFrontendVersion,
     "uk.gov.hmrc" %% "play-config" % playConfigVersion,
-    "uk.gov.hmrc" %% "play-json-logger" % playJsonLoggerVersion,
+    "uk.gov.hmrc" %% "logback-json-logger" % logbackJsonLoggerVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
 
