@@ -64,7 +64,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
             } yield {
-              println("+++++++++++++++++++++++++++++++++"+hasNominatedOfficer(rpSeqOption))
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
