@@ -1131,11 +1131,6 @@ details {
   margin-top: 0;
 }
 
-.panel-indent .form-control {
-  width: 50%;
-}
-
-
 /* more GDS stuff overridden by Assets Frontend D: */
 
 .form-control {
@@ -1160,44 +1155,49 @@ details {
 }
 
 @media (min-width: 641px) {
-  .form-control {
+  .form-control,
+  .panel-indent .form-control {
     width: 50%
   }
 }
-
-/* yes, twice to override shady assets frontend nonsense *facepalm* */
 
 .form-control-3-4,
-.form-control-3-4.form-control-3-4 {
-  width: 100%
-}
-
-@media (min-width: 641px) {
-  .form-control-3-4,
-  .form-control-3-4.form-control-3-4 {
-    width: 75%
-  }
-}
-
+.form-control-2-3,
 .form-control-1-2,
-.form-control-1-2.form-control-1-2 {
-  width: 100%
+.form-control-1-3,
+.form-control-1-4,
+.form-control-1-8 {
+    width: 100%;
 }
 
 @media (min-width: 641px) {
-  .form-control-1-2,
-  .form-control-1-2.form-control-1-2 {
-    width: 50%
-  }
-}
+    .form-control-3-4,
+    .form-control-3-4.form-control-3-4 {
+        width: 75%;
+    }
 
-.form-control-1-4,
-.form-control-1-4.form-control-1-4 {
-  width: 25%
-}
+    .form-control-2-3,
+    .form-control-2-3.form-control-2-3 {
+        width: 66.66%;
+    }
 
-.form-control-1-8,
-.form-control-1-8.form-control-1-8 {
-  width: 12.5%
-}
+    .form-control-1-2,
+    .form-control-1-2.form-control-1-2 {
+        width: 50%;
+    }
 
+    .form-control-1-3,
+    .form-control-1-3.form-control-1-3 {
+        width: 33.33%;
+    }
+
+    .form-control-1-4,
+    .form-control-1-4.form-control-1-4 {
+        width: 25%;
+    }
+
+    .form-control-1-8,
+    .form-control-1-8.form-control-1-8 {
+        width: 12.5%;
+    }
+}
