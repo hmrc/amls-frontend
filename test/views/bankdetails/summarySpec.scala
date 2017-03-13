@@ -24,20 +24,20 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     "section is incomplete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
 
         doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
 
         heading.html must be(Messages("title.cya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
 
         doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
       }
@@ -46,20 +46,20 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     "section is complete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
 
         doc.title must startWith(Messages("title.ya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
 
         heading.html must be(Messages("title.ya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionDecisionApproved)
+        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
 
         doc.getElementsByClass("button").html must include(Messages("button.confirmandcontinue"))
       }
@@ -104,7 +104,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "123456")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (_, check) => {
@@ -140,7 +140,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -176,7 +176,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("890834561")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
+        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -219,7 +219,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
                 private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
 
-                accountNumberField.takeRight(8).take(6) must be("******")
+                accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                 accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
               }
             }
@@ -240,7 +240,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
                 private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
 
-                accountNumberField.takeRight(8).take(6) must be("******")
+                accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                 accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
               }
             }

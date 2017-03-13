@@ -6,4 +6,7 @@
     status: SubmissionStatus
 )(implicit lang:Lang,  m: Messages)
 
-@value
+@{status match {
+    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => { s"******${value.takeRight(2)}" }
+    case _ => value
+}}
