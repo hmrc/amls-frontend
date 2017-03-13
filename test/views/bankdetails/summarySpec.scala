@@ -192,27 +192,29 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       "complete" when {
         "user is making an amendment" in {
 
-          val accountNameGen: Gen[String] = Gen.alphaStr //map (_.take(8))
+          val sortCodeLength = 6
+          val accountNumberLength = 8
 
-          val genUKAccount: Gen[BankAccount] = for {
-            accountNumber <- Gen.numStr suchThat(_.length == 8)
-            accountName <- accountNameGen suchThat(_.length == 8)
-            sortCode <- Gen.numStr suchThat(_.length == 6)
+          val genUKAccount: Gen[UKAccount] = for {
+            accountNumber <- Gen.listOfN[String](accountNumberLength,Gen.numStr).map(_.mkString(""))
+            sortCode <- Gen.listOfN[String](sortCodeLength,Gen.numStr).map(_.mkString(""))
           } yield {
-            BankAccount(accountName, UKAccount(accountNumber, sortCode))
+            UKAccount(accountNumber, sortCode)
           }
 
-          implicit val arbB: Arbitrary[BankAccount] = Arbitrary {
-            genUKAccount
+          val genBankAccount: Gen[BankAccount] = for {
+            accountName <- Gen.listOfN[String](accountNumberLength,Gen.alphaStr).map(_.mkString(""))
+            ukAccount <- genUKAccount
+          } yield {
+            BankAccount(accountName, ukAccount)
           }
 
-          forAll{ (ba: BankAccount) =>
+          forAll(genBankAccount, genUKAccount){ (ba: BankAccount, uk: UKAccount) =>
+            println(">>>>>>" + ba)
             whenever(
-              ba.accountName.length > 0
+              ba.accountName.length > 0 && uk.sortCode.length == 6 && uk.accountNumber.length == 8
             ) {
               new ViewFixture {
-
-                println(">>>>>>" + ba)
 
                 val testdata = Seq(BankDetails(Some(PersonalAccount), Some(ba)))
 
