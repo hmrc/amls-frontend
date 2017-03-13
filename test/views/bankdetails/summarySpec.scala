@@ -202,6 +202,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
             UKAccount(accountNumber, sortCode)
           }
 
+<<<<<<< HEAD
           val genAccountName: Gen[String] = Gen.listOfN[String](accountNumberLength,Gen.alphaStr).map(_.mkString(""))
 
           forAll(genAccountName, genUKAccount){ (accountName: String, uk: UKAccount) =>
@@ -216,6 +217,23 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
                 println(">" + bankAccount)
 
                 val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
+=======
+          val genBankAccount: Gen[BankAccount] = for {
+            accountName <- Gen.listOfN[String](accountNumberLength,Gen.alphaStr).map(_.mkString(""))
+            ukAccount <- genUKAccount
+          } yield {
+            BankAccount(accountName, ukAccount)
+          }
+
+          forAll(genBankAccount, genUKAccount){ (ba: BankAccount, uk: UKAccount) =>
+            println(">>>>>>" + ba)
+            whenever(
+              ba.accountName.length > 0 && uk.sortCode.length == 6 && uk.accountNumber.length == 8
+            ) {
+              new ViewFixture {
+
+                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(ba)))
+>>>>>>> 39811aae4a6cb7f24231ee53eeca3e2c4dd858ab
 
                 def view = views.html.bankdetails.summary(testdata, true, true, true)
 
