@@ -1,12 +1,14 @@
 @import models.status._
+@import utils.StatusConstants
 @(
     value: String,
     label: String,
     complete: Boolean,
-    status: SubmissionStatus
+    status: SubmissionStatus,
+    accountStatus: Option[String]
 )(implicit lang:Lang,  m: Messages)
-@{status match {
-    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => {
+@{(status, accountStatus) match {
+    case ((SubmissionReadyForReview | SubmissionDecisionApproved), Some(accStatus)) if complete & accStatus != StatusConstants.Added => {
         <li>{label}: <span class='visuallyhidden'>Ending in</span><span aria-hidden='true'>******</span>{value.takeRight(2)}</li>
     }
     case _ => <li>{label}: {value}</li>

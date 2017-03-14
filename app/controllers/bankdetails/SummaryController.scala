@@ -9,8 +9,6 @@ import services.StatusService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
-import scala.concurrent.Future
-
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
