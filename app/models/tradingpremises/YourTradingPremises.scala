@@ -56,7 +56,7 @@ object YourTradingPremises {
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
           (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address") ~
-          (__ \ "startDate").read(localDateRule)
+          (__ \ "startDate").read(localDateRuleWithPattern(yearType))
         ) ((tradingName: String, address: Address, isResidential: Boolean, startDate: LocalDate) =>
         YourTradingPremises(tradingName, address, isResidential, startDate))
     }

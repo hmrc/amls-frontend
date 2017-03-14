@@ -76,6 +76,9 @@ error.expected.dateofchange.date.after.activitystartdate = The date must be afte
 
 error.invalid.mlr.number = Enter a valid Money Laundering Regulation registration number
 
+error.invalid.year = Enter a valid date in the format DD MM YYYY
+error.invalid.year.post1900 = The year can’t be before 1900
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
@@ -153,7 +156,7 @@ error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
 error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
-error.required.tp.year = Enter a year.
+error.required.tp.year = Enter a valid date in the format DD MM YYYY
 error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
 error.required.tp.residential.address = Select yes if this is also a residential address
 error.required.tp.registered.business.name = Enter your agent’s registered business name.

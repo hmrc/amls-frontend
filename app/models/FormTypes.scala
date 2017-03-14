@@ -43,7 +43,8 @@ object FormTypes {
     ")$").r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
-  val yearRegex = "((19|20)\\d\\d)".r
+  val yearRegexPost1900 = "((19|20)\\d\\d)".r
+  val yearRegexFourDigits = "(?<!\\d)(?!0000)\\d{4}(?!\\d)".r
   val corporationTaxRegex = "^[0-9]{10}$".r
   val ninoRegex = "(AA|AB|AE|AH|AK|AL|AM|AP|AR|AS|AT|AW|AX|AY|AZ|BA|BB|BE|BH|BK|BL|BM|BT|CA|CB|CE|CH|CK|CL|CR|EA|EB|EE|EH|EK|EL|EM|EP|ER|ES|ET|EW|EX|EY|EZ|GY|HA|HB|HE|HH|HK|HL|HM|HP|HR|HS|HT|HW|HX|HY|HZ|JA|JB|JC|JE|JG|JH|JJ|JK|JL|JM|JN|JP|JR|JS|JT|JW|JX|JY|JZ|KA|KB|KE|KH|KK|KL|KM|KP|KR|KS|KT|KW|KX|KY|KZ|LA|LB|LE|LH|LK|LL|LM|LP|LR|LS|LT|LW|LX|LY|LZ|MA|MW|MX|NA|NB|NE|NH|NL|NM|NP|NR|NS|NW|NX|NY|NZ|OA|OB|OE|OH|OK|OL|OM|OP|OR|OS|OX|PA|PB|PC|PE|PG|PH|PJ|PK|PL|PM|PN|PP|PR|PS|PT|PW|PX|PY|RA|RB|RE|RH|RK|RM|RP|RR|RS|RT|RW|RX|RY|RZ|SA|SB|SC|SE|SG|SH|SJ|SK|SL|SM|SN|SP|SR|SS|ST|SW|SX|SY|SZ|TA|TB|TE|TH|TK|TL|TM|TN|TP|TR|TS|TT|TW|TX|TY|TZ|WA|WB|WE|WK|WL|WM|WP|YA|YB|YE|YH|YK|YL|YM|YP|YR|YS|YT|YW|YX|YY|YZ|ZA|ZB|ZE|ZH|ZK|ZL|ZM|ZP|ZR|ZS|ZT|ZW|ZX|ZY)[0-9]{6}[A-D]".r
 
@@ -146,15 +147,31 @@ object FormTypes {
   private val monthPattern = regexWithMsg(monthRegex, "error.invalid.tp.month")
 
   private val yearRequired = required("error.required.tp.year")
-  private val yearPattern = regexWithMsg(yearRegex, "error.invalid.tp.year")
+  private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
+  private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
   val phoneNumberType = phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
+  val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
   val yearType: Rule[String, String] = yearRequired andThen yearPattern
 
-  val localDateRule: Rule[UrlFormEncoded, LocalDate] =
+  val localDateRule = localDateRuleWithPattern(yearTypePost1900)
+
+  def localDateRuleWithPattern(yearTypeRule: Rule[String, String]) : Rule[UrlFormEncoded, LocalDate] = {
+      From[UrlFormEncoded] { __ =>
+        (
+          (__ \ "year").read(yearTypeRule) ~
+            (__ \ "month").read(monthType) ~
+            (__ \ "day").read(dayType)
+          ) ((y, m, d) => s"$y-$m-$d") orElse
+          Rule[UrlFormEncoded, String](__ => Valid("INVALID DATE STRING")) andThen
+          jodaLocalDateR("yyyy-MM-dd")
+      }.repath(_ => Path)
+  }
+
+  /*val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>
       (
         (__ \ "year").read(yearType) ~
@@ -163,7 +180,7 @@ object FormTypes {
         ) ((y, m, d) => s"$y-$m-$d") orElse
         Rule[UrlFormEncoded, String](__ => Valid("INVALID DATE STRING")) andThen
         jodaLocalDateR("yyyy-MM-dd")
-    }.repath(_ => Path)
+    }.repath(_ => Path)*/
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>

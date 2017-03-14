@@ -179,7 +179,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
       yearType.validate("19999") must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.tp.year"))
+          Path -> Seq(ValidationError("error.invalid.year"))
         )))
     }
 
@@ -187,7 +187,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
       yearType.validate("1") must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.tp.year"))
+          Path -> Seq(ValidationError("error.invalid.year"))
         )))
     }
   }
