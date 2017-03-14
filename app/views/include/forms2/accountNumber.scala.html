@@ -1,13 +1,13 @@
 @import models.status._
-
 @(
     value: String,
     label: String,
     complete: Boolean,
     status: SubmissionStatus
 )(implicit lang:Lang,  m: Messages)
-
 @{status match {
-    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => s"$label: <span class=visuallyhidden>Ending in</span><span aria-hidden=true>******</span>${value.takeRight(2)}"
-    case _ => s"$label: $value"
+    case (SubmissionReadyForReview | SubmissionDecisionApproved) if complete => {
+        <li>{label}: <span class='visuallyhidden'>Ending in</span><span aria-hidden='true'>******</span>{value.takeRight(2)}</li>
+    }
+    case _ => <li>{label}: {value}</li>
 }}

@@ -60,7 +60,7 @@
                         ) {
                             <ul class="list">
                                 <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
-                                <li>@accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status)</li>
+                                @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status)
                                 <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
