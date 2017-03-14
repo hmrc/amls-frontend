@@ -49,7 +49,7 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
 
       "load the Premises Registered page1" in new Fixture {
         val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
-          true, new LocalDate(1990, 2, 24))
+          Some(true), Some(new LocalDate(1990, 2, 24)))
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(registeringAgentPremises = None,

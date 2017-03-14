@@ -254,7 +254,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
           val yourPremises = mock[YourTradingPremises]
-          when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
+          when(yourPremises.startDate) thenReturn new Some(new LocalDate(2005, 1, 1))
 
           val premises = TradingPremises(agentName = Some(name), yourTradingPremises = Some(yourPremises))
 
@@ -286,7 +286,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           )
 
           val yourPremises = mock[YourTradingPremises]
-          when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
+          when(yourPremises.startDate) thenReturn Some(new LocalDate(2005, 1, 1))
 
           val premises = TradingPremises(agentName = Some(AgentName("Trading Name")), yourTradingPremises = Some(yourPremises))
 
@@ -307,10 +307,10 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
   val day = 24
   val date = new LocalDate(year, month, day)
 
-  val ytp = YourTradingPremises("tradingName1", address, true, date)
-  val ytp1 = YourTradingPremises("tradingName2", address, true, date)
-  val ytp2 = YourTradingPremises("tradingName3", address, true, date)
-  val ytp3 = YourTradingPremises("tradingName3", address, true, date)
+  val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
+  val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))
+  val ytp2 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
+  val ytp3 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
 
 
   val businessStructure = SoleProprietor

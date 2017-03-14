@@ -25,7 +25,7 @@ import scala.concurrent.Future
 
 class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar with BeforeAndAfter {
 
-  val mockDataCacheConnector = mock[DataCacheConnector]
+  private val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -54,7 +54,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       "respond with OK and show the form with data when there is data" in new Fixture {
 
         val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
-        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now())
+        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -96,30 +96,43 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
     }
 
     "post is called" must {
+
+      val ytp = YourTradingPremises(
+        "foo",
+        Address(
+          "1",
+          "2",
+          None,
+          None,
+          "AA03 5BB"
+        ),
+        Some(true),
+        Some(new LocalDate(1990, 2, 24))
+      )
+
       "respond with SEE_OTHER" when {
-        "edit mode is false, and redirect to the 'what does your business do' page" in new Fixture {
+        "edit mode is false, and redirect to the 'Activity Start Date' page" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010"
+            "postcode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(ytp))))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          val updatedYtp = ytp.copy(tradingName = "Trading Name", tradingPremisesAddress = Address("Address 1", "Address 2", None, None, "AA1 1AA"))
+
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),
+            meq(Seq(TradingPremises(yourTradingPremises = Some(updatedYtp), hasChanged = true))))(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId1, false)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
         }
         
         "fail submission on invalid uk address" in new Fixture {
@@ -130,11 +143,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "addressLine2" -> "Address **2",
             "addressLine3" -> "Address **3",
             "addressLine4" -> "Address **4",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010"
+            "postcode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -154,23 +163,43 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           }
         }
 
-        "edit mode is true, and redirect to WhatDoesYourBusinessDo Controller" in new Fixture {
+        "redirect to the 'Activity Start Date' page when no data in save4later" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010"
+            "postcode" -> "AA1 1AA"
           )
+          val newYtp = Some(YourTradingPremises(tradingName = "Trading Name",
+            tradingPremisesAddress = Address("Address 1", "Address 2", None, None, "AA1 1AA")))
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), meq(Seq(TradingPremises(yourTradingPremises = newYtp,  hasChanged = true))))(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+
+          val result = controller.post(RecordId1, false)(newRequest)
+
+          hstatus(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1, false).url))
+        }
+
+        "edit mode is true, and redirect to check your answer page" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "tradingName" -> "Trading Name",
+            "addressLine1" -> "Address 1",
+            "addressLine2" -> "Address 2",
+            "postcode" -> "AA1 1AA"
+          )
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
 
@@ -203,13 +232,9 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
-            "addressLine1" -> "Address 1",
+            "addressLine1" -> "Address 1"*120,
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "201345670"
+            "postcode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -221,7 +246,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           val result = controller.post(RecordId1, false)(newRequest)
 
           hstatus(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+          contentAsString(result) must include(Messages("error.max.length.address.line"))
 
         }
       }
@@ -233,11 +258,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA",
-            "isResidential" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010"
+            "postcode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -259,11 +280,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           "tradingName" -> "Trading Name",
           "addressLine1" -> "Address 1",
           "addressLine2" -> "Address 2",
-          "postcode" -> "AA1 1AA",
-          "isResidential" -> "true",
-          "startDate.day" -> "01",
-          "startDate.month" -> "02",
-          "startDate.year" -> "2010"
+          "postcode" -> "AA1 1AA"
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -275,13 +292,13 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         val result = controller.post(1)(newRequest)
 
         hstatus(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
+        redirectLocation(result) must be(Some(routes.ActivityStartDateController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
-            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, true, TradingPremisesSection.date))
+            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, Some(true), Some(TradingPremisesSection.date)))
           ))))(any(), any(), any())
       }
     }
@@ -294,15 +311,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA",
-        "isResidential" -> "true",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010"
+        "postcode" -> "AA1 1AA"
       )
 
       val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, LocalDate.now())
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
@@ -327,15 +340,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA",
-        "isResidential" -> "true",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010"
+        "postcode" -> "AA1 1AA"
       )
 
       val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2007, 2, 1))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(new LocalDate(2007, 2, 1)))
 
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -352,7 +361,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val result = controller.post(1)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
     }
 
     "the trading premises instance is brand new" in new Fixture {
@@ -361,15 +370,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA",
-        "isResidential" -> "true",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010"
+        "postcode" -> "AA1 1AA"
       )
 
       val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, new LocalDate(2007, 2, 1))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(new LocalDate(2007, 2, 1)))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
@@ -403,7 +408,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
       val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = true, new LocalDate(2001, 1, 1), None)
+      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = Some(true), Some(new LocalDate(2001, 1, 1)), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
       val expectedResult = yourPremises.copy(
@@ -437,7 +442,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
       val postRequest = request.withFormUrlEncodedBody()
 
@@ -455,7 +460,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
       val postRequest = request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "1",
@@ -480,7 +485,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       "dateOfChange.day" -> "01"
     )
 
-    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
+    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(new LocalDate(2008, 1, 1)), None)
     val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
     when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))

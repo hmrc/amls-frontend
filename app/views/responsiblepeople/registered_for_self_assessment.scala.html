@@ -44,15 +44,20 @@ s"""${f("utrNumber").id}-fieldset"""
         }
 
         @fieldset(
-            legend = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-            legendHidden = true,
             classes = Seq("saRegistered-fieldset"),
-            f = f("utrNumber-fieldset")
+            f = f("utrNumber-fieldset"),
+            legend = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+            legendHidden = true
         ) {
             @input(
+                attrMaxlength = "10",
+                attrPattern = "[0-9]{1,10}",
+                bold = false,
+                classes = Seq("form-control-1-4 form-control-1-4"),
                 field = f("utrNumber"),
-                labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber",
-                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint")
+                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
+            )
         }
 
         @submit(edit)

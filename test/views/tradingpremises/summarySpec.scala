@@ -13,7 +13,7 @@ trait ViewTestHelper extends GenericTestHelper {
     registeringAgentPremises = Some(RegisteringAgentPremises(true)),
     status = Some(StatusConstants.Added),
     lineId = Some(11),
-    yourTradingPremises = Some(YourTradingPremises("Test", Address("Line 1", "Line 2", None, None, "TEST", None), true, LocalDate.now, None))
+    yourTradingPremises = Some(YourTradingPremises("Test", Address("Line 1", "Line 2", None, None, "TEST", None), Some(true), Some(LocalDate.now), None))
   ))
 
   trait ViewFixture extends Fixture {
