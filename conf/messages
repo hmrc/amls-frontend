@@ -1036,7 +1036,7 @@ responsiblepeople.personName.otherlastnames = Previous last names
 responsiblepeople.personName.previous.date.lbl = When did their name legally change?
 responsiblepeople.personName.alternativeName = Alternative name
 responsiblepeople.registeredforselfassessment.title = Is {0} registered for Self Assessment?
-responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
+responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference (UTR) number
 responsiblepeople.contact_details.title = What are the contact details for {0}?
 responsiblepeople.contact_details.lbl = By providing this information, this responsible person gives their permission to be contacted by HM Revenue and Customs.
 responsiblepeople.contact_details.phone.lbl = Phone number
@@ -1248,7 +1248,7 @@ supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants
 supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Scotland
 supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants of England and Wales
 supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
-supervision.memberofprofessionalbody.lbl.12 = International Association of Book-keepers
+supervision.memberofprofessionalbody.lbl.12 = International Association of Bookkeepers
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
