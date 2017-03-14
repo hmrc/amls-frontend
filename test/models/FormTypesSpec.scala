@@ -190,6 +190,14 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
           Path -> Seq(ValidationError("error.invalid.year"))
         )))
     }
+
+    "fail to validate year before 1990" in {
+
+      yearTypePost1900.validate("1899") must
+        be(Invalid(Seq(
+          Path -> Seq(ValidationError("error.invalid.year.post1900"))
+        )))
+    }
   }
 
   "localDateRule" must {
