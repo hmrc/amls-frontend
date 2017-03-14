@@ -204,52 +204,54 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
       val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength, Gen.alphaChar).map(_.mkString(""))
 
-      "complete" when {
-        "user is making an amendment" in {
+      "showing My Answers" when {
+        "bank account has not just been added" when {
+          "user is making an amendment" in {
 
-          forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-            whenever(
-              accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-            ) {
-              new ViewFixture {
-                val bankAccount = BankAccount(accountName, uk)
-                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
+            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
+              whenever(
+                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
+              ) {
+                new ViewFixture {
+                  val bankAccount = BankAccount(accountName, uk)
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
 
-                def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionReadyForReview)
+                  def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionReadyForReview)
 
-                private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
 
-                accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
-                accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
+                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
+                }
               }
             }
+
           }
+          "user is making a variation" in {
 
-        }
-        "user is making a variation" in {
+            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
+              whenever(
+                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
+              ) {
+                new ViewFixture {
+                  val bankAccount = BankAccount(accountName, uk)
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
 
-          forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-            whenever(
-              accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-            ) {
-              new ViewFixture {
-                val bankAccount = BankAccount(accountName, uk)
-                val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
+                  def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
 
-                def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
 
-                private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
-
-                accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
-                accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
+                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
+                }
               }
             }
-          }
 
+          }
         }
       }
 
-      "incomplete" when {
+      "showing Check My Answers" when {
         "bank account has not just been added" when {
           "user is making an amendment" in {
 
