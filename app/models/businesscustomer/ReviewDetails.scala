@@ -27,9 +27,9 @@ object ReviewDetails {
     (
       (__ \ "businessName").read[String] and
         (__ \ "businessType").readNullable[String].map[Option[BusinessType]] {
-          thing =>
-            Logger.debug(s"[ReviewDetails - BusinessType: $thing}")
-            thing match {
+          typeOption =>
+            Logger.debug(s"[ReviewDetails - BusinessType: $typeOption}")
+            typeOption match {
               case Some("Sole Trader") => Some(SoleProprietor)
               case Some("Corporate Body") => Some(LimitedCompany)
               case Some("Partnership") => Some(Partnership)
