@@ -1,7 +1,7 @@
 package models.tradingpremises
 
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted}
+import models.registrationprogress.{Completed, NotStarted, Started}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -11,7 +11,7 @@ import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{StatusConstants}
+import utils.StatusConstants
 
 
 class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite {
@@ -172,6 +172,22 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         section.hasChanged must be(true)
         section.status must be(NotStarted)
         section.call must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+      }
+    }
+
+    "the section is complete with all the trading premises being removed and has one incomplete model" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(Some(RegisteringAgentPremises(true)), None))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Started)
+        section.call must be(controllers.tradingpremises.routes.WhatYouNeedController.get(3))
       }
     }
 

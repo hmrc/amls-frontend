@@ -82,8 +82,9 @@ object TradingPremises {
         case premises if premises.nonEmpty && premises.forall {
           _.isComplete
         } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
-        case premises => {
-          val index = premises.indexWhere {
+        case _ => {
+          val premise = tp.filterNot(_ == TradingPremises())
+          val index = premise.indexWhere {
             case model if !model.isComplete => true
             case _ => false
           }
