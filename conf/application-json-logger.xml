@@ -7,6 +7,14 @@
 
     <logger name="uk.gov" level="${logger.uk.gov:-WARN}"/>
 
+    <logger name="com.ning.http.client" level="WARN"/>
+
+    <logger name="org.asynchttpclient.netty.channel.DefaultChannelPool" level="WARN"/>
+
+    <logger name="org.asynchttpclient.netty" level="WARN"/>
+
+    <logger name="play.core.netty.utils.ServerCookieDecoder" level="WARN"/>
+
     <root level="${logger.application:-WARN}">
         <appender-ref ref="STDOUT"/>
     </root>
