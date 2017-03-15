@@ -6,7 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
 import services.StatusService
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -38,8 +38,11 @@ trait BankAccountController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[BankDetails](index) { bd =>
-              bd.bankAccount(data)
+            _ <- updateDataStrict[BankDetails](index) { bd =>
+              bd.copy(
+                bankAccount = Some(data),
+                status = Some(if(edit){StatusConstants.Updated}else{StatusConstants.Added})
+              )
             }
           } yield {
             if(edit) {
