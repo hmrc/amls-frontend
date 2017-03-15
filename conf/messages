@@ -213,6 +213,8 @@ error.required.positionWithinBusiness = Select one or more options to show this 
 error.required.rp.wherepersonlives.howlonglived = Select one option to show how long this person lived at this address
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
+error.required.rp.sole_proprietor = Select yes if {0} is registered for VAT in the UK as a sole proprietor
+
 
 ############################### Trust and company service providers ###############################
 

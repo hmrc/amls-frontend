@@ -99,10 +99,10 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
         }
 
-        "redirect to the vat registered controller when another type is selected" in new Fixture {
+        "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
@@ -113,7 +113,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
         }
 
 
