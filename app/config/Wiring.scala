@@ -33,7 +33,7 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
 }
 
 @Singleton
-class FrontendAuthConnector @Inject()(config: ServicesConfig) extends AuthConnector {
+class FrontendAuthConnector @Inject()(config: uk.gov.hmrc.play.config.inject.ServicesConfig) extends AuthConnector {
   lazy val serviceUrl = config.baseUrl("auth")
   override def http = WSHttp
 }
