@@ -7,9 +7,13 @@
     status: SubmissionStatus,
     accountStatus: Option[String]
 )(implicit lang:Lang,  m: Messages)
-@{(status, accountStatus) match {
-    case ((SubmissionReadyForReview | SubmissionDecisionApproved), Some(accStatus)) if complete & accStatus != StatusConstants.Added => {
-        <li>{label}: <span class='visuallyhidden'>Ending in</span><span aria-hidden='true'>******</span>{value.takeRight(2)}</li>
+@{accountStatus match {
+    case Some(a) if a.equals(StatusConstants.Added) => <li>{label}: {value}</li>
+    case _ => {
+        status match {
+            case SubmissionDecisionApproved | SubmissionReadyForReview => {<li>{label}: <span class='visuallyhidden'>Ending in</span> <span aria-hidden='true'>******</span>{value.takeRight(2)}</li>
+        }
+        case _ => <li>{label}: {value}</li>
     }
-    case _ => <li>{label}: {value}</li>
+    }
 }}
