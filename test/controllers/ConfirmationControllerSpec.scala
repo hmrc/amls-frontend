@@ -11,6 +11,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -33,6 +34,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PaymentsConnector].to(paymentsConnector))
+    .configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> true)
     .build()
 
   trait Fixture extends AuthorisedFixture {
@@ -68,7 +70,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     )
 
     protected val mockCacheMap = mock[CacheMap]
-    val paymentCookie = Cookie("test", "test-value")
+    val paymentCookie = Cookie("mdtpp", "test-value")
 
     reset(paymentsConnector)
 
@@ -86,7 +88,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "ConfirmationController" must {
-    
+
     "write a confirmation value to Keystore" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -139,7 +141,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     "query the payments service for the payments url for a new submission" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionReady))
+        .thenReturn(Future.successful(SubmissionReady))
 
       val paymentsRedirectUrl = controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).absoluteURL(request.secure, request.host)
 
@@ -313,4 +315,89 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
   }
+}
+
+class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
+
+  val paymentsConnector = mock[PaymentsConnector]
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[PaymentsConnector].to(paymentsConnector))
+    .configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> false)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+
+    self =>
+
+    implicit val authContext = mock[AuthContext]
+    implicit val headerCarrier = HeaderCarrier()
+
+    val baseUrl = "http://localhost"
+    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+
+    val controller = new ConfirmationController {
+      override protected val authConnector = self.authConnector
+      override private[controllers] val submissionService = mock[SubmissionService]
+      override val statusService: StatusService = mock[StatusService]
+      override val keystoreConnector = mock[KeystoreConnector]
+      override val dataCacheConnector = mock[DataCacheConnector]
+    }
+
+    val paymentRefNo = "XA111123451111"
+
+    val response = SubscriptionResponse(
+      etmpFormBundleNumber = "",
+      amlsRefNo = "",
+      registrationFee = 0,
+      fpFee = None,
+      fpFeeRate = None,
+      premiseFee = 0,
+      premiseFeeRate = None,
+      totalFees = 0,
+      paymentReference = paymentRefNo
+    )
+
+    protected val mockCacheMap = mock[CacheMap]
+    val paymentCookie = Cookie("test", "test-value")
+
+    reset(paymentsConnector)
+
+    when(controller.submissionService.getSubscription(any(), any(), any()))
+      .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
+
+    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
+
+    when {
+      paymentsConnector.requestPaymentRedirectUrl(any())(any(), any())
+    } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
+
+    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+
+  }
+
+  "ConfirmationController" must {
+
+    "show the old confirmation screen when the payments url lookup is toggled off" in new Fixture {
+
+      when(controller.submissionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any())
+
+      cookies(result) must contain(paymentCookie)
+
+      Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true
+    }
+
+  }
+
 }
