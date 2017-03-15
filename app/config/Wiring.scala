@@ -34,7 +34,7 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
 
 @Singleton
 class FrontendAuthConnector @Inject()() extends AuthConnector with ServicesConfig {
-  val serviceUrl = baseUrl("auth")
+  lazy val serviceUrl = baseUrl("auth")
   override def http = WSHttp
 }
 
