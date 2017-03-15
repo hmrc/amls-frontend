@@ -75,7 +75,10 @@ trait ConfirmationController extends BaseController {
         (paymentRef, total, rows) <- submissionService.getSubscription
         paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).absoluteURL())
       } yield {
-        Ok(views.html.confirmation.confirmation(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+        ApplicationConfig.paymentsUrlLookupToggle match {
+          case true => Ok(views.html.confirmation.confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+          case _ => Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
+        }
       }
     }
   }
