@@ -3,60 +3,40 @@
 
 @(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
 
-@target = @{
-    s"""${f("vrnNumber").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.registeredforvat.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.sole.proprietor.another.business.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforvat.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.sole.proprietor.another.business.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.post(index, edit, fromDeclaration)) {
 
         @fieldset(
-            f = f("registeredForVAT-fieldset"),
-            legend = "responsiblepeople.registeredforvat.title",
+            f = f("soleProprietorOfAnotherBusiness-fieldset"),
+            legend = "responsiblepeople.sole.proprietor.another.business.title",
             legendHidden = true,
             panel = false
         ) {
             @errorGroup(
-                field = f("registeredForVAT")
+                field = f("soleProprietorOfAnotherBusiness")
                 ) {
                     @radio(
-                        f = f("registeredForVAT"),
+                        f = f("soleProprietorOfAnotherBusiness"),
                         labelText = "lbl.yes",
                         value = "true",
-                        inline = true,
-                        target = s"#$target"
+                        inline = true
                     )
                 @radio(
-                    f = f("registeredForVAT"),
+                    f = f("soleProprietorOfAnotherBusiness"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
                 )
             }
-        }
-
-        @fieldset(
-            f = f(s"$target"),
-            legend = "responsiblepeople.registeredforvat.lbl.vatNumber",
-            legendHidden = true
-        ) {
-            @input(
-                field = f("vrnNumber"),
-                labelText = "responsiblepeople.registeredforvat.lbl.vatNumber",
-                attrMaxlength = "9",
-                attrPattern = "[0-9]{1,9}",
-                bold = false,
-                classes = Seq("form-control-1-4 form-control-1-4")
-            )
         }
 
         @submit()

@@ -26,14 +26,14 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
           "soleProprietorOfAnotherBusiness" -> Seq("")
         )
         SoleProprietorOfAnotherBusiness.formRule.validate(model) must be(Invalid(Seq(
-          Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor", "booooooop"))
+          Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor", "personName"))
         )))
       }
 
       "given missing data represented by an empty Map" in {
 
         SoleProprietorOfAnotherBusiness.formRule.validate(Map.empty) must be(Invalid(Seq(
-          Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor", "booooooop"))
+          Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor", "personName"))
         )))
       }
     }

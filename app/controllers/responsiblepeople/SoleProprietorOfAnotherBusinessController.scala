@@ -22,4 +22,6 @@ class SoleProprietorOfAnotherBusinessController @Inject()(
         }
     }
 
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = ???
+
 }

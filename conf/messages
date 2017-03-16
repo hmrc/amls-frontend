@@ -1122,6 +1122,7 @@ responsiblepeople.person.registered.title = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
+responsiblepeople.sole.proprietor.another.business.title = Is {0} the sole proprietor of another business?
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
