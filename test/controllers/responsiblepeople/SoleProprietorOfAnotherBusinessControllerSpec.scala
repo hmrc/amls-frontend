@@ -53,7 +53,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         "redirect to the detailed answers controller" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "true",
+            "personName" -> "Person Name")
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
@@ -69,7 +71,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         "redirect to the vat registered controller when yes is selected" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "true",
+            "personName" -> "Person Name")
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
@@ -84,7 +88,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "false")
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "false",
+            "personName" -> "Person Name")
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
@@ -102,7 +108,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
       "respond with BAD_REQUEST" when {
         "fail submission on empty string" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "")
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "",
+            "personName" -> "Person Name")
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
@@ -121,7 +129,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
       "respond with NOT_FOUND" when {
         "return not found when no rps" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "true",
+            "personName" -> "Person Name")
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))

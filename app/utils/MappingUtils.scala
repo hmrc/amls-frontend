@@ -150,16 +150,6 @@ trait MappingUtils {
           }
         }
 
-      def withError(error: ValidationError): Rule[I, O] =
-        Rule { d =>
-          rule.validate(d).leftMap {
-            _.map {
-              case (p, errs) =>
-                p -> Seq(error)
-            }
-          }
-        }
-
       def validateWith(msg: String = "error.invalid")(fn: O => Boolean): Rule[I, O] =
         rule andThen Rule[O, O] {
           case a if fn(a) =>
