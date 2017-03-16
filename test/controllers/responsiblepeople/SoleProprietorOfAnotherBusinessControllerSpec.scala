@@ -51,10 +51,14 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
     "post is called" must {
       "when edit is true" must {
         "redirect to the detailed answers controller" in new Fixture {
+
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
           val result = controller.post(1,true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -69,6 +73,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -76,10 +82,14 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         }
 
         "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
+
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "false")
+
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(None)
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -106,18 +116,18 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 //        }
 //      }
 
-//      "respond with NOT_FOUND" when {
-//        "return not found when no rps" in new Fixture {
-//
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-//
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//          val result = controller.post(RecordId)(newRequest)
-//          status(result) must be(NOT_FOUND)
-//
-//        }
+      "respond with NOT_FOUND" when {
+        "return not found when no rps" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(NOT_FOUND)
+
+        }
 //
 //        "return not found when index out of bounds" in new Fixture {
 //
@@ -144,7 +154,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 //          status(result) must be(NOT_FOUND)
 //
 //        }
-//      }
+      }
     }
 
   }
