@@ -22,7 +22,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
-      doc.title must startWith("ExpectedTitleTextHere")
+      doc.title must startWith(Messages("responsiblepeople.sole.proprietor.another.business.title", "Person Name"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -31,8 +31,8 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
-      heading.html must be(Messages("expectedHeadingText"))
-      subHeading.html must include(Messages("ExpectedSubHeading"))
+      heading.html must be(Messages("responsiblepeople.sole.proprietor.another.business.title", "Person Name"))
+      subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }
 
@@ -40,25 +40,15 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "soleProprietorOfAnotherBusiness") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
 
-      doc.getElementById("id1")
+      doc.getElementById("soleProprietorOfAnotherBusiness")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("id2")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("id3")
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
     }
   }

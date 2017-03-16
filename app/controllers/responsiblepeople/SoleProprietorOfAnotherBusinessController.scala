@@ -22,6 +22,12 @@ class SoleProprietorOfAnotherBusinessController @Inject()(
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = ???
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  Authorised.async {
+    implicit authContext => implicit request =>
+      getData[ResponsiblePeople](index) map {rp =>
+        Ok(views.html.responsiblepeople.sole_proprietor(EmptyForm, true, 0, true, ""))
+      }
+  }
 
 }
