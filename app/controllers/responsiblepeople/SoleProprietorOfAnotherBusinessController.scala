@@ -33,7 +33,10 @@ class SoleProprietorOfAnotherBusinessController @Inject()(
             BadRequest(views.html.responsiblepeople.sole_proprietor(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) => {
-          Future.successful(Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration)))
+          data.soleProprietorOfAnotherBusiness match {
+            case true => Future.successful(Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration)))
+            case false => Future.successful(Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration)))
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

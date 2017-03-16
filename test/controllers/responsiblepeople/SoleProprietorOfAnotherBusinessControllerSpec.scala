@@ -78,19 +78,16 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1).url))
         }
 
-//        "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
-//          val mockCacheMap = mock[CacheMap]
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-//          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-//            .thenReturn(Some(Seq(noNominatedOfficer)))
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(noNominatedOfficer))))
-//          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-//
-//          val result = controller.post(RecordId)(newRequest)
-//          status(result) must be(SEE_OTHER)
-//          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
-//        }
+        "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "false")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(None)
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+        }
 
 
       }
