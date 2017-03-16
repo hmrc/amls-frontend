@@ -56,18 +56,20 @@ trait ConfirmationController extends BaseController {
       for {
         fees <- getAmendmentFees
         paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
-        case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.amendment.title", "confirmation.amendment.lede"))
+        case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
       }
     }
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
         paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
-        case None => Ok(views.html.confirmation.confirmation_no_fee("confirmation.variation.title", "confirmation.variation.lede"))
+        case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
       }
     }
     case _ => {

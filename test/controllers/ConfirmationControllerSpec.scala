@@ -104,6 +104,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "query the payments service for the payments url for an amendment" in new Fixture {
 
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
+
       when(controller.submissionService.getAmendment(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
 
@@ -121,6 +131,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "query the payments service for the payments url for a variation" in new Fixture {
+
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
 
       when(controller.submissionService.getVariation(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
@@ -157,6 +177,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "return the default configured url for payments if none was returned by the payments service" in new Fixture {
 
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
+
       when(controller.submissionService.getVariation(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
@@ -183,6 +213,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
 
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
+
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
@@ -199,6 +239,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "notify user of variation if application has been submitted and approved and fees have been accrued" in new Fixture {
+
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -219,6 +269,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "an amendment has difference(/Some(0))" in new Fixture {
 
+        val companyName = "My Test Company"
+
+        val model = BusinessMatching(
+          reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+        )
+
+        when {
+          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
+
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
 
@@ -227,11 +287,21 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(companyName)
       }
       "an amendment has no difference(/None)" in new Fixture {
+
+        val companyName = "My Test Company"
+
+        val model = BusinessMatching(
+          reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+        )
+
+        when {
+          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -241,12 +311,22 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(companyName)
       }
 
       "an amendment has no payment reference" in new Fixture {
+
+        val companyName = "My Test Company"
+
+        val model = BusinessMatching(
+          reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+        )
+
+        when {
+          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -256,12 +336,22 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(companyName)
       }
 
       "a variation has no payment reference" in new Fixture {
+
+        val companyName = "My Test Company"
+
+        val model = BusinessMatching(
+          reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+        )
+
+        when {
+          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -273,10 +363,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) mustBe OK
         Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(companyName)
       }
 
       "a variation without the addition of tp or rp" in new Fixture {
+
+        val companyName = "My Test Company"
+
+        val model = BusinessMatching(
+          reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+        )
+
+        when {
+          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -288,7 +388,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) mustBe OK
         Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(companyName)
       }
 
     }
@@ -381,6 +481,16 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
   "ConfirmationController" must {
 
     "show the old confirmation screen when the payments url lookup is toggled off" in new Fixture {
+
+      val companyName = "My Test Company"
+
+      val model = BusinessMatching(
+        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+      )
+
+      when {
+        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
 
       when(controller.submissionService.getAmendment(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
