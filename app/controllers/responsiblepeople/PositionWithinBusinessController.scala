@@ -55,7 +55,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               (data.personalTax, edit) match {
                 case (false, false) => Redirect(routes.ExperienceTrainingController.get(index, false, fromDeclaration))
                 case (false, true) => Redirect(routes.DetailedAnswersController.get(index, false))
-                case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+                case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, fromDeclaration))
               }
             }
             for {
@@ -67,7 +67,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+                  case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, fromDeclaration))
                 }
               } else {
                 Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
