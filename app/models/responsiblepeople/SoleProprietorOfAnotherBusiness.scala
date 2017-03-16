@@ -14,7 +14,10 @@ object SoleProprietorOfAnotherBusiness {
   implicit val formRule: Rule[UrlFormEncoded, SoleProprietorOfAnotherBusiness] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "soleProprietorOfAnotherBusiness").read[Boolean].withError(ValidationError("error.required.rp.sole_proprietor", "personName")) map SoleProprietorOfAnotherBusiness.apply
+      (__ \ "soleProprietorOfAnotherBusiness").read[Boolean]
+        .withError(
+          ValidationError("error.required.rp.sole_proprietor", (__ \ "personName").read[String])
+        ) map SoleProprietorOfAnotherBusiness.apply
     }
 
   implicit val formWrites = Write[SoleProprietorOfAnotherBusiness, UrlFormEncoded] {

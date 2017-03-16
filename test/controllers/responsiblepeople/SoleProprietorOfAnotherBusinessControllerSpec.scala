@@ -29,7 +29,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val pageTitle = Messages("responsiblepeople.registeredforvat.title", "firstname lastname") + " - " +
+  val pageTitle = Messages("responsiblepeople.sole.proprietor.another.business.title", "firstname lastname") + " - " +
     Messages("summary.responsiblepeople") + " - " +
     Messages("title.amls") + " - " + Messages("title.gov")
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
@@ -99,22 +99,24 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
       }
 
-//      "respond with BAD_REQUEST" when {
-//        "fail submission on empty string" in new Fixture {
-//
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
-//
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-//
-//          val result = controller.post(RecordId)(newRequest)
-//          status(result) must be(BAD_REQUEST)
-//          val document: Document = Jsoup.parse(contentAsString(result))
-//          document.title mustBe(pageTitle)
-//          document.select("a[href=#isNominatedOfficer]").html() must include(Messages("error.required.rp.nominated_officer"))
-//
-//        }
-//      }
+      "respond with BAD_REQUEST" when {
+        "fail submission on empty string" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "")
+
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.title mustBe(pageTitle)
+          document.select("a[href=#soleProprietorOfAnotherBusiness]").html() must
+            include(Messages("error.required.rp.sole_proprietor", personName.get.fullName))
+
+        }
+      }
 
       "respond with NOT_FOUND" when {
         "return not found when no rps" in new Fixture {
@@ -128,32 +130,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           status(result) must be(NOT_FOUND)
 
         }
-//
-//        "return not found when index out of bounds" in new Fixture {
-//
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-//
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.failed(new IndexOutOfBoundsException))
-//
-//          val result = controller.post(RecordId)(newRequest)
-//          status(result) must be(NOT_FOUND)
-//
-//        }
-//
-//        "return not found" in new Fixture {
-//          val mockCacheMap = mock[CacheMap]
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-//          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-//            .thenReturn(Some(Seq(withPartnerShip)))
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
-//          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-//
-//          val result = controller.post(0)(newRequest)
-//          status(result) must be(NOT_FOUND)
-//
-//        }
       }
     }
 
