@@ -526,7 +526,7 @@ confirmation.submission.info = Your application won’t be reviewed by HM Revenu
 confirmation.notice = You must make a note of this reference number and registration fee. You will need them to make the payment.
 confirmation.reference.notice = You must make a note of this reference number.
 confirmation.fee = Your fee
-confirmation.no.fee = There are no additional fees to pay.
+confirmation.no.fee = There are no fees to pay for these changes.
 confirmation.breakdown.details = How your fee has been calculated
 confirmation.breakdown = This shows your total fees for each item.
 confirmation.sidebar.code = Your reference
@@ -563,7 +563,7 @@ confirmation.amendment.details.list.03 = paid some of your fees so far, but not 
 confirmation.amendment.details.02 = Your application won’t be reviewed by HM Revenue and Customs until all the fees are paid.
 
 confirmation.variation.title = You’ve submitted your updated information
-confirmation.variation.lede = You’ve submitted your updated information
+confirmation.variation.lede = You’ve updated your information
 confirmation.variation.summary = This shows your total fees for each item.
 
 confirmation.payment.title = You’ve submitted and paid
