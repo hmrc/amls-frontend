@@ -50,19 +50,16 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
     "post is called" must {
       "when edit is true" must {
-//        "redirect to the detailed answers controller" in new Fixture {
-//          val mockCacheMap = mock[CacheMap]
-//          val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-//          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-//            .thenReturn(Some(Seq(hasNominatedOfficer)))
-//          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-//            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-//          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-//
-//          val result = controller.post(RecordId,true)(newRequest)
-//          status(result) must be(SEE_OTHER)
-//          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-//        }
+        "redirect to the detailed answers controller" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody("soleProprietorOfAnotherBusiness" -> "true")
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(None)
+
+          val result = controller.post(1,true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+        }
       }
       "when edit is false" must {
         "redirect to the vat registered controller when yes is selected" in new Fixture {
