@@ -88,7 +88,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
         }
       }
       "when edit is false" must {
-        "redirect to the vat registered controller when partnership is selected" in new Fixture {
+        "redirect to the SoleProprietorOfAnotherBusinessController when partnership is selected" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
