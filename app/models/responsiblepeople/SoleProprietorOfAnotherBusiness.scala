@@ -14,7 +14,7 @@ object SoleProprietorOfAnotherBusiness {
   import utils.MappingUtils.Implicits._
 
   private val soleProprietorWithNameMapping = Rule.fromMapping[(String, Option[Boolean]), SoleProprietorOfAnotherBusiness] {
-    case (name, Some(response)) => Valid(SoleProprietorOfAnotherBusiness(response))
+    case (_, Some(response)) => Valid(SoleProprietorOfAnotherBusiness(response))
     case (name, None) => Invalid(Seq(ValidationError("error.required.rp.sole_proprietor", name)))
   }
 
