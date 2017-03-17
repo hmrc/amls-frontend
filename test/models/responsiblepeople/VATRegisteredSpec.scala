@@ -13,7 +13,8 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
 
-      VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
+      VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"),
+        "personName" -> Seq("Person Name"))) must
         be(Valid(VATRegisteredNo))
     }
 
@@ -21,27 +22,19 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq("123456789")
+        "vrnNumber" -> Seq("123456789"),
+        "personName" -> Seq("Person Name")
       )
 
       VATRegistered.formRule.validate(data) must
         be(Valid(VATRegisteredYes("123456789")))
     }
 
-
     "fail to validate given missing mandatory field" in {
 
-      VATRegistered.formRule.validate(Map.empty) must
+      VATRegistered.formRule.validate(Map("personName" -> Seq("Person Name"))) must
         be(Invalid(Seq(
-          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
-        )))
-    }
-
-    "fail to validate given invalid field" in {
-
-      VATRegistered.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
+          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat", "Person Name"))
         )))
     }
 
@@ -49,7 +42,8 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq("")
+        "vrnNumber" -> Seq(""),
+        "personName" -> Seq("Person Name")
       )
 
       VATRegistered.formRule.validate(data) must
