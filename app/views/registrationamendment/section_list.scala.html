@@ -1,0 +1,10 @@
+@import models.registrationprogress.Section
+
+@(sections: Seq[Section])(implicit request: Request[_], m: Messages)
+
+@* Main section *@
+<ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
+    @sections.map { case Section(name, status, hasChanged, call) =>
+        @section(name, status, hasChanged, call)
+    }
+</ul>
