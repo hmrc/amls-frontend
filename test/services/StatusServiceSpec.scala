@@ -6,7 +6,7 @@ import connectors.AmlsConnector
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._
-import org.joda.time.{LocalDate, LocalDateTime}
+import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -91,6 +91,36 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       whenReady(TestStatusService.getStatus) {
         _ mustEqual ReadyForRenewal
       }
+
+    }
+
+    "return ReadyForRenewal when on first day of window" in {
+      val renewalDate = new LocalDate(2017,3,31)
+      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,2)).toDateTimeAtStartOfDay.getMillis)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual ReadyForRenewal
+      }
+
+      DateTimeUtils.setCurrentMillisSystem()
+
+    }
+
+    "return Approved when one day before window" in {
+      val renewalDate = new LocalDate(2017,3,31)
+      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,1)).toDateTimeAtStartOfDay.getMillis)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual SubmissionDecisionApproved
+      }
+
+      DateTimeUtils.setCurrentMillisSystem()
 
     }
 
