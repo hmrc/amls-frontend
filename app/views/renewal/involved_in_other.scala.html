@@ -10,11 +10,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.involved.other.legend", "summary.businessactivities")
+    @heading("renewal.involvedinother.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("businessactivities.involved.other.legend") + " - " + Messages("summary.businessactivities"),
+    title = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal"),
     heading = header
 )  {
 
@@ -23,14 +23,14 @@
         wide = true,
         gutter = true
         ) {
-            <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes</p>
+            <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
     }
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "businessactivities.involved.other.title",
+            legend = "renewal.involvedinother.title",
             legendHidden = true,
             panel = false,
             hint = "businessactivities.involved.other.hint"

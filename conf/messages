@@ -891,7 +891,6 @@ bankdetails.summary.accounttype.lbl.02 = My business’s account
 bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
-bankdetails.confirm-activities.subtitle = You’ve told us your business type is:
 bankdetails.bank.account.registered.title = Bank account registered
 bankdetails.have.registered.account.text = You have registered {0} bank account.
 bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
@@ -916,6 +915,7 @@ businessactivities.businessfranchise.subtitle = If your business is a franchise,
 businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
+businessactivities.confirm-activities.subtitle = You’ve told us your business type is:
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months, from the following activities?
 businessactivities.turnover.lbl.01 = £0 to £14,999
@@ -1422,6 +1422,8 @@ notifications.table.header.date = Date
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
 renewal.whatyouneed.line_1 = your net profit
 renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
+
+renewal.involvedinother.title = Is your business involved in any other activities?
 
 ############################### Survey ###############################
 
