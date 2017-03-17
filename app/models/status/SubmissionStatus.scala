@@ -7,4 +7,6 @@ object SubmissionReady extends SubmissionStatus
 object SubmissionReadyForReview extends SubmissionStatus
 object SubmissionDecisionApproved extends SubmissionStatus
 object SubmissionDecisionRejected extends SubmissionStatus
+object ReadyForRenewal extends SubmissionStatus
+object RenewalSubmitted extends SubmissionStatus
 

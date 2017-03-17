@@ -3,6 +3,7 @@ package services
 import connectors.AmlsConnector
 import models.registrationprogress.{Completed, Section}
 import models.status._
+import org.joda.time.LocalDate
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.status.status
@@ -46,11 +47,15 @@ trait StatusService {
   private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
       amlsConnector.status(amlsRefNumber) map {
-        response => response.formBundleStatus match {
-          case "Pending" => SubmissionReadyForReview
-          case "Approved" => SubmissionDecisionApproved
-          case "Rejected" => SubmissionDecisionRejected
-        }
+        response =>
+          (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
+            case ("Pending", None, false) => SubmissionReadyForReview
+            case ("Rejected", None, false) => SubmissionDecisionRejected
+            case ("Approved", Some(endDate), false) if (LocalDate.now().isBefore(endDate)) => ReadyForRenewal
+            case ("Approved", _, true) => RenewalSubmitted
+            case ("Approved", _, false) => SubmissionDecisionApproved
+            case _ => throw new RuntimeException("ETMP returned status is inconsistent")
+          }
       }
     }
   }

@@ -189,7 +189,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -234,7 +234,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -281,7 +281,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -330,7 +330,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any())).thenReturn(Future.successful(amendmentFeeResponse))
@@ -375,7 +375,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any())).thenReturn(Future.successful(amendmentFeeResponse))
@@ -419,7 +419,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Rejected", None, None, None, false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Rejected", None, None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionRejected))
