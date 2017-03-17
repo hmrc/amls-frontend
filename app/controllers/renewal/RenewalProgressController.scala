@@ -2,21 +2,32 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
-import play.api.mvc.AnyContent
-import play.mvc.Result
+import services.ProgressService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
 
 @Singleton
-class RenewalProgressController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class RenewalProgressController @Inject()(val authConnector: AuthConnector, dataCacheConnector: DataCacheConnector, progressService: ProgressService) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
 
-    Future.successful(Ok(renewal_progress()))
+      val block = for {
+        cache <- OptionT(dataCacheConnector.fetchAll)
+      } yield  {
+        val variationSections = progressService.sections(cache)
+
+        Ok(renewal_progress(variationSections))
+      }
+
+      block getOrElseF Future.failed(new Exception("Hello"))
+
   }
 
 }
