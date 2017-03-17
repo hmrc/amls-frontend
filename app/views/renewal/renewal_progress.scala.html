@@ -1,6 +1,7 @@
 @import include._
 @import models.registrationprogress.Section
 @import views.html.registrationamendment._
+@import utils.Strings._
 
 @(sections: Seq[Section])(implicit messages: Messages, request: Request[_])
 
@@ -11,6 +12,8 @@
 @main(
     s"${messages("renewal.progress.title")} - ${messages("summary.status")}",
     heading = header) {
+
+    <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
 
     @section_list(sections)
 
