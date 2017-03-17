@@ -12,6 +12,7 @@ import views.html.responsiblepeople.sole_proprietor
 
 import scala.concurrent.Future
 
+@Singleton
 class SoleProprietorOfAnotherBusinessController @Inject()(
                                                            val dataCacheConnector: DataCacheConnector,
                                                            val authConnector: AuthConnector) extends RepeatingSection with BaseController {
