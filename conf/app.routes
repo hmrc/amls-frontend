@@ -416,3 +416,7 @@ POST        /high-value-dealer/date-change                              controll
 
 GET         /renewal/what-you-need                                      @controllers.renewal.WhatYouNeedController.get()
 GET         /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
+GET         /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+GET         /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+
+GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
