@@ -89,7 +89,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
       whenReady(TestStatusService.getStatus) {
-        _ mustEqual ReadyForRenewal
+        _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
 
     }
@@ -102,7 +102,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
       whenReady(TestStatusService.getStatus) {
-        _ mustEqual ReadyForRenewal
+        _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
 
       DateTimeUtils.setCurrentMillisSystem()
@@ -142,7 +142,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
       whenReady(TestStatusService.getStatus) {
-        _ mustEqual RenewalSubmitted
+        _ mustEqual RenewalSubmitted(None)
       }
 
     }

@@ -467,7 +467,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
       when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
+        .thenReturn(Future.successful(ReadyForRenewal(Some(renewalDate))))
 
       when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
         .thenReturn(Future.successful(feeResponse))
@@ -475,7 +475,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       status(result) must be(OK)
 
-      contentAsString(result) must contain(Messages("status.readyforrenewal.warning",DateHelper.formatDate(renewalDate)))
+      contentAsString(result) must include(Messages("status.readyforrenewal.warning",DateHelper.formatDate(renewalDate)))
 
       val document = Jsoup.parse(contentAsString(result))
 
@@ -483,13 +483,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
       }
 
-      document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
 
       document.title() must be(Messages("status.submissiondecisionapproved.heading") + pageTitleSuffix)
 
-      document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionapproved.description"))
-      document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionapproved.description2"))
-      document.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
 
     "show the correct content to edit submission" when {

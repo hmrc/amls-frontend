@@ -48,19 +48,6 @@ case _ => { None }
 <div class="grid-layout">
     <div class="grid-layout__column grid-layout__column--2-3">
 
-        @completionState.currentState match {
-            case ReadyForRenewal(renewalDateOpt:Option[LocalDate])  => {
-                @renewalDateOpt match{
-        case Some(date) => {<h3 class="heading-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</h3>}
-                case _ => {}
-             }
-
-        }
-        case _ => {}
-
-        }
-
-
         @(businessName,completionState.currentState) match {
         case (Some(bn),SubmissionDecisionApproved) => {
         <div class="panel-indent panel-indent--gutter panel-border-wide">
@@ -131,8 +118,20 @@ case _ => { None }
 </div>
 
 @completionState.currentState match {
+case ReadyForRenewal(renewalDateOpt:Option[LocalDate])  => {
+@renewalDateOpt match{
+case Some(date) => {<div class="notice spacelarge"><i class="icon icon-important"><span class="visuallyhidden">Warning</span></i><strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong></div>}
+case _ => {}
+}
+
+}
+case _ => {}
+
+}
+
+@completionState.currentState match {
     case ReadyForRenewal(_) => {
-    <a href = "@"
+<a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">Renew supervision</a>
 
     }
     case _ => {}
