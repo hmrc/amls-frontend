@@ -1423,6 +1423,7 @@ notifications.table.header.date = Date
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
 renewal.whatyouneed.line_1 = your net profit
 renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
+renewal.progress.title = Your renewal progress
 
 renewal.involvedinother.title = Is your business involved in any other activities?
 

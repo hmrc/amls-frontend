@@ -1,0 +1,13 @@
+@import include._
+
+@()(implicit messages: Messages, request: Request[_])
+
+@header = {
+    @heading("renewal.progress.title", "summary.status")
+}
+
+@main(
+    s"${messages("renewal.progress.title")} - ${messages("summary.status")}",
+    heading = header) {
+
+}
