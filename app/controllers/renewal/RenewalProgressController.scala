@@ -23,10 +23,10 @@ class RenewalProgressController @Inject()(val authConnector: AuthConnector, data
       } yield  {
         val variationSections = progressService.sections(cache)
 
-        Ok(renewal_progress(variationSections))
+        Ok(renewal_progress(variationSections, canSubmit = false))
       }
 
-      block getOrElseF Future.failed(new Exception("Hello"))
+      block getOrElseF Future.successful(Ok(renewal_progress(Seq.empty, canSubmit = false)))
 
   }
 

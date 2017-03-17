@@ -2,19 +2,48 @@
 @import models.registrationprogress.Section
 @import views.html.registrationamendment._
 @import utils.Strings._
+@import views.html.helper.CSRF
 
-@(sections: Seq[Section])(implicit messages: Messages, request: Request[_])
+@(sections: Seq[Section], canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
 
 @header = {
     @heading("renewal.progress.title", "summary.status")
 }
 
-@main(
-    s"${messages("renewal.progress.title")} - ${messages("summary.status")}",
-    heading = header) {
+@main2(s"${messages("renewal.progress.title")} - ${messages("summary.status")}") {
 
-    <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
+    @* Heading *@
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @header
+        </div>
+    </div>
 
-    @section_list(sections)
+    <div class="grid-layout grid-layout--stacked">
 
+        <div class="grid-layout__column grid-layout__column--2-3">
+            <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
+
+            @section_list(sections)
+        </div>
+
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @* Sidebar *@
+            <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
+                <div class="application-submit">
+                    <h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
+
+                    <p>@messages("renewal.progress.submit.intro")</p>
+
+                    <form method="post" action="">
+                        @CSRF.formField
+                        <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
+                        @messages("progress.submit")
+                    </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 }
