@@ -62,6 +62,7 @@ trait WhoIsRegisteringController extends BaseController {
       case NominatedOfficer => models.declaration.release7.NominatedOfficer
       case Partner => models.declaration.release7.Partner
       case SoleProprietor => models.declaration.release7.SoleProprietor
+      case DesignatedMember => models.declaration.release7.DesignatedMember
     }
     )
   }
