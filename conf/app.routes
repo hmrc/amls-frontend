@@ -413,3 +413,6 @@ POST        /high-value-dealer/receiving                                controll
 
 GET         /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.get
 POST        /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.post
+
+GET         /renewal/what-you-need                                      @controllers.renewal.WhatYouNeedController.get()
+GET         /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)

@@ -600,6 +600,7 @@ summary.asp = Accountancy Service Provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
+summary.renewal = Renewal
 summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
@@ -1419,6 +1420,11 @@ notifications.youHaveMessages = View your messages
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
+
+############################### Renewal ###############################
+renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
+renewal.whatyouneed.line_1 = your net profit
+renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
 
 ############################### Survey ###############################
 

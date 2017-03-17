@@ -1133,6 +1133,12 @@ details {
 
 /* more GDS stuff overridden by Assets Frontend D: */
 
+.input--no-spinner {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .form-control {
   -webkit-appearance: none;
   background-color: #fff;
