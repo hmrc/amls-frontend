@@ -23,7 +23,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
 
-      doc.title must startWith("ExpectedTitleTextHere")
+      doc.title must startWith(Messages("responsiblepeople.registeredforvat.title", "Person Name"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -32,8 +32,8 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
 
-      heading.html must be(Messages("expectedHeadingText"))
-      subHeading.html must include(Messages("ExpectedSubHeading"))
+      heading.html must be(Messages("responsiblepeople.registeredforvat.title", "Person Name"))
+      subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }
 
@@ -50,10 +50,10 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("registeredForVAT")
+      doc.getElementById("registeredForVAT").parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("vrnNumber")
+      doc.getElementById("vrnNumber").parent()
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
