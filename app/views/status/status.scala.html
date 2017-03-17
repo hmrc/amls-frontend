@@ -1,13 +1,8 @@
 @import include._
-@import models.status.CompletionStateViewModel
-@import models.status.SubmissionStatus
-@import models.status.CompletionState
-@import models.status.NotCompleted
-@import models.status.SubmissionReadyForReview
-@import models.status.SubmissionDecisionApproved
-@import models.status.SubmissionDecisionRejected
-@import models.status.{Current,SubmissionReady}
+@import models.status._
 @import config.ApplicationConfig
+@import org.joda.time.LocalDate
+@import utils.DateHelper
 
 @(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel, feeResponse: Option[FeeResponse], notifications: Boolean)(implicit request: Request[_],m:Messages)
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
@@ -23,16 +18,17 @@
 case NotCompleted => {Messages("status.incomplete.heading")}
 case SubmissionReady => {Messages("status.submissionready.heading")}
 case SubmissionReadyForReview => {Messages("status.submissionreadyforreview.heading")}
-case SubmissionDecisionApproved => {Messages("status.submissiondecisionapproved.heading")}
+case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => {Messages("status.submissiondecisionapproved.heading")}
 case SubmissionDecisionRejected => {Messages("status.submissiondecisionrejected.heading")}
 case _ => {Messages("status.incomplete.heading")}
 }}
 
 @changeLink = @{completionState.currentState match {
 case SubmissionReady => { Some("status.submissionready.changelink1") }
-case (SubmissionReadyForReview | SubmissionDecisionApproved) if(ApplicationConfig.amendmentsToggle) => { Some("status.amendment.edit") }
+case (SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) if(ApplicationConfig.amendmentsToggle) => { Some("status.amendment.edit") }
 case _ => { None }
 }}
+
 
 @main2(title = statusTitle +" - Your registration") {
 
@@ -51,6 +47,20 @@ case _ => { None }
 
 <div class="grid-layout">
     <div class="grid-layout__column grid-layout__column--2-3">
+
+        @completionState.currentState match {
+            case ReadyForRenewal(renewalDateOpt:Option[LocalDate])  => {
+                @renewalDateOpt match{
+        case Some(date) => {<h3 class="heading-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</h3>}
+                case _ => {}
+             }
+
+        }
+        case _ => {}
+
+        }
+
+
         @(businessName,completionState.currentState) match {
         case (Some(bn),SubmissionDecisionApproved) => {
         <div class="panel-indent panel-indent--gutter panel-border-wide">
@@ -94,8 +104,11 @@ case _ => { None }
     <div class="grid-layout__column grid-layout__column--1-3">
         <ol class="list list-number status-list">
 
-            @completionState.statuses.map{entry=>
-                <li class="status-list--pending @{entry._2.cssClass+borderClass(entry)}">@completionState.statusTitle(entry._1)</li>
+            @completionState.statuses.map{ entry =>
+            @entry._1 match {
+            case ReadyForRenewal(_) | RenewalSubmitted(_) => {}
+            case _ => {<li class="status-list--pending @{entry._2.cssClass+borderClass(entry)}">@completionState.statusTitle(entry._1)</li>}
+            }
             }
         </ol>
     </div>
@@ -106,7 +119,7 @@ case _ => { None }
                 case NotCompleted => {@include.status.rightpanel_incomplete()}
                 case SubmissionReady => {@include.status.rightpanel_submissionready()}
                 case SubmissionReadyForReview => {@include.status.rightpanel_submissionreadyforreview(feeResponse)}
-                case SubmissionDecisionApproved => {@include.status.rightpanel_submissiondecisionapproved(feeResponse)}
+                case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => {@include.status.rightpanel_submissiondecisionapproved(feeResponse)}
                 case SubmissionDecisionRejected => {@include.status.rightpanel_submissiondecisionrejected()}
                 case _ => {@include.status.rightpanel_incomplete()}
             }
@@ -118,7 +131,16 @@ case _ => { None }
 </div>
 
 @completionState.currentState match {
-case SubmissionReadyForReview | SubmissionDecisionApproved | SubmissionDecisionRejected => {
+    case ReadyForRenewal(_) => {
+    <a href = "@"
+
+    }
+    case _ => {}
+}
+
+
+@completionState.currentState match {
+case SubmissionReadyForReview | SubmissionDecisionApproved | SubmissionDecisionRejected | ReadyForRenewal(_) | RenewalSubmitted(_) => {
 <div class="grid-row">
     <div class="column-two-thirds">
         <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>

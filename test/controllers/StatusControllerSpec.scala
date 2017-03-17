@@ -6,20 +6,19 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status._
 import models.{AmendVariationResponse, Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
-import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.NotFoundException
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
@@ -441,6 +440,56 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionrejected.description"))
       }
+    }
+
+    "ready for renewal" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
+
+      when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("amlsRegNo")))
+
+      when(authConnector.currentAuthority(any()))
+        .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+      val renewalDate = LocalDate.now().plusDays(15)
+
+      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+        .thenReturn(Future.successful(feeResponse))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must contain(Messages("status.readyforrenewal.warning",DateHelper.formatDate(renewalDate)))
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      for (index <- 0 to 2) {
+        document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
+      }
+
+      document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
+
+      document.title() must be(Messages("status.submissiondecisionapproved.heading") + pageTitleSuffix)
+
+      document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionapproved.description"))
+      document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionapproved.description2"))
+      document.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
 
     "show the correct content to edit submission" when {

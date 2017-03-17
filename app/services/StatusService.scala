@@ -51,8 +51,8 @@ trait StatusService {
           (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
             case ("Pending", None, false) => SubmissionReadyForReview
             case ("Rejected", None, false) => SubmissionDecisionRejected
-            case ("Approved", Some(endDate), false) if (LocalDate.now().isAfter(endDate.minusDays(30))) => ReadyForRenewal
-            case ("Approved", _, true) => RenewalSubmitted
+            case ("Approved", Some(endDate), false) if (LocalDate.now().isAfter(endDate.minusDays(30))) => ReadyForRenewal(response.currentRegYearEndDate)
+            case ("Approved", _, true) => RenewalSubmitted(response.currentRegYearEndDate)
             case ("Approved", _, false) => SubmissionDecisionApproved
             case _ => throw new RuntimeException("ETMP returned status is inconsistent")
           }
