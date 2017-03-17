@@ -358,7 +358,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
 
       "when edit is false" must {
-        "redirect to the VAT Registered Controller when Nominated Officer is selected" in new Fixture {
+        "redirect to the sole proprietor another business Controller when Nominated Officer is selected" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "positions" -> "04",
@@ -410,7 +410,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
         }
 
-        "redirect to VATRegisteredController when another position is selected in addition to the nomindated Officer" in new Fixture {
+        "redirect to sole proprietor another business controller when another position is selected in addition to the nomindated Officer" in new Fixture {
 
           val positions = Positions(Set(Director, NominatedOfficer), startDate)
           val responsiblePeople = ResponsiblePeople(positions = Some(positions))
