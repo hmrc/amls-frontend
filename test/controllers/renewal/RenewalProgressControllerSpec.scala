@@ -58,7 +58,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     } thenReturn Seq(defaultSection)
 
     when {
-      renewalService.getSection
+      renewalService.getSection(any(), any(), any())
     } thenReturn Future.successful(renewalSection)
 
   }

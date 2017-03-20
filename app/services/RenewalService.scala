@@ -29,8 +29,10 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   }
 
-  def getRenewal = dataCache.fetch[Renewal](Renewal.key)
+  def getRenewal(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.fetch[Renewal](Renewal.key)
 
-  def updateRenewal(renewal: Renewal) = dataCache.save[Renewal](Renewal.key, renewal)
+  def updateRenewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.save[Renewal](Renewal.key, renewal)
 
 }

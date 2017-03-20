@@ -6,10 +6,8 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.registrationprogress.{Completed, NotStarted, Section}
-import models.renewal.Renewal
+import models.registrationprogress.Completed
 import play.api.i18n.MessagesApi
-import play.api.mvc.Call
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.renewal_progress
@@ -36,10 +34,10 @@ class RenewalProgressController @Inject()
           } yield {
             val variationSections = progressService.sections(cache)
 
-            Ok(renewal_progress(renewalSection, variationSections, canSubmit = false))
+            Ok(renewal_progress(renewalSection, variationSections, canSubmit = renewalSection.status == Completed))
           }
 
-          block getOrElseF Future.successful(Ok(renewal_progress(renewalSection, Seq.empty, canSubmit = false)))
+          block getOrElseF Future.successful(Ok(renewal_progress(renewalSection, Seq.empty, canSubmit = renewalSection.status == Completed)))
         }
   }
 
