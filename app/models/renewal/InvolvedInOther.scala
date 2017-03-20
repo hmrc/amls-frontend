@@ -61,4 +61,11 @@ object InvolvedInOther {
       case models.businessactivities.InvolvedInOtherNo => models.renewal.InvolvedInOtherNo
     }
   }
+
+  def convertFromRenewal(baInvolvedInOther: models.renewal.InvolvedInOther): models.businessactivities.InvolvedInOther = {
+    baInvolvedInOther match {
+      case models.renewal.InvolvedInOtherYes(value) => models.businessactivities.InvolvedInOtherYes(value)
+      case models.renewal.InvolvedInOtherNo => models.businessactivities.InvolvedInOtherNo
+    }
+  }
 }
