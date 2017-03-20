@@ -441,6 +441,7 @@ status.submissiondecisionrejected.description = Your application has been reject
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
 status.fee.link = If you haven’t paid the fee
+status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.registration.fee.lbl = Your registration fee

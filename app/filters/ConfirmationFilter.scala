@@ -12,7 +12,8 @@ import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)
+                                  (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
     val exclusionSet = Set(

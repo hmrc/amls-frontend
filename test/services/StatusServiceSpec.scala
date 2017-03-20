@@ -1,10 +1,12 @@
 package services
 
+import java.lang.RuntimeException
+
 import connectors.AmlsConnector
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._
-import org.joda.time.LocalDateTime
+import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -29,7 +31,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   implicit val ac = mock[AuthContext]
   implicit val ec = mock[ExecutionContext]
 
-  val readStatusResponse:ReadStatusResponse = ReadStatusResponse(new LocalDateTime(),"Pending",None,None,None,false)
+  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None, None, false)
 
   "Status Service" must {
     "return NotCompleted" in {
@@ -54,7 +56,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
       when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(TestStatusService.amlsConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
       whenReady(TestStatusService.getStatus) {
         _ mustEqual SubmissionReadyForReview
       }
@@ -64,7 +66,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
       when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(TestStatusService.amlsConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved")))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved")))
       whenReady(TestStatusService.getStatus) {
         _ mustEqual SubmissionDecisionApproved
       }
@@ -74,10 +76,75 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
       when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(TestStatusService.amlsConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected")))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected")))
       whenReady(TestStatusService.getStatus) {
         _ mustEqual SubmissionDecisionRejected
       }
+    }
+
+    "return ReadyForRenewal" in {
+      val renewalDate = LocalDate.now().plusDays(15)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual ReadyForRenewal(Some(renewalDate))
+      }
+
+    }
+
+    "return ReadyForRenewal when on first day of window" in {
+      val renewalDate = new LocalDate(2017,3,31)
+      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,2)).toDateTimeAtStartOfDay.getMillis)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual ReadyForRenewal(Some(renewalDate))
+      }
+
+      DateTimeUtils.setCurrentMillisSystem()
+
+    }
+
+    "return Approved when one day before window" in {
+      val renewalDate = new LocalDate(2017,3,31)
+      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,1)).toDateTimeAtStartOfDay.getMillis)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual SubmissionDecisionApproved
+      }
+
+      DateTimeUtils.setCurrentMillisSystem()
+
+    }
+
+    "not return ReadyForRenewal" in {
+      val renewalDate = LocalDate.now().plusDays(15)
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(TestStatusService.getStatus.failed) {
+        _.getMessage mustBe("ETMP returned status is inconsistent")
+      }
+
+    }
+
+    "return RenewalSubmitted" in {
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual RenewalSubmitted(None)
+      }
+
     }
   }
 

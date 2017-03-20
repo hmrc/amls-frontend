@@ -42,7 +42,8 @@ trait ConfirmationController extends BaseController {
   }
 
   def paymentConfirmation(reference: String) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
           case Some(bm) if bm.reviewDetails.isDefined =>
             Ok(payment_confirmation(bm.reviewDetails.get.businessName, reference))
@@ -58,7 +59,8 @@ trait ConfirmationController extends BaseController {
         paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
-        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url))
+          .withCookies(paymentsRedirect.responseCookies: _*)
         case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
       }
     }
@@ -68,30 +70,35 @@ trait ConfirmationController extends BaseController {
         paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
-        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url))
+          .withCookies(paymentsRedirect.responseCookies: _*)
         case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
       }
     }
     case _ => {
       for {
         (paymentRef, total, rows) <- submissionService.getSubscription
-        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController
+          .paymentConfirmation(paymentRef).absoluteURL())
       } yield {
         ApplicationConfig.paymentsUrlLookupToggle match {
-          case true => Ok(views.html.confirmation.confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+          case true => Ok(views.html.confirmation.confirmation_new(paymentRef, total, rows, paymentsRedirect.url))
+            .withCookies(paymentsRedirect.responseCookies: _*)
           case _ => Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
         }
       }
     }
   }
 
-  private def requestPaymentsUrl(data: Option[ViewData], returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] = data match {
+  private def requestPaymentsUrl(data: Option[ViewData], returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
+  : Future[PaymentServiceRedirect] = data match {
     case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl)
     case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total, returnUrl)
     case _ => Future.successful(PaymentServiceRedirect(ApplicationConfig.paymentsUrl))
   }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[PaymentServiceRedirect] =
+  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
+  : Future[PaymentServiceRedirect] =
     paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, returnUrl)) map {
       case Some(redirect) => redirect
       case _ =>

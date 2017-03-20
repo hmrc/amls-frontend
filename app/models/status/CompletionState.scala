@@ -1,8 +1,10 @@
 package models.status
 
+import models.status
 import play.api.i18n.Messages
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+
 import scala.collection.immutable.ListMap
 
 sealed trait CompletionState {
@@ -21,6 +23,9 @@ object Incomplete extends CompletionState {
   val cssClass = "status-list--upcoming"
 }
 
+object NotShown extends CompletionState {
+  val cssClass = "status-list--hidden"
+}
 
 case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionState]) {
 
@@ -40,15 +45,18 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
   }
 
   def currentState = {
-    (statuses.find(_._2 == Current) map {
-      pair: (SubmissionStatus,CompletionState) => {
+    (statuses.find(x => x._2 == Current || x._2 == NotShown) map {
+      pair: (SubmissionStatus, CompletionState) => {
         pair._1
       }
     }).getOrElse(NotCompleted)
   }
 
-  def notificationsAvailable : Boolean = {
-    Seq(SubmissionReadyForReview, SubmissionDecisionApproved, SubmissionDecisionRejected).contains(currentState)
+  def notificationsAvailable: Boolean = {
+    currentState match {
+      case SubmissionReadyForReview|SubmissionDecisionApproved|SubmissionDecisionRejected|ReadyForRenewal(_)|RenewalSubmitted(_) => true
+      case _ => false
+    }
   }
 }
 
@@ -59,19 +67,28 @@ object CompletionStateViewModel {
       SubmissionReady -> Complete,
       SubmissionReadyForReview -> Complete,
       SubmissionDecisionApproved -> Complete,
-      SubmissionDecisionRejected -> Complete)
+      SubmissionDecisionRejected -> Complete) ++ {
+      current match {
+        case r: ReadyForRenewal => ListMap(r -> NotShown)
+        case r: RenewalSubmitted => ListMap(r -> NotShown)
+        case _ => ListMap.empty
+      }
+    }
 
     val (prefix, suffix) = statuses.span(s => s._1 != current)
-    val updatedStatuses = prefix ++
-                          Map(current -> Current) ++
-                          suffix.tail.mapValues(_ => Incomplete)
+    val updatedStatuses = {
+      prefix ++
+        Map(current -> Current) ++
+        suffix.tail.mapValues(_ => Incomplete)
+
+
+    }
 
 
     val filterStatuses = current match {
       case SubmissionDecisionRejected => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionApproved)
-      case _ => updatedStatuses.filterNot (m => m._1 == SubmissionDecisionRejected)
+      case _ => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionRejected)
     }
-
     CompletionStateViewModel(filterStatuses)
   }
 
