@@ -18,6 +18,8 @@ trait StatusService {
 
   private[services] def enrolmentsService: AuthEnrolmentsService
 
+  private val renewalPeriod = 30
+
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -51,7 +53,7 @@ trait StatusService {
           (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
             case ("Pending", None, false) => SubmissionReadyForReview
             case ("Rejected", None, false) => SubmissionDecisionRejected
-            case ("Approved", Some(endDate), false) if (LocalDate.now().isAfter(endDate.minusDays(30))) => ReadyForRenewal(response.currentRegYearEndDate)
+            case ("Approved", Some(endDate), false) if (LocalDate.now().isAfter(endDate.minusDays(renewalPeriod))) => ReadyForRenewal(response.currentRegYearEndDate)
             case ("Approved", _, true) => RenewalSubmitted(response.currentRegYearEndDate)
             case ("Approved", _, false) => SubmissionDecisionApproved
             case _ => throw new RuntimeException("ETMP returned status is inconsistent")
