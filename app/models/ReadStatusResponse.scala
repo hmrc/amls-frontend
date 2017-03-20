@@ -7,10 +7,14 @@ import play.api.libs.json._
 case class ReadStatusResponse(
                                processingDate: LocalDateTime,
                                formBundleStatus: String,
+                               statusReason: Option[String],
                                deRegistrationDate: Option[LocalDate],
                                currentRegYearStartDate: Option[LocalDate],
                                currentRegYearEndDate: Option[LocalDate],
-                               renewalConFlag: Boolean
+                               renewalConFlag: Boolean,
+                               renewalSubmissionFlag: Option[Boolean] = None,
+                               currentAMLSOutstandingBalance: Option[String] = None,
+                               businessContactNumber: Option[String] = None
                              )
 
 object ReadStatusResponse {
@@ -29,3 +33,4 @@ object ReadStatusResponse {
 
   implicit val format = Json.format[ReadStatusResponse]
 }
+

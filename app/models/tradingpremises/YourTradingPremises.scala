@@ -56,7 +56,7 @@ object YourTradingPremises {
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
           (__ \ "isResidential").read[Option[Boolean]] ~
-          (__ \ "startDate").read(optionR(localDateRule)) ~
+          (__ \ "startDate").read(optionR(localDateRuleWithPattern(yearType))) ~
           (__ \ "tradingNameChangeDate").read[Option[DateOfChange]]
         ) (YourTradingPremises.apply)
     }

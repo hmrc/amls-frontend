@@ -2,8 +2,9 @@
 @import forms2._
 @import models.bankdetails._
 @import utils.StatusConstants
+@import models.status._
 
-@(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading(if(complete) "title.ya" else "title.cya", "summary.bankdetails")
@@ -59,7 +60,7 @@
                         ) {
                             <ul class="list">
                                 <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
-                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
                                 <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}

@@ -76,6 +76,9 @@ error.expected.dateofchange.date.after.activitystartdate = The date must be afte
 
 error.invalid.mlr.number = Enter a valid Money Laundering Regulation registration number
 
+error.invalid.year = Enter a valid date in the format DD MM YYYY
+error.invalid.year.post1900 = The year can’t be before 1900
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
@@ -153,7 +156,7 @@ error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
 error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
-error.required.tp.year = Enter a year.
+error.required.tp.year = Enter a valid date in the format DD MM YYYY
 error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
 error.required.tp.residential.address = Select yes if this is also a residential address
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
@@ -439,6 +442,7 @@ status.submissiondecisionrejected.description = Your application has been reject
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
 status.fee.link = If you haven’t paid the fee
+status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.registration.fee.lbl = Your registration fee
@@ -524,7 +528,7 @@ confirmation.submission.info = Your application won’t be reviewed by HM Revenu
 confirmation.notice = You must make a note of this reference number and registration fee. You will need them to make the payment.
 confirmation.reference.notice = You must make a note of this reference number.
 confirmation.fee = Your fee
-confirmation.no.fee = There are no additional fees to pay.
+confirmation.no.fee = There are no fees to pay for these changes.
 confirmation.breakdown.details = How your fee has been calculated
 confirmation.breakdown = This shows your total fees for each item.
 confirmation.sidebar.code = Your reference
@@ -561,7 +565,7 @@ confirmation.amendment.details.list.03 = paid some of your fees so far, but not 
 confirmation.amendment.details.02 = Your application won’t be reviewed by HM Revenue and Customs until all the fees are paid.
 
 confirmation.variation.title = You’ve submitted your updated information
-confirmation.variation.lede = You’ve submitted your updated information
+confirmation.variation.lede = You’ve updated your information
 confirmation.variation.summary = This shows your total fees for each item.
 
 confirmation.payment.title = You’ve submitted and paid
@@ -596,6 +600,7 @@ summary.asp = Accountancy Service Provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
+summary.renewal = Renewal
 summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
@@ -889,7 +894,6 @@ bankdetails.summary.accounttype.lbl.02 = My business’s account
 bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
-bankdetails.confirm-activities.subtitle = You’ve told us your business type is:
 bankdetails.bank.account.registered.title = Bank account registered
 bankdetails.have.registered.account.text = You have registered {0} bank account.
 bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
@@ -914,6 +918,7 @@ businessactivities.businessfranchise.subtitle = If your business is a franchise,
 businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
+businessactivities.confirm-activities.subtitle = You’ve told us your business type is:
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months, from the following activities?
 businessactivities.turnover.lbl.01 = £0 to £14,999
@@ -1415,6 +1420,21 @@ notifications.youHaveMessages = View your messages
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
+
+############################### Renewal ###############################
+renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
+renewal.whatyouneed.line_1 = your net profit
+renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
+renewal.progress.title = Your renewal progress
+renewal.progress.intro = In order to submit your renewal you will need to complete the renewal section. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
+  Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+renewal.progress.submit.header = Submit renewal
+renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
+progress.renewal.name = Renewal
+progress.renewal.description = Information about your business over the last 12 months
+progress.renewal.time = 7 and 10
+
+renewal.involvedinother.title = Is your business involved in any other activities?
 
 ############################### Survey ###############################
 

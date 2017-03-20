@@ -9,8 +9,6 @@ import services.StatusService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
-import scala.concurrent.Future
-
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
@@ -20,14 +18,15 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       for {
         bankDetails <- dataCache.fetch[Seq[BankDetails]](BankDetails.key)
-        canEdit <- statusService.getStatus map {
-          case NotCompleted | SubmissionReady => true
-          case _ => false
-        }
+        status <- statusService.getStatus
       } yield bankDetails match {
         case Some(data) => {
-          val bankDtls = data.filterNot(_.status.contains(StatusConstants.Deleted))
-          Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDtls), canEdit))
+          val canEdit = status match {
+            case NotCompleted | SubmissionReady => true
+            case _ => false
+          }
+          val bankDetails = data.filterNot(_.status.contains(StatusConstants.Deleted))
+          Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDetails), canEdit, status))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }

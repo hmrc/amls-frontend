@@ -33,8 +33,8 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
       override val statusService: StatusService = mock[StatusService]
     }
 
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
 
   }
 
@@ -275,8 +275,8 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       override val statusService: StatusService = mock[StatusService]
     }
 
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
     val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(
