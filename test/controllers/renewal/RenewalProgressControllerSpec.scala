@@ -13,7 +13,10 @@ import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.inject.bind
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -22,6 +25,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
+
+    implicit val authContext = mock[AuthContext]
+    implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
     val progressService = mock[ProgressService]
@@ -53,7 +59,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     when {
       renewalService.getSection
-    } thenReturn renewalSection
+    } thenReturn Future.successful(renewalSection)
 
   }
 

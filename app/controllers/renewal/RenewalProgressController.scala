@@ -29,18 +29,18 @@ class RenewalProgressController @Inject()
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
+        renewals.getSection flatMap { renewalSection =>
 
-        val renewalSection = renewals.getSection
+          val block = for {
+            cache <- OptionT(dataCacheConnector.fetchAll)
+          } yield {
+            val variationSections = progressService.sections(cache)
 
-        val block = for {
-          cache <- OptionT(dataCacheConnector.fetchAll)
-        } yield {
-          val variationSections = progressService.sections(cache)
+            Ok(renewal_progress(renewalSection, variationSections, canSubmit = false))
+          }
 
-          Ok(renewal_progress(renewalSection, variationSections, canSubmit = false))
+          block getOrElseF Future.successful(Ok(renewal_progress(renewalSection, Seq.empty, canSubmit = false)))
         }
-
-        block getOrElseF Future.successful(Ok(renewal_progress(renewalSection, Seq.empty, canSubmit = false)))
   }
 
 }

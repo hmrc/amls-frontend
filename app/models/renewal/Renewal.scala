@@ -1,14 +1,14 @@
 package models.renewal
 
-import models.registrationprogress.{NotStarted, Section}
 import play.api.libs.json.Json
-import play.api.mvc.Call
 
-case class Renewal()
+case class Renewal(hasChanged: Boolean) {
+  def isComplete = true
+}
 
 object Renewal {
+  val key = "renewal"
 
-  //implicit val formats = Json.format[Renewal]
-
+  implicit val formats = Json.format[Renewal]
 
 }
