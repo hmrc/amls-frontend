@@ -56,18 +56,5 @@ object InvolvedInOther {
     )
     case involvedInOtherNo => Json.obj("involvedInOther" -> false)
   }
-
-  def convertToRenewal(baInvolvedInOther: models.businessactivities.InvolvedInOther): models.renewal.InvolvedInOther = {
-    baInvolvedInOther match {
-      case models.businessactivities.InvolvedInOtherYes(value) => models.renewal.InvolvedInOtherYes(value)
-      case models.businessactivities.InvolvedInOtherNo => models.renewal.InvolvedInOtherNo
-    }
-  }
-
-  def convertFromRenewal(baInvolvedInOther: models.renewal.InvolvedInOther): models.businessactivities.InvolvedInOther = {
-    baInvolvedInOther match {
-      case models.renewal.InvolvedInOtherYes(value) => models.businessactivities.InvolvedInOtherYes(value)
-      case models.renewal.InvolvedInOtherNo => models.businessactivities.InvolvedInOtherNo
-    }
-  }
+  
 }
