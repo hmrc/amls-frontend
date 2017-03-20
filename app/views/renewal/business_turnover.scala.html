@@ -5,58 +5,58 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.business-turnover.title", "summary.businessactivities")
+    @heading("renewal.business-turnover.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("businessactivities.business-turnover.title") + " - " + Messages("summary.businessactivities"),
+    title = Messages("renewal.business-turnover.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
+    @form(f, controllers.renewal.routes.BusinessTurnoverController.post(edit)) {
 
         @fieldset(
-            f = f("expectedBusinessTurnover-fieldset"),
-            legend = "businessactivities.business-turnover.title",
+            f = f("BusinessTurnover-fieldset"),
+            legend = "renewal.business-turnover.title",
             legendHidden = true,
             panel = false
         ) {
             @errorGroup(
-                 field = f("expectedBusinessTurnover")
+                 field = f("BusinessTurnover")
             ) {
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.01",
                     value = "01"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.02",
                     value = "02"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.03",
                     value = "03"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.04",
                     value = "04"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.05",
                     value = "05"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
+                    f = f("BusinessTurnover"),
                     labelText = "businessactivities.business-turnover.lbl.06",
                     value = "06"
                 )
                 @radio(
-                    f = f("expectedBusinessTurnover"),
-                    labelText = "businessactivities.business-turnover.lbl.07",
+                    f = f("BusinessTurnover"),
+                labelText = "businessactivities.business-turnover.lbl.07",
                     value = "07"
                 )
             }
