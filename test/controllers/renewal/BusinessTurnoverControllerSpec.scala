@@ -85,7 +85,7 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.AMLSTurnoverController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.BusinessTurnoverController.get().url))
       }
 
       "on post with valid data in edit mode" in new Fixture {
@@ -102,7 +102,7 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
       }
 
     }

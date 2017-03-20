@@ -7,7 +7,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2}
 import models.renewal.BusinessTurnover
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import views.html.renewal.business_turnover
 
 @Singleton
 class BusinessTurnoverController @Inject()(
