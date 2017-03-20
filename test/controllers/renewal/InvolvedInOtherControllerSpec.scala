@@ -35,8 +35,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
-      statusService = mockStatusService
+      authConnector = self.authConnector
     )
   }
 
@@ -44,9 +43,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "when get is called" must {
       "display the is your business involved in other activities page" in new Fixture {
-
-        when(mockStatusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
           .thenReturn(None)
@@ -63,9 +59,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
 
       "display the involved in other with pre populated data" in new Fixture {
-
-        when(mockStatusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
           .thenReturn(Some(BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))))
@@ -88,9 +81,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
-
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -110,9 +100,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           val businessMatching = BusinessMatching(
             activities = Some(BMActivities(Set(BillPaymentServices)))
           )
-
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
 
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
@@ -134,9 +121,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(EstateAgentBusinessService)))
           )
 
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
-
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -156,9 +140,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           val businessMatching = BusinessMatching(
             activities = Some(BMActivities(Set(HighValueDealing)))
           )
-
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
 
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
@@ -181,9 +162,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(MoneyServiceBusiness)))
           )
 
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
-
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -204,9 +182,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(TrustAndCompanyServices)))
           )
 
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
-
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -226,9 +201,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           val businessMatching = BusinessMatching(
             activities = Some(BMActivities(Set(TelephonePaymentService)))
           )
-
-          when(mockStatusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
 
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(None)
@@ -380,9 +352,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           val document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
         }
-
       }
-
     }
   }
 }
