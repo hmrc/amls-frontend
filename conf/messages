@@ -1426,6 +1426,8 @@ renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laun
 
 renewal.involvedinother.title = Is your business involved in any other activities?
 
+renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback

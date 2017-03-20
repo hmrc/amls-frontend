@@ -1,0 +1,82 @@
+@import include._
+@import forms2._
+@import models.businessmatching._
+
+@(f: forms.Form2[_], edit: Boolean, bmBusinessActivities:Option[BusinessActivities])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.turnover.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+        ) {
+            <ul class="list list--comma">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
+            </ul>
+        }
+
+        @form(f, controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
+
+            @fieldset(
+                f = f("AMLSTurnover-fieldset"),
+                legend = "businessactivities.turnover.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("AMLSTurnover")
+                ) {
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.01",
+                        value = "01"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.02",
+                        value = "02"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.03",
+                        value = "03"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.04",
+                        value = "04"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.05",
+                        value = "05"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.06",
+                        value = "06"
+                    )
+                    @radio(
+                        f = f("AMLSTurnover"),
+                        labelText = "businessactivities.turnover.lbl.07",
+                        value = "07"
+                    )
+                }
+            }
+
+        @submit(edit)
+    }
+}
