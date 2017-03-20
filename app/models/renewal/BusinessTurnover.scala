@@ -21,6 +21,8 @@ object BusinessTurnover {
 
   import utils.MappingUtils.Implicits._
 
+  val key = "renewal-business-turnover"
+
   implicit val formRule: Rule[UrlFormEncoded, BusinessTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     import models.FormTypes._
