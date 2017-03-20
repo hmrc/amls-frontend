@@ -17,6 +17,8 @@ object InvolvedInOther {
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
 
+  val key = "renewal-involved-in-other"
+
   val maxOtherBusinessActivityTypeLength = 255
   val OtherBusinessActivityType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.ba.involved.in.other.text") andThen

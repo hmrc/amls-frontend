@@ -229,10 +229,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -246,10 +243,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -263,10 +257,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -281,10 +272,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)

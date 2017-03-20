@@ -72,11 +72,7 @@ class InvolvedInOtherController @Inject()(
             }
           case ValidForm(_, data) =>
             for {
-              businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](
-                BusinessActivities.key, getUpdatedBA(businessActivities, InvolvedInOther.convertFromRenewal(data))
-              )
-
+              _ <- dataCacheConnector.save[InvolvedInOther](InvolvedInOther.key, data)
             } yield data match {
               case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
               case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)
@@ -88,14 +84,6 @@ class InvolvedInOtherController @Inject()(
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
     case false => Redirect(routes.AMLSTurnoverController.get(edit))
     case true => Redirect(routes.SummaryController.get())
-  }
-
-  private def getUpdatedBA(businessActivities: Option[BusinessActivities], data: models.businessactivities.InvolvedInOther): BusinessActivities = {
-    (businessActivities, data) match {
-      case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data))
-      case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
-      case (_, _) => BusinessActivities(involvedInOther = Some(data))
-    }
   }
 
 }
