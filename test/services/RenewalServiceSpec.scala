@@ -2,7 +2,7 @@ package services
 
 import connectors.DataCacheConnector
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.renewal.Renewal
+import models.renewal.{InvolvedInOtherNo, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -32,6 +32,11 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
     val service = injector.instanceOf[RenewalService]
 
+    val completeModel = Renewal(
+      Some(InvolvedInOtherNo),
+      // Add other models here
+      true)
+
   }
 
   "The renewal service" must {
@@ -53,7 +58,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       "the renewal is complete and has been started" in new Fixture {
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(Renewal(None, true)))
+        } thenReturn Future.successful(Some(completeModel))
 
         val section = await(service.getSection)
 
@@ -78,9 +83,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "the renewal model is not complete and not started" in new Fixture {
-        val renewal = mock[Renewal]
-        when(renewal.involvedInOtherActivities) thenReturn None
-        when(renewal.isComplete) thenReturn false
+        val renewal = Renewal(None)
 
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
