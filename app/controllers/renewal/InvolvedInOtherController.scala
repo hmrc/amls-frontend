@@ -32,8 +32,7 @@ class InvolvedInOtherController @Inject()(
               } yield {
                 Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther),
                   edit, businessTypes(businessMatching)))
-              })
-                .getOrElse(Ok(involved_in_other(EmptyForm, edit, businessTypes(businessMatching))))
+              }) getOrElse Ok(involved_in_other(EmptyForm, edit, businessTypes(businessMatching)))
             }) getOrElse Ok(involved_in_other(EmptyForm, edit, None))
         }
   }
@@ -66,7 +65,7 @@ class InvolvedInOtherController @Inject()(
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             } yield businessMatching match {
-              case Some(x) => BadRequest(involved_in_other(f, edit, businessTypes(businessMatching)))
+              case Some(_) => BadRequest(involved_in_other(f, edit, businessTypes(businessMatching)))
               case None => BadRequest(involved_in_other(f, edit, None))
             }
           case ValidForm(_, data) =>

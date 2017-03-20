@@ -83,6 +83,12 @@ a.block-link {
   visibility: hidden;
 }
 
+.renewal-progress-section {
+  border-bottom: 10px solid #e2e2e2;
+  margin-bottom: 40px!important;
+  padding-bottom: 30px;
+}
+
 
 /* -- Progress Step: assets (tick & chevrons) -- */
 

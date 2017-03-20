@@ -421,4 +421,8 @@ GET         /renewal/turnover                                           @control
 GET         /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
 
+GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
+POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
+
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
