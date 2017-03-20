@@ -57,5 +57,5 @@ class involved_in_otherSpec extends GenericTestHelper with MustMatchers {
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
-  }git
+  }
 }

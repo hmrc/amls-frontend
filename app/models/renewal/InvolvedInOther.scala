@@ -55,4 +55,10 @@ object InvolvedInOther {
     case involvedInOtherNo => Json.obj("involvedInOther" -> false)
   }
 
+  def convertToRenewal(baInvolvedInOther: models.businessactivities.InvolvedInOther): models.renewal.InvolvedInOther = {
+    baInvolvedInOther match {
+      case models.businessactivities.InvolvedInOtherYes(value) => models.renewal.InvolvedInOtherYes(value)
+      case models.businessactivities.InvolvedInOtherNo => models.renewal.InvolvedInOtherNo
+    }
+  }
 }
