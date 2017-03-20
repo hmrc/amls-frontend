@@ -7,9 +7,10 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.registrationprogress.{Completed, NotStarted, Section}
+import models.renewal.Renewal
 import play.api.i18n.MessagesApi
 import play.api.mvc.Call
-import services.ProgressService
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.renewal_progress
 
@@ -21,14 +22,15 @@ class RenewalProgressController @Inject()
   val authConnector: AuthConnector,
   dataCacheConnector: DataCacheConnector,
   progressService: ProgressService,
-  messages: MessagesApi
+  messages: MessagesApi,
+  renewals: RenewalService
 ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
 
-        val renewalSection = Section("renewal", NotStarted, false, Call("test", "test"))
+        val renewalSection = renewals.getSection
 
         val block = for {
           cache <- OptionT(dataCacheConnector.fetchAll)
@@ -39,7 +41,6 @@ class RenewalProgressController @Inject()
         }
 
         block getOrElseF Future.successful(Ok(renewal_progress(renewalSection, Seq.empty, canSubmit = false)))
-
   }
 
 }

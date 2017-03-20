@@ -9,10 +9,12 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.ProgressService
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.inject.bind
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
@@ -23,10 +25,14 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     val dataCacheConnector = mock[DataCacheConnector]
     val progressService = mock[ProgressService]
+    val renewalService = mock[RenewalService]
 
     lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[ProgressService].to(progressService))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .bindings(bind[RenewalService].to(renewalService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
     val controller = app.injector.instanceOf[RenewalProgressController]
@@ -34,6 +40,8 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     val cacheMap = mock[CacheMap]
 
     val defaultSection = Section("A new section", NotStarted, hasChanged = false, mock[Call])
+
+    val renewalSection = Section("renewal", NotStarted, hasChanged = false, mock[Call])
 
     when {
       dataCacheConnector.fetchAll(any(), any())
@@ -43,12 +51,15 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       progressService.sections(eqTo(cacheMap))
     } thenReturn Seq(defaultSection)
 
+    when {
+      renewalService.getSection
+    } thenReturn renewalSection
+
   }
 
   "The Renewal Progress Controller" must {
 
     "load the page" in new Fixture {
-
       val result = controller.get()(request)
 
       status(result) mustBe OK
@@ -67,6 +78,15 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       html.select(".progress-step--details").text() must include("A new section")
 
+    }
+
+    "display the renewal section" in new Fixture {
+
+      val result = controller.get()(request)
+
+      val html = Jsoup.parse(contentAsString(result))
+
+      html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
     }
 
   }
