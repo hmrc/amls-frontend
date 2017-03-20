@@ -17,7 +17,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
     val notStarted = Section("renewal", NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
-    dataCache.fetch[Renewal](Renewal.key) map {
+    this.getRenewal map {
       case Some(model) if model.isComplete =>
         Section("renewal", Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get())
       case Some(Renewal(None, _)) =>
@@ -28,5 +28,9 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
 
   }
+
+  def getRenewal = dataCache.fetch[Renewal](Renewal.key)
+
+  def updateRenewal(renewal: Renewal) = dataCache.save[Renewal](Renewal.key, renewal)
 
 }
