@@ -79,7 +79,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "the renewal model is not complete and not started" in new Fixture {
         val renewal = mock[Renewal]
-        when(renewal.involedInOtherActivities) thenReturn None
+        when(renewal.involvedInOtherActivities) thenReturn None
         when(renewal.isComplete) thenReturn false
 
         when {

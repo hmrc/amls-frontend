@@ -2,8 +2,13 @@ package models.renewal
 
 import play.api.libs.json.Json
 
-case class Renewal(involedInOtherActivities: Option[InvolvedInOther] = None, hasChanged: Boolean = false) {
-  def isComplete = true
+case class Renewal(involvedInOtherActivities: Option[InvolvedInOther] = None, hasChanged: Boolean = false) {
+  def isComplete = {
+    this match {
+      case Renewal(Some(_), _) => true
+      case _ => false
+    }
+  }
 }
 
 object Renewal {
