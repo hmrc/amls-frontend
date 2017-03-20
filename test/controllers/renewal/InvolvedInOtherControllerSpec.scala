@@ -3,7 +3,8 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
+import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -247,137 +248,141 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
 
-    //    "when post is called" must {
-    //
-    //      "on post with valid data with option yes" in new Fixture {
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "true",
-    //          "details" -> "test"
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessActivities](any())
-    //          (any(), any(), any())).thenReturn(Future.successful(None))
-    //
-    //        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(emptyCache))
-    //
-    //        val result = controller.post()(newRequest)
-    //        status(result) must be(SEE_OTHER)
-    //        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
-    //      }
-    //
-    //      "on post with valid data with option no" in new Fixture {
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "false"
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(None))
-    //
-    //        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(emptyCache))
-    //
-    //        val result = controller.post()(newRequest)
-    //        status(result) must be(SEE_OTHER)
-    //        redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
-    //      }
-    //
-    //      "on post with valid data with option no in edit mode" in new Fixture {
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "false"
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(None))
-    //
-    //        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(emptyCache))
-    //
-    //        val result = controller.post(true)(newRequest)
-    //        status(result) must be(SEE_OTHER)
-    //        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    //      }
-    //
-    //      "on post with invalid data with business activities" in new Fixture {
-    //
-    //        val businessMatching = BusinessMatching(
-    //          activities = Some(BMActivities(Set(AccountancyServices)))
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(Some(businessMatching)))
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "test"
-    //        )
-    //
-    //        val result = controller.post()(newRequest)
-    //        status(result) must be(BAD_REQUEST)
-    //        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
-    //
-    //        val document = Jsoup.parse(contentAsString(result))
-    //        document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
-    //      }
-    //
-    //      "on post with invalid data without business activities" in new Fixture {
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(None))
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "test"
-    //        )
-    //
-    //        val result = controller.post()(newRequest)
-    //        status(result) must be(BAD_REQUEST)
-    //
-    //        val document = Jsoup.parse(contentAsString(result))
-    //        document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
-    //      }
-    //
-    //      "on post with required field not filled with business activities" in new Fixture {
-    //
-    //        val businessMatching = BusinessMatching(
-    //          activities = Some(BMActivities(Set(AccountancyServices)))
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(Some(businessMatching)))
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "true",
-    //          "details" -> ""
-    //        )
-    //
-    //        val result = controller.post()(newRequest)
-    //        status(result) must be(BAD_REQUEST)
-    //        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
-    //
-    //        val document = Jsoup.parse(contentAsString(result))
-    //        document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
-    //      }
-    //
-    //
-    //      "on post with valid data in edit mode" in new Fixture {
-    //
-    //        val newRequest = request.withFormUrlEncodedBody(
-    //          "involvedInOther" -> "true",
-    //          "details" -> "test"
-    //        )
-    //
-    //        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(None))
-    //
-    //        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-    //          .thenReturn(Future.successful(emptyCache))
-    //
-    //        val result = controller.post(true)(newRequest)
-    //        status(result) must be(SEE_OTHER)
-    //        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get(true).url))
-    //      }
-    //    }
+    "when post is called" must {
+
+      "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "involvedInOther" -> "true",
+          "details" -> "test"
+        )
+
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
+      }
+
+      "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "involvedInOther" -> "false"
+        )
+
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
+      }
+
+      "redirect to SummaryController with valid data with option no in edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "involvedInOther" -> "false"
+        )
+
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+
+      "redirect to BusinessTurnoverController with valid data in edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "involvedInOther" -> "true",
+          "details" -> "test"
+        )
+
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get(true).url))
+      }
+
+      "respond with BAD_REQUEST" when {
+
+        "with invalid data with business activities" in new Fixture {
+
+          val businessMatching = BusinessMatching(
+            activities = Some(BMActivities(Set(AccountancyServices)))
+          )
+
+          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(businessMatching)))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "test"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
+        }
+
+        "with invalid data without business activities" in new Fixture {
+
+          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "test"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
+        }
+
+        "with required field not filled with business activities" in new Fixture {
+
+          val businessMatching = BusinessMatching(
+            activities = Some(BMActivities(Set(AccountancyServices)))
+          )
+
+          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(businessMatching)))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "true",
+            "details" -> ""
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
+        }
+
+      }
+
+    }
   }
 }
