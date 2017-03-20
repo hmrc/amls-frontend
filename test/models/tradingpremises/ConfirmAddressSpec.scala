@@ -5,9 +5,9 @@ import jto.validation.{Path, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
-class ConfirmTradingPremisesAddressSpec extends PlaySpec with MockitoSugar {
+class ConfirmAddressSpec extends PlaySpec with MockitoSugar {
   
-  "ConfirmTradingPremisesAddress" must {
+  "ConfirmAddress" must {
 
     "successfully validate" when {
       "given a 'true' value" in {
@@ -16,8 +16,8 @@ class ConfirmTradingPremisesAddressSpec extends PlaySpec with MockitoSugar {
           "confirmAddress" -> Seq("true")
         )
 
-        ConfirmTradingPremisesAddress.formRule.validate(data) must
-          be(Valid(ConfirmTradingPremisesAddress(true)))
+        ConfirmAddress.formRule.validate(data) must
+          be(Valid(ConfirmAddress(true)))
       }
 
       "given a 'false' value" in {
@@ -26,15 +26,15 @@ class ConfirmTradingPremisesAddressSpec extends PlaySpec with MockitoSugar {
           "confirmAddress" -> Seq("false")
         )
 
-        ConfirmTradingPremisesAddress.formRule.validate(data) must
-          be(Valid(ConfirmTradingPremisesAddress(false)))
+        ConfirmAddress.formRule.validate(data) must
+          be(Valid(ConfirmAddress(false)))
       }
     }
 
     "fail validation" when {
       "given missing data represented by an empty Map" in {
 
-        ConfirmTradingPremisesAddress.formRule.validate(Map.empty) must
+        ConfirmAddress.formRule.validate(Map.empty) must
           be(Invalid(Seq(
             (Path \ "confirmAddress") -> Seq(ValidationError("error.required.tp.confirm.address"))
           )))
@@ -46,7 +46,7 @@ class ConfirmTradingPremisesAddressSpec extends PlaySpec with MockitoSugar {
           "confirmAddress" -> Seq("")
         )
 
-        ConfirmTradingPremisesAddress.formRule.validate(data) must
+        ConfirmAddress.formRule.validate(data) must
           be(Invalid(Seq(
             (Path \ "confirmAddress") -> Seq(ValidationError("error.required.tp.confirm.address"))
           )))
@@ -55,9 +55,9 @@ class ConfirmTradingPremisesAddressSpec extends PlaySpec with MockitoSugar {
 
     "write correct data" in {
 
-      val model = ConfirmTradingPremisesAddress(true)
+      val model = ConfirmAddress(true)
 
-      ConfirmTradingPremisesAddress.formWrites.writes(model) must
+      ConfirmAddress.formWrites.writes(model) must
         be(Map(
           "confirmAddress" -> Seq("true")
         ))

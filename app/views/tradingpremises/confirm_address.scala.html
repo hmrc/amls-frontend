@@ -1,10 +1,10 @@
 @import forms.Form2
 @import include.{main, heading, registered_office_helper}
 @import include.forms2._
-@import models.aboutthebusiness._
 @import play.api.i18n.Messages
+@import models.businesscustomer.Address
 
-@(f: Form2[_], model: RegisteredOffice, index: Int)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], model: Address, index: Int)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -16,13 +16,13 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.ConfirmTradingPremisesAddressController.post(index)) {
+    @form(f, controllers.tradingpremises.routes.ConfirmAddressController.post(index)) {
 
         @registered_office_helper(model)
 
         @fieldset(
-            f = f("confirmingyouraddress-fieldset"),
-            legend = "aboutthebusiness.confirmingyouraddress.title",
+            f = f("confirmAddress-fieldset"),
+            legend = "tradingpremises.confirmaddress.title",
             legendHidden = true,
             panel = false
         ) {
@@ -30,7 +30,6 @@
             @errorGroup(
                 field = f("confirmAddress")
             ) {
-
                 @radio(
                     f = f("confirmAddress"),
                     labelText = "lbl.yes",
