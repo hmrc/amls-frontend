@@ -6,8 +6,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.registrationprogress.{NotStarted, Section, Started}
-import models.status.{Complete, Incomplete}
+import models.registrationprogress.{Completed, NotStarted, Section}
 import play.api.i18n.MessagesApi
 import play.api.mvc.Call
 import services.ProgressService
@@ -29,7 +28,7 @@ class RenewalProgressController @Inject()
     implicit authContext =>
       implicit request =>
 
-        val renewalSection = Section(messages("renewal.section.title"), Started, false, Call("test", "test"))
+        val renewalSection = Section("renewal", NotStarted, false, Call("test", "test"))
 
         val block = for {
           cache <- OptionT(dataCacheConnector.fetchAll)

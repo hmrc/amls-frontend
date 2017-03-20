@@ -1,6 +1,8 @@
 @import include._
 @import models.registrationprogress.Section
-@import views.html.registrationamendment._
+@import models.registrationprogress._
+@import views.html.registrationprogress._
+@import views.html.registrationamendment.section_list
 @import utils.Strings._
 @import views.html.helper.CSRF
 
@@ -24,11 +26,15 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
 
-            <div class="grid-layout grid-layout--stacked">
-                @section_list(Seq(renewalSection))
+            <div class="grid-layout grid-layout--stacked renewal-progress-section">
+                <ul>
+                    @section(renewalSection.name, renewalSection.status, renewalSection.call)
+                </ul>
             </div>
 
-            @section_list(sections)
+            <div class="grid-layout grid-layout--stacked">
+                @section_list(sections)
+            </div>
 
         </div>
 
