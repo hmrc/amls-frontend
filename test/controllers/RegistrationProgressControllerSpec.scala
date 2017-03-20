@@ -30,7 +30,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
     self => val request = addToken(authRequest)
     val controller = new RegistrationProgressController {
       override val authConnector = self.authConnector
-      override protected[controllers] val service: ProgressService = mock[ProgressService]
+      override protected[controllers] val progressService: ProgressService = mock[ProgressService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override protected[controllers] val statusService : StatusService = mock[StatusService]
@@ -53,7 +53,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.service.sections(mockCacheMap))
+        when(controller.progressService.sections(mockCacheMap))
           .thenReturn(Seq.empty[Section])
 
         when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
@@ -79,7 +79,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.service.sections(mockCacheMap))
+          when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq(
               Section("TESTSECTION1", Completed, false, mock[Call]),
               Section("TESTSECTION2", Completed, true, mock[Call])
@@ -107,7 +107,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.service.sections(mockCacheMap))
+          when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq(
               Section("TESTSECTION1", Completed, false, mock[Call]),
               Section("TESTSECTION2", Completed, false, mock[Call])
@@ -137,7 +137,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.service.sections(mockCacheMap))
+          when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq(
               Section("TESTSECTION1", NotStarted, false, mock[Call]),
               Section("TESTSECTION2", Completed, true, mock[Call])
@@ -164,7 +164,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.service.sections(mockCacheMap))
+          when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq(
               Section("TESTSECTION1", NotStarted, false, mock[Call]),
               Section("TESTSECTION2", Completed, false, mock[Call])
@@ -189,7 +189,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.service.sections(mockCacheMap))
+        when(controller.progressService.sections(mockCacheMap))
           .thenReturn(Seq.empty[Section])
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
@@ -289,52 +289,16 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
         val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val responsiblePeople = Seq(john, mark)
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
-          thenReturn(Future.successful(Some(respinsiblePeople)))
+          thenReturn(Future.successful(Some(responsiblePeople)))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment().url)
-      }
-    }
-  }
-}
-
-class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHelper with MustMatchers {
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-    val controller = new RegistrationProgressController {
-      override val authConnector = self.authConnector
-      override protected[controllers] val service: ProgressService = mock[ProgressService]
-      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
-      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override protected[controllers] val statusService : StatusService = mock[StatusService]
-    }
-
-    protected val mockCacheMap = mock[CacheMap]
-  }
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
-
-  "RegistrationProgressController" when {
-    "there has already been a submission" must {
-      "show the registration progress page" in new Fixture {
-        when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
-          .thenReturn(Future.successful(Seq(
-            Section("TESTSECTION1", Completed, false, mock[Call]),
-            Section("TESTSECTION2", Completed, false, mock[Call])
-          )))
-
-        val responseF = controller.get()(request)
-        status(responseF) must be (OK)
-        val pageTitle = Messages("progress.title") + " - " +
-          Messages("title.yapp") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-        Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
       }
     }
   }
