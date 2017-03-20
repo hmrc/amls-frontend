@@ -79,13 +79,15 @@ class InvolvedInOtherController @Inject()(
 
           } yield data match {
             case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
-            case models.renewal.InvolvedInOtherNo => edit match {
-              case false => Redirect(routes.AMLSTurnoverController.get(edit))
-              case true => Redirect(routes.SummaryController.get())
-            }
+            case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)
           }
       }
     }
+  }
+
+  private def redirectDependingOnEdit(edit: Boolean) =  edit match {
+    case false => Redirect(routes.AMLSTurnoverController.get(edit))
+    case true => Redirect(routes.SummaryController.get())
   }
 
   private def getUpdatedBA(businessActivities: Option[BusinessActivities], data: models.businessactivities.InvolvedInOther): BusinessActivities = {
