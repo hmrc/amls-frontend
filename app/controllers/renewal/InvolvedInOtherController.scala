@@ -16,8 +16,7 @@ import views.html.renewal.involved_in_other
 @Singleton
 class InvolvedInOtherController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector,
-                                         val statusService: StatusService
+                                         val authConnector: AuthConnector
                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
