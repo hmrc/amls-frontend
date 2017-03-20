@@ -143,6 +143,10 @@ a.block-link {
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
 }
 
+.status-list--hidden {
+    display:none
+}
+
 
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */

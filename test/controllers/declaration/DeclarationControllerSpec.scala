@@ -45,8 +45,8 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
       totalFees = 0,
       paymentReference = ""
     )
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
     val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
   }
 
@@ -156,8 +156,8 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       totalFees = 0,
       paymentReference = ""
     )
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
     val addPerson = AddPerson("John", Some("Envy"), "Doe", RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
   }
 
