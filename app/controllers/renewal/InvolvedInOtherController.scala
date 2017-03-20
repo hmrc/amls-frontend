@@ -28,10 +28,9 @@ class InvolvedInOtherController @Inject()(
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               (for {
-                businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-                involvedInOther <- businessActivities.involvedInOther
+                involvedInOther <- cache.getEntry[InvolvedInOther](InvolvedInOther.key)
               } yield {
-                Ok(involved_in_other(Form2[InvolvedInOther](InvolvedInOther.convertToRenewal(involvedInOther)),
+                Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther),
                   edit, businessTypes(businessMatching)))
               })
                 .getOrElse(Ok(involved_in_other(EmptyForm, edit, businessTypes(businessMatching))))
