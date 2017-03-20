@@ -1,8 +1,8 @@
 @import include._
 @import forms2._
-@import models.businessmatching._
+@import models.renewal._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -10,11 +10,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.involved.other.legend", "summary.businessactivities")
+    @heading("renewal.involvedinother.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("businessactivities.involved.other.legend") + " - " + Messages("summary.businessactivities"),
+    title = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal"),
     heading = header
 )  {
 
@@ -26,11 +26,11 @@
             <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
     }
 
-    @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
+    @form(f, controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "businessactivities.involved.other.title",
+            legend = "renewal.involvedinother.title",
             legendHidden = true,
             panel = false,
             hint = "businessactivities.involved.other.hint"
