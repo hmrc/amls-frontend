@@ -53,7 +53,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       "the renewal is complete and has been started" in new Fixture {
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(Renewal(true)))
+        } thenReturn Future.successful(Some(Renewal(None, true)))
 
         val section = await(service.getSection)
 
@@ -75,6 +75,20 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
         section mustBe Section("renewal", Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
 
+      }
+
+      "the renewal model is not complete and not started" in new Fixture {
+        val renewal = mock[Renewal]
+        when(renewal.involedInOtherActivities) thenReturn None
+        when(renewal.isComplete) thenReturn false
+
+        when {
+          dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(renewal))
+
+        val section = await(service.getSection)
+
+        section mustBe Section("renewal", NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
       }
 
     }
