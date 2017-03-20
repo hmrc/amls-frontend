@@ -3,26 +3,33 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.registrationprogress.{Completed, NotStarted, Section}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{ eq => eqTo, _ }
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.ProgressService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
-
+import play.api.inject.bind
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
     val progressService = mock[ProgressService]
 
-    val controller = new RenewalProgressController(self.authConnector, dataCacheConnector, progressService)
+    lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[ProgressService].to(progressService))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[RenewalProgressController]
 
     val cacheMap = mock[CacheMap]
 

@@ -4,7 +4,7 @@
 @import utils.Strings._
 @import views.html.helper.CSRF
 
-@(sections: Seq[Section], canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
+@(renewalSection: Section, sections: Seq[Section], canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
 
 @header = {
     @heading("renewal.progress.title", "summary.status")
@@ -24,7 +24,12 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
 
+            <div class="grid-layout grid-layout--stacked">
+                @section_list(Seq(renewalSection))
+            </div>
+
             @section_list(sections)
+
         </div>
 
         <div class="grid-layout__column grid-layout__column--1-3">
