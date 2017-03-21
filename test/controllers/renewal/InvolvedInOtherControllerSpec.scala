@@ -2,7 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => BMActivities, _}
-import models.renewal.{InvolvedInOtherYes, InvolvedInOther}
+import models.renewal.{Renewal, InvolvedInOtherYes, InvolvedInOther}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -32,10 +32,12 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
+    lazy val mockRenewalService = mock[RenewalService]
 
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      renewalService = mockRenewalService
     )
   }
 
@@ -44,7 +46,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
     "when get is called" must {
       "display the is your business involved in other activities page" in new Fixture {
 
-        when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+        when(mockCacheMap.getEntry[Renewal](Renewal.key))
           .thenReturn(None)
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(None)
@@ -60,8 +62,8 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
       "display the involved in other with pre populated data" in new Fixture {
 
-        when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
-          .thenReturn(Some(InvolvedInOtherYes("test")))
+        when(mockCacheMap.getEntry[Renewal](Renewal.key))
+          .thenReturn(Some(Renewal(involvedInOtherActivities = Some(InvolvedInOtherYes("test")))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching()))
 
@@ -81,13 +83,13 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockDataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -101,7 +103,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(BillPaymentServices)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
@@ -121,7 +123,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(EstateAgentBusinessService)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
@@ -141,7 +143,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(HighValueDealing)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -162,7 +164,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(MoneyServiceBusiness)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
@@ -182,7 +184,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(TrustAndCompanyServices)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
@@ -202,7 +204,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
             activities = Some(BMActivities(Set(TelephonePaymentService)))
           )
 
-          when(mockCacheMap.getEntry[InvolvedInOther](InvolvedInOther.key))
+          when(mockCacheMap.getEntry[Renewal](Renewal.key))
             .thenReturn(None)
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
@@ -229,8 +231,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -243,8 +248,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -257,8 +265,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -272,8 +283,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
