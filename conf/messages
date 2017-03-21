@@ -1436,6 +1436,8 @@ renewal.involvedinother.title = Is your business involved in any other activitie
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 
+renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
