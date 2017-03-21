@@ -2,16 +2,18 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businesscustomer.{Address => BCAddress, ReviewDetails}
+import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{Address, AgentCompanyDetails, TradingPremises, YourTradingPremises}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{AuthorisedFixture, GenericTestHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -23,11 +25,7 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
     val controller = new ConfirmAddressController(messagesApi, self.dataCache, self.authConnector)
-    val mockCacheMap = mock[CacheMap]
 
-
-
-    when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(CacheMap("testCacheMap", Map()))))
   }
 
   "ConfirmTradingPremisesAddress" must {
@@ -70,9 +68,9 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       val emptyCache = CacheMap("", Map.empty)
 
       val ytp = YourTradingPremises(
-        "foo",
+        "BusinessName",
         Address(
-          "line11",
+          "line1",
           "line2",
           Some("line3"),
           Some("line4"),
@@ -87,16 +85,26 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "true"
           )
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-            .thenReturn(Future.successful(Some(bm)))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(),
-            meq(TradingPremises(yourTradingPremises = Some(ytp))))(any(),any(),any()))
-            .thenReturn(Future.successful(emptyCache))
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises())))
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(bm))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ActivityStartDateController.get(1).url))
+
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+            any(),
+            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any(), any(), any())
+
         }
 
         "option is 'No' is selected confirming the mentioned address is the trading premises address" in new Fixture {

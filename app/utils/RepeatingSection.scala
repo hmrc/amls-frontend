@@ -123,7 +123,7 @@ trait RepeatingSection {
       }
     }
 
-  protected def fetchAllAndUpdateStrict[T]
+  def fetchAllAndUpdateStrict[T]
   (index: Int)
   (fn: (CacheMap, T) => T)
   (implicit

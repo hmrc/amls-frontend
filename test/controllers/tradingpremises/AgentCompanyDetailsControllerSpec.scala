@@ -16,6 +16,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
 import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -77,17 +79,19 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
+          val mockCacheMap = mock[CacheMap]
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
         }
       }
+
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
@@ -95,16 +99,18 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
+          val mockCacheMap = mock[CacheMap]
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
+          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
         }
 
         "edit is true and given valid data" in new Fixture {
@@ -113,12 +119,13 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
+          val mockCacheMap = mock[CacheMap]
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -134,12 +141,6 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "11111111111" * 40
           )
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.invalid.tp.agent.registered.company.name"))
@@ -151,12 +152,6 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> " "
           )
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.required.tp.agent.registered.company.name"))
@@ -167,11 +162,13 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
 
         val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
+        val mockCacheMap = mock[CacheMap]
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
 
@@ -185,7 +182,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             agentName = None,
             agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
             agentPartnership = None
-          ))))(any(), any(), any())
+          ), TradingPremises())))(any(), any(), any())
       }
     }
   }
