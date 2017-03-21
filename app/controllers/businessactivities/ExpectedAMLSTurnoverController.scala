@@ -26,7 +26,6 @@ trait ExpectedAMLSTurnoverController extends BaseController {
             (for {
               cache <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              mlrActivities <- businessMatching.activities
             } yield {
               (for {
                 businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)

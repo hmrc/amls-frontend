@@ -24,12 +24,12 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
 
+    val mockCacheMap = mock[CacheMap]
+
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector
     )
-
-    val mockCacheMap = mock[CacheMap]
 
     val businessMatching = BusinessMatching(
       activities = Some(Activities(Set.empty))
@@ -51,215 +51,223 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
   "AMLSTurnoverController" must {
 
-    "on get display the Turnover Expect In 12Months Related To AMLS page" in new Fixture {
+    "on get" must {
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewal.turnover.title"))
-    }
+      "display AMLS Turnover page" in new Fixture {
 
-    "on get display the Role Within Business page with pre populated data" in new Fixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("renewal.turnover.title"))
+      }
 
-      override def model = Some(First)
+      "display the Role Within Business page with pre populated data" in new Fixture {
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
+        override def model = Some(First)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-    "on post with valid data" in new Fixture {
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[value=01]").hasAttr("checked") must be(true)
+      }
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "AMLSTurnover" -> "01"
-      )
+      "display the business type is AccountancyServices" in new Fixture {
 
-      when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(AccountancyServices)))
+        )
 
-      when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.BusinessFranchiseController.get().url))
-    }
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-    "on post with valid data in edit mode" in new Fixture {
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "AMLSTurnover" -> "01"
-      )
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.01"))
 
-      when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      }
 
-      when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      "display the business type is BillPaymentServices" in new Fixture {
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-    }
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(BillPaymentServices)))
+        )
 
-    "on post with invalid data" in new Fixture {
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(businessMatching)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.post(true)(request)
-      val document = Jsoup.parse(contentAsString(result))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      status(result) mustBe BAD_REQUEST
-      document.select(".amls-error-summary").size mustEqual 1
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.02"))
 
-    "on get display the business type is AccountancyServices" in new Fixture {
+      }
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(AccountancyServices)))
-      )
+      "display the business type is EstateAgentBusinessService" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(EstateAgentBusinessService)))
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.01"))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.03"))
 
-    "on get display the business type is BillPaymentServices" in new Fixture {
+      }
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(BillPaymentServices)))
-      )
+      "display the business type is HighValueDealing" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(HighValueDealing)))
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.02"))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.04"))
 
-    "on get display the business type is EstateAgentBusinessService" in new Fixture {
+      }
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(EstateAgentBusinessService)))
-      )
+      "display the business type is MoneyServiceBusiness" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(MoneyServiceBusiness)))
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.03"))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.05"))
 
-    "on get display the business type is HighValueDealing" in new Fixture {
+      }
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(HighValueDealing)))
-      )
+      "display the business type is TrustAndCompanyServices" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(TrustAndCompanyServices)))
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.04"))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.06"))
 
-    "on get display the business type is MoneyServiceBusiness" in new Fixture {
+      }
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(MoneyServiceBusiness)))
-      )
+      "display the business type is TelephonePaymentService" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val bMatching = BusinessMatching(
+          activities = Some(Activities(Set(TelephonePaymentService)))
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(bMatching))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.05"))
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    }
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.07"))
 
-    "on get display the business type is TrustAndCompanyServices" in new Fixture {
-
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(TrustAndCompanyServices)))
-      )
-
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
-
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.06"))
+      }
 
     }
 
-    "on get display the business type is TelephonePaymentService" in new Fixture {
+    "on post" must {
 
-      val bMatching = BusinessMatching(
-        activities = Some(Activities(Set(TelephonePaymentService)))
-      )
+      "valid data go to renewal CustomerOutsideUK" in new Fixture {
 
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(None)
+        val newRequest = request.withFormUrlEncodedBody(
+          "AMLSTurnover" -> "01"
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(bMatching))
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
-      when(mockDataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.07"))
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+      }
+
+      "valid data in edit mode go to renewal Summary" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "AMLSTurnover" -> "01"
+        )
+
+        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
+
+      "invalid data show BAD_REQUEST" in new Fixture {
+
+        when(mockDataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+          .thenReturn(Future.successful(Some(businessMatching)))
+
+        val result = controller.post(true)(request)
+        val document = Jsoup.parse(contentAsString(result))
+
+        status(result) mustBe BAD_REQUEST
+      }
 
     }
+
   }
 }
