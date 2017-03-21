@@ -58,8 +58,6 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
 
         val document = Jsoup.parse(contentAsString(result))
 
-        println(document.select("input[value=01]"))
-
         document.select("input[value=01]").hasAttr("checked") must be(true)
       }
 

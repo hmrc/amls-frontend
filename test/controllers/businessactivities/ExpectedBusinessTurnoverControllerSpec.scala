@@ -42,7 +42,6 @@ class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with Mock
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("businessactivities.business-turnover.title"))
@@ -60,7 +59,6 @@ class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with Mock
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      println(document.select("input[value=01]"))
       document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
