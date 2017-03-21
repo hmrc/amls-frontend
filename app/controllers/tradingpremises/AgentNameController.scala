@@ -41,16 +41,6 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
       }
   }
 
-  def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
-    result match {
-      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
-        case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
-        case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-      }
-      case _ => NotFound(notFoundView)
-    }
-  }
-
   def getTradingPremises(result: Option[CacheMap], index: Int)(implicit
                                                                user: AuthContext,
                                                                hc: HeaderCarrier,
@@ -80,7 +70,7 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
               Redirect(routes.AgentNameController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => redirectToNextPage(result, index, edit)
+              case false => ControllerHelper.redirectToNextPage(result, index, edit)
             }
           }
         }.recoverWith {

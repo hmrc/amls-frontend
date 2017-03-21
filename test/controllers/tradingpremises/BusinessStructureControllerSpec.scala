@@ -28,10 +28,7 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BusinessStructureController {
-      override val dataCacheConnector: DataCacheConnector = self.cache
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new BusinessStructureController (self.cache, self.authConnector, messagesApi)
   }
 
   "BusinessStructureController" must {

@@ -1,10 +1,13 @@
 package controllers.tradingpremises
 
+import javax.inject.{Inject, Singleton}
+
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
+import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -12,9 +15,10 @@ import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait BusinessStructureController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector,
+                                            override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -29,26 +33,16 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
       }
   }
 
-  def redirectToAddressPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
-    result match {
-      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
-        case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
-        case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-      }
-      case _ => NotFound(notFoundView)
-    }
-  }
-
-  def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int, result: Option[CacheMap])(implicit request: Request[AnyContent] ) = {
+  def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int, result: Option[CacheMap])(implicit request: Request[AnyContent]) = {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
-      case LimitedLiabilityPartnership | IncorporatedBody if ApplicationConfig.release7 => Redirect(routes.AgentCompanyDetailsController.get(index,edit))
+      case LimitedLiabilityPartnership | IncorporatedBody if ApplicationConfig.release7 => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => edit match {
         case true => Redirect(routes.SummaryController.getIndividual(index))
-        case false => redirectToAddressPage(result, index, edit)
+        case false => ControllerHelper.redirectToNextPage(result, index, edit)
       }
-      case _ => Redirect(routes.AgentCompanyNameController.get(index,edit))
+      case _ => Redirect(routes.AgentCompanyNameController.get(index, edit))
     }
   }
 
@@ -66,15 +60,9 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
       }
   }
 
-  private def resetAgentValues(tp:TradingPremises, data:BusinessStructure):TradingPremises = data match {
-    case UnincorporatedBody => tp.copy(agentName=None,agentCompanyDetails=None,agentPartnership=None, hasChanged=true)
+  private def resetAgentValues(tp: TradingPremises, data: BusinessStructure): TradingPremises = data match {
+    case UnincorporatedBody => tp.copy(agentName = None, agentCompanyDetails = None, agentPartnership = None, hasChanged = true)
     case _ => tp.businessStructure(data)
   }
-
 }
 
-object BusinessStructureController extends BusinessStructureController {
-  // $COVERAGE-OFF$
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-}

@@ -5,7 +5,10 @@ import models.businessmatching._
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
-import play.api.mvc.{AnyContent, Request}
+import play.api.Play.current
+import play.api.i18n.Messages
+import play.api.i18n.Messages.Implicits._
+import play.api.mvc.{AnyContent, Request, Results}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -81,5 +84,21 @@ object ControllerHelper {
     }
   }
 
+
+  def notFoundView(implicit request: Request[_]) = {
+    views.html.error(Messages("error.not-found.title"),
+      Messages("error.not-found.heading"),
+      Messages("error.not-found.message"))
+  }
+
+  def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
+    result match {
+      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
+        case true if !edit => Results.Redirect(routes.ConfirmAddressController.get(index))
+        case false => Results.Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+      }
+      case _ => Results.NotFound(notFoundView)
+    }
+  }
 
 }

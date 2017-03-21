@@ -18,9 +18,7 @@ import scala.concurrent.Future
 
     def get(index: Int, edit: Boolean = false) = Authorised.async {
       implicit authContext => implicit request =>
-
         getData[TradingPremises](index) map {
-
           case Some(tp) => {
             val form = tp.agentPartnership match {
               case Some(data) => Form2[AgentPartnership](data)
@@ -31,16 +29,6 @@ import scala.concurrent.Future
           case None => NotFound(notFoundView)
         }
     }
-
-   def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
-     result match {
-       case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
-         case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
-         case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-       }
-       case _ => NotFound(notFoundView)
-     }
-   }
 
    def post(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
@@ -57,9 +45,8 @@ import scala.concurrent.Future
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => redirectToNextPage(result, index, edit)
+            case false => ControllerHelper.redirectToNextPage(result, index, edit)
           }
-
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

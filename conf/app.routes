@@ -97,8 +97,8 @@ POST        /trading-premises/what-does-your-business-do/:index         controll
 GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 
-GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/agent/:index                              @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                              @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
 GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.answers()
@@ -107,8 +107,8 @@ GET         /trading-premises/trading-premise-details/:index            controll
 GET         /trading-premises/what-does-your-business-do/date-of-change/:index  controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
 POST        /trading-premises/what-does-your-business-do/date-of-change/:index  controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
 
-GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/who-uses/:index                           @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/who-uses/:index                           @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
 POST        /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
