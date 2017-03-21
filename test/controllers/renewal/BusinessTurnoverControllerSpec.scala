@@ -65,42 +65,42 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
 
     }
 
-//    "when post is called" must {
-//
-//      "on post with valid data" in new Fixture {
-//
-//        val newRequest = request.withFormUrlEncodedBody(
-//          "BusinessTurnover" -> "01"
-//        )
-//
-//        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
-//          (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
-//          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//        val result = controller.post()(newRequest)
-//        status(result) must be(SEE_OTHER)
-//        redirectLocation(result) must be(Some(controllers.renewal.routes.BusinessTurnoverController.get().url))
-//      }
-//
-//      "on post with valid data in edit mode" in new Fixture {
-//
-//        val newRequest = request.withFormUrlEncodedBody(
-//          "BusinessTurnover" -> "01"
-//        )
-//
-//        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
-//          (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
-//          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//        val result = controller.post(true)(newRequest)
-//        status(result) must be(SEE_OTHER)
-//        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-//      }
-//
-//    }
+    "when post is called" must {
+
+      "on post with valid data" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "businessTurnover" -> "01"
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.AMLSTurnoverController.get().url))
+      }
+
+      "on post with valid data in edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "businessTurnover" -> "01"
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
+
+    }
   }
 }
