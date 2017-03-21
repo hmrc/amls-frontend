@@ -7,7 +7,7 @@ import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.businessactivities.{InvolvedInOtherNo, InvolvedInOtherYes, BusinessActivities}
 import models.businessmatching._
-import models.renewal.InvolvedInOther
+import models.renewal.{Renewal, InvolvedInOther}
 import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -28,7 +28,8 @@ class InvolvedInOtherController @Inject()(
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               (for {
-                involvedInOther <- cache.getEntry[InvolvedInOther](InvolvedInOther.key)
+                renewal <- cache.getEntry[Renewal](Renewal.key)
+                involvedInOther <- renewal.involvedInOtherActivities
               } yield {
                 Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther),
                   edit, businessTypes(businessMatching)))
