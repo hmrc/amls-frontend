@@ -40,14 +40,14 @@ class amls_turnoverSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "AMLSTurnover") -> Seq(ValidationError("not a message Key"))
+          (Path \ "turnover") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.renewal.amls_turnover(form2, true, None)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("AMLSTurnover")
+      doc.getElementById("turnover")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
   }
