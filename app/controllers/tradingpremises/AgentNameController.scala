@@ -8,10 +8,16 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.libs.json.Format
+import play.api.mvc.{AnyContent, Request}
 import services.StatusService
-import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{ControllerHelper, DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
@@ -35,6 +41,27 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
       }
   }
 
+  def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
+    result match {
+      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
+        case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
+        case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+      }
+      case _ => NotFound(notFoundView)
+    }
+  }
+
+  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit
+                                                               user: AuthContext,
+                                                               hc: HeaderCarrier,
+                                                               formats: Format[TradingPremises],
+                                                               key: MongoKey[TradingPremises]
+                                                               ) = {
+    result map { cache =>
+      getData(cache, index)
+    }
+  }
+
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AgentName](request.body) match {
@@ -42,18 +69,18 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
           Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index, edit)))
         case ValidForm(_, data) => {
           for {
-            tradingPremises <- getData[TradingPremises](index)
-            result <- updateDataStrict[TradingPremises](index) { tp =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
               TradingPremises(tp.registeringAgentPremises, tp.yourTradingPremises,
                 tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
+
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, data) =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(getTradingPremises(result, index), data) =>
               Redirect(routes.AgentNameController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+              case false => redirectToNextPage(result, index, edit)
             }
           }
         }.recoverWith {
