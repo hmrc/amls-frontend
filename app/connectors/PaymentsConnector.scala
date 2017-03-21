@@ -2,24 +2,20 @@ package connectors
 
 import javax.inject._
 
-import com.google.common.io.BaseEncoding
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
-import play.api.{Configuration, Logger}
+import play.api.http.HeaderNames._
 import play.api.http.Status
-import play.api.mvc.{Cookie, Cookies, Request}
+import play.api.mvc.{Cookies, Request}
+import play.api.{Configuration, Logger}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
-import play.api.http.HeaderNames._
-import play.api.libs.Crypto
-import play.libs.crypto.CookieSigner
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, configuration: Configuration) {
+class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, configuration: Configuration, authConnector: AuthConnector) {
 
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
@@ -28,8 +24,8 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, config
 
     if (config.getConfBool("feature-toggle.payments-url-lookup", defBool = false)) {
 
-      AuthConnector.getCurrentAuthority flatMap { auth =>
-        AuthConnector.getIds(auth) flatMap { ids =>
+      authConnector.getCurrentAuthority flatMap { auth =>
+        authConnector.getIds(auth) flatMap { ids =>
 
           val url = s"$baseUrl/pay-online/other-taxes/custom"
 
