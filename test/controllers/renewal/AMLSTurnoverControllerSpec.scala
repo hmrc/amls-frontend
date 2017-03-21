@@ -65,7 +65,7 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "display the Role Within Business page with pre populated data" in new Fixture {
 
-        override def testRenewal = Some(testRenewal.copy(turnover = Some(First)))
+        override def testRenewal = Some(Renewal(turnover = Some(First)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -228,7 +228,7 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
       "valid data go to renewal CustomerOutsideUK" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "AMLSTurnover" -> "01"
+          "turnover" -> "01"
         )
 
         when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
@@ -236,6 +236,11 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockRenewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+        when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -245,7 +250,7 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
       "valid data in edit mode go to renewal Summary" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "AMLSTurnover" -> "01"
+          "turnover" -> "01"
         )
 
         when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
@@ -253,6 +258,11 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockRenewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+        when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
