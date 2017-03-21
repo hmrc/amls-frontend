@@ -1,5 +1,6 @@
 package models.renewal
 
+import models.renewal.AMLSTurnover.First
 import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
@@ -19,7 +20,7 @@ class RenewalSpec extends GenericTestHelper {
 
       "involved in other activities was specified" in {
 
-        val model = Renewal(Some(InvolvedInOtherNo), hasChanged = true)
+        val model = Renewal(Some(InvolvedInOtherNo), Some(First), hasChanged = true)
 
         model.isComplete mustBe true
 
