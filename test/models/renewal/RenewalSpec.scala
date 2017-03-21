@@ -22,6 +22,7 @@ class RenewalSpec extends GenericTestHelper {
         val model = Renewal(
           Some(InvolvedInOtherNo),
           Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
           hasChanged = true)
 
         model.isComplete mustBe true
