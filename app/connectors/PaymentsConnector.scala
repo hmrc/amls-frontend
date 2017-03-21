@@ -5,7 +5,7 @@ import javax.inject._
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import play.api.Logger
 import play.api.http.Status
-import play.api.mvc.{Cookie, Cookies}
+import play.api.mvc.{Cookie, Cookies, Request}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 import play.api.http.HeaderNames._
@@ -19,18 +19,21 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
 
-  def requestPaymentRedirectUrl(request: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PaymentServiceRedirect]] = {
+  def requestPaymentRedirectUrl(redirectRequest: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, httpRequest: Request[_]): Future[Option[PaymentServiceRedirect]] = {
 
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
+    val mdtpCookie = httpRequest.cookies("mdtp")
+
     val headers = Seq(
       "Custom-Payment" -> customPaymentId,
-      "Csrf-Token" -> "nocheck"
+      "Csrf-Token" -> "nocheck",
+      "Cookie" -> httpRequest.headers.get("Cookie").getOrElse("")
     )
 
-    if (config.getConfBool("feature-toggle.payments-url-lookup", false)) {
+    if (config.getConfBool("feature-toggle.payments-url-lookup", defBool = false)) {
 
-      http.POST(url, request, headers) map { r =>
+      http.POST(url, redirectRequest, headers) map { r =>
         r.status match {
           case Status.CREATED =>
 

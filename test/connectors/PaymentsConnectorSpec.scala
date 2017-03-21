@@ -2,13 +2,14 @@ package connectors
 
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import org.apache.http.client.HttpResponseException
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{Cookie, Cookies}
+import play.api.mvc.{AnyContentAsEmpty, Cookie, Cookies, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
@@ -35,7 +36,9 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
     lazy val connector = app.injector.instanceOf[PaymentsConnector]
 
-    implicit val request = FakeRequest()
+    val mdtpCookie = Cookie("mdtp", "this_is_the_cookie_value")
+
+    implicit val request = FakeRequest().withCookies(mdtpCookie)
 
     def createResponse(f: () => Future[HttpResponse]) = {
       when {
@@ -65,7 +68,10 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
 
         result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection", cookies))
 
-        verify(http).POST(any(), any(), any())(any(), any(), any())
+        val captor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
+        verify(http).POST(any(), any(), captor.capture())(any(), any(), any())
+
+        captor.getValue must contain("Cookie" -> Cookies.encodeCookieHeader(Seq(mdtpCookie)))
 
       }
     }
