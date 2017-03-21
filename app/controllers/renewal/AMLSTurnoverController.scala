@@ -4,16 +4,18 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms._
 import models.businessmatching.BusinessMatching
-import models.renewal.AMLSTurnover
+import models.renewal.{AMLSTurnover, Renewal}
+import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.amls_turnover
 
 @Singleton
 class AMLSTurnoverController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector
+                                        val authConnector: AuthConnector,
+                                        val renewalService: RenewalService
                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -24,10 +26,13 @@ class AMLSTurnoverController @Inject()(
               cache <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
+
               val form = (for {
-                turnover <- cache.getEntry[AMLSTurnover](AMLSTurnover.key)
-              } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
+                renewal <- cache.getEntry[Renewal](Renewal.key)
+              } yield Form2[Renewal](renewal)) getOrElse EmptyForm
+
               Ok(amls_turnover(form, edit, businessMatching.activities))
+
             }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
         }
   }
@@ -41,7 +46,8 @@ class AMLSTurnoverController @Inject()(
             } yield BadRequest(amls_turnover(f, edit, businessMatching.activities))
           case ValidForm(_, data) =>
             for {
-              _ <- dataCacheConnector.save[AMLSTurnover](AMLSTurnover.key, data)
+              renewal <- renewalService.getRenewal
+              _ <- renewalService.updateRenewal(renewal.turnover(data))
             } yield edit match {
               case true => Redirect(routes.SummaryController.get())
               case false => Redirect(routes.CustomersOutsideUKController.get())
