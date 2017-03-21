@@ -16,7 +16,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 
-
 import scala.concurrent.Future
 
 class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
@@ -61,6 +60,7 @@ class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with Mock
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
+      println(document.select("input[value=01]"))
       document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
