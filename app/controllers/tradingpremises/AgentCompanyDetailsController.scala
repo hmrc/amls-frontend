@@ -7,7 +7,7 @@ import forms._
 import models.tradingpremises._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{FeatureToggle, RepeatingSection, StatusConstants}
+import utils.{ControllerHelper, FeatureToggle, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -35,23 +35,14 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
     }
   }
 
-  def isFirstTradingPremises(cache: CacheMap): Option[Boolean] = {
-    cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map {tps =>
-      tps.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1
-    }
-  }
-
   def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
-    println("result======>"+result)
-    val test = result match {
-      case Some(cache) => isFirstTradingPremises(cache).getOrElse(false) match {
+    result match {
+      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
         case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
         case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
       }
       case _ => NotFound(notFoundView)
     }
-    println("++++++++++++++++++++++++++++++"+test)
-    test
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {

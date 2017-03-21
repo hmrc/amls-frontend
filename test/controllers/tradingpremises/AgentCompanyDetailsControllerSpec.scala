@@ -35,6 +35,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
   "AgentCompanyDetailsController" when {
 
     val emptyCache = CacheMap("", Map.empty)
+    val mockCacheMap = mock[CacheMap]
 
     "get is called" must {
       "display agent company name Page" in new Fixture {
@@ -79,7 +80,6 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
-          val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
@@ -99,11 +99,8 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
-          val mockCacheMap = mock[CacheMap]
-
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
-
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -119,7 +116,6 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
-          val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
@@ -161,8 +157,6 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
-
-        val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))

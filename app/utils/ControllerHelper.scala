@@ -1,9 +1,13 @@
 package utils
 
+import controllers.tradingpremises.routes
 import models.businessmatching._
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import models.tradingpremises.TradingPremises
+import play.api.mvc.{AnyContent, Request}
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -69,4 +73,13 @@ object ControllerHelper {
   }
 
   def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
+
+
+  def isFirstTradingPremises(cache: CacheMap): Option[Boolean] = {
+    cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map {tps =>
+      tps.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1
+    }
+  }
+
+
 }
