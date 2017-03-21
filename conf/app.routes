@@ -425,3 +425,4 @@ GET         /renewal/employment                                         @control
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
