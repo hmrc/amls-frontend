@@ -9,14 +9,15 @@ import models.businessactivities.{InvolvedInOtherNo, InvolvedInOtherYes, Busines
 import models.businessmatching._
 import models.renewal.{Renewal, InvolvedInOther}
 import play.api.i18n.Messages
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.involved_in_other
 
 @Singleton
 class InvolvedInOtherController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector
+                                           val authConnector: AuthConnector,
+                                           val renewalService: RenewalService
                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -71,7 +72,8 @@ class InvolvedInOtherController @Inject()(
             }
           case ValidForm(_, data) =>
             for {
-              _ <- dataCacheConnector.save[InvolvedInOther](InvolvedInOther.key, data)
+              renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
+              _ <- renewalService.updateRenewal(renewal.getOrElse(Renewal()).involvedInOtherActivities(data))
             } yield data match {
               case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
               case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)
