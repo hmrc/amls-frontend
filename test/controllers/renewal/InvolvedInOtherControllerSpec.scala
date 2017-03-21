@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -32,10 +32,12 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
+    lazy val mockRenewalService = mock[RenewalService]
 
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      renewalService = mockRenewalService
     )
   }
 
@@ -229,8 +231,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -243,8 +248,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -257,8 +265,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "involvedInOther" -> "false"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -272,8 +283,11 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           "details" -> "test"
         )
 
-        when(mockDataCacheConnector.save[InvolvedInOther](any(), any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
+
+        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

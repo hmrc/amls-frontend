@@ -71,11 +71,11 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
           "businessTurnover" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -88,11 +88,11 @@ class BusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar
           "businessTurnover" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessTurnover](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
