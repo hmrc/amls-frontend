@@ -62,7 +62,8 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
             data.confirmAddress match {
               case true => {
                   for {
-                    cacheMap <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
+                    _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
+                      println("*********************************here*************************")
                       tp.copy(yourTradingPremises = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
                     }
                   } yield Redirect(routes.ActivityStartDateController.get(index))

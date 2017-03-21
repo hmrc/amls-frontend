@@ -72,7 +72,7 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       val ytp = YourTradingPremises(
         "foo",
         Address(
-          "line1",
+          "line11",
           "line2",
           Some("line3"),
           Some("line4"),

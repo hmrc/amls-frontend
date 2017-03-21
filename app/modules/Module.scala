@@ -11,6 +11,7 @@ class Module extends AbstractModule {
   override def configure() = {
     bind(classOf[HttpPost]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
+    bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[AuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[ProgressService]).toInstance(ProgressService)
   }
