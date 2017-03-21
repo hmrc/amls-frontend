@@ -5,7 +5,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
-import utils.RepeatingSection
+import play.api.mvc.{AnyContent, Request}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -30,6 +32,16 @@ import scala.concurrent.Future
         }
     }
 
+   def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
+     result match {
+       case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
+         case true if !edit => Redirect(routes.ConfirmAddressController.get(index))
+         case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+       }
+       case _ => NotFound(notFoundView)
+     }
+   }
+
    def post(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AgentPartnership](request.body) match {
@@ -37,7 +49,7 @@ import scala.concurrent.Future
           Future.successful(BadRequest(views.html.tradingpremises.agent_partnership(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[TradingPremises](index) { tp =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_,tp) =>
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises, tp.businessStructure,
                   None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress,
@@ -45,7 +57,7 @@ import scala.concurrent.Future
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => Redirect(routes.WhereAreTradingPremisesController.get (index, edit))
+            case false => redirectToNextPage(result, index, edit)
           }
 
         }.recoverWith {

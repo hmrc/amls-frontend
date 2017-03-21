@@ -7,7 +7,7 @@ import forms._
 import models.tradingpremises._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{ControllerHelper, FeatureToggle, RepeatingSection, StatusConstants}
+import utils.{ControllerHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
