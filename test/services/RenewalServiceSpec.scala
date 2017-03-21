@@ -2,6 +2,7 @@ package services
 
 import connectors.DataCacheConnector
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.renewal.AMLSTurnover.First
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -25,7 +26,6 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
     val dataCache = mock[DataCacheConnector]
     implicit val authContext = mock[AuthContext]
 
-
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[DataCacheConnector].to(dataCache))
       .build()
@@ -34,6 +34,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
     val completeModel = Renewal(
       Some(InvolvedInOtherNo),
+      Some(First),
       // Add other models here
       true)
 

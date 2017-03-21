@@ -10,7 +10,6 @@ import models.renewal.{AMLSTurnover, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.amls_turnover
-import jto.validation.{From, Rule, Write}
 
 @Singleton
 class AMLSTurnoverController @Inject()(
@@ -30,7 +29,8 @@ class AMLSTurnoverController @Inject()(
 
               val form = (for {
                 renewal <- cache.getEntry[Renewal](Renewal.key)
-              } yield Form2[Renewal](renewal)) getOrElse EmptyForm
+                turnover <- renewal.turnover
+              } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
 
               Ok(amls_turnover(form, edit, businessMatching.activities))
 

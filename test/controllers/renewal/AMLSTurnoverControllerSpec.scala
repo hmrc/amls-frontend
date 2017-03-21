@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => Activities, _}
-import models.renewal.AMLSTurnover
+import models.renewal.{AMLSTurnover, Renewal}
 import models.renewal.AMLSTurnover.First
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -12,6 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -23,19 +24,21 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
+    lazy val mockRenewalService = mock[RenewalService]
 
     val mockCacheMap = mock[CacheMap]
 
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      renewalService = mockRenewalService
     )
 
     val businessMatching = BusinessMatching(
       activities = Some(Activities(Set.empty))
     )
 
-    def model: Option[AMLSTurnover] = None
+    def testRenewal: Option[Renewal] = None
 
     when(mockDataCacheConnector.fetchAll(any(), any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -43,8 +46,8 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
     when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
       .thenReturn(Some(businessMatching))
 
-    when(mockCacheMap.getEntry[AMLSTurnover](eqTo(AMLSTurnover.key))(any()))
-      .thenReturn(model)
+    when(mockCacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+      .thenReturn(testRenewal)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -62,7 +65,7 @@ class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "display the Role Within Business page with pre populated data" in new Fixture {
 
-        override def model = Some(First)
+        override def testRenewal = Some(testRenewal.copy(turnover = Some(First)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
