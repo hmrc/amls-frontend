@@ -117,8 +117,8 @@ case _ => { None }
 
 </div>
 
-@completionState.currentState match {
-case ReadyForRenewal(renewalDateOpt:Option[LocalDate])  => {
+@(completionState.currentState,ApplicationConfig.renewalsToggle) match {
+case (ReadyForRenewal(renewalDateOpt:Option[LocalDate]),true)  => {
 @renewalDateOpt match{
 case Some(date) => {<div class="notice spacelarge"><i class="icon icon-important"><span class="visuallyhidden">Warning</span></i><strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong></div>}
 case _ => {}
@@ -129,8 +129,8 @@ case _ => {}
 
 }
 
-@completionState.currentState match {
-    case ReadyForRenewal(_) => {
+@(completionState.currentState,ApplicationConfig.renewalsToggle) match {
+    case (ReadyForRenewal(_),true) => {
 <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">Renew supervision</a>
 
     }

@@ -18,6 +18,8 @@ trait ApplicationConfig {
   def refreshProfileToggle: Boolean
 
   def paymentsUrlLookupToggle: Boolean
+
+  def renewalsToggle: Boolean
 }
 
 
@@ -88,6 +90,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     val value = getConfBool("feature-toggle.release7", false)
     value
   }
+
+  override def renewalsToggle:Boolean = getConfBool("feature-toggle.renewals", false)
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
