@@ -3,18 +3,19 @@ package connectors
 import javax.inject._
 
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.http.Status
 import play.api.mvc.{Cookie, Cookies, Request}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 import play.api.http.HeaderNames._
+import play.api.libs.Crypto
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
+class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, configuration: Configuration) {
 
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
@@ -24,11 +25,12 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig) {
     val url = s"$baseUrl/pay-online/other-taxes/custom"
 
     val mdtpCookie = httpRequest.cookies("mdtp")
+    val encryptedMdtp = Crypto.encryptAES(mdtpCookie.value, configuration.getString("play.crypto.secret").get)
 
     val headers = Seq(
       "Custom-Payment" -> customPaymentId,
       "Csrf-Token" -> "nocheck",
-      "Cookie" -> httpRequest.headers.get("Cookie").getOrElse("")
+      "Cookie" -> s"mdtp=$encryptedMdtp"
     )
 
     if (config.getConfBool("feature-toggle.payments-url-lookup", defBool = false)) {
