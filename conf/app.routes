@@ -415,8 +415,18 @@ GET         /high-value-dealer/date-change                              controll
 POST        /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.post
 
 GET         /renewal/what-you-need                                      @controllers.renewal.WhatYouNeedController.get()
+
 GET         /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
+
 GET         /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
+
 GET         /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
+
+GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
+POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()

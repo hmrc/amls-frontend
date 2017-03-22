@@ -1,0 +1,67 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.business-turnover.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("renewal.business-turnover.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+    @form(f, controllers.renewal.routes.BusinessTurnoverController.post(edit)) {
+
+        @fieldset(
+            f = f("BusinessTurnover-fieldset"),
+            legend = "renewal.business-turnover.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                 field = f("businessTurnover")
+            ) {
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.05",
+                    value = "05"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                    labelText = "businessactivities.business-turnover.lbl.06",
+                    value = "06"
+                )
+                @radio(
+                    f = f("businessTurnover"),
+                labelText = "businessactivities.business-turnover.lbl.07",
+                    value = "07"
+                )
+            }
+        }
+
+        @submit(false)
+    }
+}

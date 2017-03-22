@@ -83,6 +83,12 @@ a.block-link {
   visibility: hidden;
 }
 
+.renewal-progress-section {
+  border-bottom: 10px solid #e2e2e2;
+  margin-bottom: 40px!important;
+  padding-bottom: 30px;
+}
+
 
 /* -- Progress Step: assets (tick & chevrons) -- */
 
@@ -141,6 +147,10 @@ a.block-link {
 .no-svg .progress-step__complete .progress-step--status,
 .no-svg .progress-step__complete:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
+}
+
+.status-list--hidden {
+    display:none
 }
 
 

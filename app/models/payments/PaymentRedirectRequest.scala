@@ -2,7 +2,7 @@ package models.payments
 
 import play.api.libs.json.Writes
 
-case class PaymentRedirectRequest(reference: String, amount: Double, redirectUrl: String)
+case class PaymentRedirectRequest(reference: String, amount: Double, redirectUrl: String, internalId: Option[String] = None)
 
 object PaymentRedirectRequest {
 
@@ -12,7 +12,8 @@ object PaymentRedirectRequest {
     (
       (__ \ "reference").write[String] and
         (__ \ "amount").write[String].contramap[Double](_.toString) and
-        (__ \ "url").write[String]
+        (__ \ "url").write[String] and
+        (__ \ "internalId").writeNullable[String]
       ) (unlift(PaymentRedirectRequest.unapply))
   }
 
