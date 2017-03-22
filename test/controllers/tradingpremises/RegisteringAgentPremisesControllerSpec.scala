@@ -2,12 +2,12 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.TradingPremisesSection
-import models.tradingpremises.{RegisteringAgentPremises, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -22,10 +22,8 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new RegisteringAgentPremisesController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new RegisteringAgentPremisesController (mock[DataCacheConnector],
+      self.authConnector, messagesApi)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -130,9 +128,6 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
 
       "on post invalid data show error" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
-        when(controller.dataCacheConnector.fetch[RegisteringAgentPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("tradingpremises.agent.premises.title"))
@@ -151,11 +146,10 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           "agentPremises" -> "false"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
 
         val result = controller.post(1,edit = true)(newRequest)
 
@@ -175,11 +169,10 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           "agentPremises" -> "false"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model, model)))
 
         val result = controller.post(1,edit = false)(newRequest)
 
@@ -198,11 +191,10 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           "agentPremises" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
 
         val result = controller.post(1,edit = false)(newRequest)
 
@@ -216,9 +208,10 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           val newRequest = request.withFormUrlEncodedBody(
             "agentPremises" -> "true"
           )
-
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None)))))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None))))
 
           val result = controller.post(10, false)(newRequest)
 
@@ -246,7 +239,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
+          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
 
         }
       }
@@ -256,9 +249,11 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
         val newRequest = request.withFormUrlEncodedBody(
           "agentPremises" -> "false"
         )
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 
         when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
@@ -277,7 +272,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
             businessStructure=None,
             agentCompanyDetails=None,
             agentPartnership=None
-          ))))(any(), any(), any())
+          ), TradingPremises())))(any(), any(), any())
       }
 
     }

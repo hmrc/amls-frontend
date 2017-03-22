@@ -1,18 +1,21 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-
-trait AgentCompanyNameController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class AgentCompanyNameController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                           val authConnector: AuthConnector,
+                                           override val messagesApi: MessagesApi)extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -37,7 +40,7 @@ trait AgentCompanyNameController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.tradingpremises.agent_company_name(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[TradingPremises](index) { tp =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
               TradingPremises(tp.registeringAgentPremises,
                 tp.yourTradingPremises,
                 tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress,
@@ -45,7 +48,7 @@ trait AgentCompanyNameController extends RepeatingSection with BaseController {
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => Redirect (routes.WhereAreTradingPremisesController.get (index, edit) )
+            case false => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -53,10 +56,4 @@ trait AgentCompanyNameController extends RepeatingSection with BaseController {
       }
     }
   }
-}
-
-object AgentCompanyNameController extends AgentCompanyNameController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
