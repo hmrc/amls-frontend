@@ -7,12 +7,12 @@ import play.api.http.HeaderNames._
 import play.api.http.Status
 import play.api.mvc.{Cookies, Request}
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, PlainText}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import utils.Strings._
 
 @Singleton
 class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, configuration: Configuration, authConnector: AuthConnector) {
@@ -28,7 +28,6 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, config
         authConnector.getIds(auth) flatMap { ids =>
 
           val url = s"$baseUrl/pay-online/other-taxes/custom"
-
           val mdtpCookie = httpRequest.cookies("mdtp")
           val encryptedMdtp = ApplicationCrypto.SessionCookieCrypto.encrypt(PlainText(mdtpCookie.value)).value
 
@@ -38,21 +37,9 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, config
             "Cookie" -> s"mdtp=$encryptedMdtp"
           )
 
-          import utils.Strings._
+          val requestWithInternalId = redirectRequest.copy(internalId = Some(ids.internalId))
 
-          val c = httpRequest.cookies.get("mdtp").get
-
-//          println(mdtpCookie.value in Console.GREEN)
-//          println(ApplicationCrypto.SessionCookieCrypto.encrypt(PlainText(c.value)).value in Console.YELLOW)
-//          println(encryptedMdtp in Console.CYAN)
-//          println(headers.toString in Console.RED)
-//          println(hc.toString in Console.BLUE)
-
-          val r = redirectRequest.copy(internalId = Some(ids.internalId))
-
-          println(r.toString in Console.YELLOW)
-
-          http.POST(url, r, headers) map { r =>
+          http.POST(url, requestWithInternalId, headers) map { r =>
             r.status match {
               case Status.CREATED =>
 
