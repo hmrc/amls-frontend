@@ -1,5 +1,6 @@
 package models.renewal
 
+import models.Country
 import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
@@ -19,11 +20,12 @@ class RenewalSpec extends GenericTestHelper {
 
       "involved in other activities was specified" in {
 
-        val model = Renewal(Some(InvolvedInOtherNo), hasChanged = true)
+        val model = Renewal(Some(InvolvedInOtherNo), Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))), hasChanged = true)
 
         model.isComplete mustBe true
 
       }
+
 
     }
 
@@ -31,7 +33,7 @@ class RenewalSpec extends GenericTestHelper {
 
       "any of the sub models are not specified" in {
 
-        val model = Renewal(None, hasChanged = true)
+        val model = Renewal(None, Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))), hasChanged = true)
 
         model.isComplete mustBe false
 

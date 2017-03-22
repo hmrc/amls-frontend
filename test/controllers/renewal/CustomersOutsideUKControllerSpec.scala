@@ -2,9 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessactivities.{BusinessActivities, CustomersOutsideUK}
-import models.businessmatching.{BusinessActivities => BMActivities, _}
-import models.renewal.{InvolvedInOther, InvolvedInOtherYes}
+import models.renewal.{CustomersOutsideUK, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -51,7 +49,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
   "The customer outside uk controller" must {
     "load the page" in new Fixture {
 
-      when(dataCacheConnector.fetch[BusinessActivities](any())
+      when(dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -68,8 +66,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     "pre-populate the Customer outside UK Page" in new Fixture  {
 
-      when(dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
+      when(dataCacheConnector.fetch[Renewal](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -89,10 +87,10 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         "countries[1]" -> "US"
       )
 
-      when(dataCacheConnector.fetch[BusinessActivities](any())
+      when(dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(dataCacheConnector.save[BusinessActivities](any(), any())
+      when(dataCacheConnector.save[Renewal](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -108,10 +106,10 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         "countries[1]" -> ""
       )
 
-      when(dataCacheConnector.fetch[BusinessActivities](any())
+      when(dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(dataCacheConnector.save[BusinessActivities](any(), any())
+      when(dataCacheConnector.save[Renewal](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -126,10 +124,10 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         "isOutside" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[Renewal](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)

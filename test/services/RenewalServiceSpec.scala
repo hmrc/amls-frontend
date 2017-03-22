@@ -1,8 +1,9 @@
 package services
 
 import connectors.DataCacheConnector
+import models.Country
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.renewal.{InvolvedInOtherNo, Renewal}
+import models.renewal.{CustomersOutsideUK, InvolvedInOtherNo, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -34,6 +35,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
     val completeModel = Renewal(
       Some(InvolvedInOtherNo),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       // Add other models here
       true)
 

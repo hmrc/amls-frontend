@@ -2,27 +2,29 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
-import config.AMLSAuthConnector
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, CustomersOutsideUK}
+import models.renewal.{CustomersOutsideUK, Renewal}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal._
+import services.RenewalService
 
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector, val authConnector: AuthConnector
+class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector, val authConnector: AuthConnector,
+                                             val renewalService: RenewalService
 ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+      renewalService.getRenewal map {
         response =>
           val form: Form2[CustomersOutsideUK] = (for {
-            businessActivities <- response
-            customers <- businessActivities.customersOutsideUK
+            renewal <- response
+            customers <- renewal.customersOutsideUK
           } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
           Ok(customers_outside_uk(form, edit))
       }
@@ -35,12 +37,15 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
           Future.successful(BadRequest(customers_outside_uk(f, edit)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <-
-            dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-              businessActivity.customersOutsideUK(data)
-            )
-          } yield Redirect(routes.SummaryController.get())
+            renewal <- renewalService.getRenewal
+          } yield renewal match {
+            case Some(renewal) => {
+              renewalService.updateRenewal(renewal.customersOutsideUK(data))
+              Redirect(routes.SummaryController.get())
+            }
+            case _ => Redirect(routes.SummaryController.get())
+          }
+
         }
       }
   }
