@@ -13,9 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.PremisesRegisteredController.post(index)) {
-
-        @panel(
+    @panel(
             wide = true,
             gutter = true,
             jsHidden = false
@@ -23,10 +21,18 @@
             <p>@Messages("tradingpremises.have.registered.premises.text", index) </p>
         }
 
+    <p>@Messages("tradingpremises.have.registered.premises.text2")</p>
+    <p>@Messages("tradingpremises.have.registered.premises.text3")</p>
+
+    @form(f, controllers.tradingpremises.routes.PremisesRegisteredController.post(index)) {
+
+
+
         @fieldset(
             f = f("registerAnotherPremises-fieldset"),
             legend = "tradingpremises.want.to.register.another.premises",
-            panel = false
+            panel = false,
+            legendHidden = true
         ) {
             @errorGroup(
                 field = f("registerAnotherPremises")

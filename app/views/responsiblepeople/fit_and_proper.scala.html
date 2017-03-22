@@ -14,8 +14,12 @@
     heading = header
 ) {
 
+
+    <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
+
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, fromDeclaration)) {
 
+        <div class="form-group">
         @fieldset(
             f = f("hasAlreadyPassedFitAndProper-fieldset"),
             legend = "responsiblepeople.fit_and_proper.title",
@@ -37,6 +41,19 @@
                     value = "false",
                     inline = true
                 )
+            }
+        }
+        </div>
+
+@detailsSummary(
+            summary = Messages("responsiblepeople.fit_and_proper.text.info")
+        ) {
+            @panel(
+                jsHidden = false,
+                wide = false
+            ) {
+                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
+                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
             }
         }
 
