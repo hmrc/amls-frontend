@@ -417,7 +417,10 @@ GET         /renewal/confirm-activities                                 @control
 POST        /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
 
 GET         /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
+
 GET         /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
 
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)

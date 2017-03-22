@@ -20,12 +20,16 @@ class RenewalSpec extends GenericTestHelper {
 
       "involved in other activities was specified" in {
 
-        val model = Renewal(Some(InvolvedInOtherNo), Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))), hasChanged = true)
+        val model = Renewal(
+          Some(InvolvedInOtherNo),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          hasChanged = true)
 
         model.isComplete mustBe true
 
       }
-
 
     }
 
@@ -33,7 +37,7 @@ class RenewalSpec extends GenericTestHelper {
 
       "any of the sub models are not specified" in {
 
-        val model = Renewal(None, Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))), hasChanged = true)
+        val model = Renewal(None, hasChanged = true)
 
         model.isComplete mustBe false
 

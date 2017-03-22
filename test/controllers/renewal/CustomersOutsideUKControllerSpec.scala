@@ -88,7 +88,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       )
 
       when(dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
       when(dataCacheConnector.save[Renewal](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

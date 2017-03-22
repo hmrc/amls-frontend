@@ -1,0 +1,92 @@
+@import include._
+@import forms2._
+@import models.renewal._
+@import models.businessmatching.BusinessActivities
+
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.renewal")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+    @checkYourAnswers(
+        question = Messages("renewal.involvedinother.title"),
+        editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+    ) {
+        <p>@model.involvedInOtherActivities.map {
+            case InvolvedInOtherNo => { @Messages("lbl.no") }
+            case InvolvedInOtherYes(v) => { @v }
+        }</p>
+    }
+
+    @model.businessTurnover.map { turnover =>
+        @checkYourAnswers(
+            question = Messages("renewal.business-turnover.title"),
+            editUrl = controllers.renewal.routes.BusinessTurnoverController.get(true).toString
+        ) {
+            <p>@turnover match {
+                case BusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
+                case BusinessTurnover.Second => { @Messages("businessactivities.turnover.lbl.02") }
+                case BusinessTurnover.Third => { @Messages("businessactivities.turnover.lbl.03") }
+                case BusinessTurnover.Fourth => { @Messages("businessactivities.turnover.lbl.04") }
+                case BusinessTurnover.Fifth => { @Messages("businessactivities.turnover.lbl.05") }
+                case BusinessTurnover.Sixth => { @Messages("businessactivities.turnover.lbl.06") }
+                case BusinessTurnover.Seventh => { @Messages("businessactivities.turnover.lbl.07") }
+            }</p>
+        }
+    }
+
+    @model.turnover.map { turnover =>
+        @checkYourAnswers(
+            question = Messages("renewal.turnover.title"),
+            editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
+        ) {
+            <ul class="list list-bullet">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
+
+            </ul>
+
+            <p>@turnover match {
+                case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                case AMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                case AMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                case AMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                case AMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                case AMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                case AMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
+            }</p>
+        }
+    }
+
+    @model.customersOutsideUK.map { boa =>
+        @checkYourAnswers(
+            question = Messages("renewal.customer.outside.uk.title"),
+            editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
+            ) {
+            @boa.countries.fold {
+            <p>@Messages("lbl.no")</p>
+            } { branches =>
+            <ul class="list list-bullet">
+                @branches.map { country =>
+                <li>@country</li>
+                }
+            </ul>
+            }
+        }
+    }
+
+    @anchor(
+        attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}
