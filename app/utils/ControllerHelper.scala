@@ -1,9 +1,16 @@
 package utils
 
+import controllers.tradingpremises.routes
 import models.businessmatching._
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import models.tradingpremises.TradingPremises
+import play.api.Play.current
+import play.api.i18n.Messages
+import play.api.i18n.Messages.Implicits._
+import play.api.mvc.{AnyContent, Request, Results}
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -69,4 +76,10 @@ object ControllerHelper {
   }
 
   def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
+
+  def notFoundView(implicit request: Request[_]) = {
+    views.html.error(Messages("error.not-found.title"),
+      Messages("error.not-found.heading"),
+      Messages("error.not-found.message"))
+  }
 }
