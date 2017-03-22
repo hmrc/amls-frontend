@@ -1,6 +1,6 @@
 package controllers.responsiblepeople
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
