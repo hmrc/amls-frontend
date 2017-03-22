@@ -96,7 +96,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       "display the previous home address with UK fields populated" in new Fixture {
 
         val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(personName = personName,addressHistory = Some(history))
 
@@ -120,7 +120,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       "display the previous home address with non-UK fields populated" in new Fixture {
 
         val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, SixToElevenMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, Some(SixToElevenMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -154,7 +154,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "timeAtAddress" -> "04"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -180,7 +180,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "timeAtAddress" -> "04"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -213,7 +213,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "timeAtAddress" -> "02"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -311,7 +311,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "timeAtAddress" -> "01"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -342,7 +342,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "timeAtAddress" -> "01"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -371,7 +371,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "timeAtAddress" -> "03"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -399,7 +399,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 "timeAtAddress" -> "04"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -514,7 +514,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
               val originalResponsiblePeople = ResponsiblePeople(
                 addressHistory = Some(ResponsiblePersonAddressHistory(
-                  currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                  currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(OneToThreeYears), None)
                   )
                 )),
                 lineId = Some(1)
@@ -547,7 +547,8 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    currentAddress = Some(
+                      ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
                     )
                   )),
                   lineId = Some(1)
@@ -578,7 +579,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(OneToThreeYears), None)
                     )
                   )),
                   lineId = Some(1)
@@ -666,7 +667,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
                     )
                   )),
                   lineId = None
@@ -697,7 +698,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(OneToThreeYears), None)
                     )
                   )),
                   lineId = None

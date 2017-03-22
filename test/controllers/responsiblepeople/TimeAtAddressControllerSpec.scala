@@ -86,7 +86,7 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "timeAtAddress" -> "04"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -123,12 +123,12 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "respond with NOT_FOUND" when {
         "given an out of bounds index" in new Fixture {
-println("????")
+
           val requestWithParams = request.withFormUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -140,7 +140,6 @@ println("????")
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = timeAtAddressController.post(outOfBounds, true)(requestWithParams)
-          println("????")
 
           status(result) must be(NOT_FOUND)
         }
@@ -156,7 +155,7 @@ println("????")
                 "timeAtAddress" -> "01"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -180,7 +179,7 @@ println("????")
                 "timeAtAddress" -> "03"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -204,7 +203,7 @@ println("????")
                 "timeAtAddress" -> "04"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -227,7 +226,7 @@ println("????")
         "when edit mode is off" when {
 
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -305,7 +304,8 @@ println("????")
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    currentAddress = Some(
+                      ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
                     )
                   )),
                   lineId = Some(1)
@@ -332,7 +332,7 @@ println("????")
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(OneToThreeYears), None)
                     )
                   )),
                   lineId = Some(1)
@@ -357,7 +357,7 @@ println("????")
           "adding a new responsible person (therefore edit is false)" when {
 
             val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val originalResponsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -409,7 +409,7 @@ println("????")
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
                     )
                   )),
                   lineId = None
@@ -436,7 +436,7 @@ println("????")
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(OneToThreeYears), None)
                     )
                   )),
                   lineId = None

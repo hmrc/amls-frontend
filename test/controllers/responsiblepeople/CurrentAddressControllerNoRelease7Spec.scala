@@ -48,11 +48,10 @@ class CurrentAddressControllerNoRelease7Spec extends GenericTestHelper with Mock
             "isUK" -> "true",
             "addressLine1" -> "new Line 1",
             "addressLine2" -> "new Line 2",
-            "postCode" -> "NE17YH",
-            "timeAtAddress" -> "01"
+            "postCode" -> "NE17YH"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
 
@@ -78,11 +77,10 @@ class CurrentAddressControllerNoRelease7Spec extends GenericTestHelper with Mock
             "isUK" -> "true",
             "addressLine1" -> "new Line 1",
             "addressLine2" -> "new Line 2",
-            "postCode" -> "NE17YH",
-            "timeAtAddress" -> "03"
+            "postCode" -> "NE17YH"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, OneToThreeYears)
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
 

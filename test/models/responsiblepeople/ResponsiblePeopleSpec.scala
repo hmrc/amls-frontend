@@ -426,7 +426,7 @@ trait ResponsiblePeopleValues {
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ")
-    private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, ZeroToFiveMonths)
+    private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
     private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH")
     private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, ZeroToFiveMonths)
     //scalastyle:off magic.number
@@ -453,7 +453,7 @@ trait ResponsiblePeopleValues {
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
     private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
-    private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, ZeroToFiveMonths)
+    private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
 
     val personName = PersonName("first", Some("middle"), "last", None, None)
