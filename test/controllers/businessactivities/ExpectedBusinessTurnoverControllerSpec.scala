@@ -16,7 +16,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 
-
 import scala.concurrent.Future
 
 class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
@@ -42,7 +41,6 @@ class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with Mock
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
-
 
       val result = controller.get()(request)
       status(result) must be(OK)

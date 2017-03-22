@@ -19,7 +19,11 @@ class RenewalSpec extends GenericTestHelper {
 
       "involved in other activities was specified" in {
 
-        val model = Renewal(Some(InvolvedInOtherNo), hasChanged = true)
+        val model = Renewal(
+          Some(InvolvedInOtherNo),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          hasChanged = true)
 
         model.isComplete mustBe true
 

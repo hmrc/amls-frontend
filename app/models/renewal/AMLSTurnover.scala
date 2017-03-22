@@ -9,8 +9,6 @@ sealed trait AMLSTurnover
 
 object AMLSTurnover {
 
-  val key = "renewal-amls-turnover"
-
   case object First extends AMLSTurnover
   case object Second extends AMLSTurnover
   case object Third extends AMLSTurnover
@@ -24,7 +22,7 @@ object AMLSTurnover {
   implicit val formRule: Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     import models.FormTypes._
-    (__ \ "AMLSTurnover").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
+    (__ \ "turnover").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
@@ -33,23 +31,23 @@ object AMLSTurnover {
       case "06" => Sixth
       case "07" => Seventh
       case _ =>
-        (Path \ "AMLSTurnover") -> Seq(ValidationError("error.invalid"))
+        (Path \ "turnover") -> Seq(ValidationError("error.invalid"))
     }
   }
 
   implicit val formWrites: Write[AMLSTurnover, UrlFormEncoded] = Write {
-    case First => "AMLSTurnover" -> "01"
-    case Second => "AMLSTurnover" -> "02"
-    case Third => "AMLSTurnover" -> "03"
-    case Fourth => "AMLSTurnover" -> "04"
-    case Fifth => "AMLSTurnover" -> "05"
-    case Sixth => "AMLSTurnover" -> "06"
-    case Seventh=> "AMLSTurnover" -> "07"
+    case First => "turnover" -> "01"
+    case Second => "turnover" -> "02"
+    case Third => "turnover" -> "03"
+    case Fourth => "turnover" -> "04"
+    case Fifth => "turnover" -> "05"
+    case Sixth => "turnover" -> "06"
+    case Seventh=> "turnover" -> "07"
   }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads
-    (__ \ "AMLSTurnover").read[String].flatMap[AMLSTurnover] {
+    (__ \ "turnover").read[String].flatMap[AMLSTurnover] {
       case "01" => First
       case "02" => Second
       case "03" => Third
@@ -63,12 +61,12 @@ object AMLSTurnover {
   }
 
   implicit val jsonWrites = Writes[AMLSTurnover] {
-    case First => Json.obj("AMLSTurnover" -> "01")
-    case Second => Json.obj("AMLSTurnover" -> "02")
-    case Third => Json.obj("AMLSTurnover" -> "03")
-    case Fourth => Json.obj("AMLSTurnover" -> "04")
-    case Fifth => Json.obj("AMLSTurnover" -> "05")
-    case Sixth => Json.obj("AMLSTurnover" -> "06")
-    case Seventh => Json.obj("AMLSTurnover" -> "07")
+    case First => Json.obj("turnover" -> "01")
+    case Second => Json.obj("turnover" -> "02")
+    case Third => Json.obj("turnover" -> "03")
+    case Fourth => Json.obj("turnover" -> "04")
+    case Fifth => Json.obj("turnover" -> "05")
+    case Sixth => Json.obj("turnover" -> "06")
+    case Seventh => Json.obj("turnover" -> "07")
   }
 }
