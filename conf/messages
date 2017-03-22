@@ -1059,12 +1059,12 @@ responsiblepeople.wherepersonlives.address = Address
 responsiblepeople.wherepersonlives.postcode = Postcode
 responsiblepeople.wherepersonlives.country = Country
 responsiblepeople.wherepersonlives.address_history = How long has this person lived at this address?
-responsiblepeople.wherepersonlives.5_months_history = 0 to 5 months
-responsiblepeople.wherepersonlives.11_months_history = 6 to 11 months
-responsiblepeople.wherepersonlives.3_years_history = 1 to 3 years
-responsiblepeople.wherepersonlives.more_years_history = More than 3 years
 
 responsiblepeople.timeataddress.address_history = How long has {0} lived at this address?
+responsiblepeople.timeataddress.5_months_history = 0 to 5 months
+responsiblepeople.timeataddress.11_months_history = 6 to 11 months
+responsiblepeople.timeataddress.3_years_history = 1 to 3 years
+responsiblepeople.timeataddress.more_years_history = More than 3 years
 
 responsiblepeople.additional_address.title = Where was {0}’s previous home address?
 responsiblepeople.additional_address.ukAddress = UK

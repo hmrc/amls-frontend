@@ -21,7 +21,6 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   val statusService: StatusService
 
-
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Empty)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
