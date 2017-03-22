@@ -1,20 +1,21 @@
 @import include._
 @import forms2._
 @import models.renewal._
+@import models.businessmatching.BusinessActivities
 
-@(model: Renewal)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
-    @heading("title.cya", "summary.businessactivities")
+    @heading("title.cya", "summary.renewal")
 }
 
 @main(
-    title = Messages("title.cya") + " - " + Messages("summary.businessactivities"),
+    title = Messages("title.cya") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
     @checkYourAnswers(
-        question = Messages("renewal.confirm-activities.title"),
+        question = Messages("renewal.involvedinother.title"),
         editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
     ) {
         <p>@model.involvedInOtherActivities.map {
@@ -45,14 +46,14 @@
             question = Messages("renewal.turnover.title"),
             editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
         ) {
-            <!--<ul class="list list-bullet">-->
-                <!--bmBusinessActivities.map { ba =>-->
-                    <!--ba.businessActivities.map {activity =>-->
-                        <!--<li>Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>-->
-                    <!--}-->
-                <!--}-->
+            <ul class="list list-bullet">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
 
-            <!--</ul>-->
+            </ul>
 
             <p>@turnover match {
                 case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
