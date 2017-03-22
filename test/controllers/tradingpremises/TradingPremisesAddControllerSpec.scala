@@ -21,7 +21,7 @@ class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyCh
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new TradingPremisesAddController (mock[DataCacheConnector], self.authConnector, messagesApi)
+    val controller = new TradingPremisesAddController (mock[DataCacheConnector], self.authConnector)
   }
 
   "TradingPremisesAddController" should {
