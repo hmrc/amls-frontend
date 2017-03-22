@@ -41,8 +41,7 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
-  val outOfBounds = 40
-
+  val outOfBounds = 99
 
   "TimeAtAddressController" when {
 
@@ -124,7 +123,7 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "respond with NOT_FOUND" when {
         "given an out of bounds index" in new Fixture {
-
+println("????")
           val requestWithParams = request.withFormUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
@@ -141,6 +140,7 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = timeAtAddressController.post(outOfBounds, true)(requestWithParams)
+          println("????")
 
           status(result) must be(NOT_FOUND)
         }
@@ -225,13 +225,18 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         }
 
         "when edit mode is off" when {
+
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
           "time at address is less than 1 year" must {
             "redirect to the correct location" in new Fixture {
 
               val requestWithParams = request.withFormUrlEncodedBody(
                 "timeAtAddress" -> "01"
               )
-              val responsiblePeople = ResponsiblePeople()
 
               when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -252,7 +257,6 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
               val requestWithParams = request.withFormUrlEncodedBody(
                 "timeAtAddress" -> "03"
               )
-              val responsiblePeople = ResponsiblePeople()
 
               when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -273,7 +277,6 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
               val requestWithParams = request.withFormUrlEncodedBody(
                 "timeAtAddress" -> "04"
               )
-              val responsiblePeople = ResponsiblePeople()
 
               when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -352,13 +355,17 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         }
         "the responsible person has not previously been submitted and therefore has not got a lineID" when {
           "adding a new responsible person (therefore edit is false)" when {
+
+            val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+            val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
+            val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+            val originalResponsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
-
-                val originalResponsiblePeople = ResponsiblePeople()
 
                 when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
@@ -378,8 +385,6 @@ class TimeAtAddressControllerSpec extends GenericTestHelper with MockitoSugar {
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "timeAtAddress" -> "03"
                 )
-
-                val originalResponsiblePeople = ResponsiblePeople()
 
                 when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))

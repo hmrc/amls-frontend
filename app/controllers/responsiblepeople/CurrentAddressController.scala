@@ -41,8 +41,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                         rpO: Option[ResponsiblePeople],
                         status: SubmissionStatus,
                         edit: Boolean,
-                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = {
-    status match {
+                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
       case SubmissionDecisionApproved => {
         rpO match {
           case None => NotFound(notFoundView)
@@ -64,7 +63,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
       }
       case _ => handleNotYetApproved(index, data.timeAtAddress, edit, fromDeclaration)
     }
-  }
+
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
@@ -96,7 +95,6 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                               data: ResponsiblePersonCurrentAddress, fromDeclaration: Boolean = false) = {
 
     val moreThanOneYear = (data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears
-
 
     if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)
       && lineId.isDefined && originalPersonAddress.isDefined) {
