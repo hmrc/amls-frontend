@@ -17,9 +17,8 @@ object ResponsiblePersonCurrentAddress {
 
     import jto.validation.forms.Rules._
     (
-      __.read[PersonAddress] ~
-        __.read[Option[TimeAtAddress]]
-      ) ((personAddress:PersonAddress, timeAtAddress: Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
+      __.read[PersonAddress] ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
+      ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
   }
 
   def unapplyNoDateOfChange(currentAddress:ResponsiblePersonCurrentAddress):Option[(PersonAddress,Option[TimeAtAddress])] =
