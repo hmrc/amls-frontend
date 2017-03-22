@@ -43,23 +43,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     val mockCacheMap = mock[CacheMap]
 
-    val completeModel = BusinessActivities(
-      involvedInOther = Some(BusinessActivitiesValues.DefaultInvolvedInOther),
-      expectedBusinessTurnover = Some(BusinessActivitiesValues.DefaultBusinessTurnover),
-      expectedAMLSTurnover = Some(BusinessActivitiesValues.DefaultAMLSTurnover),
-      businessFranchise = Some(BusinessActivitiesValues.DefaultBusinessFranchise),
-      transactionRecord = Some(BusinessActivitiesValues.DefaultTransactionRecord),
-      customersOutsideUK = Some(BusinessActivitiesValues.DefaultCustomersOutsideUK),
-      ncaRegistered = Some(BusinessActivitiesValues.DefaultNCARegistered),
-      accountantForAMLSRegulations = Some(BusinessActivitiesValues.DefaultAccountantForAMLSRegulations),
-      riskAssessmentPolicy = Some(BusinessActivitiesValues.DefaultRiskAssessments),
-      howManyEmployees = Some(BusinessActivitiesValues.DefaultHowManyEmployees),
-      identifySuspiciousActivity = Some(BusinessActivitiesValues.DefaultIdentifySuspiciousActivity),
-      whoIsYourAccountant = Some(BusinessActivitiesValues.DefaultWhoIsYourAccountant),
-      taxMatters = Some(BusinessActivitiesValues.DefaultTaxMatters),
-      hasChanged = false
-    )
-
     val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
   "Get" must {
@@ -108,27 +91,4 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     }
   }
-}
-
-object BusinessActivitiesValues {
-  val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
-  val DefaultSoftwareName = "DEFAULT SOFTWARE"
-  val DefaultBusinessTurnover = ExpectedBusinessTurnover.First
-  val DefaultAMLSTurnover = ExpectedAMLSTurnover.First
-  val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
-  val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
-  val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
-  val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-  val DefaultNCARegistered = NCARegistered(true)
-  val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
-  val DefaultHowManyEmployees = HowManyEmployees("5","4")
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
-    "Accountant's name",
-    Some("Accountant's trading name"),
-    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")
-  )
-  val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
-  val DefaultTaxMatters = TaxMatters(false)
 }
