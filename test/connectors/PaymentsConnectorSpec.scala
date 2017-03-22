@@ -2,40 +2,44 @@ package connectors
 
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import org.apache.http.client.HttpResponseException
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{Cookie, Cookies}
+import play.api.mvc.{AnyContentAsEmpty, Cookie, Cookies, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
+class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   implicit val hc = HeaderCarrier()
 
   trait TestFixture {
 
     val http = mock[HttpPost]
+    val authConnector = mock[AuthConnector]
 
     val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> true)
+      .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[HttpPost].to(http))
 
     val builder = defaultBuilder
-
     lazy val app = builder.build()
-
     lazy val connector = app.injector.instanceOf[PaymentsConnector]
 
-    implicit val request = FakeRequest()
+    val mdtpCookie = Cookie("mdtp", "hello")
+
+    implicit val request = FakeRequest().withCookies(mdtpCookie)
 
     def createResponse(f: () => Future[HttpResponse]) = {
       when {
@@ -43,6 +47,13 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
       } thenReturn f()
     }
 
+    when {
+      authConnector.getCurrentAuthority(any(), any())
+    } thenReturn Future.successful(mock[Authority])
+
+    when {
+      authConnector.getIds(any())(any(), any())
+    } thenReturn Future.successful(Ids("an internal id"))
   }
 
   "The payments connector" must {
@@ -66,7 +77,6 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar {
         result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection", cookies))
 
         verify(http).POST(any(), any(), any())(any(), any(), any())
-
       }
     }
 
