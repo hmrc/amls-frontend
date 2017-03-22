@@ -13,15 +13,12 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
-
 import scala.collection.JavaConversions._
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -52,32 +49,16 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
 
   "WhereAreTradingPremisesController" when {
-    val mockCacheMap = mock[CacheMap]
 
     "get is called" must {
-      "redirect to ConfirmAddress page" when {
-        "for the first trading premises" in new Fixture {
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get(RecordId1, false)(request)
-          hstatus(result) must be (SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(RecordId1).url))
-        }
-      }
-
       "respond with OK and show the form with data when there is data" in new Fixture {
 
         val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(tradingPremises)))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
         val result = controller.get(RecordId1, true)(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -90,10 +71,8 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
       "respond with OK and show the empty form when there is no data" in new Fixture {
 
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(TradingPremises(), TradingPremises())))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(RecordId1, false)(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -106,11 +85,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       }
 
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(None)
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-          val result = controller.get(RecordId1, false)(request)
+
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        val result = controller.get(RecordId1, false)(request)
 
         hstatus(result) must be(NOT_FOUND)
       }
