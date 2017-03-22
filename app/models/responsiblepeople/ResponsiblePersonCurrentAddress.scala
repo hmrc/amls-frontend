@@ -17,8 +17,8 @@ object ResponsiblePersonCurrentAddress {
 
     import jto.validation.forms.Rules._
     (
-      (__).read[PersonAddress] ~
-        (__).read[TimeAtAddress]
+      __.read[PersonAddress] ~
+        __.read[TimeAtAddress]
       ) ((personAddress:PersonAddress, timeAtAddress: TimeAtAddress) => ResponsiblePersonCurrentAddress(personAddress, timeAtAddress, None))
   }
 
@@ -29,8 +29,8 @@ object ResponsiblePersonCurrentAddress {
     import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-      (__).write[PersonAddress] ~
-        (__).write[TimeAtAddress]
+      __.write[PersonAddress] ~
+        __.write[TimeAtAddress]
       ) (unlift(ResponsiblePersonCurrentAddress.unapplyNoDateOfChange))
   }
 
