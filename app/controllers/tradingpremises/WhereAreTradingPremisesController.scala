@@ -9,7 +9,7 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
-import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection, StatusConstants}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -21,14 +21,25 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
-        case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
-        case Some(_) =>
-          Ok(where_are_trading_premises(EmptyForm, edit, index))
-        case _ =>
-          NotFound(notFoundView)
+      dataCacheConnector.fetchAll map {
+        cacheMap =>
+          (for {
+            cache <- cacheMap
+            tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+            tradingPremise <- getData[TradingPremises](cache, index)
+          } yield tradingPremises.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1 match {
+            case true if!edit => Redirect(routes.ConfirmAddressController.get(index))
+            case _ => tradingPremise match {
+                case TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _) =>
+                  Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
+                case TradingPremises(_, None, _, _, _, _, _, _, _, _, _, _, _, _) =>
+                  Ok(where_are_trading_premises(EmptyForm, edit, index))
+                case _ =>
+                  NotFound(notFoundView)
+              }
+          }).getOrElse(Ok(where_are_trading_premises(EmptyForm, edit, index)))
       }
+
   }
 
   // TODO: Consider if this can be refactored
