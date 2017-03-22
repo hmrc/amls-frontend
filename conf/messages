@@ -1433,6 +1433,7 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Is your business involved in any other activities?
+renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 ############################### Survey ###############################
 
