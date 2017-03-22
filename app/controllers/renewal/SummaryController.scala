@@ -31,7 +31,9 @@ class SummaryController @Inject()(
             renewal <- cache.getEntry[Renewal](Renewal.key)
           } yield {
             Future.successful(Ok(summary(renewal, businessMatching.activities)))
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          }) getOrElse {
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          }
       }
   }
 }

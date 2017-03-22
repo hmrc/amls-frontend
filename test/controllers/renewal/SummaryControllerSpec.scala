@@ -67,19 +67,20 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "load the summary page when there is data in the renewal" in new Fixture {
 
-      val model = Renewal()
-
-      when(mockRenewalService.getRenewal(any(),any(), any()))
-        .thenReturn(Future.successful(Some(Renewal())))
+      when(mockDataCacheConnector.fetchAll(any(),any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[Renewal](Renewal.key))
+        .thenReturn(Some(Renewal(Some(models.renewal.InvolvedInOtherYes("test")))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
     "redirect to the renewal progress page when section data is unavailable" in new Fixture {
-
-      when(mockRenewalService.getRenewal(any(),any(), any()))
-        .thenReturn(Future.successful(None))
+      when(mockDataCacheConnector.fetchAll(any(),any()))
+        .thenReturn(Future.successful(Some(emptyCache)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -87,20 +88,23 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "pre load Business matching business activities data in " +
       "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
-
-      when(mockRenewalService.getRenewal(any(),any(), any()))
-        .thenReturn(Future.successful(Some(
+      when(mockDataCacheConnector.fetchAll(any(),any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+      when(mockCacheMap.getEntry[Renewal](Renewal.key))
+        .thenReturn(Some(
           Renewal(
             Some(models.renewal.InvolvedInOtherYes("test")),
             Some(BusinessTurnover.First),
             Some(AMLSTurnover.First),
-            false))))
+            false)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-//      val document = Jsoup.parse(contentAsString(result))
-//      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
-//      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+      val document = Jsoup.parse(contentAsString(result))
+      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
+      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
 
     }
   }
