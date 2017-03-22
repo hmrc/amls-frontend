@@ -29,11 +29,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentNameController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val controller = new AgentNameController (mock[DataCacheConnector], self.authConnector, mock[StatusService], messagesApi)
 
     when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
   }

@@ -26,10 +26,7 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyNameController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new AgentCompanyNameController(mock[DataCacheConnector], self.authConnector, messagesApi)
   }
 
   "AgentCompanyDetailsController" when {

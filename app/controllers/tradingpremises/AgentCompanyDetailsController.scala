@@ -1,17 +1,22 @@
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import javax.inject.{Inject, Singleton}
+
+import config.{ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait AgentCompanyDetailsController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector,
+                                              override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = FeatureToggle(ApplicationConfig.release7) {
     Authorised.async {
@@ -57,8 +62,3 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
   }
 }
 
-object AgentCompanyDetailsController extends AgentCompanyDetailsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-}
