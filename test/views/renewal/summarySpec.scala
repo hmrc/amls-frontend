@@ -1,6 +1,6 @@
 package views.renewal
 
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, AccountancyServices, BusinessActivities}
+import models.businessmatching._
 import models.renewal.{AMLSTurnover, BusinessTurnover, InvolvedInOtherYes, Renewal}
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -46,30 +46,41 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       true
     }
 
-    val fullProductSet = Set("hvd.products.option.01","hvd.products.option.02","hvd.products.option.03",
-      "hvd.products.option.04","hvd.products.option.05","hvd.products.option.06","hvd.products.option.07",
-      "hvd.products.option.08","hvd.products.option.09","hvd.products.option.10","hvd.products.option.11",
-      "Other Product"
+    val fullActivitiesSet = Set(
+      "businessmatching.registerservices.servicename.lbl.01",
+      "businessmatching.registerservices.servicename.lbl.02",
+      "businessmatching.registerservices.servicename.lbl.03",
+      "businessmatching.registerservices.servicename.lbl.04",
+      "businessmatching.registerservices.servicename.lbl.05",
+      "businessmatching.registerservices.servicename.lbl.06",
+      "businessmatching.registerservices.servicename.lbl.07"
     )
 
     val sectionChecks = Table[String, Element=>Boolean](
       ("title key", "check"),
-      ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes", "20 June 2012")),
-      ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
-      ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes"))
+      ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text")),
+      ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
+      ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
+      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet))
     )
 
     "include the provided data" in new ViewFixture {
       def view = {
         val renewalModel = Renewal(
-          Some(InvolvedInOtherYes("test")),
+          Some(InvolvedInOtherYes("test text")),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           false
         )
 
         val businessActivitiesModel = BusinessActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
+          Set(AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            TelephonePaymentService)
         )
 
         views.html.renewal.summary(renewalModel, Some(businessActivitiesModel))
