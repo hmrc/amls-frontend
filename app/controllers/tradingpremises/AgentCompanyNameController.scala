@@ -8,7 +8,7 @@ import forms._
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
@@ -48,7 +48,7 @@ class AgentCompanyNameController @Inject()(val dataCacheConnector: DataCacheConn
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => ControllerHelper.redirectToNextPage(result, index, edit)
+            case false => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

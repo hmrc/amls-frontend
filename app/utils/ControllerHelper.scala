@@ -77,28 +77,9 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-
-  def isFirstTradingPremises(cache: CacheMap): Option[Boolean] = {
-    cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map {tps =>
-      tps.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1
-    }
-  }
-
-
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
   }
-
-  def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent] )= {
-    result match {
-      case Some(cache) => ControllerHelper.isFirstTradingPremises(cache).getOrElse(false) match {
-        case true if !edit => Results.Redirect(routes.ConfirmAddressController.get(index))
-        case false => Results.Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-      }
-      case _ => Results.NotFound(notFoundView)
-    }
-  }
-
 }

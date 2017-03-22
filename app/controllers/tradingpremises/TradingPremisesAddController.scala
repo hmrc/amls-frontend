@@ -31,7 +31,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
      dataCacheConnector.fetchAll map {
       cache => isMSBSelected(cache) match {
         case true => Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx))
-        case false => ControllerHelper.redirectToNextPage(cache, idx, false)
+        case false => TPControllerHelper.redirectToNextPage(cache, idx, false)
       }
     }
   }

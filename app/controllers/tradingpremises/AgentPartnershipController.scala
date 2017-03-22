@@ -46,7 +46,7 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => ControllerHelper.redirectToNextPage(result, index, edit)
+            case false => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

@@ -40,7 +40,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => edit match {
         case true => Redirect(routes.SummaryController.getIndividual(index))
-        case false => ControllerHelper.redirectToNextPage(result, index, edit)
+        case false => TPControllerHelper.redirectToNextPage(result, index, edit)
       }
       case _ => Redirect(routes.AgentCompanyNameController.get(index, edit))
     }

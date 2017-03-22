@@ -31,7 +31,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
                 }
                 Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
               }
-              case Some(tp) => ControllerHelper.redirectToNextPage(cache, index, edit)
+              case Some(tp) => TPControllerHelper.redirectToNextPage(cache, index, edit)
               case None => NotFound(notFoundView)
             }
           } getOrElse NotFound(notFoundView)
@@ -51,7 +51,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
           } yield (data.agentPremises, edit) match {
             case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
             case (false, true) => Redirect(routes.SummaryController.getIndividual(index))
-            case (false, false) => ControllerHelper.redirectToNextPage(result, index, edit)
+            case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
