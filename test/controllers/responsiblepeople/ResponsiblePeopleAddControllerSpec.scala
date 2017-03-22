@@ -9,11 +9,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
 import org.scalatest.{Pending, WordSpecLike}
-import org.scalatestplus.play.{ OneAppPerSuite}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.mvc.Call
-import utils.{GenericTestHelper, AuthorisedFixture}
+import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -55,6 +56,7 @@ class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
 
 
         val zeroCase = Gen.const(0)
+        val emptyCache = CacheMap("", Map.empty)
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
         val partitions = Seq (zeroCase, reasonableCounts)
 
@@ -64,6 +66,9 @@ class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(testSeq)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val resultF = controller.get(guidanceRequested)(request)
 

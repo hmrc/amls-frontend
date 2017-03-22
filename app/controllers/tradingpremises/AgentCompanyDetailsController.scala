@@ -1,18 +1,22 @@
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import javax.inject.{Inject, Singleton}
+
+import config.{ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
-import utils.{FeatureToggle, RepeatingSection}
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{ControllerHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
-
-trait AgentCompanyDetailsController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector,
+                                              override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = FeatureToggle(ApplicationConfig.release7) {
     Authorised.async {
@@ -20,7 +24,6 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
         implicit request =>
 
           getData[TradingPremises](index) map {
-
             case Some(tp) => {
               val form = tp.agentCompanyDetails match {
                 case Some(data) => Form2[AgentCompanyDetails](data)
@@ -41,7 +44,7 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
             Future.successful(BadRequest(views.html.tradingpremises.agent_company_details(f, index, edit)))
           case ValidForm(_, data) => {
             for {
-              result <- updateDataStrict[TradingPremises](index) { tp =>
+              result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_,tp) =>
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises,
                   tp.businessStructure, None, Some(data), None, tp.whatDoesYourBusinessDoAtThisAddress,
@@ -49,7 +52,7 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
               }
             } yield edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+              case false => TPControllerHelper.redirectToNextPage(result, index, edit)
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -59,8 +62,3 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
   }
 }
 
-object AgentCompanyDetailsController extends AgentCompanyDetailsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-}
