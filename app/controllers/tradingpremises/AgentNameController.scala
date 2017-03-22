@@ -1,8 +1,6 @@
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
-import config.ApplicationConfig
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
@@ -10,24 +8,20 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.i18n.MessagesApi
 import play.api.libs.json.Format
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class AgentNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                    val authConnector: AuthConnector,
-                                    val statusService: StatusService,
-                                    override val messagesApi: MessagesApi) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
+trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
+  val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -119,4 +113,9 @@ class AgentNameController @Inject()(val dataCacheConnector: DataCacheConnector,
   }
 }
 
-
+object AgentNameController extends AgentNameController {
+  // $COVERAGE-OFF$
+  override val dataCacheConnector = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
+  override val statusService = StatusService
+}

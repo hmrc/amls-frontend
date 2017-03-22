@@ -25,10 +25,7 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentPartnershipController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new AgentPartnershipController(mock[DataCacheConnector], self.authConnector, messagesApi)
   }
 
   "AgentPartnershipController" when {

@@ -12,7 +12,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -29,7 +29,11 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentNameController (mock[DataCacheConnector], self.authConnector, mock[StatusService], messagesApi)
+    val controller = new AgentNameController {
+      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+      override val authConnector: AuthConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
 
     when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
   }

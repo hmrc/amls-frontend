@@ -57,7 +57,7 @@ GET         /about-the-business/check-your-answers                      controll
 
 GET         /trading-premises/what-you-need/:index                      controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
-GET         /trading-premises/add                                       controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
+GET         /trading-premises/add                                       @controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
 
 GET         /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
 POST        /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
@@ -82,14 +82,14 @@ POST        /trading-premises/crn-name/:index                           @control
 GET         /trading-premises/crn-number/:index                         @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-number/:index                         @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent-name/:index                         @controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent-name/:index                         @controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
-GET         /trading-premises/agent-name/date-of-change/:index          @controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
-POST        /trading-premises/agent-name/date-of-change/:index          @controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
+GET         /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/agent-name/date-of-change/:index          controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
+POST        /trading-premises/agent-name/date-of-change/:index          controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
 
 
-GET         /trading-premises/partners/:index                           controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/partners/:index                           controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/partners/:index                           @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/partners/:index                           @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)

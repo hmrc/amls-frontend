@@ -1,6 +1,7 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
@@ -14,7 +15,9 @@ import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait TradingPremisesAddController extends BaseController with RepeatingSection {
+@Singleton
+class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector) extends BaseController with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[CacheMap])(implicit ac: AuthContext, hc: HeaderCarrier): Boolean = {
     val test = for {
@@ -44,9 +47,3 @@ trait TradingPremisesAddController extends BaseController with RepeatingSection 
   }
 }
 
-object TradingPremisesAddController extends TradingPremisesAddController {
-  // $COVERAGE-OFF$
-  override def dataCacheConnector: DataCacheConnector = DataCacheConnector
-
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-}
