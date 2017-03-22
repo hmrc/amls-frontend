@@ -80,6 +80,7 @@ object ControllerHelper {
 
   def isFirstTradingPremises(cache: CacheMap): Option[Boolean] = {
     cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map {tps =>
+      println("++++++++++isFirstTradingPremises+++++++++++++++++++++"+tps.filterNot(_.status.contains(StatusConstants.Deleted)))
       tps.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1
     }
   }

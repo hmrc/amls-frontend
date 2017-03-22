@@ -37,7 +37,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
                 case _ =>
                   NotFound(notFoundView)
               }
-          }).getOrElse(Ok(where_are_trading_premises(EmptyForm, edit, index)))
+          }).getOrElse(NotFound(notFoundView))
       }
 
   }

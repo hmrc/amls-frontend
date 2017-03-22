@@ -52,11 +52,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
 
   "WhereAreTradingPremisesController" when {
+    val mockCacheMap = mock[CacheMap]
 
     "get is called" must {
       "redirect to ConfirmAddress page" when {
         "for the first trading premises" in new Fixture {
-          val mockCacheMap = mock[CacheMap]
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -74,7 +74,6 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
-        val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremises)))
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -91,8 +90,10 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
       "respond with OK and show the empty form when there is no data" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(TradingPremises(), TradingPremises())))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(RecordId1, false)(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -105,11 +106,11 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       }
 
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
-
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        val result = controller.get(RecordId1, false)(request)
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(None)
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+          val result = controller.get(RecordId1, false)(request)
 
         hstatus(result) must be(NOT_FOUND)
       }
