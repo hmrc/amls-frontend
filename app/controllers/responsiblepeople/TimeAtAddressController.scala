@@ -21,13 +21,13 @@ trait TimeAtAddressController extends RepeatingSection with BaseController {
   
   val statusService: StatusService
 
-  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2[TimeAtAddress](currentAddress.timeAtAddress), edit, index, fromDeclaration, personName.titleName))
+        case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_)) =>
+          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, fromDeclaration, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
         case _ => NotFound(notFoundView)

@@ -26,13 +26,13 @@
 </section>
 }
 
-@timeAtAddress(t : TimeAtAddress) = {
+@timeAtAddress(t : Option[TimeAtAddress]) = {
     <p>@t match {
-        case TimeAtAddress.Empty => {@Messages("missing.dataItem")}
-        case TimeAtAddress.ZeroToFiveMonths => {@Messages("responsiblepeople.additional_extra_address.0_5_months")}
-        case TimeAtAddress.SixToElevenMonths => {@Messages("responsiblepeople.additional_extra_address.6_11_months")}
-        case TimeAtAddress.OneToThreeYears => {@Messages("responsiblepeople.additional_extra_address.1_3_years")}
-        case TimeAtAddress.ThreeYearsPlus => {@Messages("responsiblepeople.additional_extra_address.more_3_years")}
+        case Some(TimeAtAddress.Empty) => {@Messages("missing.dataItem")}
+        case Some(TimeAtAddress.ZeroToFiveMonths) => {@Messages("responsiblepeople.additional_extra_address.0_5_months")}
+        case Some(TimeAtAddress.SixToElevenMonths) => {@Messages("responsiblepeople.additional_extra_address.6_11_months")}
+        case Some(TimeAtAddress.OneToThreeYears) => {@Messages("responsiblepeople.additional_extra_address.1_3_years")}
+        case Some(TimeAtAddress.ThreeYearsPlus) => {@Messages("responsiblepeople.additional_extra_address.more_3_years")}
     }
     @Messages("responsiblepeople.detailed_answers.at_this_address")</p>
 }
@@ -169,7 +169,7 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
-                @timeAtAddress(a.timeAtAddress)
+                @timeAtAddress(Some(a.timeAtAddress))
             }
         }
 
@@ -182,7 +182,7 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
-                @timeAtAddress(a.timeAtAddress)
+                @timeAtAddress(Some(a.timeAtAddress))
             }
         }
 

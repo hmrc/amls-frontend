@@ -66,9 +66,8 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
                 for {
                   addHist <- rp.addressHistory
                   rpCurr <- addHist.currentAddress
-                } yield {
-                  rpCurr.timeAtAddress
-                }
+                  timeAtAddress <- rpCurr.timeAtAddress
+                } yield timeAtAddress
               }
 
               doUpdate(index, dateOfChange).map { _ =>

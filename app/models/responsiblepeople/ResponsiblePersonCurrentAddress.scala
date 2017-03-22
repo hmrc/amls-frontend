@@ -6,7 +6,7 @@ import jto.validation.{From, Rule, To, Write}
 
 
 case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
-                                           timeAtAddress: TimeAtAddress,
+                                           timeAtAddress: Option[TimeAtAddress],
                                            dateOfChange: Option[DateOfChange] = None)
 
 object ResponsiblePersonCurrentAddress {
@@ -18,11 +18,11 @@ object ResponsiblePersonCurrentAddress {
     import jto.validation.forms.Rules._
     (
       __.read[PersonAddress] ~
-        __.read[TimeAtAddress]
-      ) ((personAddress:PersonAddress, timeAtAddress: TimeAtAddress) => ResponsiblePersonCurrentAddress(personAddress, timeAtAddress, None))
+        __.read[Option[TimeAtAddress]]
+      ) ((personAddress:PersonAddress, timeAtAddress: Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
   }
 
-  def unapplyNoDateOfChange(currentAddress:ResponsiblePersonCurrentAddress):Option[(PersonAddress,TimeAtAddress)] =
+  def unapplyNoDateOfChange(currentAddress:ResponsiblePersonCurrentAddress):Option[(PersonAddress,Option[TimeAtAddress])] =
     Some((currentAddress.personAddress,currentAddress.timeAtAddress))
 
   implicit val formWrites: Write[ResponsiblePersonCurrentAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -30,7 +30,7 @@ object ResponsiblePersonCurrentAddress {
     import play.api.libs.functional.syntax.unlift
     (
       __.write[PersonAddress] ~
-        __.write[TimeAtAddress]
+        __.write[Option[TimeAtAddress]]
       ) (unlift(ResponsiblePersonCurrentAddress.unapplyNoDateOfChange))
   }
 

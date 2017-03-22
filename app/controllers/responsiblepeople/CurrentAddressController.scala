@@ -21,7 +21,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   val statusService: StatusService
 
-  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
@@ -94,7 +94,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                               lineId: Option[Int],
                               data: ResponsiblePersonCurrentAddress, fromDeclaration: Boolean = false) = {
 
-    val moreThanOneYear = (data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears
+    val moreThanOneYear = data.timeAtAddress.contains(ThreeYearsPlus) || data.timeAtAddress.contains(OneToThreeYears)
 
     if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)
       && lineId.isDefined && originalPersonAddress.isDefined) {
@@ -109,12 +109,12 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
   }
 
   private def handleNotYetApproved(index: Int,
-                                   timeAtAddress: TimeAtAddress,
+                                   timeAtAddress: Option[TimeAtAddress],
                                    edit: Boolean, fromDeclaration: Boolean = false) = {
     (timeAtAddress, edit) match {
-      case (ThreeYearsPlus | OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+      case (Some(ThreeYearsPlus) | Some(OneToThreeYears), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-      case (ThreeYearsPlus | OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index, edit))
+      case (Some(ThreeYearsPlus) | Some(OneToThreeYears), true) => Redirect(routes.DetailedAnswersController.get(index, edit))
       case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
     }
   }
@@ -125,7 +125,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         (res.addressHistory, data.timeAtAddress) match {
-          case (Some(a), ThreeYearsPlus | OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+          case (Some(_), Some(ThreeYearsPlus) | Some(OneToThreeYears)) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           case (Some(a), _) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
