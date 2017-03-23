@@ -51,10 +51,13 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.soleProprietorOfAnotherBusiness(data)
+                  rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = None)
                 }
               } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case true => data.soleProprietorOfAnotherBusiness match {
+                  case true => Redirect(routes.VATRegisteredController.get(index, edit))
+                  case false => Redirect(routes.DetailedAnswersController.get(index))
+                }
                 case false => redirectDependingOnFormResponse(data, index, edit, fromDeclaration)
               }
             }.recoverWith {

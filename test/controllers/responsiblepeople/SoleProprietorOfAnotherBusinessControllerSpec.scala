@@ -1,7 +1,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, ResponsiblePeople, SoleProprietorOfAnotherBusiness}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegisteredNo}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
@@ -69,7 +69,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody(
-            "soleProprietorOfAnotherBusiness" -> "true",
+            "soleProprietorOfAnotherBusiness" -> "false",
             "personName" -> "Person Name")
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -93,7 +93,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
             "personName" -> "Person Name")
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
 
           when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
@@ -101,6 +101,29 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1).url))
+
+          verify(controller.dataCacheConnector).save(any(),
+            meq(Seq(ResponsiblePeople(hasChanged = false,
+              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = None))))(any(), any(), any())
+
+        }
+
+        "redirect to the vat registered controller when yes is selected and edit is true" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+          val newRequest = request.withFormUrlEncodedBody(
+            "soleProprietorOfAnotherBusiness" -> "true",
+            "personName" -> "Person Name")
+
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post(1, true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1, true).url))
         }
 
         "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
@@ -121,7 +144,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
 
           verify(controller.dataCacheConnector).save(any(),
-            meq(Seq(ResponsiblePeople(hasChanged = true,
+            meq(Seq(ResponsiblePeople(hasChanged = false,
               soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))))))(any(), any(), any())
         }
       }
