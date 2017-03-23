@@ -67,7 +67,7 @@ class CurrentAddressControllerNoRelease7Spec extends GenericTestHelper with Mock
           val result = currentAddressController.post(recordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId, true).url))
+          redirectLocation(result) must be(Some(routes.TimeAtAddressController.get(recordId, true).url))
         }
       }
       "time at address is more than 1 year" must {

@@ -37,34 +37,6 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
     }
 
-  def handleRedirection(index: Int, data: ResponsiblePersonCurrentAddress,
-                        rpO: Option[ResponsiblePeople],
-                        status: SubmissionStatus,
-                        edit: Boolean,
-                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
-      case SubmissionDecisionApproved => {
-        rpO match {
-          case None => NotFound(notFoundView)
-          case Some(rp) => {
-            rp.addressHistory match {
-              case None =>
-                handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-              case Some(hist) => {
-                hist.currentAddress match {
-                  case None =>
-                    handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-                  case Some(currAdd) =>
-                    handleApproved(index, edit, Some(currAdd.personAddress), rp.lineId, data, fromDeclaration)
-                }
-              }
-            }
-          }
-        }
-      }
-      case _ => handleNotYetApproved(index, data.timeAtAddress, edit, fromDeclaration)
-    }
-
-
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
@@ -74,50 +46,14 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
               BadRequest(current_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            val responsiblePersonF = getData[ResponsiblePeople](index)
-            doUpdate(index, data).flatMap { _ =>
-              for {
-                rpO <- responsiblePersonF
-                status <- statusService.getStatus
-              } yield handleRedirection(index, data, rpO, status, edit, fromDeclaration)
+            doUpdate(index, data) map { _ =>
+              Redirect(routes.TimeAtAddressController.get(index,edit,fromDeclaration))
             }
           }
         }).recoverWith {
-          case _: IndexOutOfBoundsException =>
-            Future.successful(NotFound(notFoundView))
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
-
-  private def handleApproved(index: Int,
-                              edit: Boolean,
-                              originalPersonAddress: Option[PersonAddress],
-                              lineId: Option[Int],
-                              data: ResponsiblePersonCurrentAddress, fromDeclaration: Boolean = false) = {
-
-    val moreThanOneYear = data.timeAtAddress.contains(ThreeYearsPlus) || data.timeAtAddress.contains(OneToThreeYears)
-
-    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)
-      && lineId.isDefined && originalPersonAddress.isDefined) {
-      Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-    } else if (moreThanOneYear && !edit) {
-      Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-    } else if (!moreThanOneYear) {
-      Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-    } else {
-      Redirect(routes.DetailedAnswersController.get(index, edit))
-    }
-  }
-
-  private def handleNotYetApproved(index: Int,
-                                   timeAtAddress: Option[TimeAtAddress],
-                                   edit: Boolean, fromDeclaration: Boolean = false) = {
-    (timeAtAddress, edit) match {
-      case (Some(ThreeYearsPlus) | Some(OneToThreeYears), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-      case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-      case (Some(ThreeYearsPlus) | Some(OneToThreeYears), true) => Redirect(routes.DetailedAnswersController.get(index, edit))
-      case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-    }
-  }
 
   private def doUpdate
   (index: Int, data: ResponsiblePersonCurrentAddress)
