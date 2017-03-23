@@ -44,13 +44,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               }
             case ValidForm(_, data) =>
               doUpdate(index, data).map { _ =>
-                (data.timeAtAddress, edit) match {
-                  case (Some(ThreeYearsPlus), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-                  case (Some(OneToThreeYears), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-                  case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
-                  case (Some(ThreeYearsPlus), true) => Redirect(routes.DetailedAnswersController.get(index))
-                  case (Some(OneToThreeYears), true) => Redirect(routes.DetailedAnswersController.get(index))
-                  case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
+                edit match {
+                  case true => Redirect(routes.DetailedAnswersController.get(index))
+                  case false => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, fromDeclaration))
                 }
               }
           }).recoverWith {
