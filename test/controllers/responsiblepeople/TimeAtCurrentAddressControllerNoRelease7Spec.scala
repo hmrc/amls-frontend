@@ -15,7 +15,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class TimeAtAddressControllerNoRelease7Spec extends GenericTestHelper with MockitoSugar {
+class TimeAtCurrentAddressControllerNoRelease7Spec extends GenericTestHelper with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1
@@ -23,7 +23,7 @@ class TimeAtAddressControllerNoRelease7Spec extends GenericTestHelper with Mocki
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val timeAtAddressController = new TimeAtAddressController {
+    val timeAtAddressController = new TimeAtCurrentAddressController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]

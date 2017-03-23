@@ -166,7 +166,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtAddressController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
         }
 
@@ -193,7 +193,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtAddressController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
         }
       }

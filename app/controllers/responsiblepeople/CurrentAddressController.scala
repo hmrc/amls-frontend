@@ -47,7 +47,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
             }
           case ValidForm(_, data) => {
             doUpdate(index, data) map { _ =>
-              Redirect(routes.TimeAtAddressController.get(index,edit,fromDeclaration))
+              Redirect(routes.TimeAtCurrentAddressController.get(index,edit,fromDeclaration))
             }
           }
         }).recoverWith {

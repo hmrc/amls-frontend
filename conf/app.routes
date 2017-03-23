@@ -258,8 +258,8 @@ POST        /responsible-people/self-assessment/:index                  controll
 GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
-GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)

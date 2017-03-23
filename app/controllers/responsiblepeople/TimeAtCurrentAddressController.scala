@@ -15,10 +15,10 @@ import views.html.responsiblepeople.time_at_address
 
 import scala.concurrent.Future
 
-trait TimeAtAddressController extends RepeatingSection with BaseController {
+trait TimeAtCurrentAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
-  
+
   val statusService: StatusService
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
@@ -129,7 +129,7 @@ trait TimeAtAddressController extends RepeatingSection with BaseController {
 
 }
 
-object TimeAtAddressController extends TimeAtAddressController {
+object TimeAtCurrentAddressController extends TimeAtCurrentAddressController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   val statusService = StatusService
