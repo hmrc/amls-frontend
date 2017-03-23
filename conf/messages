@@ -1158,6 +1158,7 @@ responsiblepeople.detailed_answers.position_start = When did this position start
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
+responsiblepeople.check_your_answers.soleproprietor_for_other_business = Sole proprietor of another business?
 responsiblepeople.detailed_answers.visuallyhidden.header = Responsible person
 responsiblepeople.nationality.title = What is the nationality of {0}?
 responsiblepeople.nationality.select = Select all that apply

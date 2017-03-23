@@ -25,7 +25,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         rp <- getData[ResponsiblePeople](index)
         status <- statusService.getStatus
       } yield rp match {
-        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
+        case (Some(ResponsiblePeople(Some(personName),_, _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
           def isDateRequired = status match {
             case SubmissionDecisionApproved if rp.get.lineId.isDefined => true
             case _ => false
