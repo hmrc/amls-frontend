@@ -114,7 +114,6 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("AA1 1AA")
-        document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
       }
 
       "display the previous home address with non-UK fields populated" in new Fixture {
@@ -137,7 +136,6 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         document.select("input[name=addressLineNonUK3]").`val` must be("")
         document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
-        document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(true)
       }
     }
 
@@ -201,7 +199,6 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             ele.html() must include(Messages("err.text.validation"))
           }
         }
-
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
 
