@@ -38,15 +38,13 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         case ValidForm(_, data) => {
           for {
             renewal <- renewalService.getRenewal
-          } yield renewal match {
-            case Some(renewal) => {
-              renewalService.updateRenewal(renewal.customersOutsideUK(data))
+            _ <- renewalService.updateRenewal(renewal.getOrElse(Renewal()).customersOutsideUK(data))
+          } yield {
               Redirect(routes.SummaryController.get())
             }
-            case _ => Redirect(routes.SummaryController.get())
           }
-
         }
       }
-  }
 }
+
+
