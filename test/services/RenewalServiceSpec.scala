@@ -1,6 +1,7 @@
 package services
 
 import connectors.DataCacheConnector
+import models.Country
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -35,6 +36,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       Some(InvolvedInOtherNo),
       Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       // Add other models here
       true)
 

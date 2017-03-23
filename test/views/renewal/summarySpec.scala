@@ -1,13 +1,15 @@
 package views.renewal
 
+import models.Country
 import models.businessmatching._
-import models.renewal.{AMLSTurnover, BusinessTurnover, InvolvedInOtherYes, Renewal}
+import models.renewal._
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 import org.jsoup.nodes.Element
+
 import scala.collection.JavaConversions._
 
 class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
@@ -61,7 +63,8 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text")),
       ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
-      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet))
+      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
+      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -70,6 +73,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(InvolvedInOtherYes("test text")),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           false
         )
 
