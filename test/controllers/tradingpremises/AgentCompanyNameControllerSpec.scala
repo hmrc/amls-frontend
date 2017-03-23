@@ -16,6 +16,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
 import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -24,15 +26,13 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyNameController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new AgentCompanyNameController(mock[DataCacheConnector], self.authConnector, messagesApi)
   }
 
   "AgentCompanyDetailsController" when {
 
     val emptyCache = CacheMap("", Map.empty)
+    val mockCacheMap = mock[CacheMap]
 
     "get is called" must {
       "display agent company name Page" in new Fixture {
@@ -77,11 +77,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             "agentCompanyName" -> "text"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -94,11 +94,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             "agentCompanyName" -> "text"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -111,11 +111,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             "agentCompanyName" -> "text"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -131,8 +131,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             "agentCompanyName" -> "11111111111" * 40
           )
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -148,8 +151,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             "agentCompanyName" -> " "
           )
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -164,11 +170,11 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
 
         val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text")
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
 
@@ -182,7 +188,7 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
             agentName = None,
             agentCompanyDetails = Some(AgentCompanyName("text")),
             agentPartnership = None
-          ))))(any(), any(), any())
+          ), TradingPremises())))(any(), any(), any())
       }
     }
   }

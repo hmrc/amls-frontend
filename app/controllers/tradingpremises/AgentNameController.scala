@@ -8,11 +8,15 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.libs.json.Format
 import services.StatusService
-import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{ControllerHelper, DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
-import scala.concurrent.Future
-
+import scala.concurrent.{ExecutionContext, Future}
 
 trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
@@ -20,54 +24,68 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
   val statusService: StatusService
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
 
-      getData[TradingPremises](index) map {
+        getData[TradingPremises](index) map {
 
-        case Some(tp) => {
-          val form = tp.agentName match {
-            case Some(data) => Form2[AgentName](data)
-            case None => EmptyForm
+          case Some(tp) => {
+            val form = tp.agentName match {
+              case Some(data) => Form2[AgentName](data)
+              case None => EmptyForm
+            }
+            Ok(views.html.tradingpremises.agent_name(form, index, edit))
           }
-          Ok(views.html.tradingpremises.agent_name(form, index, edit))
+          case None => NotFound(notFoundView)
         }
-        case None => NotFound(notFoundView)
-      }
+  }
+
+  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit
+                                                               user: AuthContext,
+                                                               hc: HeaderCarrier,
+                                                               formats: Format[TradingPremises],
+                                                               key: MongoKey[TradingPremises]
+  ) = {
+    result map { cache =>
+      getData(cache, index)
+    }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[AgentName](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index, edit)))
-        case ValidForm(_, data) => {
-          for {
-            tradingPremises <- getData[TradingPremises](index)
-            result <- updateDataStrict[TradingPremises](index) { tp =>
-              TradingPremises(tp.registeringAgentPremises, tp.yourTradingPremises,
-                tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
+    implicit authContext =>
+      implicit request => {
+        Form2[AgentName](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index, edit)))
+          case ValidForm(_, data) => {
+            for {
+              result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
+                TradingPremises(tp.registeringAgentPremises, tp.yourTradingPremises,
+                  tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
+              }
+              status <- statusService.getStatus
+
+            } yield status match {
+              case SubmissionDecisionApproved if redirectToDateOfChange(getTradingPremises(result, index), data) =>
+                Redirect(routes.AgentNameController.dateOfChange(index))
+              case _ => edit match {
+                case true => Redirect(routes.SummaryController.getIndividual(index))
+                case false => TPControllerHelper.redirectToNextPage(result, index, edit)
+              }
             }
-            status <- statusService.getStatus
-          } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, data) =>
-              Redirect(routes.AgentNameController.dateOfChange(index))
-            case _ => edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-            }
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
-    }
   }
 
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
-      implicit authContext => implicit request =>
-        Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
-          "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
+      implicit authContext =>
+        implicit request =>
+          Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+            "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
     }
   }
 

@@ -172,6 +172,7 @@ error.invalid.tp.agent.partnership = You can’t enter more than 140 characters 
 error.required.tp.register.another.premises = Select yes if you want to register another trading premises
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
+error.required.tp.confirm.address = Select yes if this is the address of your trading premises
 
 ###############################  Estate Agency Business ###############################
 error.required.eab.redress.scheme = Select yes if the business is registered with a redress scheme
@@ -773,6 +774,7 @@ tradingpremises.remove_reasons.agent.premises.lbl.05 = Requested by agent
 tradingpremises.remove_reasons.agent.premises.lbl.06 = Other
 tradingpremises.remove_reasons.agent.other.missing = Enter a reason for removing this trading premises
 tradingpremises.remove_reasons.missing = Select one option to show why you’re removing this trading premises
+tradingpremises.confirmaddress.title = Is this your trading premises address?
 
 estateagentbusiness.whatyouneed.subheading = For this section you’ll need:
 estateagentbusiness.whatyouneed.line_1 = a list of which services you provide
@@ -1436,6 +1438,7 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Is your business involved in any other activities?
+renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 

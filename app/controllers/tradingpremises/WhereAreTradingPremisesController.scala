@@ -8,7 +8,6 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.i18n.Messages
 import services.StatusService
 import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
