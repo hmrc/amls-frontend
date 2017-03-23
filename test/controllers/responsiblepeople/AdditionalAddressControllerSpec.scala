@@ -35,6 +35,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
   }
 
   val emptyCache = CacheMap("", Map.empty)
+  val outOfBounds = 99
 
   "AdditionalAddressController" when {
 
@@ -71,16 +72,12 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("")
         document.select("input[name=country]").`val` must be("")
-        document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
       }
 
       "display the previous home address with UK fields populated" in new Fixture {
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -98,13 +95,12 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("AA1 1AA")
-        document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
       }
 
       "display the previous home address with non-UK fields populated" in new Fixture {
 
         val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
+        val additionalAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -121,7 +117,6 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         document.select("input[name=addressLineNonUK3]").`val` must be("")
         document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
-        document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(true)
       }
     }
 
@@ -134,11 +129,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA",
-            "timeAtAddress" -> "04"
+            "postCode" -> "AA1 1AA"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -158,11 +152,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "true",
             "addressLine1" -> "Line *1",
             "addressLine2" -> "Line &2",
-            "postCode" -> "AA1 1AA",
-            "timeAtAddress" -> "04"
+            "postCode" -> "AA1 1AA"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(personName = personName,addressHistory = Some(history))
 
@@ -189,11 +182,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
             "addressLineNonUK2" -> "Line 2",
-            "country" -> "ES",
-            "timeAtAddress" -> "02"
+            "country" -> "ES"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -213,11 +205,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line *1",
             "addressLineNonUK2" -> "Line *2",
-            "country" -> "ES",
-            "timeAtAddress" -> "02"
+            "country" -> "ES"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -260,8 +251,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "true",
             "addressLine1" -> "",
             "addressLine2" -> "",
-            "postCode" -> "",
-            "timeAtAddress" -> ""
+            "postCode" -> ""
           )
 
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
@@ -274,7 +264,6 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
-          document.select("a[href=#timeAtAddress]").html() must include(Messages("error.required.timeAtAddress"))
         }
 
         "the default fields for overseas are not supplied" in new Fixture {
@@ -283,8 +272,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
-            "country" -> "",
-            "timeAtAddress" -> ""
+            "country" -> ""
           )
 
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
@@ -297,7 +285,6 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#country]").html() must include(Messages("error.required.country"))
-          document.select("a[href=#timeAtAddress]").html() must include(Messages("error.required.timeAtAddress"))
         }
       }
 
@@ -309,11 +296,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "01"
+              "postCode" -> "AA1 1AA"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -336,11 +322,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "03"
+              "postCode" -> "AA1 1AA"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -362,11 +347,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "04"
+              "postCode" -> "AA1 1AA"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -391,8 +375,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "01"
+              "postCode" -> "AA1 1AA"
             )
             val responsiblePeople = ResponsiblePeople()
 
@@ -415,8 +398,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "03"
+              "postCode" -> "AA1 1AA"
             )
             val responsiblePeople = ResponsiblePeople()
 
@@ -439,8 +421,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA",
-              "timeAtAddress" -> "04"
+              "postCode" -> "AA1 1AA"
             )
             val responsiblePeople = ResponsiblePeople()
 
@@ -477,8 +458,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           "isUK" -> "true",
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
-          "postCode" -> "AA1 1AA",
-          "timeAtAddress" -> "04"
+          "postCode" -> "AA1 1AA"
         )
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -486,7 +466,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         when(additionalAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
-        val result = additionalAddressController.post(50, true)(requestWithParams)
+        val result = additionalAddressController.post(outOfBounds, true)(requestWithParams)
 
         status(result) must be(NOT_FOUND)
       }

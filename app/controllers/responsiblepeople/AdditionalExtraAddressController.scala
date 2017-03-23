@@ -17,7 +17,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
   def dataCacheConnector: DataCacheConnector
 
-  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {

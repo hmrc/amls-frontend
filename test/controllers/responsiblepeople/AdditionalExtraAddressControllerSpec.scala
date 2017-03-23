@@ -72,16 +72,12 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("input[name=addressLineNonUK4]").`val` must be("")
       document.select("input[name=postcode]").`val` must be("")
       document.select("input[name=country]").`val` must be("")
-      document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
-      document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
-      document.select("input[name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
-      document.select("input[name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
     }
 
     "on get() display the previous home address with UK fields populated" in new Fixture {
 
       val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-      val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
       val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
       val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -99,13 +95,12 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("input[name=addressLine3]").`val` must be("Line 3")
       document.select("input[name=addressLine4]").`val` must be("")
       document.select("input[name=postcode]").`val` must be("AA1 1AA")
-      document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
     }
 
     "on get() display the previous home address with non-UK fields populated" in new Fixture {
 
       val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-      val additionalExtraAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
+      val additionalExtraAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
       val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalExtraAddress))
       val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
@@ -123,7 +118,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("input[name=addressLineNonUK3]").`val` must be("")
       document.select("input[name=addressLineNonUK4]").`val` must be("")
       document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
-      document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(true)
     }
 
     "must pass on post with all the mandatory UK parameters supplied" in new Fixture {
@@ -132,8 +126,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA",
-        "timeAtAddress" -> "01"
+        "postCode" -> "AA1 1AA"
       )
 
       val responsiblePeople = ResponsiblePeople(personName)
@@ -153,8 +146,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "false",
         "addressLineNonUK1" -> "Line 1",
         "addressLineNonUK2" -> "Line 2",
-        "country" -> "ES",
-        "timeAtAddress" -> "02"
+        "country" -> "ES"
       )
 
       val responsiblePeople = ResponsiblePeople()
@@ -174,8 +166,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "false",
         "addressLineNonUK1" -> "Line #1",
         "addressLineNonUK2" -> "Line #2",
-        "country" -> "ES",
-        "timeAtAddress" -> "02"
+        "country" -> "ES"
       )
 
       val responsiblePeople = ResponsiblePeople(personName)
@@ -212,8 +203,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "",
         "addressLine2" -> "",
-        "postCode" -> "",
-        "timeAtAddress" -> ""
+        "postCode" -> ""
       )
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
@@ -223,7 +213,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
       document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
       document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
-      document.select("a[href=#timeAtAddress]").html() must include(Messages("error.required.timeAtAddress"))
     }
 
     "must fail on post if default fields for overseas not supplied" in new Fixture {
@@ -232,8 +221,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "false",
         "addressLineNonUK1" -> "",
         "addressLineNonUK2" -> "",
-        "country" -> "",
-        "timeAtAddress" -> ""
+        "country" -> ""
       )
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
@@ -243,7 +231,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
       document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
       document.select("a[href=#country]").html() must include(Messages("error.required.country"))
-      document.select("a[href=#timeAtAddress]").html() must include(Messages("error.required.timeAtAddress"))
     }
 
 
@@ -253,8 +240,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA",
-        "timeAtAddress" -> "01"
+        "postCode" -> "AA1 1AA"
       )
 
       val responsiblePeople = ResponsiblePeople()
@@ -275,8 +261,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line &1",
         "addressLine2" -> "Line &2",
-        "postCode" -> "AA1 1AA",
-        "timeAtAddress" -> "01"
+        "postCode" -> "AA1 1AA"
       )
 
       val responsiblePeople = ResponsiblePeople()
@@ -302,8 +287,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "isUK" -> "true",
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA",
-        "timeAtAddress" -> "01"
+        "postCode" -> "AA1 1AA"
       )
 
       val responsiblePeople = ResponsiblePeople()
@@ -317,7 +301,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
     }
-
 
   }
 

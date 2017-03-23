@@ -169,7 +169,7 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
-                @timeAtAddress(Some(a.timeAtAddress))
+                @timeAtAddress(a.timeAtAddress)
             }
         }
 
@@ -182,7 +182,7 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
-                @timeAtAddress(Some(a.timeAtAddress))
+                @timeAtAddress(a.timeAtAddress)
             }
         }
 

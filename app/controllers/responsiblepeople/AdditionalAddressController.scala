@@ -3,8 +3,8 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, OneToThreeYears, ThreeYearsPlus, ZeroToFiveMonths}
+import forms.{Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -17,7 +17,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
       Authorised.async {
@@ -45,11 +45,11 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
             case ValidForm(_, data) =>
               doUpdate(index, data).map { _ =>
                 (data.timeAtAddress, edit) match {
-                  case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-                  case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+                  case (Some(ThreeYearsPlus), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+                  case (Some(OneToThreeYears), false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
                   case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
-                  case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
-                  case (OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
+                  case (Some(ThreeYearsPlus), true) => Redirect(routes.DetailedAnswersController.get(index))
+                  case (Some(OneToThreeYears), true) => Redirect(routes.DetailedAnswersController.get(index))
                   case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
                 }
               }
@@ -64,8 +64,8 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     updateDataStrict[ResponsiblePeople](index) { res =>
         res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
-            case (Some(a), ThreeYearsPlus) => a.additionalAddress(data).removeAdditionalExtraAddress
-            case (Some(a), OneToThreeYears) => a.additionalAddress(data).removeAdditionalExtraAddress
+            case (Some(a), Some(ThreeYearsPlus)) => a.additionalAddress(data).removeAdditionalExtraAddress
+            case (Some(a), Some(OneToThreeYears)) => a.additionalAddress(data).removeAdditionalExtraAddress
             case (Some(a), _) => a.additionalAddress(data)
             case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
           })
