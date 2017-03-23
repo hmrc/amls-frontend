@@ -4,13 +4,13 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.renewal.{BusinessTurnover, AMLSTurnover, Renewal}
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.renewal.{AMLSTurnover, BusinessTurnover, CustomersOutsideUK, Renewal}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -81,6 +81,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(models.renewal.InvolvedInOtherYes("test")),
             Some(BusinessTurnover.First),
             Some(AMLSTurnover.First),
+            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             false)))
 
       val result = controller.get()(request)

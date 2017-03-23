@@ -67,6 +67,23 @@
         }
     }
 
+    @model.customersOutsideUK.map { boa =>
+        @checkYourAnswers(
+            question = Messages("renewal.customer.outside.uk.title"),
+            editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
+            ) {
+            @boa.countries.fold {
+            <p>@Messages("lbl.no")</p>
+            } { branches =>
+            <ul class="list list-bullet">
+                @branches.map { country =>
+                <li>@country</li>
+                }
+            </ul>
+            }
+        }
+    }
+
     @anchor(
         attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
         attrRole = true,
