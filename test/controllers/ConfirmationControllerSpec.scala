@@ -83,7 +83,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get())(request)
 
   }
 
@@ -165,8 +165,9 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       val body = contentAsString(result)
+      val submissionReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, defaultPaymentsReturnUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, submissionReturnUrl)))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -472,7 +473,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)(request)
 
   }
 

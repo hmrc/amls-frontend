@@ -56,7 +56,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionReadyForReview => {
       for {
         fees <- getAmendmentFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url))
@@ -67,7 +67,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url))

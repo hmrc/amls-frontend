@@ -2,7 +2,7 @@ package models.payments
 
 import play.api.mvc.{Call, Request}
 
-class ReturnLocation(val url: String, val returnUrl: String)
+case class ReturnLocation(url: String, returnUrl: String)
 
 object ReturnLocation {
 
