@@ -47,7 +47,10 @@ trait TimeAtAddressController extends RepeatingSection with BaseController {
               addressHistory <- rp.addressHistory
               currentAddress <- addressHistory.currentAddress
             } yield {
-              doUpdate(index, data, currentAddress).flatMap { _ =>
+              val currentAddressWithTime = currentAddress.copy(
+                timeAtAddress = Some(data)
+              )
+              doUpdate(index, currentAddressWithTime).flatMap { _  =>
                 for {
                   status <- statusService.getStatus
                 } yield {
@@ -62,12 +65,12 @@ trait TimeAtAddressController extends RepeatingSection with BaseController {
       }
   }
 
-  private def doUpdate(index: Int, data: TimeAtAddress, rp: ResponsiblePersonCurrentAddress)
+  private def doUpdate(index: Int, rp: ResponsiblePersonCurrentAddress)
                       (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
-        (res.addressHistory, data) match {
-          case (Some(_), ThreeYearsPlus | OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
+        (res.addressHistory, rp.timeAtAddress) match {
+          case (Some(_), Some(ThreeYearsPlus) | Some(OneToThreeYears)) => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
           case (Some(a), _) => a.currentAddress(rp)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
         })
