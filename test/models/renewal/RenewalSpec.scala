@@ -18,11 +18,24 @@ class RenewalSpec extends GenericTestHelper {
 
     "be complete" when {
 
-      "involved in other activities was specified" in {
+      "involvedInOther is yes" in {
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          hasChanged = true)
+
+        model.isComplete mustBe true
+
+      }
+
+      "involvedInOther is no" in {
 
         val model = Renewal(
           Some(InvolvedInOtherNo),
-          Some(BusinessTurnover.First),
+          None,
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           hasChanged = true)
@@ -43,8 +56,18 @@ class RenewalSpec extends GenericTestHelper {
 
       }
 
+      "involvedinOther is yes, but there is nothing in businessTurnover" in {
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          None,
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          hasChanged = true)
+
+        model.isComplete mustBe false
+
+      }
     }
-
   }
-
 }

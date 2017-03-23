@@ -13,7 +13,8 @@ case class Renewal
 {
   def isComplete = {
     this match {
-      case Renewal(Some(_), Some(_), Some(_), Some(_), _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _) => true
       case _ => false
     }
   }
