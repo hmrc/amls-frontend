@@ -80,7 +80,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
     rpSeqOption match {
       case Some(rpSeq) => edit match {
         case true => Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+        case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, fromDeclaration))
       }
       case _ => NotFound(notFoundView)
     }
