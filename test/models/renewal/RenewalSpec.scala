@@ -1,5 +1,6 @@
 package models.renewal
 
+import models.Country
 import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
@@ -23,6 +24,7 @@ class RenewalSpec extends GenericTestHelper {
           Some(InvolvedInOtherNo),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           hasChanged = true)
 
         model.isComplete mustBe true
