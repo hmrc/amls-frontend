@@ -36,7 +36,7 @@ heading = header
         @notifications.map { comms =>
             <tr class="@if(!comms.isRead){unread}">
                 <td>@if(!comms.isRead){<span class="circle"></span>}</td>
-                <td><a href="@controllers.routes.NotificationsController.messageDetails(comms._id.id)">@Messages(comms.subject)</a></td>
+                <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id,comms.getContactType)">@Messages(comms.subject)</a></td>
                 <!--<td></td>-->
                 <td>@comms.dateReceived</td>
             </tr>

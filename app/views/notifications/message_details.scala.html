@@ -11,6 +11,6 @@
 title = Messages(msgTitle) + " - " + Messages("summary.status"),
 heading = header
 )  {
-    <p>@msgContent</p>
-    <a href="@controllers.routes.NotificationsController.getMessages().url" class="back-link">@Messages("button.back")</a>
+    <p>@Html(msgContent)</p>
+    <a href="@controllers.routes.NotificationController.getMessages().url" class="back-link">@Messages("button.back")</a>
 }
