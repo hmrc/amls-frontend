@@ -66,11 +66,13 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
         "timeAtAddress" -> "03"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
@@ -125,11 +127,13 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
         "timeAtAddress" -> "02"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
@@ -144,11 +148,13 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
         "timeAtAddress" -> "02"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
       when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 

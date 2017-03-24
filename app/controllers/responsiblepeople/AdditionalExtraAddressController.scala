@@ -36,20 +36,27 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
           getData[ResponsiblePeople](index) map { rp =>
             BadRequest(additional_extra_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
-        case ValidForm(_, data) =>
-          doUpdate(index, data).map { _ =>
-            edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
-            }
+        case ValidForm(_, data) => {
+          getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+            (for {
+              rp <- responsiblePerson
+              addressHistory <- rp.addressHistory
+              additionalExtraAddress <- addressHistory.additionalExtraAddress
+            } yield {
+              val additionalExtraAddressWithTime = data.copy(timeAtAddress = additionalExtraAddress.timeAtAddress)
+              updateAndRedirect(additionalExtraAddressWithTime, index, edit, fromDeclaration)
+            }) getOrElse updateAndRedirect(data, index, edit, fromDeclaration)
           }
+        }
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
     }
   }
 
-  private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
+  private def updateAndRedirect
+  (data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
+  (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
@@ -57,6 +64,11 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
           case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
         }
       )
+    } map { _ =>
+      edit match {
+        case true => Redirect(routes.DetailedAnswersController.get(index))
+        case false => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
+      }
     }
   }
 }
