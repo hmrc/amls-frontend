@@ -9,9 +9,11 @@ import models.businessmatching._
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
+import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationResponse, SubscriptionResponse}
+import models.{AmendVariationResponse, SubscriptionRequest, SubscriptionResponse}
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -318,13 +320,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
       } thenReturn Some(Seq(ResponsiblePeople()))
 
-        val rows = Seq(
+      val rows = Seq(
         BreakdownRow("confirmation.submission", 1, 100, 100)
       ) ++ Seq(
-          BreakdownRow("confirmation.responsiblepeople",1, 250, 500)
+        BreakdownRow("confirmation.responsiblepeople", 1, 250, 500)
       ) ++ Seq(
-          BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
-        )
+        BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
+      )
 
       val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
@@ -361,7 +363,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val result = await(TestSubmissionService.getAmendment)
 
-      whenReady(TestSubmissionService.getAmendment) { _ foreach {
+      whenReady(TestSubmissionService.getAmendment) {
+        _ foreach {
           case (_, _, rows, _) =>
             val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
             unpaidRow.perItm.value mustBe 0
@@ -394,10 +397,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val result = await(TestSubmissionService.getAmendment)
 
-      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
-        case (_, _, rows, _) =>
-          rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
-      }
+      whenReady(TestSubmissionService.getAmendment) { result =>
+        result foreach {
+          case (_, _, rows, _) =>
+            rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
+        }
       }
 
     }
@@ -631,6 +635,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(Seq(ResponsiblePeople(), ResponsiblePeople()))
 
         val result = await(TestSubmissionService.getSubscription)
+
         case class Test(str: String)
 
         result match {
@@ -1104,7 +1109,34 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
+    }
+
+    "submit a renewal" in new Fixture {
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        TestSubmissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(amendmentResponse)
+
+      val renewal = Renewal()
+
+      val result = await(TestSubmissionService.renewal(renewal))
+
+      val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
+      verify(TestSubmissionService.amlsConnector).variation(captor.capture(), any())(any(), any(), any(), any(), any())
 
     }
+
   }
 }
