@@ -21,8 +21,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @errorGroup(
-                field = f("soleProprietorOfAnotherBusiness")
+            @rpErrorGroup(
+                field = f("soleProprietorOfAnotherBusiness"),
+                personName = personName
                 ) {
                     @radio(
                         f = f("soleProprietorOfAnotherBusiness"),
