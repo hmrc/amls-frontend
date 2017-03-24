@@ -24,61 +24,41 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, config
 
     if (config.getConfBool("feature-toggle.payments-url-lookup", defBool = false)) {
 
-      authConnector.getCurrentAuthority flatMap { auth =>
-        authConnector.getIds(auth) flatMap { ids =>
+      val url = s"$baseUrl/pay-online/other-taxes/custom"
+      val mdtpCookie = httpRequest.cookies("mdtp")
+      val encryptedMdtp = ApplicationCrypto.SessionCookieCrypto.encrypt(PlainText(mdtpCookie.value)).value
 
-          val url = s"$baseUrl/pay-online/other-taxes/custom"
+      val headers = Seq(
+        "Custom-Payment" -> customPaymentId,
+        "Csrf-Token" -> "nocheck",
+        "Cookie" -> s"mdtp=$encryptedMdtp"
+      )
 
-          val mdtpCookie = httpRequest.cookies("mdtp")
-          val encryptedMdtp = ApplicationCrypto.SessionCookieCrypto.encrypt(PlainText(mdtpCookie.value)).value
+      http.POST(url, redirectRequest, headers) map { r =>
+        r.status match {
+          case Status.CREATED =>
 
-          val headers = Seq(
-            "Custom-Payment" -> customPaymentId,
-            "Csrf-Token" -> "nocheck",
-            "Cookie" -> s"mdtp=$encryptedMdtp"
-          )
+            r.header(LOCATION) match {
+              case Some(location) =>
 
-          import utils.Strings._
+                val cookies = r.allHeaders("Set-Cookie")
+                  .map(c => Cookies.fromSetCookieHeader(Some(c)))
+                  .flatMap(_.filter(_.name == "mdtpp"))
 
-          val c = httpRequest.cookies.get("mdtp").get
-
-//          println(mdtpCookie.value in Console.GREEN)
-//          println(ApplicationCrypto.SessionCookieCrypto.encrypt(PlainText(c.value)).value in Console.YELLOW)
-//          println(encryptedMdtp in Console.CYAN)
-//          println(headers.toString in Console.RED)
-//          println(hc.toString in Console.BLUE)
-
-          val r = redirectRequest.copy(internalId = Some(ids.internalId))
-
-          println(r.toString in Console.YELLOW)
-
-          http.POST(url, r, headers) map { r =>
-            r.status match {
-              case Status.CREATED =>
-
-                r.header(LOCATION) match {
-                  case Some(location) =>
-
-                    val cookies = r.allHeaders("Set-Cookie")
-                      .map(c => Cookies.fromSetCookieHeader(Some(c)))
-                      .flatMap(_.filter(_.name == "mdtpp"))
-
-                    Some(PaymentServiceRedirect(location, cookies))
-                  case _ =>
-                    Logger.warn("[PaymentsConnector] No redirect url was returned")
-                    None
-                }
-
-              case s =>
-                Logger.warn(s"[PaymentsConnector] A $s status was returned when trying to retrieve the payment url")
+                Some(PaymentServiceRedirect(location, cookies))
+              case _ =>
+                Logger.warn("[PaymentsConnector] No redirect url was returned")
                 None
             }
-          } recover {
-            case ex =>
-              Logger.warn(s"[PaymentsConnector] An exception was thrown while trying to retrieve the payments url: ${ex.getMessage}")
-              None
-          }
+
+          case s =>
+            Logger.warn(s"[PaymentsConnector] A $s status was returned when trying to retrieve the payment url")
+            None
         }
+      } recover {
+        case ex =>
+          Logger.warn(s"[PaymentsConnector] An exception was thrown while trying to retrieve the payments url: ${ex.getMessage}")
+          None
       }
     } else {
       Future.successful(None)

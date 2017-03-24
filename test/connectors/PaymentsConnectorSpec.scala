@@ -1,6 +1,6 @@
 package connectors
 
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import org.apache.http.client.HttpResponseException
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -41,6 +41,8 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     implicit val request = FakeRequest().withCookies(mdtpCookie)
 
+    val returnLocation = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation("reference").url)
+
     def createResponse(f: () => Future[HttpResponse]) = {
       when {
         http.POST[PaymentRedirectRequest, HttpResponse](any(), any(), any())(any(), any(), any())
@@ -56,7 +58,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     } thenReturn Future.successful(Ids("an internal id"))
   }
 
-  "The payments connector" must {
+  "The payments connector POST request" must {
 
     "Return the payments redirect url" when {
 
@@ -70,7 +72,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             "Set-Cookie" -> Seq(Cookies.encodeSetCookieHeader(cookies)))))
         }
 
-        val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+        val model = PaymentRedirectRequest("reference_number", 150, returnLocation)
 
         val result = await(connector.requestPaymentRedirectUrl(model))
 
@@ -86,7 +88,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         Future.failed(new HttpResponseException(400, "The request failed"))
       }
 
-      val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+      val model = PaymentRedirectRequest("reference_number", 150, returnLocation)
 
       val result = await(connector.requestPaymentRedirectUrl(model))
 
@@ -97,7 +99,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
       override val builder = defaultBuilder.configure("Test.microservice.services.feature-toggle.payments-url-lookup" -> false)
 
-      val model = PaymentRedirectRequest("reference_number", 150, "http://google.co.uk")
+      val model = PaymentRedirectRequest("reference_number", 150, returnLocation)
 
       val result = await(connector.requestPaymentRedirectUrl(model))
 
