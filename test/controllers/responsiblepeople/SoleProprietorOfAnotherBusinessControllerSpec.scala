@@ -104,7 +104,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
           verify(controller.dataCacheConnector).save(any(),
             meq(Seq(ResponsiblePeople(hasChanged = false,
-              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = None))))(any(), any(), any())
+              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = Some(VATRegisteredNo)))))(any(), any(), any())
 
         }
 

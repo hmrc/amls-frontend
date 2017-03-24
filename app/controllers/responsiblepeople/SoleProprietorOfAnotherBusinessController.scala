@@ -4,10 +4,10 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.responsiblepeople.{SoleProprietorOfAnotherBusiness, ResponsiblePeople}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.{ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegistered}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, ControllerHelper}
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.sole_proprietor
 
 import scala.concurrent.Future
@@ -40,6 +40,13 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
     }
   }
 
+  def getVatRegData(rp: ResponsiblePeople, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
+     data.soleProprietorOfAnotherBusiness match {
+      case true => rp.vatRegistered
+      case false => None
+    }
+  }
+
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     import jto.validation.forms.Rules._
     implicit authContext =>
@@ -51,14 +58,12 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = None)
+                  rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
                 }
-              } yield edit match {
-                case true => data.soleProprietorOfAnotherBusiness match {
-                  case true => Redirect(routes.VATRegisteredController.get(index, edit))
-                  case false => Redirect(routes.DetailedAnswersController.get(index))
-                }
-                case false => redirectDependingOnFormResponse(data, index, edit, fromDeclaration)
+              } yield (edit, data.soleProprietorOfAnotherBusiness) match {
+                case (_, true) => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+                case (true, false) => Redirect(routes.DetailedAnswersController.get(index))
+                case (false, false) => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -66,12 +71,4 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
           }
         }
   }
-
-  private def redirectDependingOnFormResponse(data: SoleProprietorOfAnotherBusiness, index: Int, edit: Boolean, fromDeclaration: Boolean) = {
-    data.soleProprietorOfAnotherBusiness match {
-      case true => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
-      case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
-    }
-  }
-
 }
