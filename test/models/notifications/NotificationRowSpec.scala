@@ -132,6 +132,23 @@ class NotificationRowSpec extends PlaySpec {
       model.getContactType mustBe(ContactType.RegistrationVariationApproval)
     }
 
+    "return correct ContactType when DeRegistrationEffectiveDateChange" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.DeRegistered),None
+          )),
+        None,
+        None,
+        true,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      model.getContactType mustBe(ContactType.DeRegistrationEffectiveDateChange)
+    }
+
     "throw an error when ContactType not determined" in {
       val model = NotificationRow(
         Some(

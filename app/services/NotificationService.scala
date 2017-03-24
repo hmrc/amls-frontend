@@ -20,12 +20,38 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case notifications => notifications
     }
 
-  def getMessageDetails(amlsRegNo: String, id: String, contactType:ContactType)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  def getMessageDetails(amlsRegNo: String, id: String, contactType:ContactType)
+                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     contactType match {
-      case ContactType.ApplicationAutorejectionForFailureToPay | ContactType.RegistrationVariationApproval => Future.successful(
-        Some(NotificationDetails(Some(contactType),None,Some(messagesApi("notification.static.text.application-auto-rejection-for-failure-to-pay",
-          controllers.routes.StatusController.get())),false)))
+      case ContactType.ApplicationAutorejectionForFailureToPay => Future.successful(
+        Some(NotificationDetails(
+          Some(contactType),
+          None,
+          Some(messagesApi("notification.static.text.application-auto-rejection-for-failure-to-pay",
+          controllers.routes.StatusController.get())),
+          false)
+        )
+      )
+      case ContactType.RegistrationVariationApproval => Future.successful(
+        Some(NotificationDetails(
+          Some(contactType),
+          None,
+          Some(messagesApi("notification.static.text.registration-variation-approval",
+            controllers.routes.StatusController.get())),
+          false)
+        )
+      )
+      case ContactType.DeRegistrationEffectiveDateChange => Future.successful(
+        Some(NotificationDetails(
+          Some(contactType),
+          None,
+          Some(messagesApi("notification.static.text.de-registration-effective-date-change",
+            controllers.routes.StatusController.get())),
+          false)
+        )
+      )
+
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
     }
 

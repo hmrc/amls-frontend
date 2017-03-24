@@ -28,6 +28,7 @@ object ContactType {
 
   case object RegistrationVariationApproval extends ContactType
   case object ApplicationAutorejectionForFailureToPay extends ContactType
+  case object DeRegistrationEffectiveDateChange extends ContactType
 
   case object Others extends ContactType
 

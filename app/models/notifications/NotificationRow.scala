@@ -1,7 +1,8 @@
 package models.notifications
 
-import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, RegistrationVariationApproval}
+import models.notifications.ContactType.{DeRegistrationEffectiveDateChange, ApplicationAutorejectionForFailureToPay, RegistrationVariationApproval}
 import models.notifications.RejectedReason.FailedToPayCharges
+import models.notifications.StatusType.DeRegistered
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.i18n.Messages
@@ -31,9 +32,10 @@ case class NotificationRow(
 
 
     contactType.getOrElse(
-      (statusReason, variation) match {
-        case (Some(r), _) => ApplicationAutorejectionForFailureToPay
-        case (_, true) => RegistrationVariationApproval
+      (status, statusReason, variation) match {
+        case (Some(Status(Some(DeRegistered),_)),_,_) => DeRegistrationEffectiveDateChange
+        case (_, Some(r),_) => ApplicationAutorejectionForFailureToPay
+        case (_,_, true) => RegistrationVariationApproval
         case _ => throw new RuntimeException("No matching ContactType found for id " + _id)
       }
 
