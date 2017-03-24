@@ -27,9 +27,9 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), true, edit, index, fromDeclaration, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_address(Form2(DefaultAddressHistory), true, edit, index, fromDeclaration, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
@@ -38,7 +38,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     implicit authContext => implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(time_at_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(time_at_address(f, true, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) => {
           getData[ResponsiblePeople](index) flatMap { responsiblePerson =>

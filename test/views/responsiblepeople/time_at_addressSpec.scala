@@ -22,7 +22,7 @@ class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_address(form2, true, false, 0, false, "FirstName LastName")
 
       doc.title() must startWith(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName") + " - " + Messages("summary.responsiblepeople"))
 
@@ -33,7 +33,7 @@ class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_address(form2, true, false, 0, false, "FirstName LastName")
 
       heading.html() must be(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName"))
     }
@@ -50,7 +50,7 @@ class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
       )
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_address(form2, true, false, 0, false, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
 

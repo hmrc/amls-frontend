@@ -2,11 +2,19 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], currentAddress: Boolean, edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.timeataddress.address_history", personName), "summary.responsiblepeople")
+}
+
+@route = @{
+    if(currentAddress){
+        controllers.responsiblepeople.routes.TimeAtCurrentAddressController.post(index,edit,fromDeclaration)
+    } else {
+        controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.post(index,edit,fromDeclaration)
+    }
 }
 
 @main(
@@ -14,7 +22,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.TimeAtCurrentAddressController.post(index,edit,fromDeclaration)) {
+    @form(f, route) {
 
         @fieldset(
             f = f("timeAtAddress-fieldset"),
