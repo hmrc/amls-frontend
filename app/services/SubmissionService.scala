@@ -13,6 +13,7 @@ import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -22,6 +23,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.StatusConstants
+import models.renewal.Conversions._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -145,7 +147,17 @@ trait SubmissionService extends DataCacheService {
     } yield amendment
   }
 
-  def renewal: Future[SubmissionResponse] = ???
+  def renewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+    for {
+      cache <- getCache
+      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      variation <- amlsConnector.variation(
+        createSubscriptionRequest(cache).asRenewal(renewal),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
+      )
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, variation)
+    } yield variation
+  }
 
   def getAmendment
   (implicit

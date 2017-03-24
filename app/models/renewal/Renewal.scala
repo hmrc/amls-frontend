@@ -29,7 +29,7 @@ case class Renewal
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model))
 
   def customersOutsideUK(model: CustomersOutsideUK): Renewal =
-    this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || this.customersOutsideUK != Some(model))
+    this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model))
 
 }
 

@@ -119,7 +119,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       "call the renewal method on the service" in new Fixture {
 
         when {
-          controller.subscriptionService.renewal
+          controller.subscriptionService.renewal(any())(any(), any(), any())
         } thenReturn Future.successful(mock[SubmissionResponse])
 
         when {
@@ -156,7 +156,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
         val result = await(controller.post()(request))
 
         verify(controller.subscriptionService).variation(any(), any(), any())
-        verify(controller.subscriptionService, never()).renewal
+        verify(controller.subscriptionService, never()).renewal(any())(any(), any(), any())
       }
     }
   }
