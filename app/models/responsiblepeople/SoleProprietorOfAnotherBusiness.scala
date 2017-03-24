@@ -1,9 +1,7 @@
 package models.responsiblepeople
 
-import cats.data.Validated.Valid
-import jto.validation.{ValidationError, From, Rule, Write}
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
-import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 
 case class SoleProprietorOfAnotherBusiness (soleProprietorOfAnotherBusiness: Boolean)
@@ -11,19 +9,13 @@ case class SoleProprietorOfAnotherBusiness (soleProprietorOfAnotherBusiness: Boo
 object SoleProprietorOfAnotherBusiness {
 
   implicit val format =  Json.format[SoleProprietorOfAnotherBusiness]
-  import utils.MappingUtils.Implicits._
 
-  private val soleProprietorWithNameMapping = Rule.fromMapping[(String, Option[Boolean]), SoleProprietorOfAnotherBusiness] {
-    case (_, Some(response)) => Valid(SoleProprietorOfAnotherBusiness(response))
-    case (name, None) => Invalid(Seq(ValidationError("error.required.rp.sole_proprietor", name)))
-  }
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, SoleProprietorOfAnotherBusiness] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      ((__ \ "personName").read[String] ~
-      (__ \ "soleProprietorOfAnotherBusiness").read[Option[Boolean]]).tupled
-        .andThen(soleProprietorWithNameMapping).repath(_ => Path \ "soleProprietorOfAnotherBusiness")
+      (__ \ "soleProprietorOfAnotherBusiness").read[Boolean].withMessage("error.required.rp.sole_proprietor") map SoleProprietorOfAnotherBusiness.apply
     }
 
   implicit val formWrites = Write[SoleProprietorOfAnotherBusiness, UrlFormEncoded] {

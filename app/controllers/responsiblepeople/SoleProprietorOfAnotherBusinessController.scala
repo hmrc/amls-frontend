@@ -21,27 +21,17 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
       implicit authContext =>
         implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _,_, Some(soleProprietorOfAnotherBusiness)))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
             => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, fromDeclaration, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _,_, _))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
             => Ok(sole_proprietor(EmptyForm, edit, index, fromDeclaration, personName.titleName))
             case _
             => NotFound(notFoundView)
           }
     }
 
-  def getExtradInfo(rp: Option[ResponsiblePeople]) = {
-    rp match {
-      case Some(person) => person.personName match {
-        case Some(name) => Map("personName" -> Seq(name.fullName))
-        case _ => Map.empty[String, Seq[String]]
-      }
-      case None => Map.empty[String, Seq[String]]
-    }
-  }
-
   def getVatRegData(rp: ResponsiblePeople, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
-     data.soleProprietorOfAnotherBusiness match {
+    data.soleProprietorOfAnotherBusiness match {
       case true => rp.vatRegistered
       case false => None
     }
@@ -52,22 +42,23 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
     implicit authContext =>
       implicit request =>
 
-        getData[ResponsiblePeople](index) flatMap { rp =>
-          Form2[SoleProprietorOfAnotherBusiness](request.body.asFormUrlEncoded.get ++ getExtradInfo(rp)) match {
-            case f: InvalidForm => Future.successful(BadRequest(sole_proprietor(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp))))
-            case ValidForm(_, data) => {
-              for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
-                }
-              } yield (edit, data.soleProprietorOfAnotherBusiness) match {
-                case (_, true) => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
-                case (true, false) => Redirect(routes.DetailedAnswersController.get(index))
-                case (false, false) => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
-              }
-            }.recoverWith {
-              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        Form2[SoleProprietorOfAnotherBusiness](request.body) match {
+          case f: InvalidForm =>
+            getData[ResponsiblePeople](index) flatMap { rp =>
+              Future.successful(BadRequest(sole_proprietor(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp))))
             }
+          case ValidForm(_, data) => {
+            for {
+              result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
+              }
+            } yield (edit, data.soleProprietorOfAnotherBusiness) match {
+              case (_, true) => Redirect(routes.VATRegisteredController.get(index, edit, fromDeclaration))
+              case (true, false) => Redirect(routes.DetailedAnswersController.get(index))
+              case (false, false) => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
+            }
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
   }

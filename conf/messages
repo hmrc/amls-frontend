@@ -94,7 +94,7 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
 error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
-error.required.atb.registered.for.vat = Select yes if {0} is registered for VAT
+error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
@@ -215,6 +215,7 @@ error.required.rp.wherepersonlives.howlonglived = Select one option to show how 
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
+error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 
 
 ############################### Trust and company service providers ###############################

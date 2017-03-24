@@ -77,7 +77,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title must be(pageTitle)
 
-        contentAsString(result) must include(Messages("error.required.atb.registered.for.vat", "firstname lastname"))
+        contentAsString(result) must include(Messages("error.required.rp.registered.for.vat", "firstname lastname"))
       }
 
       "when given valid data and edit = false redirect to the RegisteredForSelfAssessmentController" in new Fixture {
@@ -116,7 +116,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post(1, true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
       }
     }
   }
