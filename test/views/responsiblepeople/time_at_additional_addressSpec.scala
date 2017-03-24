@@ -9,20 +9,20 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
+class time_at_additional_addressSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "time_at_address view" must {
+  "time_at_additional_address view" must {
 
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_additional_address(form2, false, 0, false, "FirstName LastName")
 
       doc.title() must startWith(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName") + " - " + Messages("summary.responsiblepeople"))
 
@@ -33,7 +33,7 @@ class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_additional_address(form2, false, 0, false, "FirstName LastName")
 
       heading.html() must be(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName"))
     }
@@ -50,13 +50,12 @@ class time_at_addressSpec extends GenericTestHelper with MustMatchers  {
       )
 
       def view =
-        views.html.responsiblepeople.time_at_address(form2, false, 0, false, "FirstName LastName")
+        views.html.responsiblepeople.time_at_additional_address(form2, false, 0, false, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
 
       doc.getElementById(timeAtAddress).html() must include(messageKey1)
     }
   }
-
 
 }

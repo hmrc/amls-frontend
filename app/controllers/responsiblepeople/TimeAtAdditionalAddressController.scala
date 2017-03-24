@@ -9,7 +9,7 @@ import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_address
+import views.html.responsiblepeople.time_at_additional_address
 
 import scala.concurrent.Future
 
@@ -23,9 +23,9 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), _, _, Some(ResponsiblePersonAddressHistory(_, Some(ResponsiblePersonAddress(_, Some(additionalAddress))), _)), _, _, _, _, _, _, _, _, _, _)) =>
-            Ok(time_at_address(Form2[TimeAtAddress](additionalAddress), false, edit, index, fromDeclaration, personName.titleName))
+            Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-            Ok(time_at_address(Form2(DefaultAddressHistory), false, edit, index, fromDeclaration, personName.titleName))
+            Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }
   }
@@ -35,7 +35,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
         (Form2[TimeAtAddress](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map { rp =>
-              BadRequest(time_at_address(f, false, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              BadRequest(time_at_additional_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
