@@ -177,10 +177,10 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-      val document: Document  = Jsoup.parse(contentAsString(result))
+      val document: Document = Jsoup.parse(contentAsString(result))
       document.title must be(pageTitle)
       val errorCount = 2
-      val elementsWithError : Elements = document.getElementsByClass("error-notification")
+      val elementsWithError: Elements = document.getElementsByClass("error-notification")
       elementsWithError.size() must be(errorCount)
       for (ele: Element <- elementsWithError) {
         ele.html() must include(Messages("err.text.validation"))
@@ -272,34 +272,36 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-      val document: Document  = Jsoup.parse(contentAsString(result))
+      val document: Document = Jsoup.parse(contentAsString(result))
       val errorCount = 2
-      val elementsWithError : Elements = document.getElementsByClass("error-notification")
+      val elementsWithError: Elements = document.getElementsByClass("error-notification")
       elementsWithError.size() must be(errorCount)
       for (ele: Element <- elementsWithError) {
         ele.html() must include(Messages("err.text.validation"))
       }
     }
 
-    "must go to the correct location when edit mode is off" in new Fixture {
+    "must go to timeAtAdditionalExtraAddress" when {
+      "edit mode is off" in new Fixture {
 
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "true",
-        "addressLine1" -> "Line 1",
-        "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA"
-      )
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "postCode" -> "AA1 1AA"
+        )
 
-      val responsiblePeople = ResponsiblePeople()
+        val responsiblePeople = ResponsiblePeople()
 
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val mockCacheMap = mock[CacheMap]
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+      }
     }
 
   }

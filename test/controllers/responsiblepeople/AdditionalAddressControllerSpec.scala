@@ -314,35 +314,34 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
 
       }
 
-      "go to TimeAtAddress" when {
-        "edit is true" must {
-          "redirect to the correct location" in new Fixture {
+      "go to DetailedAnswers" when {
+        "edit is true"  in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "AA1 1AA"
-            )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-            val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
-            val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-            when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-            val result = additionalAddressController.post(RecordId, true)(requestWithParams)
+          val result = additionalAddressController.post(RecordId, true)(requestWithParams)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          }
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
         }
       }
 
-      "go to details page" when {
+
+      "go to TimeAtAdditionalAddress page" when {
         "edit is false" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(

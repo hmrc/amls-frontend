@@ -289,6 +289,9 @@ POST        /responsible-people/nominatedofficer/:index                 controll
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
+GET         /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
