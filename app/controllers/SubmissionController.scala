@@ -3,14 +3,15 @@ package controllers
 import config.AMLSAuthConnector
 import models.SubmissionResponse
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
-import services.{StatusService, SubmissionService}
+import play.api.Play
+import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 trait SubmissionController extends BaseController {
 
   private[controllers] def subscriptionService: SubmissionService
-
   private[controllers] def statusService: StatusService
+  private[controllers] def renewalService: RenewalService
 
 
   def post() = Authorised.async {
@@ -18,7 +19,10 @@ trait SubmissionController extends BaseController {
       statusService.getStatus.flatMap[SubmissionResponse] {
         case SubmissionReadyForReview => subscriptionService.update
         case SubmissionDecisionApproved => subscriptionService.variation
-        case ReadyForRenewal(_) => subscriptionService.renewal
+        case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
+          case Some(_) => subscriptionService.renewal
+          case _ => subscriptionService.variation
+        }
         case _ => subscriptionService.subscribe
       }
     }.map {
@@ -30,7 +34,7 @@ trait SubmissionController extends BaseController {
 object SubmissionController extends SubmissionController {
   // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
-
+  override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val subscriptionService: SubmissionService = SubmissionService
   override private[controllers] val statusService: StatusService = StatusService
 }
