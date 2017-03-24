@@ -46,8 +46,15 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
               BadRequest(current_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            doUpdate(index, data) map { _ =>
-              Redirect(routes.TimeAtCurrentAddressController.get(index,edit,fromDeclaration))
+            getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+              (for {
+                rp <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                currentAddress <- addressHistory.currentAddress
+              } yield {
+                val currentAddressWithTime = data.copy(timeAtAddress = currentAddress.timeAtAddress)
+                updateAndRedirect(currentAddressWithTime, index, edit, fromDeclaration)
+              }) getOrElse updateAndRedirect(data, index, edit, fromDeclaration)
             }
           }
         }).recoverWith {
@@ -55,8 +62,8 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
     }
 
-  private def doUpdate
-  (index: Int, data: ResponsiblePersonCurrentAddress)
+  private def updateAndRedirect
+  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
@@ -64,6 +71,8 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           case Some(a) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
+    } map { _ =>
+      Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
     }
   }
 }
