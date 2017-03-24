@@ -41,7 +41,7 @@ error.invalid.vat.number = Enter a VAT registration number. It must be 9 charact
 error.required.name.of.business = Enter the name of the business
 error.invalid.name.of.business = You can’t enter more than 120 characters for the name of the business
 
-error.required.nino = Enter a {} valid National Insurance number
+error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
 error.required.uk.passport = Enter a valid 9-digit passport number
