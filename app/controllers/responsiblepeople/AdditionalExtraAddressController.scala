@@ -4,7 +4,6 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.Empty
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePeople, ResponsiblePersonAddress, ResponsiblePersonAddressHistory}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
