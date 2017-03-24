@@ -37,11 +37,17 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
             BadRequest(time_at_additional_extra_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) =>
-          doUpdate(index, data, DefaultAddressHistory).map { _ =>
-            edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-            }
+          getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+            (for {
+              rp <- responsiblePerson
+              addressHistory <- rp.addressHistory
+              additionalExtraAddress <- addressHistory.additionalExtraAddress
+            } yield {
+              val additionalExtraAddressWithTime = additionalExtraAddress.copy(
+                timeAtAddress = Some(data)
+              )
+              updateAndRedirect(additionalExtraAddressWithTime, index, edit, fromDeclaration)
+            }) getOrElse Future.successful(NotFound(notFoundView))
           }
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -49,14 +55,21 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
     }
   }
 
-  private def doUpdate(index: Int, data: TimeAtAddress, rp: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
+  private def updateAndRedirect
+  (data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
+  (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
-          case Some(a) => a.additionalExtraAddress(rp)
-          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(rp))
+          case Some(a) => a.additionalExtraAddress(data)
+          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
         }
       )
+    } map { _ =>
+      edit match {
+        case true => Redirect(routes.DetailedAnswersController.get(index))
+        case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+      }
     }
   }
 }
