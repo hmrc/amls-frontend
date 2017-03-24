@@ -211,7 +211,6 @@ error.required.rp.otherNames = Enter the responsible person’s alternative name
 error.invalid.length.otherNames = You can’t enter more than 140 characters for the alternative name.
 error.required.timeAtAddress = Select one option to show how long this person lived at this address
 error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
-error.required.rp.wherepersonlives.howlonglived = Select one option to show how long this person lived at this address
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 
