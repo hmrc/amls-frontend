@@ -67,7 +67,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
   }
 }
 
-object TimeAtAdditionalAddressController extends AdditionalAddressController {
+object TimeAtAdditionalAddressController extends TimeAtAdditionalAddressController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
