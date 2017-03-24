@@ -1,7 +1,8 @@
 package controllers
 
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.{AmendVariationResponse, SubscriptionResponse}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.{AmendVariationResponse, SubmissionResponse, SubscriptionResponse}
+import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -107,6 +108,25 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+      }
+    }
+
+    "Submission is in renewal status" must {
+      "call the renewal method on the service" in new Fixture {
+
+        when {
+          controller.subscriptionService.renewal
+        } thenReturn Future.successful(mock[SubmissionResponse])
+
+        when {
+          controller.statusService.getStatus(any(), any(), any())
+        } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
+
       }
     }
   }

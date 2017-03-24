@@ -1,14 +1,10 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.AmlsConnector
 import models.SubmissionResponse
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
-import play.api.libs.json.Json
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
 
 trait SubmissionController extends BaseController {
 
@@ -22,6 +18,7 @@ trait SubmissionController extends BaseController {
       statusService.getStatus.flatMap[SubmissionResponse] {
         case SubmissionReadyForReview => subscriptionService.update
         case SubmissionDecisionApproved => subscriptionService.variation
+        case ReadyForRenewal(_) => subscriptionService.renewal
         case _ => subscriptionService.subscribe
       }
     }.map {
