@@ -145,6 +145,8 @@ trait SubmissionService extends DataCacheService {
     } yield amendment
   }
 
+  def renewal: Future[SubmissionResponse] = ???
+
   def getAmendment
   (implicit
    ec: ExecutionContext,
