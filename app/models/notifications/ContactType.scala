@@ -95,6 +95,7 @@ object ContactType {
         case "ReminderToPayForManualCharges" => ContactType.ReminderToPayForManualCharges
         case "RegistrationVariationApproval" => ContactType.RegistrationVariationApproval
         case "ApplicationAutorejectionForFailureToPay" => ContactType.ApplicationAutorejectionForFailureToPay
+        case "DeRegistrationEffectiveDateChange" => ContactType.DeRegistrationEffectiveDateChange
         case _ => throw new RuntimeException("No correct contact type")
       }
     }

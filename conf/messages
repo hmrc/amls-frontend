@@ -1413,6 +1413,7 @@ notifications.subject.Others = Generic communication
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has been rejected
+notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
