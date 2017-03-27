@@ -10,16 +10,20 @@ object Conversions {
     def fromRenewal(renewal: Renewal): SubscriptionRequest = {
       val newSection = request.businessActivitiesSection match {
         case Some(ba) => Some(ba.copy(
-          expectedAMLSTurnover = Functor[Option].lift(AMLSTurnover.convert)(renewal.turnover),
-          expectedBusinessTurnover = Functor[Option].lift(BusinessTurnover.convert)(renewal.businessTurnover),
-          involvedInOther = Functor[Option].lift(InvolvedInOther.convert)(renewal.involvedInOtherActivities),
-          customersOutsideUK = Functor[Option].lift(CustomersOutsideUK.convert)(renewal.customersOutsideUK)
+          expectedAMLSTurnover = renewal.turnover mappedBy AMLSTurnover.convert,
+          expectedBusinessTurnover = renewal.businessTurnover mappedBy BusinessTurnover.convert,
+          involvedInOther = renewal.involvedInOtherActivities mappedBy InvolvedInOther.convert,
+          customersOutsideUK = renewal.customersOutsideUK mappedBy CustomersOutsideUK.convert
         ))
       }
 
       request.copy(businessActivitiesSection = newSection)
     }
 
+  }
+
+  implicit class ConversionSyntax[A](target: Option[A])(implicit fnc: Functor[Option]) {
+    def mappedBy[B](fn: A => B) = fnc.lift(fn)(target)
   }
 
 }
