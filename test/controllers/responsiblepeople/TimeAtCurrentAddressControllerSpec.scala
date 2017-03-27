@@ -65,6 +65,22 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
       }
 
+      "get is called with time at address" in new Fixture {
+
+        val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+        val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
+
+        when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        val result = timeAtAddressController.get(RecordId)(request)
+        status(result) must be(OK)
+      }
+
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
 
         val responsiblePeople = ResponsiblePeople()
