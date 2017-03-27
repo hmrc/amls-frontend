@@ -2,6 +2,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models._
+import models.renewal.RenewalResponse
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
@@ -123,6 +124,27 @@ trait AmlsConnector {
         response
     }
 
+
+
+  }
+
+  def renewal(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String)
+             (implicit headerCarrier: HeaderCarrier,
+             ec: ExecutionContext,
+             authContext: AuthContext
+             ): Future[RenewalResponse] = {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
+    val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewal] $msg")
+
+    log(s"Request body: ${Json.toJson(subscriptionRequest)}")
+
+    httpPost.POST[SubscriptionRequest, RenewalResponse](postUrl, subscriptionRequest) map { response =>
+      log(s"Response body: ${Json.toJson(response)}")
+      response
+    }
   }
 }
 
