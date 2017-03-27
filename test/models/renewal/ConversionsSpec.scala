@@ -23,7 +23,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val turnover: AMLSTurnover = First
       val renewal = Renewal(turnover = Some(turnover))
 
-      val converted = subscriptionRequest.asRenewal(renewal)
+      val converted = subscriptionRequest.fromRenewal(renewal)
 
       converted.businessActivitiesSection.get.expectedAMLSTurnover mustBe Some(models.businessactivities.ExpectedAMLSTurnover.First)
 
