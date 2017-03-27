@@ -68,9 +68,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
           case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
         })
     } map { _ =>
-      edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index))
-        case false => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, fromDeclaration))
+      data.timeAtAddress match {
+        case Some(a) if edit =>  Redirect(routes.DetailedAnswersController.get(index))
+        case _ => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, fromDeclaration))
       }
     }
   }

@@ -65,9 +65,9 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
         }
       )
     } map { _ =>
-      edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index))
-        case false => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
+      data.timeAtAddress match {
+        case Some(a) if edit => Redirect(routes.DetailedAnswersController.get(index))
+        case _ => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
       }
     }
   }

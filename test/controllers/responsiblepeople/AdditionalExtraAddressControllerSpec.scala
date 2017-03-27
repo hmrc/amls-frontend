@@ -243,7 +243,10 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         "postCode" -> "AA1 1AA"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -301,6 +304,26 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+      }
+
+      "edit mode is on and time at address does not exist" in new Fixture {
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "postCode" -> "AA1 1AA"
+        )
+
+        val responsiblePeople = ResponsiblePeople()
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val mockCacheMap = mock[CacheMap]
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
       }
     }
 

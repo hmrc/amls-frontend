@@ -362,6 +362,30 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtAdditionalAddressController.get(RecordId).url))
         }
+
+        "edit is true and time at address does not exist" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, None)
+          val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = additionalAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.TimeAtAdditionalAddressController.get(RecordId, true).url))
+        }
+
       }
     }
 
