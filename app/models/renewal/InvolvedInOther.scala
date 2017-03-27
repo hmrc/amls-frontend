@@ -56,5 +56,10 @@ object InvolvedInOther {
     )
     case involvedInOtherNo => Json.obj("involvedInOther" -> false)
   }
+
+  implicit def convert(model: InvolvedInOther): models.businessactivities.InvolvedInOther = model match {
+    case InvolvedInOtherYes(details) => models.businessactivities.InvolvedInOtherYes(details)
+    case InvolvedInOtherNo => models.businessactivities.InvolvedInOtherNo
+  }
   
 }
