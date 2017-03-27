@@ -1,7 +1,7 @@
 package models.notifications
 
-import jto.validation.ValidationError
 import play.api.libs.json._
+import play.api.mvc.PathBindable
 
 sealed trait ContactType
 
@@ -25,6 +25,10 @@ object ContactType {
   case object MindedToRevoke extends ContactType
   case object NoLongerMindedToReject extends ContactType
   case object NoLongerMindedToRevoke extends ContactType
+
+  case object RegistrationVariationApproval extends ContactType
+  case object ApplicationAutorejectionForFailureToPay extends ContactType
+  case object DeRegistrationEffectiveDateChange extends ContactType
 
   case object Others extends ContactType
 
@@ -67,5 +71,38 @@ object ContactType {
       case ReminderToPayForVariation => JsString("RPV1")
       case ReminderToPayForManualCharges => JsString("RPM1")
     }
+
+  implicit def pathBinder(implicit stringBinder:PathBindable[String]) = new PathBindable[ContactType] {
+
+
+    override def bind(key: String, value: String): Either[String, ContactType] = {
+      stringBinder.bind(key,value).right map {
+
+        case "RejectionReasons" => ContactType.RejectionReasons
+        case "RevocationReasons" => ContactType.RevocationReasons
+        case "MindedToReject" => ContactType.MindedToReject
+        case "NoLongerMindedToReject" => ContactType.NoLongerMindedToReject
+        case "MindedToRevoke" => ContactType.MindedToRevoke
+        case "NoLongerMindedToRevoke" => ContactType.NoLongerMindedToRevoke
+        case "Others" => ContactType.Others
+        case "ApplicationApproval" => ContactType.ApplicationApproval
+        case "RenewalApproval" => ContactType.RenewalApproval
+        case "AutoExpiryOfRegistration" => ContactType.AutoExpiryOfRegistration
+        case "RenewalReminder" => ContactType.RenewalReminder
+        case "ReminderToPayForApplication" => ContactType.ReminderToPayForApplication
+        case "ReminderToPayForRenewal" => ContactType.ReminderToPayForRenewal
+        case "ReminderToPayForVariation" => ContactType.ReminderToPayForVariation
+        case "ReminderToPayForManualCharges" => ContactType.ReminderToPayForManualCharges
+        case "RegistrationVariationApproval" => ContactType.RegistrationVariationApproval
+        case "ApplicationAutorejectionForFailureToPay" => ContactType.ApplicationAutorejectionForFailureToPay
+        case "DeRegistrationEffectiveDateChange" => ContactType.DeRegistrationEffectiveDateChange
+        case _ => throw new RuntimeException("No correct contact type")
+      }
+    }
+
+    override def unbind(key: String, contactType: ContactType): String = {
+      contactType.toString
+    }
+  }
 
 }

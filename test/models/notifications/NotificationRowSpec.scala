@@ -78,6 +78,96 @@ class NotificationRowSpec extends PlaySpec {
 
       NotificationRow.format.reads(json) must be(JsSuccess(model))
     }
+
+    "return correct ContactType when contact type is populated" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.Revoked),
+            Some(RevokedReason.RevokedCeasedTrading)
+          )),
+        Some(ContactType.MindedToRevoke),
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      model.getContactType mustBe(ContactType.MindedToRevoke)
+    }
+
+    "return correct ContactType when auto rejected" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.Rejected),
+            Some(RejectedReason.FailedToPayCharges)
+          )),
+        None,
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      model.getContactType mustBe(ContactType.ApplicationAutorejectionForFailureToPay)
+    }
+
+    "return correct ContactType when variation approved" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.Approved),None
+          )),
+        None,
+        None,
+        true,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      model.getContactType mustBe(ContactType.RegistrationVariationApproval)
+    }
+
+    "return correct ContactType when DeRegistrationEffectiveDateChange" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.DeRegistered),None
+          )),
+        None,
+        None,
+        true,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      model.getContactType mustBe(ContactType.DeRegistrationEffectiveDateChange)
+    }
+
+    "throw an error when ContactType not determined" in {
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.Approved),None
+          )),
+        None,
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      intercept[RuntimeException] {
+        model.getContactType
+      }
+
+    }
   }
 
 }
