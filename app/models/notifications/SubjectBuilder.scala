@@ -1,16 +1,21 @@
 package models.notifications
 
+import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, RegistrationVariationApproval}
 import play.api.i18n.Messages
 
 trait SubjectBuilder {
   val contactType: Option[ContactType]
   val variation: Boolean
 
+
+  def getContactType: ContactType
+
   def subject = {
-    contactType match {
-      case Some(msg) => s"notifications.subject.$msg"
-      case None if variation => "notifications.subject.Approval.Variation"
-      case _ => "notifications.subject.FailToPay"
+    println("**************" + contactType)
+    getContactType match {
+      case RegistrationVariationApproval => "notifications.subject.Approval.Variation"
+      case ApplicationAutorejectionForFailureToPay => "notifications.subject.FailToPay"
+      case x => s"notifications.subject.$x"
     }
   }
 }
