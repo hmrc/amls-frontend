@@ -31,7 +31,6 @@ class startSpec extends GenericTestHelper with MustMatchers {
       html must include(Messages("start.line2"))
       html must include(Messages("start.line3"))
       html must include(Messages("start.before.heading"))
-      html must include(Messages("start.before.heading1"))
       html must include(Messages("start.utr.line1"))
       html must include(Messages("start.before.line1"))
 
