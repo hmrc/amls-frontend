@@ -11,7 +11,6 @@ import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
 import play.api.mvc.{Action, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.http.HttpResponse
 
@@ -27,15 +26,13 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
     .bindings(bind[AuthenticatorConnector].to(authenticator))
     .build()
 
-  val mockCacheMap = mock[CacheMap]
-
   trait TestFixture {
 
     val confirmationStatusResult = ConfirmationStatus(Some(true))
 
     Seq(keystore, authenticator).foreach(reset(_))
 
-    when(keystore.resetConfirmation(any(), any())) thenReturn Future.successful(mockCacheMap)
+    when(keystore.resetConfirmation(any(), any())) thenReturn Future.successful()
 
     when(keystore.confirmationStatus(any(), any())) thenReturn Future.successful(confirmationStatusResult)
 

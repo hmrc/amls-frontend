@@ -77,7 +77,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     when(controller.submissionService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
-    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful(mockCacheMap)
+    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
 
     when {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
