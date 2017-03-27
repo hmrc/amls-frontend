@@ -65,10 +65,12 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def status(p: String): ResponsiblePeople =
     this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
 
-  def checkVatField(otherBusinessSP: SoleProprietorOfAnotherBusiness) : Boolean = {
-    otherBusinessSP.soleProprietorOfAnotherBusiness match {
-      case true => this.vatRegistered.isDefined
-      case false => this.vatRegistered.isEmpty
+  def checkVatField(otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]): Boolean = {
+    otherBusinessSP.fold(true) { x =>
+      x.soleProprietorOfAnotherBusiness match {
+        case true => this.vatRegistered.isDefined
+        case false => this.vatRegistered.isEmpty
+      }
     }
   }
 
@@ -76,7 +78,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
     this match {
       case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(pos),
-      Some(_), _, Some(_), Some(_), _, _, _, _, _, Some(otherBusinessSP)) if pos.startDate.isDefined && checkVatField(otherBusinessSP)=> true
+      Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP) if pos.startDate.isDefined && checkVatField(otherBusinessSP)=> true
       case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
       case _ => false
     }

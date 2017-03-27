@@ -190,6 +190,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       CompleteResponsiblePeople.isComplete must be(true)
     }
 
+    "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
+      CompleteResponsiblePeople.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
+    }
+
     "the model partially complete with vat registration model is empty" in {
       CompleteResponsiblePeople.copy(vatRegistered = None).isComplete must be(false)
     }
