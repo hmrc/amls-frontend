@@ -400,14 +400,14 @@ unauthorised.register.link.text = register for a new one.
 start.title = Manage your anti-money laundering supervision
 start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
 start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
+start.line3 = You need to sign into this service with your Government Gateway account. You’ll need to <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">create a new Government Gateway account</a> if you don’t already have one.
+
 start.button.text = Start now
 start.before.heading = Before you register
-start.before.line1 = You’ll need to answer a few questions so HMRC can identify your business. You might need to look up a couple of things.
-start.utr.heading = Unique Taxpayer Reference (UTR) number
-start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR number. You’ll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
-start.crn.heading = Company registration number
-start.crn.line1 = If your business is a limited company you’ll need this. You can <a href="https://beta.companieshouse.gov.uk/">search for your company registration number</a>, or find it on official letters from Companies House or your Certificate of Incorporation.
-start.crn.link.text = search for it online
+start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">registration fees</a> when you apply, renew, or when you make certain updates. You’ll need a credit or debit card for payment.
+start.utr.heading = Unique Taxpayer Reference (UTR)
+start.utr.heading1 = Registration fees
+start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR. You’ll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
 
 ############################### Status page ###############################
 status.title = Your registration

@@ -13,13 +13,14 @@
 ) {
     <p>@Messages("start.line1")</p>
     <p>@Messages("start.line2")</p>
+    <p>@Html(Messages("start.line3", "<a href=\"/\">here</a>"))</p>
 
     <a class="button button--get-started" href="@controllers.routes.LandingController.get()" role="button">@Messages("start.button.text")</a>
 
     <p class="heading-medium">@Messages("start.before.heading")</p>
-    <p>@Messages("start.before.line1")</p>
+
+    <p class="heading-small">@Messages("start.utr.heading1")</p>
+    <p>@Html(Messages("start.before.line1", "<a href=\"/\">here</a>"))</p>
     <p class="heading-small">@Messages("start.utr.heading")</p>
     <p>@Messages("start.utr.line1")</p>
-    <p class="heading-small">@Messages("start.crn.heading")</p>
-    <p>@Html(Messages("start.crn.line1", "<a href=\"/\">here</a>"))</p>
 }
