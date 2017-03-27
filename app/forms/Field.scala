@@ -21,6 +21,10 @@ sealed trait Field {
 
   def error(implicit lang: Lang): String =
     errors.toMessage
+
+  def rpError(implicit lang: Lang): String =
+    errors.headOption.map(_.message)
+
 }
 
 case class ValidField(

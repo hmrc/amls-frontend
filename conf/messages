@@ -214,6 +214,9 @@ error.required.positionWithinBusiness = Select one or more options to show this 
 error.required.rp.wherepersonlives.howlonglived = Select one option to show how long this person lived at this address
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
+error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
+error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
+
 
 ############################### Trust and company service providers ###############################
 
@@ -388,6 +391,8 @@ hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
+
+lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -1124,6 +1129,7 @@ responsiblepeople.person.registered.title = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
+responsiblepeople.sole.proprietor.another.business.title = Is {0} the sole proprietor of another business?
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
@@ -1153,6 +1159,7 @@ responsiblepeople.detailed_answers.position_start = When did this position start
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
+responsiblepeople.check_your_answers.soleproprietor_for_other_business = Sole proprietor of another business?
 responsiblepeople.detailed_answers.visuallyhidden.header = Responsible person
 responsiblepeople.nationality.title = What is the nationality of {0}?
 responsiblepeople.nationality.select = Select all that apply
