@@ -12,7 +12,8 @@ object Conversions {
         case Some(ba) => Some(ba.copy(
           expectedAMLSTurnover = Functor[Option].lift(AMLSTurnover.convert)(renewal.turnover),
           expectedBusinessTurnover = Functor[Option].lift(BusinessTurnover.convert)(renewal.businessTurnover),
-          involvedInOther = Functor[Option].lift(InvolvedInOther.convert)(renewal.involvedInOtherActivities)
+          involvedInOther = Functor[Option].lift(InvolvedInOther.convert)(renewal.involvedInOtherActivities),
+          customersOutsideUK = Functor[Option].lift(CustomersOutsideUK.convert)(renewal.customersOutsideUK)
         ))
       }
 
