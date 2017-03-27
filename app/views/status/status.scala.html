@@ -69,7 +69,7 @@ case _ => { None }
         @if(completionState.notificationsAvailable && notifications){
             <div class="govuk-box-highlight messaging">
                 <!-- <i class="icon icon-information"></i>  -->
-                <a href="@controllers.routes.NotificationsController.getMessages()">@Messages("notifications.youHaveMessages")</a>
+                <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
             </div>
         }
         @changeLink match {
