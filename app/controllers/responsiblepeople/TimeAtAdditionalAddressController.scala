@@ -60,23 +60,20 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
   }
 
   private def redirectTo(index: Int, edit: Boolean, fromDeclaration: Boolean, data: TimeAtAddress) = {
-    (data, edit) match {
-      case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-      case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-      case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
-      case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
-      case (OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
-      case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
+    data match {
+      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case _ => Redirect(routes.AdditionalExtraAddressController.get(index, edit, fromDeclaration))
     }
   }
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
-        (res.addressHistory, data.timeAtAddress) match {
-          case (Some(a), Some(ThreeYearsPlus)) => a.additionalAddress(data).removeAdditionalExtraAddress
-          case (Some(a), Some(OneToThreeYears)) => a.additionalAddress(data).removeAdditionalExtraAddress
-          case (Some(a), _) => a.additionalAddress(data)
+        res.addressHistory match {
+          case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
+            a.additionalAddress(data).removeAdditionalExtraAddress
+          case Some(a) => a.additionalAddress(data)
           case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
         })
     }

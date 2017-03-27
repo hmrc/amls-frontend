@@ -61,15 +61,15 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
-        (res.addressHistory, data.timeAtAddress) match {
-          case (Some(a), Some(ThreeYearsPlus)) => a.additionalAddress(data).removeAdditionalExtraAddress
-          case (Some(a), Some(OneToThreeYears)) => a.additionalAddress(data).removeAdditionalExtraAddress
-          case (Some(a), _) => a.additionalAddress(data)
+        res.addressHistory match {
+          case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
+            a.additionalAddress(data).removeAdditionalExtraAddress
+          case Some(a) => a.additionalAddress(data)
           case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
         })
     } map { _ =>
       data.timeAtAddress match {
-        case Some(a) if edit =>  Redirect(routes.DetailedAnswersController.get(index))
+        case Some(_) if edit =>  Redirect(routes.DetailedAnswersController.get(index))
         case _ => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, fromDeclaration))
       }
     }

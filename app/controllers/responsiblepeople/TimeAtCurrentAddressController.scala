@@ -69,9 +69,10 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                       (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
-        (res.addressHistory, rp.timeAtAddress) match {
-          case (Some(_), Some(ThreeYearsPlus) | Some(OneToThreeYears)) => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
-          case (Some(a), _) => a.currentAddress(rp)
+        res.addressHistory match {
+          case Some(_) if rp.timeAtAddress.contains(ThreeYearsPlus) | rp.timeAtAddress.contains(ThreeYearsPlus) =>
+            ResponsiblePersonAddressHistory(currentAddress = Some(rp))
+          case Some(a) => a.currentAddress(rp)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
         })
     }
@@ -84,14 +85,11 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                         fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
     case SubmissionDecisionApproved => {
       rp.addressHistory match {
-        case None =>
-          handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
+        case None => handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
         case Some(hist) => {
           hist.currentAddress match {
-            case None =>
-              handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-            case Some(currAdd) =>
-              handleApproved(index, edit, Some(currAdd.personAddress), rp.lineId, data, fromDeclaration)
+            case None => handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
+            case Some(currAdd) => handleApproved(index, edit, Some(currAdd.personAddress), rp.lineId, data, fromDeclaration)
           }
         }
       }
@@ -119,11 +117,10 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
   private def handleNotYetApproved(index: Int,
                                    timeAtAddress: TimeAtAddress,
                                    edit: Boolean, fromDeclaration: Boolean = false) = {
-    (timeAtAddress, edit) match {
-      case (ThreeYearsPlus | OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-      case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-      case (ThreeYearsPlus | OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index, edit))
-      case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
+    timeAtAddress match {
+      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit))
+      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
     }
   }
 
