@@ -15,14 +15,11 @@ POST        /registration-progress                                      controll
 
 GET         /application-status                                         controllers.StatusController.get()
 
-GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
-GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
+GET         /your-registration/your-messages/:id/:contactType           controllers.NotificationController.messageDetails(id : String,contactType:models.notifications.ContactType)
+GET         /your-registration/your-messages                            controllers.NotificationController.getMessages()
 
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
-
-GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
-GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
 
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
