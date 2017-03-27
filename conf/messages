@@ -52,7 +52,7 @@ error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’
 
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
-error.required.sa.registration = Select yes if {0} is registered for Self Assessment
+error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
 error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
 
