@@ -11,7 +11,8 @@
     jsHidden: Boolean = false,
     labelHidden: Boolean = false,
     parentDateAttr: String = "",
-    inputAttributes:InputAttributes =  InputAttributes("",""),
+    attrMin: String = "",
+    attrMax: String = "",
     attrType: String = "",
     attrMinlength: String = "",
     attrMaxlength: String = "",
@@ -22,7 +23,7 @@
     data: String = "",
     dataAttrs: Map[String, String] = Map.empty[String, String],
     personName: String = ""
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages)
 
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}"@if(data){ data-reveal="@data"}>
@@ -44,8 +45,8 @@
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
-            @if(inputAttributes.attrMin.nonEmpty) { min="@inputAttributes.attrMin" }
-            @if(inputAttributes.attrMax.nonEmpty) { max="@inputAttributes.attrMax" }
+            @if(attrMin.nonEmpty) { min="@attrMin" }
+            @if(attrMax.nonEmpty) { max="@attrMax" }
             @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
             @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
