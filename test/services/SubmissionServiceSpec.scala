@@ -4,15 +4,16 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
+import models.businessactivities.{BusinessActivities => BusActivities, _}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching._
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.renewal.Renewal
+import models.renewal.{Renewal, RenewalResponse}
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationResponse, SubscriptionRequest, SubscriptionResponse}
+import models.{AmendVariationResponse, Country, SubscriptionRequest, SubscriptionResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -1114,6 +1115,15 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "submit a renewal" in new Fixture {
 
       when {
+        cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
+      } thenReturn Some(BusActivities(
+        involvedInOther = Some(InvolvedInOtherNo),
+        expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
+        expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Second),
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "UK")))))
+      ))
+
+      when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
@@ -1122,19 +1132,19 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       when {
-        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        TestSubmissionService.cacheConnector.save[RenewalResponse](eqTo(RenewalResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        TestSubmissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
-      } thenReturn Future.successful(amendmentResponse)
+        TestSubmissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+      } thenReturn Future.successful(mock[RenewalResponse])
 
       val renewal = Renewal()
 
       val result = await(TestSubmissionService.renewal(renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
-      verify(TestSubmissionService.amlsConnector).variation(captor.capture(), any())(any(), any(), any(), any(), any())
+      verify(TestSubmissionService.amlsConnector).renewal(captor.capture(), any())(any(), any(), any())
 
     }
 

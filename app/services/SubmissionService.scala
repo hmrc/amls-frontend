@@ -13,7 +13,7 @@ import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
-import models.renewal.Renewal
+import models.renewal.{Renewal, RenewalResponse}
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -151,12 +151,12 @@ trait SubmissionService extends DataCacheService {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
-      variation <- amlsConnector.variation(
+      response <- amlsConnector.renewal(
         createSubscriptionRequest(cache).fromRenewal(renewal),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, variation)
-    } yield variation
+      _ <- cacheConnector.save[RenewalResponse](RenewalResponse.key, response)
+    } yield response
   }
 
   def getAmendment
