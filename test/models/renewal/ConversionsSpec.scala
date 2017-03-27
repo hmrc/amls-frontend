@@ -1,6 +1,6 @@
 package models.renewal
 
-import models.SubscriptionRequest
+import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
@@ -36,13 +36,22 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'involved in other businesses' model" in new Fixture {
-
       val model: InvolvedInOther = InvolvedInOtherYes("some other business")
       val renewal = Renewal(involvedInOtherActivities = Some(model))
 
       val converted = subscriptionRequest.fromRenewal(renewal)
 
       converted.businessActivitiesSection.get.involvedInOther mustBe Some(models.businessactivities.InvolvedInOtherYes("some other business"))
+    }
+
+    "convert the 'customers outside the UK' model" in new Fixture {
+      val country = Country("My Country", "MC")
+      val model = CustomersOutsideUK(Some(Seq(country)))
+      val renewal = Renewal(customersOutsideUK = Some(model))
+
+      val converted = subscriptionRequest.fromRenewal(renewal)
+
+      converted.businessActivitiesSection.get.customersOutsideUK mustBe Some(models.businessactivities.CustomersOutsideUK(Some(Seq(country))))
     }
 
   }
