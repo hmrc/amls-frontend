@@ -5,7 +5,7 @@ import models.SubscriptionResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -83,7 +83,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get())(request)
 
   }
 
@@ -163,12 +163,11 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
 
-      val paymentsRedirectUrl = controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).absoluteURL(request.secure, request.host)
-
       val result = controller.get()(request)
       val body = contentAsString(result)
+      val submissionReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, paymentsRedirectUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, submissionReturnUrl)))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -474,7 +473,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)(request)
 
   }
 

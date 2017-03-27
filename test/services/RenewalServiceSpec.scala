@@ -33,11 +33,10 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
     val service = injector.instanceOf[RenewalService]
 
     val completeModel = Renewal(
-      Some(InvolvedInOtherNo),
+      Some(InvolvedInOtherYes("test")),
       Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-      // Add other models here
       true)
 
   }

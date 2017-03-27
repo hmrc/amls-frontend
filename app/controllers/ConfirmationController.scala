@@ -5,7 +5,7 @@ import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.{Logger, Play}
 import play.api.mvc.{AnyContent, Request}
@@ -56,7 +56,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionReadyForReview => {
       for {
         fees <- getAmendmentFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url))
@@ -67,7 +67,7 @@ trait ConfirmationController extends BaseController {
     case SubmissionDecisionApproved => {
       for {
         fees <- getVariationFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
         bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
       } yield fees match {
         case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url))
@@ -78,8 +78,8 @@ trait ConfirmationController extends BaseController {
     case _ => {
       for {
         (paymentRef, total, rows) <- submissionService.getSubscription
-        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)), controllers.routes.ConfirmationController
-          .paymentConfirmation(paymentRef).absoluteURL())
+        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)),
+          controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url)
       } yield {
         ApplicationConfig.paymentsUrlLookupToggle match {
           case true => Ok(views.html.confirmation.confirmation_new(paymentRef, total, rows, paymentsRedirect.url))
@@ -99,7 +99,7 @@ trait ConfirmationController extends BaseController {
 
   private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
   : Future[PaymentServiceRedirect] =
-    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, returnUrl)) map {
+    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, ReturnLocation(returnUrl))) map {
       case Some(redirect) => redirect
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
