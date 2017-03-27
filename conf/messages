@@ -1416,6 +1416,10 @@ notifications.subject.NoLongerMindedToReject = Rejection of Application no longe
 notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
 notifications.subject.Others = Generic communication
 
+notifications.subject.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has been rejected
+notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
+
 notifications.header = Your Messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = View your messages
@@ -1463,3 +1467,19 @@ survey.satisfaction.beforeyougo = Before you go
 survey.satisfaction.please = Please
 survey.satisfaction.answer = answer some questions
 survey.satisfaction.helpus = to help us improve the service.
+
+############################### Notifications Text ######################
+
+notification.static.text.application-auto-rejection-for-failure-to-pay = <p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money \
+Laundering regulations 2007 has been rejected.</p>\
+<p>As you’ve not paid the full fees due, your application has automatically expired.</p>\
+<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
+if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
+<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from \
+<a href="{0}">your account status page</a>.</p>
+
+notification.static.text.registration-variation-approval = <p>The recent changes made to your details have been approved.</p>\
+<p>You can find details of your registration on <a href="{0}">your status page</a>.</p>
+
+notification.static.text.de-registration-effective-date-change = <p>The date your anti-money laundering supervision ended has been changed.</p>\
+<p>You can see the new effective date on <a href="{0}">your status page</a>.</p>
