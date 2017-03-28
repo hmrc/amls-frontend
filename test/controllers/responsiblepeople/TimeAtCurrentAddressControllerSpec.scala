@@ -45,10 +45,6 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
   "TimeAtAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.wherepersonlives.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
-
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
     "get is called" must {
@@ -169,27 +165,59 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
         "edit mode is on" when {
           "time at address is less than 1 year" must {
-            "redirect to the correct location" in new Fixture {
+            "redirect to the AdditionalAddressController" when {
+              "there is no additional address already saved" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
-                "timeAtAddress" -> "01"
-              )
-              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-              val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-              val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+                val requestWithParams = request.withFormUrlEncodedBody(
+                  "timeAtAddress" -> "01"
+                )
+                val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+                val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+                val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+                val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-                .thenReturn(Future.successful(emptyCache))
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
-                .thenReturn(Future.successful(SubmissionReadyForReview))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                  .thenReturn(Future.successful(emptyCache))
+                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                  .thenReturn(Future.successful(SubmissionReadyForReview))
 
-              val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
+                val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+              }
+            }
+            "redirect to the DetailedAnswersController" when {
+              "there is an additional address already saved" in new Fixture {
+println(".")
+                val requestWithParams = request.withFormUrlEncodedBody(
+                  "timeAtAddress" -> "01"
+                )
+                val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+                val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+                val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
+                val history = ResponsiblePersonAddressHistory(
+                  currentAddress = Some(currentAddress),
+                  additionalAddress = Some(additionalAddress)
+                )
+                val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                  .thenReturn(Future.successful(emptyCache))
+                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                  .thenReturn(Future.successful(SubmissionReadyForReview))
+
+                val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
+                println(",")
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+
+              }
             }
           }
           "time at address is OneToThreeYears" must {

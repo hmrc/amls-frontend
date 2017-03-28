@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, OneToThreeYears, ThreeYearsPlus}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople.{ResponsiblePeople, _}
 import models.status.{SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
@@ -83,26 +83,20 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                         status: SubmissionStatus,
                         edit: Boolean,
                         fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
-    case SubmissionDecisionApproved => {
-      val address: Option[PersonAddress] = rp.addressHistory map {
-        case ResponsiblePersonAddressHistory(Some(currAdd), _, _) => currAdd.personAddress
-      }
-      handleApproved(index, edit, address, rp.lineId, data, fromDeclaration)
-    }
-    case _ => handleNotYetApproved(index, data, edit, fromDeclaration)
+    case SubmissionDecisionApproved => handleApproved(index, edit, rp, data, fromDeclaration)
+    case _ => handleNotYetApproved(index, data, rp, edit, fromDeclaration)
   }
 
   private def handleApproved(index: Int,
                              edit: Boolean,
-                             originalPersonAddress: Option[PersonAddress],
-                             lineId: Option[Int],
+                             rp: ResponsiblePeople,
                              data: TimeAtAddress, fromDeclaration: Boolean = false) = {
 
     val moreThanOneYear = data == ThreeYearsPlus || data == OneToThreeYears
 
     if (moreThanOneYear && !edit) {
       Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-    } else if (!moreThanOneYear) {
+    } else if (!moreThanOneYear && !additionalAddressHistory(rp)) {
       Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
     } else {
       Redirect(routes.DetailedAnswersController.get(index, edit))
@@ -111,12 +105,19 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
 
   private def handleNotYetApproved(index: Int,
                                    timeAtAddress: TimeAtAddress,
+                                   rp: ResponsiblePeople,
                                    edit: Boolean, fromDeclaration: Boolean = false) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit))
+      case _ if additionalAddressHistory(rp) => Redirect(routes.DetailedAnswersController.get(index, edit))
       case _ => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
     }
+  }
+
+  private def additionalAddressHistory(rp: ResponsiblePeople) = rp.addressHistory match {
+    case Some(ResponsiblePersonAddressHistory(_,Some(_),_)) => true
+    case _ => false
   }
 
 }
