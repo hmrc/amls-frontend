@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{Empty, OneToThreeYears, ThreeYearsPlus}
-import models.responsiblepeople._
+import models.responsiblepeople.{ResponsiblePeople, _}
 import models.status.{SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
@@ -78,7 +78,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     }
   }
 
-  def redirectTo(index: Int, data: TimeAtAddress,
+  private def redirectTo(index: Int, data: TimeAtAddress,
                         rp: ResponsiblePeople,
                         status: SubmissionStatus,
                         edit: Boolean,

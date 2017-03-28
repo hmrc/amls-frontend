@@ -53,32 +53,36 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
     "get is called" must {
 
-      "display the page" in new Fixture {
+      "display the page" when {
 
-        val responsiblePeople = ResponsiblePeople(personName)
+       "timeAtAddress exists" in new Fixture {
 
-        when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+         val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-        val result = timeAtAddressController.get(RecordId)(request)
-        status(result) must be(OK)
+         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
+         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+         val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
-      }
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      "get is called with time at address" in new Fixture {
+          val result = timeAtAddressController.get(RecordId)(request)
+          status(result) must be(OK)
+        }
 
-        val personName = Some(PersonName("firstname", None, "lastname", None, None))
+        "timeAtAddress does not exist" in new Fixture {
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(personName)
 
-        when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        val result = timeAtAddressController.get(RecordId)(request)
-        status(result) must be(OK)
+          val result = timeAtAddressController.get(RecordId)(request)
+          status(result) must be(OK)
+        }
+
+
       }
 
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
