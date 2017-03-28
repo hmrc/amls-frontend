@@ -428,10 +428,12 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
                 )
 
                 val originalResponsiblePeople = ResponsiblePeople(
-                  addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
-                    )
-                  )),
+                  addressHistory = Some(
+                    ResponsiblePersonAddressHistory(
+                      currentAddress = Some(
+                        ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), Some(ZeroToFiveMonths), None)
+                      )
+                    )),
                   lineId = None
                 )
 

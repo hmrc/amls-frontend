@@ -196,6 +196,36 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
         }
+
+      }
+
+      "redirect to DetailedAnswersController" when {
+        "edit is true" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+
+        }
       }
 
       "respond with BAD_REQUEST" when {
@@ -321,6 +351,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           status(result) must be(NOT_FOUND)
         }
+
       }
 
     }
@@ -330,30 +361,6 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
     "use the correct services" in new Fixture {
       AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
       AdditionalAddressController.authConnector must be(AMLSAuthConnector)
-    }
-  }
-
-
-  it must {
-    "respond with NOT_FOUND" when {
-      "given an index out of bounds in edit mode" in new Fixture {
-
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "isUK" -> "true",
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "AA1 1AA"
-        )
-
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-        when(currentAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        val result = currentAddressController.post(outOfBounds, true)(requestWithParams)
-
-        status(result) must be(NOT_FOUND)
-      }
     }
   }
 

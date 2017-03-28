@@ -73,7 +73,11 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
     } map { _ =>
-      Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+      if (edit) {
+        Redirect(routes.DetailedAnswersController.get(index, edit))
+      } else {
+        Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+      }
     }
   }
 }

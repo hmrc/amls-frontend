@@ -84,15 +84,10 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                         edit: Boolean,
                         fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
     case SubmissionDecisionApproved => {
-      rp.addressHistory match {
-        case None => handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-        case Some(hist) => {
-          hist.currentAddress match {
-            case None => handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-            case Some(currAdd) => handleApproved(index, edit, Some(currAdd.personAddress), rp.lineId, data, fromDeclaration)
-          }
-        }
+      val address: Option[PersonAddress] = rp.addressHistory map {
+        case ResponsiblePersonAddressHistory(Some(currAdd), _, _) => currAdd.personAddress
       }
+      handleApproved(index, edit, address, rp.lineId, data, fromDeclaration)
     }
     case _ => handleNotYetApproved(index, data, edit, fromDeclaration)
   }
