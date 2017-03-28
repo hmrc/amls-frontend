@@ -439,3 +439,4 @@ POST        /renewal/employment                                         @control
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
+POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
