@@ -1391,11 +1391,11 @@ hvd.percentage.lbl.05 = 81% to 100%
 ###############################  Notifications ###############################
 
 notifications.subject.ApplicationApproval = Application Approval
-notifications.subject.Approval.Variation = Registration Variation Approval
+notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.RenewalApproval = Renewal Approval
 
 notifications.subject.RejectionReasons = Application Rejection
-notifications.subject.FailToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Registration Expiry
 
