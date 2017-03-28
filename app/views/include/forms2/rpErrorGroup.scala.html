@@ -1,0 +1,18 @@
+@import forms.{Field, Form2}
+
+@(
+  field: Field,
+  personName: String ="",
+  classes: Seq[String] = Seq.empty
+)(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@if(field.hasErrors) {
+    <div id="@field.id" class="display-block @classes.mkString(" ") form-field--error">
+        <span class="error-notification">@Messages(field.rpError, personName)</span>
+        @content
+    </div>
+} else {
+    <div class="display-block @classes.mkString(" ")">
+        @content
+    </div>
+}

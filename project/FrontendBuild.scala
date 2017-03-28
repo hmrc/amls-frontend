@@ -16,7 +16,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
 
-  private val playHealthVersion = "2.0.0"
+  private val playHealthVersion = "2.1.0"
   private val logbackJsonLoggerVersion = "3.1.0"
   private val frontendBootstrapVersion = "7.17.0"
   private val govukTemplateVersion = "5.1.0"
@@ -25,7 +25,7 @@ private object AppDependencies {
   private val playAuthorisedFrontendVersion = "6.3.0"
   private val playConfigVersion = "4.3.0"
 
-  private val httpCachingClientVersion = "6.1.0"
+  private val httpCachingClientVersion = "6.2.0"
   private val playWhitelistFilterVersion = "2.0.0"
 
   private val validationVersion = "2.0.1"
@@ -60,8 +60,8 @@ private object AppDependencies {
   private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.8.3"
-  private val hmrctestVersion = "2.2.0"
-  private val authTestVersion = "2.4.0"
+  private val hmrctestVersion = "2.3.0"
+  private val authTestVersion = "3.1.0"
 
   object Test {
     def apply() = new ScopeDependencies {

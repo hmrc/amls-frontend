@@ -243,6 +243,19 @@
             <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
         }
 
+        @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
+            @detailedAnswers(
+            question = Messages("responsiblepeople.check_your_answers.soleproprietor_for_other_business"),
+            editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true).toString(),
+            dataItem = Some(anotherBusiness)
+            ) { vr2 =>
+            <p>@vr2.soleProprietorOfAnotherBusiness match {
+                case true => {@Messages("lbl.yes")}
+                case false => {@Messages("lbl.no")}
+                }</p>
+            }
+        }
+
         @person.vatRegistered.map { vr =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),

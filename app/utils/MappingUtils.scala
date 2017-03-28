@@ -142,7 +142,7 @@ trait MappingUtils {
 
       def withMessage(message: String*): Rule[I, O] =
         Rule { d =>
-          rule.validate(d).fail.map {
+          rule.validate(d).leftMap {
             _.map {
               case (p, errs) =>
                 p -> (message map { m => ValidationError(m) })
