@@ -152,7 +152,7 @@ trait SubmissionService extends DataCacheService {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       response <- amlsConnector.renewal(
-        createSubscriptionRequest(cache).fromRenewal(renewal),
+        createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
       _ <- cacheConnector.save[RenewalResponse](RenewalResponse.key, response)
