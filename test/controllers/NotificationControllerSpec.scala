@@ -127,14 +127,14 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
   }
 
   "messageDetails" must {
-    "display the message view given the message id" in new Fixture {
+    "display the message view given the message id for contactType ApplicationAutorejectionForFailureToPay" in new Fixture {
       when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(Some("Registration Number")))
 
       when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(NotificationDetails(None, None, Some("Message Text"), false))))
+        .thenReturn(Future.successful(Some(NotificationDetails(Some(ApplicationAutorejectionForFailureToPay), None, Some("Message Text"), false))))
 
-      val result = controller.messageDetails("dfgdhsjk",ContactType.MindedToRevoke)(request)
+      val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
 
       status(result) mustBe 200
       contentAsString(result) must include("Message Text")
