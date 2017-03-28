@@ -7,7 +7,7 @@ import play.api.libs.json.Json
 case class NotificationDetails(contactType : Option[ContactType],
                                status : Option[Status],
                                messageText : Option[String],
-                               variation : Boolean) extends SubjectBuilder {
+                               variation : Boolean) {
 
   def getContactType: ContactType = {
 
@@ -16,7 +16,6 @@ case class NotificationDetails(contactType : Option[ContactType],
       reason <- st.statusReason
     } yield reason
 
-
     contactType.getOrElse(
       (status, statusReason, variation) match {
         case (Some(Status(Some(DeRegistered),_)),_,_) => DeRegistrationEffectiveDateChange
@@ -24,8 +23,11 @@ case class NotificationDetails(contactType : Option[ContactType],
         case (_,_, true) => RegistrationVariationApproval
         case _ => throw new RuntimeException("No matching ContactType found")
       }
-
     )
+  }
+
+  def subject = {
+    s"notifications.subject.$getContactType"
   }
 
 }
