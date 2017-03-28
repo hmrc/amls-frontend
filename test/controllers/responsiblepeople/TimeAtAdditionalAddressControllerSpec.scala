@@ -41,32 +41,46 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
 
   "TimeAtAdditionalAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.additional_address.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
-
 
     "get is called" must {
 
-      "display the page" in new Fixture {
+      "display the page" when {
+        "timeAtAddress has been previously saved" in new Fixture {
 
-        val responsiblePeople = ResponsiblePeople(personName)
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
-        when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        val result = timeAtAdditionalAddressController.get(RecordId)(request)
-        status(result) must be(OK)
+          val result = timeAtAdditionalAddressController.get(RecordId)(request)
+          status(result) must be(OK)
+
+        }
+        "timeAtAddress has not been previously saved" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople(personName)
+
+          when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = timeAtAdditionalAddressController.get(RecordId)(request)
+          status(result) must be(OK)
+
+        }
 
       }
+
 
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
 
         val responsiblePeople = ResponsiblePeople()
 
-        when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = timeAtAdditionalAddressController.get(outOfBounds)(request)
         status(result) must be(NOT_FOUND)

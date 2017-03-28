@@ -118,6 +118,21 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
         document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
+
+      "display 404 NotFound" when {
+
+        "person cannot be found" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = additionalAddressController.get(RecordId)(request)
+          status(result) must be(NOT_FOUND)
+        }
+
+      }
     }
 
     "post is called" must {
