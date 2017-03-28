@@ -11,7 +11,6 @@ trait SubjectBuilder {
   def getContactType: ContactType
 
   def subject = {
-    println("**************" + contactType)
     getContactType match {
       case RegistrationVariationApproval => "notifications.subject.Approval.Variation"
       case ApplicationAutorejectionForFailureToPay => "notifications.subject.FailToPay"
