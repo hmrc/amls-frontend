@@ -1,11 +1,11 @@
 package models.renewal
 
-import models.Country
+import models.{Country, businessactivities}
 import jto.validation.forms._
 import jto.validation.{From, Rule, Success, Write}
 import jto.validation._
 import play.api.libs.json.{JsObject, Json, Reads, Writes}
-import utils.{TraversableValidators, JsonMapping}
+import utils.{JsonMapping, TraversableValidators}
 import cats.data.Validated.{Invalid, Valid}
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
@@ -112,4 +112,7 @@ object CustomersOutsideUK {
   implicit val jsonR: Reads[CustomersOutsideUK] = Cache.jsonR
   implicit val formW: Write[CustomersOutsideUK, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[CustomersOutsideUK] = Cache.jsonW
+
+  implicit def convert(model: CustomersOutsideUK): businessactivities.CustomersOutsideUK =
+    models.businessactivities.CustomersOutsideUK(model.countries)
 }
