@@ -21,7 +21,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val turnover: AMLSTurnover = AMLSTurnover.First
       val renewal = Renewal(turnover = Some(turnover))
 
-      val converted = subscriptionRequest.fromRenewal(renewal)
+      val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.businessActivitiesSection.get.expectedAMLSTurnover mustBe Some(models.businessactivities.ExpectedAMLSTurnover.First)
     }
@@ -30,7 +30,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val businessTurnover: BusinessTurnover = BusinessTurnover.Second
       val renewal = Renewal(businessTurnover = Some(businessTurnover))
 
-      val converted = subscriptionRequest.fromRenewal(renewal)
+      val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.businessActivitiesSection.get.expectedBusinessTurnover mustBe Some(models.businessactivities.ExpectedBusinessTurnover.Second)
     }
@@ -39,7 +39,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val model: InvolvedInOther = InvolvedInOtherYes("some other business")
       val renewal = Renewal(involvedInOtherActivities = Some(model))
 
-      val converted = subscriptionRequest.fromRenewal(renewal)
+      val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.businessActivitiesSection.get.involvedInOther mustBe Some(models.businessactivities.InvolvedInOtherYes("some other business"))
     }
@@ -49,7 +49,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val model = CustomersOutsideUK(Some(Seq(country)))
       val renewal = Renewal(customersOutsideUK = Some(model))
 
-      val converted = subscriptionRequest.fromRenewal(renewal)
+      val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.businessActivitiesSection.get.customersOutsideUK mustBe Some(models.businessactivities.CustomersOutsideUK(Some(Seq(country))))
     }
