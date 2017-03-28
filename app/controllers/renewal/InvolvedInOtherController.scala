@@ -5,9 +5,8 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessactivities.{InvolvedInOtherNo, InvolvedInOtherYes, BusinessActivities}
 import models.businessmatching._
-import models.renewal.{Renewal, InvolvedInOther}
+import models.renewal.{Renewal, InvolvedInOther, InvolvedInOtherYes, InvolvedInOtherNo}
 import play.api.i18n.Messages
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -73,13 +72,21 @@ class InvolvedInOtherController @Inject()(
           case ValidForm(_, data) =>
             for {
               renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-              _ <- renewalService.updateRenewal(renewal.getOrElse(Renewal()).involvedInOtherActivities(data))
+              _ <- renewalService.updateRenewal(getUpdatedRenewal(renewal, data))
             } yield data match {
               case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
               case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)
             }
         }
       }
+  }
+
+  private def getUpdatedRenewal(renewal: Option[Renewal], data: InvolvedInOther): Renewal = {
+    (renewal, data) match {
+      case (Some(renew), InvolvedInOtherYes(_)) => renew.copy(involvedInOtherActivities = Some(data))
+      case (Some(renew), InvolvedInOtherNo) => renew.copy(involvedInOtherActivities = Some(data), businessTurnover = None)
+      case (_, _) => Renewal(involvedInOtherActivities = Some(data))
+    }
   }
 
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
