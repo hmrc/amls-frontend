@@ -28,20 +28,11 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Valid(VATRegisteredYes("123456789")))
     }
 
-
-    "fail to validate given missing mandatory field" in {
-
-      VATRegistered.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
-        )))
-    }
-
     "fail to validate given invalid field" in {
 
       VATRegistered.formRule.validate(Map.empty) must
         be(Invalid(Seq(
-          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
+          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
         )))
     }
 

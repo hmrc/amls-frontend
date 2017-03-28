@@ -1,0 +1,57 @@
+@import forms.{Field, Form2}
+@import utils.HtmlElementHelpers._
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = false,
+    classes: Seq[String] = Seq.empty,
+    panel: Boolean = false,
+    jsHidden: Boolean = false,
+    labelHidden: Boolean = false,
+    parentDateAttr: String = "",
+    attrMin: String = "",
+    attrMax: String = "",
+    attrType: String = "",
+    attrMinlength: String = "",
+    attrMaxlength: String = "",
+    attrPattern: String = "",
+    attrStep: String = "",
+    attrTitle: String = "",
+    attrDescribedBy: String = "",
+    data: String = "",
+    dataAttrs: Map[String, String] = Map.empty[String, String],
+    personName: String = ""
+)(implicit m: Messages)
+
+
+<div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}"@if(data){ data-reveal="@data"}>
+    <label class="form-label@if(bold){-bold}" for="@field.id">
+        @if(labelText.nonEmpty) {
+            @if(labelHidden) {<span class="visuallyhidden">}
+            @Messages(labelText)
+            @if(labelHidden){</span>}
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@Messages(field.rpError, personName)</span>
+        }
+    </label>
+    <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
+            value="@field.value" id="@field.id"
+            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+            @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
+            @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
+            @if(attrMin.nonEmpty) { min="@attrMin" }
+            @if(attrMax.nonEmpty) { max="@attrMax" }
+            @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
+            @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
+            @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
+            @if(attrStep.nonEmpty) { step="@attrStep" }
+            @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
+            @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
+        />
+</div>
