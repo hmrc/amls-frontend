@@ -524,7 +524,7 @@ amendment.sidebar.button.text = Submit amendment
 #### Confirmation page ####
 confirmation.title = You’ve submitted your application
 confirmation.header = Application fee and reference
-confirmation.header.secondary = Submit registration
+confirmation.header.secondary = Update information
 confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
@@ -554,6 +554,7 @@ confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and
 confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.
 
 confirmation.amendment.title = You’ve submitted an updated application
+confirmation.amendment.header = Updated application fee and reference
 confirmation.amendment.lede = You’ve submitted an updated application
 confirmation.amendment.thankyou.p = Because of the changes you’ve made, you need to pay an additional fee.
 confirmation.amendment.previousfees.p = You still need to pay your previous fees, if you’ve not paid them already.
