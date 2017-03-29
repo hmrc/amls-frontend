@@ -1,32 +1,41 @@
 @import models.confirmation._
 
-@(amount: Currency, breakdown: Seq[BreakdownRow])(implicit messages: Messages, request: Request[_])
+@(amount: Currency, breakdown: Seq[BreakdownRow], summary: String)(implicit messages: Messages, request: Request[_])
 
-<table>
-    <thead>
-        <tr>
-            <th>&nbsp;</th>
-            <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-            <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-            <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
-        </tr>
-    </thead>
-    <tbody>
-    @breakdown.map {
-        case BreakdownRow(label, quantity, perItem, total) => {
-            <tr>
-                <td>@Messages(label)</td>
-                <td class="numeric">@quantity</td>
-                <td class="numeric">@perItem</td>
-                <td class="numeric">@total</td>
-            </tr>
-        }
-    }
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="3">@Messages("confirmation.total")</th>
-            <td class="numeric">@amount</td>
-        </tr>
-    </tfoot>
-</table>
+<details class="details">
+    <summary class="summary">@Messages("confirmation.itemisedfeelink")</summary>
+    <div class="details__inner">
+        <ul class="list">
+            <p>@summary</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @breakdown.map {
+                    case BreakdownRow(label, quantity, perItem, total) => {
+                        <tr>
+                            <td>@Messages(label)</td>
+                            <td class="numeric">@quantity</td>
+                            <td class="numeric">@perItem</td>
+                            <td class="numeric">@total</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">@Messages("confirmation.total")</th>
+                        <td class="numeric">@amount</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </ul>
+    </div>
+</details>
