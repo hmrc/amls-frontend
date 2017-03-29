@@ -555,6 +555,7 @@ confirmation.whathappensnext.p.2 = When you receive the email, sign back in to t
 
 confirmation.amendment.title = You’ve submitted an updated application
 confirmation.amendment.header = Updated application fee and reference
+confirmation.amendment.header.secondary = Update information
 confirmation.amendment.lede = You’ve submitted an updated application
 confirmation.amendment.thankyou.p = Because of the changes you’ve made, you need to pay an additional fee.
 confirmation.amendment.info = Because of the changes you’ve made, you need to pay an additional fee. Your changes won’t be reviewed by HM Revenue and Customs until the fee is paid.
@@ -571,8 +572,12 @@ confirmation.amendment.details.list.03 = paid some of your fees so far, but not 
 confirmation.amendment.details.02 = Your application won’t be reviewed by HM Revenue and Customs until all the fees are paid.
 
 confirmation.variation.title = You’ve submitted your updated information
+confirmation.variation.header = Updated fee and reference
+confirmation.variation.header.secondary = Update information
 confirmation.variation.lede = You’ve updated your information
+confirmation.variation.info = You need to pay a fee for the updates you’ve made. Your changes won’t be reviewed by HMRC Revenue and Customs until the fee is paid.
 confirmation.variation.summary = This shows your total fees for each item.
+confirmation.variation.itemisedfeelink = How your fee has been calculated
 
 confirmation.payment.title = You’ve submitted and paid
 confirmation.payment.lede = You’ve submitted and paid
