@@ -36,262 +36,129 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "AdditionalExtraAddressController" must {
+  "AdditionalExtraAddressController" when {
 
     val pageTitle = Messages("responsiblepeople.additional_extra_address.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-    "use the correct services" in new Fixture {
-      AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
-      AdditionalAddressController.authConnector must be(AMLSAuthConnector)
-    }
 
-    "on get() display the persons page when no existing data in keystore" in new Fixture {
+    "get is called" must {
 
-      val responsiblePeople = ResponsiblePeople(personName)
+      "display the persons page when no existing data in keystore" in new Fixture {
 
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val responsiblePeople = ResponsiblePeople(personName)
 
-      val result = additionalExtraAddressController.get(RecordId)(request)
-      status(result) must be(OK)
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-      document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
-      document.select("input[name=addressLine1]").`val` must be("")
-      document.select("input[name=addressLine2]").`val` must be("")
-      document.select("input[name=addressLine3]").`val` must be("")
-      document.select("input[name=addressLine4]").`val` must be("")
-      document.select("input[name=addressLineNonUK1]").`val` must be("")
-      document.select("input[name=addressLineNonUK2]").`val` must be("")
-      document.select("input[name=addressLineNonUK3]").`val` must be("")
-      document.select("input[name=addressLineNonUK4]").`val` must be("")
-      document.select("input[name=postcode]").`val` must be("")
-      document.select("input[name=country]").`val` must be("")
-    }
+        val result = additionalExtraAddressController.get(RecordId)(request)
+        status(result) must be(OK)
 
-    "on get() display the previous home address with UK fields populated" in new Fixture {
-
-      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-      val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      val result = additionalExtraAddressController.get(RecordId)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-      document.select("input[name=addressLine1]").`val` must be("Line 1")
-      document.select("input[name=addressLine2]").`val` must be("Line 2")
-      document.select("input[name=addressLine3]").`val` must be("Line 3")
-      document.select("input[name=addressLine4]").`val` must be("")
-      document.select("input[name=postcode]").`val` must be("AA1 1AA")
-    }
-
-    "on get() display the previous home address with non-UK fields populated" in new Fixture {
-
-      val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-      val additionalExtraAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
-      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalExtraAddress))
-      val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      val result = additionalExtraAddressController.get(RecordId)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
-      document.select("input[name=addressLineNonUK1]").`val` must be("Line 1")
-      document.select("input[name=addressLineNonUK2]").`val` must be("Line 2")
-      document.select("input[name=addressLineNonUK3]").`val` must be("")
-      document.select("input[name=addressLineNonUK4]").`val` must be("")
-      document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
-    }
-
-    "must pass on post with all the mandatory UK parameters supplied" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "true",
-        "addressLine1" -> "Line 1",
-        "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA"
-      )
-
-      val responsiblePeople = ResponsiblePeople(personName)
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-      status(result) must be(SEE_OTHER)
-    }
-
-    "must pass on post with all the mandatory non-UK parameters supplied" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "false",
-        "addressLineNonUK1" -> "Line 1",
-        "addressLineNonUK2" -> "Line 2",
-        "country" -> "ES"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-      status(result) must be(SEE_OTHER)
-    }
-
-    "fail submission on invalid non uk address" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "false",
-        "addressLineNonUK1" -> "Line #1",
-        "addressLineNonUK2" -> "Line #2",
-        "country" -> "ES"
-      )
-
-      val responsiblePeople = ResponsiblePeople(personName)
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      val errorCount = 2
-      val elementsWithError: Elements = document.getElementsByClass("error-notification")
-      elementsWithError.size() must be(errorCount)
-      for (ele: Element <- elementsWithError) {
-        ele.html() must include(Messages("err.text.validation"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
+        document.select("input[name=addressLine1]").`val` must be("")
+        document.select("input[name=addressLine2]").`val` must be("")
+        document.select("input[name=addressLine3]").`val` must be("")
+        document.select("input[name=addressLine4]").`val` must be("")
+        document.select("input[name=addressLineNonUK1]").`val` must be("")
+        document.select("input[name=addressLineNonUK2]").`val` must be("")
+        document.select("input[name=addressLineNonUK3]").`val` must be("")
+        document.select("input[name=addressLineNonUK4]").`val` must be("")
+        document.select("input[name=postcode]").`val` must be("")
+        document.select("input[name=country]").`val` must be("")
       }
-    }
 
-    "must fail on post if isUK field not supplied" in new Fixture {
+      "display the previous home address with UK fields populated" in new Fixture {
 
-      val line1MissingRequest = request.withFormUrlEncodedBody()
-      val result = additionalExtraAddressController.post(RecordId)(line1MissingRequest)
-      status(result) must be(BAD_REQUEST)
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isUK]").html() must include(Messages("error.required.uk.or.overseas"))
-    }
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-    "must fail on post if default fields for UK not supplied" in new Fixture {
+        val result = additionalExtraAddressController.get(RecordId)(request)
+        status(result) must be(OK)
 
-      val requestWithMissingParams = request.withFormUrlEncodedBody(
-        "isUK" -> "true",
-        "addressLine1" -> "",
-        "addressLine2" -> "",
-        "postCode" -> ""
-      )
-
-      val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
-      document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
-      document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
-    }
-
-    "must fail on post if default fields for overseas not supplied" in new Fixture {
-
-      val requestWithMissingParams = request.withFormUrlEncodedBody(
-        "isUK" -> "false",
-        "addressLineNonUK1" -> "",
-        "addressLineNonUK2" -> "",
-        "country" -> ""
-      )
-
-      val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-      document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-      document.select("a[href=#country]").html() must include(Messages("error.required.country"))
-    }
-
-
-    "must go to the correct location when edit mode is on" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "true",
-        "addressLine1" -> "Line 1",
-        "addressLine2" -> "Line 2",
-        "postCode" -> "AA1 1AA"
-      )
-
-      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-      val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-      val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-    }
-
-    "fail submission on invalid uk address in edit mode" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "isUK" -> "true",
-        "addressLine1" -> "Line &1",
-        "addressLine2" -> "Line &2",
-        "postCode" -> "AA1 1AA"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val mockCacheMap = mock[CacheMap]
-      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      val errorCount = 2
-      val elementsWithError: Elements = document.getElementsByClass("error-notification")
-      elementsWithError.size() must be(errorCount)
-      for (ele: Element <- elementsWithError) {
-        ele.html() must include(Messages("err.text.validation"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.select("input[name=addressLine1]").`val` must be("Line 1")
+        document.select("input[name=addressLine2]").`val` must be("Line 2")
+        document.select("input[name=addressLine3]").`val` must be("Line 3")
+        document.select("input[name=addressLine4]").`val` must be("")
+        document.select("input[name=postcode]").`val` must be("AA1 1AA")
       }
+
+      "display the previous home address with non-UK fields populated" in new Fixture {
+
+        val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+        val additionalExtraAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
+        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalExtraAddress))
+        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        val result = additionalExtraAddressController.get(RecordId)(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
+        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
+        document.select("input[name=addressLineNonUK1]").`val` must be("Line 1")
+        document.select("input[name=addressLineNonUK2]").`val` must be("Line 2")
+        document.select("input[name=addressLineNonUK3]").`val` must be("")
+        document.select("input[name=addressLineNonUK4]").`val` must be("")
+        document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
+      }
+
+      "display 404 Not Found" when {
+        "name cannot be found" in new Fixture {
+          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          val result = additionalExtraAddressController.get(RecordId)(request)
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
     }
 
-    "must go to timeAtAdditionalExtraAddress" when {
-      "edit mode is off" in new Fixture {
+    "post is called" must {
+
+      "pass on with all the mandatory UK parameters supplied" in new Fixture {
 
         val requestWithParams = request.withFormUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "postCode" -> "AA1 1AA"
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName)
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val mockCacheMap = mock[CacheMap]
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+      }
+
+      "pass on with all the mandatory non-UK parameters supplied" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "false",
+          "addressLineNonUK1" -> "Line 1",
+          "addressLineNonUK2" -> "Line 2",
+          "country" -> "ES"
         )
 
         val responsiblePeople = ResponsiblePeople()
@@ -303,10 +170,115 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
       }
 
-      "edit mode is on and time at address does not exist" in new Fixture {
+      "fail to submit" when {
+
+        "isUK field is not given" in new Fixture {
+
+          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val result = additionalExtraAddressController.post(RecordId)(line1MissingRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#isUK]").html() must include(Messages("error.required.uk.or.overseas"))
+        }
+
+        "default fields for UK is not given" in new Fixture {
+
+          val requestWithMissingParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "",
+            "addressLine2" -> "",
+            "postCode" -> ""
+          )
+
+          val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
+          document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
+          document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
+        }
+
+        "default fields for overseas is not given" in new Fixture {
+
+          val requestWithMissingParams = request.withFormUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "",
+            "addressLineNonUK2" -> "",
+            "country" -> ""
+          )
+
+          val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
+          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
+        }
+
+        "an invalid uk address is given" when {
+          "not editing" in new Fixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "isUK" -> "false",
+              "addressLineNonUK1" -> "Line #1",
+              "addressLineNonUK2" -> "Line #2",
+              "country" -> "ES"
+            )
+
+            val responsiblePeople = ResponsiblePeople(personName)
+
+            when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            val mockCacheMap = mock[CacheMap]
+            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+            val document: Document = Jsoup.parse(contentAsString(result))
+            document.title must be(pageTitle)
+            val errorCount = 2
+            val elementsWithError: Elements = document.getElementsByClass("error-notification")
+            elementsWithError.size() must be(errorCount)
+            for (ele: Element <- elementsWithError) {
+              ele.html() must include(Messages("err.text.validation"))
+            }
+          }
+          "editing" in new Fixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "isUK" -> "true",
+              "addressLine1" -> "Line &1",
+              "addressLine2" -> "Line &2",
+              "postCode" -> "AA1 1AA"
+            )
+
+            val responsiblePeople = ResponsiblePeople()
+
+            when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            val mockCacheMap = mock[CacheMap]
+            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
+            val document: Document = Jsoup.parse(contentAsString(result))
+            val errorCount = 2
+            val elementsWithError: Elements = document.getElementsByClass("error-notification")
+            elementsWithError.size() must be(errorCount)
+            for (ele: Element <- elementsWithError) {
+              ele.html() must include(Messages("err.text.validation"))
+            }
+          }
+        }
+
+
+      }
+
+      "go to the correct location when edit mode is on" in new Fixture {
+
         val requestWithParams = request.withFormUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "Line 1",
@@ -314,7 +286,10 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           "postCode" -> "AA1 1AA"
         )
 
-        val responsiblePeople = ResponsiblePeople()
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -323,10 +298,61 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
         val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
+        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
       }
+
+      "go to timeAtAdditionalExtraAddress" when {
+        "edit mode is off" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          val mockCacheMap = mock[CacheMap]
+          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+        }
+
+        "edit mode is on and time at address does not exist" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          val mockCacheMap = mock[CacheMap]
+          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
+        }
+      }
+
     }
 
+  }
+
+  it must {
+    "use the correct services" in new Fixture {
+      AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
+      AdditionalAddressController.authConnector must be(AMLSAuthConnector)
+    }
   }
 
 }
