@@ -38,7 +38,7 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "throw error on empty data" in {
       TimeAtAddress.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.required.rp.wherepersonlives.howlonglived"))))))
+        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.required.timeAtAddress"))))))
     }
   }
 

@@ -21,7 +21,7 @@ object TimeAtAddress {
 
     import jto.validation.forms.Rules._
 
-    (__ \ "timeAtAddress").read[String].withMessage("error.required.rp.wherepersonlives.howlonglived") flatMap {
+    (__ \ "timeAtAddress").read[String].withMessage("error.required.timeAtAddress") flatMap {
       case "" => (Path \ "timeAtAddress") -> Seq(ValidationError("error.required.timeAtAddress"))
       case "01" => ZeroToFiveMonths
       case "02" => SixToElevenMonths

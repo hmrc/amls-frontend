@@ -1,0 +1,38 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.timeataddress.address_history", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.timeataddress.address_history", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.post(index,edit,fromDeclaration)) {
+
+        @fieldset(
+            f = f("timeAtAddress-fieldset"),
+            legend = "responsiblepeople.additional_address.how_long",
+            legendHidden = true,
+            jsHidden = false,
+            panel = false,
+            id = s"""${f("address-history").id}-fieldset"""
+        ) {
+            @errorGroup(
+                field = f("timeAtAddress")
+            ) {
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
+            }
+        }
+        @submit(edit, Some("button.saveandcontinue"))
+    }
+}

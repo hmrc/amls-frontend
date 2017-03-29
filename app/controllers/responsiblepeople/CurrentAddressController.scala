@@ -21,8 +21,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   val statusService: StatusService
 
-
-  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
@@ -39,35 +38,6 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
     }
 
-  def handleRedirection(index: Int, data: ResponsiblePersonCurrentAddress,
-                        rpO: Option[ResponsiblePeople],
-                        status: SubmissionStatus,
-                        edit: Boolean,
-                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = {
-    status match {
-      case SubmissionDecisionApproved => {
-        rpO match {
-          case None => NotFound(notFoundView)
-          case Some(rp) => {
-            rp.addressHistory match {
-              case None =>
-                handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-              case Some(hist) => {
-                hist.currentAddress match {
-                  case None =>
-                    handleApproved(index, edit, None, rp.lineId, data, fromDeclaration)
-                  case Some(currAdd) =>
-                    handleApproved(index, edit, Some(currAdd.personAddress), rp.lineId, data, fromDeclaration)
-                }
-              }
-            }
-          }
-        }
-      }
-      case _ => handleNotYetApproved(index, data.timeAtAddress, edit, fromDeclaration)
-    }
-  }
-
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
@@ -77,62 +47,37 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
               BadRequest(current_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            val responsiblePersonF = getData[ResponsiblePeople](index)
-            doUpdate(index, data).flatMap { _ =>
-              for {
-                rpO <- responsiblePersonF
-                status <- statusService.getStatus
-              } yield handleRedirection(index, data, rpO, status, edit, fromDeclaration)
+            getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+              (for {
+                rp <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                currentAddress <- addressHistory.currentAddress
+              } yield {
+                val currentAddressWithTime = data.copy(timeAtAddress = currentAddress.timeAtAddress)
+                updateAndRedirect(currentAddressWithTime, index, edit, fromDeclaration)
+              }) getOrElse updateAndRedirect(data, index, edit, fromDeclaration)
             }
           }
         }).recoverWith {
-          case _: IndexOutOfBoundsException =>
-            Future.successful(NotFound(notFoundView))
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
 
-  private def handleApproved(index: Int,
-                              edit: Boolean,
-                              originalPersonAddress: Option[PersonAddress],
-                              lineId: Option[Int],
-                              data: ResponsiblePersonCurrentAddress, fromDeclaration: Boolean = false) = {
-
-    val moreThanOneYear = (data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears
-
-
-    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)
-      && lineId.isDefined && originalPersonAddress.isDefined) {
-      Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-    } else if (moreThanOneYear && !edit) {
-      Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-    } else if (!moreThanOneYear) {
-      Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-    } else {
-      Redirect(routes.DetailedAnswersController.get(index, edit))
-    }
-  }
-
-  private def handleNotYetApproved(index: Int,
-                                   timeAtAddress: TimeAtAddress,
-                                   edit: Boolean, fromDeclaration: Boolean = false) = {
-    (timeAtAddress, edit) match {
-      case (ThreeYearsPlus | OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-      case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-      case (ThreeYearsPlus | OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index, edit))
-      case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-    }
-  }
-
-  private def doUpdate
-  (index: Int, data: ResponsiblePersonCurrentAddress)
+  private def updateAndRedirect
+  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
-        (res.addressHistory, data.timeAtAddress) match {
-          case (Some(a), ThreeYearsPlus | OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
-          case (Some(a), _) => a.currentAddress(data)
+        res.addressHistory match {
+          case Some(a) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
+    } map { _ =>
+      if (edit) {
+        Redirect(routes.DetailedAnswersController.get(index, edit))
+      } else {
+        Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+      }
     }
   }
 }

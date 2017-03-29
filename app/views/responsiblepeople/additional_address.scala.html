@@ -79,21 +79,6 @@
             </div>
         </div>
 
-        @fieldset(
-            f = f("timeAtAddress-fieldset"),
-            legend = "responsiblepeople.additional_address.how_long",
-            panel = false
-        ) {
-            @errorGroup(
-                field = f("timeAtAddress")
-            ) {
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
-            }
-        }
-
         @submit(edit, Some("button.saveandcontinue"))
     }
 
