@@ -195,7 +195,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
           val requestWithParams = request.withFormUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
-          
+
           when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
           when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))

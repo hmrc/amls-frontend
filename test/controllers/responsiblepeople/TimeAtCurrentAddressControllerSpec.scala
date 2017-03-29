@@ -191,7 +191,7 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
             }
             "redirect to the DetailedAnswersController" when {
               "there is an additional address already saved" in new Fixture {
-println(".")
+
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
@@ -212,7 +212,6 @@ println(".")
                   .thenReturn(Future.successful(SubmissionReadyForReview))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
-                println(",")
 
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
