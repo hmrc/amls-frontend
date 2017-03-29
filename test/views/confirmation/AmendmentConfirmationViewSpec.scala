@@ -28,6 +28,10 @@ class AmendmentConfirmationViewSpec extends GenericTestHelper with MustMatchers 
       doc.select(".heading-secondary").text must include(Messages("confirmation.header.secondary"))
     }
 
+    "show the correct informational paragraph" in new ViewFixture {
+      doc.select(".info").text mustBe Messages("confirmation.amendment.info")
+    }
+
   }
 
 }
