@@ -74,6 +74,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
           false
         )
 
