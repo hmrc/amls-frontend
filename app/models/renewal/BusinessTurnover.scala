@@ -1,13 +1,11 @@
 package models.renewal
 
-import jto.validation._
+import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
+import models.businessactivities.ExpectedBusinessTurnover
 import play.api.libs.json._
 
 sealed trait BusinessTurnover
-
 
 object BusinessTurnover {
 
@@ -25,7 +23,6 @@ object BusinessTurnover {
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
     (__ \ "businessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
       case "01" => First
       case "02" => Second
@@ -64,7 +61,6 @@ object BusinessTurnover {
     }
   }
 
-
   implicit val jsonWrites = Writes[BusinessTurnover] {
     case First => Json.obj("businessTurnover" -> "01")
     case Second => Json.obj("businessTurnover" -> "02")
@@ -73,5 +69,16 @@ object BusinessTurnover {
     case Fifth => Json.obj("businessTurnover" -> "05")
     case Sixth => Json.obj("businessTurnover" -> "06")
     case Seventh => Json.obj("businessTurnover" -> "07")
+  }
+
+  implicit def convert(model: BusinessTurnover): ExpectedBusinessTurnover = model match {
+    case BusinessTurnover.First => ExpectedBusinessTurnover.First
+    case BusinessTurnover.Second => ExpectedBusinessTurnover.Second
+    case BusinessTurnover.Third => ExpectedBusinessTurnover.Third
+    case BusinessTurnover.Fourth => ExpectedBusinessTurnover.Fourth
+    case BusinessTurnover.Fifth => ExpectedBusinessTurnover.Fifth
+    case BusinessTurnover.Sixth => ExpectedBusinessTurnover.Sixth
+    case BusinessTurnover.Seventh => ExpectedBusinessTurnover.Seventh
+    case _ => throw new Exception("Invalid business turnover value")
   }
 }

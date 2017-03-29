@@ -120,6 +120,17 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
     }
 
+    "excludes partial matching urls" in new TestFixture {
+
+      val filter = app.injector.instanceOf[ConfirmationFilter]
+      val rh = FakeRequest(GET, "/confirmation/payment-complete?ref=979ereruioj").withSession(("sessionId", "SOME_SESSION_ID"))
+      val nextFilter = Action(Ok("success"))
+
+      val result = filter(nextFilter)(rh).run()
+
+      status(result) mustBe OK
+    }
+
   }
 
 }
