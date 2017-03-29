@@ -1,6 +1,5 @@
 @(edit: Boolean = false, buttonMessageKey : Option[String] = None)(implicit lang:Lang,  m: Messages)
-<div class="form-group-footer">
-    <button type="submit" name="submit" class="button" >
-        @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))
-    </button>
-</div>
+
+<button type="submit" name="submit" class="button" >
+    @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))
+</button>
