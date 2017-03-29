@@ -18,14 +18,12 @@
     @Messages("confirmation.submission.info")
     </div>
 
-
     <div class="reg-online--pay-fee">
-        @Messages("confirmation.fee")
-        <p class="heading-large push--top">@total</p>
-        @Messages("confirmation.sidebar.code")
-        <p class="heading-large push--top">@Messages(paymentRef)</p>
+        <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
+            <span class="heading-large">@total</span></p>
+        <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
+            <span class="heading-large">@Messages(paymentRef)</span></p>
     </div>
-
 
     @detailsSummary(
         summary = Messages("confirmation.breakdown.details")
@@ -61,7 +59,6 @@
                 </tr>
             </tfoot>
         </table>
-
 
     }
 
