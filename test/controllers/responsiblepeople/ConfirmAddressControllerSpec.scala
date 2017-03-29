@@ -2,7 +2,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businesscustomer.{ReviewDetails, Address => BCAddress}
+import models.businesscustomer.{ReviewDetails, Address => BusinessCustomerAddress}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
 import org.mockito.Matchers.{eq => meq, _}
@@ -17,7 +17,6 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-
 class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
@@ -28,35 +27,44 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   }
 
-  "ConfirmTradingPremisesAddress" must {
+  "ConfirmAddress" when {
 
-    val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-      BCAddress("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
+    val reviewDtls = ReviewDetails(
+      "BusinessName",
+      Some(BusinessType.LimitedCompany),
+      BusinessCustomerAddress("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")),
+      "ghghg"
+    )
     val bm = BusinessMatching(Some(reviewDtls))
 
+    "Get is called" must {
 
-    "Get Option:" must {
+      "Load Confirm address page successfully" in new Fixture {
 
-      "Load Confirm trading premises address page successfully" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(bm)))
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(Some(bm)))
         val result = controller.get(1)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.confirmaddress.title"))
       }
 
-      "redirect to where is your trading premises page" when {
+      "redirect to current address page" when {
         "business matching model does not exist" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
         }
 
         "business matching ->review details is empty" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = None))))
+
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
@@ -64,16 +72,14 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       }
     }
 
-    "Post" must {
-      val emptyCache = CacheMap("", Map.empty)
+    "Post is called" must {
 
       val personAddress = PersonAddressUK("address1","address2",Some("address3"),Some("address4"),"postcode")
       val rp = ResponsiblePersonCurrentAddress(personAddress,None,None)
 
-
       "successfully redirect to next page" when {
 
-        "option is 'Yes' is selected confirming the mentioned address is the trading premises address" in new Fixture {
+        "option is 'Yes' is selected confirming the mentioned address is the address" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "true"
@@ -96,11 +102,12 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePersonCurrentAddress]](
             any(),
-            meq(Seq(rp)))(any(), any(), any())
+            meq(Seq(rp))
+          )(any(), any(), any())
 
         }
 
-        "option is 'No' is selected confirming the mentioned address is the trading premises address" in new Fixture {
+        "option is 'No' is selected confirming the mentioned address is the address" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "false"
           )
