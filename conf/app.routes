@@ -252,8 +252,11 @@ POST        /responsible-people/your-name/:index                        controll
 GET         /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
-GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
+POST        /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
+
+GET         /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
