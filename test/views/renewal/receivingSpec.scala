@@ -36,6 +36,16 @@ class receivingSpec extends GenericTestHelper with MustMatchers  {
 
     }
 
+    "have the correct content" in new ViewFixture {
+
+      val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
+
+      def view = views.html.renewal.receiving(form2, true)
+
+      form.html() must include (Messages("renewal.receiving.expect.to.receive"))
+
+    }
+
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,

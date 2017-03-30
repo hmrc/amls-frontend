@@ -67,19 +67,32 @@
         }
     }
 
-    @model.customersOutsideUK.map { boa =>
+    @model.receiveCashPayments.map { rcp =>
         @checkYourAnswers(
-            question = Messages("renewal.customer.outside.uk.title"),
-            editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
-            ) {
-            @boa.countries.fold {
-            <p>@Messages("lbl.no")</p>
-            } { branches =>
-            <ul class="list list-bullet">
-                @branches.map { country =>
-                <li>@country</li>
+            question = Messages("renewal.receiving.title"),
+            editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
+        ) {
+            @rcp.paymentMethods match {
+                case None => {<p>@Messages("lbl.no")</p>}
+                case Some(pm:PaymentMethods) => {
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("renewal.receiving.expect.to.receive")
+                    ) {
+                        <ul class="list list--comma">
+                            <li>@pm match {
+                                case PaymentMethods(false, false, None) => { Unknown }
+                                case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                                }</li>
+                        </ul>
+                    }
                 }
-            </ul>
             }
         }
     }

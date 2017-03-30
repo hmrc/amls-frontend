@@ -2,19 +2,16 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessactivities._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.renewal.{AMLSTurnover, BusinessTurnover, CustomersOutsideUK, Renewal, PercentageOfCashPaymentOver15000}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.test.Helpers._
-import services.{RenewalService, StatusService}
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -37,8 +34,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       renewalService = mockRenewalService
     )
 
-//    when(mockRenewalService.getRenewal(any(), any(), any()))
-//      .thenReturn(Future.successful(Some(Renewal(businessTurnover = Some(BusinessTurnover.First)))))
   }
 
     val mockCacheMap = mock[CacheMap]
@@ -46,7 +41,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
   "Get" must {
-
 
     "load the summary page when there is data in the renewal" in new Fixture {
 
@@ -83,6 +77,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(AMLSTurnover.First),
             Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             Some(PercentageOfCashPaymentOver15000.First),
+            Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
             false)))
 
       val result = controller.get()(request)

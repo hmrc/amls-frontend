@@ -1452,8 +1452,8 @@ renewal.involvedinother.title = Is your business involved in any other activitie
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
-renewal.receiving.title =In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
-
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
