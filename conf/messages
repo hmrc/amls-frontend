@@ -524,7 +524,7 @@ amendment.sidebar.button.text = Submit amendment
 #### Confirmation page ####
 confirmation.title = You’ve submitted your application
 confirmation.header = Application fee and reference
-confirmation.header.secondary = Submit registration
+confirmation.header.secondary = Update information
 confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
@@ -552,14 +552,17 @@ confirmation.unpaidpeople = Responsible people who have already passed the Fit a
 confirmation.whathappensnext.heading = What happens next
 confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and Customs within 45 days of paying the registration fee.
 confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.
+confirmation.itemisedfeelink = How your fee has been calculated
 
 confirmation.amendment.title = You’ve submitted an updated application
+confirmation.amendment.header = Updated application fee and reference
+confirmation.amendment.header.secondary = Update information
 confirmation.amendment.lede = You’ve submitted an updated application
 confirmation.amendment.thankyou.p = Because of the changes you’ve made, you need to pay an additional fee.
+confirmation.amendment.info = Because of the changes you’ve made, you need to pay an additional fee. Your changes won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.amendment.previousfees.p = You still need to pay your previous fees, if you’ve not paid them already.
 confirmation.amendment.fee = Your amendment fee
 confirmation.amendment.breakdown = How your fee has been calculated:
-confirmation.amendment.itemisedfeelink = Your itemised fee
 confirmation.amendment.summary = This shows your total registration fees, including your original registration and the amendments you’ve made.
 confirmation.amendment.details.header = How much you have to pay
 confirmation.amendment.details.01 = The amount you have to pay depends on whether or not you’ve paid your previous fees yet. If you’ve:
@@ -569,7 +572,10 @@ confirmation.amendment.details.list.03 = paid some of your fees so far, but not 
 confirmation.amendment.details.02 = Your application won’t be reviewed by HM Revenue and Customs until all the fees are paid.
 
 confirmation.variation.title = You’ve submitted your updated information
+confirmation.variation.header = Updated fee and reference
+confirmation.variation.header.secondary = Update information
 confirmation.variation.lede = You’ve updated your information
+confirmation.variation.info = You need to pay a fee for the updates you’ve made. Your changes won’t be reviewed by HMRC Revenue and Customs until the fee is paid.
 confirmation.variation.summary = This shows your total fees for each item.
 
 confirmation.payment.title = You’ve submitted and paid
