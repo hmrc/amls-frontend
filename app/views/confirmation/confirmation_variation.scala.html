@@ -2,79 +2,33 @@
 @import forms2._
 @import models.confirmation._
 @import config.ApplicationConfig
+@import views.html.confirmation.{breakdown => breakdown_display}
 
-@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_],m:Messages)
+@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_], m: Messages)
 
 @main(
     title = Messages("confirmation.variation.title")
 ) {
 
-<div class="confirmation">
-    <h1 class="heading-large">@Messages("confirmation.variation.lede")</h1>
-</div>
+    <header class="page-header">
+        <h1 class="heading-xlarge">@Messages("confirmation.variation.header")</h1>
+        <p class="heading-secondary"><span class="visuallyhidden">
+            This section is </span>@Messages("confirmation.variation.header.secondary")</p>
+    </header>
 
-<p>@Messages("confirmation.amendment.thankyou.p")</p>
-
-<p>@Messages("confirmation.amendment.previousfees.p")</p>
-
-    @notice(
-        notice = Messages("confirmation.notice")
-    )
-
-<div class="panel-indent panel-indent--gutter panel-border-wide reg-online--pay-fee">
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--1-3">
-            @Messages("confirmation.amendment.fee")
-            <p class="heading-large">@total</p>
-        </div>
-        <div class="grid-layout__column grid-layout__column--2-3">
-            @Messages("confirmation.sidebar.code")
-            <p class="heading-large">@Messages(mlrRegNo)</p>
-        </div>
+    <div class="panel-indent panel-indent--gutter panel-border-wide">
+        @Messages("confirmation.variation.info")
     </div>
-</div>
 
-<details class="details">
-    <summary class="summary">@Messages("confirmation.amendment.itemisedfeelink")</summary>
-    <div class="details__inner">
-        <ul class="list panel-indent">
-            <p>@Messages("confirmation.variation.summary")</p>
-
-            <table>
-                <thead>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-                    <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-                    <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
-                </tr>
-                </thead>
-                <tbody>
-                @breakdown.map {
-                case BreakdownRow(label, quantity, perItem, total) => {
-                <tr>
-                    <td>@Messages(label)</td>
-                    <td class="numeric">@quantity</td>
-                    <td class="numeric">@perItem</td>
-                    <td class="numeric">@total</td>
-                </tr>
-                }
-                }
-                </tbody>
-                <tfoot>
-                <tr>
-                    <th colspan="3">@Messages("confirmation.total")</th>
-                    <td class="numeric">@total</td>
-                </tr>
-                </tfoot>
-            </table>
-
-            <p>@Messages("confirmation.amendment.details.02") </p>
-
-        </ul>
+    <div class="reg-online--pay-fee">
+        <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
+            <span class="heading-large">@total</span></p>
+        <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
+            <span class="heading-large">@Messages(mlrRegNo)</span></p>
     </div>
-</details>
 
-<p><a class="button" href="@paymentsUrl">@Messages("button.amendment.payfee")</a></p>
+    @breakdown_display(total, breakdown, Messages("confirmation.variation.summary"))
+
+    <p><a class="button" href="@paymentsUrl">@Messages("button.continue")</a></p>
 
 }
