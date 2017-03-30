@@ -1472,6 +1472,8 @@ renewal.turnover.title = How much total net profit did your business make in the
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
 
+renewal.msb.throughput.header = What was your total throughput in the last 12 months?
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
