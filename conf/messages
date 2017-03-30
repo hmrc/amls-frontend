@@ -1473,6 +1473,13 @@ renewal.turnover.title = How much total net profit did your business make in the
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
+renewal.msb.throughput.selection.1 = £0 to £99,999 
+renewal.msb.throughput.selection.2 = £100,000 to £499,999 
+renewal.msb.throughput.selection.3 = £500,000 to £999,999 
+renewal.msb.throughput.selection.4 = £1 million to £20 million 
+renewal.msb.throughput.selection.5 = £21 million to £100 million 
+renewal.msb.throughput.selection.6 = £101 million to £1 billion
+renewal.msb.throughput.selection.7 = More than £1 billion
 
 ############################### Survey ###############################
 

@@ -1,6 +1,8 @@
 package views.renewal
 
 import forms.EmptyForm
+import models.renewal.MsbThroughput
+import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -27,10 +29,20 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       doc.title must include(s"${Messages("renewal.msb.throughput.header")} - ${Messages("summary.renewal")}")
     }
 
-    "display the throughput selection radio buttons" in new ViewFixture {
+    MsbThroughput.throughputValues foreach { selection =>
 
+      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughputSelection"][value="${selection.code}"]""")
 
+      s"display the radio button for selection ${selection.code}" in new ViewFixture {
+        Option(getElement(doc).first) mustBe defined
+      }
 
+      s"display the selection label for selection ${selection.code}" in new ViewFixture {
+        val radioLabelElement = getElement(doc).first.parent
+
+        Option(radioLabelElement) mustBe defined
+        radioLabelElement.text mustBe Messages(selection.label)
+      }
     }
 
   }
