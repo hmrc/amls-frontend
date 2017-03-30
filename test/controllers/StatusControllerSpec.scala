@@ -74,7 +74,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       document.getElementsByClass("list").first().child(0).html() must be(Messages("status.incomplete"))
       document.getElementsByClass("list").first().child(1).html() must be(Messages("status.notsubmitted"))
       document.getElementsByClass("list").first().child(2).html() must be(Messages("status.underreview"))
-      document.getElementsByClass("list").first().child(3).html() must be(Messages("status.decisionmade"))
 
     }
 
