@@ -33,7 +33,7 @@
         case TimeAtAddress.SixToElevenMonths => {@Messages("responsiblepeople.additional_extra_address.6_11_months")}
         case TimeAtAddress.OneToThreeYears => {@Messages("responsiblepeople.additional_extra_address.1_3_years")}
         case TimeAtAddress.ThreeYearsPlus => {@Messages("responsiblepeople.additional_extra_address.more_3_years")}
-    }
+        }</p>
 }
 
 @personName(person: ResponsiblePeople) = @{person.personName.map ( name =>
@@ -171,7 +171,7 @@
             editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true).toString,
             dataItem = person.addressHistory.flatMap(_.currentAddress)
         ){ a =>
-            <p>@timeAtAddress(a.timeAtAddress)</p>
+            @timeAtAddress(a.timeAtAddress)
         }
 
         @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
@@ -190,7 +190,7 @@
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>
-                <p>@timeAtAddress(a.timeAtAddress)</p>
+                @timeAtAddress(a.timeAtAddress)
             }
 
         }
@@ -211,7 +211,7 @@
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>
-                <p>@timeAtAddress(a.timeAtAddress)</p>
+                @timeAtAddress(a.timeAtAddress)
             }
         }
 
