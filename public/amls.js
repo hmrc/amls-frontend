@@ -66,6 +66,7 @@ $(function () {
       input = $('<input>')
         .insertAfter(this.element)
         .val(value)
+        .addClass('form-control')
         .autocomplete({
           source: options,
           select: _select,
