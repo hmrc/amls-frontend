@@ -8,7 +8,7 @@ import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
-class InvolvedInOtherController @Inject()(
+class CashPaymentController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val authConnector: AuthConnector,
                                            val renewalService: RenewalService

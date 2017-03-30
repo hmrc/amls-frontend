@@ -428,6 +428,10 @@ POST        /renewal/business-turnover                                  @control
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
+GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+
+GET         /renewal/receiving                                          @controllers.renewal.CashPaymentController.get(edit: Boolean ?= false)
+
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
