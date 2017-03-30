@@ -1,6 +1,8 @@
 @import include._
+@import forms._
+@import forms2._
 
-@()(implicit request: Request[_], messages: Messages)
+@(f: Form2[_])(implicit request: Request[_], messages: Messages)
 
 @header = {
     @heading("renewal.msb.throughput.header", "summary.renewal")
@@ -11,6 +13,8 @@
     heading = header
 ) {
 
+    @form(f, controllers.renewal.routes.MsbThroughputController.post()) {
 
+    }
 
 }

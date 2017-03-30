@@ -447,3 +447,4 @@ GET         /renewal/progress                                           @control
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
 
 GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get()
+POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post()
