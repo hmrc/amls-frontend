@@ -15,9 +15,15 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
 
   "The MSB total throughput view" must {
     "display the correct header" in new ViewFixture {
-
       doc.select("header .heading-xlarge").text mustBe Messages("renewal.msb.throughput.header")
+    }
 
+    "display the correct secondary header" in new ViewFixture {
+      doc.select("header .heading-secondary").text must include(Messages("summary.renewal"))
+    }
+
+    "display the correct title" in new ViewFixture {
+      doc.title must include(s"${Messages("renewal.msb.throughput.header")} - ${Messages("summary.renewal")}")
     }
   }
 
