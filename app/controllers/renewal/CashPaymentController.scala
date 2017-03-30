@@ -14,7 +14,7 @@ class CashPaymentController @Inject()(
                                            val renewalService: RenewalService
                                          ) extends BaseController {
 
-  def get = ???
+  def get(edit: Boolean) = ???
 
   def post = ???
 

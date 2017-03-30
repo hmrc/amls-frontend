@@ -433,5 +433,6 @@ GET         /renewal/percentage                                         @control
 GET         /renewal/receiving                                          @controllers.renewal.CashPaymentController.get(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
