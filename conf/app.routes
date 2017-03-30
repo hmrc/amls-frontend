@@ -430,7 +430,7 @@ POST        /renewal/employment                                         @control
 
 GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 
-GET         /renewal/receiving                                          @controllers.renewal.CashPaymentController.get(edit: Boolean ?= false)
+GET         /renewal/receiving                                          @controllers.renewal.CashPaymentController.get()
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
 
