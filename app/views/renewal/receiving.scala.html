@@ -1,0 +1,86 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+  @errorSummary(f)
+  @heading("renewal.receiving.title", "summary.renewal")
+}
+
+@main(
+  title = Messages("renewal.receiving.title") + " - " + Messages("summary.renewal"),
+  heading = header
+) {
+
+  <span class="form-hint">@Messages("hvd.receiving.convert.currency.text")</span>
+
+  @form(f, controllers.renewal.routes.ReceiveCashPaymentsController.post(edit)) {
+
+    @fieldset(
+        f = f("receivePayments-fieldset"),
+        legend = "hvd.receiving.title",
+        legendHidden = true,
+        panel = false
+    ) {
+        @errorGroup(
+            field = f("receivePayments")
+        ) {
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.yes",
+              value = "true",
+              inline = true,
+              target = s".paymentMethods-fieldset"
+          )
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.no",
+              value = "false",
+              inline = true
+          )
+        }
+    }
+
+    @fieldset(
+          f = f("paymentMethods-fieldset"),
+          legend = "hvd.receiving.expect.to.receive",
+          legendHidden = true,
+          classes = Seq("paymentMethods-fieldset"),
+          hint = "lbl.select.all"
+      ) {
+        @errorGroup(
+            field = f("paymentMethods")
+        ) {
+            @checkbox(
+                f = f("paymentMethods.courier"),
+                labelText = "hvd.receiving.option.01",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.direct"),
+                labelText = "hvd.receiving.option.02",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.other"),
+                labelText = "hvd.receiving.option.03",
+                value = "true",
+                target = s"#paymentMethods-details-fieldset"
+            )
+        }
+    }
+
+    @panel(
+        field = Some(f("paymentMethods-details-fieldset")),
+        jsHidden = true
+    ) {
+        @input(
+            field = f("paymentMethods.details"),
+            labelText = "hvd.receiving.give.details.lbl"
+        )
+    }
+
+    @submit(edit)
+  }
+}

@@ -8,16 +8,18 @@ import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
-class CashPaymentController @Inject()(
+class ReceiveCashPaymentsController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val authConnector: AuthConnector,
                                            val renewalService: RenewalService
                                          ) extends BaseController {
 
-  def get = Authorised.async{
+  def get(edit: Boolean = false) = Authorised.async{
     ???
   }
 
-  def post = ???
+  def post(edit: Boolean = false) = Authorised.async{
+    ???
+  }
 
 }
