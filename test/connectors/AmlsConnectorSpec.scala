@@ -3,6 +3,7 @@ package connectors
 import models._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
+import models.renewal.RenewalResponse
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -20,6 +21,7 @@ import scala.concurrent.Future
 class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   object AmlsConnector extends AmlsConnector {
+
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
     override private[connectors] val url: String = "amls/subscription"
     override private[connectors] val httpGet: HttpGet = mock[HttpGet]
@@ -86,6 +88,19 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     paymentReference = Some(""),
     difference = Some(0)
   )
+  val renewalResponse = RenewalResponse(
+    processingDate = "",
+    etmpFormBundleNumber = "",
+    registrationFee = 0,
+    fpFee = Some(0),
+    fpFeeRate = None,
+    premiseFee = 0,
+    premiseFeeRate = None,
+    totalFees = 0,
+    paymentReference = Some(""),
+    difference = Some(0)
+  )
+
 
 
   val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
@@ -171,5 +186,18 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         _ mustBe amendmentResponse
       }
     }
+  }
+
+  "renewal" must {
+    "successfully submit renewal" in {
+      when { AmlsConnector.httpPost.POST[SubscriptionRequest, RenewalResponse](
+          eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewal"), eqTo(subscriptionRequest), any())(any(), any(), any())
+      } thenReturn Future.successful(renewalResponse)
+
+      whenReady(AmlsConnector.renewal(subscriptionRequest, amlsRegistrationNumber)) {
+        _ mustBe renewalResponse
+      }
+    }
+
   }
 }

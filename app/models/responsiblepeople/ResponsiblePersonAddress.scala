@@ -5,7 +5,7 @@ import jto.validation.forms._
 
 
 case class ResponsiblePersonAddress(personAddress: PersonAddress,
-                                    timeAtAddress: TimeAtAddress)
+                                    timeAtAddress: Option[TimeAtAddress])
 
 object ResponsiblePersonAddress {
 
@@ -14,18 +14,15 @@ object ResponsiblePersonAddress {
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonAddress] = From[UrlFormEncoded] { __ =>
 
   import jto.validation.forms.Rules._
-  (
-    (__).read[PersonAddress] ~
-      (__).read[TimeAtAddress]
-    ) (ResponsiblePersonAddress.apply _)
+    (__.read[PersonAddress] ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
 }
 
   implicit val formWrites: Write[ResponsiblePersonAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-        (__).write[PersonAddress] ~
-          (__).write[TimeAtAddress]
+        __.write[PersonAddress] ~
+          __.write[Option[TimeAtAddress]]
       ) (unlift(ResponsiblePersonAddress.unapply))
   }
 

@@ -3,28 +3,38 @@ package controllers
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessType, _}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.notifications.ContactType._
-import models.notifications.{NotificationDetails, IDType, NotificationRow}
+import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.AuthEnrolmentsService
-import utils.AuthorisedFixture
+import play.api.{Application, Mode}
+import services.{AuthEnrolmentsService, NotificationService}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
+class NotificationControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+
+  val notificationService = mock[NotificationService]
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[NotificationService].to(notificationService))
+    .build()
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = authRequest
+    self =>
+    val request = authRequest
 
     val testNotifications = NotificationRow(
       status = None,
@@ -44,7 +54,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       testNotifications,
       testNotifications.copy(contactType = Some(RevocationReasons), receivedAt = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(ReminderToPayForApplication),receivedAt = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
+      testNotifications.copy(contactType = Some(ReminderToPayForApplication), receivedAt = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(ReminderToPayForVariation), receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(ReminderToPayForRenewal), receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
@@ -56,10 +66,9 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       testNotifications.copy(contactType = Some(Others), receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
     )
 
-    val controller = new NotificationsController {
+    val controller = new NotificationController {
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
-      override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
@@ -79,44 +88,16 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
   }
 
   "getMessages" must {
-    "display the page with messages in chronological order (newest first)" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-        .thenReturn(Future.successful(Some(testBusinessMatch)))
-
-      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
-        .thenReturn(Future.successful(Some("")))
-
-      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-        .thenReturn(Future.successful(testList))
-
-      val result = controller.getMessages()(request)
-      val content = contentAsString(result)
-      val document = Jsoup.parse(content)
-      val table = document.getElementsByTag("table")
-      val rows = table.select("tbody").select("tr")
-
-      status(result) mustBe 200
-
-      document.getElementsByClass("panel-indent").html() must include(testBusinessName)
-
-      table.html() must include("Subject")
-      table.html() must include("Date")
-      table.html() must include("message-unread")
-
-      rows.first().children().last().text() mustBe "3 December 2017"
-      rows.last().children().last().text() mustBe "1 December 1971"
-    }
 
     "throw an exception" when {
       "business name cannot be retrieved" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("")))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
+        when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
           .thenReturn(Future.successful(testList))
 
         val result = intercept[Exception] {
@@ -127,13 +108,13 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
       }
       "enrolment does not exist" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
 
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
+        when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
           .thenReturn(Future.successful(testList))
 
         val result = intercept[Exception] {
@@ -146,31 +127,40 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
   }
 
   "messageDetails" must {
-    "display the message view given the message id" in new Fixture {
-      when (controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+    "display the message view given the message id for contactType ApplicationAutorejectionForFailureToPay" in new Fixture {
+      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(Some("Registration Number")))
 
-      when (controller.amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(NotificationDetails(None,None,Some("Message Text"), false))))
+      when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(NotificationDetails(Some(ApplicationAutorejectionForFailureToPay), None, Some("Message Text"), false))))
 
-      val result = controller.messageDetails("dfgdhsjk")(request)
+      val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
 
       status(result) mustBe 200
-      contentAsString(result) must include ("Message Text")
+      contentAsString(result) must include("Message Text")
     }
   }
 
 }
 
-class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
+class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
+
+  val notificationService = mock[NotificationService]
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[NotificationService].to(notificationService))
+    .configure("Test.microservice.services.feature-toggle.notifications" -> false)
+    .build()
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new NotificationsController {
+    val controller = new NotificationController {
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
-      override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
@@ -189,15 +179,13 @@ class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper 
     )
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
-
   "NotificationsControllerWithoutNotificationsSpec" must {
     "respond with not found when toggle is off" when {
       "viewing a list of messages" in new Fixture {
         status(controller.getMessages()(request)) mustBe 404
       }
       "viewing an individual message" in new Fixture {
-        status(controller.messageDetails("")(request)) mustBe 404
+        status(controller.messageDetails("",ContactType.MindedToRevoke)(request)) mustBe 404
       }
     }
   }

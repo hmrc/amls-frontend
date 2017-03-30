@@ -26,16 +26,21 @@
 </section>
 }
 
-@timeAtAddress(t : TimeAtAddress) = {
-    <p>@t match {
+@timeAtAddress(t : Option[TimeAtAddress]) = {
+    <p>@t.map{
         case TimeAtAddress.Empty => {@Messages("missing.dataItem")}
         case TimeAtAddress.ZeroToFiveMonths => {@Messages("responsiblepeople.additional_extra_address.0_5_months")}
         case TimeAtAddress.SixToElevenMonths => {@Messages("responsiblepeople.additional_extra_address.6_11_months")}
         case TimeAtAddress.OneToThreeYears => {@Messages("responsiblepeople.additional_extra_address.1_3_years")}
         case TimeAtAddress.ThreeYearsPlus => {@Messages("responsiblepeople.additional_extra_address.more_3_years")}
-    }
-    @Messages("responsiblepeople.detailed_answers.at_this_address")</p>
+        }</p>
 }
+
+@personName(person: ResponsiblePeople) = @{person.personName.map ( name =>
+    name.fullName
+).getOrElse(
+    Messages("missing.personName")
+)}
 
 @header = {
     @heading("responsiblepeople.detailed_answers.title", "summary.responsiblepeople")
@@ -47,6 +52,8 @@
 ) {
 
     @model.map { person =>
+
+
 
         <h2 class="heading-large">
             @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):
@@ -157,6 +164,13 @@
             <ul class="list list--comma">
                 @a.personAddress.toLines.map { l => <li>@l</li> }
             </ul>
+        }
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+            editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true).toString,
+            dataItem = person.addressHistory.flatMap(_.currentAddress)
+        ){ a =>
             @timeAtAddress(a.timeAtAddress)
         }
 
@@ -169,8 +183,16 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
+            }
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true).toString,
+                dataItem = Some(pa)
+            ){ a =>
                 @timeAtAddress(a.timeAtAddress)
             }
+
         }
 
         @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
@@ -182,6 +204,13 @@
                 <ul class="list list--comma">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
+            }
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true).toString,
+                dataItem = Some(pa)
+            ){ a =>
                 @timeAtAddress(a.timeAtAddress)
             }
         }
@@ -212,6 +241,19 @@
             dataItem = person.positions
         ) { pos =>
             <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
+        }
+
+        @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
+            @detailedAnswers(
+            question = Messages("responsiblepeople.check_your_answers.soleproprietor_for_other_business"),
+            editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true).toString(),
+            dataItem = Some(anotherBusiness)
+            ) { vr2 =>
+            <p>@vr2.soleProprietorOfAnotherBusiness match {
+                case true => {@Messages("lbl.yes")}
+                case false => {@Messages("lbl.no")}
+                }</p>
+            }
         }
 
         @person.vatRegistered.map { vr =>

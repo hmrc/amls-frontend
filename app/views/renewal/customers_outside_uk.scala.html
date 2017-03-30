@@ -1,0 +1,63 @@
+@import forms.{Form2, ValidField, InvalidField}
+@import include._
+@import include.forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target = @{
+    s"""${f("isOutside").id}-panel"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.customer.outside.uk.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+    @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
+
+        @fieldset(
+            legend = "renewal.customer.outside.uk.title",
+            legendHidden = true,
+            panel = false,
+            f = f("isOutside")
+        ) {
+
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            data = Seq("data-toggle-new")
+        ) {
+            @hint(
+                hint = "businessactivities.hight.value.customer.lbl.hint"
+            )
+
+            @errorGroup(f("countries")) {
+                @addRemove("lbl.add.another.country") {
+                    @for(i <- 0 until 10) {@country(f(s"countries[$i]"))}
+                }
+            }
+        }
+
+        @submit(edit)
+    }
+
+}

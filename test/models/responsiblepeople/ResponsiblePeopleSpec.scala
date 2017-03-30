@@ -190,6 +190,19 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       CompleteResponsiblePeople.isComplete must be(true)
     }
 
+    "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
+      CompleteResponsiblePeople.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
+    }
+
+    "the model partially complete with vat registration model is empty" in {
+      CompleteResponsiblePeople.copy(vatRegistered = None).isComplete must be(false)
+    }
+
+    "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
+      CompleteResponsiblePeople.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+        vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
+    }
+
     "the model is has no data" in {
       val initial = ResponsiblePeople()
       initial.isComplete must be(true)
@@ -426,9 +439,10 @@ trait ResponsiblePeopleValues {
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ")
-    private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, ZeroToFiveMonths)
+    private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
     private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH")
-    private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, ZeroToFiveMonths)
+    private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
+    val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
     val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
     val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
@@ -453,8 +467,8 @@ trait ResponsiblePeopleValues {
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
     private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
-    private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, ZeroToFiveMonths)
-    private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
+    private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
+    private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
     val personName = PersonName("first", Some("middle"), "last", None, None)
     val contactDetails = ContactDetails("07702743444", "new@test.com")
@@ -480,7 +494,9 @@ trait ResponsiblePeopleValues {
     Some(true),
     false,
     Some(1),
-    Some(StatusConstants.Unchanged)
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val InCompleteResponsiblePeople = ResponsiblePeople(
@@ -552,6 +568,9 @@ trait ResponsiblePeopleValues {
     "training" -> Json.obj(
       "training" -> true,
       "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
     ),
     "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,

@@ -16,11 +16,12 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
                                   (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
-    val exclusionSet = Set(
+    val exclusionSet = Seq(
       controllers.routes.LandingController.get().url,
       controllers.routes.LandingController.start().url,
       controllers.routes.ConfirmationController.get().url,
-      "/pay-online/other-taxes"
+      "/pay-online/other-taxes",
+      "/confirmation/payment-complete"
     )
 
     implicit val headerCarrier = HeaderCarrier.fromHeadersAndSession(rh.headers, Some(rh.session))
@@ -33,7 +34,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
       rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
         case false =>
           keystoreConnector.confirmationStatus flatMap {
-            case ConfirmationStatus(Some(true)) if !exclusionSet.contains(rh.path) =>
+            case ConfirmationStatus(Some(true)) if !exclusionSet.exists(rh.path.startsWith(_)) =>
 
               for {
                 _ <- authenticator.refreshProfile

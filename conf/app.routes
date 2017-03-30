@@ -15,14 +15,11 @@ POST        /registration-progress                                      controll
 
 GET         /application-status                                         controllers.StatusController.get()
 
-GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
-GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
+GET         /your-registration/your-messages/:id/:contactType           controllers.NotificationController.messageDetails(id : String,contactType:models.notifications.ContactType)
+GET         /your-registration/your-messages                            controllers.NotificationController.getMessages()
 
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
-
-GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
-GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
 
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
@@ -57,10 +54,13 @@ GET         /about-the-business/check-your-answers                      controll
 
 GET         /trading-premises/what-you-need/:index                      controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
-GET         /trading-premises/add                                       controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
+GET         /trading-premises/add                                       @controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
 
-GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
+POST        /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
+
+GET         /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
@@ -72,12 +72,12 @@ POST        /trading-premises/is-residential/:index                     @control
 GET         /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
 POST        /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
-GET         /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/crn-name/:index                           @controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/crn-name/:index                           @controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
 
 
-GET         /trading-premises/crn-number/:index                         controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/crn-number/:index                         controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/crn-number/:index                         @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/crn-number/:index                         @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
@@ -85,8 +85,8 @@ GET         /trading-premises/agent-name/date-of-change/:index          controll
 POST        /trading-premises/agent-name/date-of-change/:index          controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
 
 
-GET         /trading-premises/partners/:index                           controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/partners/:index                           controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/partners/:index                           @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/partners/:index                           @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
@@ -94,18 +94,18 @@ POST        /trading-premises/what-does-your-business-do/:index         controll
 GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 
-GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/agent/:index                              @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                              @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
 GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.answers()
 GET         /trading-premises/trading-premise-details/:index            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
 GET         /trading-premises/what-does-your-business-do/date-of-change/:index  controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
-POST         /trading-premises/what-does-your-business-do/date-of-change/:index  controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
+POST        /trading-premises/what-does-your-business-do/date-of-change/:index  controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
 
-GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/who-uses/:index                           @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/who-uses/:index                           @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
 POST        /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
@@ -255,6 +255,9 @@ POST        /responsible-people/self-assessment/:index                  controll
 GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
+GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
 
@@ -271,14 +274,23 @@ GET         /responsible-people/person-details/:index                   controll
 GET         /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
+GET         /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/nominatedofficer/:index                 controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/nominatedofficer/:index                 controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
+GET         /responsible-people/sole-proprietor/:index                  @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/sole-proprietor/:index                  @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
+GET         /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
@@ -425,5 +437,11 @@ POST        /renewal/business-turnover                                  @control
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
+GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+
+GET         /renewal/receiving                                          @controllers.renewal.CashPaymentController.get()
+
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
+POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()

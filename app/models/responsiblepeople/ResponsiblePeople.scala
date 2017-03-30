@@ -22,7 +22,8 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              hasChanged: Boolean = false,
                              lineId: Option[Int] = None,
                              status: Option[String] = None,
-                             endDate:Option[ResponsiblePersonEndDate] = None
+                             endDate:Option[ResponsiblePersonEndDate] = None,
+                             soleProprietorOfAnotherBusiness: Option[SoleProprietorOfAnotherBusiness] = None
                             ) {
 
   def personName(p: PersonName): ResponsiblePeople =
@@ -46,6 +47,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def positions(p: Positions): ResponsiblePeople =
     this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p))
 
+  def soleProprietorOfAnotherBusiness(p: SoleProprietorOfAnotherBusiness): ResponsiblePeople =
+    this.copy(soleProprietorOfAnotherBusiness = Some(p), hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p))
+
   def vatRegistered(p: VATRegistered): ResponsiblePeople =
     this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p))
 
@@ -61,14 +65,21 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def status(p: String): ResponsiblePeople =
     this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
 
+  def checkVatField(otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]): Boolean = {
+    otherBusinessSP.fold(true) { x =>
+      x.soleProprietorOfAnotherBusiness match {
+        case true => this.vatRegistered.isDefined
+        case false => this.vatRegistered.isEmpty
+      }
+    }
+  }
+
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
     this match {
       case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(pos),
-      None, None, Some(_), Some(_), _, _, _, _, _) if !pos.personalTax & pos.startDate.isDefined => true
-      case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(pos),
-      Some(_), Some(_), Some(_), Some(_), _, _, _, _, _) if pos.startDate.isDefined => true
-      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _, _) => true
+      Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP) if pos.startDate.isDefined && checkVatField(otherBusinessSP)=> true
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
       case _ => false
     }
   }
@@ -139,7 +150,8 @@ object ResponsiblePeople {
         } and
         (__ \ "lineId").readNullable[Int] and
         (__ \ "status").readNullable[String] and
-        (__ \ "endDate").readNullable[ResponsiblePersonEndDate]
+        (__ \ "endDate").readNullable[ResponsiblePersonEndDate] and
+        (__ \ "soleProprietorOfAnotherBusiness").readNullable[SoleProprietorOfAnotherBusiness]
       ) apply ResponsiblePeople.apply _
   }
 

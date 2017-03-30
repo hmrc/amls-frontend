@@ -5,7 +5,7 @@ import models.SubscriptionResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -83,7 +83,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get())(request)
 
   }
 
@@ -163,12 +163,11 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
 
-      val paymentsRedirectUrl = controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).absoluteURL(request.secure, request.host)
-
       val result = controller.get()(request)
       val body = contentAsString(result)
+      val submissionReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, paymentsRedirectUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, submissionReturnUrl)))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -208,60 +207,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your application")
-      contentAsString(result) must include(paymentRefNo)
-    }
-
-    "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
-
-      val companyName = "My Test Company"
-
-      val model = BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )
-
-      when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
-
-      when(controller.submissionService.getAmendment(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Some(Currency.fromInt(100))))))
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
-      contentAsString(result) must include(Messages("confirmation.amendment.fee"))
-      contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
-      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
-      contentAsString(result) must include(paymentRefNo)
-    }
-
-    "notify user of variation if application has been submitted and approved and fees have been accrued" in new Fixture {
-
-      val companyName = "My Test Company"
-
-      val model = BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )
-
-      when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      when(controller.submissionService.getVariation(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq()))))
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-      contentAsString(result) must include(Messages("confirmation.amendment.fee"))
-      contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
-      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
       contentAsString(result) must include(paymentRefNo)
     }
 
@@ -474,7 +419,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = s"$baseUrl${controllers.routes.LandingController.get().url}"
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)(request)
 
   }
 

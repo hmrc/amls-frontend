@@ -95,6 +95,12 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
     }
 
+    "redirect to the declaration page when the form is posted" in new Fixture {
+      val result = controller.post()(request)
+
+      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+    }
+
   }
 
 }

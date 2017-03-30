@@ -53,7 +53,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           )
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
@@ -82,7 +82,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           )
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, SixToElevenMonths)
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
@@ -111,7 +111,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           )
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, OneToThreeYears)
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(OneToThreeYears))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
@@ -140,7 +140,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           )
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
@@ -166,7 +166,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
         val invalidPostRequest = request.withFormUrlEncodedBody()
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
         val responsiblePeople = ResponsiblePeople(
           addressHistory = Some(history),
@@ -193,7 +193,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
         )
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus, Some(DateOfChange(new LocalDate(2017,1,1))))
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus), Some(DateOfChange(new LocalDate(2017,1,1))))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
         val responsiblePeople = ResponsiblePeople(
           addressHistory = Some(history),

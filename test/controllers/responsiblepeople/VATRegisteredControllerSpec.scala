@@ -66,7 +66,8 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVATYes" -> "1234567890"
+          "registeredForVATYes" -> "1234567890",
+          "personName" -> "Person Name"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
@@ -76,14 +77,15 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title must be(pageTitle)
 
-        contentAsString(result) must include(Messages("error.required.atb.registered.for.vat"))
+        contentAsString(result) must include(Messages("error.required.rp.registered.for.vat", "firstname lastname"))
       }
 
       "when given valid data and edit = false redirect to the RegisteredForSelfAssessmentController" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789"
+          "vrnNumber" -> "123456789",
+          "personName" -> "Person Name"
         )
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -102,7 +104,8 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val newRequest = request.withFormUrlEncodedBody(
           "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789"
+          "vrnNumber" -> "123456789",
+          "personName" -> "Person Name"
         )
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -113,7 +116,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post(1, true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
       }
     }
   }

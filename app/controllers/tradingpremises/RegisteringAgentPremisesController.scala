@@ -1,19 +1,22 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatching
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait RegisteringAgentPremisesController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector,
+                                                   override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -28,7 +31,7 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
                 }
                 Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
               }
-              case Some(tp) => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+              case Some(tp) => TPControllerHelper.redirectToNextPage(cache, index, edit)
               case None => NotFound(notFoundView)
             }
           } getOrElse NotFound(notFoundView)
@@ -42,15 +45,13 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
           Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[TradingPremises](index) { tp =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_,tp) =>
               resetAgentValues(tp.registeringAgentPremises(data), data)
             }
-          } yield data.agentPremises match {
-            case true => Redirect(routes.BusinessStructureController.get(index,edit))
-            case false => edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-            }
+          } yield (data.agentPremises, edit) match {
+            case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
+            case (false, true) => Redirect(routes.SummaryController.getIndividual(index))
+            case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -62,11 +63,5 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
     case true => tp.registeringAgentPremises(data)
     case false => tp.copy(agentName=None,businessStructure=None,agentCompanyDetails=None,agentPartnership=None, hasChanged=true)
   }
-
 }
 
-object RegisteringAgentPremisesController extends RegisteringAgentPremisesController {
-  // $COVERAGE-OFF$
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-}

@@ -79,11 +79,12 @@ trait RepeatingSection {
      formats: Format[T],
      key: MongoKey[T],
      ec: ExecutionContext): Future[Int] = {
-    getData[T].map { d =>
-      if (d.lastOption != Some(data)) {
-        putData(d :+ data)
-        d.size + 1
-      } else {d.size}
+    getData[T].flatMap { d =>
+      if (!d.lastOption.contains(Some(data))) {
+        putData(d :+ data) map {
+          _ => d.size + 1
+        }
+      } else {Future.successful(d.size)}
     }
   }
 
@@ -123,7 +124,7 @@ trait RepeatingSection {
       }
     }
 
-  protected def fetchAllAndUpdateStrict[T]
+  def fetchAllAndUpdateStrict[T]
   (index: Int)
   (fn: (CacheMap, T) => T)
   (implicit

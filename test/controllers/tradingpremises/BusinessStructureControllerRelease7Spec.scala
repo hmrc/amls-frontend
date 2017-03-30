@@ -12,7 +12,9 @@ import play.api.test.FakeApplication
 import utils.GenericTestHelper
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -26,13 +28,12 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BusinessStructureController {
-      override val dataCacheConnector: DataCacheConnector = self.cache
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new BusinessStructureController(self.cache, self.authConnector, messagesApi)
   }
 
   "BusinessStructureController" must {
+
+    val mockCacheMap = mock[CacheMap]
 
     "Load Business Structure page" in new Fixture {
       when(cache.fetch[Seq[TradingPremises]](any())
@@ -88,13 +89,13 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.AgentNameController.get(1, false).url)
@@ -109,13 +110,13 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1, false).url)
@@ -129,13 +130,13 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.AgentPartnershipController.get(1).url)
@@ -149,13 +150,13 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1).url)
@@ -169,17 +170,39 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model, model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1, false).url)
     }
+
+    "successfully submit and navigate to next page when user selects the option UnincorporatedBody" +
+      " without edit and is the First Trading Premises" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentsBusinessStructure" -> "05"
+      )
+      val model = TradingPremises(
+        businessStructure = Some(SoleProprietor)
+      )
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      val result = controller.post(1, false)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.ConfirmAddressController.get(1).url)
+    }
+
     "successfully submit and navigate to next page when user selects the option UnincorporatedBody with edit" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -188,11 +211,11 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post(1,edit = true)(newRequest)
 
@@ -206,11 +229,11 @@ class BusinessStructureControllerRelease7Spec extends GenericTestHelper with Sca
         "agentsBusinessStructure" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post(1)(newRequest)
 
