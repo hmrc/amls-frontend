@@ -46,7 +46,7 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
                                                                formats: Format[TradingPremises],
                                                                key: MongoKey[TradingPremises]
   ) = {
-    result map { cache =>
+    result flatMap { cache =>
       getData(cache, index)
     }
   }
@@ -64,9 +64,8 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
                   tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
               }
               status <- statusService.getStatus
-
             } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange(getTradingPremises(result, index), data) =>
+              case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data, edit) =>
                 Redirect(routes.AgentNameController.dateOfChange(index))
               case _ => edit match {
                 case true => Redirect(routes.SummaryController.getIndividual(index))
@@ -108,8 +107,8 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
         }
   }
 
-  private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
+  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName, edit: Boolean) = {
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined && edit
   }
 }
 

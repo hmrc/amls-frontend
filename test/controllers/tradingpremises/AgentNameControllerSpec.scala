@@ -189,6 +189,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           contentAsString(result) must include(Messages("error.required.tp.agent.name"))
         }
       }
+
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("agentName" -> "text",
@@ -217,7 +218,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           ), TradingPremises())))(any(), any(), any())
       }
 
-      "go to the date of change page" when {
+      "go to the date of change page in edit mode" when {
         "the agent name has been changed and submission is successful" in new Fixture {
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -237,12 +238,41 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
             "agentDateOfBirth.month" -> "2",
             "agentDateOfBirth.year" -> "1956")
 
-          val result = controller.post(1)(newRequest)
+          val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AgentNameController.dateOfChange(1).url))
         }
       }
+
+      "reditect to WhereAreTradingPremises Page" when {
+        "status is SubmissionDecisionApproved" in new Fixture {
+
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentName" -> "someName",
+            "agentDateOfBirth.day" -> "15",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1956")
+
+          val result = controller.post(1, false)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
+        }
+      }
+
+
 
       "return view for Date of Change" in new Fixture {
         val result = controller.dateOfChange(1)(request)
