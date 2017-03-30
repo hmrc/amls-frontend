@@ -65,10 +65,6 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
   }
 
   def checkListContainsItems(parent: Element, keysToFind: List[String]) = {
-    println(">>>" + parent)
-    println("$$$" + parent.select("li"))
-    println("***" + parent.select("li").toList.map((el: Element) => el.text()))
-    println(">>>" + parent.select("li").toList.map((el: Element) => el.text()).tail)
     parent.select("li").toList.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
     true
   }
