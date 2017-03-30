@@ -8,13 +8,14 @@ case class Renewal
   businessTurnover: Option[BusinessTurnover] = None,
   turnover: Option[AMLSTurnover] = None,
   customersOutsideUK: Option[CustomersOutsideUK] = None,
+  percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
   hasChanged: Boolean = false
 )
 {
   def isComplete = {
     this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _) => true
       case _ => false
     }
   }
@@ -31,6 +32,8 @@ case class Renewal
   def customersOutsideUK(model: CustomersOutsideUK): Renewal =
     this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model))
 
+  def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
+    this.copy(percentageOfCashPaymentOver15000 = Some(v))
 }
 
 object Renewal {

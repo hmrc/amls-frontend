@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.renewal.{AMLSTurnover, BusinessTurnover, CustomersOutsideUK, Renewal}
+import models.renewal.{AMLSTurnover, BusinessTurnover, CustomersOutsideUK, Renewal, PercentageOfCashPaymentOver15000}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -82,6 +82,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(BusinessTurnover.First),
             Some(AMLSTurnover.First),
             Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            Some(PercentageOfCashPaymentOver15000.First),
             false)))
 
       val result = controller.get()(request)
