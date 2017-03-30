@@ -64,7 +64,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
-      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom"))
+      ("renewal.receiving.title", checkElementTextIncludes(_, "other"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -96,7 +96,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }}
