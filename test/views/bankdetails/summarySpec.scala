@@ -1,9 +1,9 @@
 package views.bankdetails
 
-import models.bankdetails.{NonUKAccount, _}
+import models.bankdetails._
 import models.status._
 import org.jsoup.nodes.Element
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
@@ -11,8 +11,6 @@ import utils.{GenericTestHelper, StatusConstants}
 import views.Fixture
 
 import scala.collection.JavaConversions._
-import scala.util.Random
-
 
 class summarySpec extends GenericTestHelper with MustMatchers with PropertyChecks {
 
@@ -66,8 +64,12 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
     }
   }
 
-  def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
-    parent.select("li").toSet.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
+  def checkListContainsItems(parent: Element, keysToFind: List[String]) = {
+    println(">>>" + parent)
+    println("$$$" + parent.select("li"))
+    println("***" + parent.select("li").toList.map((el: Element) => el.text()))
+    println(">>>" + parent.select("li").toList.map((el: Element) => el.text()).tail)
+    parent.select("li").toList.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
     true
   }
 
@@ -84,9 +86,9 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
       private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
 
-      private val bankDetailsSet = Set(
-        Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890",
+      private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.sortcode") + ": 12-34-56",
+        Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890",
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.yes"),
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
       )
@@ -122,7 +124,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
       private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
 
-      private val bankDetailsSet = Set(
+      private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.accountnumber") + ": 56789",
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
@@ -158,7 +160,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
       private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
 
-      private val bankDetailsSet = Set(
+      private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.iban") + ": 890834561",
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
