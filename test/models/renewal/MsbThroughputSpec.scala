@@ -22,10 +22,22 @@ class MsbThroughputSpec extends PlaySpec with MustMatchers {
 
         MsbThroughput.formReader.validate(form) must be(
           Invalid(Seq(
-            (Path \ "throughputSelection") -> Seq(ValidationError("error.required"))
+            (Path \ "throughputSelection") -> Seq(ValidationError("renewal.msb.throughput.selection.required"))
           ))
         )
 
+      }
+
+      "an invalid value is sent" in {
+        val form = Map(
+          "throughputSelection" -> Seq("some invalid value")
+        )
+
+        MsbThroughput.formReader.validate(form) must be(
+          Invalid(Seq(
+            (Path \ "throughputSelection") -> Seq(ValidationError("renewal.msb.throughput.selection.invalid"))
+          ))
+        )
       }
     }
 
