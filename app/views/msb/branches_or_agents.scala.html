@@ -31,7 +31,7 @@
                     f = f("hasCountries"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#countries-fieldset",
+                    target = s"#countries",
                     inline = true
                 )
                 @radio(
@@ -44,17 +44,17 @@
         }
 
         @panel(
-            field = Some(f("countries-fieldset")),
+            field = Some(f("countries")),
             jsHidden = false,
             data = Seq("data-toggle-new")
         ) {
 
-
-            @hint(
-                hint = "msb.branchesoragents.hint"
-            )
-
-            @errorGroup(f("countries")) {
+            @fieldset(
+                f = f("countries-fieldset"),
+                hint = "msb.branchesoragents.hint",
+                legend = "msb.branchesoragents.legend",
+                panel = false
+            ) {
                 @addRemove("lbl.add.another.country") {
                     @for(i <- 0 until 10) {
                         @defining(
@@ -68,6 +68,7 @@
                     }
                 }
             }
+
         }
 
         @submit(edit)
