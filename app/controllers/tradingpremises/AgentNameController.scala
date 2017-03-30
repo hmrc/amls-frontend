@@ -65,7 +65,7 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
               }
               status <- statusService.getStatus
             } yield status match {
-              case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data, edit) =>
+              case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data) =>
                 Redirect(routes.AgentNameController.dateOfChange(index))
               case _ => edit match {
                 case true => Redirect(routes.SummaryController.getIndividual(index))
@@ -107,8 +107,8 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
         }
   }
 
-  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName, edit: Boolean) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined && edit
+  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
 }
 

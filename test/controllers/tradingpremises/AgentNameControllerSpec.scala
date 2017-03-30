@@ -249,7 +249,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
         "status is SubmissionDecisionApproved" in new Fixture {
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = None))))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
