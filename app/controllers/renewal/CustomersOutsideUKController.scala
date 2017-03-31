@@ -39,25 +39,20 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         case ValidForm(_, data) => {
 
           dataCacheConnector.fetchAll map { optionalCache =>
-
-            val result = for {
+            (for {
               cache <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              businessActivities <- ControllerHelper.getBusinessActivity(Some(businessMatching))
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
               renewalService.updateRenewal(renewal)
               redirectDependingOnActivities(businessMatching)
-            }
-
-            result.getOrElse(Redirect(routes.SummaryController.get()))
+            }) getOrElse Redirect(routes.SummaryController.get())
           }
         }
       }
   }
 
-  def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
-
+  private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
     ControllerHelper.getBusinessActivity(Some(businessMatching)) match {
       case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case _ => Redirect(routes.SummaryController.get())

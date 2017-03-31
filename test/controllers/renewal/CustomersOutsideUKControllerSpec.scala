@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.businessactivities.CustomersOutsideUKController
 import models.Country
-import models.businessmatching.{BusinessActivities, HighValueDealing, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideUK, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -28,7 +28,6 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
-
 
     val dataCacheConnector = mock[DataCacheConnector]
 
@@ -84,51 +83,61 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     "post is called" must {
 
-      "when business is not an hvd" must {
-        "redirect to the summary page when given valid data" in new Fixture {
+      "redirect to the summary page" when {
+        "given valid data" when {
+          "business is not an hvd" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> "true",
-            "countries[0]" -> "GB",
-            "countries[1]" -> "US"
-          )
+            val newRequest = request.withFormUrlEncodedBody(
+              "isOutside" -> "true",
+              "countries[0]" -> "GB",
+              "countries[1]" -> "US"
+            )
 
-          when(dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching()))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching()))
 
-          when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+            when(mockCacheMap.getEntry[Renewal](Renewal.key))
+              .thenReturn(Some(Renewal()))
 
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
         }
       }
 
-      "when business is an hvd" must {
-        "redirect to the PercentageOfCashPaymentOver15000Controller when given valid data" in new Fixture {
+      "redirect to the PercentageOfCashPaymentOver15000Controller" when {
+        "given valid data" when {
+          "business is not an hvd" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> "true",
-            "countries[0]" -> "GB",
-            "countries[1]" -> "US"
-          )
+            val newRequest = request.withFormUrlEncodedBody(
+              "isOutside" -> "true",
+              "countries[0]" -> "GB",
+              "countries[1]" -> "US"
+            )
 
-          when(dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(emptyCache)))
+            when(dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))))
 
-          when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+            when(mockCacheMap.getEntry[Renewal](Renewal.key))
+              .thenReturn(Some(Renewal()))
 
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
+            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
+          }
         }
       }
 
@@ -174,16 +183,5 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       }
     }
 
-    "redirectDependingOnActivities" when {
-      "given BusinessActivities containing HighValueDealer" must {
-        "redirect to PercentageOfCashPaymentOver15000Controller" in {
-
-          CustomersOutsideUKController.redirectDependingOnActivities(BusinessActivities(Set(HighValueDealing))) must be(
-            Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-          )
-
-        }
-      }
-    }
   }
 }
