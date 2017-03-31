@@ -57,8 +57,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      when(controller.statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((NotCompleted, None)))
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(None))
@@ -90,8 +90,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      when(controller.statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((NotCompleted, None)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -117,9 +117,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
-
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((NotCompleted, None)))
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -150,8 +149,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionReady, None)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -187,8 +186,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
@@ -202,9 +201,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
         }
 
-        document.getElementsByClass("status-list").first().child(2).hasClass("current") must be(true)
+        document.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
-        document.getElementsByClass("status-list").first().child(3).hasClass("status-list--upcoming") must be(true)
         document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.description"))
@@ -232,8 +230,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.failed(new NotFoundException("")))
