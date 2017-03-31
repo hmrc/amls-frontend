@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.status.SubmissionDecisionApproved
+import models.status.{SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
@@ -31,8 +31,6 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       }
   }
 
-  // TODO: Consider if this can be refactored
-  // scalastyle:off cyclomatic.complexity
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
@@ -41,27 +39,38 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
         case ValidForm(_, ytp) => {
           for {
             tradingPremises <- getData[TradingPremises](index)
-            _ <- updateDataStrict[TradingPremises](index) { tp =>
-              val updatedYtp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](Some(ytp))(x =>
-                Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential)))
-              TradingPremises(tp.registeringAgentPremises,
-                updatedYtp, tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
-                tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
-            }
+            _ <- updateDataStrict[TradingPremises](index)(updateTradingPremises(ytp, _))
             status <- statusService.getStatus
-          } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, ytp) && edit =>
-              Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
-            case _ => edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.ActivityStartDateController.get(index, edit))
-            }
-          }
-
+          } yield redirectTo(index, edit, ytp, tradingPremises, status)
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
+  }
+
+  private def updateTradingPremises(ytp: YourTradingPremises, tp: TradingPremises) = {
+
+    val updatedYtp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](Some(ytp))(x =>
+      Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential)))
+
+    TradingPremises(
+      tp.registeringAgentPremises,
+      updatedYtp, tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
+      tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices,
+      hasChanged = true, tp.lineId, tp.status, tp.endDate
+    )
+
+  }
+
+  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus) = {
+    status match {
+      case SubmissionDecisionApproved if redirectToDateOfChange(tp, ytp) && edit =>
+        Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
+      case _ => edit match {
+        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case false => Redirect(routes.ActivityStartDateController.get(index, edit))
+      }
+    }
   }
 
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {

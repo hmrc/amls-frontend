@@ -4,16 +4,15 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.additional_address
+import views.html.responsiblepeople.time_at_additional_extra_address
 
 import scala.concurrent.Future
 
-trait AdditionalAddressController extends RepeatingSection with BaseController {
+trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
@@ -22,34 +21,34 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(_,Some(additionalAddress),_)),_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, fromDeclaration, personName.titleName))
+        case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_)) =>
+          Ok(time_at_additional_extra_address(Form2[TimeAtAddress](additionalExtraAddress), edit, index, fromDeclaration, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_additional_extra_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      (Form2[ResponsiblePersonAddress](request.body) match {
+      (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
           getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(additional_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(time_at_additional_extra_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
-        case ValidForm(_, data) => {
+        case ValidForm(_, data) =>
           getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
             (for {
               rp <- responsiblePerson
               addressHistory <- rp.addressHistory
-              additionalAddress <- addressHistory.additionalAddress
+              additionalExtraAddress <- addressHistory.additionalExtraAddress
             } yield {
-              val additionalAddressWithTime = data.copy(timeAtAddress = additionalAddress.timeAtAddress)
-              updateAndRedirect(additionalAddressWithTime, index, edit, fromDeclaration)
-            }) getOrElse updateAndRedirect(data, index, edit, fromDeclaration)
+              val additionalExtraAddressWithTime = additionalExtraAddress.copy(
+                timeAtAddress = Some(data)
+              )
+              updateAndRedirect(additionalExtraAddressWithTime, index, edit, fromDeclaration)
+            }) getOrElse Future.successful(NotFound(notFoundView))
           }
-        }
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
@@ -62,21 +61,20 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
-          case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
-            a.additionalAddress(data).removeAdditionalExtraAddress
-          case Some(a) => a.additionalAddress(data)
-          case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
-        })
+          case Some(a) => a.additionalExtraAddress(data)
+          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
+        }
+      )
     } map { _ =>
-      data.timeAtAddress match {
-        case Some(_) if edit =>  Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, fromDeclaration))
+      edit match {
+        case true => Redirect(routes.DetailedAnswersController.get(index))
+        case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       }
     }
   }
 }
 
-object AdditionalAddressController extends AdditionalAddressController {
+object TimeAtAdditionalExtraAddressController extends TimeAtAdditionalExtraAddressController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
