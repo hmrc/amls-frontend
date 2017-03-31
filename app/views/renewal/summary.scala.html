@@ -14,14 +14,16 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("renewal.involvedinother.title"),
-        editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
-    ) {
-        <p>@model.involvedInOtherActivities.map {
-            case InvolvedInOtherNo => { @Messages("lbl.no") }
-            case InvolvedInOtherYes(v) => { @v }
-        }</p>
+    @model.involvedInOtherActivities.map{ inv =>
+        @checkYourAnswers(
+            question = Messages("renewal.involvedinother.title"),
+            editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+        ) {
+            <p>@model.involvedInOtherActivities.map {
+                case InvolvedInOtherNo => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(v) => { @v }
+            }</p>
+        }
     }
 
     @model.businessTurnover.map { turnover =>
