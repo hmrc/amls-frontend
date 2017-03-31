@@ -29,6 +29,10 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       doc.title must include(s"${Messages("renewal.msb.throughput.header")} - ${Messages("summary.renewal")}")
     }
 
+    "display the informational text" in new ViewFixture {
+      doc.body().text must include(Messages("renewal.msb.throughput.info"))
+    }
+
     MsbThroughput.throughputValues foreach { selection =>
 
       val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughputSelection"][value="${selection.code}"]""")
@@ -44,6 +48,11 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
         radioLabelElement.text mustBe Messages(selection.label)
       }
     }
+
+    "display the 'save and continue' button" in new ViewFixture {
+      doc.select("""button[type=submit][name=submit]""").text mustBe Messages("button.saveandcontinue")
+    }
+
 
   }
 

@@ -1473,6 +1473,7 @@ renewal.turnover.title = How much total net profit did your business make in the
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
+renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
 renewal.msb.throughput.selection.1 = £0 to £99,999 
 renewal.msb.throughput.selection.2 = £100,000 to £499,999 
 renewal.msb.throughput.selection.3 = £500,000 to £999,999 
