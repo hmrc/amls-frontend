@@ -39,8 +39,7 @@ trait StatusService {
     }
   }
 
-  def getDetailedStatusInfo(implicit hc: HeaderCarrier,
-                            authContext: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+  def getDetailedStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
         etmpStatusInformation(mlrRegNumber)(hc, authContext, ec)

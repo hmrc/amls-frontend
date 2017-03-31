@@ -55,17 +55,16 @@ trait StatusController extends BaseController {
         }
         for {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
-          statusInfo <-  statusService.getDetailedStatusInfo
-          submissionStatus <- statusService.getStatus
+          statusInfo <-  statusService.getDetailedStatus
           businessNameOption <- businessName
-          feeResponse <- getFeeResponse(mlrRegNumber, submissionStatus)
+          feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
         } yield statusInfo match {
             case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
             case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
             case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
               businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x =>Some(x.processingDate))))
-            case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-            case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+            case (SubmissionDecisionApproved, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+            case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
         }
   }
 }
