@@ -74,8 +74,10 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "Post is called" must {
 
-      val personAddress = PersonAddressUK("address1","address2",Some("address3"),Some("address4"),"postcode")
-      val rp = ResponsiblePersonCurrentAddress(personAddress,None,None)
+      val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, None)
+      val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+      val rp = ResponsiblePeople(addressHistory = Some(history))
 
       "successfully redirect to next page" when {
 
@@ -87,8 +89,8 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePersonCurrentAddress]](any())(any()))
-            .thenReturn(Some(Seq(rp)))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople())))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(bm))
@@ -100,7 +102,7 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1).url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePersonCurrentAddress]](
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](
             any(),
             meq(Seq(rp))
           )(any(), any(), any())

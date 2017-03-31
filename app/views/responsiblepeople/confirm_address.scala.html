@@ -1,18 +1,18 @@
 @import forms.Form2
-@import include.{main, heading, registered_office_helper}
+@import include._
 @import include.forms2._
 @import play.api.i18n.Messages
 @import models.businesscustomer.Address
 
-@(f: Form2[_], model: Address, index: Int)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], model: Address, index: Int, personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @errorSummary(f)
-    @heading("responsiblepeople.confirmaddress.title", "summary.responsiblepeople")
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("responsiblepeople.confirmaddress.title", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.confirmaddress.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.confirmaddress.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -27,8 +27,9 @@
             panel = false
         ) {
 
-            @errorGroup(
-                field = f("confirmAddress")
+            @rpErrorGroup(
+                field = f("confirmAddress"),
+                personName = personName
             ) {
                 @radio(
                     f = f("confirmAddress"),
