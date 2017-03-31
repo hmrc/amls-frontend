@@ -210,60 +210,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       contentAsString(result) must include(paymentRefNo)
     }
 
-    "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
-
-      val companyName = "My Test Company"
-
-      val model = BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )
-
-      when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
-
-      when(controller.submissionService.getAmendment(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Some(Currency.fromInt(100))))))
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
-      contentAsString(result) must include(Messages("confirmation.amendment.fee"))
-      contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
-      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
-      contentAsString(result) must include(paymentRefNo)
-    }
-
-    "notify user of variation if application has been submitted and approved and fees have been accrued" in new Fixture {
-
-      val companyName = "My Test Company"
-
-      val model = BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )
-
-      when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      when(controller.submissionService.getVariation(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq()))))
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-      contentAsString(result) must include(Messages("confirmation.amendment.fee"))
-      contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
-      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
-      contentAsString(result) must include(paymentRefNo)
-    }
-
     "notify user there is no fee" when {
 
       "an amendment has difference(/Some(0))" in new Fixture {
