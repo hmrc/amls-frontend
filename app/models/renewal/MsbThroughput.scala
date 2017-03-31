@@ -8,7 +8,7 @@ import models.ValidationRule
 import play.api.libs.json.Json
 import utils.MappingUtils.Implicits._
 
-case class MsbThroughput(throughputSelection: String)
+case class MsbThroughput(throughput: String)
 
 object MsbThroughput {
 
@@ -29,16 +29,16 @@ object MsbThroughput {
   private val validSelectionRule: ValidationRule[String] = Rule.fromMapping[String, String] {
     case input if throughputValues.exists(_.code == input) => Success(input)
     case _ => Invalid(Seq(ValidationError("renewal.msb.throughput.selection.invalid")))
-  }.repath(_ => Path \ "throughputSelection")
+  }.repath(_ => Path \ "throughput")
 
   implicit val formReader: Rule[UrlFormEncoded, MsbThroughput] = From[UrlFormEncoded] { __ =>
-    val fieldReader = (__ \ "throughputSelection").read[String].withMessage("renewal.msb.throughput.selection.required")
+    val fieldReader = (__ \ "throughput").read[String].withMessage("renewal.msb.throughput.selection.required")
 
     fieldReader andThen validSelectionRule map MsbThroughput.apply
   }
 
   implicit val formWriter: Write[MsbThroughput, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    (__ \ "throughputSelection").write[String] contramap(_.throughputSelection)
+    (__ \ "throughput").write[String] contramap(_.throughput)
   }
 
 }

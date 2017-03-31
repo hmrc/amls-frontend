@@ -6,6 +6,7 @@
 @(f: Form2[_])(implicit request: Request[_], messages: Messages)
 
 @header = {
+    @errorSummary(f)
     @heading("renewal.msb.throughput.header", "summary.renewal")
 }
 
@@ -25,11 +26,11 @@
             panel = false
         ) {
             @errorGroup(
-                field = f("throughputSelection")
+                field = f("throughput")
             ) {
                 @(MsbThroughput.throughputValues.map { v =>
                     radio(
-                        f = f("throughputSelection"),
+                        f = f("throughput"),
                         labelText = v.label,
                         value = v.code
                     )

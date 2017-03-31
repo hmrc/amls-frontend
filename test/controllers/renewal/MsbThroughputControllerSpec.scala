@@ -24,6 +24,15 @@ class MsbThroughputControllerSpec extends GenericTestHelper {
       contentAsString(result) must include(Messages("renewal.msb.throughput.header"))
 
     }
+
+    "show validation errors when an invalid form is posted" in new Fixture {
+      val result = controller.post()(request)
+
+      status(result) mustBe BAD_REQUEST
+
+      contentAsString(result) must include(Messages("renewal.msb.throughput.selection.required"))
+    }
+
   }
 
 }

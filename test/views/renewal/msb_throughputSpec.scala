@@ -1,19 +1,33 @@
 package views.renewal
 
-import forms.EmptyForm
+import forms.{EmptyForm, InvalidForm}
+import jto.validation.{Path, ValidationError}
 import models.renewal.MsbThroughput
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import views.html.renewal.msb_total_throughput
 
 class msb_throughputSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = views.html.renewal.msb_total_throughput(EmptyForm)
+    override def view = msb_total_throughput(EmptyForm)
+  }
+
+  trait InvalidFormFixture extends ViewFixture {
+
+    val requiredMsg = Messages("renewal.msb.throughput.selection.required")
+
+    val invalidForm = InvalidForm(
+      Map.empty[String, Seq[String]],
+      Seq(Path \ "throughput" -> Seq(ValidationError(requiredMsg)))
+    )
+
+    override def view = msb_total_throughput(invalidForm)
   }
 
   "The MSB total throughput view" must {
@@ -35,7 +49,7 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
 
     MsbThroughput.throughputValues foreach { selection =>
 
-      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughputSelection"][value="${selection.code}"]""")
+      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.code}"]""")
 
       s"display the radio button for selection ${selection.code}" in new ViewFixture {
         Option(getElement(doc).first) mustBe defined
@@ -53,7 +67,16 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       doc.select("""button[type=submit][name=submit]""").text mustBe Messages("button.saveandcontinue")
     }
 
+    "display the error summary" in new InvalidFormFixture {
+      val summaryElement = doc.getElementsByClass("amls-error-summary").first
+      Option(summaryElement) mustBe defined
+      summaryElement.text must include(requiredMsg)
+    }
 
+    "display the validation error next to the field" in new InvalidFormFixture {
+      val validationMsg = doc.select("#throughput .error-notification").first
+      Option(validationMsg) mustBe defined
+      validationMsg.text must include(requiredMsg)
+    }
   }
-
 }
