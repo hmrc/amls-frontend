@@ -71,9 +71,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       document.getElementsByClass("heading-secondary").first().html() must be(Messages("summary.status"))
       document.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
-      document.getElementsByClass("list").first().child(0).html() must be(Messages("status.incomplete"))
-      document.getElementsByClass("list").first().child(1).html() must be(Messages("status.notsubmitted"))
-      document.getElementsByClass("list").first().child(2).html() must be(Messages("status.underreview"))
+      document.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
+      document.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
+      document.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
 
     }
 
@@ -124,10 +124,10 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("status-list").first().child(0).hasClass("current") must be(true)
+        document.getElementsByClass("status-list").first().child(0).hasClass("status-list--start") must be(true)
 
-        for (index <- 1 to 3) {
-          document.getElementsByClass("status-list").first().child(index).hasClass("current") must be(false)
+        for (index <- 1 to 2) {
+          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--start") must be(false)
         }
         document.title() must be(Messages("status.incomplete.heading") + pageTitleSuffix)
 
@@ -159,11 +159,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val document = Jsoup.parse(contentAsString(result))
         document.getElementsByClass("declaration").first().child(0).html() must be(Messages("status.hassomethingchanged"))
         document.getElementsByClass("status-list").first().child(0).hasClass("status-list--complete") must be(true)
-        document.getElementsByClass("status-list").first().child(1).hasClass("current") must be(true)
+        document.getElementsByClass("status-list").first().child(1).hasClass("status-list--pending") must be(true)
+        document.getElementsByClass("status-list").first().child(2).hasClass("status-list--upcoming") must be(true)
 
-        for (index <- 2 to 3) {
-          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--upcoming") must be(true)
-        }
         document.title() must be(Messages("status.submissionready.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionready.description"))

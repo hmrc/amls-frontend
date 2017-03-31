@@ -366,6 +366,8 @@ lbl.1200.character.limit=1200 character limit
 
 lbl.give.details = Please give details
 
+lbl.registration.status = Registration status:
+
 legend.address = Address
 lbl.address.line1 = Address
 lbl.address.line2 = Address line 2
@@ -447,6 +449,7 @@ status.submissiondecisionrejected.description2 = Your business is not registered
 status.amendment.edit = update or view your information
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
+status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.registration.fee.lbl = Your registration fee

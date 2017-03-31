@@ -5,11 +5,12 @@ import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
-import models.status.{CompletionStateViewModel, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
+import models.status._
+import org.joda.time.{LocalDate, LocalDateTime}
 import services.{AuthEnrolmentsService, LandingService, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
-import views.html.status.status
+import views.html.status.{status_incomplete, status_not_submitted, status_submitted}
 
 import scala.concurrent.Future
 
@@ -43,7 +44,6 @@ trait StatusController extends BaseController {
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        val notificationsToggle = ApplicationConfig.notificationsToggle
         val businessName = landingService.cacheMap map {
           case Some(cache) => {
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -55,13 +55,18 @@ trait StatusController extends BaseController {
         }
         for {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
+          statusInfo <-  statusService.getDetailedStatusInfo
           submissionStatus <- statusService.getStatus
           businessNameOption <- businessName
           feeResponse <- getFeeResponse(mlrRegNumber, submissionStatus)
-        } yield {
-          Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse, notificationsToggle))
+        } yield statusInfo match {
+            case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+            case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
+            case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+              businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x =>Some(x.processingDate))))
+            case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+            case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
         }
-
   }
 }
 

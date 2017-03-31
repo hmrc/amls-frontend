@@ -2,6 +2,7 @@ package services
 
 import config.ApplicationConfig
 import connectors.AmlsConnector
+import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
@@ -20,6 +21,35 @@ trait StatusService {
   private[services] def enrolmentsService: AuthEnrolmentsService
 
   private val renewalPeriod = 30
+
+
+  def etmpStatusInformation(mlrRegNumber: String) (implicit hc: HeaderCarrier,
+                                                   auth: AuthContext, ec: ExecutionContext) : Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+    amlsConnector.status(mlrRegNumber) map {
+      response =>
+        (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
+          case ("Pending", None, false) => (SubmissionReadyForReview, Some(response))
+          case ("Rejected", None, false) => (SubmissionDecisionRejected, Some(response))
+          case ("Approved", Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod))
+          => (ReadyForRenewal(response.currentRegYearEndDate), Some(response))
+          case ("Approved", _, true) => (RenewalSubmitted(response.currentRegYearEndDate), Some(response))
+          case ("Approved", _, false) => (SubmissionDecisionApproved, Some(response))
+          case _ => throw new RuntimeException("ETMP returned status is inconsistent")
+        }
+    }
+  }
+
+  def getDetailedStatusInfo(implicit hc: HeaderCarrier,
+                            authContext: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+    enrolmentsService.amlsRegistrationNumber flatMap {
+      case Some(mlrRegNumber) =>
+        etmpStatusInformation(mlrRegNumber)(hc, authContext, ec)
+      case None =>
+        notYetSubmitted(hc, authContext, ec) map {status =>
+          (status, None)
+        }
+    }
+  }
 
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
@@ -54,7 +84,7 @@ trait StatusService {
           (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
             case ("Pending", None, false) => SubmissionReadyForReview
             case ("Rejected", None, false) => SubmissionDecisionRejected
-            case ("Approved", Some(endDate), false) if (ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)))
+            case ("Approved", Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod))
             => ReadyForRenewal(response.currentRegYearEndDate)
             case ("Approved", _, true) => RenewalSubmitted(response.currentRegYearEndDate)
             case ("Approved", _, false) => SubmissionDecisionApproved

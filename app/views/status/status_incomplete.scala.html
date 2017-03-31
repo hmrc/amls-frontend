@@ -1,0 +1,52 @@
+@import include._
+@import models.status._
+@import config.ApplicationConfig
+@import org.joda.time.LocalDate
+@import utils.DateHelper
+
+@(regNo: String, businessName: Option[String])(implicit request: Request[_],m:Messages)
+
+@main2(title = Messages("status.incomplete.heading") +" - Your registration") {
+
+@* Heading *@
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--3-3">
+        <h1 class="heading-xlarge">
+        <span class="heading-secondary">
+            @Messages("summary.status")
+        </span>
+            <span>@Messages("status.incomplete.heading")</span>
+        </h1>
+
+    </div>
+</div>
+
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+
+        @businessName.map {bn =>
+            <div class="panel-indent panel-indent--gutter panel-border-wide">
+                <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            </div>
+
+        }
+    </div>
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--1-3">
+        <ol class="list list-number status-list">
+            <li class="status-list--pending status-list--start">@Messages("status.incomplete") <span class="status-list--icon"></span></li>
+            <li class="status-list--upcoming">@Messages("status.submitted")<span class="status-list--icon"></span></li>
+            <li class="status-list--upcoming">@Messages("status.underreview")<span class="status-list--icon"></span></li>
+        </ol>
+    </div>
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="status-detail">
+           @include.status.rightpanel_incomplete()
+        </div>
+
+    </div>
+
+</div>
+}
