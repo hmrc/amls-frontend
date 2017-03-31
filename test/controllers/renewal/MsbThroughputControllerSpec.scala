@@ -9,9 +9,12 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -25,9 +28,31 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
     )
   }
 
-  trait ValidFormFixture extends Fixture {
+  trait FormSubmissionFixture extends Fixture { self =>
+
     val formData = "throughput" -> "01"
     val formRequest = request.withFormUrlEncodedBody(formData)
+
+    val renewalService = mock[RenewalService]
+
+    override lazy val controller = new MsbThroughputController(
+      self.authConnector,
+      renewalService
+    )
+
+    val renewal = Renewal()
+
+    when {
+      renewalService.getRenewal(any(), any(), any())
+    } thenReturn Future.successful(Some(renewal))
+
+    when {
+      renewalService.updateRenewal(any())(any(), any(), any())
+    } thenReturn Future.successful(mock[CacheMap])
+
+    def post(edit: Boolean = false)(block: Result => Unit) =
+      block(await(controller.post(edit)(formRequest)))
+
   }
 
   "The MSB throughput controller" must {
@@ -47,40 +72,27 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "A valid form post to the MSB throughput controller" must {
-
-    lazy val fixture = new ValidFormFixture { self =>
-
-      val renewalService = mock[RenewalService]
-
-      override lazy val controller = new MsbThroughputController(
-        self.authConnector,
-        renewalService
-      )
-
-      val renewal = Renewal()
-
-      when {
-        renewalService.getRenewal(any(), any(), any())
-      } thenReturn Future.successful(Some(renewal))
-
-      when {
-        renewalService.updateRenewal(any())(any(), any(), any())
-      } thenReturn Future.successful(mock[CacheMap])
-
-      lazy val result = controller.post()(formRequest)
-
+    "redirect to the next page in the flow if edit = false" in new FormSubmissionFixture {
+      post() { result =>
+        result.header.status mustBe SEE_OTHER
+        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.MsbMoneyTransfersController.get().url)
+      }
     }
 
-    "return a redirect result when a valid form is posted" in {
-      status(fixture.result) mustBe SEE_OTHER
-      redirectLocation(fixture.result) mustBe Some(controllers.renewal.routes.SummaryController.get().url)
+    "redirect to the summary page if edit = true" in new FormSubmissionFixture {
+      post(edit = true) { result =>
+        result.header.status mustBe SEE_OTHER
+        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get().url)
+      }
     }
 
-    "save the throughput model into the renewals model when posted" in {
-      val captor = ArgumentCaptor.forClass(classOf[Renewal])
+    "save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
+      post() { _ =>
+        val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-      verify(fixture.renewalService).updateRenewal(captor.capture())(any(), any(), any())
-      captor.getValue.msbThroughput mustBe Some(MsbThroughput("01"))
+        verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
+        captor.getValue.msbThroughput mustBe Some(MsbThroughput("01"))
+      }
     }
   }
 }

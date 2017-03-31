@@ -87,7 +87,7 @@
     @model.msbThroughput.map { m =>
         @checkYourAnswers(
             question = messages("renewal.msb.throughput.header"),
-            editUrl = controllers.renewal.routes.MsbThroughputController.get().url
+            editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
         ) {
             <p>@MsbThroughput.labelFor(m)</p>
         }

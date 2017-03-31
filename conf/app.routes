@@ -446,5 +446,7 @@ GET         /renewal/check-your-answers                                 @control
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
 
-GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get()
-POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post()
+GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+
+GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
