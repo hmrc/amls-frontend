@@ -20,8 +20,6 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-
-
       def view = views.html.renewal.summary(Renewal(), None)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
@@ -93,11 +91,11 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
-        val section = hTwo.get.parents().select("section").first()
+        header must not be None
+        val section = header.get.parents().select("section").first()
         check(section) must be(true)
       }}
     }
