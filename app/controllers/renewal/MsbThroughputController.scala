@@ -3,7 +3,7 @@ package controllers.renewal
 import javax.inject.Inject
 
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.renewal.MsbThroughput
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.msb_total_throughput
@@ -21,6 +21,7 @@ class MsbThroughputController @Inject()(val authConnector: AuthConnector) extend
     implicit authContext => implicit request =>
       Form2[MsbThroughput](request.body) match {
         case form: InvalidForm => Future.successful(BadRequest(msb_total_throughput(form)))
+        case ValidForm(_, model) => Future.successful(Redirect(controllers.renewal.routes.SummaryController.get()))
       }
   }
 
