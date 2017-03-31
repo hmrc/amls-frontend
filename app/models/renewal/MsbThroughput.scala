@@ -5,6 +5,7 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.forms.Writes._
 import models.ValidationRule
+import models.moneyservicebusiness.ExpectedThroughput
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import utils.MappingUtils.Implicits._
@@ -12,21 +13,20 @@ import utils.MappingUtils.Implicits._
 case class MsbThroughput(throughput: String)
 
 object MsbThroughput {
-
-  case class FormSelection(value: String, label: String)
+  private[renewal] case class Mapping(value: String, label: String, submissionModel: ExpectedThroughput)
 
   val throughputValues = Seq(
-    FormSelection("01", "renewal.msb.throughput.selection.1"),
-    FormSelection("02", "renewal.msb.throughput.selection.2"),
-    FormSelection("03", "renewal.msb.throughput.selection.3"),
-    FormSelection("04", "renewal.msb.throughput.selection.4"),
-    FormSelection("05", "renewal.msb.throughput.selection.5"),
-    FormSelection("06", "renewal.msb.throughput.selection.6"),
-    FormSelection("07", "renewal.msb.throughput.selection.7")
+    Mapping("01", "renewal.msb.throughput.selection.1", ExpectedThroughput.First),
+    Mapping("02", "renewal.msb.throughput.selection.2", ExpectedThroughput.Second),
+    Mapping("03", "renewal.msb.throughput.selection.3", ExpectedThroughput.Third),
+    Mapping("04", "renewal.msb.throughput.selection.4", ExpectedThroughput.Fourth),
+    Mapping("05", "renewal.msb.throughput.selection.5", ExpectedThroughput.Fifth),
+    Mapping("06", "renewal.msb.throughput.selection.6", ExpectedThroughput.Sixth),
+    Mapping("07", "renewal.msb.throughput.selection.7", ExpectedThroughput.Seventh)
   )
 
   def labelFor(model: MsbThroughput)(implicit messages: Messages) = throughputValues.collectFirst {
-    case FormSelection(model.throughput, label) => messages(label)
+    case Mapping(model.throughput, label, _) => messages(label)
   }.getOrElse("")
 
   implicit val format = Json.format[MsbThroughput]
@@ -44,6 +44,12 @@ object MsbThroughput {
 
   implicit val formWriter: Write[MsbThroughput, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     (__ \ "throughput").write[String] contramap(_.throughput)
+  }
+
+  implicit def convert(model: MsbThroughput): ExpectedThroughput = {
+    throughputValues.collectFirst {
+      case x if x.value == model.throughput => x.submissionModel
+    }.getOrElse(throw new Exception("Invalid MSB throughput value"))
   }
 
 }

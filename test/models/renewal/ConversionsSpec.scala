@@ -2,17 +2,16 @@ package models.renewal
 
 import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
 
 class ConversionsSpec extends WordSpec with MustMatchers {
 
   trait Fixture {
-
     val businessActivities = BusinessActivities()
-
-    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, None, None, None)
-
+    val msbSection = MoneyServiceBusiness()
+    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, Some(msbSection), None, None)
   }
 
   "The renewal converter" must {
@@ -52,6 +51,14 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.businessActivitiesSection.get.customersOutsideUK mustBe Some(models.businessactivities.CustomersOutsideUK(Some(Seq(country))))
+    }
+
+    "convert the 'MSB throughput' model" in new Fixture {
+      val model = MsbThroughput("03")
+      val renewal = Renewal(msbThroughput = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.throughput mustBe Some(models.moneyservicebusiness.ExpectedThroughput.Third)
     }
 
   }

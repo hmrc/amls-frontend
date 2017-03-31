@@ -1160,6 +1160,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       submission.businessActivitiesSection.get.expectedBusinessTurnover mustBe defined
       submission.businessActivitiesSection.get.customersOutsideUK mustBe defined
       submission.businessActivitiesSection.get.involvedInOther mustBe defined
+
+      submission.msbSection mustBe defined
+      submission.msbSection.get.throughput mustBe defined
     }
 
   }
