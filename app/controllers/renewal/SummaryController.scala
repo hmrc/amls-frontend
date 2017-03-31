@@ -14,26 +14,28 @@ import scala.concurrent.Future
 
 
 @Singleton
-class SummaryController @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector,
-                                           val renewalService: RenewalService
-                                         ) extends BaseController {
+class SummaryController @Inject()
+(
+  val dataCacheConnector: DataCacheConnector,
+  val authConnector: AuthConnector,
+  val renewalService: RenewalService
+) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
 
-      dataCacheConnector.fetchAll flatMap {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            renewal <- cache.getEntry[Renewal](Renewal.key)
-          } yield {
-            Future.successful(Ok(summary(renewal, businessMatching.activities)))
-          }) getOrElse {
-            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-          }
-      }
+        dataCacheConnector.fetchAll flatMap {
+          optionalCache =>
+            (for {
+              cache <- optionalCache
+              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              renewal <- cache.getEntry[Renewal](Renewal.key)
+            } yield {
+              Future.successful(Ok(summary(renewal, businessMatching.activities)))
+            }) getOrElse {
+              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            }
+        }
   }
 }

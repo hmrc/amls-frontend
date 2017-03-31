@@ -49,13 +49,13 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
 
     MsbThroughput.throughputValues foreach { selection =>
 
-      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.code}"]""")
+      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.value}"]""")
 
-      s"display the radio button for selection ${selection.code}" in new ViewFixture {
+      s"display the radio button for selection ${selection.value}" in new ViewFixture {
         Option(getElement(doc).first) mustBe defined
       }
 
-      s"display the selection label for selection ${selection.code}" in new ViewFixture {
+      s"display the selection label for selection ${selection.value}" in new ViewFixture {
         val radioLabelElement = getElement(doc).first.parent
 
         Option(radioLabelElement) mustBe defined

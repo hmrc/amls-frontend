@@ -5,6 +5,7 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.forms.Writes._
 import models.ValidationRule
+import play.api.i18n.Messages
 import play.api.libs.json.Json
 import utils.MappingUtils.Implicits._
 
@@ -12,7 +13,7 @@ case class MsbThroughput(throughput: String)
 
 object MsbThroughput {
 
-  case class FormSelection(code: String, label: String)
+  case class FormSelection(value: String, label: String)
 
   val throughputValues = Seq(
     FormSelection("01", "renewal.msb.throughput.selection.1"),
@@ -24,10 +25,14 @@ object MsbThroughput {
     FormSelection("07", "renewal.msb.throughput.selection.7")
   )
 
+  def labelFor(model: MsbThroughput)(implicit messages: Messages) = throughputValues.collectFirst {
+    case FormSelection(model.throughput, label) => messages(label)
+  }.getOrElse("")
+
   implicit val format = Json.format[MsbThroughput]
 
   private val validSelectionRule: ValidationRule[String] = Rule.fromMapping[String, String] {
-    case input if throughputValues.exists(_.code == input) => Success(input)
+    case input if throughputValues.exists(_.value == input) => Success(input)
     case _ => Invalid(Seq(ValidationError("renewal.msb.throughput.selection.invalid")))
   }.repath(_ => Path \ "throughput")
 
