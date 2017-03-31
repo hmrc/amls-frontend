@@ -15,7 +15,8 @@ import views.html.renewal._
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector, val authConnector: AuthConnector,
+class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector,
                                              val renewalService: RenewalService
                                             ) extends BaseController {
 
@@ -37,14 +38,13 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         case f: InvalidForm =>
           Future.successful(BadRequest(customers_outside_uk(f, edit)))
         case ValidForm(_, data) => {
-
           dataCacheConnector.fetchAll map { optionalCache =>
             (for {
               cache <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
-              renewalService.updateRenewal(renewal)
+              renewalService.updateRenewal(renewal.customersOutsideUK(data))
               redirectDependingOnActivities(businessMatching)
             }) getOrElse Redirect(routes.SummaryController.get())
           }

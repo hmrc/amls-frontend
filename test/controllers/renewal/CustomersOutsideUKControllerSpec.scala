@@ -81,12 +81,12 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     }
 
-    "post is called" must {
+    "post is called" when {
 
-      "redirect to the summary page" when {
-        "given valid data" when {
+      "given valid data" must {
+
+        "redirect to the summary page" when {
           "business is not an hvd" in new Fixture {
-
             val newRequest = request.withFormUrlEncodedBody(
               "isOutside" -> "true",
               "countries[0]" -> "GB",
@@ -110,12 +110,9 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
           }
         }
-      }
 
-      "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-        "given valid data" when {
+        "redirect to the PercentageOfCashPaymentOver15000Controller" when {
           "business is not an hvd" in new Fixture {
-
             val newRequest = request.withFormUrlEncodedBody(
               "isOutside" -> "true",
               "countries[0]" -> "GB",
@@ -139,8 +136,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
             redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
           }
         }
-      }
 
+      }
       "respond with BAD_REQUEST" when {
         "given invalid data represented by an empty string" in new Fixture {
 
