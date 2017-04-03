@@ -8,7 +8,6 @@ import models.status._
 import org.joda.time.LocalDate
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import views.html.status.status
 
 import scala.concurrent.{ExecutionContext, Future}
 
