@@ -15,7 +15,7 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = msb_total_throughput(EmptyForm)
+    override def view = msb_total_throughput(EmptyForm, edit = false)
   }
 
   trait InvalidFormFixture extends ViewFixture {
@@ -27,7 +27,7 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       Seq(Path \ "throughput" -> Seq(ValidationError(requiredMsg)))
     )
 
-    override def view = msb_total_throughput(invalidForm)
+    override def view = msb_total_throughput(invalidForm, edit = false)
   }
 
   "The MSB total throughput view" must {

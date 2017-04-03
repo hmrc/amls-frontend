@@ -6,7 +6,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, HighValueDealing}
+import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -56,6 +56,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
 
   private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
     ControllerHelper.getBusinessActivity(Some(businessMatching)) match {
+      case Some(activities) if activities.businessActivities contains MoneyServiceBusiness => Redirect(routes.MsbThroughputController.get())
       case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case _ => Redirect(routes.SummaryController.get())
     }

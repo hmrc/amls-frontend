@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.businessactivities.CustomersOutsideUKController
 import models.Country
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing}
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -134,6 +134,32 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
+          }
+        }
+
+        "redirect to the Msb Turnover page" when {
+          "business is an msb" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "isOutside" -> "true",
+              "countries[0]" -> "GB",
+              "countries[1]" -> "US"
+            )
+
+            when(dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing))))))
+
+            when(mockCacheMap.getEntry[Renewal](Renewal.key))
+              .thenReturn(Some(Renewal()))
+
+            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.MsbThroughputController.get().url))
           }
         }
 
