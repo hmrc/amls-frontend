@@ -10,7 +10,7 @@
 
 @* Heading *@
 <div class="grid-layout">
-    <div class="grid-layout__column grid-layout__column--3-3">
+    <div class="grid-layout__column grid-layout__column--2-3">
         <header class="page-header">
             <h1 class="heading-xlarge">@Messages("status.submissionready.heading")</h1>
             <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
@@ -47,11 +47,7 @@
         </ol>
     </div>
     <div class="grid-layout__column grid-layout__column--2-3">
-        <div class="status-detail">
-            @include.status.rightpanel_submissionready()
-        </div>
-
+        @include.status.rightpanel_submissionready()
     </div>
-
 </div>
 }

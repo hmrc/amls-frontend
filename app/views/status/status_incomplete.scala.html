@@ -20,12 +20,10 @@
 
 <div class="grid-layout">
     <div class="grid-layout__column grid-layout__column--2-3">
-
         @businessName.map {bn =>
             <div class="panel-indent panel-indent--gutter panel-border-wide">
                 <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
             </div>
-
         }
     </div>
 </div>
@@ -39,10 +37,7 @@
         </ol>
     </div>
     <div class="grid-layout__column grid-layout__column--2-3">
-        <div class="status-detail">
-           @include.status.rightpanel_incomplete()
-        </div>
-
+       @include.status.rightpanel_incomplete()
     </div>
 
 </div>

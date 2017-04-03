@@ -46,20 +46,18 @@
 
 <div class="grid-layout grid-layout--stacked">
     <div class="grid-layout__column grid-layout__column--2-3">
-        <div class="status-detail">
-            @if(renewalFlow) {
-                @endDate.map {date =>
-                    <div class="notice spacelarge">
-                        <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
-                        <strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong>
-                    </div>
-                    <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
-                    <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
-                }
-            } else {
-              <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
+        @if(renewalFlow) {
+            @endDate.map {date =>
+                <div class="notice spacelarge">
+                    <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+                    <strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong>
+                </div>
+                <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
+                <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
             }
-        </div>
+        } else {
+          <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
+        }
     </div>
 
 </div>
