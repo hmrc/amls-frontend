@@ -3,7 +3,7 @@
 @import models.renewal._
 @import models.businessmatching.BusinessActivities
 
-@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -81,6 +81,15 @@
                 }
             </ul>
             }
+        }
+    }
+
+    @model.msbThroughput.map { m =>
+        @checkYourAnswers(
+            question = messages("renewal.msb.throughput.header"),
+            editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
+        ) {
+            <p>@MsbThroughput.labelFor(m)</p>
         }
     }
 

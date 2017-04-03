@@ -8,7 +8,8 @@ object Conversions {
   implicit class SubscriptionConversions(request: SubscriptionRequest) {
 
     def withRenewalData(renewal: Renewal): SubscriptionRequest = {
-      val newSection = request.businessActivitiesSection match {
+
+      val baSection = request.businessActivitiesSection match {
         case Some(ba) => Some(ba.copy(
           expectedAMLSTurnover = renewal.turnover contramap AMLSTurnover.convert,
           expectedBusinessTurnover = renewal.businessTurnover contramap BusinessTurnover.convert,
@@ -18,7 +19,14 @@ object Conversions {
         case _ => throw new Exception("[Conversions] Trying to process data for renewal, but no business activities data was found")
       }
 
-      request.copy(businessActivitiesSection = newSection)
+      val msbSection = request.msbSection match {
+        case Some(msb) => Some(msb.copy(
+          throughput = renewal.msbThroughput contramap MsbThroughput.convert
+        ))
+        case _ => None
+      }
+
+      request.copy(businessActivitiesSection = baSection, msbSection = msbSection)
     }
 
   }

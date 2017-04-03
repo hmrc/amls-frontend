@@ -4,13 +4,14 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
-import models.businessactivities.{BusinessActivities => BusActivities, _}
+import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
-import models.businessmatching._
 import models.businessmatching.BusinessType.SoleProprietor
+import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.renewal.{Renewal, RenewalResponse}
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.renewal._
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, Country, SubscriptionRequest, SubscriptionResponse}
@@ -681,7 +682,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           activities.businessActivities
-        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+        } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
         val result = await(TestSubmissionService.getSubscription)
 
@@ -813,7 +814,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           activities.businessActivities
-        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+        } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
         val result = await(TestSubmissionService.getAmendment)
 
@@ -1005,7 +1006,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           activities.businessActivities
-        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+        } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
         val result = await(TestSubmissionService.getVariation)
 
@@ -1116,12 +1117,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       when {
         cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
-      } thenReturn Some(BusActivities(
-        involvedInOther = Some(InvolvedInOtherNo),
-        expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
-        expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Second),
-        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "UK")))))
-      ))
+      } thenReturn Some(BusActivities())
+
+      when {
+        cache.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any())
+       } thenReturn Some(MoneyServiceBusiness())
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -1139,13 +1139,30 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         TestSubmissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
       } thenReturn Future.successful(mock[RenewalResponse])
 
-      val renewal = Renewal()
+      val renewal = Renewal(
+        turnover = Some(AMLSTurnover.First),
+        businessTurnover = Some(BusinessTurnover.Second),
+        msbThroughput = Some(MsbThroughput("02")),
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
+        involvedInOtherActivities = Some(InvolvedInOtherNo)
+      )
 
       val result = await(TestSubmissionService.renewal(renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
       verify(TestSubmissionService.amlsConnector).renewal(captor.capture(), any())(any(), any(), any())
 
+      val submission = captor.getValue
+
+      // The actual values of these are tested in renewals.models.Conversions
+      submission.businessActivitiesSection mustBe defined
+      submission.businessActivitiesSection.get.expectedAMLSTurnover mustBe defined
+      submission.businessActivitiesSection.get.expectedBusinessTurnover mustBe defined
+      submission.businessActivitiesSection.get.customersOutsideUK mustBe defined
+      submission.businessActivitiesSection.get.involvedInOther mustBe defined
+
+      submission.msbSection mustBe defined
+      submission.msbSection.get.throughput mustBe defined
     }
 
   }
