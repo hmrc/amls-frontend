@@ -33,7 +33,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       authConnector = self.authConnector,
       renewalService = mockRenewalService
     )
-
   }
 
     val mockCacheMap = mock[CacheMap]
@@ -78,6 +77,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             Some(PercentageOfCashPaymentOver15000.First),
             Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+            Some(MsbThroughput("01")),
             false)))
 
       val result = controller.get()(request)

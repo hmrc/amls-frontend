@@ -24,7 +24,7 @@ class time_at_additional_addressSpec extends GenericTestHelper with MustMatchers
       def view =
         views.html.responsiblepeople.time_at_additional_address(form2, false, 0, false, "FirstName LastName")
 
-      doc.title() must startWith(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName") + " - " + Messages("summary.responsiblepeople"))
+      doc.title() must startWith(Messages("responsiblepeople.timeataddress.address_history.title") + " - " + Messages("summary.responsiblepeople"))
 
     }
 
@@ -35,7 +35,7 @@ class time_at_additional_addressSpec extends GenericTestHelper with MustMatchers
       def view =
         views.html.responsiblepeople.time_at_additional_address(form2, false, 0, false, "FirstName LastName")
 
-      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history", "FirstName LastName"))
+      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", "FirstName LastName"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {

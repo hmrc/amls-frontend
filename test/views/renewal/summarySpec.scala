@@ -20,8 +20,6 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-
-
       def view = views.html.renewal.summary(Renewal(), None)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
@@ -65,7 +63,8 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
-      ("renewal.receiving.title", checkElementTextIncludes(_, "other"))
+      ("renewal.receiving.title", checkElementTextIncludes(_, "other")),
+      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -77,6 +76,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+          Some(MsbThroughput("01")),
           false
         )
 
@@ -94,11 +94,11 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        header must not be None
+        val section = header.get.parents().select("section").first()
         check(section) must be(true)
       }}
     }
