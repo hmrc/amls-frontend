@@ -1098,14 +1098,15 @@ table.notifications thead th {
 /* Overrides the stupid Assets Frontend - what were they thinking! */
 
 button,
-.button,
-.button--get-started {
+.button{
   line-height: 1.25em;
   padding: 0.5em 0.6em 0.3em 0.6em;
   font-size: 1em;
 }
 
 .button--get-started {
+  line-height: 1.25em;
+  padding: 0.36842em 2.15789em 0.21053em 0.84211em;
   padding-right: 40px;
   font-size: 24px;
 }
