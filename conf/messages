@@ -311,7 +311,7 @@ button.saveandcontinue = Save and continue
 button.saveandreturn = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
-button.edit = Edit
+button.edit = Change
 button.remove = Remove
 button.delete = Delete
 button.continue = Continue
@@ -855,7 +855,7 @@ businessmatching.psr.number.lbl = PSR registration number
 businessmatching.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
 businessmatching.cannotcontinuewiththeapplication.heading = You cannot continue with your application
 businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
-businessmatching.summary.business.address.lbl = Your business:
+businessmatching.summary.business.address.lbl = Your business
 businessmatching.button.confirm.start = Confirm and start application
 
 businessmatching.services.title = Which services does your business provide?
