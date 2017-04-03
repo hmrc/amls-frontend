@@ -10,14 +10,11 @@
 
 @* Heading *@
 <div class="grid-layout">
-    <div class="grid-layout__column grid-layout__column--3-3">
-        <h1 class="heading-xlarge">
-        <span class="heading-secondary">
-            @Messages("summary.status")
-        </span>
-            <span>@Messages("status.submissiondecisionrejected.heading")</span>
-        </h1>
-
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <header class="page-header">
+            <h1 class="heading-xlarge">@Messages("status.submissiondecisionrejected.heading")</h1>
+            <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+        </header>
     </div>
 </div>
 
@@ -25,7 +22,8 @@
     <div class="grid-layout__column grid-layout__column--2-3">
         @businessName.map {bn =>
             <div class="panel-indent panel-indent--gutter panel-border-wide">
-                <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+                <p class="heading-small">@Messages("status.business")</p>
+                <p>@bn</p>
             </div>
         }
     </div>

@@ -10,14 +10,11 @@
 
 @* Heading *@
 <div class="grid-layout">
-    <div class="grid-layout__column grid-layout__column--3-3">
-        <h1 class="heading-xlarge">
-        <span class="heading-secondary">
-            @Messages("summary.status")
-        </span>
-            <span>@Messages("status.submissiondecisionsupervised.heading")</span>
-        </h1>
-
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <header class="page-header">
+            <h1 class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
+            <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+        </header>
     </div>
 </div>
 
@@ -52,12 +49,14 @@
         <div class="status-detail">
             @if(renewalFlow) {
                 @endDate.map {date =>
-                    <div class="notice spacelarge"><i class="icon icon-important"><span class="visuallyhidden">Warning</span></i><strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong></div>
-                    <P>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</P>
-
+                    <div class="notice spacelarge">
+                        <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+                        <strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong>
+                    </div>
+                    <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
                     <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
                 }
-            }else{
+            } else {
               <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
             }
         </div>
