@@ -1,0 +1,48 @@
+@import include._
+@import models.status._
+@import config.ApplicationConfig
+@import org.joda.time.LocalDate
+@import utils.DateHelper
+
+@(regNo: String, businessName: Option[String])(implicit request: Request[_],m:Messages)
+
+@main2(title = Messages("status.submissiondecisionrejected.heading") +" - Your registration") {
+
+@* Heading *@
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--3-3">
+        <h1 class="heading-xlarge">
+        <span class="heading-secondary">
+            @Messages("summary.status")
+        </span>
+            <span>@Messages("status.submissiondecisionrejected.heading")</span>
+        </h1>
+
+    </div>
+</div>
+
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        @businessName.map {bn =>
+            <div class="panel-indent panel-indent--gutter panel-border-wide">
+                <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            </div>
+        }
+    </div>
+    <div class = "grid-layout__column grid-layout__column--1-3">
+        <div class="govuk-box-highlight messaging">
+            <!-- <i class="icon icon-information"></i>  -->
+            <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
+        </div>
+    </div>
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="status-detail">
+            @include.status.rightpanel_submissiondecisionrejected()
+        </div>
+    </div>
+
+</div>
+}

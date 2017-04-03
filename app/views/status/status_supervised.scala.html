@@ -1,12 +1,12 @@
 @import include._
 @import models.status._
 @import config.ApplicationConfig
-@import org.joda.time.LocalDateTime
+@import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], submittedDate: Option[LocalDateTime])(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean)(implicit request: Request[_],m:Messages)
 
-@main2(title = Messages("status.submissionreadyforreview.heading") +" - Your registration") {
+@main2(title = Messages("status.submissiondecisionsupervised.heading") +" - Your registration") {
 
 @* Heading *@
 <div class="grid-layout">
@@ -15,7 +15,7 @@
         <span class="heading-secondary">
             @Messages("summary.status")
         </span>
-            <span>@Messages("status.submissionreadyforreview.heading")</span>
+            <span>@Messages("status.submissiondecisionsupervised.heading")</span>
         </h1>
 
     </div>
@@ -23,14 +23,15 @@
 
 <div class="grid-layout">
     <div class="grid-layout__column grid-layout__column--2-3">
-        <div class="panel-indent panel-indent--gutter panel-border-wide">
         @businessName.map {bn =>
-          <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            <div class="panel-indent panel-indent--gutter panel-border-wide">
+                <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+                @endDate.map {date =>
+                   <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))</p>
+                }
+                <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+            </div>
         }
-        @submittedDate.map {date =>
-          <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
-        }
-        </div>
     </div>
     <div class = "grid-layout__column grid-layout__column--1-3">
         <div class="govuk-box-highlight messaging">
@@ -47,22 +48,22 @@
 </div>
 
 <div class="grid-layout grid-layout--stacked">
-    <div class="grid-layout__column grid-layout__column--1-3">
-        <ol class="list list-number status-list">
-            <li class="status-list--complete">@Messages("status.complete") <span class="status-list--icon"></span></li>
-            <li class="status-list--complete">@Messages("status.submitted") <span class="status-list--icon"></span></li>
-            <li class="status-list--pending status-list--end">@Messages("status.underreview") <span class="status-list--icon"></span></li>
-        </ol>
-    </div>
     <div class="grid-layout__column grid-layout__column--2-3">
         <div class="status-detail">
-            @include.status.rightpanel_submissionreadyforreview(feeResponse)
-        </div>
+            @if(renewalFlow) {
+                @endDate.map {date =>
+                    <div class="notice spacelarge"><i class="icon icon-important"><span class="visuallyhidden">Warning</span></i><strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong></div>
+                    <P>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</P>
 
+                    <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
+                }
+            }else{
+              <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
+            }
+        </div>
     </div>
 
 </div>
-
 <div class="grid-row">
     <div class="column-two-thirds">
         <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
