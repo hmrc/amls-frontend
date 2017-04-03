@@ -9,11 +9,11 @@ s"""${f("utrNumber").id}-fieldset"""
 
 @header = {
     @rpErrorSummary(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforselfassessment.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.registeredforselfassessment.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
 
