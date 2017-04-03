@@ -17,8 +17,7 @@ import scala.concurrent.Future
 class PercentageOfCashPaymentOver15000Controller @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val authConnector: AuthConnector,
-                                           val renewalService: RenewalService,
-                                           val statusService: StatusService
+                                           val renewalService: RenewalService
                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -37,7 +36,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[PercentageOfCashPaymentOver15000](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(percentage(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(views.html.renewal.percentage(f, edit)))
         case ValidForm(_, data) =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)

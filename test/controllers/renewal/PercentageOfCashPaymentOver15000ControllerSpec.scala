@@ -27,14 +27,12 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
     val emptyCache = CacheMap("", Map.empty)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
     val controller = new PercentageOfCashPaymentOver15000Controller(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
-      renewalService = mockRenewalService,
-      statusService = mockStatusService
+      renewalService = mockRenewalService
     )
   }
 
@@ -46,9 +44,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
 
       "display the Percentage Of CashPayment Over 15000 page" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
-
         when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -58,9 +53,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
       }
 
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[Renewal](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))

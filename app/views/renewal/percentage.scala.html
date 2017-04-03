@@ -5,17 +5,17 @@
 
 @header = {
     @errorSummary(f)
-    @heading("hvd.percentage.title", "summary.hvd")
+    @heading("hvd.percentage.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("hvd.percentage.title") + " - " + Messages("summary.hvd"),
+    title = Messages("hvd.percentage.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
     <span class="form-hint">@Messages("hvd.percentage.text")</span>
 
-    @form(f, controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
+    @form(f, controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
         @fieldset(
             f = f("percentage-fieldset"),
