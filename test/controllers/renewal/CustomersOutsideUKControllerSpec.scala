@@ -112,7 +112,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is not an hvd" in new Fixture {
+          "business is an hvd" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "isOutside" -> "true",
               "countries[0]" -> "GB",

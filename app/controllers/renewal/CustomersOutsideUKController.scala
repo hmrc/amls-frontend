@@ -2,6 +2,7 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -38,15 +39,16 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         case f: InvalidForm =>
           Future.successful(BadRequest(customers_outside_uk(f, edit)))
         case ValidForm(_, data) => {
-          dataCacheConnector.fetchAll map { optionalCache =>
+          dataCacheConnector.fetchAll flatMap { optionalCache =>
             (for {
               cache <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
-              renewalService.updateRenewal(renewal.customersOutsideUK(data))
-              redirectDependingOnActivities(businessMatching)
-            }) getOrElse Redirect(routes.SummaryController.get())
+              renewalService.updateRenewal(renewal.customersOutsideUK(data)) map { _ =>
+                redirectDependingOnActivities(businessMatching)
+              }
+            }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
           }
         }
       }
