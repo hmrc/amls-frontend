@@ -38,7 +38,7 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
-      heading.html() must be(Messages("responsiblepeople.experiencetraining.title", "FirstName LastName"))
+      heading.html() must be(Messages("responsiblepeople.experiencetraining.heading", "FirstName LastName"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
