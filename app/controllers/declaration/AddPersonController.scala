@@ -11,7 +11,6 @@ import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.ControllerHelper
-import views.html.status.status
 
 import scala.concurrent.Future
 

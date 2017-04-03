@@ -3,8 +3,7 @@ package controllers.businessactivities
 
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
-import models.status.{NotCompleted, SubmissionDecisionApproved, Incomplete}
-import  utils.GenericTestHelper
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => Activities, _}
 import org.jsoup.Jsoup
