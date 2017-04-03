@@ -10,14 +10,11 @@
 
 @* Heading *@
 <div class="grid-layout">
-    <div class="grid-layout__column grid-layout__column--3-3">
-        <h1 class="heading-xlarge">
-        <span class="heading-secondary">
-            @Messages("summary.status")
-        </span>
-            <span>@Messages("status.submissionreadyforreview.heading")</span>
-        </h1>
-
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <header class="page-header">
+            <h1 class="heading-xlarge">@Messages("status.submissionreadyforreview.heading")</h1>
+            <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+        </header>
     </div>
 </div>
 
@@ -25,10 +22,11 @@
     <div class="grid-layout__column grid-layout__column--2-3">
         <div class="panel-indent panel-indent--gutter panel-border-wide">
         @businessName.map {bn =>
-          <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            <p class="heading-small">@Messages("status.business")</p>
+            <p>@bn</p>
         }
         @submittedDate.map {date =>
-          <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
+            <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
         }
         </div>
     </div>
