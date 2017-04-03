@@ -2,21 +2,23 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideUK, Renewal}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal._
 import services.RenewalService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
+import views.html.renewal._
 
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector, val authConnector: AuthConnector,
+class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector,
                                              val renewalService: RenewalService
-) extends BaseController {
+                                            ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -36,15 +38,26 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         case f: InvalidForm =>
           Future.successful(BadRequest(customers_outside_uk(f, edit)))
         case ValidForm(_, data) => {
-          for {
-            renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(renewal.getOrElse(Renewal()).customersOutsideUK(data))
-          } yield {
-              Redirect(routes.SummaryController.get())
-            }
+          dataCacheConnector.fetchAll map { optionalCache =>
+            (for {
+              cache <- optionalCache
+              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              renewal <- cache.getEntry[Renewal](Renewal.key)
+            } yield {
+              renewalService.updateRenewal(renewal.customersOutsideUK(data))
+              redirectDependingOnActivities(businessMatching)
+            }) getOrElse Redirect(routes.SummaryController.get())
           }
         }
       }
+  }
+
+  private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
+    ControllerHelper.getBusinessActivity(Some(businessMatching)) match {
+      case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+      case _ => Redirect(routes.SummaryController.get())
+    }
+  }
 }
 
 
