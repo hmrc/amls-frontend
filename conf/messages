@@ -299,7 +299,7 @@ error.required.declaration.specify.role = Specify your role in the business
 ########################################################################################################################
 
 title.gov = GOV.UK
-title.amls = Anti-money laundering supervision
+title.amls = Register for anti-money laundering supervision
 title.services = Which services does your business provide?
 title.contact = Your contact details
 title.wyn = What you need
@@ -1476,11 +1476,11 @@ renewal.msb.throughput.header = What was your total throughput in the last 12 mo
 renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
 renewal.msb.throughput.selection.required = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
-renewal.msb.throughput.selection.1 = £0 to £99,999 
-renewal.msb.throughput.selection.2 = £100,000 to £499,999 
-renewal.msb.throughput.selection.3 = £500,000 to £999,999 
-renewal.msb.throughput.selection.4 = £1 million to £20 million 
-renewal.msb.throughput.selection.5 = £21 million to £100 million 
+renewal.msb.throughput.selection.1 = £0 to £99,999
+renewal.msb.throughput.selection.2 = £100,000 to £499,999
+renewal.msb.throughput.selection.3 = £500,000 to £999,999
+renewal.msb.throughput.selection.4 = £1 million to £20 million
+renewal.msb.throughput.selection.5 = £21 million to £100 million
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
