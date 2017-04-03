@@ -1081,7 +1081,8 @@ responsiblepeople.timeataddress.11_months_history = 6 to 11 months
 responsiblepeople.timeataddress.3_years_history = 1 to 3 years
 responsiblepeople.timeataddress.more_years_history = More than 3 years
 
-responsiblepeople.additional_address.title = Where was {0}’s previous home address?
+responsiblepeople.additional_address.heading = Where was {0}’s previous home address?
+responsiblepeople.additional_address.title = Where was this person’s previous home address?
 responsiblepeople.additional_address.ukAddress = UK
 responsiblepeople.additional_address.nonUkAddress = Overseas
 responsiblepeople.additional_address.address = Address
