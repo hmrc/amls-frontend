@@ -84,6 +84,21 @@
         }
     }
 
+    @model.percentageOfCashPaymentOver15000.map { p =>
+        @checkYourAnswers(
+            question = Messages("hvd.percentage.title"),
+            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+            ) {
+                <p>@p match {
+                    case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
+                    case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
+                    case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
+                    case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                    case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
+            }
+    }
+
     @model.msbThroughput.map { m =>
         @checkYourAnswers(
             question = messages("renewal.msb.throughput.header"),
