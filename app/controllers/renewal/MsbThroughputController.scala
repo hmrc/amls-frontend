@@ -23,7 +23,8 @@ class MsbThroughputController @Inject()
 ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         val maybeResult = for {
           renewal <- OptionT(renewals.getRenewal)
           throughput <- OptionT.fromOption[Future](renewal.msbThroughput)
@@ -35,30 +36,27 @@ class MsbThroughputController @Inject()
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         Form2[MsbThroughput](request.body) match {
           case form: InvalidForm => Future.successful(BadRequest(msb_total_throughput(form, edit)))
           case ValidForm(_, model) =>
             val maybeResult = for {
               renewal <- OptionT(renewals.getRenewal)
               _ <- OptionT.liftF(renewals.updateRenewal(renewal.msbThroughput(model)))
-              cache <- OptionT(dataCacheConnector.fetchAll)
-              businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
-              Redirect(getNextPage(businessMatching, edit))
+              Redirect(getNextPage(edit))
             }
 
             maybeResult.getOrElse(Redirect(routes.SummaryController.get()))
         }
   }
 
-  private def getNextPage(businessMatching: BusinessMatching, edit: Boolean) =
-    (businessMatching, edit) match {
-      case (_, true) => routes.SummaryController.get()
-      case (bm, _) => bm.activities match {
-        case Some(x) if x.businessActivities.contains(HighValueDealing) => routes.PercentageOfCashPaymentOver15000Controller.get()
-        case _ => routes.SummaryController.get()
-      }
+  private def getNextPage(edit: Boolean) =
+    if (edit) {
+      routes.SummaryController.get()
+    } else {
+      routes.MsbMoneyTransfersController.get()
     }
 
 }
