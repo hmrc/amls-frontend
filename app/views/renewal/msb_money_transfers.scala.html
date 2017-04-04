@@ -1,5 +1,28 @@
-@(edit: Boolean)(implicit messages: Messages)
+@import forms._
+@import models.renewal.MsbMoneyTransfers
+@import include._
+@import forms2._
 
-<div class="heading-xlarge">@messages("renewal.msb.transfers.header")</div>
+@(f: Form2[MsbMoneyTransfers], edit: Boolean)(implicit messages: Messages, request: Request[_])
 
-<form action="@controllers.renewal.routes.MsbMoneyTransfersController.post(edit)"></form>
+@header = {
+    @errorSummary(f)
+    @heading("renewal.msb.transfers.header", "summary.renewal")
+}
+
+@main(
+    title = s"${messages("renewal.msb.transfers.header")} - ${messages("summary.renewal")}",
+    heading = header
+) {
+
+    @form(f, controllers.renewal.routes.MsbMoneyTransfersController.post(edit)) {
+
+        @input(
+            field = f("transfers"),
+            labelText = "Transfers",
+            labelHidden = true
+        )
+
+        @submit()
+    }
+}

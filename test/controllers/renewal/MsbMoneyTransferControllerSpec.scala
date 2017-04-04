@@ -22,13 +22,13 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
     val request = addToken(authRequest)
 
     lazy val controller = new MsbMoneyTransfersController(self.authConnector, renewalService)
-  }
-
-  trait FormSubmissionFixture extends Fixture {
 
     when {
       renewalService.getRenewal(any(), any(), any())
-    } thenReturn Future.successful(Some(Renewal()))
+    } thenReturn Future.successful(Renewal().some)
+  }
+
+  trait FormSubmissionFixture extends Fixture {
 
   }
 
@@ -51,6 +51,20 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         val doc = Jsoup.parse(contentAsString(result))
         doc.select("form").first.attr("action") mustBe routes.MsbMoneyTransfersController.post(true).url
       }
+
+      "reads the current value from the renewals model" in new Fixture {
+
+        when {
+          renewalService.getRenewal(any(), any(), any())
+        } thenReturn Future.successful(Renewal(msbTransfers = MsbMoneyTransfers(2500).some).some)
+
+        val result = controller.get(true)(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select("input[name=transfers]").first.attr("value") mustBe "2500"
+
+        verify(renewalService).getRenewal(any(), any(), any())
+      }
     }
   }
 
@@ -69,7 +83,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.msbTransfers mustBe Some(MsbMoneyTransfers(1500))
+        captor.getValue.msbTransfers mustBe MsbMoneyTransfers(1500).some
       }
     }
   }
