@@ -2,21 +2,20 @@ package models.renewal
 
 import play.api.libs.json.Json
 
-case class Renewal
-(
+case class Renewal(
   involvedInOtherActivities: Option[InvolvedInOther] = None,
   businessTurnover: Option[BusinessTurnover] = None,
   turnover: Option[AMLSTurnover] = None,
   customersOutsideUK: Option[CustomersOutsideUK] = None,
   percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
   msbThroughput: Option[MsbThroughput] = None,
+  ceTransactions: Option[CETransactions] = None,
   hasChanged: Boolean = false
-)
-{
+) {
   def isComplete = {
     this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
       case _ => false
     }
   }
@@ -38,6 +37,10 @@ case class Renewal
 
   def msbThroughput(model: MsbThroughput): Renewal =
     this.copy(msbThroughput = Some(model), hasChanged = hasChanged || !this.msbThroughput.contains(model))
+
+  def ceTransactions(p: CETransactions): Renewal =
+    this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
+
 }
 
 object Renewal {

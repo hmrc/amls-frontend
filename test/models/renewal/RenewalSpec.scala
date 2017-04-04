@@ -1,6 +1,7 @@
 package models.renewal
 
 import models.Country
+import models.moneyservicebusiness.ExpectedThroughput
 import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
@@ -25,7 +26,11 @@ class RenewalSpec extends GenericTestHelper {
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          hasChanged = true)
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(MsbThroughput("01")),
+          Some(CETransactions("123")),
+          hasChanged = true
+        )
 
         model.isComplete mustBe true
 
@@ -38,7 +43,11 @@ class RenewalSpec extends GenericTestHelper {
           None,
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          hasChanged = true)
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(MsbThroughput("01")),
+          Some(CETransactions("123")),
+          hasChanged = true
+        )
 
         model.isComplete mustBe true
 
