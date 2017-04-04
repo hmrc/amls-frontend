@@ -215,6 +215,7 @@ error.expected.future.date = Enter a valid date. The date cannot be in the futur
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
+error.required.rp.confirm.address = Select yes if this is {0}’s home address
 
 
 ############################### Trust and company service providers ###############################
@@ -1213,6 +1214,8 @@ responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
+responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
+responsiblepeople.confirmaddress.title = Is this this person’s home address?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = For this section you may need to know:

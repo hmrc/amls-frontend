@@ -63,6 +63,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
+      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
       ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"))
     )
 
