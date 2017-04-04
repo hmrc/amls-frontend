@@ -1,6 +1,6 @@
 package controllers
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.FeeConnector
 import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}

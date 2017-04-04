@@ -68,7 +68,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val document = Jsoup.parse(contentAsString(result))
 
-      document.getElementsByClass("heading-secondary").first().html() must be(Messages("summary.status"))
+      document.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
       document.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
       document.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
@@ -130,9 +130,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         }
         document.title() must be(Messages("status.incomplete.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.incomplete.description"))
-
-
+        document.getElementsMatchingOwnText(Messages("status.incomplete.description")).text must be(Messages("status.incomplete.description"))
 
       }
 
@@ -164,7 +162,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.title() must be(Messages("status.submissionready.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionready.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissionready.description")).text() must be(Messages("status.submissionready.description"))
         document.getElementsByTag("details").html() must be("")
       }
 
@@ -206,8 +204,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.description"))
-        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description2"))
+        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description")).text must be(Messages("status.submissionreadyforreview.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text must be(Messages("status.submissionreadyforreview.description2"))
         document.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
 
         val date = DateHelper.formatDate(LocalDate.now())
@@ -254,8 +252,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.description"))
-        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description2"))
+        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description")).text must be(Messages("status.submissionreadyforreview.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text must be(Messages("status.submissionreadyforreview.description2"))
         document.getElementsByTag("details").html() must be("")
       }
 
@@ -294,7 +292,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.title() must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionsupervised.success.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.success.description")).text must be(Messages("status.submissiondecisionsupervised.success.description"))
         val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
         document.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
         Messages("status.submissiondecisionsupervised.enddate.text", date)
@@ -336,8 +334,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         document.title() must be(Messages("status.submissiondecisionrejected.heading") + pageTitleSuffix)
 
-        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionrejected.description"))
-        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionrejected.description2"))
+        document.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description")).text must be(Messages("status.submissiondecisionrejected.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description2")).text must be(Messages("status.submissiondecisionrejected.description2"))
       }
     }
 
