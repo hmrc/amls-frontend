@@ -3,7 +3,7 @@
 @import forms2._
 
 @import models.renewal.MsbThroughput
-@(f: Form2[_])(implicit request: Request[_], messages: Messages)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @header = {
     @errorSummary(f)
@@ -17,7 +17,7 @@
 
     <p class="form-hint">@messages("renewal.msb.throughput.info")</p>
 
-    @form(f, controllers.renewal.routes.MsbThroughputController.post()) {
+    @form(f, controllers.renewal.routes.MsbThroughputController.post(edit)) {
 
         @fieldset(
             f = f("throughput-fieldset"),
