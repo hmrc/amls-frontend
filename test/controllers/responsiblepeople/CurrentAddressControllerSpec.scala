@@ -199,6 +199,34 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
       }
 
+      "redirect to CurrentAddressDateOfChangeController" when {
+        "address changed and in approved state" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+
+        }
+      }
+
       "redirect to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
