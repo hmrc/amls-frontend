@@ -1,7 +1,10 @@
 package models.renewal
 
-import jto.validation.{From, Rule}
+import jto.validation.forms.Rules._
+import jto.validation.forms.Writes._
 import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Path, Rule, To, Write}
+import models.FormTypes.regexWithMsg
 import play.api.libs.json.Json
 import utils.MappingUtils.Implicits._
 
@@ -12,8 +15,14 @@ object MsbMoneyTransfers {
   implicit val format = Json.format[MsbMoneyTransfers]
 
   implicit val formReader: Rule[UrlFormEncoded, MsbMoneyTransfers] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "transfers").read[Int].withMessage("renewal.msb.transfers.value.required").map(MsbMoneyTransfers.apply)
+    val fieldR = (__ \ "transfers").read[String].withMessage("renewal.msb.transfers.value.required")
+    val digitsR = regexWithMsg("^[0-9]+$".r, "renewal.msb.transfers.value.invalid").repath(_ => Path \ "transfers")
+
+    (fieldR andThen digitsR andThen intR) map MsbMoneyTransfers.apply
+  }
+
+  implicit val formWriter: Write[MsbMoneyTransfers, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    (__ \ "transfers").write[Int] contramap(_.transfers)
   }
 
 }
