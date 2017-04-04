@@ -62,22 +62,42 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
       document.select("input[name=emailAddress]").`val` must be("test@test.com")
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data" when {
+      "this is the first responsible person" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "07702745869",
-        "emailAddress" -> "test@test.com"
-      )
+        val newRequest = request.withFormUrlEncodedBody(
+          "phoneNumber" -> "07702745869",
+          "emailAddress" -> "test@test.com"
+        )
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      when(controller.dataCacheConnector.save[ContactDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.save[ContactDetails](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(1)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(1).url))
+        val result = controller.post(1)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ConfirmAddressController.get(1).url))
+      }
+
+      "this is not the first responsible person" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "phoneNumber" -> "07702745869",
+          "emailAddress" -> "test@test.com"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+
+        when(controller.dataCacheConnector.save[ContactDetails](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(2)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(2).url))
+      }
     }
 
      "fail submission on invalid phone number" in new Fixture {
