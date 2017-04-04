@@ -5,21 +5,21 @@
 
 @header = {
     @errorSummary(f)
-    @heading("msb.most.transactions.title", "summary.msb")
+    @heading("renewal.msb.most.transactions.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("msb.most.transactions.title") + " - " + Messages("summary.msb"),
+    title = Messages("renewal.msb.most.transactions.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
      <span class="form-hint">@Messages("lbl.list.upto.3.countries")</span>
 
-    @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
+    @form(f, controllers.renewal.routes.MostTransactionsController.post(edit)) {
 
         @fieldset(
             f = f("mostTransactionsCountries-fieldset"),
-            legend = "msb.most.transactions.list.countries",
+            legend = "renewal.msb.most.transactions.list.countries",
             legendHidden = true,
             panel = false
         ) {

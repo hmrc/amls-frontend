@@ -93,6 +93,19 @@
         }
     }
 
+    @model.mostTransactions.map { mt =>
+        @checkYourAnswers(
+            question = Messages("renewal.msb.most.transactions.title"),
+            editUrl = controllers.renewal.routes.MostTransactionsController.get(true).url
+        ) {
+            <ul class="list list--comma">
+                @mt.countries.map { country =>
+                    <li>@country.name</li>
+                }
+            </ul>
+        }
+    }
+
     @anchor(
         attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
         attrRole = true,

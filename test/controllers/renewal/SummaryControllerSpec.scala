@@ -78,6 +78,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             Some(PercentageOfCashPaymentOver15000.First),
             Some(MsbThroughput("01")),
+            Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             false)))
 
       val result = controller.get()(request)
