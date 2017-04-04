@@ -19,21 +19,11 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val authConnector: AuthConnector,
                                             val renewalService: RenewalService
-                                          )(implicit val statusService: StatusService) extends BaseController {
+                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[SendTheLargestAmountsOfMoney] = (for {
-              msb <- response
-              amount <- msb.sendTheLargestAmountsOfMoney
-            } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-            Ok(send_largest_amounts_of_money(form, edit))
-        }
-        case false => Future.successful(NotFound(notFoundView))
-      }
+      ???
   }
 
   def post(edit: Boolean = false) = Authorised.async {
