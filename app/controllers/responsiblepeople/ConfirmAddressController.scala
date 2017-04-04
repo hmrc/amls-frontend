@@ -12,6 +12,7 @@ import models.responsiblepeople._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.confirm_address
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -51,7 +52,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
   def get(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetchAll flatMap {
+        dataCacheConnector.fetchAll map {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -59,14 +60,13 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
               bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               getAddress(bm) match {
-                case Some(addr) => Future.successful(BadRequest(views.html.responsiblepeople.confirm_address(EmptyForm, addr,
-                  index, ControllerHelper.rpTitleName(Some(rp)))))
-                case _ => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
+                case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
+                case _ => Redirect(routes.CurrentAddressController.get(index))
               }
-            }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }
-  
+
   def post(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -93,7 +93,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                   _ <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
                     rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
                   }
-                } yield Redirect(routes.TimeAtAdditionalAddressController.get(index))
+                } yield Redirect(routes.TimeAtCurrentAddressController.get(index))
               }
               case false => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
             }

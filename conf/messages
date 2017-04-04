@@ -1177,7 +1177,8 @@ responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
-responsiblepeople.confirmaddress.title = Is this {0}’s home address?
+responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
+responsiblepeople.confirmaddress.title = Is this this person’s home address?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = For this section you may need to know:
