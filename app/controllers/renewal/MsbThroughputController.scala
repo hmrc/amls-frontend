@@ -7,7 +7,6 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.renewal.MsbThroughput
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

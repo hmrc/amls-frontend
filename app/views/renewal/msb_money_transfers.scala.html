@@ -1,3 +1,5 @@
-@()(implicit messages: Messages)
+@(edit: Boolean)(implicit messages: Messages)
 
 <div class="heading-xlarge">@messages("renewal.msb.transfers.header")</div>
+
+<form action="@controllers.renewal.routes.MsbMoneyTransfersController.post(edit)"></form>
