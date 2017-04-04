@@ -28,7 +28,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
               msb <- response
               transactions <- msb.mostTransactions
             } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-          Ok(views.html.msb.most_transactions(form, edit))
+          Ok(views.html.renewal.most_transactions(form, edit))
         }
         case false => Future.successful(NotFound(notFoundView))
       }
