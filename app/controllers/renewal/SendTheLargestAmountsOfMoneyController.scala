@@ -8,7 +8,7 @@ import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.msb.send_largest_amounts_of_money
+import views.html.renewal.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
