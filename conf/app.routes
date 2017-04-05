@@ -455,6 +455,10 @@ POST        /renewal/throughput                                         @control
 
 GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
 
-GET         /renewal/msb/most-transactions                              @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
-POST        /renewal/msb/most-transactions                              @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
+GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)
 
+GET         /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/ce/currency                                    @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
