@@ -5,7 +5,9 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
 import models.renewal.{MostTransactions, Renewal}
+import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -27,6 +29,14 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
+  private def standardRouting(services: Set[MsbService]): Result =
+    if (services contains CurrencyExchange) {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(false))
+    } else {
+      Redirect(routes.SummaryController.get())
+    }
+
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -34,10 +44,22 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit)))
           case ValidForm(_, data) =>
-            for {
-              renewal <- cache.fetch[Renewal](Renewal.key)
-              _ <- cache.save[Renewal](Renewal.key, renewal.mostTransactions(data))
-            } yield Redirect(routes.SummaryController.get())
+            cache.fetchAll flatMap {
+              optMap =>
+                val result = for {
+                  cacheMap <- optMap
+                  msb <- cacheMap.getEntry[Renewal](Renewal.key)
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  services <- bm.msbServices
+                } yield {
+                  cache.save[Renewal](Renewal.key,
+                    msb.mostTransactions(data)
+                  ) map { _ =>
+                      standardRouting(services.msbServices)
+                   }
+                }
+                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
         }
   }
 }

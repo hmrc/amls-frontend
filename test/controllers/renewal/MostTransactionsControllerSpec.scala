@@ -2,10 +2,12 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
+import models.businessmatching.{BusinessMatching, ChequeCashingScrapMetal, CurrencyExchange, MsbServices}
 import models.renewal.{MostTransactions, Renewal}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{eq, eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -76,8 +78,15 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       document.select(".amls-error-summary").size mustEqual 1
     }
 
-    "successfully submit valid data" in new Fixture {
+    "on valid submission (no edit) (CE)" in new Fixture {
 
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        )
+      )
       val incomingModel = Renewal()
 
       val outgoingModel = incomingModel.copy(
@@ -92,16 +101,211 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         "mostTransactionsCountries[]" -> "GB"
       )
 
-      when(cache.fetch[Renewal](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Renewal(mostTransactions = None))))
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(false)(newRequest)
+      val result = controller.post(edit = false)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get().url)
+    }
+
+    "on valid submission (no edit) (non-CE)" in new Fixture {
+
+      val incomingModel = Renewal()
+
+      val outgoingModel = incomingModel.copy(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        ), hasChanged = true
+      )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = false)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+
+    "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
+
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        )
+      )
+
+      val incomingModel = Renewal(
+        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
+          "1223131"
+        ))
+      )
+
+      val outgoingModel = Renewal(
+        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
+          "1223131"
+        )),
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        ), hasChanged = true
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        )
+      )
+      val incomingModel = Renewal()
+
+      val outgoingModel = incomingModel.copy(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        ), hasChanged = true
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[0]" -> "GB"
+      )
+
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+        .thenReturn(Some(incomingModel))
+      when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get(true).url)
+    }
+
+    "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
+
+      val incomingModel = Renewal()
+
+      val outgoingModel = incomingModel.copy(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        ), hasChanged = true
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+        .thenReturn(Some(incomingModel))
+      when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
   }
+
+  "throw exception when Msb services in Business Matching returns none" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody(
+      "mostTransactionsCountries[]" -> "GB"
+    )
+
+    val incomingModel = Renewal()
+
+    when(cache.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(None)
+
+    when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+      .thenReturn(Some(incomingModel))
+
+    when(cache.save[Renewal](eqTo(Renewal.key), any())
+      (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+
+    a[Exception] must be thrownBy {
+      ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+    }
+  }
+
 }
