@@ -2,6 +2,7 @@
 @import models.renewal.MsbMoneyTransfers
 @import include._
 @import forms2._
+@import utils.HtmlElementHelpers._
 
 @(f: Form2[MsbMoneyTransfers], edit: Boolean)(implicit messages: Messages, request: Request[_])
 
@@ -20,7 +21,9 @@
         @input(
             field = f("transfers"),
             labelText = "Transfers",
-            labelHidden = true
+            labelHidden = true,
+            attrType = "numbers",
+            dataAttrs = digitsOnlyAttributes
         )
 
         @submit()
