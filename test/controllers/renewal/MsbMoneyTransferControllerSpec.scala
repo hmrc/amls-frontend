@@ -83,6 +83,13 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         redirectLocation(result) mustBe controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get().url.some
       }
 
+      "redirect to the summary page when edit = true" in new FormSubmissionFixture {
+        val result = controller.post(edit = true)(validFormRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+      }
+
       "return a bad request" when {
         "the form fails validation" in new FormSubmissionFixture {
           val result = controller.post()(request)
