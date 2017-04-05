@@ -454,3 +454,7 @@ GET         /renewal/throughput                                         @control
 POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
 
 GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
+
+GET         /renewal/msb/most-transactions                              @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/msb/most-transactions                              @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
+

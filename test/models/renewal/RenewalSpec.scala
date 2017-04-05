@@ -25,6 +25,9 @@ class RenewalSpec extends GenericTestHelper {
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          None,
+          None,
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           hasChanged = true)
 
         model.isComplete mustBe true
