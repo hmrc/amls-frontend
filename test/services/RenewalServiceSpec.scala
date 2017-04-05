@@ -40,6 +40,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       Some(PercentageOfCashPaymentOver15000.First),
       Some(MsbThroughput("01")),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactions("123")),
       // Add other models here
       true)
 

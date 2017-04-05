@@ -116,7 +116,7 @@
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
-                    editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
+                    editUrl = controllers.renewal.routes.MsbMostTransactionsController.get(edit = true).url
                 ) {
                     <ul class="list list--comma">
                         @mt.countries.map { country =>
@@ -125,6 +125,15 @@
                     </ul>
                 }
             }
+        }
+    }
+
+    @model.ceTransactions.map{ trans =>
+        @checkYourAnswers(
+            question = Messages("renewals.msb.ce.transactions.expected.title"),
+            editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
+        ) {
+            <p>@trans.ceTransaction</p>
         }
     }
 
