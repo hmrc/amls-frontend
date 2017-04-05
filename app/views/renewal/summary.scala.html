@@ -108,6 +108,15 @@
         }
     }
 
+    @model.ceTransactions.map{ trans =>
+        @checkYourAnswers(
+            question = Messages("renewals.msb.ce.transactions.expected.title"),
+            editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
+        ) {
+            <p>@trans.ceTransaction</p>
+        }
+    }
+
     @anchor(
         attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
         attrRole = true,
