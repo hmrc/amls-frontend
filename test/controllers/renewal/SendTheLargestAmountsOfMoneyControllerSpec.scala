@@ -70,92 +70,58 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
       }
     }
-//    "on post with valid data" in new Fixture {
-//
-//      val newRequest = request.withFormUrlEncodedBody(
-//        "country_1" -> "GS"
-//      )
-//
-//      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-//        (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
-//        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//      val result = controller.post()(newRequest)
-//      status(result) must be(SEE_OTHER)
-//      redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
-//    }
-//
-//    "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
-//
-//      val newRequest = request.withFormUrlEncodedBody(
-//        "country_1" -> "GB"
-//      )
-//
-//      val incomingModel = MoneyServiceBusiness(
-//        mostTransactions = Some(MostTransactions(
-//          Seq(
-//            Country("United Kingdom", "UK")
-//          )
-//        ))
-//      )
-//
-//      val outgoingModel = incomingModel.copy(
-//        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
-//      )
-//
-//      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-//        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
-//
-//      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-//        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//      val result = controller.post(true)(newRequest)
-//      status(result) must be(SEE_OTHER)
-//      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-//    }
-//
-//    "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
-//
-//      val newRequest = request.withFormUrlEncodedBody(
-//        "country_1" -> "GB"
-//      )
-//
-//      val incomingModel = MoneyServiceBusiness()
-//
-//      val outgoingModel = incomingModel.copy(
-//        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
-//      )
-//
-//      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-//        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
-//
-//      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-//        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//      val result = controller.post(true)(newRequest)
-//      status(result) must be(SEE_OTHER)
-//      redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
-//    }
-//
-//    "on post with invalid data" in new Fixture {
-//
-//      val newRequest = request.withFormUrlEncodedBody(
-//        "country_1" -> ""
-//      )
-//
-//      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-//        (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-//        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//      val result = controller.post()(newRequest)
-//      status(result) must be(BAD_REQUEST)
-//
-//      val document = Jsoup.parse(contentAsString(result))
-//      document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
-//    }
+
+    "post is called" when {
+      "edit is false" must {
+        "redirect to the MostTransactionsController with valid data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "country_1" -> "GS"
+          )
+
+          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
+        }
+      }
+
+      "edit is true" must {
+        "redirect to the SummaryController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "country_1" -> "GB"
+          )
+
+          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+      }
+
+      "given invalid data, must respond with BAD_REQUEST" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "country_1" -> ""
+        )
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
+      }
+    }
   }
 }

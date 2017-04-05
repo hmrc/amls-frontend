@@ -450,4 +450,9 @@ POST        /renewal/progress                                           @control
 GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
 POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
 
+GET         /renewal/largest-amounts                                    @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /renewal/largest-amounts                                    @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+
+GET         /renewal/most-transactions                                  @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
+
 GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
