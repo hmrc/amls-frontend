@@ -112,6 +112,15 @@
             }
         }
 
+        @model.msbTransfers.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.transfers.header"),
+                editUrl = controllers.renewal.routes.MsbMoneyTransfersController.get(edit = true).url
+            ) {
+                <p>@m.transfers</p>
+            }
+        }
+
         @if(services.msbServices.contains(TransmittingMoney)) {
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
