@@ -13,7 +13,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authConnector: AuthConnector,
+class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
                                            val cache: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -29,9 +29,9 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def standardRouting(services: Set[MsbService]): Result =
-    if (services contains CurrencyExchange) {
-      Redirect(routes.CETransactionsInNext12MonthsController.get(false))
+  private def standardRouting(services: Set[MsbService], ceTransactionEmpty: Boolean, edit: Boolean): Result =
+    if ((services contains CurrencyExchange) && ceTransactionEmpty) {
+      Redirect(routes.MsbCurrencyExchangeTransactionsController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
     }
@@ -48,14 +48,14 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
               optMap =>
                 val result = for {
                   cacheMap <- optMap
-                  msb <- cacheMap.getEntry[Renewal](Renewal.key)
+                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
                   cache.save[Renewal](Renewal.key,
-                    msb.mostTransactions(data)
+                    renewal.mostTransactions(data)
                   ) map { _ =>
-                      standardRouting(services.msbServices)
+                      standardRouting(services.msbServices, renewal.ceTransactions.isEmpty, edit)
                    }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
