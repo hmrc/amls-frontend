@@ -64,7 +64,8 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
       ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
-      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"))
+      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
+      ("msb.send.the.largest.amounts.of.money.title", checkElementTextIncludes(_, "america"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -76,7 +77,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(MsbThroughput("01")),
-          Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+          Some(SendTheLargestAmountsOfMoney(Country("america", "US"))),
           false
         )
 
