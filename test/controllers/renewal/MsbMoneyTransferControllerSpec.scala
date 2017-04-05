@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -31,6 +32,10 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
   trait FormSubmissionFixture extends Fixture {
     val validFormData = "transfers" -> "1500"
     val validFormRequest = request.withFormUrlEncodedBody(validFormData)
+
+    when {
+      renewalService.updateRenewal(any())(any(), any(), any())
+    } thenReturn Future.successful(mock[CacheMap])
   }
 
   "Calling the GET action" must {
