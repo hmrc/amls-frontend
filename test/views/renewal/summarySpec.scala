@@ -65,6 +65,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
       ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
       ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
+      ("msb.send.the.largest.amounts.of.money.title", checkElementTextIncludes(_, "america")),
       ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"))
     )
 
@@ -77,6 +78,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(MsbThroughput("01")),
+          Some(SendTheLargestAmountsOfMoney(Country("america", "US"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           false
