@@ -2,8 +2,7 @@ package models.renewal
 
 import play.api.libs.json.Json
 
-case class Renewal
-(
+case class Renewal(
   involvedInOtherActivities: Option[InvolvedInOther] = None,
   businessTurnover: Option[BusinessTurnover] = None,
   turnover: Option[AMLSTurnover] = None,
@@ -11,13 +10,14 @@ case class Renewal
   percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
   msbThroughput: Option[MsbThroughput] = None,
   sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
+  mostTransactions: Option[MostTransactions] = None,
+  ceTransactions: Option[CETransactions] = None,
   hasChanged: Boolean = false
-)
-{
+) {
   def isComplete = {
     this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _, _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
       case _ => false
     }
   }
@@ -42,6 +42,12 @@ case class Renewal
 
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
+
+  def ceTransactions(p: CETransactions): Renewal =
+    this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
+
+  def mostTransactions(model: MostTransactions): Renewal =
+    this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
 }
 
 object Renewal {

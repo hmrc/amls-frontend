@@ -1,0 +1,51 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import play.api.i18n.Messages
+@import models.businesscustomer.Address
+
+@(f: Form2[_], model: Address, index: Int, personName: String)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("responsiblepeople.confirmaddress.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.confirmaddress.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.ConfirmAddressController.post(index)) {
+
+        @registered_office_helper(model)
+
+        @fieldset(
+            f = f("confirmAddress-fieldset"),
+            legend = "responsiblepeople.confirmaddress.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @rpErrorGroup(
+                field = f("confirmAddress"),
+                personName = personName
+            ) {
+                @radio(
+                    f = f("confirmAddress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("confirmAddress"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit(false)
+    }
+}

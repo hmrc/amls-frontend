@@ -2,7 +2,6 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}

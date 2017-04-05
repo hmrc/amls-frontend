@@ -215,6 +215,7 @@ error.expected.future.date = Enter a valid date. The date cannot be in the futur
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
+error.required.rp.confirm.address = Select yes if this is {0}’s home address
 
 
 ############################### Trust and company service providers ###############################
@@ -286,6 +287,11 @@ error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
 error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
+
+
+################################# Renewal ###################################
+error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -1208,6 +1214,8 @@ responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
+responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
+responsiblepeople.confirmaddress.title = Is this this person’s home address?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = For this section you may need to know:
@@ -1498,6 +1506,10 @@ renewal.msb.throughput.selection.4 = £1 million to £20 million
 renewal.msb.throughput.selection.5 = £21 million to £100 million 
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
+
+renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
+
+renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 ############################### Survey ###############################
 

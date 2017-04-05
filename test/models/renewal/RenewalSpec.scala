@@ -25,7 +25,12 @@ class RenewalSpec extends GenericTestHelper {
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          hasChanged = true)
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(MsbThroughput("01")),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactions("123")),
+          hasChanged = true
+        )
 
         model.isComplete mustBe true
 
@@ -38,7 +43,12 @@ class RenewalSpec extends GenericTestHelper {
           None,
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          hasChanged = true)
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(MsbThroughput("01")),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactions("123")),
+          hasChanged = true
+        )
 
         model.isComplete mustBe true
 
