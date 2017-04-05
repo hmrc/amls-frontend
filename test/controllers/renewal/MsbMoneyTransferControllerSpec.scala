@@ -93,7 +93,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
-        val result = controller.post()(validFormRequest)
+        val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
