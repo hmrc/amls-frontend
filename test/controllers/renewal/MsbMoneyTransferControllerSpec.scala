@@ -29,7 +29,8 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
   }
 
   trait FormSubmissionFixture extends Fixture {
-
+    val validFormData = "transfers" -> "1500"
+    val validFormRequest = request.withFormUrlEncodedBody(validFormData)
   }
 
   "Calling the GET action" must {
@@ -70,17 +71,26 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
 
   "Calling the POST action" when {
     "posting valid data" must {
-      "redirect to the next page in the flow" ignore new FormSubmissionFixture {
-        val result = controller.post()(request)
+      "redirect to the next page in the flow" in new FormSubmissionFixture {
+        val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get().url.some
       }
 
-      "save the model data into the renewal object" ignore new FormSubmissionFixture {
-        val form = "transfers" -> "1500"
-        val result = controller.post()(request.withFormUrlEncodedBody(form))
+      "return a bad request" when {
+        "the form fails validation" in new FormSubmissionFixture {
+          val result = controller.post()(request)
 
+          status(result) mustBe BAD_REQUEST
+          verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
+        }
+      }
+
+      "save the model data into the renewal object" in new FormSubmissionFixture {
+        val result = controller.post()(validFormRequest)
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
+
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
         captor.getValue.msbTransfers mustBe MsbMoneyTransfers(1500).some

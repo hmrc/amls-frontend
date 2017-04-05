@@ -41,6 +41,9 @@ case class Renewal(
   def msbThroughput(model: MsbThroughput): Renewal =
     this.copy(msbThroughput = Some(model), hasChanged = hasChanged || !this.msbThroughput.contains(model))
 
+  def msbTransfers(model: MsbMoneyTransfers): Renewal =
+    this.copy(msbTransfers = Some(model), hasChanged = hasChanged || !this.msbTransfers.contains(model))
+
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
 

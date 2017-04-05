@@ -18,7 +18,7 @@ class MsbMoneyTransfersSpec extends GenericTestHelper {
 
     "given missing form data" in {
       val form = Map.empty[String, Seq[String]]
-      MsbMoneyTransfers.formReader.validate(form) mustBe Invalid(Seq(Path \ "transfers" -> Seq(ValidationError("renewal.msb.transfers.value.required"))))
+      MsbMoneyTransfers.formReader.validate(form) mustBe Invalid(Seq(Path \ "transfers" -> Seq(ValidationError("renewal.msb.transfers.value.invalid"))))
     }
 
     "given something that's not a number" in {

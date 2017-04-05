@@ -15,10 +15,7 @@ object MsbMoneyTransfers {
   implicit val format = Json.format[MsbMoneyTransfers]
 
   implicit val formReader: Rule[UrlFormEncoded, MsbMoneyTransfers] = From[UrlFormEncoded] { __ =>
-    val fieldR = (__ \ "transfers").read[String].withMessage("renewal.msb.transfers.value.required")
-    val digitsR = regexWithMsg("^[0-9]+$".r, "renewal.msb.transfers.value.invalid").repath(_ => Path \ "transfers")
-
-    (fieldR andThen digitsR andThen intR) map MsbMoneyTransfers.apply
+    (__ \ "transfers").read[Int].withMessage("renewal.msb.transfers.value.invalid") map MsbMoneyTransfers.apply
   }
 
   implicit val formWriter: Write[MsbMoneyTransfers, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
