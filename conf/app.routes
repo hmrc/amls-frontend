@@ -59,8 +59,8 @@ GET         /trading-premises/add                                       @control
 GET         /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
 POST        /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
 
-GET         /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/premises-details/:index                   controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/premises-details/:index                   controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
@@ -252,8 +252,11 @@ POST        /responsible-people/your-name/:index                        controll
 GET         /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
-GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
+POST        /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
+
+GET         /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
@@ -438,6 +441,7 @@ GET         /renewal/employment                                         @control
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
 GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
 GET         /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
@@ -446,3 +450,8 @@ GET         /renewal/check-your-answers                                 @control
 
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
+
+GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+
+GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()

@@ -22,7 +22,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
-      doc.title must startWith(Messages("responsiblepeople.sole.proprietor.another.business.title", "Person Name"))
+      doc.title must startWith(Messages("responsiblepeople.sole.proprietor.another.business.title"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -31,7 +31,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
-      heading.html must be(Messages("responsiblepeople.sole.proprietor.another.business.title", "Person Name"))
+      heading.html must be(Messages("responsiblepeople.sole.proprietor.another.business.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }

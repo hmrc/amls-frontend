@@ -1,0 +1,43 @@
+@import include._
+@import forms._
+@import forms2._
+
+@import models.renewal.MsbThroughput
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.msb.throughput.header", "summary.renewal")
+}
+
+@main(
+    title = s"${messages("renewal.msb.throughput.header")} - ${messages("summary.renewal")}",
+    heading = header
+) {
+
+    <p class="form-hint">@messages("renewal.msb.throughput.info")</p>
+
+    @form(f, controllers.renewal.routes.MsbThroughputController.post(edit)) {
+
+        @fieldset(
+            f = f("throughput-fieldset"),
+            legend = "renewal.msb.throughput.legend",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("throughput")
+            ) {
+                @(MsbThroughput.throughputValues.map { v =>
+                    radio(
+                        f = f("throughput"),
+                        labelText = v.label,
+                        value = v.value
+                    )
+                })
+            }
+        }
+
+        @submit()
+    }
+}

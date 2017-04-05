@@ -13,9 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index, fromDeclaration)) {
-
-        @panel(
+     @panel(
             jsHidden = false,
             wide = true,
             gutter = true
@@ -27,10 +25,22 @@
             }
         }
 
+        <p>@Messages("responsiblepeople.have.registered.people.line1")</p>
+        <ul class="list list-bullet">
+            <li>@Messages("responsiblepeople.have.registered.people.line2")</li>
+            <li>@Messages("responsiblepeople.have.registered.people.line3")</li>
+            <li>@Messages("responsiblepeople.have.registered.people.line4")</li>
+        </ul>
+
+    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index, fromDeclaration)) {
+
+
+
         @fieldset(
             f = f("registerAnotherPerson-fieldset"),
             legend = "responsiblepeople.want.to.register.another.person",
-            panel = false
+            panel = false,
+            legendHidden = true
         ) {
             @errorGroup(
                 field = f("registerAnotherPerson")

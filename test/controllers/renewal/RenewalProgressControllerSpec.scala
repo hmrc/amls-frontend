@@ -77,22 +77,30 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     }
 
     "display all the available sections from a normal variation progress page" in new Fixture {
-
       val result = controller.get()(request)
-
       val html = Jsoup.parse(contentAsString(result))
 
-      html.select(".progress-step--details").text() must include("A new section")
-
+      val element = html.select(".progress-step--details")
+      element.text must include("A new section")
+      element.size mustBe 2
     }
 
     "display the renewal section" in new Fixture {
-
       val result = controller.get()(request)
-
       val html = Jsoup.parse(contentAsString(result))
 
       html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
+    }
+
+    "displays the renewal page with an empty sequence when no sections are returned" in new Fixture {
+      when {
+        dataCacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(None)
+
+      val result = controller.get()(request)
+      val html = Jsoup.parse(contentAsString(result))
+
+      html.select(".progress-step--details").size() mustBe 1
     }
 
     "redirect to the declaration page when the form is posted" in new Fixture {

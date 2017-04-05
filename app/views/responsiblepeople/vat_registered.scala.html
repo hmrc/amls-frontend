@@ -9,11 +9,11 @@
 
 @header = {
     @rpErrorSummary(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.registeredforvat.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.registeredforvat.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforvat.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.registeredforvat.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 

@@ -39,7 +39,7 @@ class BusinessTurnoverController @Inject()(
         case ValidForm(_, data) =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-            _ <- renewalService.updateRenewal(renewal.getOrElse(Renewal()).businessTurnover(data))
+            _ <- renewalService.updateRenewal(renewal.businessTurnover(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.AMLSTurnoverController.get())
