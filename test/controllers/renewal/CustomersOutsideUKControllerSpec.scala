@@ -1,7 +1,6 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.businessactivities.CustomersOutsideUKController
 import models.Country
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal}
