@@ -80,7 +80,7 @@ trait RepeatingSection {
      key: MongoKey[T],
      ec: ExecutionContext): Future[Int] = {
     getData[T].flatMap { d =>
-      if (d.lastOption != Some(data)) {
+      if (!d.lastOption.contains(data)) {
         putData(d :+ data) map {
           _ => d.size + 1
         }
