@@ -1,9 +1,9 @@
 @import include._
 @import forms2._
 @import models.renewal._
-@import models.businessmatching.BusinessActivities
+@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney}
 
-@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -14,14 +14,16 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("renewal.involvedinother.title"),
-        editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
-    ) {
-        <p>@model.involvedInOtherActivities.map {
-            case InvolvedInOtherNo => { @Messages("lbl.no") }
-            case InvolvedInOtherYes(v) => { @v }
-        }</p>
+    @model.involvedInOtherActivities.map { involvedInOther =>
+        @checkYourAnswers(
+            question = Messages("renewal.involvedinother.title"),
+            editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+        ) {
+            <p>@involvedInOther match {
+                case InvolvedInOtherNo => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(v) => { @v }
+            }</p>
+        }
     }
 
     @model.businessTurnover.map { turnover =>
@@ -80,6 +82,48 @@
                 <li>@country</li>
                 }
             </ul>
+            }
+        }
+    }
+
+    @model.percentageOfCashPaymentOver15000.map { p =>
+        @checkYourAnswers(
+            question = Messages("hvd.percentage.title"),
+            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+            ) {
+                <p>@p match {
+                    case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
+                    case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
+                    case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
+                    case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                    case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
+            }
+    }
+
+    @bmMsbServices.map {services =>
+
+        @model.msbThroughput.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.throughput.header"),
+                editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
+            ) {
+                <p>@MsbThroughput.labelFor(m)</p>
+            }
+        }
+
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            @model.mostTransactions.map { mt =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.most.transactions.title"),
+                    editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
+                ) {
+                    <ul class="list list--comma">
+                        @mt.countries.map { country =>
+                            <li>@country.name</li>
+                        }
+                    </ul>
+                }
             }
         }
     }

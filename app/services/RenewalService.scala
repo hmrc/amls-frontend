@@ -20,7 +20,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     this.getRenewal map {
       case Some(model) if model.isComplete =>
         Section("renewal", Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get())
-      case Some(Renewal(None, None, None, None, _, _)) =>
+      case Some(Renewal(None, None, None, None, _, _, _,_)) =>
         notStarted
       case Some(model) =>
         Section("renewal", Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get())

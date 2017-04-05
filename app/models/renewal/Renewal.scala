@@ -9,13 +9,15 @@ case class Renewal
   turnover: Option[AMLSTurnover] = None,
   customersOutsideUK: Option[CustomersOutsideUK] = None,
   percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+  msbThroughput: Option[MsbThroughput] = None,
+  mostTransactions: Option[MostTransactions] = None,
   hasChanged: Boolean = false
 )
 {
   def isComplete = {
     this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _,_) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _, _) => true
       case _ => false
     }
   }
@@ -34,6 +36,12 @@ case class Renewal
 
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
+
+  def msbThroughput(model: MsbThroughput): Renewal =
+    this.copy(msbThroughput = Some(model), hasChanged = hasChanged || !this.msbThroughput.contains(model))
+
+  def mostTransactions(model: MostTransactions): Renewal =
+    this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
 }
 
 object Renewal {
