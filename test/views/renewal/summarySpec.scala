@@ -20,13 +20,13 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.renewal.summary(Renewal(), None)
+      def view = views.html.renewal.summary(Renewal(), None, None)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.renewal.summary(Renewal(), None)
+      def view = views.html.renewal.summary(Renewal(), None, None)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -63,7 +63,9 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
-      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"))
+      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
+      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
+      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -75,6 +77,8 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(MsbThroughput("01")),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactions("123")),
           false
         )
 
@@ -88,7 +92,18 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
             TelephonePaymentService)
         )
 
-        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel))
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney,
+              CurrencyExchange,
+              ChequeCashingNotScrapMetal,
+              ChequeCashingScrapMetal
+            )
+          )
+        )
+
+        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel), msbServices)
       }
 
       forAll(sectionChecks) { (key, check) => {

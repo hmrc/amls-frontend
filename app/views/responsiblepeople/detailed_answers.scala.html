@@ -167,7 +167,7 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+            question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
             editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true).toString,
             dataItem = person.addressHistory.flatMap(_.currentAddress)
         ){ a =>
@@ -186,7 +186,7 @@
             }
 
             @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>
@@ -207,7 +207,7 @@
             }
 
             @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history", personName(person)),
+                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>

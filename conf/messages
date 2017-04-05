@@ -215,6 +215,7 @@ error.expected.future.date = Enter a valid date. The date cannot be in the futur
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
+error.required.rp.confirm.address = Select yes if this is {0}’s home address
 
 
 ############################### Trust and company service providers ###############################
@@ -286,6 +287,11 @@ error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
 error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
+
+
+################################# Renewal ###################################
+error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -1038,17 +1044,20 @@ responsiblepeople.personName.othermiddlenames = Previous middle names
 responsiblepeople.personName.otherlastnames = Previous last names
 responsiblepeople.personName.previous.date.lbl = When did their name legally change?
 responsiblepeople.personName.alternativeName = Alternative name
-responsiblepeople.registeredforselfassessment.title = Is {0} registered for Self Assessment?
+responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
+responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Self Assessment UTR number
 responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint = You can find it in the header of any letter issued by HMRC, labelled as ‘Tax Reference’, ‘UTR’ or ‘Official Use’. It’s 10 or 13 numbers long, but if it’s 13 numbers you should only enter the last 10.
-responsiblepeople.contact_details.title = What are the contact details for {0}?
+responsiblepeople.contact_details.heading = What are the contact details for {0}?
+responsiblepeople.contact_details.title = What are the contact details for this person?
 responsiblepeople.contact_details.lbl = By providing this information, this responsible person gives their permission to be contacted by HM Revenue and Customs.
 responsiblepeople.contact_details.phone.lbl = Phone number
 responsiblepeople.contact_details.phone.hint = You can only use numbers, spaces, brackets, plus (+) and dash (-).
 responsiblepeople.contact_details.email.lbl = Email address
 responsiblepeople.contact_details.email.hint = For example, myname@example.com.
 
-responsiblepeople.wherepersonlives.title = Where does {0} live?
+responsiblepeople.wherepersonlives.heading = Where does {0} live?
+responsiblepeople.wherepersonlives.title = Where does this person live?
 responsiblepeople.wherepersonlives.need.to.know = We need to know all the home addresses for the last 3 years.
 responsiblepeople.wherepersonlives.is.uk = Is this a UK address?
 responsiblepeople.wherepersonlives.is.overseas = Is this address overseas?
@@ -1059,13 +1068,15 @@ responsiblepeople.wherepersonlives.postcode = Postcode
 responsiblepeople.wherepersonlives.country = Country
 responsiblepeople.wherepersonlives.address_history = How long has this person lived at this address?
 
-responsiblepeople.timeataddress.address_history = How long has {0} lived at this address?
+responsiblepeople.timeataddress.address_history.heading = How long has {0} lived at this address?
+responsiblepeople.timeataddress.address_history.title = How long has this person lived at this address?
 responsiblepeople.timeataddress.5_months_history = 0 to 5 months
 responsiblepeople.timeataddress.11_months_history = 6 to 11 months
 responsiblepeople.timeataddress.3_years_history = 1 to 3 years
 responsiblepeople.timeataddress.more_years_history = More than 3 years
 
-responsiblepeople.additional_address.title = Where was {0}’s previous home address?
+responsiblepeople.additional_address.heading = Where was {0}’s previous home address?
+responsiblepeople.additional_address.title = Where was this person’s previous home address?
 responsiblepeople.additional_address.ukAddress = UK
 responsiblepeople.additional_address.nonUkAddress = Overseas
 responsiblepeople.additional_address.address = Address
@@ -1076,7 +1087,8 @@ responsiblepeople.additional_address.0_5_months = 0 to 5 months
 responsiblepeople.additional_address.6_11_months = 6 to 11 months
 responsiblepeople.additional_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_address.more_3_years = More than 3 years
-responsiblepeople.additional_extra_address.title = Where was {0}’s other previous home address?
+responsiblepeople.additional_extra_address.heading = Where was {0}’s other previous home address?
+responsiblepeople.additional_extra_address.title = Where was this person’s other previous home address?
 responsiblepeople.additional_extra_address.ukAddress = UK
 responsiblepeople.additional_extra_address.nonUkAddress = Overseas
 responsiblepeople.additional_extra_address.address = Address
@@ -1087,7 +1099,8 @@ responsiblepeople.additional_extra_address.0_5_months = 0 to 5 months
 responsiblepeople.additional_extra_address.6_11_months = 6 to 11 months
 responsiblepeople.additional_extra_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_extra_address.more_3_years = More than 3 years
-responsiblepeople.position_within_business.title = What’s {0}’s role in the business?
+responsiblepeople.position_within_business.heading = What’s {0}’s role in the business?
+responsiblepeople.position_within_business.title = What’s this person’s role in the business?
 responsiblepeople.position_within_business.startDate.lbl = When did this position start? If there is more than one position, give the date of the earliest.
 responsiblepeople.position_within_business.startDate.hint = For example, 31 03 1980
 responsiblepeople.position_within_business.important = The business must have a nominated officer. Only one person can register as the nominated officer.
@@ -1098,8 +1111,10 @@ responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member
-responsiblepeople.aretheynominatedofficer.title = Is {0} the nominated officer for the business?
-responsiblepeople.person.a.resident.title = Is {0} a UK resident?
+responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
+responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
+responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
+responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.dob.lbl = Date of birth
 responsiblepeople.dob.lbl.hint = For example, 31 03 1980
 responsiblepeople.passporttype.lbl = What type of passport does this person have?
@@ -1115,10 +1130,12 @@ responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than
 responsiblepeople.whomustregister.line_3 = the ‘nominated officer’, who is the person who acts as the money laundering reporting officer
 responsiblepeople.registeredforvat.title = Is {0} registered for VAT with that business?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
-responsiblepeople.experiencetraining.title = Does {0} have previous experience in these activities?
+responsiblepeople.experiencetraining.heading = Does {0} have previous experience in these activities?
+responsiblepeople.experiencetraining.title = Does this person have previous experience in these activities?
 responsiblepeople.experiencetraining.businessactivities = You’ve told us your business does this:
 responsiblepeople.experiencetraining.information = Please give a brief description. Include approximate dates and duration of any current or previous experience.
-responsiblepeople.training.title = Has {0} had training in anti-money laundering or counter-terrorism funding?
+responsiblepeople.training.heading = Has {0} had training in anti-money laundering or counter-terrorism funding?
+responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.hinttext = Include formal training such as courses, and informal training such as self-directed learning.
 responsiblepeople.training.information = Please give a brief description, including approximate dates and duration.
 responsiblepeople.person.registered.title = Do you want to register another responsible person?
@@ -1129,12 +1146,14 @@ responsiblepeople.have.registered.people.line2 = everyone who directs the busine
 responsiblepeople.have.registered.people.line3 = any person who owns or controls more than 25% of the business
 responsiblepeople.have.registered.people.line4 = the ‘nominated officer’, who is the person who acts as the money laundering reporting officer
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
-responsiblepeople.sole.proprietor.another.business.title = Is {0} the sole proprietor of another business?
+responsiblepeople.sole.proprietor.another.business.heading = Is {0} the sole proprietor of another business?
+responsiblepeople.sole.proprietor.another.business.title = Is this person the sole proprietor of another business?
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
 responsiblepeople.check_your_answers.visuallyhidden.from.your = from your responsible people
-responsiblepeople.fit_and_proper.title = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
+responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
+responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
 responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
@@ -1165,7 +1184,8 @@ responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training 
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
 responsiblepeople.check_your_answers.soleproprietor_for_other_business = Sole proprietor of another business?
 responsiblepeople.detailed_answers.visuallyhidden.header = Responsible person
-responsiblepeople.nationality.title = What is the nationality of {0}?
+responsiblepeople.nationality.heading = What is the nationality of {0}?
+responsiblepeople.nationality.title = What is the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
 responsiblepeople.nationality.selection.irish = Irish
@@ -1177,6 +1197,8 @@ responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
+responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
+responsiblepeople.confirmaddress.title = Is this this person’s home address?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
@@ -1445,6 +1467,10 @@ renewal.msb.throughput.selection.4 = £1 million to £20 million
 renewal.msb.throughput.selection.5 = £21 million to £100 million
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
+
+renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
+
+renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 ############################### Survey ###############################
 

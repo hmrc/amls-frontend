@@ -23,7 +23,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
 
-      doc.title must startWith(Messages("responsiblepeople.registeredforvat.title", "Person Name"))
+      doc.title must startWith(Messages("responsiblepeople.registeredforvat.title"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -32,7 +32,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
 
-      heading.html must be(Messages("responsiblepeople.registeredforvat.title", "Person Name"))
+      heading.html must be(Messages("responsiblepeople.registeredforvat.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }

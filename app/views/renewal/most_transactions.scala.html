@@ -1,0 +1,36 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.msb.most.transactions.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("renewal.msb.most.transactions.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+     <span class="form-hint">@Messages("lbl.list.upto.3.countries")</span>
+
+    @form(f, controllers.renewal.routes.MsbMostTransactionsController.post(edit)) {
+
+        @fieldset(
+            f = f("mostTransactionsCountries-fieldset"),
+            legend = "renewal.msb.most.transactions.list.countries",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("mostTransactionsCountries")
+            ) {
+                @country(f("mostTransactionsCountries[0]"))
+                @country(f("mostTransactionsCountries[1]"))
+                @country(f("mostTransactionsCountries[2]"))
+            }
+        }
+        @submit(edit)
+    }
+}
