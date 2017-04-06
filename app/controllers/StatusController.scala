@@ -2,14 +2,16 @@ package controllers
 
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.FeeConnector
-import models.FeeResponse
+import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
-import models.status.{CompletionStateViewModel, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
+import models.status._
+import org.joda.time.{LocalDate, LocalDateTime}
+import play.api.mvc.{AnyContent, Request}
 import services.{AuthEnrolmentsService, LandingService, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
-import views.html.status.status
+import views.html.status._
 
 import scala.concurrent.Future
 
@@ -40,10 +42,29 @@ trait StatusController extends BaseController {
     }
   }
 
+  private def redirectBasedOnStatus(mlrRegNumber: Option[String],
+                            statusInfo: (SubmissionStatus,
+                            Option[ReadStatusResponse]),
+                            businessNameOption: Option[String],
+                            feeResponse: Option[FeeResponse])(implicit request: Request[AnyContent]) = {
+
+    statusInfo match {
+      case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+        businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x =>Some(x.processingDate))))
+      case (SubmissionDecisionApproved, statusDtls) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
+        statusDtls.fold[Option[LocalDate]](None)(x =>x.currentRegYearEndDate), false))
+      case (ReadyForRenewal(renewalDate), _) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
+        renewalDate, true))
+      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+    }
+  }
+
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        val notificationsToggle = ApplicationConfig.notificationsToggle
         val businessName = landingService.cacheMap map {
           case Some(cache) => {
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -55,13 +76,10 @@ trait StatusController extends BaseController {
         }
         for {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
-          submissionStatus <- statusService.getStatus
+          statusInfo <-  statusService.getDetailedStatus
           businessNameOption <- businessName
-          feeResponse <- getFeeResponse(mlrRegNumber, submissionStatus)
-        } yield {
-          Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse, notificationsToggle))
-        }
-
+          feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
+        } yield redirectBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse)
   }
 }
 

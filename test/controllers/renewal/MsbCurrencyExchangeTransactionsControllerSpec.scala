@@ -86,7 +86,7 @@ class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper wi
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.WhichCurrenciesController.get().url))
+      redirectLocation(result) must be(Some(controllers.renewal.routes.MsbWhichCurrenciesController.get().url))
     }
 
     "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
