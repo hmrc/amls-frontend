@@ -53,7 +53,7 @@ trait ConfirmationController extends BaseController {
         status <- OptionT.liftF(statusService.getStatus)
         businessName <- companyNameT orElse OptionT.some("")
       } yield status match {
-        case SubmissionReadyForReview => Ok(payment_confirmation_amendvariation(businessName, reference))
+        case SubmissionReadyForReview | SubmissionDecisionApproved => Ok(payment_confirmation_amendvariation(businessName, reference))
         case _ => Ok(payment_confirmation(businessName, reference))
       }
 

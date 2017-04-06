@@ -292,6 +292,22 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         doc.select(".confirmation").text must include(companyName)
       }
 
+      "the application status is 'approved'" in new Fixture {
+        setupStatus(SubmissionDecisionApproved)
+
+        val paymentReference = "XH8439483944"
+        val result = controller.paymentConfirmation(paymentReference)(request)
+
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
+        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
+        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(companyName)
+      }
+
       "there is no business name" in new Fixture {
         setupStatus(SubmissionReady)
 
