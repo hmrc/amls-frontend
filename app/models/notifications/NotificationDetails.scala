@@ -30,9 +30,6 @@ case class NotificationDetails(contactType : Option[ContactType],
   def subject = {
     s"notifications.subject.$getContactType"
   }
-
-
-
 }
 
 object NotificationDetails {

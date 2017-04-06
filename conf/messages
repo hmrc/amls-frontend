@@ -1549,3 +1549,8 @@ notification.static.text.registration-variation-approval = <p>The recent changes
 
 notification.static.text.de-registration-effective-date-change = <p>The date your anti-money laundering supervision ended has been changed.</p>\
 <p>You can see the new effective date on <a href="{0}">your status page</a>.</p>
+
+notification.reminder-to-pay-variation = <p>You need to pay {0} for the recent changes made to your details.</p>\
+<p>Your payment reference is: {1}.</p>\
+<p>Pay online by credit or debit card.</p>\
+<p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
