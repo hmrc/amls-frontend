@@ -455,12 +455,12 @@ status.submissiondecisionsupervised.renewal.advice.text = When you submit your r
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
 status.submissiondecisionrejected.heading = Not supervised
-status.submissiondecisionrejected.description = Your application has been revoked.
+status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
-status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
+status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
