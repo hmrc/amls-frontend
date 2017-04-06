@@ -26,17 +26,17 @@ error.required.country.name = Enter an official country name: for example, Holla
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
-error.required.firstname = Enter a first name. ##NOT USED##
-error.required.lastname = Enter a last name. ##NOT USED##
-error.required.otherfirstnames = Enter responsible person’s previous first name ##PREVIOUS: Enter all other first names.##
-error.required.otherlastnames = Enter responsible person’s previous last name ##PREVIOUS: Enter all other last names.##
+error.required.firstname = Enter a first name.
+error.required.lastname = Enter a last name.
+error.required.otherfirstnames = Enter the responsible person’s previous first name ##PREVIOUS: Enter all other first names.##
+error.required.otherlastnames = Enter the responsible person’s previous last name ##PREVIOUS: Enter all other last names.##
 error.required.yourname = Enter your name
 error.invalid.yourname = You can’t enter more than 140 characters for your name ##PREVIOUS: You can’t enter more than 140 characters for your name##
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
 error.invalid.common_name.length = You can’t enter more than 35 characters
 
-error.required.vat.number = Enter a VAT registration number.
-error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
+error.required.vat.number = Enter a valid VAT registration number ##PREVIOUS: Enter a VAT registration number.##
+error.invalid.vat.number = Enter a valid VAT registration number ##PREVIOUS: Enter a VAT registration number. It must be 9 characters long, and can only be numbers##
 
 error.required.name.of.business = Enter the name of the business
 error.invalid.name.of.business = You can’t enter more than 120 characters for the name of the business
@@ -44,14 +44,14 @@ error.invalid.name.of.business = You can’t enter more than 120 characters for 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
-error.required.uk.passport = Enter a valid 9-digit passport number
+error.required.uk.passport = Enter a valid passport number ##PREVIOUS: Enter a valid 9-digit passport number##
 error.required.non.uk.passport = Enter a valid passport number
 error.invalid.uk.passport = Only use numbers 0 to 9, with no spaces or other characters
-error.required.non.uk.passport = Enter the non-UK passport number
-error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
+error.required.non.uk.passport = Enter the non-UK passport number ##DUPLICATE##
+error.invalid.non.uk.passport = Enter a valid passport number ##PREVIOUS: Enter a valid non-UK passport number. You can’t enter more than 40 characters.##
 
-error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
-error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.utr.number = Enter valid UTR number ##PREVIOUS: Enter a Unique Taxpayer Reference (UTR) number##
+error.invalid.length.utr.number = Enter valid UTR number ##PREVIOUS: Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long##
 error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
 error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
@@ -74,7 +74,7 @@ error.max.length.phone = You can’t enter more than 24 characters for the phone
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 
-error.invalid.mlr.number = Enter a valid Money Laundering Regulation registration number
+error.invalid.mlr.number = Enter a valid Money Laundering Regulations registration number ##PREVIOUS: Enter a valid Money Laundering Regulation registration number##
 
 error.invalid.year = Enter a valid date in the format DD MM YYYY
 error.invalid.year.post1900 = The year can’t be before 1900
