@@ -20,7 +20,8 @@
             legend = "businessactivities.whoisyouraccountant.title",
             legendHidden = true,
             panel = false,
-            f = f("whoisyouraccountant-fieldset")
+            f = f("whoisyouraccountant-fieldset"),
+            classes = Seq("form-group")
         ) {
                 @input(
                     field = f("name"),
@@ -36,7 +37,8 @@
         @fieldset(
             f = f("isUK"),
             legend = "businessactivities.whoisyouraccountant.address.location",
-            panel = false
+            panel = false,
+            classes = Seq("form-group")
         ) {
             @radio(
                 f = f("isUK"),
