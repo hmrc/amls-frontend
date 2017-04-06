@@ -63,10 +63,12 @@
     </div>
 
 </div>
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
-        <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
-    </div>
-</div>
+    @if(!renewalFlow)
+        <div class="grid-row">
+            <div class="column-two-thirds">
+                <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
+                <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
+            </div>
+        </div>
+    }
 }
