@@ -24,49 +24,39 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     contactType match {
-      case ContactType.ApplicationAutorejectionForFailureToPay => Future.successful(
-        Some(NotificationDetails(
-          Some(contactType),
-          None,
-          Some(messagesApi("notification.static.text.application-auto-rejection-for-failure-to-pay",
-            controllers.routes.StatusController.get())),
-          false)
+      case ContactType.ApplicationAutorejectionForFailureToPay |
+           ContactType.RegistrationVariationApproval |
+           ContactType.DeRegistrationEffectiveDateChange =>
+        Future.successful(
+          Some(NotificationDetails(
+            Some(contactType),
+            None,
+            Some(messagesApi(s"notification.static.text.$contactType",
+              controllers.routes.StatusController.get())),
+            false)
+          )
         )
-      )
-      case ContactType.RegistrationVariationApproval => Future.successful(
-        Some(NotificationDetails(
-          Some(contactType),
-          None,
-          Some(messagesApi("notification.static.text.registration-variation-approval",
-            controllers.routes.StatusController.get())),
-          false)
-        )
-      )
-      case ContactType.DeRegistrationEffectiveDateChange => Future.successful(
-        Some(NotificationDetails(
-          Some(contactType),
-          None,
-          Some(messagesApi("notification.static.text.de-registration-effective-date-change",
-            controllers.routes.StatusController.get())),
-          false)
-        )
-      )
 
-      case _ => {
+      case ContactType.ReminderToPayForVariation => {
         val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
         details.map {
           case Some(notificationDetails) => {
-
-            val messageObject = NotificationDetails.convertMessageText(notificationDetails.messageText.getOrElse(""))
-
-            val message = messagesApi("notification.reminder-to-pay-variation", messageObject.get.d, messageObject.get.s)
-
-            Some(notificationDetails.copy(messageText = Some(message)))
+              for {
+                message <- notificationDetails.messageText
+                details <- NotificationDetails.convertMessageText(message)
+              } yield {
+                notificationDetails.copy(messageText = Some(messagesApi(
+                  "notification.reminder-to-pay-variation",
+                  details.paymentAmount,
+                  details.referenceNumber)))
+              }
           }
           case _ => None
         }
       }
+
+      case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
     }
 
   }

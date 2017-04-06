@@ -136,5 +136,37 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
       result.get.messageText.get mustBe Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
     }
+
+    "return correct message content when contact type is not ReminderToPayForRenewal" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForRenewal),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
+
+      result.get.messageText.get mustBe reminderVariationMessage
+    }
+
+    "return empty Notification Details when contact type is not ReminderToPayForRenewal" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForRenewal),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
+
+      result.get.messageText.get mustBe reminderVariationMessage
+    }
   }
 }

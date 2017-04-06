@@ -2,6 +2,6 @@ package models.notifications
 
 import models.confirmation.Currency
 
-case class ReminderDetails(d: Currency, s: String) {
+case class ReminderDetails(paymentAmount: Currency, referenceNumber: String) {
 
 }
