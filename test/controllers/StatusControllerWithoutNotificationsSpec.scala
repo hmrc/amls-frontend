@@ -54,8 +54,8 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(Some("XAML00000567890")))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
+      when(controller.statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview, None))
 
       when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
         .thenReturn(Future.successful(mock[FeeResponse]))

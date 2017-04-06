@@ -32,10 +32,7 @@ class what_you_needSpec extends GenericTestHelper with MustMatchers {
       html must include(Messages("hvd.whatyouneed.line_1"))
       html must include(Messages("hvd.whatyouneed.line_2"))
       html must include(Messages("hvd.whatyouneed.line_3"))
-      html must include(Messages("hvd.whatyouneed.line_4"))
-      html must include(Messages("hvd.whatyouneed.line_5"))
-      html must include(Messages("hvd.whatyouneed.line_6"))
-      html must include(Messages("hvd.whatyouneed.line_7"))
+
     }
   }
 }

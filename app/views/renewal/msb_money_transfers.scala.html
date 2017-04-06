@@ -1,0 +1,31 @@
+@import forms._
+@import models.renewal.MsbMoneyTransfers
+@import include._
+@import forms2._
+@import utils.HtmlElementHelpers._
+
+@(f: Form2[MsbMoneyTransfers], edit: Boolean)(implicit messages: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.msb.transfers.header", "summary.renewal")
+}
+
+@main(
+    title = s"${messages("renewal.msb.transfers.header")} - ${messages("summary.renewal")}",
+    heading = header
+) {
+
+    @form(f, controllers.renewal.routes.MsbMoneyTransfersController.post(edit)) {
+
+        @input(
+            field = f("transfers"),
+            labelText = "Transfers",
+            labelHidden = true,
+            attrType = "numbers",
+            dataAttrs = digitsOnlyAttributes
+        )
+
+        @submit()
+    }
+}

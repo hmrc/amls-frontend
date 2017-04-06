@@ -82,20 +82,10 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "A valid form post to the MSB throughput controller" must {
-    "redirect to the next page in the flow if edit = false and the business is a HDV" in new FormSubmissionFixture {
+    "redirect to the next page in the flow if edit = false" in new FormSubmissionFixture {
       post() { result =>
         result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
-      }
-    }
-
-    "redirect to the next page in the flow if edit = false and the business is not a HDV" in new FormSubmissionFixture {
-
-      setupActivities(Set(MoneyServiceBusiness))
-
-      post() { result =>
-        result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get().url)
+        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.MsbMoneyTransfersController.get().url)
       }
     }
 
