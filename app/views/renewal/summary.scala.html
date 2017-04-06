@@ -14,12 +14,12 @@
     heading = header
 ) {
 
-    @model.involvedInOtherActivities.map { involvedInOther =>
+    @model.involvedInOtherActivities.map{ inv =>
         @checkYourAnswers(
             question = Messages("renewal.involvedinother.title"),
             editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
         ) {
-            <p>@involvedInOther match {
+            <p>@model.involvedInOtherActivities.map {
                 case InvolvedInOtherNo => { @Messages("lbl.no") }
                 case InvolvedInOtherYes(v) => { @v }
             }</p>
