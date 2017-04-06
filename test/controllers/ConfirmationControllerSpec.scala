@@ -83,7 +83,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get())(request)
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))(request)
 
   }
 
@@ -123,7 +123,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       val body = contentAsString(result)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, defaultPaymentsReturnUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 100, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -151,7 +151,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       val body = contentAsString(result)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -165,9 +165,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       val body = contentAsString(result)
-      val submissionReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, submissionReturnUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 0, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
 
       cookies(result) must contain(paymentCookie)
 
@@ -196,7 +195,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = await(controller.get()(request))
 
-      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, defaultPaymentsReturnUrl)))(any(), any(), any())
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
