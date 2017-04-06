@@ -20,7 +20,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case notifications => notifications
     }
 
-  def getMessageDetails(amlsRegNo: String, id: String, contactType:ContactType)
+  def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType)
                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     contactType match {

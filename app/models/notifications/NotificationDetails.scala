@@ -1,5 +1,6 @@
 package models.notifications
 
+import models.confirmation.Currency
 import models.notifications.ContactType.{RegistrationVariationApproval, ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange}
 import models.notifications.StatusType.DeRegistered
 import play.api.libs.json.Json
@@ -30,8 +31,19 @@ case class NotificationDetails(contactType : Option[ContactType],
     s"notifications.subject.$getContactType"
   }
 
+
+
 }
 
 object NotificationDetails {
+  def convertMessageText(inputString: String): ReminderDetails = {
+    inputString.split("\\|").toList match {
+      case amount::ref::tail =>
+        ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref))
+    }
+  }
+
+  private def splitByDash(s: String): String = s.split("-")(1)
+
   implicit val reads = Json.reads[NotificationDetails]
 }
