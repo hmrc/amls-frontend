@@ -44,12 +44,20 @@ trait ConfirmationController extends BaseController {
 
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext => implicit request =>
-        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-          case Some(bm) if bm.reviewDetails.isDefined =>
-            Ok(payment_confirmation(bm.reviewDetails.get.businessName, reference))
-          case _ =>
-            Ok(payment_confirmation("", reference))
-        }
+
+      val companyNameT = for {
+        r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      } yield r.reviewDetails.fold("")(_.businessName)
+
+      val result = for {
+        status <- OptionT.liftF(statusService.getStatus)
+        businessName <- companyNameT orElse OptionT.some("")
+      } yield status match {
+        case SubmissionReadyForReview => Ok(payment_confirmation_amendvariation(businessName, reference))
+        case _ => Ok(payment_confirmation(businessName, reference))
+      }
+
+      result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
@@ -77,8 +85,7 @@ trait ConfirmationController extends BaseController {
           paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((paymentRef, total, rows, None), routes.ConfirmationController.paymentConfirmation(paymentRef).url))
         } yield {
           ApplicationConfig.paymentsUrlLookupToggle match {
-            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url))
-              .withCookies(paymentsRedirect.responseCookies: _*)
+            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
             case _ => Ok(confirmation(paymentRef, total, rows))
           }
         }
