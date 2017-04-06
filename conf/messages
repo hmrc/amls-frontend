@@ -102,20 +102,20 @@ error.required.rightaddress = Select yes if this is the right address to send yo
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
-error.bankdetails.accountname = Enter a bank account name
-error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
+error.bankdetails.accountname = Enter a name for this account ##PREVIOUS: Enter a bank account name##
+error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name ##PREVIOUS: You can’t enter more than 40 characters for the account name.##
 error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
-error.bankdetails.accountnumber = Enter the account number
-error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
-error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
-error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
+error.bankdetails.accountnumber = Enter a valid account number ##PREVIOUS: Enter the account number"
+error.invalid.bankdetails.accountnumber = Enter a valid account number ##PREVIOUS: Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.##
+error.max.length.bankdetails.accountnumber = Enter a valid account number ##PREVIOUS: You can’t enter more than 8 numbers for the account number.##
+error.required.bankdetails.iban.account = Enter either an IBAN number or an account number ##PREVIOUS: Enter an IBAN number or an account number.##
 
 error.invalid.bankdetails.iban = Enter a valid IBAN number
 error.invalid.bankdetails.account = Enter a valid account number
 # to delete:
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
-error.max.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+error.max.length.bankdetails.account = Enter a valid account number ##PREVIOUS: You can’t enter more than 40 numbers or letters for the account number.##
 
 error.required.bankdetails.register.another.bank = Select yes if you want to register another bank account
 
