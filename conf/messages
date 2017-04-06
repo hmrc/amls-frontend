@@ -372,6 +372,8 @@ lbl.1200.character.limit=1200 character limit
 
 lbl.give.details = Please give details
 
+lbl.registration.status = Registration status:
+
 legend.address = Address
 lbl.address.line1 = Address
 lbl.address.line2 = Address line 2
@@ -429,7 +431,7 @@ status.complete = Completed
 status.notsubmitted = Not submitted
 status.submitted = Submitted
 status.feepaid = Fee paid
-status.underreview = Pending
+status.underreview = Decision pending
 status.decisionmade = Decision made
 status.incomplete.heading = Application incomplete
 status.incomplete.description = You’ve started the application form but you haven’t finished it. You have 28 days to finish the application, from when you last saved your progress.
@@ -442,17 +444,24 @@ status.hassomethingchanged = Has something changed?
 status.submissionready.changelink1 = edit your application
 status.submissionready.buttontext = Submit application
 status.submissionreadyforreview.heading = Application pending
-status.submissionreadyforreview.description = If you have submitted the application and paid the fee, your application will be reviewed by HM Revenue and Customs.
-status.submissionreadyforreview.description2 = The review process can take up to 45 days. This web page will be updated when a decision has been made.
+status.submissionreadyforreview.description = Your application will be reviewed by HM Revenue and Customs.
+status.submissionreadyforreview.description2 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
 status.submissiondecisionapproved.heading = Application approved
+status.submissiondecisionsupervised.heading = Supervised
+status.submissiondecisionsupervised.renewal.btn = Renew supervision
+status.submissiondecisionsupervised.enddate.text = Currently supervised to {0}
+status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HM Revenue and Customs.
+status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
-status.submissiondecisionrejected.heading = Application rejected
-status.submissiondecisionrejected.description = Your application has been rejected.
+status.submissiondecisionrejected.heading = Not supervised
+status.submissiondecisionrejected.description = Your application has been revoked.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
+status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
+status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.registration.fee.lbl = Your registration fee
