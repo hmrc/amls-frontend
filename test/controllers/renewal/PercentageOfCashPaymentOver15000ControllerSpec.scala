@@ -98,7 +98,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.renewal.routes.CashPaymentController.get().url))
+          redirectLocation(result) must be(Some(controllers.renewal.routes.ReceiveCashPaymentsController.get().url))
         }
       }
 

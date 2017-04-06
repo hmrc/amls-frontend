@@ -48,7 +48,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(
 
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
     case true => Redirect(routes.SummaryController.get())
-    case false => Redirect(routes.CashPaymentController.get)
+    case false => Redirect(routes.ReceiveCashPaymentsController.get(edit))
   }
 
 }
