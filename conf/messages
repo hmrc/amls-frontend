@@ -1465,6 +1465,8 @@ renewal.customer.outside.uk.title = In the last 12 months did you have customers
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
@@ -1485,6 +1487,8 @@ renewal.msb.most.transactions.title = Where did you send the most transactions i
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
 renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
 
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback

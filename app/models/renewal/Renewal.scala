@@ -8,6 +8,7 @@ case class Renewal(
   turnover: Option[AMLSTurnover] = None,
   customersOutsideUK: Option[CustomersOutsideUK] = None,
   percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+  receiveCashPayments: Option[ReceiveCashPayments] = None,
   msbThroughput: Option[MsbThroughput] = None,
   msbTransfers: Option[MsbMoneyTransfers] = None,
   sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
@@ -17,8 +18,8 @@ case class Renewal(
 ) {
   def isComplete = {
     this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _,_, _, _, _, _, _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _,_, _, _, _, _, _, _) => true
       case _ => false
     }
   }
@@ -37,6 +38,9 @@ case class Renewal(
 
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
+
+  def receiveCashPayments(p: ReceiveCashPayments): Renewal =
+    this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p))
 
   def msbThroughput(model: MsbThroughput): Renewal =
     this.copy(msbThroughput = Some(model), hasChanged = hasChanged || !this.msbThroughput.contains(model))
