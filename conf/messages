@@ -227,7 +227,7 @@ error.required.tcsp.off.the.shelf.companies = Select yes if you only sell off-th
 error.required.tcsp.complex.corporate.structures = Select yes if you create complex corporate structures for clients, or plan to
 error.required.tcsp.services.another.tcsp = Select yes if you use the services of another Trust or Company Service Provider
 
-############################### Accountancy service provide ###############################
+############################### Accountancy service provider ###############################
 error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other business’s tax matters
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
