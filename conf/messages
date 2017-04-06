@@ -20,18 +20,18 @@ error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
 error.invalid.postcode = Enter a valid postcode
-error.required.country = Enter a country.
-error.invalid.country = Enter valid country.
-error.required.country.name = Enter at least one country.
+error.required.country = Enter an official country name: for example, Holland is Netherlands ##PREVIOUS: Enter a country.##
+error.invalid.country = Enter an official country name: for example, Holland is Netherlands ##PREVIOUS: Enter valid country.##
+error.required.country.name = Enter an official country name: for example, Holland is Netherlands ##PREVIOUS: Enter at least one country.##
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
-error.required.firstname = Enter a first name.
-error.required.lastname = Enter a last name.
-error.required.otherfirstnames = Enter all other first names.
-error.required.otherlastnames = Enter all other last names.
+error.required.firstname = Enter a first name. ##NOT USED##
+error.required.lastname = Enter a last name. ##NOT USED##
+error.required.otherfirstnames = Enter responsible person’s previous first name ##PREVIOUS: Enter all other first names.##
+error.required.otherlastnames = Enter responsible person’s previous last name ##PREVIOUS: Enter all other last names.##
 error.required.yourname = Enter your name
-error.invalid.yourname = You can’t enter more than 140 characters for your name
+error.invalid.yourname = You can’t enter more than 140 characters for your name ##PREVIOUS: You can’t enter more than 140 characters for your name##
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
 error.invalid.common_name.length = You can’t enter more than 35 characters
 
