@@ -1502,6 +1502,9 @@ renewal.msb.throughput.selection.5 = £21 million to £100 million
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
+renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
+
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback

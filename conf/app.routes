@@ -454,3 +454,6 @@ GET         /renewal/throughput                                         @control
 POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
 
 GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
+
+GET         /renewal/msb/which-currencies                               @controllers.renewal.MsbWhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /renewal/msb/which-currencies                               @controllers.renewal.MsbWhichCurrenciesController.post(edit: Boolean ?= false)
