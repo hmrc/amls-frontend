@@ -1472,6 +1472,9 @@ renewals.msb.ce.transactions.expected.title = How many currency exchange transac
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
+renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
+renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback

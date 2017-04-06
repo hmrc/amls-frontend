@@ -450,10 +450,16 @@ GET         /renewal/check-your-answers                                 @control
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
 
-GET         /renewal/throughput                                         @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
-POST        /renewal/throughput                                         @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+GET         /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
 
-GET         /renewal/moneytransfers                                     @controllers.renewal.MsbMoneyTransfersController.get()
+GET         /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
+
+GET         /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.get(edit: Boolean ?= false)
+POST        /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.post(edit: Boolean ?= false)
 
 GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
 POST        /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)

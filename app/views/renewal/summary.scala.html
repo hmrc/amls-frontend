@@ -112,6 +112,15 @@
             }
         }
 
+        @model.msbTransfers.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.transfers.header"),
+                editUrl = controllers.renewal.routes.MsbMoneyTransfersController.get(edit = true).url
+            ) {
+                <p>@m.transfers</p>
+            }
+        }
+
         @if(services.msbServices.contains(TransmittingMoney)) {
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
@@ -134,6 +143,19 @@
             editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
         ) {
             <p>@trans.ceTransaction</p>
+        }
+    }
+
+    @model.sendTheLargestAmountsOfMoney.map { lom =>
+        @checkYourAnswers(
+            question = Messages("msb.send.the.largest.amounts.of.money.title"),
+            editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+        ) {
+        <ul class="list list--comma">
+            @lom.countryList.map { country =>
+                <li>@country.name</li>
+            }
+        </ul>
         }
     }
 

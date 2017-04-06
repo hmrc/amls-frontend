@@ -41,10 +41,9 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
           r.businessAddress.line_3,
           r.businessAddress.line_4,
           r.businessAddress.postcode.getOrElse(""))
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, None)
-        Some(ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress)))
-      }
-      )
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
+        Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress)))
+      })
       case _ => None
     }
   }
@@ -68,36 +67,33 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
   }
 
   def post(index: Int) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Form2[ConfirmAddress](request.body) match {
-          case f: InvalidForm =>
-            dataCacheConnector.fetchAll flatMap {
-              optionalCache =>
-                (for {
-                  cache <- optionalCache
-                  rp <- getData[ResponsiblePeople](cache, index)
-                  bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-                } yield {
-                  getAddress(bm) match {
-                    case Some(addr) => Future.successful(BadRequest(views.html.responsiblepeople.confirm_address(f, addr,
-                      index, ControllerHelper.rpTitleName(Some(rp)))))
-                    case _ => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
-                  }
-                }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+    implicit authContext => implicit request =>
+      Form2[ConfirmAddress](request.body) match {
+        case f: InvalidForm =>
+          dataCacheConnector.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                rp <- getData[ResponsiblePeople](cache, index)
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              } yield {
+                getAddress(bm) match {
+                  case Some(addr) => BadRequest(views.html.responsiblepeople.confirm_address(f, addr,
+                    index, ControllerHelper.rpTitleName(Some(rp))))
+                  case _ => Redirect(routes.CurrentAddressController.get(index))
+                }
+              }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          }
+        case ValidForm(_, data) =>
+          data.confirmAddress match {
+            case true => {
+              fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
+                rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
+              } map ( _ => Redirect(routes.TimeAtCurrentAddressController.get(index)))
             }
-          case ValidForm(_, data) =>
-            data.confirmAddress match {
-              case true => {
-                for {
-                  _ <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
-                    rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
-                  }
-                } yield Redirect(routes.TimeAtCurrentAddressController.get(index))
-              }
-              case false => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
-            }
-        }
+            case false => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
+          }
+      }
   }
 
 }

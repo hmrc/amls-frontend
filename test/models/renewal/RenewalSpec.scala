@@ -27,6 +27,8 @@ class RenewalSpec extends GenericTestHelper {
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(MsbThroughput("01")),
+          Some(MsbMoneyTransfers(1500)),
+          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           hasChanged = true
@@ -45,6 +47,8 @@ class RenewalSpec extends GenericTestHelper {
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(MsbThroughput("01")),
+          Some(MsbMoneyTransfers(2300)),
+          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           hasChanged = true
