@@ -43,7 +43,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
-    val pageTitleSuffix = " - Your registration - Register for anti-money laundering supervision - GOV.UK"
+    val pageTitleSuffix = " - Your registration - " +Messages("title.amls") + " - " + Messages("title.gov")
 
 
     "load the status page" in new Fixture {
