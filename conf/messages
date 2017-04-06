@@ -83,10 +83,10 @@ error.invalid.year.post1900 = The year can’t be before 1900
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select at least one activity that you need to register.
-error.required.bm.registration.number = Enter the company registration number.
+error.required.bm.register.service = Select one or more options to show what you need to register ##PREVIOUS: Select at least one activity that you need to register.##
+error.required.bm.registration.number = Enter a valid company registration number ##PREVIOUS: Enter the company registration number.##
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
-error.required.bm.businesstype.type = Enter your type of business.
+error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust ##PREVIOUS: Enter your type of business.##
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
 
