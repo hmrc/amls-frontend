@@ -11,10 +11,17 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
 
       val inputString = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
 
-      NotificationDetails.convertMessageText(inputString) mustBe ReminderDetails(1234, "ABC1234")
+      NotificationDetails.convertMessageText(inputString) mustBe Some(ReminderDetails(1234, "ABC1234"))
 
     }
+
+    "return none when supplied with an invalid string" in {
+      val inputString = "invalidtest"
+
+      NotificationDetails.convertMessageText(inputString) must be(None)
+    }
   }
+
 
 
 }

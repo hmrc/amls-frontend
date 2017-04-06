@@ -36,10 +36,11 @@ case class NotificationDetails(contactType : Option[ContactType],
 }
 
 object NotificationDetails {
-  def convertMessageText(inputString: String): ReminderDetails = {
+  def convertMessageText(inputString: String): Option[ReminderDetails] = {
     inputString.split("\\|").toList match {
       case amount::ref::tail =>
-        ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref))
+        Some(ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref)))
+      case _ => None
     }
   }
 
