@@ -32,7 +32,7 @@ class SummaryController @Inject()
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
-              Future.successful(Ok(summary(renewal, businessMatching.activities)))
+              Future.successful(Ok(summary(renewal, businessMatching.activities, businessMatching.msbServices)))
             }) getOrElse {
               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
             }

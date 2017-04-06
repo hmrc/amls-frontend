@@ -18,11 +18,17 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
 
     val exclusionSet = Seq(
       controllers.routes.LandingController.get().url,
-      controllers.routes.LandingController.start().url,
       controllers.routes.ConfirmationController.get().url,
       "/pay-online/other-taxes",
       "/confirmation/payment-complete"
     )
+
+    // If the current request path starts with anything listed in exclusionSet, do not interfere
+    lazy val shouldRedirect = !exclusionSet.exists(p => rh.path.startsWith(p))
+
+    // True if the request path matches anything with a filename, like a .js or .css file.
+    // In this case, the filter should not interfere
+    val isFilePath = rh.path.matches(".*\\.[a-zA-Z0-9]+$")
 
     implicit val headerCarrier = HeaderCarrier.fromHeadersAndSession(rh.headers, Some(rh.session))
 
@@ -31,11 +37,10 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     }
     else {
       //noinspection SimplifyBooleanMatch
-      rh.path.matches(".*\\.[a-zA-Z0-9]+$") match {
+      isFilePath match {
         case false =>
           keystoreConnector.confirmationStatus flatMap {
-            case ConfirmationStatus(Some(true)) if !exclusionSet.exists(rh.path.startsWith(_)) =>
-
+            case ConfirmationStatus(Some(true)) if shouldRedirect =>
               for {
                 _ <- authenticator.refreshProfile
                 _ <- keystoreConnector.resetConfirmation
@@ -48,7 +53,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
                 Redirect(targetUrl)
               }
 
-            case _ => nextFilter(rh)
+            case x => nextFilter(rh)
           }
 
         case _ => nextFilter(rh)

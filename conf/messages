@@ -288,6 +288,11 @@ error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
 error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
 
+
+################################# Renewal ###################################
+error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -1504,6 +1509,13 @@ renewal.msb.throughput.selection.7 = More than £1 billion
 
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
 
+
+renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
+
+renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
+
+renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
+renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
 
 ############################### Survey ###############################
 

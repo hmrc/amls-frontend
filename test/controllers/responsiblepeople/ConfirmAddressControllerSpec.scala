@@ -106,8 +106,8 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
     "Post is called" must {
 
       val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-      val additionalAddress = ResponsiblePersonAddress(UKAddress, None)
-      val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+      val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
+      val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
       val rp = ResponsiblePeople(addressHistory = Some(history))
 
       "successfully redirect to next page" when {

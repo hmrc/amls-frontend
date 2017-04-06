@@ -8,20 +8,20 @@ import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
-class MostTransactionsController @Inject()(
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
-                                            val renewalService: RenewalService
-                                          ) extends BaseController {
-
+class WhichCurrenciesController @Inject()(
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val authConnector: AuthConnector,
+                                           val renewalService: RenewalService
+                                         ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+    ???
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+    ???
   }
+
 }
