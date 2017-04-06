@@ -96,8 +96,8 @@ error.required.atb.confirm.office = Select yes if this is the address of your re
 error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
-error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
-error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
+error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number ##PREVIOUS: Enter the Corporation Tax number.##
+error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number ##PREVIOUS: Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.##
 error.required.rightaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
