@@ -278,19 +278,19 @@ error.required.countries.msb.most.transactions = Enter an official country name:
 error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €15,000 or more
 error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
 error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
-error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
-error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
+error.required.hvd.business.sell.other.details = Enter a description of what your business will sell ##PREVIOUS: Enter some information about the other items your business will sell.##
+error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters ##PREVIOUS: You can’t enter more than 255 characters for the other items your business will sell.##
 error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €15,000 or more
 error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €15,000 from customers you’ve not met in person
 error.required.hvd.describe = Please describe how you expect to receive these payments.
-error.maxlength.hvd.describe = You can’t enter more than 255 characters.
+error.maxlength.hvd.describe = You can’t enter more than 255 characters ##PREVIOUS: You can’t enter more than 255 characters.##
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
 error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
 
 
 ################################# Renewal ###################################
-error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months ##PREVIOUS: Enter the number of transactions in the last 12 months.##
 
 
 ################################# Declaration #####################################
