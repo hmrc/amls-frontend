@@ -306,6 +306,8 @@ error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency w
 
 error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
+error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -1500,7 +1502,7 @@ renewals.msb.ce.transactions.expected.title = How many currency exchange transac
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
+renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months
 
 renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
 renewal.receiving.expect.to.receive = How did you receive these payments?

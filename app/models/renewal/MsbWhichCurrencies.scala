@@ -47,7 +47,7 @@ object MsbWhichCurrencies {
       case x@(Some(_), _, _) => Valid(x)
       case x@(_, Some(_), _) => Valid(x)
       case x@(_, _, Some(true)) => Valid(x)
-      case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+      case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
     }
 
 
@@ -56,7 +56,7 @@ object MsbWhichCurrencies {
     case x@(Some(true), _, Some(c), _) => Valid(x)
     case x@(Some(true), _, _, Some(d)) => Valid(x)
     case x@(Some(false), _, _, _) => Valid((Some(false), None, None, None))
-    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
   }
 
   implicit def formR: Rule[UrlFormEncoded, MsbWhichCurrencies] = From[UrlFormEncoded] { __ =>

@@ -311,7 +311,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
           "usesForeignCurrencies" -> Seq("Yes")
         )
 
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
+        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources")))))
       }
     }
 
@@ -343,7 +343,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       "fail validation with error messages" in {
         MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
-          (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
+          (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))
         )))
       }
     }
