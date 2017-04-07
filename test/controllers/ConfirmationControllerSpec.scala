@@ -174,9 +174,12 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())) thenReturn Future.successful(None)
 
-      val result = await(controller.get()(request))
+      val result = controller.get()(request)
+      val doc = Jsoup.parse(contentAsString(result))
 
       verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
+
+      doc.select(".button").first.attr("href") must include("/pay-online/other-taxes")
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
@@ -388,7 +391,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.requestPaymentRedirectUrl(any())(any(), any(), any())
     } thenReturn Future.successful(Some(PaymentServiceRedirect("/payments", Seq(paymentCookie))))
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.LandingController.get().url)(request)
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
 
   }
 
