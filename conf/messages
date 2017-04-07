@@ -291,6 +291,7 @@ error.required.hvd.percentage = Select one option to show how much of your turno
 
 ################################# Renewal ###################################
 error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
 error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €15,000 in the last 12 months from customers you’ve not met in person
 error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
