@@ -29,8 +29,8 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def standardRouting(services: Set[MsbService], ceTransactionEmpty: Boolean, edit: Boolean): Result =
-    if ((services contains CurrencyExchange) && ceTransactionEmpty) {
+  private def standardRouting(services: Set[MsbService], edit: Boolean): Result =
+    if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.MsbCurrencyExchangeTransactionsController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
@@ -55,7 +55,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
                   cache.save[Renewal](Renewal.key,
                     renewal.mostTransactions(data)
                   ) map { _ =>
-                      standardRouting(services.msbServices, renewal.ceTransactions.isEmpty, edit)
+                      standardRouting(services.msbServices, edit)
                    }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
