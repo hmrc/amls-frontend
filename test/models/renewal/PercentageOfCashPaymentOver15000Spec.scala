@@ -55,7 +55,7 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "throw error on empty data" in {
         PercentageOfCashPaymentOver15000.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "percentage", Seq(ValidationError("error.required.hvd.percentage"))))))
+          be(Invalid(Seq((Path \ "percentage", Seq(ValidationError("error.required.renewal.percentage"))))))
       }
     }
 

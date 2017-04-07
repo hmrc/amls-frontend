@@ -19,7 +19,7 @@ object PercentageOfCashPaymentOver15000 {
 
   implicit val formRule: Rule[UrlFormEncoded, PercentageOfCashPaymentOver15000] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "percentage").read[String].withMessage("error.required.hvd.percentage") flatMap {
+    (__ \ "percentage").read[String].withMessage("error.required.renewal.percentage") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
