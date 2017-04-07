@@ -29,7 +29,7 @@
             question = Messages("aboutthebusiness.activity.start.date.title"),
             editUrl = controllers.aboutthebusiness.routes.ActivityStartDateController.get(true).toString
         ) {
-            <p>@DateHelper.formatDate(activityStartDate.startDate)</p>
+            <p>@Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)</p>
         }
     }
 
