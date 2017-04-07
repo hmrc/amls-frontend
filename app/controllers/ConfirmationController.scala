@@ -3,14 +3,14 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
-import play.api.{Logger, Play}
 import play.api.mvc.{AnyContent, Request}
+import play.api.{Logger, Play}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -44,7 +44,6 @@ trait ConfirmationController extends BaseController {
 
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext => implicit request =>
-
       val companyNameT = for {
         r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       } yield r.reviewDetails.fold("")(_.businessName)

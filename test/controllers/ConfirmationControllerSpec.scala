@@ -1,6 +1,7 @@
 package controllers
 
-import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import cats.implicits._
+import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -11,7 +12,6 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -21,9 +21,8 @@ import play.api.{Application, Mode}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
-import cats.implicits._
 
 import scala.concurrent.Future
 
@@ -290,6 +289,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReference)
         doc.select(".confirmation").text must include(companyName)
+        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'approved'" in new Fixture {
@@ -306,6 +306,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReference)
         doc.select(".confirmation").text must include(companyName)
+        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "there is no business name" in new Fixture {
