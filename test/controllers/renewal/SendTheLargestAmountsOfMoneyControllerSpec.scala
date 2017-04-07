@@ -32,7 +32,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
-    val controller = new SendTheLargestAmountsOfMoneyController(
+    val controller = new MsbSendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService

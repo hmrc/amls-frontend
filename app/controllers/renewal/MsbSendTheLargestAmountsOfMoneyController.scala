@@ -13,7 +13,7 @@ import views.html.renewal.send_largest_amounts_of_money
 import scala.concurrent.Future
 
 @Singleton
-class SendTheLargestAmountsOfMoneyController @Inject()(
+class MsbSendTheLargestAmountsOfMoneyController @Inject()(
                                                         val dataCacheConnector: DataCacheConnector,
                                                         val authConnector: AuthConnector,
                                                         val renewalService: RenewalService

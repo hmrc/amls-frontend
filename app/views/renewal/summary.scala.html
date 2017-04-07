@@ -106,6 +106,20 @@
             }
         }
 
+
+        @model.sendTheLargestAmountsOfMoney.map { lom =>
+            @checkYourAnswers(
+                question = Messages("renewal.msb.largest.amounts.title"),
+                editUrl = controllers.renewal.routes.MsbSendTheLargestAmountsOfMoneyController.get(true).toString
+            ) {
+                <ul class="list list--comma">
+                    @lom.countryList.map { country =>
+                        <li>@country.name</li>
+                    }
+                </ul>
+            }
+        }
+
         @if(services.msbServices.contains(TransmittingMoney)) {
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
