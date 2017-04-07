@@ -1434,7 +1434,7 @@ notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Registration Expiry
 
 notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
-notifications.subject.ReminderToPayForVariation = Reminder to pay
+notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
 notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
