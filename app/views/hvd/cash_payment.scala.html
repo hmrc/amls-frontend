@@ -17,6 +17,7 @@
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 
+        <div class="form-group">
         @fieldset(
             f = f("acceptedAnyPayment-fieldset"),
             legend = "hvd.cash.payment.title",
@@ -54,6 +55,24 @@
                 hintText = "hvd.cash.payment.date.example",
                 example = false
             )
+        }
+        </div>
+
+        @detailsSummary(
+            summary = Messages("hvd.cash.payment.data.details.summary")
+        ) {
+            @panel(
+                jsHidden = false
+            ) {
+            <p>@Messages("hvd.cash.payment.data.details.summary.details")</p>
+            <p>@Messages("hvd.cash.payment.data.details.summary.details.start")</p>
+
+            <ul class="list list-bullet">
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.01")</li>
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.02")</li>
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.03")</li>
+            </ul>
+            }
         }
 
         @submit(edit)

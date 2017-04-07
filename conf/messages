@@ -1373,6 +1373,12 @@ hvd.cash.payment.title = Has your business already accepted any cash payments of
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 03 2015
+hvd.cash.payment.data.details.summary = What a cash payment is
+hvd.cash.payment.data.details.summary.details = A cash payment is physical money, notes and coins, either paid to you in person or paid directly into a bank account.
+hvd.cash.payment.data.details.summary.details.start = This includes:
+hvd.cash.payment.data.details.summary.details.01 = any single cash payment of €15,000 or more
+hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €15,000 or more including things like payment plans, payments on account and deposits
+hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €15,000 or more in any 90 day period
 
 hvd.summary.payment.date.label = Date of first payment
 
