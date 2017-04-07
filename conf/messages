@@ -296,6 +296,14 @@ error.required.renewal.hvd.receive.cash.payments = Select yes if you received an
 error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
 error.required.renewal.hvd.describe = Enter details of how you received these payments
 
+error.required.renewal.ba.turnover.from.mlr = Select one option to show how much net profit your business made in the last 12 months from activities related to anti-money laundering supervision
+
+error.required.renewal.ba.business.turnover = Select one option to show the total net profit your business made in the last 12 months
+
+error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
+error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
+
+error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one

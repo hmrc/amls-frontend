@@ -33,7 +33,7 @@ object MsbWhichCurrencies {
 
   private def nameType(fieldName: String) = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
+      minLength(1).withMessage(s"error.invalid.renewal.msb.wc.$fieldName") andThen
       maxLength(140).withMessage("error.invalid.maxlength.140") andThen
       basicPunctuationPattern()
   }

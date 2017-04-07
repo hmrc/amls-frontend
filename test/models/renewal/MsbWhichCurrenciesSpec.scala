@@ -154,7 +154,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
+        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")))))
       }
     }
 
@@ -169,7 +169,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames")))))
       }
     }
 
@@ -233,8 +233,8 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
 
       "fail validation" in {
         MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
-          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")),
-          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames"))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames"))
         )))
       }
 
@@ -362,7 +362,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       "fail validation with both error messages" in {
         MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
-          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames"))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames"))
         )))
       }
     }
