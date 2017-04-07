@@ -47,7 +47,7 @@ sealed trait PaymentMethods0 {
       }
 
       val detailsR: Rule[String, String] =
-        (minLengthR(minLength) withMessage "error.required.hvd.describe") andThen
+        (minLengthR(minLength) withMessage "error.required.renewal.hvd.describe") andThen
         (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255") andThen
         basicPunctuationPattern()
 
@@ -62,7 +62,7 @@ sealed trait PaymentMethods0 {
           case false =>
             Rule(_ => Valid(None))
         }
-      )(PaymentMethods.apply _).validateWith("error.required.hvd.choose.option"){
+      )(PaymentMethods.apply _).validateWith("error.required.renewal.hvd.choose.option"){
         methods =>
           methods.courier || methods.direct || methods.other.isDefined
       }

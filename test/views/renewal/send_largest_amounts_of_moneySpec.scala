@@ -23,7 +23,7 @@ class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatch
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 
-      doc.title must startWith(Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -32,7 +32,7 @@ class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatch
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 
-      heading.html must be(Messages("msb.send.the.largest.amounts.of.money.title"))
+      heading.html must be(Messages("renewal.msb.largest.amounts.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

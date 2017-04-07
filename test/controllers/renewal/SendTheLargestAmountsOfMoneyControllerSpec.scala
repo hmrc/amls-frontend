@@ -53,7 +53,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be(Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.renewal") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+        document.title() must be(Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
       }
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
