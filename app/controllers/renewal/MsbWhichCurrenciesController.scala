@@ -44,8 +44,9 @@ class MsbWhichCurrenciesController @Inject()
           val maybeResponse = for {
             renewal <- OptionT(renewalService.getRenewal)
             _ <- OptionT.liftF(renewalService.updateRenewal(renewal.msbWhichCurrencies(model)))
-          } yield {
-            Redirect(routes.SummaryController.get())
+          }yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
           }
 
           maybeResponse getOrElse Redirect(routes.SummaryController.get())

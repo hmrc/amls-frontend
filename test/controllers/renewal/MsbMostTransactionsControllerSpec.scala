@@ -207,7 +207,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
+    "return a redirect on valid submission where in non edit mode" in new Fixture {
       val msbServices = Some(
         MsbServices(
           Set(
@@ -238,10 +238,10 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
       when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(edit = true)(newRequest)
+      val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get(true).url)
+      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get().url)
     }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
