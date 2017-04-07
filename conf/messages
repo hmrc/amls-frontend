@@ -1552,5 +1552,5 @@ notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your an
 
 notification.reminder-to-pay-variation = <p>You need to pay {0} for the recent changes made to your details.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p><a href="@controllers.routes.ConfirmationController.get()">Pay online </a>by credit or debit card.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
