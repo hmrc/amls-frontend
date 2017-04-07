@@ -9,7 +9,6 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-
 class percentageSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {

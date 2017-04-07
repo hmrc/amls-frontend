@@ -1,0 +1,33 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("msb.send.the.largest.amounts.of.money.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+
+    <p class="form-hint">@Messages("lbl.list.upto.3.countries")</p>
+
+    @form(f, controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.post(edit)) {
+
+        @fieldset(
+            legend = "msb.send.the.largest.amounts.of.money.title",
+            f = f("countries"),
+            legendHidden = true,
+            panel = false
+        ) {
+            @country(f("country_1"))
+            @country(f("country_2"))
+            @country(f("country_3"))
+        }
+        @submit(edit)
+    }
+}

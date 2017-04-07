@@ -1,9 +1,9 @@
 @import include._
 @import forms2._
 @import models.renewal._
-@import models.businessmatching.BusinessActivities
+@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney}
 
-@(model: Renewal, bmBusinessActivities: Option[BusinessActivities])(implicit request: Request[_], messages: Messages, lang: Lang)
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -14,14 +14,16 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("renewal.involvedinother.title"),
-        editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
-    ) {
-        <p>@model.involvedInOtherActivities.map {
-            case InvolvedInOtherNo => { @Messages("lbl.no") }
-            case InvolvedInOtherYes(v) => { @v }
-        }</p>
+    @model.involvedInOtherActivities.map{ inv =>
+        @checkYourAnswers(
+            question = Messages("renewal.involvedinother.title"),
+            editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+        ) {
+            <p>@model.involvedInOtherActivities.map {
+                case InvolvedInOtherNo => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(v) => { @v }
+            }</p>
+        }
     }
 
     @model.businessTurnover.map { turnover =>
@@ -71,15 +73,45 @@
         @checkYourAnswers(
             question = Messages("renewal.customer.outside.uk.title"),
             editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
-            ) {
+        ) {
             @boa.countries.fold {
-            <p>@Messages("lbl.no")</p>
+                <p>@Messages("lbl.no")</p>
             } { branches =>
-            <ul class="list list-bullet">
-                @branches.map { country =>
-                <li>@country</li>
+                <ul class="list list-bullet">
+                    @branches.map { country =>
+                    <li>@country</li>
+                    }
+                </ul>
+            }
+        }
+    }
+
+    @model.receiveCashPayments.map { rcp =>
+        @checkYourAnswers(
+            question = Messages("renewal.receiving.title"),
+            editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
+        ) {
+            @rcp.paymentMethods match {
+                case None => {<p>@Messages("lbl.no")</p>}
+                case Some(pm:PaymentMethods) => {
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("renewal.receiving.expect.to.receive")
+                    ) {
+                        <ul class="list list--comma">
+                            <li>@pm match {
+                                case PaymentMethods(false, false, None) => { Unknown }
+                                case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                                }</li>
+                        </ul>
+                    }
                 }
-            </ul>
             }
         }
     }
@@ -99,12 +131,61 @@
             }
     }
 
-    @model.msbThroughput.map { m =>
+    @bmMsbServices.map {services =>
+
+        @model.msbThroughput.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.throughput.header"),
+                editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
+            ) {
+                <p>@MsbThroughput.labelFor(m)</p>
+            }
+        }
+
+        @model.msbTransfers.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.transfers.header"),
+                editUrl = controllers.renewal.routes.MsbMoneyTransfersController.get(edit = true).url
+            ) {
+                <p>@m.transfers</p>
+            }
+        }
+
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            @model.mostTransactions.map { mt =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.most.transactions.title"),
+                    editUrl = controllers.renewal.routes.MsbMostTransactionsController.get(edit = true).url
+                ) {
+                    <ul class="list list--comma">
+                        @mt.countries.map { country =>
+                            <li>@country.name</li>
+                        }
+                    </ul>
+                }
+            }
+        }
+    }
+
+    @model.ceTransactions.map{ trans =>
         @checkYourAnswers(
-            question = messages("renewal.msb.throughput.header"),
-            editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
+            question = Messages("renewals.msb.ce.transactions.expected.title"),
+            editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
         ) {
-            <p>@MsbThroughput.labelFor(m)</p>
+            <p>@trans.ceTransaction</p>
+        }
+    }
+
+    @model.sendTheLargestAmountsOfMoney.map { lom =>
+        @checkYourAnswers(
+            question = Messages("msb.send.the.largest.amounts.of.money.title"),
+            editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+        ) {
+        <ul class="list list--comma">
+            @lom.countryList.map { country =>
+                <li>@country.name</li>
+            }
+        </ul>
         }
     }
 

@@ -25,18 +25,17 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
-      implicit authContext =>
-        implicit request =>
+      implicit authContext => implicit request =>
 
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName), _, _,
-            Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _))
-            => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-            => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
-            case _
-            => NotFound(notFoundView)
-          }
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(Some(personName), _, _,
+          Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _,_, _, _, _, _, _, _, _, _, _))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _,_))
+          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          case _
+          => NotFound(notFoundView)
+        }
     }
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =

@@ -36,7 +36,7 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
     when(keystore.confirmationStatus(any(), any())) thenReturn Future.successful(confirmationStatusResult)
 
-    when(authenticator.refreshProfile(any())) thenReturn Future.successful(HttpResponse(OK))
+    when(authenticator.refreshProfile(any(), any())) thenReturn Future.successful(HttpResponse(OK))
 
   }
 
@@ -93,10 +93,10 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
     }
 
-    "excludes anything that isn't a page page" in new TestFixture {
+    "excludes anything that isn't a page" in new TestFixture {
 
       val filter = app.injector.instanceOf[ConfirmationFilter]
-      val rh = FakeRequest(GET, "/amls.js")
+      val rh = FakeRequest(GET, "/amls.js").withSession(("sessionId", "SOME_SESSION_ID"))
       val nextFilter = Action(Ok("success"))
 
       val result = filter(nextFilter)(rh).run()
@@ -116,7 +116,7 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
 
-      verify(authenticator).refreshProfile(any())
+      verify(authenticator).refreshProfile(any(), any())
 
     }
 
