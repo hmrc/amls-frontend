@@ -1226,7 +1226,7 @@ tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another Trust or Company Service Provider?
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company’s Money Laundering Regulation reference number?
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company’s Money Laundering Regulation registration number?
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
