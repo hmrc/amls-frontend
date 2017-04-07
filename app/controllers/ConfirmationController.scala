@@ -69,14 +69,14 @@ trait ConfirmationController extends BaseController {
           fees@(payRef, total, rows, difference) <- OptionT(getAmendmentFees)
           paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, returnLocation(payRef)))
         } yield {
-          Ok(confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+          Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         }
       case SubmissionDecisionApproved =>
         for {
           fees@(payRef, total, rows, _) <- OptionT(getVariationFees)
           paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
         } yield {
-          Ok(confirmation_variation(payRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+          Ok(confirm_amendvariation(payRef, total, rows, None, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         }
       case _ =>
         for {
