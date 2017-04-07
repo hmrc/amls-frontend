@@ -455,12 +455,12 @@ status.submissiondecisionsupervised.renewal.advice.text = When you submit your r
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
 status.submissiondecisionrejected.heading = Not supervised
-status.submissiondecisionrejected.description = Your application has been revoked.
+status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
-status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
+status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
@@ -1136,7 +1136,8 @@ responsiblepeople.whomustregister.title = You must register:
 responsiblepeople.whomustregister.line_1 = everyone who directs the business, including sole proprietors, partners, designated members, directors and shadow directors
 responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than 25% of the business
 responsiblepeople.whomustregister.line_3 = the ‘nominated officer’, who is the person who acts as the money laundering reporting officer
-responsiblepeople.registeredforvat.title = Is {0} registered for VAT with that business?
+responsiblepeople.registeredforvat.title = Is this person registered for VAT with that business?
+responsiblepeople.registeredforvat.headiing = Is {0} registered for VAT with that business?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
 responsiblepeople.experiencetraining.heading = Does {0} have previous experience in these activities?
 responsiblepeople.experiencetraining.title = Does this person have previous experience in these activities?
@@ -1463,6 +1464,8 @@ renewal.customer.outside.uk.title = In the last 12 months did you have customers
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
@@ -1483,6 +1486,8 @@ renewal.msb.most.transactions.title = Where did you send the most transactions i
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
 renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
 
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
