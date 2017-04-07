@@ -54,8 +54,8 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(Some("XAML00000567890")))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
+      when(controller.statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview, None))
 
       when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
         .thenReturn(Future.successful(mock[FeeResponse]))
@@ -64,7 +64,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("statusblock").html() must not include(Messages("status.amendment.edit"))
+      document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
     }
   }
 }
