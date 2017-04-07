@@ -1277,6 +1277,7 @@ supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
 supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
+supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
 supervision.penalisedbyprofessional.details.lbl = Please provide details
 
