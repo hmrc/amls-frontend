@@ -53,7 +53,7 @@
                 @bankAccount.account match {
                     case f:UKAccount => {
                         @checkYourAnswersBanks(
-                            question = Messages("bankdetails.bankaccount.accountname") + ": " + bankAccount.accountName,
+                            question = bankAccount.accountName,
                             editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
                             removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
                             canEdit
