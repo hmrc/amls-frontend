@@ -55,13 +55,13 @@
                     inline = true
                 )
             }
-        }
 
-        @panel(
-            field = Some(f("usesForeignCurrency-fieldset")),
-            jsHidden = false
-        ) {
-            @panelContents
+            @panel(
+                field = Some(f("usesForeignCurrency-fieldset")),
+                jsHidden = false
+            ) {
+                @panelContents
+            }
         }
 
     } else {
@@ -91,7 +91,6 @@
         @input(
             field = f("bankNames"),
             labelText = "msb.which_currencies.source.which_banks",
-            panel = true,
             jsHidden = true,
             data = "banks"
         )
@@ -104,7 +103,6 @@
         @input(
             field = f("wholesalerNames"),
             labelText = "msb.which_currencies.source.which_wholesalers",
-            panel = true,
             jsHidden = true,
             data = "wholesalers"
         )
