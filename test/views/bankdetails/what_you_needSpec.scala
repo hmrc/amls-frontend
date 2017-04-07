@@ -32,8 +32,6 @@ class what_you_needSpec extends GenericTestHelper with MustMatchers {
       html must include(Messages("bankdetails.whatyouneed.line_1"))
       html must include(Messages("bankdetails.whatyouneed.line_2"))
       html must include(Messages("bankdetails.whatyouneed.line_3"))
-      html must include(Messages("bankdetails.whatyouneed.line_4"))
-      html must include(Messages("bankdetails.whatyouneed.line_5"))
     }
   }
 }

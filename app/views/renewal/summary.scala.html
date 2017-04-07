@@ -14,12 +14,12 @@
     heading = header
 ) {
 
-    @model.involvedInOtherActivities.map { involvedInOther =>
+    @model.involvedInOtherActivities.map{ inv =>
         @checkYourAnswers(
             question = Messages("renewal.involvedinother.title"),
             editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
         ) {
-            <p>@involvedInOther match {
+            <p>@model.involvedInOtherActivities.map {
                 case InvolvedInOtherNo => { @Messages("lbl.no") }
                 case InvolvedInOtherYes(v) => { @v }
             }</p>
@@ -73,32 +73,17 @@
         @checkYourAnswers(
             question = Messages("renewal.customer.outside.uk.title"),
             editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
-            ) {
+        ) {
             @boa.countries.fold {
-            <p>@Messages("lbl.no")</p>
+                <p>@Messages("lbl.no")</p>
             } { branches =>
-            <ul class="list list-bullet">
-                @branches.map { country =>
-                <li>@country</li>
-                }
-            </ul>
+                <ul class="list list-bullet">
+                    @branches.map { country =>
+                    <li>@country</li>
+                    }
+                </ul>
             }
         }
-    }
-
-    @model.percentageOfCashPaymentOver15000.map { p =>
-        @checkYourAnswers(
-            question = Messages("hvd.percentage.title"),
-            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
-            ) {
-                <p>@p match {
-                    case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
-                    case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
-                    case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
-                    case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
-                    case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
-                }</p>
-            }
     }
 
     @bmMsbServices.map {services =>
@@ -177,6 +162,51 @@
                 }
             }
             }
+        }
+    }
+
+    @model.percentageOfCashPaymentOver15000.map { p =>
+        @checkYourAnswers(
+            question = Messages("renewal.hvd.percentage.title"),
+            editUrl = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+        ) {
+            <p>@p match {
+                case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
+                case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
+                case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
+                case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
+            }
+        }
+
+        @model.receiveCashPayments.map { rcp =>
+            @checkYourAnswers(
+                question = Messages("renewal.receiving.title"),
+                editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
+            ) {
+                @rcp.paymentMethods match {
+                    case None => {<p>@Messages("lbl.no")</p>}
+                    case Some(pm:PaymentMethods) => {
+                        <p>@Messages("lbl.yes")</p>
+                        @checkYourAnswersExtra(
+                            question = Messages("renewal.receiving.expect.to.receive")
+                        ) {
+                            <ul class="list list--comma">
+                                <li>@pm match {
+                                    case PaymentMethods(false, false, None) => { Unknown }
+                                    case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                    case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                    case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                                    }</li>
+                            </ul>
+                        }
+                    }
+                }
         }
     }
 
