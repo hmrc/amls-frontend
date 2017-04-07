@@ -90,7 +90,7 @@ class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSug
                 val result = controller.post()(validFormRequest)
 
                   status(result) mustBe SEE_OTHER
-                redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+                redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
               }
 
               "redirect to the summary page when edit = true" in new FormSubmissionFixture {
