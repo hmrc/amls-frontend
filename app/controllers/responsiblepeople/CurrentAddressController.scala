@@ -84,7 +84,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
 
-        if (status == SubmissionDecisionApproved && redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress) && originalResponsiblePerson.map {
+        if (status == SubmissionDecisionApproved && redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress) && originalResponsiblePerson.flatMap {
           orp => orp.lineId
         }.isDefined && originalAddress.isDefined) {
           Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))

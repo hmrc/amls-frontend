@@ -210,7 +210,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
