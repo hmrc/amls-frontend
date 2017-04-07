@@ -134,10 +134,26 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
 
-      result.get.messageText.get mustBe Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForVariation",Currency(1234),"ABC1234")
     }
 
-    "return correct message content when contact type is not ReminderToPayForRenewal" in new Fixture {
+    "return correct message content when contact type is ReminderToPayForApplication" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForApplication),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication))
+
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForApplication",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is ReminderToPayForRenewal" in new Fixture {
 
       val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
 
@@ -150,23 +166,39 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
 
-      result.get.messageText.get mustBe reminderVariationMessage
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForRenewal",Currency(1234),"ABC1234")
     }
 
-    "return empty Notification Details when contact type is not ReminderToPayForRenewal" in new Fixture {
+    "return correct message content when contact type is ReminderToPayForManualCharges" in new Fixture {
 
       val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
 
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
-          NotificationDetails(Some(ReminderToPayForRenewal),
+          NotificationDetails(Some(ReminderToPayForManualCharges),
             None,
             Some(reminderVariationMessage),
             true))))
 
-      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges))
 
-      result.get.messageText.get mustBe reminderVariationMessage
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is not ReminderToPay or static content" in new Fixture {
+
+      val message = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(MindedToReject),
+            None,
+            Some(message),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToReject))
+
+      result.get.messageText.get mustBe message
     }
   }
 }

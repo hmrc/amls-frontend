@@ -27,6 +27,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
            ContactType.DeRegistrationEffectiveDateChange =>
+
         Future.successful(
           Some(NotificationDetails(
             Some(contactType),
@@ -37,24 +38,27 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           )
         )
 
-      case ContactType.ReminderToPayForVariation => {
+      case ContactType.ReminderToPayForVariation |
+           ContactType.ReminderToPayForRenewal |
+           ContactType.ReminderToPayForApplication |
+           ContactType.ReminderToPayForManualCharges =>
+
         val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
         details.map {
           case Some(notificationDetails) => {
-              for {
-                message <- notificationDetails.messageText
-                details <- NotificationDetails.convertMessageText(message)
-              } yield {
-                notificationDetails.copy(messageText = Some(messagesApi(
-                  "notification.reminder-to-pay-variation",
-                  details.paymentAmount,
-                  details.referenceNumber)))
-              }
+            for {
+              message <- notificationDetails.messageText
+              details <- NotificationDetails.convertMessageText(message)
+            } yield {
+              notificationDetails.copy(messageText = Some(messagesApi(
+                s"notification.reminder.to.pay.$contactType",
+                details.paymentAmount,
+                details.referenceNumber)))
+            }
           }
           case _ => None
         }
-      }
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
     }
