@@ -1,6 +1,7 @@
 package views.renewal
 
-import forms.{Form2, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.renewal.MsbWhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -49,30 +50,30 @@ class msb_which_currenciesSpec extends GenericTestHelper with MustMatchers {
       Option(doc.getElementById("usesForeignCurrencies-No")).isDefined must be(true)
     }
 
-//    "show errors in the correct locations" in new ViewFixture {
-//
-//      val form2: InvalidForm = InvalidForm(Map.empty,
-//        Seq(
-//          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-//          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-//          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
-//        ))
-//
-//      def view = msb_which_currencies(form2, true)
-//
-//      errorSummary.html() must include("not a message Key")
-//      errorSummary.html() must include("second not a message Key")
-//      errorSummary.html() must include("third not a message Key")
-//
-//      doc.getElementById("id1")
-//        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-//
-//      doc.getElementById("id2")
-//        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-//
-//      doc.getElementById("id3")
-//        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
-//
-//    }
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
+          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+        ))
+
+      def view = msb_which_currencies(form2, true)
+
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
+      errorSummary.html() must include("third not a message Key")
+
+      doc.getElementById("id1")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+      doc.getElementById("id2")
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+
+      doc.getElementById("id3")
+        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+
+    }
   }
 }

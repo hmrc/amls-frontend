@@ -24,7 +24,7 @@ object MsbWhichCurrencies {
   type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
   type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
-  val emptyToNone: String => Option[String] = { x =>
+  private val emptyToNone: String => Option[String] = { x =>
     x.trim() match {
       case "" => None
       case s => Some(s)

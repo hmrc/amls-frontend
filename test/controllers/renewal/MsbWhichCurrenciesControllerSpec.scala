@@ -100,15 +100,6 @@ class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSug
         redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
       }
 
-      "return a bad request" when {
-        "the form fails validation" in new FormSubmissionFixture {
-          val result = controller.post()(request)
-
-          status(result) mustBe BAD_REQUEST
-          verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
-        }
-      }
-
       "save the model data into the renewal object" in new FormSubmissionFixture {
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
@@ -122,6 +113,14 @@ class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSug
           Some(WholesalerMoneySource("wholesaler names")),
           Some(true)
         ))
+      }
+    }
+    "return a bad request" when {
+      "the form fails validation" in new FormSubmissionFixture {
+        val result = controller.post()(request)
+
+        status(result) mustBe BAD_REQUEST
+        verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
       }
     }
   }

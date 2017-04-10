@@ -117,8 +117,6 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
         val headers = doc.select("section.check-your-answers h2")
         val header = headers.toList.find(e => e.text() == Messages(key))
 
-        //println("header: " + header + "key: " + key + "check: " + check)
-
         header must not be None
         val section = header.get.parents().select("section").first()
         check(section) must be(true)
