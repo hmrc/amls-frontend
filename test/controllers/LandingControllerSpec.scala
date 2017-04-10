@@ -10,6 +10,7 @@ import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -21,7 +22,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
@@ -280,6 +281,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     val testTcsp = Tcsp(hasChanged = hasChanged)
     val testTradingPremises = Seq(TradingPremises(hasChanged = hasChanged))
     val testHvd = Hvd(hasChanged = hasChanged)
+    val testRenewal = Renewal(hasChanged = hasChanged)
 
     when(result.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
     when(result.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
@@ -293,6 +295,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     when(result.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
     when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
     when(result.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
+    when(result.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
 
     if (includesResponse) {
       val testResponse = SubscriptionResponse(
@@ -347,6 +350,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               when(emptyCacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(None)
               when(emptyCacheMap.getEntry[Hvd](Hvd.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[Renewal](Renewal.key)).thenReturn(None)
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
               val result = controller.get()(request)
