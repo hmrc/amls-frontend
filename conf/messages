@@ -1489,7 +1489,7 @@ progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
 
-renewal.involvedinother.title = Is your business involved in any other activities?
+renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
@@ -1525,6 +1525,8 @@ renewal.receiving.expect.to.receive = How did you receive these payments?
 renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €15,000?
 
 renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
+
+renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
