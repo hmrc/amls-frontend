@@ -4,8 +4,8 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.renewal.{MsbSendTheLargestAmountsOfMoney, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.send_largest_amounts_of_money
@@ -23,17 +23,17 @@ class MsbSendTheLargestAmountsOfMoneyController @Inject()(
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Renewal](Renewal.key) map {
         response =>
-          val form: Form2[SendTheLargestAmountsOfMoney] = (for {
+          val form: Form2[MsbSendTheLargestAmountsOfMoney] = (for {
             renewal <- response
             amount <- renewal.sendTheLargestAmountsOfMoney
-          } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
+          } yield Form2[MsbSendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
           Ok(send_largest_amounts_of_money(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[SendTheLargestAmountsOfMoney](request.body) match {
+      Form2[MsbSendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(send_largest_amounts_of_money(f, edit)))
         case ValidForm(_, data) =>

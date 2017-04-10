@@ -6,7 +6,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
-import models.renewal.{MostTransactions, Renewal}
+import models.renewal.{MsbMostTransactions, Renewal}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -24,7 +24,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
             val form = (for {
               msb <- response
               transactions <- msb.mostTransactions
-            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
+            } yield Form2[MsbMostTransactions](transactions)).getOrElse(EmptyForm)
             Ok(views.html.renewal.most_transactions(form, edit))
         }
   }
@@ -40,7 +40,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[MostTransactions](request.body) match {
+        Form2[MsbMostTransactions](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit)))
           case ValidForm(_, data) =>

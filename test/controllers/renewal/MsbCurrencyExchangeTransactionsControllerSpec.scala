@@ -69,7 +69,7 @@ class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper wi
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.renewal.transactions.in.12months"))
+      contentAsString(result) must include (Messages("error.required.renewal.ce.transactions.in.12months"))
 
     }
 

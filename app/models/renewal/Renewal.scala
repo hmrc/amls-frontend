@@ -3,19 +3,19 @@ package models.renewal
 import play.api.libs.json.Json
 
 case class Renewal(
-  involvedInOtherActivities: Option[InvolvedInOther] = None,
-  businessTurnover: Option[BusinessTurnover] = None,
-  turnover: Option[AMLSTurnover] = None,
-  customersOutsideUK: Option[CustomersOutsideUK] = None,
-  percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-  receiveCashPayments: Option[ReceiveCashPayments] = None,
-  msbThroughput: Option[MsbThroughput] = None,
-  msbWhichCurrencies: Option[MsbWhichCurrencies] = None,
-  msbTransfers: Option[MsbMoneyTransfers] = None,
-  sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
-  mostTransactions: Option[MostTransactions] = None,
-  ceTransactions: Option[CETransactions] = None,
-  hasChanged: Boolean = false
+                    involvedInOtherActivities: Option[InvolvedInOther] = None,
+                    businessTurnover: Option[BusinessTurnover] = None,
+                    turnover: Option[AMLSTurnover] = None,
+                    customersOutsideUK: Option[CustomersOutsideUK] = None,
+                    percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+                    receiveCashPayments: Option[ReceiveCashPayments] = None,
+                    msbThroughput: Option[MsbThroughput] = None,
+                    msbWhichCurrencies: Option[MsbWhichCurrencies] = None,
+                    msbTransfers: Option[MsbMoneyTransfers] = None,
+                    sendTheLargestAmountsOfMoney: Option[MsbSendTheLargestAmountsOfMoney] = None,
+                    mostTransactions: Option[MsbMostTransactions] = None,
+                    ceTransactions: Option[CETransactions] = None,
+                    hasChanged: Boolean = false
 ) {
   def isComplete = {
     this match {
@@ -52,13 +52,13 @@ case class Renewal(
   def msbTransfers(model: MsbMoneyTransfers): Renewal =
     this.copy(msbTransfers = Some(model), hasChanged = hasChanged || !this.msbTransfers.contains(model))
 
-  def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
+  def sendTheLargestAmountsOfMoney(p: MsbSendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
 
   def ceTransactions(p: CETransactions): Renewal =
     this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
 
-  def mostTransactions(model: MostTransactions): Renewal =
+  def mostTransactions(model: MsbMostTransactions): Renewal =
     this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
 }
 

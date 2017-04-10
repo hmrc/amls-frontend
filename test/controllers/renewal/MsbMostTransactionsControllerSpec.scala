@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessMatching, ChequeCashingScrapMetal, CurrencyExchange, MsbServices}
-import models.renewal.{CETransactions, MostTransactions, Renewal}
+import models.renewal.{CETransactions, MsbMostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -47,7 +47,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val model = Renewal(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             models.countries.take(3)
           )
         )
@@ -91,7 +91,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -125,7 +125,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -179,7 +179,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
           "1223131"
         )),
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -219,7 +219,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -250,7 +250,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
