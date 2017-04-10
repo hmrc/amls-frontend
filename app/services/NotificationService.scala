@@ -33,32 +33,28 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
            ContactType.ReminderToPayForApplication |
            ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType)
 
-      case ContactType.ApplicationApproval => {
-        val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
-
-        details.map {
-          case Some(notificationDetails) => {
-            for {
-              message <- notificationDetails.messageText
-              details <- NotificationDetails.convertEndDateMessageText(message)
-            } yield {
-              notificationDetails.copy(messageText = Some(messagesApi(
-                s"notification.message.with.end.date.$contactType",
-                details.endDate,
-                details.referenceNumber)))
-            }
-          }
-          case _ => None
-        }
-      }
+      case ContactType.ApplicationApproval => handleEndDateMessage(amlsRegNo, id, contactType)
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
     }
 
   }
 
+
+  private def handleStaticMessage(contactType: ContactType): Future[Some[NotificationDetails]] = {
+    Future.successful(
+      Some(NotificationDetails(
+        Some(contactType),
+        None,
+        Some(messagesApi(s"notification.static.text.$contactType",
+          controllers.routes.StatusController.get())),
+        false)
+      )
+    )
+  }
+
   private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType)
-                           (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+                                   (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
     val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
     details.map {
@@ -77,15 +73,23 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleStaticMessage(contactType: ContactType): Future[Some[NotificationDetails]] = {
-    Future.successful(
-      Some(NotificationDetails(
-        Some(contactType),
-        None,
-        Some(messagesApi(s"notification.static.text.$contactType",
-          controllers.routes.StatusController.get())),
-        false)
-      )
-    )
+  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
+                          (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+    val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
+
+    details.map {
+      case Some(notificationDetails) => {
+        for {
+          message <- notificationDetails.messageText
+          details <- NotificationDetails.convertEndDateMessageText(message)
+        } yield {
+          notificationDetails.copy(messageText = Some(messagesApi(
+            s"notification.message.with.end.date.$contactType",
+            details.endDate,
+            details.referenceNumber)))
+        }
+      }
+      case _ => None
+    }
   }
 }

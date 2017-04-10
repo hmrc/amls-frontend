@@ -3,6 +3,7 @@ package models.notifications
 import models.confirmation.Currency
 import models.notifications.ContactType.{RegistrationVariationApproval, ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange}
 import models.notifications.StatusType.DeRegistered
+import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
@@ -35,8 +36,15 @@ case class NotificationDetails(contactType : Option[ContactType],
 
 object NotificationDetails {
 
+  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
+
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
-    Some(EndDateDetails(new LocalDate(2018,7,31), Some("testref")))
+    inputString.split("\\|").toList match {
+      case date::ref::tail =>
+        val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
+        Some(EndDateDetails(dateValue,Some(splitByDash(ref))))
+      case _ => None
+    }
   }
 
   def convertMessageText(inputString: String): Option[ReminderDetails] = {
