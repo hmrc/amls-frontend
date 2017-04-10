@@ -55,24 +55,29 @@ class msb_which_currenciesSpec extends GenericTestHelper with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "currencies") -> Seq(ValidationError("not a message Key")),
-          (Path \ "usesForeignCurrencies") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "bankMoneySource") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "bankNames") -> Seq(ValidationError("third not a message Key")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("fifth not a message Key")),
+          (Path \ "usesForeignCurrencies") -> Seq(ValidationError("seventh not a message Key"))
         ))
 
       def view = msb_which_currencies(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
       errorSummary.html() must include("third not a message Key")
+      errorSummary.html() must include("fifth not a message Key")
 
       doc.getElementById("currencies")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("usesForeignCurrencies")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("WhoWillSupply")
+      doc.getElementById("usesForeignCurrency-fieldset")
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+
+      doc.getElementById("usesForeignCurrency-fieldset")
+        .getElementsByClass("form-field--error").first().nextElementSibling().nextElementSibling()
+        .getElementsByClass("error-notification").first().html()must include("fifth not a message Key")
+
+      doc.getElementById("usesForeignCurrencies")
+        .getElementsByClass("error-notification").first().html() must include("seventh not a message Key")
 
     }
   }
