@@ -1525,6 +1525,8 @@ renewal.receiving.expect.to.receive = How did you receive these payments?
 renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €15,000?
 
 renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
+
+renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
