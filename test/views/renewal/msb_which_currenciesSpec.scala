@@ -54,9 +54,9 @@ class msb_which_currenciesSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "currencies") -> Seq(ValidationError("not a message Key")),
+          (Path \ "usesForeignCurrencies") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "bankMoneySource") -> Seq(ValidationError("third not a message Key"))
         ))
 
       def view = msb_which_currencies(form2, true)
@@ -65,13 +65,13 @@ class msb_which_currenciesSpec extends GenericTestHelper with MustMatchers {
       errorSummary.html() must include("second not a message Key")
       errorSummary.html() must include("third not a message Key")
 
-      doc.getElementById("id1")
+      doc.getElementById("currencies")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("id2")
+      doc.getElementById("usesForeignCurrencies")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
-      doc.getElementById("id3")
+      doc.getElementById("WhoWillSupply")
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
     }
