@@ -21,7 +21,8 @@ object Conversions {
 
       val msbSection = request.msbSection match {
         case Some(msb) => Some(msb.copy(
-          throughput = renewal.msbThroughput contramap MsbThroughput.convert
+          throughput = renewal.msbThroughput contramap MsbThroughput.convert,
+          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert
         ))
         case _ => None
       }

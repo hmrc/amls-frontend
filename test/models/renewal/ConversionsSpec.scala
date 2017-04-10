@@ -61,6 +61,38 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       converted.msbSection.get.throughput mustBe Some(models.moneyservicebusiness.ExpectedThroughput.Third)
     }
 
+    "convert the 'MSB money transfers' model" in new Fixture {
+      val model = MsbMoneyTransfers(2)
+      val renewal = Renewal(msbTransfers = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.transactionsInNext12Months mustBe Some(models.moneyservicebusiness.TransactionsInNext12Months)
+    }
+
+    "convert the 'MSB largest amounts' model" in new Fixture {
+      val model = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
+      val renewal = Renewal(sendTheLargestAmountsOfMoney = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.sendTheLargestAmountsOfMoney mustBe Some(models.moneyservicebusiness.SendTheLargestAmountsOfMoney)
+    }
+
+    "convert the 'MSB most transactions' model" in new Fixture {
+      val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
+      val renewal = Renewal(mostTransactions = Some(model))
+      val converted = subscriptionRequest.withRenewalData((renewal))
+
+      converted.msbSection.get.mostTransactions mustBe Some(models.moneyservicebusiness.MostTransactions)
+    }
+
+    "convert the 'MSB currency transactions' model" in new Fixture {
+      val model = CETransactions("12345678963")
+      val renewal = Renewal(ceTransactions = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months)
+    }
+
   }
 
 }

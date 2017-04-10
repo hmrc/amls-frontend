@@ -22,4 +22,8 @@ object MsbMoneyTransfers {
     (__ \ "transfers").write[Int] contramap(_.transfers)
   }
 
+  implicit def convert(model: MsbMoneyTransfers): models.moneyservicebusiness.TransactionsInNext12Months = {
+    models.moneyservicebusiness.TransactionsInNext12Months
+  }
+
 }
