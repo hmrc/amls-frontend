@@ -16,11 +16,13 @@
 
     @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.post(edit)) {
 
+
         @fieldset(
             f = f("isUK"),
             legend = "aboutthebusiness.registeredoffice.lbl",
             legendHidden = false,
-            panel = false
+            panel = false,
+            classes = Seq("form-group")
         ) {
             @radio(
                 f = f("isUK"),
