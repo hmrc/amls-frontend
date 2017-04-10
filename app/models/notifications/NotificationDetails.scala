@@ -1,5 +1,6 @@
 package models.notifications
 
+import models.confirmation.Currency
 import models.notifications.ContactType.{RegistrationVariationApproval, ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange}
 import models.notifications.StatusType.DeRegistered
 import play.api.libs.json.Json
@@ -7,7 +8,7 @@ import play.api.libs.json.Json
 case class NotificationDetails(contactType : Option[ContactType],
                                status : Option[Status],
                                messageText : Option[String],
-                               variation : Boolean) extends SubjectBuilder {
+                               variation : Boolean) {
 
   def getContactType: ContactType = {
 
@@ -16,7 +17,6 @@ case class NotificationDetails(contactType : Option[ContactType],
       reason <- st.statusReason
     } yield reason
 
-
     contactType.getOrElse(
       (status, statusReason, variation) match {
         case (Some(Status(Some(DeRegistered),_)),_,_) => DeRegistrationEffectiveDateChange
@@ -24,12 +24,24 @@ case class NotificationDetails(contactType : Option[ContactType],
         case (_,_, true) => RegistrationVariationApproval
         case _ => throw new RuntimeException("No matching ContactType found")
       }
-
     )
   }
 
+  def subject = {
+    s"notifications.subject.$getContactType"
+  }
 }
 
 object NotificationDetails {
+  def convertMessageText(inputString: String): Option[ReminderDetails] = {
+    inputString.split("\\|").toList match {
+      case amount::ref::tail =>
+        Some(ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref)))
+      case _ => None
+    }
+  }
+
+  private def splitByDash(s: String): String = s.split("-")(1)
+
   implicit val reads = Json.reads[NotificationDetails]
 }

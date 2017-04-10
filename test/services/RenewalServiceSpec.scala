@@ -37,6 +37,14 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+      Some(MsbThroughput("01")),
+      Some(MsbMoneyTransfers(1500)),
+      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactions("123")),
+      // Add other models here
       true)
 
   }

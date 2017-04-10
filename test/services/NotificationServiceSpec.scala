@@ -1,19 +1,21 @@
 package services
 
 import connectors.AmlsNotificationConnector
+import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationApproval, AutoExpiryOfRegistration, MindedToReject, MindedToRevoke, NoLongerMindedToReject, NoLongerMindedToRevoke, Others, RejectionReasons, ReminderToPayForApplication, ReminderToPayForManualCharges, ReminderToPayForRenewal, ReminderToPayForVariation, RenewalApproval, RenewalReminder, RevocationReasons}
-import models.notifications.{ContactType, IDType, NotificationRow}
+import models.notifications.{NotificationDetails, ContactType, IDType, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{Messages, I18nSupport, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -117,6 +119,86 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
           controllers.routes.StatusController.get() +
           """">your status page</a>.</p>"""
         )
+    }
+
+    "return correct message content when contact type is ReminderToPayForVariation" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForVariation),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
+
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForVariation",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is ReminderToPayForApplication" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForApplication),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication))
+
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForApplication",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is ReminderToPayForRenewal" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForRenewal),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
+
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForRenewal",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is ReminderToPayForManualCharges" in new Fixture {
+
+      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(ReminderToPayForManualCharges),
+            None,
+            Some(reminderVariationMessage),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges))
+
+      result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges",Currency(1234),"ABC1234")
+    }
+
+    "return correct message content when contact type is not ReminderToPay or static content" in new Fixture {
+
+      val message = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+
+      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(
+          NotificationDetails(Some(MindedToReject),
+            None,
+            Some(message),
+            true))))
+
+      val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToReject))
+
+      result.get.messageText.get mustBe message
     }
   }
 }

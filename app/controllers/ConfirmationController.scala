@@ -1,14 +1,16 @@
 package controllers
 
+import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AuthenticatorConnector, DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
-import play.api.{Logger, Play}
 import play.api.mvc.{AnyContent, Request}
+import play.api.{Logger, Play}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -32,8 +34,7 @@ trait ConfirmationController extends BaseController {
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
+    implicit authContext => implicit request =>
         for {
           status <- statusService.getStatus
           result <- resultFromStatus(status)
@@ -42,58 +43,64 @@ trait ConfirmationController extends BaseController {
   }
 
   def paymentConfirmation(reference: String) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-          case Some(bm) if bm.reviewDetails.isDefined =>
-            Ok(payment_confirmation(bm.reviewDetails.get.businessName, reference))
-          case _ =>
-            Ok(payment_confirmation("", reference))
-        }
+    implicit authContext => implicit request =>
+      val companyNameT = for {
+        r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      } yield r.reviewDetails.fold("")(_.businessName)
+
+      val result = for {
+        status <- OptionT.liftF(statusService.getStatus)
+        businessName <- companyNameT orElse OptionT.some("")
+      } yield status match {
+        case SubmissionReadyForReview | SubmissionDecisionApproved => Ok(payment_confirmation_amendvariation(businessName, reference))
+        case _ => Ok(payment_confirmation(businessName, reference))
+      }
+
+      result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = status match {
-    case SubmissionReadyForReview => {
-      for {
-        fees <- getAmendmentFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
-        bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-      } yield fees match {
-        case Some((payRef, total, rows, difference)) => Ok(views.html.confirmation.confirm_amendment(payRef, total, rows, difference, paymentsRedirect.url))
-          .withCookies(paymentsRedirect.responseCookies: _*)
-        case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
-      }
-    }
-    case SubmissionDecisionApproved => {
-      for {
-        fees <- getVariationFees
-        paymentsRedirect <- requestPaymentsUrl(fees, controllers.routes.LandingController.get().url)
-        bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-      } yield fees match {
-        case Some((payRef, total, rows, _)) => Ok(views.html.confirmation.confirmation_variation(payRef, total, rows, paymentsRedirect.url))
-          .withCookies(paymentsRedirect.responseCookies: _*)
-        case None if bm.reviewDetails.isDefined => Ok(views.html.confirmation.confirmation_no_fee(bm.reviewDetails.get.businessName))
-      }
-    }
-    case _ => {
-      for {
-        (paymentRef, total, rows) <- submissionService.getSubscription
-        paymentsRedirect <- requestPaymentsUrl(Some((paymentRef, total, rows, None)),
-          controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url)
-      } yield {
-        ApplicationConfig.paymentsUrlLookupToggle match {
-          case true => Ok(views.html.confirmation.confirmation_new(paymentRef, total, rows, paymentsRedirect.url))
-            .withCookies(paymentsRedirect.responseCookies: _*)
-          case _ => Ok(views.html.confirmation.confirmation(paymentRef, total, rows))
+  private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+
+    def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
+
+    val maybeResult = status match {
+      case SubmissionReadyForReview =>
+        for {
+          fees@(payRef, total, rows, difference) <- OptionT(getAmendmentFees)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, returnLocation(payRef)))
+        } yield {
+          Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         }
-      }
+      case SubmissionDecisionApproved =>
+        for {
+          fees@(payRef, total, rows, _) <- OptionT(getVariationFees)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+        } yield {
+          Ok(confirm_amendvariation(payRef, total, rows, None, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+        }
+      case _ =>
+        for {
+          (paymentRef, total, rows) <- OptionT.liftF(submissionService.getSubscription)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((paymentRef, total, rows, None), routes.ConfirmationController.paymentConfirmation(paymentRef).url))
+        } yield {
+          ApplicationConfig.paymentsUrlLookupToggle match {
+            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+            case _ => Ok(confirmation(paymentRef, total, rows))
+          }
+        }
     }
+
+    lazy val noFeeResult = for {
+      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+    } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
+
+    maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def requestPaymentsUrl(data: Option[ViewData], returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
+  private def requestPaymentsUrl(data: ViewData, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
   : Future[PaymentServiceRedirect] = data match {
-    case Some((ref, _, _, Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl)
-    case Some((ref, total, _, None)) => paymentsUrlOrDefault(ref, total, returnUrl)
+    case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
+    case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl)
     case _ => Future.successful(PaymentServiceRedirect(ApplicationConfig.paymentsUrl))
   }
 

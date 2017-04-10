@@ -20,15 +20,13 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-
-
-      def view = views.html.renewal.summary(Renewal(), None)
+      def view = views.html.renewal.summary(Renewal(), None, None)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.renewal.summary(Renewal(), None)
+      def view = views.html.renewal.summary(Renewal(), None, None)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -64,7 +62,12 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
-      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom"))
+      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
+      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
+      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
+      ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500")),
+      ("msb.send.the.largest.amounts.of.money.title", checkElementTextIncludes(_, "america")),
+      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -74,6 +77,13 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+          Some(MsbThroughput("01")),
+          Some(MsbMoneyTransfers(1500)),
+          Some(SendTheLargestAmountsOfMoney(Country("america", "US"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactions("123")),
           false
         )
 
@@ -87,15 +97,26 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
             TelephonePaymentService)
         )
 
-        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel))
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney,
+              CurrencyExchange,
+              ChequeCashingNotScrapMetal,
+              ChequeCashingScrapMetal
+            )
+          )
+        )
+
+        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel), msbServices)
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
-        val section = hTwo.get.parents().select("section").first()
+        header must not be None
+        val section = header.get.parents().select("section").first()
         check(section) must be(true)
       }}
     }

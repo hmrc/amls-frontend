@@ -43,7 +43,8 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.CurrentAddressController.get(index, edit, fromDeclaration))
+              case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, fromDeclaration))
+              case false if index == 1 => Redirect(routes.ConfirmAddressController.get(index))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

@@ -9,11 +9,11 @@ s"""${f("utrNumber").id}-fieldset"""
 
 @header = {
     @rpErrorSummary(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforselfassessment.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.registeredforselfassessment.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
 
@@ -54,9 +54,8 @@ s"""${f("utrNumber").id}-fieldset"""
                 attrMaxlength = "10",
                 attrPattern = "[0-9]{1,10}",
                 bold = false,
-                classes = Seq("form-control-1-4 form-control-1-4"),
                 field = f("utrNumber"),
-                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
                 labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
             )
         }

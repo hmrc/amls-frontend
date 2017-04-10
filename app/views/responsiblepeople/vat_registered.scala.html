@@ -9,11 +9,11 @@
 
 @header = {
     @rpErrorSummary(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.registeredforvat.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.registeredforvat.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforvat.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.registeredforvat.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -56,7 +56,6 @@
                 attrMaxlength = "9",
                 attrPattern = "[0-9]{1,9}",
                 bold = false,
-                classes = Seq("form-control-1-4 form-control-1-4"),
                 hintText = "lbl.hint.vat"
 
             )

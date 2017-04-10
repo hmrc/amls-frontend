@@ -59,8 +59,8 @@ GET         /trading-premises/add                                       @control
 GET         /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
 POST        /trading-premises/premises/:index                           @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
 
-GET         /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/premises/premises-details/:index          controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/premises-details/:index                   controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/premises-details/:index                   controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/trading-start-date/:index                 @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
@@ -252,8 +252,14 @@ POST        /responsible-people/your-name/:index                        controll
 GET         /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
-GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
+POST        /responsible-people/address/:index                           @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
+
+GET         /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/new-address/:index                       controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
+GET         /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-address/:index                  controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
@@ -271,6 +277,9 @@ GET         /responsible-people/person-details/:index                   controll
 GET         /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
+GET         /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
@@ -282,6 +291,9 @@ POST        /responsible-people/sole-proprietor/:index                  @control
 
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
+GET         /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/time-at-additional-extra-address/:index controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
@@ -428,6 +440,32 @@ POST        /renewal/business-turnover                                  @control
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
+GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
+GET         /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
+
 GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
+
+GET         /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
+
+GET         /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.get(edit: Boolean ?= false)
+POST        /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)
+
+GET         /renewal/msb/ce/currency                                    @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)

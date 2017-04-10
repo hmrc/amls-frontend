@@ -52,7 +52,7 @@ class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.sub.heading"))
-      contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.circumstances.info.text1"))
+
     }
   }
 

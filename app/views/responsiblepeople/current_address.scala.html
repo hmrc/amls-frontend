@@ -6,7 +6,7 @@
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.wherepersonlives.title", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.wherepersonlives.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -106,39 +106,6 @@
         }
 
         </div>
-
-        @fieldset(
-            f = f("timeAtAddress-fieldset"),
-            legend = "responsiblepeople.wherepersonlives.address_history",
-            jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
-        ) {
-            @errorGroup(
-                field = f("timeAtAddress")
-            ) {
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.wherepersonlives.5_months_history",
-                    value = "01"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.wherepersonlives.11_months_history",
-                    value = "02"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.wherepersonlives.3_years_history",
-                    value = "03"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.wherepersonlives.more_years_history",
-                    value = "04"
-                )
-            }
-        }
 
         @submit(edit, Some("button.saveandcontinue"))
     }
