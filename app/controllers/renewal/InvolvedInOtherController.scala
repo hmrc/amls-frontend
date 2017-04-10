@@ -90,8 +90,8 @@ class InvolvedInOtherController @Inject()(
   }
 
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
-    case false => Redirect(routes.AMLSTurnoverController.get(edit))
     case true => Redirect(routes.SummaryController.get())
+    case false => Redirect(routes.AMLSTurnoverController.get(edit))
   }
 
 }
