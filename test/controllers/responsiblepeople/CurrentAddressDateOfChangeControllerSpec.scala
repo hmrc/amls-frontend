@@ -44,7 +44,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
 
     "when post is called" when {
       "given valid data for a current address time ZeroToFiveMonths" must {
-        "redirect to the additional address page" in new Fixture {
+        "redirect to the how long at current address page" in new Fixture {
 
           val postRequest = request.withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
@@ -68,12 +68,12 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val result = controller.post(1, true)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, true).url))
 
         }
       }
       "given valid data for a current address time SixToElevenMonths" must {
-        "redirect to the additional address page" in new Fixture {
+        "redirect to the time at current address page" in new Fixture {
 
           val postRequest = request.withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
@@ -97,7 +97,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val result = controller.post(1, true)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, true).url))
 
         }
       }
