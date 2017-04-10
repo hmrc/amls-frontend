@@ -6,7 +6,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
-import models.renewal.{MostTransactions, Renewal}
+import models.renewal.{MsbMostTransactions, Renewal}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -24,13 +24,13 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
             val form = (for {
               msb <- response
               transactions <- msb.mostTransactions
-            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
+            } yield Form2[MsbMostTransactions](transactions)).getOrElse(EmptyForm)
             Ok(views.html.renewal.most_transactions(form, edit))
         }
   }
 
-  private def standardRouting(services: Set[MsbService], ceTransactionEmpty: Boolean, edit: Boolean): Result =
-    if ((services contains CurrencyExchange) && ceTransactionEmpty) {
+  private def standardRouting(services: Set[MsbService], edit: Boolean): Result =
+    if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.MsbCurrencyExchangeTransactionsController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
@@ -40,7 +40,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[MostTransactions](request.body) match {
+        Form2[MsbMostTransactions](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit)))
           case ValidForm(_, data) =>
@@ -55,7 +55,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
                   cache.save[Renewal](Renewal.key,
                     renewal.mostTransactions(data)
                   ) map { _ =>
-                      standardRouting(services.msbServices, renewal.ceTransactions.isEmpty, edit)
+                      standardRouting(services.msbServices, edit)
                    }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))

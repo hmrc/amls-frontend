@@ -22,7 +22,7 @@ class CETransactionsSpec extends PlaySpec {
         val map = Map("ceTransaction" -> Seq(""))
 
         CETransactions.formRule.validate(map) must be(Invalid(
-          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.required.renewal.transactions.in.12months")))))
+          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.required.renewal.ce.transactions.in.12months")))))
       }
 
       "fail validation on invalid field" in {

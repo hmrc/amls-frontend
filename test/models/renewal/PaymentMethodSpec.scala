@@ -21,7 +21,7 @@ class PaymentMethodSpec extends PlaySpec {
 
     "fail to validate when no payment method is selected" in {
       val data = Map.empty[String, Seq[String]]
-      PaymentMethods.formR.validate(data) mustEqual Invalid(Seq(Path -> Seq(ValidationError("error.required.hvd.choose.option"))))
+      PaymentMethods.formR.validate(data) mustEqual Invalid(Seq(Path -> Seq(ValidationError("error.required.renewal.hvd.choose.option"))))
     }
 
     "fail to validate when other is selected without details" in {
@@ -29,7 +29,7 @@ class PaymentMethodSpec extends PlaySpec {
         "other" -> Seq("true"),
         "details" -> Seq("")
       )
-      PaymentMethods.formR.validate(data) mustEqual Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.required.hvd.describe"))))
+      PaymentMethods.formR.validate(data) mustEqual Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.required.renewal.hvd.describe"))))
     }
 
     "fail to validate when invalid characters are specified in 'other details'" in {

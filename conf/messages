@@ -291,7 +291,26 @@ error.required.hvd.percentage = Select one option to show how much of your turno
 
 ################################# Renewal ###################################
 error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
+error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €15,000 in the last 12 months from customers you’ve not met in person
+error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
+error.required.renewal.hvd.describe = Enter details of how you received these payments
+
+error.required.renewal.ba.turnover.from.mlr = Select one option to show how much net profit your business made in the last 12 months from activities related to anti-money laundering supervision
+
+error.required.renewal.ba.business.turnover = Select one option to show the total net profit your business made in the last 12 months
+
+error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
+error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
+
+error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
+
+error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
+
+error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+
+error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in in the last 12 months
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -1470,7 +1489,7 @@ progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
 
-renewal.involvedinother.title = Is your business involved in any other activities?
+renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
@@ -1491,15 +1510,23 @@ renewal.msb.throughput.selection.5 = £21 million to £100 million
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
+renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
+
 renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
+renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
 
 renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
 renewal.receiving.expect.to.receive = How did you receive these payments?
+
+renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €15,000?
+
+renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
+
+renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback

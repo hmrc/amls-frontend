@@ -2,8 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
-import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.renewal.{MsbSendTheLargestAmountsOfMoney, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -13,7 +12,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -32,7 +30,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
-    val controller = new SendTheLargestAmountsOfMoneyController(
+    val controller = new MsbSendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService
@@ -53,14 +51,14 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be(Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.renewal") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+        document.title() must be(Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
       }
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(
-            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
+            Renewal(sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
           )))
 
         val result = controller.get()(request)
@@ -121,7 +119,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         status(result) must be(BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
+        document.select("a[href=#country_1]").html() must include(Messages("error.required.renewal.country.name"))
       }
     }
   }

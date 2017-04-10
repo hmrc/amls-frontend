@@ -67,17 +67,18 @@
                 value = "true",
                 target = s"#paymentMethods-details-fieldset"
             )
-        }
-    }
 
-    @panel(
-        field = Some(f("paymentMethods-details-fieldset")),
-        jsHidden = true
-    ) {
-        @input(
-            field = f("paymentMethods.details"),
-            labelText = "hvd.receiving.give.details.lbl"
-        )
+            @panel(
+                field = Some(f("paymentMethods-details-fieldset")),
+                jsHidden = true,
+                panel = false
+            ) {
+                @input(
+                    field = f("paymentMethods.details"),
+                    labelText = "hvd.receiving.give.details.lbl"
+                )
+            }
+        }
     }
 
     @submit(edit)

@@ -426,46 +426,45 @@ POST        /high-value-dealer/receiving                                controll
 GET         /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.get
 POST        /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.post
 
+GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
+POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
+
 GET         /renewal/what-you-need                                      @controllers.renewal.WhatYouNeedController.get()
 
 GET         /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /renewal/confirm-activities                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
 
-GET         /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
-
 GET         /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /renewal/business-turnover                                  @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
+
+GET         /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /renewal/turnover                                           @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
 
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
+GET         /renewal/anticipated-totals                                 @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/anticipated-totals                                 @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+
+GET         /renewal/transfers                                          @controllers.renewal.MsbMoneyTransfersController.get(edit: Boolean ?= false)
+POST        /renewal/transfers                                          @controllers.renewal.MsbMoneyTransfersController.post(edit: Boolean ?= false)
+
+GET         /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+
+GET         /renewal/most-transactions                                  @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/most-transactions                                  @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)
+
+GET         /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)
+
+GET         /renewal/currency                                           @controllers.renewal.MsbWhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /renewal/currency                                           @controllers.renewal.MsbWhichCurrenciesController.post(edit: Boolean ?= false)
+
 GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 POST        /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
-GET         /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
-POST        /renewal/hvd/receiving                                      @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+GET         /renewal/receiving                                          @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /renewal/receiving                                          @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                 @controllers.renewal.SummaryController.get()
-
-GET         /renewal/progress                                           @controllers.renewal.RenewalProgressController.get()
-POST        /renewal/progress                                           @controllers.renewal.RenewalProgressController.post()
-
-GET         /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
-POST        /renewal/msb/anticipated-totals                             @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
-
-GET         /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
-POST        /renewal/msb/largest-amounts                                @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
-
-GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
-
-GET         /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.get(edit: Boolean ?= false)
-POST        /renewal/msb/transfers                                      @controllers.renewal.MsbMoneyTransfersController.post(edit: Boolean ?= false)
-
-GET         /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
-POST        /renewal/msb/most-transactions                              @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)
-
-GET         /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
-POST        /renewal/msb/ce/transaction-currency                        @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)
-
-GET         /renewal/msb/ce/currency                                    @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
