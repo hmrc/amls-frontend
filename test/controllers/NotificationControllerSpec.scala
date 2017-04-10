@@ -4,6 +4,7 @@ import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -12,6 +13,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
@@ -139,8 +141,24 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       status(result) mustBe 200
       contentAsString(result) must include("Message Text")
     }
-  }
 
+    "display the message view given the message id for contactType ReminderToPayForVariation" in new Fixture {
+      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("Registration Number")))
+
+      val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+
+      when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(NotificationDetails(Some(ReminderToPayForVariation), None, Some(reminderVariationMessage), false))))
+
+      val result = controller.messageDetails("dfgdhsjk",ContactType.ReminderToPayForVariation)(request)
+
+      status(result) mustBe 200
+      contentAsString(result) must include(
+        reminderVariationMessage
+      )
+    }
+  }
 }
 
 class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
