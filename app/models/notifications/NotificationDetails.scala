@@ -3,6 +3,7 @@ package models.notifications
 import models.confirmation.Currency
 import models.notifications.ContactType.{RegistrationVariationApproval, ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange}
 import models.notifications.StatusType.DeRegistered
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
 case class NotificationDetails(contactType : Option[ContactType],
@@ -33,6 +34,11 @@ case class NotificationDetails(contactType : Option[ContactType],
 }
 
 object NotificationDetails {
+
+  def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
+    Some(EndDateDetails(new LocalDate(2018,7,31), Some("testref")))
+  }
+
   def convertMessageText(inputString: String): Option[ReminderDetails] = {
     inputString.split("\\|").toList match {
       case amount::ref::tail =>
