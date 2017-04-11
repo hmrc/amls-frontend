@@ -15,7 +15,7 @@ sealed trait ReceiveCashPayments0 {
 
     import jto.validation.forms.Rules._
 
-    (__ \ "receivePayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap{
+    (__ \ "receivePayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap {
       case true =>
         (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
       case false => Rule.fromMapping { _ => Valid(ReceiveCashPayments(None)) }
@@ -30,9 +30,9 @@ sealed trait ReceiveCashPayments0 {
 
   private implicit def write[A]
   (implicit
-   mon:cats.Monoid[A],
+   mon: cats.Monoid[A],
    a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[PaymentMethods] , A]
+   b: Path => WriteLike[Option[PaymentMethods], A]
   ): Write[ReceiveCashPayments, A] =
     To[A] { __ =>
       (
@@ -41,7 +41,7 @@ sealed trait ReceiveCashPayments0 {
           case None => false
         } ~
           (__ \ "paymentMethods").write[Option[PaymentMethods]]
-        )(a => (a.paymentMethods, a.paymentMethods))
+        ) (a => (a.paymentMethods, a.paymentMethods))
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
@@ -49,7 +49,7 @@ sealed trait ReceiveCashPayments0 {
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
- val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
+  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
     import cats.implicits._
     import utils.MappingUtils.MonoidImplicits.urlMonoid
     import jto.validation.forms.Writes._
@@ -58,16 +58,17 @@ sealed trait ReceiveCashPayments0 {
   val jsonR: Reads[ReceiveCashPayments] = {
     implicitly[Reads[ReceiveCashPayments]]
   }
-  val jsonW = Writes[ReceiveCashPayments] {x =>
-   x.paymentMethods match {
-     case Some(paymentMtds) => Json.obj("receivePayments" -> true,
-       "paymentMethods" -> Json.obj("courier" -> paymentMtds.courier,
-       "direct" -> paymentMtds.direct,
-       "other" -> paymentMtds.other.isDefined,
-       "details" -> paymentMtds.other
-     ))
-     case None =>  Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
-   }
+  val jsonW = Writes[ReceiveCashPayments] { x =>
+    x.paymentMethods match {
+      case Some(paymentMtds) => Json.obj("receivePayments" -> true,
+        "paymentMethods" -> Json.obj(
+          "courier" -> paymentMtds.courier,
+          "direct" -> paymentMtds.direct,
+          "other" -> paymentMtds.other.isDefined,
+          "details" -> paymentMtds.other
+        ))
+      case None => Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
+    }
   }
 
 }
@@ -81,7 +82,9 @@ object ReceiveCashPayments {
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
-  implicit def convert(model: ReceiveCashPayments): models.hvd.ReceiveCashPayments = {
-    ???
+  implicit def convert(model: ReceiveCashPayments): models.hvd.ReceiveCashPayments = model.paymentMethods match {
+    case Some(paymentMethods) =>
+      models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)))
+    case None => models.hvd.ReceiveCashPayments(None)
   }
 }
