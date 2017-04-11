@@ -233,6 +233,11 @@ object MsbWhichCurrencies {
   }
 
   implicit def convert(model: MsbWhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
-    ???
+    models.moneyservicebusiness.WhichCurrencies(
+      model.currencies,
+      model.usesForeignCurrencies,
+      model.bankMoneySource,
+      model.wholesalerMoneySource,
+      model.customerMoneySource)
   }
 }

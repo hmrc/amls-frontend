@@ -77,6 +77,6 @@ object MsbMostTransactions {
   implicit val jsonW: Writes[MsbMostTransactions] = Cache.jsonW
 
   implicit def convert(model: MsbMostTransactions): models.moneyservicebusiness.MostTransactions = {
-    ???
+    models.moneyservicebusiness.MostTransactions(model.countries)
   }
 }
