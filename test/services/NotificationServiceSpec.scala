@@ -68,6 +68,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
   }
 
+  val messageWithAmountRefNumberAndStatus = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
+  val messageWithDateAndRefNumber = "parameter1-31/07/2018|parameter2-ABC1234"
+  val messageWithDate = "parameter1-31/07/2018"
+
+
   "The Notification Service" must {
 
     "get all notifications in order" in new Fixture {
@@ -123,13 +128,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is ReminderToPayForVariation" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(ReminderToPayForVariation),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithAmountRefNumberAndStatus),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
@@ -139,13 +142,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is ReminderToPayForApplication" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(ReminderToPayForApplication),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithAmountRefNumberAndStatus),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication))
@@ -155,13 +156,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is ReminderToPayForRenewal" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(ReminderToPayForRenewal),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithAmountRefNumberAndStatus),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
@@ -171,13 +170,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is ReminderToPayForManualCharges" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(ReminderToPayForManualCharges),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithAmountRefNumberAndStatus),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges))
@@ -187,13 +184,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is ApplicationApproval" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-31/07/2018|parameter2-ABC1234"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(ApplicationApproval),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithDateAndRefNumber),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
@@ -203,13 +198,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is RenewalApproval" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-31/07/2018"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(RenewalApproval),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithDate),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval))
@@ -219,13 +212,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is AutoExpiryOfRegistration" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-31/07/2018"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(AutoExpiryOfRegistration),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithDate),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration))
@@ -235,13 +226,11 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
     "return correct message content when contact type is RenewalReminder" in new Fixture {
 
-      val reminderVariationMessage = "parameter1-31/07/2018"
-
       when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(
           NotificationDetails(Some(RenewalReminder),
             None,
-            Some(reminderVariationMessage),
+            Some(messageWithDate),
             true))))
 
       val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))

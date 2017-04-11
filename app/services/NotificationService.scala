@@ -53,8 +53,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
         None,
         Some(messagesApi(s"notification.static.text.$contactType",
           controllers.routes.StatusController.get())),
-        false)
-      )
+        false
+      ))
     )
   }
 
@@ -71,7 +71,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.reminder.to.pay.$contactType",
             details.paymentAmount,
-            details.referenceNumber)))
+            details.referenceNumber
+          )))
         }
       }
       case _ => None
@@ -92,7 +93,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.message.with.end.date.$contactType",
             details.endDate,
-            details.referenceNumber.getOrElse(""))))
+            details.referenceNumber.getOrElse("")
+          )))
         }
       }
       case _ => None
