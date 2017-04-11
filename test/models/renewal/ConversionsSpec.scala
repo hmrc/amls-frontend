@@ -82,7 +82,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB most transactions' model" in new Fixture {
-      val model = MsbMostTransactions(Seq(Country("United Kingdom", "GB")))
+      val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
       val renewal = Renewal(mostTransactions = Some(model))
       val converted = subscriptionRequest.withRenewalData((renewal))
 

@@ -13,7 +13,7 @@ case class Renewal(
                     msbWhichCurrencies: Option[MsbWhichCurrencies] = None,
                     transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
                     sendTheLargestAmountsOfMoney: Option[MsbSendTheLargestAmountsOfMoney] = None,
-                    mostTransactions: Option[MsbMostTransactions] = None,
+                    mostTransactions: Option[MostTransactions] = None,
                     ceTransactions: Option[CETransactions] = None,
                     hasChanged: Boolean = false
 ) {
@@ -58,7 +58,7 @@ case class Renewal(
   def ceTransactions(p: CETransactions): Renewal =
     this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
 
-  def mostTransactions(model: MsbMostTransactions): Renewal =
+  def mostTransactions(model: MostTransactions): Renewal =
     this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
 }
 

@@ -452,8 +452,8 @@ POST        /renewal/transfers                                          @control
 GET         /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
 POST        /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
-GET         /renewal/most-transactions                                  @controllers.renewal.MsbMostTransactionsController.get(edit: Boolean ?= false)
-POST        /renewal/most-transactions                                  @controllers.renewal.MsbMostTransactionsController.post(edit: Boolean ?= false)
+GET         /renewal/most-transactions                                  @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
+POST        /renewal/most-transactions                                  @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
 
 GET         /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
 POST        /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)

@@ -31,7 +31,7 @@ class RenewalSpec extends GenericTestHelper {
           Some(MsbWhichCurrencies(Seq("EUR"),None,None,None,None)),
           Some(TransactionsInLast12Months("1500")),
           Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-          Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           hasChanged = true
         )
@@ -53,7 +53,7 @@ class RenewalSpec extends GenericTestHelper {
           Some(MsbWhichCurrencies(Seq("EUR"),None,None,None,None)),
           Some(TransactionsInLast12Months("2300")),
           Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-          Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           hasChanged = true
         )
