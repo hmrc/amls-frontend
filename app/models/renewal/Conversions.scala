@@ -35,7 +35,7 @@ object Conversions {
 
       val hvdSection = request.hvdSection match {
         case Some(hvd) => Some(hvd.copy(
-          //percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
+          percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert
           //receiveCashPayments = renewal.receiveCashPayments contramap ReceiveCashPayments.convert
         ))
         case _ => None
