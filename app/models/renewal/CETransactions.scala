@@ -28,6 +28,6 @@ object CETransactions {
   }
 
   implicit def convert(model: CETransactions): models.moneyservicebusiness.CETransactionsInNext12Months = {
-    ???
+    models.moneyservicebusiness.CETransactionsInNext12Months(model.ceTransaction)
   }
 }

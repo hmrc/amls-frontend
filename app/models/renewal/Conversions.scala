@@ -23,11 +23,11 @@ object Conversions {
       val msbSection = request.msbSection match {
         case Some(msb) => Some(msb.copy(
           throughput = renewal.msbThroughput contramap MsbThroughput.convert,
-          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert,
-          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap MsbSendTheLargestAmountsOfMoney.convert,
-          mostTransactions = renewal.mostTransactions contramap MsbMostTransactions.convert,
-          ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert,
-          whichCurrencies = renewal.msbWhichCurrencies contramap MsbWhichCurrencies.convert
+          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert
+          //sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap MsbSendTheLargestAmountsOfMoney.convert,
+          //mostTransactions = renewal.mostTransactions contramap MsbMostTransactions.convert,
+          //ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert
+          //whichCurrencies = renewal.msbWhichCurrencies contramap MsbWhichCurrencies.convert
 
         ))
         case _ => None
@@ -35,9 +35,10 @@ object Conversions {
 
       val hvdSection = request.hvdSection match {
         case Some(hvd) => Some(hvd.copy(
-          percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
-          receiveCashPayments = renewal.receiveCashPayments contramap ReceiveCashPayments.convert
+          //percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
+          //receiveCashPayments = renewal.receiveCashPayments contramap ReceiveCashPayments.convert
         ))
+        case _ => None
       }
 
       request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)
