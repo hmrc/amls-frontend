@@ -15,17 +15,9 @@
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ) {
 
 
-        <p>@Messages("responsiblepeople.position_within_business.important")</p>
-    }
-
-    <span class="form-hint">@Messages("lbl.select.all")</span>
+    <p>@Messages("lbl.select.all")</p>
 
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, fromDeclaration)) {
 

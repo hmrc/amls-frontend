@@ -12,6 +12,7 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with MockitoSugar {
 

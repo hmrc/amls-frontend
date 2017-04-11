@@ -13,7 +13,7 @@ class AmendmentConfirmationViewSpec extends GenericTestHelper with MustMatchers 
 
     val continueHref = "http://google.co.uk"
 
-    override def view = views.html.confirmation.confirm_amendment("ref number", Currency(100), Seq.empty, Some(Currency(150)), continueHref)
+    override def view = views.html.confirmation.confirm_amendvariation("ref number", Currency(100), Seq.empty, Some(Currency(150)), continueHref)
   }
 
   "The amendment confirmation view" must {

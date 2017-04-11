@@ -48,7 +48,7 @@ class MsbMoneyTransfersController @Inject()(val authConnector: AuthConnector, re
     if (edit) {
       routes.SummaryController.get()
     } else {
-      routes.SendTheLargestAmountsOfMoneyController.get()
+      routes.MsbSendTheLargestAmountsOfMoneyController.get()
     }
   }
 }

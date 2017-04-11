@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessMatching, ChequeCashingScrapMetal, CurrencyExchange, MsbServices}
-import models.renewal.{CETransactions, MostTransactions, Renewal}
+import models.renewal.{CETransactions, MsbMostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -47,7 +47,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val model = Renewal(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             models.countries.take(3)
           )
         )
@@ -91,7 +91,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -125,7 +125,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -179,7 +179,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
           "1223131"
         )),
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -207,7 +207,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
+    "return a redirect on valid submission where in non edit mode" in new Fixture {
       val msbServices = Some(
         MsbServices(
           Set(
@@ -219,7 +219,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true
@@ -238,10 +238,10 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
       when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(edit = true)(newRequest)
+      val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get(true).url)
+      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get().url)
     }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
@@ -250,7 +250,7 @@ class MsbMostTransactionsControllerSpec extends GenericTestHelper with MockitoSu
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
-          MostTransactions(
+          MsbMostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
         ), hasChanged = true

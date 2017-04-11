@@ -62,7 +62,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
 
         when {
           renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(msbTransfers = MsbMoneyTransfers(2500).some).some)
+        } thenReturn Future.successful(Renewal(msbTransfers = MsbMoneyTransfers("2500").some).some)
 
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
@@ -80,7 +80,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get().url.some
+        redirectLocation(result) mustBe routes.MsbSendTheLargestAmountsOfMoneyController.get().url.some
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
@@ -105,7 +105,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.msbTransfers mustBe MsbMoneyTransfers(1500).some
+        captor.getValue.msbTransfers mustBe MsbMoneyTransfers("1500").some
       }
     }
   }

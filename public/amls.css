@@ -617,8 +617,19 @@ form .inline .block-label {
   clear: both;
 }
 
+
+.clear:before,
+.clear:after {
+  content: '';
+  display: table;
+}
+
+.clear:after {
+  clear: both;
+}
+
 .clear {
-    clear: both;
+  *zoom: 1;
 }
 
 .visuallyhidden-legend > legend {
@@ -895,6 +906,7 @@ fieldset.panel-indent legend {
 
 .status-list {
   margin-left: 0;
+  margin-right: 30px;
   padding-left: 0;
 }
 
@@ -918,13 +930,9 @@ fieldset.panel-indent legend {
   color: #fff;
 }
 
-.status-detail {
-  margin-left: 30px;
-}
-
 @media screen and (max-width: 640px) {
-  .status-detail {
-    margin-left: 0;
+  .status-list {
+    margin-right: 0;
   }
 }
 
@@ -1022,10 +1030,10 @@ fieldset.panel-indent legend {
   margin-bottom: 20px;
 }
 
-.details__inner .panel-indent,
+/* .details__inner .panel-indent,
 .details__inner li:last-of-type {
   margin-bottom: 0;
-}
+} */
 
 
 /* -- notifications -- */
@@ -1081,7 +1089,7 @@ table.notifications thead th {
   background-color: #005ea5;
   margin: 0;
   padding-left: 20px;
-  padding: 10px;
+  padding: 10px 20px;
   text-align: left;
 }
 
@@ -1098,14 +1106,15 @@ table.notifications thead th {
 /* Overrides the stupid Assets Frontend - what were they thinking! */
 
 button,
-.button,
-.button--get-started {
+.button{
   line-height: 1.25em;
   padding: 0.5em 0.6em 0.3em 0.6em;
   font-size: 1em;
 }
 
 .button--get-started {
+  line-height: 1.25em;
+  padding: 0.36842em 2.15789em 0.21053em 0.84211em;
   padding-right: 40px;
   font-size: 24px;
 }

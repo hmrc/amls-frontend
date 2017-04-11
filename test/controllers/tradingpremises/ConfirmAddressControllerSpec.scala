@@ -65,7 +65,6 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "Post" must {
-      val emptyCache = CacheMap("", Map.empty)
 
       val ytp = YourTradingPremises(
         "BusinessName",

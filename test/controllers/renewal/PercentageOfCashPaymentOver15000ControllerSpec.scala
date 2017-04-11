@@ -80,7 +80,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.hvd.percentage"))
+        contentAsString(result) must include(Messages("error.required.renewal.hvd.percentage"))
       }
 
       "when edit is false" must {
@@ -98,7 +98,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.renewal.routes.CashPaymentController.get().url))
+          redirectLocation(result) must be(Some(controllers.renewal.routes.ReceiveCashPaymentsController.get().url))
         }
       }
 

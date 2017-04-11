@@ -291,7 +291,26 @@ error.required.hvd.percentage = Select one option to show how much of your turno
 
 ################################# Renewal ###################################
 error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
+error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
+error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €15,000 in the last 12 months from customers you’ve not met in person
+error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
+error.required.renewal.hvd.describe = Enter details of how you received these payments
+
+error.required.renewal.ba.turnover.from.mlr = Select one option to show how much net profit your business made in the last 12 months from activities related to anti-money laundering supervision
+
+error.required.renewal.ba.business.turnover = Select one option to show the total net profit your business made in the last 12 months
+
+error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
+error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
+
+error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
+
+error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
+
+error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+
+error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in in the last 12 months
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -305,7 +324,7 @@ error.required.declaration.specify.role = Specify your role in the business
 ########################################################################################################################
 
 title.gov = GOV.UK
-title.amls = Anti-money laundering supervision
+title.amls = Manage your anti-money laundering supervision
 title.services = Which services does your business provide?
 title.contact = Your contact details
 title.wyn = What you need
@@ -372,6 +391,8 @@ lbl.1200.character.limit=1200 character limit
 
 lbl.give.details = Please give details
 
+lbl.registration.status = Registration status:
+
 legend.address = Address
 lbl.address.line1 = Address
 lbl.address.line2 = Address line 2
@@ -429,7 +450,7 @@ status.complete = Completed
 status.notsubmitted = Not submitted
 status.submitted = Submitted
 status.feepaid = Fee paid
-status.underreview = Pending
+status.underreview = Decision pending
 status.decisionmade = Decision made
 status.incomplete.heading = Application incomplete
 status.incomplete.description = You’ve started the application form but you haven’t finished it. You have 28 days to finish the application, from when you last saved your progress.
@@ -442,17 +463,24 @@ status.hassomethingchanged = Has something changed?
 status.submissionready.changelink1 = edit your application
 status.submissionready.buttontext = Submit application
 status.submissionreadyforreview.heading = Application pending
-status.submissionreadyforreview.description = If you have submitted the application and paid the fee, your application will be reviewed by HM Revenue and Customs.
-status.submissionreadyforreview.description2 = The review process can take up to 45 days. This web page will be updated when a decision has been made.
+status.submissionreadyforreview.description = Your application will be reviewed by HM Revenue and Customs.
+status.submissionreadyforreview.description2 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
 status.submissiondecisionapproved.heading = Application approved
+status.submissiondecisionsupervised.heading = Supervised
+status.submissiondecisionsupervised.renewal.btn = Renew supervision
+status.submissiondecisionsupervised.enddate.text = Currently supervised to {0}
+status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HM Revenue and Customs.
+status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
-status.submissiondecisionrejected.heading = Application rejected
+status.submissiondecisionrejected.heading = Not supervised
 status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update or view your information
+status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
-status.readyforrenewal.warning = Your registration will expire on {0} unless you renew your supervision.
+status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
+status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.registration.fee.lbl = Your registration fee
@@ -469,7 +497,8 @@ progress.continue = Section incomplete
 progress.start = Start this section
 progress.pre-minutes = Between
 progress.minutes = minutes to complete
-progress.submit = Submit application
+progress.submit = Continue
+progress.submit.title = Submit application
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can’t finish the application until you’ve completed all the sections.
 progress.businessmatching.name = Pre-application
@@ -490,7 +519,7 @@ progress.tradingpremises.time = 3 and 8
 progress.asp.name = Accountancy Service Provider
 progress.asp.description = Registration information specifically for Accountancy Service Providers.
 progress.asp.time = 2 and 4
-progress.eab.name = Estate Agent Business
+progress.eab.name = Estate Agency Business
 progress.eab.description = Registration information specifically for Estate Agency Businesses.
 progress.eab.time = 5 and 9
 progress.hvd.name = High Value Dealer
@@ -584,8 +613,8 @@ confirmation.variation.lede = You’ve updated your information
 confirmation.variation.info = You need to pay a fee for the updates you’ve made. Your changes won’t be reviewed by HMRC Revenue and Customs until the fee is paid.
 confirmation.variation.summary = This shows your total fees for each item.
 
-confirmation.payment.title = You’ve submitted and paid
-confirmation.payment.lede = You’ve submitted and paid
+confirmation.payment.title = You’ve submitted
+confirmation.payment.lede = You’ve submitted
 confirmation.payment.reference_header = Payment reference: {0}
 confirmation.payment.info.hmrc_review = Your application will be reviewed by HM Revenue and Customs. You can sign into this service at any time to see the status of your application.
 confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
@@ -594,6 +623,10 @@ confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves yo
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
 confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
 confirmation.payment.status_button.text = View your current status
+
+confirmation.payment.amendvariation.lede = You’ve updated your information
+confirmation.payment.amendvariation.title = You have submitted the application
+confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
@@ -654,16 +687,12 @@ aboutyou.rolewithinbusiness.lbl.06 = Partner
 aboutyou.rolewithinbusiness.lbl.07 = Sole proprietor
 aboutyou.rolewithinbusiness.lbl.08 = Other
 
-aboutthebusiness.whatyouneed.subheading = For this section you may need:
+aboutthebusiness.whatyouneed.subheading = In this section, you’ll be asked for things like:
 aboutthebusiness.whatyouneed.subheading_2 = You’ll also need:
 aboutthebusiness.whatyouneed.line_1 = your registered office or main place of business address
-aboutthebusiness.whatyouneed.line_2 = your email address
-aboutthebusiness.whatyouneed.line_3 = your phone number
-aboutthebusiness.whatyouneed.line_4 = your postal address
-aboutthebusiness.whatyouneed.line_5 = your Money Laundering Regulations registration number
-aboutthebusiness.whatyouneed.line_6 = the date your business will start activities which need to be supervised
-aboutthebusiness.whatyouneed.line_7 = your VAT registration number
-aboutthebusiness.whatyouneed.line_8 = your Corporation Tax reference number
+aboutthebusiness.whatyouneed.line_2 = a contact email, phone number and address
+aboutthebusiness.whatyouneed.line_3 = your Money Laundering Regulations registration number, if you’re already registered
+aboutthebusiness.whatyouneed.line_4 = your VAT registration number, if you’re registered for VAT
 aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
 aboutthebusiness.registeredforvat.lbl.vatNumber.hint = It’s 9 numbers with no letters, punctuation or other characters.
@@ -709,7 +738,7 @@ aboutthebusiness.activity.start.date.title = When will your business start activ
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
-tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll need to know:
+tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll be asked for things like:
 tradingpremises.whatyouneed.requiredinfo.text.1 = the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2 = what the business does from these premises
 tradingpremises.whatyouneed.requiredinfo.text.3 = the date you’ll start trading from these premises
@@ -792,10 +821,10 @@ tradingpremises.remove_reasons.agent.other.missing = Enter a reason for removing
 tradingpremises.remove_reasons.missing = Select one option to show why you’re removing this trading premises
 tradingpremises.confirmaddress.title = Is this your trading premises address?
 
-estateagentbusiness.whatyouneed.subheading = For this section you’ll need:
-estateagentbusiness.whatyouneed.line_1 = a list of which services you provide
-estateagentbusiness.whatyouneed.line_2 = which redress scheme you’re registered with, if relevant
-estateagentbusiness.whatyouneed.line_3 = information about any penalties you’ve received, if relevant
+estateagentbusiness.whatyouneed.subheading = In this section, you’ll be asked for things like:
+estateagentbusiness.whatyouneed.line_1 = what services you provide
+estateagentbusiness.whatyouneed.line_2 = if you’re registered with a redress scheme
+estateagentbusiness.whatyouneed.line_3 = if your business has been penalised in the past
 estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
@@ -808,6 +837,7 @@ estateagentbusiness.penalisedbyprofessional.line_1 = a fine
 estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
+estateagentbusiness.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Give a brief overview of the penalty and when it occurred
 estateagentbusiness.services.title = Which services does your business provide?
 estateagentbusiness.service.lbl.01 = Residential estate agency services
@@ -839,9 +869,9 @@ businessmatching.registerservices.title = What do you need to register?
 businessmatching.registerservices.details = More information about these categories
 businessmatching.registerservices.servicename.lbl.01 = Accountancy services
 businessmatching.registerservices.servicename.lbl.02 = Bill payment services
-businessmatching.registerservices.servicename.lbl.03 = Estate agent services
+businessmatching.registerservices.servicename.lbl.03 = Estate agency services
 businessmatching.registerservices.servicename.lbl.04 = High value dealing
-businessmatching.registerservices.servicename.lbl.05 = Money service business activities
+businessmatching.registerservices.servicename.lbl.05 = Money Service Business activities
 businessmatching.registerservices.servicename.lbl.06 = Trust or company services
 businessmatching.registerservices.servicename.lbl.07 = Telephone, digital and IT payment services
 businessmatching.registerservices.servicename.details.01 = Accountancy Service Providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
@@ -861,7 +891,7 @@ businessmatching.psr.number.lbl = PSR registration number
 businessmatching.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
 businessmatching.cannotcontinuewiththeapplication.heading = You cannot continue with your application
 businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
-businessmatching.summary.business.address.lbl = Your business:
+businessmatching.summary.business.address.lbl = Your business
 businessmatching.button.confirm.start = Confirm and start application
 
 businessmatching.services.title = Which services does your business provide?
@@ -870,7 +900,7 @@ businessmatching.services.list.lbl.01 = Transmitting money
 businessmatching.services.list.lbl.02 = Currency exchange
 businessmatching.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
-businessmatching.cannotcontinuewiththeapplication.title = You cannot continue with your application
+businessmatching.cannotcontinuewiththeapplication.title = You can’t continue with your application
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = Your business must have a Payment Services Regulations (PSR) reference number in order to apply for anti-money laundering supervision from HM Revenue and Customs.
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
@@ -878,12 +908,10 @@ businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The infor
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn’t the place to pay registration fees.
-bankdetails.whatyouneed.requiredinfo.heading = For each bank account used by the business, you’ll need to know:
-bankdetails.whatyouneed.line_1 = whose account it is
-bankdetails.whatyouneed.line_2 = if it’s a UK account
-bankdetails.whatyouneed.line_3 = the account name
-bankdetails.whatyouneed.line_4 = the sort code
-bankdetails.whatyouneed.line_5 = the account number or IBAN number
+bankdetails.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+bankdetails.whatyouneed.line_1 = what kind of bank accounts your business uses
+bankdetails.whatyouneed.line_2 = if they’re UK bank accounts
+bankdetails.whatyouneed.line_3 = sort codes and account numbers
 bankdetails.accounttype.title = What kind of bank account does your business use?
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
@@ -920,20 +948,14 @@ bankdetails.remove.bank.account.title = Remove bank account
 bankdetails.remove.bank.account.text = This will permanently remove {0} from your list of bank accounts.
 bankdetails.remove.bank.account.btn = Remove bank account
 
-businessactivities.whatyouneed.requiredinfo.heading = For this section you may need to know:
-businessactivities.whatyouneed.line_1 = the anticipated net profit for the next 12 months
-businessactivities.whatyouneed.line_2 = approximately how many people your business employs
-businessactivities.whatyouneed.line_3 = approximately how many people work on activities covered by Money Laundering Regulations
-businessactivities.whatyouneed.possiblerequiredinfo.heading = You’ll also need to know:
-businessactivities.whatyouneed.line_4 = in which countries your customers live or work
-businessactivities.whatyouneed.line_5 = your franchisor’s name
-businessactivities.whatyouneed.line_6 = how you record transactions
-businessactivities.whatyouneed.line_7 = your professional advisor’s name and address
-businessactivities.whatyouneed.line_8 = your professional advisor’s HMRC agent code
+businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+businessactivities.whatyouneed.line_1 = your anticipated net profit
+businessactivities.whatyouneed.line_2 = how many people your business employs
+businessactivities.whatyouneed.line_3 = how you record transactions
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor’s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor’s registration.
-businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
+businessactivities.confirm-activities.title = Is your business involved in any other activities?
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.subtitle = You’ve told us your business type is:
@@ -970,7 +992,7 @@ businessactivities.hight.value.customer.lbl = Where do these customers live or w
 businessactivities.hight.value.customer.lbl.hint = List up to 10 countries. If there are more than 10, list the countries for the customers who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
 businessactivities.accountantForAMLSRegulations.title = Does your business receive advice on Money Laundering Regulations and due diligence?
-businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional advisor, such as an accountant.
+businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional adviser who is not part of your business, such as an accountant.
 businessactivities.riskassessment.policy.title = Does your business have a documented risk assessment policy and procedure?
 businessactivities.riskassessment.policy.line1.text = Is it paper-based or digital?
 businessactivities.paper.or.digital = Is it paper-based or digital?
@@ -979,14 +1001,13 @@ businessactivities.RiskAssessmentType.lbl.02 = Digital
 businessactivities.employees.title = People in your business
 businessactivities.employees.line1.text = Approximately how many people work in the business? Include directors.
 businessactivities.employees.line1.hint = If you’re a sole proprietor with no employees, enter 1.
-businessactivities.employees.line1.cya = Approximately how many people work in the business
+businessactivities.employees.line1.cya = Approximately how many people work in the business? Include directors.
 businessactivities.employees.line2.text = Approximately how many people work on activities covered by Money Laundering Regulations?
 businessactivities.employees.line2.hint = If you’re a sole proprietor with no employees, enter 1.
-businessactivities.employees.line2.cya = Approximately how many people work on activities covered by Money Laundering Regulations
-businessactivities.whoisyouraccountant.title = Who is your professional advisor?
+businessactivities.employees.line2.cya = Approximately how many people work on activities covered by Money Laundering Regulations?
+businessactivities.whoisyouraccountant.title = Who advises you on Money Laundering Regulations and due diligence?
 businessactivities.involved.other.title = Other activities – Business Activities
 businessactivities.involved.other.heading = Other activities
-businessactivities.whoisyouraccountant.title = Who is your professional advisor?
 businessactivities.involved.other.title = Other activities
 businessactivities.involved.other.legend = Is your business involved in other activities?
 businessactivities.involved.other.hint = For example: you would select ‘yes’ if your business is a newsagents that sends money overseas. Your shop will be classed as a Money Service Business. The other activities are the newsagents part of the business.
@@ -999,7 +1020,7 @@ businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas addres
 businessactivities.whoisyouraccountant.country = Country
 businessactivities.whoisyouraccountant.postCode = Postcode
 businessactivities.whoisyouraccountant.reference.details = Your accountant’s HMRC Agent Reference Number
-businessactivities.tax.matters.title = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+businessactivities.tax.matters.title = Does this professional advisor manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
@@ -1037,18 +1058,13 @@ declaration.who.is.registering.text = One person must take responsibility for th
 declaration.who.is.business.nominated.officer = Who is the business’s nominated officer?
 declaration.who.is.business.nominated.officer.text = You need to appoint a nominated officer before you can submit your application. The nominated officer must be one of the responsible people you’ve registered.
 
-responsiblepeople.whatyouneed.requiredinfo = For each responsible person, you may need:
-responsiblepeople.whatyouneed.line_1 = their current name, and any alternative or former names
-responsiblepeople.whatyouneed.line_2 = their date of birth
-responsiblepeople.whatyouneed.line_3 = their nationality and country of birth
-responsiblepeople.whatyouneed.line_4 = their phone number and email address
-responsiblepeople.whatyouneed.line_5 = their home address
-responsiblepeople.whatyouneed.line_6 = their position within the business and start date
-responsiblepeople.whatyouneed.possiblerequiredinfo = You’ll also need:
-responsiblepeople.whatyouneed.line_7 = their passport number
-responsiblepeople.whatyouneed.line_8 = their National Insurance number
-responsiblepeople.whatyouneed.line_9 = their VAT number and Self Assessment number
-responsiblepeople.whatyouneed.line_10 = the details of relevant experience and training
+responsiblepeople.whatyouneed.requiredinfo = You’ll be asked for a number of personal details for each person. It may be helpful to have the person with you when completing the section.
+responsiblepeople.whatyouneed.possiblerequiredinfo = You’ll be asked for things like:
+responsiblepeople.whatyouneed.line_1 = their name and date of birth
+responsiblepeople.whatyouneed.line_2 = their home address, phone number and email address
+responsiblepeople.whatyouneed.line_3 = their National Insurance number
+responsiblepeople.whatyouneed.line_4 = details of their personal business interests
+responsiblepeople.whatyouneed.line_5 = details of their relevant experience and training
 responsiblepeople.personName.title = What’s the name of this responsible person?
 responsiblepeople.personName.firstname = First name
 responsiblepeople.personName.middlename = Middle name, if applicable
@@ -1141,11 +1157,11 @@ responsiblepeople.country.of.birth.lbl = Country of birth
 responsiblepeople.country.of.birth.hint = If you were born in England, Scotland, Wales, or Northern Ireland, select ‘United Kingdom’.
 responsiblepeople.or.lbl = or
 responsiblepeople.whomustregister.title = You must register:
-responsiblepeople.whomustregister.line_1 = everyone who directs the business - this includes sole proprietors, partners, directors and shadow directors
+responsiblepeople.whomustregister.line_1 = everyone who directs the business, including sole proprietors, partners, designated members, directors and shadow directors
 responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than 25% of the business
-responsiblepeople.whomustregister.line_3 = the ‘nominated officer’ - the person who acts as the money laundering reporting officer
-responsiblepeople.registeredforvat.heading = Is {0} registered for VAT with that business?
+responsiblepeople.whomustregister.line_3 = the ‘nominated officer’, who is the person who acts as the money laundering reporting officer
 responsiblepeople.registeredforvat.title = Is this person registered for VAT with that business?
+responsiblepeople.registeredforvat.heading = Is {0} registered for VAT with that business?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
 responsiblepeople.experiencetraining.heading = Does {0} have previous experience in these activities?
 responsiblepeople.experiencetraining.title = Does this person have previous experience in these activities?
@@ -1218,14 +1234,10 @@ responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
 responsiblepeople.confirmaddress.title = Is this this person’s home address?
 
 #TCSP
-tcsp.whatyouneed.requiredinfo.heading = For this section you may need to know:
-tcsp.whatyouneed.requiredinfo.text.1 = what kind of Trust or Company Service Provider you are
-tcsp.whatyouneed.requiredinfo.text.2 = which services your business provides
-tcsp.whatyouneed.requiredinfo.text.3 = whether or not you use the services of another Trust or Company Service Provider
-tcsp.whatyouneed.dependinginfo.heading = You’ll also need to know:
-tcsp.whatyouneed.dependinginfo.text.1 = if you only sell off-the-shelf companies
-tcsp.whatyouneed.dependinginfo.text.2 = if you create complex corporate structures for clients, or plan to do so in the future
-tcsp.whatyouneed.dependinginfo.text.3 = the Money Laundering Regulation reference number of the Trust or Company Service Provider you use
+tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+tcsp.whatyouneed.requiredinfo.text.1 = what services you provide
+tcsp.whatyouneed.requiredinfo.text.2 = if you create complex corporate structures for clients, or plan to do so
+tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another Trust or Company Service Provider and what their details are
 
 tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
@@ -1237,7 +1249,7 @@ tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another Trust or Company Service Provider?
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company’s Money Laundering Regulation reference number?
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company’s Money Laundering Regulation registration number?
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
@@ -1252,10 +1264,10 @@ tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
 
 #ASP
-asp.whatyouneed.subheading = For this section you’ll need to know:
-asp.whatyouneed.line_1 = which services you provide
+asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
+asp.whatyouneed.line_1 = what services you provide
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other business’ tax matters
-asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if relevant
+asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if you have one
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other business’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme
@@ -1268,12 +1280,10 @@ asp.service.lbl.05 = Financial advice and/or tax advice
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
-supervision.whatyouneed.requiredinfo.heading = Depending on your circumstances, you may need:
-supervision.whatyouneed.requiredinfo.text.1 = the name of your last anti-money laundering supervisor
-supervision.whatyouneed.requiredinfo.text.2 = the start date and end date of your last supervision
-supervision.whatyouneed.requiredinfo.text.3 = the reason your last supervision ended
-supervision.whatyouneed.requiredinfo.text.4 = a list of your professional memberships
-supervision.whatyouneed.requiredinfo.text.5 = details of penalties you’ve received from a professional body
+supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervision by another body
+supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
+supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
 supervision.another_body.title = Has your business ever been registered with another supervising body?
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
@@ -1290,6 +1300,7 @@ supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
 supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
+supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
 supervision.penalisedbyprofessional.details.lbl = Please provide details
 
@@ -1310,22 +1321,10 @@ supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
 
-msb.whatyouneed.requiredinfo.heading = For this section you may need to know:
-msb.whatyouneed.line_1 = a list of which services you provide
-msb.whatyouneed.line_2 = how much throughput you expect in the next 12 months
-msb.whatyouneed.line_3 = how many transactions you expect in the next 12 months
-msb.whatyouneed.line_4 = if your systems can identify linked payments
-msb.whatyouneed.line_5 = if you transfer money without using formal banking systems
-msb.whatyouneed.line_6 = how many transactions you expect in the next 12 months
-msb.whatyouneed.line_7 = which currencies you expect to be most popular with customers
-msb.whatyouneed.line_8 = who will supply your foreign currency
-msb.whatyouneed.possiblerequiredinfo.heading = You’ll also need to know:
-msb.whatyouneed.possiblerequiredinfo.line_1 = which countries your branches or agents operate in
-msb.whatyouneed.possiblerequiredinfo.line_2 = your Payment Systems Regulator registration number
-msb.whatyouneed.possiblerequiredinfo.line_3 = your Intermediary Payment Service Provider’s name
-msb.whatyouneed.possiblerequiredinfo.line_4 = your Intermediary Payment Service Provider’s HM Revenue and Customs registration number
-msb.whatyouneed.possiblerequiredinfo.line_5 = where you expect to send the largest amounts of money
-msb.whatyouneed.possiblerequiredinfo.line_6 = where you expect to send the greatest number of money transfers
+msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months
+msb.whatyouneed.line_2 = how you manage transactions and money transfers
+msb.whatyouneed.line_3 = if you use an Intermediary Payment Service Provider and what their details are
 msb.services.title = Which services does your business provide?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
@@ -1351,7 +1350,7 @@ msb.which_currencies.source.which_banks = Which Banks?
 msb.which_currencies.source.wholesalers = Currency wholesalers
 msb.which_currencies.source.which_wholesalers = Which currency wholesalers?
 msb.which_currencies.source.customers = Customers selling their foreign currency
-msb.which_currencies.foreign_currencies_question = Do you deal in physical foreign currencies?
+msb.which_currencies.foreign_currencies_question = Do you expect to deal in physical foreign currencies?
 msb.ipsp.title = Does your business use an Intermediary Payment Service Provider (IPSP)?
 msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn’t the Payment Service Provider for the payer or the payee.
 msb.ipsp.name.lbl = IPSP’s name
@@ -1383,14 +1382,10 @@ msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
-hvd.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
+hvd.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 hvd.whatyouneed.line_1 = what your business will sell
-hvd.whatyouneed.line_2 = how you’ll sell goods
-hvd.whatyouneed.line_3 = if you will be buying or selling duty-suspended excise goods
-hvd.whatyouneed.line_4 = if your business has already accepted cash payments of €15,000 or more
-hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash payments of €15,000 or more
-hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you’ve not met in person
-hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
+hvd.whatyouneed.line_2 = if you’ll be buying or selling duty-suspended excise goods
+hvd.whatyouneed.line_3 = how your business deals with cash payments of €15,000 or more
 
 hvd.how-will-you-sell-goods.title = How will you sell these goods?
 hvd.how-will-you-sell-goods.channels.auction = Auction
@@ -1401,6 +1396,12 @@ hvd.cash.payment.title = Has your business already accepted any cash payments of
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 03 2015
+hvd.cash.payment.data.details.summary = What a cash payment is
+hvd.cash.payment.data.details.summary.details = A cash payment is physical money, notes and coins, either paid to you in person or paid directly into a bank account.
+hvd.cash.payment.data.details.summary.details.start = This includes:
+hvd.cash.payment.data.details.summary.details.01 = any single cash payment of €15,000 or more
+hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €15,000 or more including things like payment plans, payments on account and deposits
+hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €15,000 or more in any 90 day period
 
 hvd.summary.payment.date.label = Date of first payment
 
@@ -1451,10 +1452,10 @@ notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto
 notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Registration Expiry
 
-notifications.subject.ReminderToPayForApplication = Reminder to Pay - Application
-notifications.subject.ReminderToPayForVariation = Reminder to Pay - Variation
-notifications.subject.ReminderToPayForRenewal = Reminder to Pay - Renewal
-notifications.subject.ReminderToPayForManualCharges = Reminder to Pay - Manual Charge
+notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
+notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
+notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
+notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
 
 notifications.subject.MindedToReject = Rejection of Application being Considered
@@ -1488,32 +1489,44 @@ progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
 
-renewal.involvedinother.title = Is your business involved in any other activities?
+renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
 renewal.msb.throughput.selection.required = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
-renewal.msb.throughput.selection.1 = £0 to £99,999 
-renewal.msb.throughput.selection.2 = £100,000 to £499,999 
-renewal.msb.throughput.selection.3 = £500,000 to £999,999 
-renewal.msb.throughput.selection.4 = £1 million to £20 million 
-renewal.msb.throughput.selection.5 = £21 million to £100 million 
+renewal.msb.throughput.selection.1 = £0 to £99,999
+renewal.msb.throughput.selection.2 = £100,000 to £499,999
+renewal.msb.throughput.selection.3 = £500,000 to £999,999
+renewal.msb.throughput.selection.4 = £1 million to £20 million
+renewal.msb.throughput.selection.5 = £21 million to £100 million
 renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
+
+renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
 
 renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers made in the last 12 months, using numbers only
+renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
 
+renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.expect.to.receive = How did you receive these payments?
+
+renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €15,000?
+
+renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
+
+renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
@@ -1536,7 +1549,7 @@ survey.satisfaction.helpus = to help us improve the service.
 
 ############################### Notifications Text ######################
 
-notification.static.text.application-auto-rejection-for-failure-to-pay = <p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money \
+notification.static.text.ApplicationAutorejectionForFailureToPay = <p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money \
 Laundering regulations 2007 has been rejected.</p>\
 <p>As you’ve not paid the full fees due, your application has automatically expired.</p>\
 <p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
@@ -1544,8 +1557,28 @@ if Money Laundering Regulations apply to your business. If you’re not supervis
 <p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from \
 <a href="{0}">your account status page</a>.</p>
 
-notification.static.text.registration-variation-approval = <p>The recent changes made to your details have been approved.</p>\
+notification.static.text.RegistrationVariationApproval = <p>The recent changes made to your details have been approved.</p>\
 <p>You can find details of your registration on <a href="{0}">your status page</a>.</p>
 
-notification.static.text.de-registration-effective-date-change = <p>The date your anti-money laundering supervision ended has been changed.</p>\
+notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your anti-money laundering supervision ended has been changed.</p>\
 <p>You can see the new effective date on <a href="{0}">your status page</a>.</p>
+
+notification.reminder.to.pay.ReminderToPayForVariation = <p>You need to pay {0} for the recent changes made to your details.</p>\
+<p>Your payment reference is: {1}.</p>\
+<p>Pay online by credit or debit card.</p>\
+<p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
+
+notification.reminder.to.pay.ReminderToPayForApplication = <p>You need to pay {0} for your application to register with HM Revenue and Customs.</p>\
+<p>Your payment reference is: {1}.</p>\
+<p>Pay online by credit or debit card.</p>\
+<p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
+
+notification.reminder.to.pay.ReminderToPayForRenewal = <p>You need to pay {0} for your annual renewal.</p>\
+<p>Your payment reference is: {1}.</p>\
+<p>Pay online by credit or debit card.</p>\
+<p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
+
+notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay {0} for the recent charge added to your account.</p>\
+<p>Your payment reference is: {1}.</p>\
+<p>Pay online by credit or debit card.</p>\
+<p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>

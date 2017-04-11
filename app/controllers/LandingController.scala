@@ -9,6 +9,7 @@ import models.businessmatching.BusinessMatching
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -110,7 +111,8 @@ trait LandingController extends BaseController {
       cacheMap.getEntry[Supervision](Supervision.key).fold(false){_.hasChanged},
       cacheMap.getEntry[Tcsp](Tcsp.key).fold(false){_.hasChanged},
       cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false){_.exists(_.hasChanged)},
-      cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged}
+      cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[Renewal](Renewal.key).fold(false){_.hasChanged}
     ).exists(identity)
   }
 
