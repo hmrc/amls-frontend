@@ -11,6 +11,8 @@ import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
@@ -164,7 +166,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       reviewDetails.businessType
     } thenReturn Some(businessType)
-
     when {
       businessMatching.reviewDetails
     } thenReturn Some(reviewDetails)
@@ -174,7 +175,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       activities.businessActivities
     } thenReturn Set[BusinessActivity]()
-
     when {
       cache.getEntry[BusinessMatching](BusinessMatching.key)
     } thenReturn Some(businessMatching)
@@ -1122,6 +1122,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       when {
         cache.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any())
        } thenReturn Some(MoneyServiceBusiness())
+
+      when {
+        cache.getEntry[Hvd](eqTo(Hvd.key))(any())
+       } thenReturn Some(Hvd())
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
