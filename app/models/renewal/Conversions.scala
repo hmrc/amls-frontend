@@ -2,6 +2,7 @@ package models.renewal
 import cats.Functor
 import cats.implicits._
 import models.SubscriptionRequest
+import models.moneyservicebusiness.WhichCurrencies
 
 object Conversions {
 
@@ -22,12 +23,24 @@ object Conversions {
       val msbSection = request.msbSection match {
         case Some(msb) => Some(msb.copy(
           throughput = renewal.msbThroughput contramap MsbThroughput.convert,
-          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert
+          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert,
+          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
+          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
+          ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert
+          //whichCurrencies = renewal.msbWhichCurrencies contramap WhichCurrencies.convert
+
         ))
         case _ => None
       }
 
-      request.copy(businessActivitiesSection = baSection, msbSection = msbSection)
+      val hvdSection = request.hvdSection match {
+        case Some(hvd) => Some(hvd.copy(
+          percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
+          receiveCashPayments = renewal.receiveCashPayments contramap ReceiveCashPayments.convert
+        ))
+      }
+
+      request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)
     }
 
   }

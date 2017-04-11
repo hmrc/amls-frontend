@@ -75,4 +75,8 @@ object MostTransactions {
   implicit val formW: Write[MostTransactions, UrlFormEncoded] = Cache.formW
   implicit val jsonR: Reads[MostTransactions] = Cache.jsonR
   implicit val jsonW: Writes[MostTransactions] = Cache.jsonW
+
+  implicit def convert(model: MostTransactions): models.moneyservicebusiness.MostTransactions = {
+    ???
+  }
 }

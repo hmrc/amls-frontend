@@ -23,7 +23,7 @@ object MsbMoneyTransfers {
   }
 
   implicit def convert(model: MsbMoneyTransfers): models.moneyservicebusiness.TransactionsInNext12Months = {
-    models.moneyservicebusiness.TransactionsInNext12Months
+    ???
   }
 
 }

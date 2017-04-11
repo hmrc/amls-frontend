@@ -59,4 +59,8 @@ object PercentageOfCashPaymentOver15000 {
     case Fourth => Json.obj("percentage" -> "04")
     case Fifth => Json.obj("percentage" -> "05")
   }
+
+  implicit def convert(model: PercentageOfCashPaymentOver15000): models.hvd.PercentageOfCashPaymentOver15000 = {
+    ???
+  }
 }

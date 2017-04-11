@@ -40,4 +40,8 @@ object SendTheLargestAmountsOfMoney {
         "country_3" -> (countries.country_3.toSeq map { _.code })
       )
     }
+
+  implicit def convert(model: SendTheLargestAmountsOfMoney): models.moneyservicebusiness.SendTheLargestAmountsOfMoney = {
+    ???
+  }
 }

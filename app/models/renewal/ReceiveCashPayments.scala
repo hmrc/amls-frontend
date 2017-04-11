@@ -80,4 +80,8 @@ object ReceiveCashPayments {
   implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonR
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
+
+  implicit def convert(model: ReceiveCashPayments): models.hvd.ReceiveCashPayments = {
+    ???
+  }
 }
