@@ -1582,3 +1582,7 @@ notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay 
 <p>Your payment reference is: {1}.</p>\
 <p>Pay online by credit or debit card.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
+
+notification.message.with.end.date.ApplicationApproval = <p>Your application to register has been approved. You’re now registered until {0}.</p>\
+<p>Your anti-money laundering registration number is: {1}.</p>\
+<p>You can find details of your registration on your status page.</p>

@@ -38,16 +38,26 @@ object NotificationDetails {
 
   val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
-  def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
+  def convertEndDateWithRefMessageText(inputString: String): Option[EndDateDetails] = {
+
     inputString.split("\\|").toList match {
-      case date::ref::tail =>
-        val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
-        Some(EndDateDetails(dateValue,Some(splitByDash(ref))))
+      case date::ref::tail => convertMessageTextWithRefNo(date, ref)
+      case d: List[String] => convertEndDateMessageText(d.head)
       case _ => None
     }
   }
 
-  def convertMessageText(inputString: String): Option[ReminderDetails] = {
+  def convertMessageTextWithRefNo(date: String, ref: String): Some[EndDateDetails] = {
+    val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
+    Some(EndDateDetails(dateValue, Some(splitByDash(ref))))
+  }
+
+  def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
+    val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
+    Some(EndDateDetails(dateValue, None))
+  }
+
+  def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
     inputString.split("\\|").toList match {
       case amount::ref::tail =>
         Some(ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref)))

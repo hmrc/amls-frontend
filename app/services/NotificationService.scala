@@ -24,6 +24,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     contactType match {
+
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
            ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(contactType)
@@ -33,11 +34,12 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
            ContactType.ReminderToPayForApplication |
            ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType)
 
-      case ContactType.ApplicationApproval => handleEndDateMessage(amlsRegNo, id, contactType)
+      case ContactType.ApplicationApproval |
+           ContactType.RenewalApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
-    }
 
+    }
   }
 
 
@@ -61,7 +63,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
-          details <- NotificationDetails.convertMessageText(message)
+          details <- NotificationDetails.convertReminderMessageText(message)
         } yield {
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.reminder.to.pay.$contactType",
@@ -73,20 +75,21 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
+  private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType)
                           (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+
     val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
     details.map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
-          details <- NotificationDetails.convertEndDateMessageText(message)
+          details <- NotificationDetails.convertEndDateWithRefMessageText(message)
         } yield {
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.message.with.end.date.$contactType",
             details.endDate,
-            details.referenceNumber)))
+            details.referenceNumber.getOrElse(""))))
         }
       }
       case _ => None
