@@ -20,23 +20,23 @@ error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
 error.invalid.postcode = Enter a valid postcode
-error.required.country = Enter a country.
-error.invalid.country = Enter valid country.
-error.required.country.name = Enter at least one country.
+error.required.country = Enter an official country name: for example, Holland is Netherlands
+error.invalid.country = Enter an official country name: for example, Holland is Netherlands
+error.required.country.name = Enter an official country name: for example, Holland is Netherlands
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
 error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.
-error.required.otherfirstnames = Enter all other first names.
-error.required.otherlastnames = Enter all other last names.
+error.required.otherfirstnames = Enter the responsible person’s previous first name
+error.required.otherlastnames = Enter the responsible person’s previous last name
 error.required.yourname = Enter your name
-error.invalid.yourname = You can’t enter more than 140 characters for your name
+error.invalid.yourname = You can’t enter more than 140 characters
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
 error.invalid.common_name.length = You can’t enter more than 35 characters
 
-error.required.vat.number = Enter a VAT registration number.
-error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
+error.required.vat.number = Enter a valid VAT registration number
+error.invalid.vat.number = Enter a valid VAT registration number
 
 error.required.name.of.business = Enter the name of the business
 error.invalid.name.of.business = You can’t enter more than 120 characters for the name of the business
@@ -44,14 +44,14 @@ error.invalid.name.of.business = You can’t enter more than 120 characters for 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
-error.required.uk.passport = Enter a valid 9-digit passport number
+error.required.uk.passport = Enter a valid passport number
 error.required.non.uk.passport = Enter a valid passport number
 error.invalid.uk.passport = Only use numbers 0 to 9, with no spaces or other characters
-error.required.non.uk.passport = Enter the non-UK passport number
-error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
+error.required.non.uk.passport = Enter a valid passport number
+error.invalid.non.uk.passport = Enter a valid passport number
 
-error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
-error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.utr.number = Enter a valid UTR number
+error.invalid.length.utr.number = Enter a valid UTR number
 error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
 error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
@@ -74,7 +74,7 @@ error.max.length.phone = You can’t enter more than 24 characters for the phone
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
 
-error.invalid.mlr.number = Enter a valid Money Laundering Regulation registration number
+error.invalid.mlr.number = Enter a valid Money Laundering Regulations registration number
 
 error.invalid.year = Enter a valid date in the format DD MM YYYY
 error.invalid.year.post1900 = The year can’t be before 1900
@@ -83,10 +83,10 @@ error.invalid.year.post1900 = The year can’t be before 1900
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select at least one activity that you need to register.
-error.required.bm.registration.number = Enter the company registration number.
-error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
-error.required.bm.businesstype.type = Enter your type of business.
+error.required.bm.register.service = Select one or more options to show what you need to register
+error.required.bm.registration.number = Enter a valid company registration number
+error.invalid.bm.registration.number = Enter a valid company registration number
+error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
 
@@ -96,26 +96,26 @@ error.required.atb.confirm.office = Select yes if this is the address of your re
 error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
-error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
-error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
+error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
+error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.rightaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
-error.bankdetails.accountname = Enter a bank account name
-error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
+error.bankdetails.accountname = Enter a name for this account
+error.invalid.bankdetails.accountname = You can’t enter more than 40 characters
 error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
-error.bankdetails.accountnumber = Enter the account number
-error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
-error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
-error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
+error.bankdetails.accountnumber = Enter a valid account number
+error.invalid.bankdetails.accountnumber = Enter a valid account number
+error.max.length.bankdetails.accountnumber = Enter a valid account number=
+error.required.bankdetails.iban.account = Enter either an IBAN number or an account number
 
 error.invalid.bankdetails.iban = Enter a valid IBAN number
 error.invalid.bankdetails.account = Enter a valid account number
 # to delete:
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
-error.max.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+error.max.length.bankdetails.account = Enter a valid account number
 
 error.required.bankdetails.register.another.bank = Select yes if you want to register another bank account
 
@@ -127,17 +127,17 @@ error.required.ba.business.turnover = Select one option to show how much net pro
 error.required.ba.turnover.from.mlr = Select one option to show how much net profit your business expects in the next 12 months from activities covered by the Money Laundering Regulations
 error.required.ba.is.your.franchise = Select yes if your business is a franchise
 error.required.ba.franchise.name = Enter the franchisor’s name
-error.max.length.ba.franchise.name = You can’t enter more than 140 characters for the franchisor’s name.
-error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
-error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
+error.max.length.ba.franchise.name = You can’t enter more than 140 characters
+error.required.ba.employee.count1 = Enter the number of people in your business, it must be at least 1
+error.invalid.ba.employee.count = Enter numbers only
 error.max.length.ba.employee.count = You can’t enter a number larger than 99999999999
-error.required.ba.employee.count2 = Enter a number.
+error.required.ba.employee.count2 = Enter the number of people in your business who work on activities covered by Money Laundering Regulations, it must be at least 1
 error.required.ba.select.country = Select yes if you have customers who live or work outside the UK
-error.invalid.ba.select.country = Enter at least one country.
+error.invalid.ba.select.country = Enter an official country name: for example, Holland is Netherlands
 error.required.ba.select.transaction.record = Select yes if you keep records of all your transaction with customers
 error.required.ba.atleast.one.transaction.record = Select one or more options to show how you record transactions
-error.required.ba.software.package.name = Enter the name of the software package.
-error.max.length.ba.software.package.name = You can’t enter more than 40 characters for the names of the software packages.
+error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
+error.max.length.ba.software.package.name = You can’t enter more than 40 characters
 error.required.ba.select.nca = Select yes if your business is registered online with the National Crime Agency
 error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
 error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
@@ -148,10 +148,10 @@ error.required.ba.advisor.name = Enter your professional adviser’s name
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
-error.required.tp.trading.name = Enter a trading name
-error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
+error.required.tp.trading.name = Enter the trading name you use for this premises
+error.invalid.tp.trading.name = You can’t enter more than 120 characters
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
-error.future.date = Enter a valid date. The date cannot be in the future.
+error.future.date = The date can’t be in the future
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
@@ -163,12 +163,12 @@ error.required.tp.registered.business.name = Enter your agent’s registered bus
 error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.business.structure = Select one option to show your agent’s business structure
 error.required.tp.agent.premises = Select yes if you’re registering an agent’s premises
-error.required.tp.agent.registered.company.name = Enter your agent’s registered company name.
-error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters for the registered company name.
-error.required.tp.agent.name = Enter your agent’s name.
-error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
-error.required.tp.agent.partnership = Enter your agent’s partners.
-error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
+error.required.tp.agent.registered.company.name = Enter your agent’s registered company name
+error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters
+error.required.tp.agent.name = Enter your agent’s name
+error.invalid.tp.agent.name = You can’t enter more than 140 characters
+error.required.tp.agent.partnership = Enter your agent’s partners
+error.invalid.tp.agent.partnership = You can’t enter more than 140 characters
 error.required.tp.register.another.premises = Select yes if you want to register another trading premises
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
@@ -178,27 +178,27 @@ error.required.tp.confirm.address = Select yes if this is the address of your tr
 error.required.eab.redress.scheme = Select yes if the business is registered with a redress scheme
 error.required.eab.which.redress.scheme = Select one option to show the redress scheme the business is registered with
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
-error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters for the name of the redress scheme.
+error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters
 error.required.eab.business.services = Select one or more options to show the services your business provides
 error.required.eab.penalised.under.act = Select yes if the business, or anyone in it, have ever been penalised under the Estate Agents Act 1979
-error.required.eab.info.about.penalty = Enter some information about the penalty received.
+error.required.eab.info.about.penalty = Give a brief description of what the penalty was, and when it occurred
 error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes if this person is a UK resident
-error.required.rp.birth.country = Enter a country of birth.
+error.required.rp.birth.country = Enter an official country name: for example, Holland is Netherlands
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
 error.required.rp.register.another.person = Select yes if you want to register another responsible person
 error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
-error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
+error.max.length.rp.email = You can’t enter more than 100 characters
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
-error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
+error.required.rp.experiencetraining.information = Enter a brief description of this person's experience
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
-error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.training.information = Enter a brief description of this person's training
 error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
-error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
+error.invalid.length.rp.training.information = You can’t enter more than 255 characters
 error.required.rp.isknownbyothernames = Select yes if this person is known by another name
 error.required.rp.otherfirstnames = Enter all other first names.
 error.required.rp.otherlastnames = Enter all other last names.
@@ -208,10 +208,10 @@ error.required.rp.first_name = Enter the responsible person’s first name
 error.required.rp.last_name = Enter the responsible person’s last name
 error.rp.previous.invalid = Enter the responsible person’s previous name
 error.required.rp.otherNames = Enter the responsible person’s alternative name
-error.invalid.length.otherNames = You can’t enter more than 140 characters for the alternative name.
+error.invalid.length.otherNames = You can’t enter more than 140 characters
 error.required.timeAtAddress = Select one option to show how long this person lived at this address
 error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
-error.expected.future.date = Enter a valid date. The date cannot be in the future.
+error.expected.future.date = The date cannot be in the future
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
@@ -255,42 +255,42 @@ error.required.professionalbody.penalised.by.professional.body = Select yes if t
 error.required.msb.services = Select one or more options to show the services your business provides
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
-error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters.
+error.required.msb.ipsp.name = Enter your IPSP’s name
+error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
+error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
 error.required.msb.send.money = Select yes if you send money to other countries
-error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
-error.invalid.msb.transactions.in.12months = Enter a valid number. It must be 11 characters long.
+error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
+error.invalid.msb.transactions.in.12months = Enter up to 11 numbers only
 error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
-error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
+error.invalid.countries.msb.branchesOrAgents = Enter an official country name: for example, Holland is Netherlands
 error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
-error.required.countries.msb.most.transactions = Enter at least one country.
+error.required.countries.msb.most.transactions = Enter an official country name: for example, Holland is Netherlands
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €15,000 or more
 error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
 error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
-error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
-error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
+error.required.hvd.business.sell.other.details = Enter a description of what your business will sell
+error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters
 error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €15,000 or more
 error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €15,000 from customers you’ve not met in person
-error.required.hvd.describe = Please describe how you expect to receive these payments.
-error.maxlength.hvd.describe = You can’t enter more than 255 characters.
+error.required.hvd.describe = Enter details of how you expect to receive these payments
+error.maxlength.hvd.describe = You can’t enter more than 255 characters
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
 error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
 
 
 ################################# Renewal ###################################
-error.required.renewal.transactions.in.12months = Enter the number of transactions in the last 12 months.
+error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
 
 error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €15,000 in the last 12 months from customers you’ve not met in person
@@ -1465,7 +1465,7 @@ notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no lon
 notifications.subject.Others = Generic communication
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
-notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has been rejected
+notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
 notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
 
 notifications.header = Your Messages
@@ -1550,7 +1550,7 @@ survey.satisfaction.helpus = to help us improve the service.
 ############################### Notifications Text ######################
 
 notification.static.text.ApplicationAutorejectionForFailureToPay = <p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money \
-Laundering regulations 2007 has been rejected.</p>\
+Laundering regulations 2007 has failed.</p>\
 <p>As you’ve not paid the full fees due, your application has automatically expired.</p>\
 <p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
 if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
