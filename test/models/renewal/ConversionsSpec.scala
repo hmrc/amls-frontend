@@ -107,9 +107,8 @@ class ConversionsSpec extends WordSpec with MustMatchers {
           Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None))
 
     }
-    */
 
-    /*"convert the 'HVD percentage' model" in new Fixture {
+    "convert the 'HVD percentage' model" in new Fixture {
       val model = PercentageOfCashPaymentOver15000.First
       val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)

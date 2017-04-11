@@ -10,7 +10,7 @@ import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
@@ -1144,7 +1144,16 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         businessTurnover = Some(BusinessTurnover.Second),
         msbThroughput = Some(MsbThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
-        involvedInOtherActivities = Some(InvolvedInOtherNo)
+        involvedInOtherActivities = Some(InvolvedInOtherNo),
+        mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+        sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
+        msbWhichCurrencies = Some(MsbWhichCurrencies(
+          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
+        ceTransactions = Some(CETransactions("12345678963")),
+        msbTransfers = Some(MsbMoneyTransfers("2500")),
+        percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other")))))
       )
 
       val result = await(TestSubmissionService.renewal(renewal))
@@ -1163,6 +1172,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       submission.msbSection mustBe defined
       submission.msbSection.get.throughput mustBe defined
+      submission.msbSection.get.mostTransactions mustBe defined
+      submission.msbSection.get.sendTheLargestAmountsOfMoney mustBe defined
+      submission.msbSection.get.whichCurrencies mustBe defined
+      submission.msbSection.get.ceTransactionsInNext12Months mustBe defined
+      submission.msbSection.get.transactionsInNext12Months mustBe defined
+
+      submission.hvdSection.get.percentageOfCashPaymentOver15000 mustBe defined
+      submission.hvdSection.get.receiveCashPayments mustBe defined
     }
 
   }
