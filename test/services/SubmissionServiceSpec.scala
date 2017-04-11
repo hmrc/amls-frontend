@@ -1149,13 +1149,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         msbThroughput = Some(MsbThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
-        mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+        mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
         sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(
           Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
         msbWhichCurrencies = Some(MsbWhichCurrencies(
           Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
         ceTransactions = Some(CETransactions("12345678963")),
-        msbTransfers = Some(MsbMoneyTransfers("2500")),
+        transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
         receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other")))))
       )

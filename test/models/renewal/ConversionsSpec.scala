@@ -64,8 +64,8 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB money transfers' model" in new Fixture {
-      val model = MsbMoneyTransfers("2500")
-      val renewal = Renewal(msbTransfers = Some(model))
+      val model = TransactionsInLast12Months("2500")
+      val renewal = Renewal(transactionsInLast12Months = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.msbSection.get.transactionsInNext12Months mustBe Some(models.moneyservicebusiness.TransactionsInNext12Months("2500"))
@@ -82,7 +82,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB most transactions' model" in new Fixture {
-      val model = MsbMostTransactions(Seq(Country("United Kingdom", "GB")))
+      val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
       val renewal = Renewal(mostTransactions = Some(model))
       val converted = subscriptionRequest.withRenewalData((renewal))
 

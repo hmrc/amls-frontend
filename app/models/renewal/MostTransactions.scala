@@ -6,7 +6,7 @@ import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.{Reads, Writes}
 import utils.TraversableValidators
 
-case class MsbMostTransactions(countries: Seq[Country])
+case class MostTransactions(countries: Seq[Country])
 
 private sealed trait MostTransactions0 {
 
@@ -14,7 +14,7 @@ private sealed trait MostTransactions0 {
   (implicit
    a: Path => RuleLike[A, Seq[String]],
    cR: Rule[Seq[String], Seq[Country]]
-  ): Rule[A, MsbMostTransactions] =
+  ): Rule[A, MostTransactions] =
     From[A] { __ =>
 
       import utils.MappingUtils.Implicits.RichRule
@@ -31,52 +31,52 @@ private sealed trait MostTransactions0 {
           .andThen(maxLengthR[Seq[Country]](3))
       }
 
-      (__ \ "mostTransactionsCountries").read(seqR) map MsbMostTransactions.apply
+      (__ \ "mostTransactionsCountries").read(seqR) map MostTransactions.apply
     }
 
   private implicit def write[A]
   (implicit
    a: Path => WriteLike[Seq[Country], A]
-  ): Write[MsbMostTransactions, A] =
+  ): Write[MostTransactions, A] =
     To[A] { __ =>
       import play.api.libs.functional.syntax.unlift
-      (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap unlift(MsbMostTransactions.unapply)
+      (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap unlift(MostTransactions.unapply)
     }
 
-  val formR: Rule[UrlFormEncoded, MsbMostTransactions] = {
+  val formR: Rule[UrlFormEncoded, MostTransactions] = {
     import jto.validation.forms.Rules._
     implicitly
   }
 
-  val jsonR: Reads[MsbMostTransactions] = {
+  val jsonR: Reads[MostTransactions] = {
     import utils.JsonMapping._
     import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     implicitly
   }
 
-  val formW: Write[MsbMostTransactions, UrlFormEncoded] = {
+  val formW: Write[MostTransactions, UrlFormEncoded] = {
     import jto.validation.forms.Writes._
     import utils.MappingUtils.spm
     implicitly
   }
 
-  val jsonW: Writes[MsbMostTransactions] = {
+  val jsonW: Writes[MostTransactions] = {
     import jto.validation.playjson.Writes._
     import utils.JsonMapping._
     implicitly
   }
 }
 
-object MsbMostTransactions {
+object MostTransactions {
 
   private object Cache extends MostTransactions0
 
-  implicit val formR: Rule[UrlFormEncoded, MsbMostTransactions] = Cache.formR
-  implicit val formW: Write[MsbMostTransactions, UrlFormEncoded] = Cache.formW
-  implicit val jsonR: Reads[MsbMostTransactions] = Cache.jsonR
-  implicit val jsonW: Writes[MsbMostTransactions] = Cache.jsonW
+  implicit val formR: Rule[UrlFormEncoded, MostTransactions] = Cache.formR
+  implicit val formW: Write[MostTransactions, UrlFormEncoded] = Cache.formW
+  implicit val jsonR: Reads[MostTransactions] = Cache.jsonR
+  implicit val jsonW: Writes[MostTransactions] = Cache.jsonW
 
-  implicit def convert(model: MsbMostTransactions): models.moneyservicebusiness.MostTransactions = {
+  implicit def convert(model: MostTransactions): models.moneyservicebusiness.MostTransactions = {
     models.moneyservicebusiness.MostTransactions(model.countries)
   }
 }

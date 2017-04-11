@@ -10,21 +10,21 @@ class MostTransactionsSpec extends PlaySpec {
 
   "MostTransactions" must {
 
-    val rule: Rule[UrlFormEncoded, MsbMostTransactions] = implicitly
-    val write: Write[MsbMostTransactions, UrlFormEncoded] = implicitly
+    val rule: Rule[UrlFormEncoded, MostTransactions] = implicitly
+    val write: Write[MostTransactions, UrlFormEncoded] = implicitly
 
     "roundtrip through json" in {
 
-      val model: MsbMostTransactions =
-        MsbMostTransactions(Seq(Country("United Kingdom", "GB")))
+      val model: MostTransactions =
+        MostTransactions(Seq(Country("United Kingdom", "GB")))
 
-      Json.fromJson[MsbMostTransactions](Json.toJson(model)) mustEqual JsSuccess(model)
+      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model)
     }
 
     "roundtrip through forms" in {
 
-      val model: MsbMostTransactions =
-        MsbMostTransactions(Seq(Country("United Kingdom", "GB")))
+      val model: MostTransactions =
+        MostTransactions(Seq(Country("United Kingdom", "GB")))
 
       rule.validate(write.writes(model)) mustEqual Valid(model)
     }
@@ -56,7 +56,7 @@ class MostTransactionsSpec extends PlaySpec {
   "MostTransactions Form Writes" when {
     "an item is repeated" must {
       "serialise all items correctly" in {
-        MsbMostTransactions.formW.writes(MsbMostTransactions(List(
+        MostTransactions.formW.writes(MostTransactions(List(
           Country("Country2", "BB"),
           Country("Country1", "AA"),
           Country("Country1", "AA")
@@ -75,13 +75,13 @@ class MostTransactionsSpec extends PlaySpec {
     "all countries are valid" must {
       "Successfully read from the form" in {
 
-        MsbMostTransactions.formR.validate(
+        MostTransactions.formR.validate(
           Map(
             "mostTransactionsCountries[0]" -> Seq("GB"),
             "mostTransactionsCountries[1]" -> Seq("MK"),
             "mostTransactionsCountries[2]" -> Seq("JO")
           )
-        ) must be(Valid(MsbMostTransactions(Seq(
+        ) must be(Valid(MostTransactions(Seq(
           Country("United Kingdom", "GB"),
           Country("Macedonia, the Former Yugoslav Republic of", "MK"),
           Country("Jordan", "JO")
@@ -92,7 +92,7 @@ class MostTransactionsSpec extends PlaySpec {
     "the second country is invalid" must {
       "fail validation" in {
 
-        val x: VA[MsbMostTransactions] = MsbMostTransactions.formR.validate(
+        val x: VA[MostTransactions] = MostTransactions.formR.validate(
           Map(
             "mostTransactionsCountries[0]" -> Seq("GB"),
             "mostTransactionsCountries[1]" -> Seq("hjjkhjkjh"),

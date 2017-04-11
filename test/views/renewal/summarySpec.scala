@@ -82,9 +82,9 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
           Some(MsbThroughput("01")),
           Some(MsbWhichCurrencies(Seq("EUR"),None,None,None,None)),
-          Some(MsbMoneyTransfers("1500")),
+          Some(TransactionsInLast12Months("1500")),
           Some(MsbSendTheLargestAmountsOfMoney(Country("France", "FR"))),
-          Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           false
         )

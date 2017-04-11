@@ -1038,7 +1038,8 @@ fieldset.panel-indent legend {
 
 /* -- notifications -- */
 
-table.notifications thead th {
+table.notifications thead th,
+table.notifications thead td {
   background-color: #005ea5;
   color: #fff;
 }
@@ -1110,6 +1111,11 @@ button,
   line-height: 1.25em;
   padding: 0.5em 0.6em 0.3em 0.6em;
   font-size: 1em;
+}
+
+/* stops the massive overhang on focus in firefox */
+.button .visuallyhidden {
+  left: 0;
 }
 
 .button--get-started {

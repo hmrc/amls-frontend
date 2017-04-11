@@ -23,9 +23,9 @@ object Conversions {
       val msbSection = request.msbSection flatMap { msb =>
         Some(msb.copy(
           throughput = renewal.msbThroughput contramap MsbThroughput.convert,
-          transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert,
+          transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
           sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap MsbSendTheLargestAmountsOfMoney.convert,
-          mostTransactions = renewal.mostTransactions contramap MsbMostTransactions.convert,
+          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
           ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert,
           whichCurrencies = renewal.msbWhichCurrencies contramap MsbWhichCurrencies.convert
 

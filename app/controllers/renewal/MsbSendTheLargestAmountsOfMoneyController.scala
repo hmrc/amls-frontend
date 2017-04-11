@@ -47,6 +47,6 @@ class MsbSendTheLargestAmountsOfMoneyController @Inject()(
 
   def redirectDependingOnEdit(edit:Boolean) = edit match {
     case true  => Redirect(routes.SummaryController.get())
-    case _ => Redirect(routes.MsbMostTransactionsController.get(edit))
+    case _ => Redirect(routes.MostTransactionsController.get(edit))
   }
 }

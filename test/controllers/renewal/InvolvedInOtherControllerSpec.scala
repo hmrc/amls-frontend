@@ -221,7 +221,6 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
 
     }
 
-
     "when post is called" must {
 
       "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
@@ -314,7 +313,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
+          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.renewal.ba.involved.in.other"))
         }
 
         "with invalid data without business activities" in new Fixture {
@@ -330,7 +329,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           status(result) must be(BAD_REQUEST)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
+          document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.renewal.ba.involved.in.other"))
         }
 
         "with required field not filled with business activities" in new Fixture {
@@ -352,7 +351,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
+          document.select("a[href=#details]").html() must include(Messages("error.required.renewal.ba.involved.in.other.text"))
         }
       }
     }
