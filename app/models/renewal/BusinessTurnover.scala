@@ -23,7 +23,7 @@ object BusinessTurnover {
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "businessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
+    (__ \ "businessTurnover").read[String].withMessage("error.required.renewal.ba.business.turnover") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third

@@ -3,7 +3,7 @@ package views.renewal
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
-import models.renewal.SendTheLargestAmountsOfMoney
+import models.renewal.MsbSendTheLargestAmountsOfMoney
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -19,20 +19,20 @@ class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatch
   "expected_business_turnover view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[MsbSendTheLargestAmountsOfMoney] = Form2(MsbSendTheLargestAmountsOfMoney(Country("Country", "US")))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 
-      doc.title must startWith(Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[MsbSendTheLargestAmountsOfMoney] = Form2(MsbSendTheLargestAmountsOfMoney(Country("Country", "US")))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 
-      heading.html must be(Messages("msb.send.the.largest.amounts.of.money.title"))
+      heading.html must be(Messages("renewal.msb.largest.amounts.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

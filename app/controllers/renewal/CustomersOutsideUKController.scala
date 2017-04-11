@@ -45,12 +45,19 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
               renewalService.updateRenewal(renewal.customersOutsideUK(data)) map { _ =>
-                redirectDependingOnActivities(businessMatching)
+                redirect(edit, businessMatching)
               }
             }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
           }
         }
       }
+  }
+
+  private def redirect(edit: Boolean, businessMatching: BusinessMatching) = {
+    edit match {
+      case true => Redirect(routes.SummaryController.get())
+      case false => redirectDependingOnActivities(businessMatching)
+    }
   }
 
   private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {

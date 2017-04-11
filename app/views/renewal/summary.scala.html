@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 @import models.renewal._
-@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney}
+@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
 
 @(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
 
@@ -86,51 +86,6 @@
         }
     }
 
-    @model.receiveCashPayments.map { rcp =>
-        @checkYourAnswers(
-            question = Messages("renewal.receiving.title"),
-            editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
-        ) {
-            @rcp.paymentMethods match {
-                case None => {<p>@Messages("lbl.no")</p>}
-                case Some(pm:PaymentMethods) => {
-                    <p>@Messages("lbl.yes")</p>
-                    @checkYourAnswersExtra(
-                        question = Messages("renewal.receiving.expect.to.receive")
-                    ) {
-                        <ul class="list list--comma">
-                            <li>@pm match {
-                                case PaymentMethods(false, false, None) => { Unknown }
-                                case PaymentMethods(false, false, Some(txt)) => { @txt }
-                                case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
-                                case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
-                                case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
-                                case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
-                                case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
-                                case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
-                                }</li>
-                        </ul>
-                    }
-                }
-            }
-        }
-    }
-
-    @model.percentageOfCashPaymentOver15000.map { p =>
-        @checkYourAnswers(
-            question = Messages("hvd.percentage.title"),
-            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
-            ) {
-                <p>@p match {
-                    case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
-                    case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
-                    case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
-                    case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
-                    case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
-                }</p>
-            }
-    }
-
     @bmMsbServices.map {services =>
 
         @model.msbThroughput.map { m =>
@@ -151,6 +106,20 @@
             }
         }
 
+
+        @model.sendTheLargestAmountsOfMoney.map { lom =>
+            @checkYourAnswers(
+                question = Messages("renewal.msb.largest.amounts.title"),
+                editUrl = controllers.renewal.routes.MsbSendTheLargestAmountsOfMoneyController.get(true).toString
+            ) {
+                <ul class="list list--comma">
+                    @lom.countryList.map { country =>
+                        <li>@country.name</li>
+                    }
+                </ul>
+            }
+        }
+
         @if(services.msbServices.contains(TransmittingMoney)) {
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
@@ -165,27 +134,93 @@
                 }
             }
         }
-    }
 
-    @model.ceTransactions.map{ trans =>
-        @checkYourAnswers(
-            question = Messages("renewals.msb.ce.transactions.expected.title"),
-            editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
-        ) {
-            <p>@trans.ceTransaction</p>
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            @model.ceTransactions.map{ trans =>
+                @checkYourAnswers(
+                question = Messages("renewals.msb.ce.transactions.expected.title"),
+                editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
+            ) {
+                <p>@trans.ceTransaction</p>
+                }
+            }
+
+            @model.msbWhichCurrencies.map { wc =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.whichcurrencies.header"),
+                    editUrl = controllers.renewal.routes.MsbWhichCurrenciesController.get(true).toString
+                ) {
+                <ul class="list list--comma">
+                    @wc.currencies.map { cur =>
+                        <li>@cur</li>
+                    }
+                </ul>
+
+                @if(config.ApplicationConfig.release7) {
+                    @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
+                    @checkYourAnswersExtra(
+                        question = Messages("msb.which_currencies.foreign_currencies_question")
+                    ) {
+                        <p>@usesForeignCurrencies match {
+                            case true => {@Messages("lbl.yes")}
+                            case _ => {@Messages("lbl.no")}
+                        }</p>
+                    }
+
+                    @if(usesForeignCurrencies) {
+                        @whoUsesCurrencies(wc)
+                    }
+                }
+                } else {
+                    @whoUsesCurrencies(wc)
+                }
+            }
+            }
         }
     }
 
-    @model.sendTheLargestAmountsOfMoney.map { lom =>
+    @model.percentageOfCashPaymentOver15000.map { p =>
         @checkYourAnswers(
-            question = Messages("msb.send.the.largest.amounts.of.money.title"),
-            editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+            question = Messages("renewal.hvd.percentage.title"),
+            editUrl = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
         ) {
-        <ul class="list list--comma">
-            @lom.countryList.map { country =>
-                <li>@country.name</li>
+            <p>@p match {
+                case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
+                case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
+                case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
+                case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
             }
-        </ul>
+        }
+
+        @model.receiveCashPayments.map { rcp =>
+            @checkYourAnswers(
+                question = Messages("renewal.receiving.title"),
+                editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
+            ) {
+                @rcp.paymentMethods match {
+                    case None => {<p>@Messages("lbl.no")</p>}
+                    case Some(pm:PaymentMethods) => {
+                        <p>@Messages("lbl.yes")</p>
+                        @checkYourAnswersExtra(
+                            question = Messages("renewal.receiving.expect.to.receive")
+                        ) {
+                            <ul class="list list--comma">
+                                <li>@pm match {
+                                    case PaymentMethods(false, false, None) => { Unknown }
+                                    case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                    case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                    case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                                    }</li>
+                            </ul>
+                        }
+                    }
+                }
         }
     }
 
@@ -194,4 +229,22 @@
         attrRole = true,
         linkText = Messages("button.checkyouranswers.acceptandcomplete")
     )
+}
+
+@whoUsesCurrencies(wc: MsbWhichCurrencies) = {
+    @checkYourAnswersExtra(
+    question = Messages("msb.which_currencies.who")
+    ) {
+    <ul class="list">
+        @wc.bankMoneySource.map { bms =>
+        <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+        }
+        @wc.wholesalerMoneySource.map { wms =>
+        <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+        }
+        @if(wc.customerMoneySource) {
+        <li>@Messages("msb.which_currencies.source.customers")</li>
+        }
+    </ul>
+    }
 }

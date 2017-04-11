@@ -6,12 +6,12 @@
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @if(field.hasErrors) {
-    <div id="@field.id" class="display-block @classes.mkString(" ") form-field--error">
+    <div id="@field.id" class="clear @classes.mkString(" ") form-field--error">
         <span class="error-notification">@field.error</span>
         @content
     </div>
 } else {
-    <div class="display-block @classes.mkString(" ")">
+    <div class="clear @classes.mkString(" ")">
         @content
     </div>
 }

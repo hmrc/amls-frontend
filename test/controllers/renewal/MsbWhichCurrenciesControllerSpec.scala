@@ -1,7 +1,8 @@
 package controllers.renewal
 
 import cats.implicits._
-import models.renewal.{MsbMoneyTransfers, Renewal}
+import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
+import models.renewal.{MsbWhichCurrencies, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
@@ -15,14 +16,14 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar {
+class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
 
-    lazy val controller = new MsbMoneyTransfersController(self.authConnector, renewalService)
+    lazy val controller = new MsbWhichCurrenciesController(self.authConnector, renewalService)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -30,8 +31,17 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormData = "transfers" -> "1500"
-    val validFormRequest = request.withFormUrlEncodedBody(validFormData)
+    val validFormRequest = request.withFormUrlEncodedBody(
+      "currencies[0]" -> "USD",
+      "currencies[1]" -> "GBP",
+      "currencies[2]" -> "BOB",
+      "bankMoneySource" -> "Yes",
+      "bankNames" -> "Bank names",
+      "wholesalerMoneySource" -> "Yes",
+      "wholesalerNames" -> "wholesaler names",
+      "customerMoneySource" -> "Yes",
+      "usesForeignCurrencies" -> "Yes"
+    )
 
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
@@ -46,7 +56,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.transfers.header")
+        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.whichcurrencies.header")
       }
 
       "edit is true" in new Fixture {
@@ -55,19 +65,19 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select("form").first.attr("action") mustBe routes.MsbMoneyTransfersController.post(true).url
+        doc.select("form").first.attr("action") mustBe routes.MsbWhichCurrenciesController.post(true).url
       }
 
       "reads the current value from the renewals model" in new Fixture {
 
         when {
           renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(msbTransfers = MsbMoneyTransfers("2500").some).some)
+        } thenReturn Future.successful(Renewal(msbWhichCurrencies = MsbWhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
 
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select("input[name=transfers]").first.attr("value") mustBe "2500"
+        doc.select("select[name=currencies[0]] option[selected]").attr("value") mustBe "EUR"
 
         verify(renewalService).getRenewal(any(), any(), any())
       }
@@ -80,7 +90,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe routes.MsbSendTheLargestAmountsOfMoneyController.get().url.some
+        redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
@@ -90,22 +100,27 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
       }
 
-      "return a bad request" when {
-        "the form fails validation" in new FormSubmissionFixture {
-          val result = controller.post()(request)
-
-          status(result) mustBe BAD_REQUEST
-          verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
-        }
-      }
-
       "save the model data into the renewal object" in new FormSubmissionFixture {
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.msbTransfers mustBe MsbMoneyTransfers("1500").some
+        captor.getValue.msbWhichCurrencies mustBe Some(MsbWhichCurrencies(
+          Seq("USD", "GBP", "BOB"),
+          Some(true),
+          Some(BankMoneySource("Bank names")),
+          Some(WholesalerMoneySource("wholesaler names")),
+          Some(true)
+        ))
+      }
+    }
+    "return a bad request" when {
+      "the form fails validation" in new FormSubmissionFixture {
+        val result = controller.post()(request)
+
+        status(result) mustBe BAD_REQUEST
+        verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
       }
     }
   }
