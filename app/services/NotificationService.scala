@@ -37,8 +37,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case ContactType.ApplicationApproval |
            ContactType.RenewalApproval |
-           AutoExpiryOfRegistration |
-           RenewalReminder => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
+           ContactType.AutoExpiryOfRegistration |
+           ContactType.RenewalReminder => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 

@@ -42,7 +42,10 @@ object NotificationDetails {
 
     inputString.split("\\|").toList match {
       case date::ref::tail => convertMessageTextWithRefNo(date, ref)
-      case d: List[String] => convertEndDateMessageText(d.head)
+      case d if d.length == 1 => {
+        println("**********" + d)
+        convertEndDateMessageText(d.head)
+      }
       case _ => None
     }
   }
@@ -53,8 +56,13 @@ object NotificationDetails {
   }
 
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
-    val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
-    Some(EndDateDetails(dateValue, None))
+    inputString.split("-") match {
+      case dateString if dateString.length > 1 => {
+        val dateValue = LocalDate.parse(dateString(1), DateTimeFormat.forPattern("dd/MM/yyyy"))
+        Some(EndDateDetails(dateValue, None))
+      }
+      case _ => None
+    }
   }
 
   def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
