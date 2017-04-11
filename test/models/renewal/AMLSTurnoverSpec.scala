@@ -65,7 +65,7 @@ class AMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error on empty data" in {
       AMLSTurnover.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "turnover", Seq(ValidationError("error.required.ba.turnover.from.mlr"))))))
+        be(Invalid(Seq((Path \ "turnover", Seq(ValidationError("error.required.renewal.ba.turnover.from.mlr"))))))
     }
   }
 

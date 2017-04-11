@@ -63,11 +63,12 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
       ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
-      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
+      ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
       ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
       ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500")),
-      ("msb.send.the.largest.amounts.of.money.title", checkElementTextIncludes(_, "america")),
-      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"))
+      ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France")),
+      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom")),
+      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -80,9 +81,10 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(PercentageOfCashPaymentOver15000.First),
           Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
           Some(MsbThroughput("01")),
-          Some(MsbMoneyTransfers(1500)),
-          Some(SendTheLargestAmountsOfMoney(Country("america", "US"))),
-          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(MsbWhichCurrencies(Seq("EUR"),None,None,None,None)),
+          Some(MsbMoneyTransfers("1500")),
+          Some(MsbSendTheLargestAmountsOfMoney(Country("France", "FR"))),
+          Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactions("123")),
           false
         )

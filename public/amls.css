@@ -617,8 +617,19 @@ form .inline .block-label {
   clear: both;
 }
 
+
+.clear:before,
+.clear:after {
+  content: '';
+  display: table;
+}
+
+.clear:after {
+  clear: both;
+}
+
 .clear {
-    clear: both;
+  *zoom: 1;
 }
 
 .visuallyhidden-legend > legend {

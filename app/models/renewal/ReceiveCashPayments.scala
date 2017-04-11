@@ -15,7 +15,7 @@ sealed trait ReceiveCashPayments0 {
 
     import jto.validation.forms.Rules._
 
-    (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
+    (__ \ "receivePayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap{
       case true =>
         (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
       case false => Rule.fromMapping { _ => Valid(ReceiveCashPayments(None)) }

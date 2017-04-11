@@ -24,10 +24,10 @@ object Conversions {
         case Some(msb) => Some(msb.copy(
           throughput = renewal.msbThroughput contramap MsbThroughput.convert,
           transactionsInNext12Months = renewal.msbTransfers contramap MsbMoneyTransfers.convert,
-          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
-          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
-          ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert
-          //whichCurrencies = renewal.msbWhichCurrencies contramap WhichCurrencies.convert
+          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap MsbSendTheLargestAmountsOfMoney.convert,
+          mostTransactions = renewal.mostTransactions contramap MsbMostTransactions.convert,
+          ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert,
+          whichCurrencies = renewal.msbWhichCurrencies contramap MsbWhichCurrencies.convert
 
         ))
         case _ => None

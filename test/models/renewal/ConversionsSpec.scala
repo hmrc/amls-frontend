@@ -62,7 +62,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB money transfers' model" in new Fixture {
-      val model = MsbMoneyTransfers(2)
+      val model = MsbMoneyTransfers("2500")
       val renewal = Renewal(msbTransfers = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
@@ -70,7 +70,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB largest amounts' model" in new Fixture {
-      val model = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
+      val model = MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
       val renewal = Renewal(sendTheLargestAmountsOfMoney = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
@@ -78,7 +78,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB most transactions' model" in new Fixture {
-      val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
+      val model = MsbMostTransactions(Seq(Country("United Kingdom", "GB")))
       val renewal = Renewal(mostTransactions = Some(model))
       val converted = subscriptionRequest.withRenewalData((renewal))
 
@@ -94,6 +94,11 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB which currencies' model" in new Fixture{
+      val model = MsbWhichCurrencies(Seq("EUR"),None,None,None,None)
+      val renewal = Renewal(msbWhichCurrencies = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.whichCurrencies mustBe Some(models.moneyservicebusiness.WhichCurrencies)
 
     }
 
@@ -107,7 +112,10 @@ class ConversionsSpec extends WordSpec with MustMatchers {
 
     "convert the 'HVD receive cash payments' model" in new Fixture {
       val model = ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))
-      val renewal = Renewal(ReceiveCashPayments = Some(model))
+      val renewal = Renewal(receiveCashPayments = Some(model))
+      val converted = subscriptionRequest.withRenewalData((renewal))
+
+      converted.hvdSection.get.receiveCashPayments mustBe Some(models.hvd.ReceiveCashPayments)
 
     }
 
