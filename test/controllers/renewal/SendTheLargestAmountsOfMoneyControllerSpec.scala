@@ -86,7 +86,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.MsbMostTransactionsController.get().url))
+          redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
         }
       }
 
