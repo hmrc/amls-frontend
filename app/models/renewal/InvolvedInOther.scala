@@ -21,7 +21,7 @@ object InvolvedInOther {
 
   val maxOtherBusinessActivityTypeLength = 255
   val OtherBusinessActivityType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.ba.involved.in.other.text") andThen
+    notEmpty.withMessage("error.required.renewal.ba.involved.in.other.text") andThen
     maxWithMsg(maxOtherBusinessActivityTypeLength, "error.invalid.maxlength.255") andThen
     basicPunctuationPattern()
 
