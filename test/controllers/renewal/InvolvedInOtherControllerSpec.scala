@@ -351,7 +351,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
+          document.select("a[href=#details]").html() must include(Messages("error.required.renewal.ba.involved.in.other.text"))
         }
       }
     }
