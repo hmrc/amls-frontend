@@ -1,10 +1,10 @@
 @import forms._
-@import models.renewal.MsbMoneyTransfers
+@import models.renewal.TransactionsInLast12Months
 @import include._
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: Form2[MsbMoneyTransfers], edit: Boolean)(implicit messages: Messages, request: Request[_])
+@(f: Form2[TransactionsInLast12Months], edit: Boolean)(implicit messages: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -16,7 +16,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.renewal.routes.MsbMoneyTransfersController.post(edit)) {
+    @form(f, controllers.renewal.routes.TransactionsInLast12MonthsController.post(edit)) {
 
         @input(
             field = f("transfers"),

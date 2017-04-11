@@ -97,10 +97,10 @@
             }
         }
 
-        @model.msbTransfers.map { m =>
+        @model.transactionsInLast12Months.map { m =>
             @checkYourAnswers(
                 question = messages("renewal.msb.transfers.header"),
-                editUrl = controllers.renewal.routes.MsbMoneyTransfersController.get(edit = true).url
+                editUrl = controllers.renewal.routes.TransactionsInLast12MonthsController.get(edit = true).url
             ) {
                 <p>@m.transfers</p>
             }
