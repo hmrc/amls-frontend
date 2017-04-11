@@ -46,15 +46,18 @@
             jsHidden = false,
             data = Seq("data-toggle-new")
         ) {
-            @hint(
-                hint = "businessactivities.hight.value.customer.lbl.hint"
-            )
 
-            @errorGroup(f("countries")) {
+            @fieldset(
+                legend = "renewal.customers.outside.uk.hint.lbl",
+                f = f("countries"),
+                hint = "businessactivities.hight.value.customer.lbl.hint",
+                panel = false
+            ) {
                 @addRemove("lbl.add.another.country") {
                     @for(i <- 0 until 10) {@country(f(s"countries[$i]"))}
                 }
             }
+
         }
 
         @submit(edit)
