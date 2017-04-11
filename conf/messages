@@ -1586,3 +1586,14 @@ notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay 
 notification.message.with.end.date.ApplicationApproval = <p>Your application to register has been approved. You’re now registered until {0}.</p>\
 <p>Your anti-money laundering registration number is: {1}.</p>\
 <p>You can find details of your registration on your status page.</p>
+
+notification.message.with.end.date.RenewalApproval = <p>Your renewal has been approved. You’re now registered for supervision until {0}.</p>\
+<p>You can find details of your registration on your status page.</p>
+
+notification.message.with.end.date.AutoExpiryOfRegistration = <p>Your registration to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 expired on {0}.</p>\
+<p>You need to be registered with a supervisory body if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
+<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your status page.</p>
+
+notification.message.with.end.date.RenewalReminder = <p>You need to renew your registration before {0}.</p>\
+<p>You can renew from your status page.</p>\
+<p>If you don’t renew and pay your fees before this date your registration will expire and you won’t be supervised by HM Revenue and Customs.</p>

@@ -3,6 +3,7 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import connectors.AmlsNotificationConnector
+import models.notifications.ContactType.{RenewalReminder, AutoExpiryOfRegistration}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,7 +36,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
            ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType)
 
       case ContactType.ApplicationApproval |
-           ContactType.RenewalApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
+           ContactType.RenewalApproval |
+           AutoExpiryOfRegistration |
+           RenewalReminder => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
