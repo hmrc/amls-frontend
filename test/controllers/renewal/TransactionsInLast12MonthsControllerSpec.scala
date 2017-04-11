@@ -80,7 +80,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
         val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe routes.MsbSendTheLargestAmountsOfMoneyController.get().url.some
+        redirectLocation(result) mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
