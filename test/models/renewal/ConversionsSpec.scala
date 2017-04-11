@@ -3,7 +3,7 @@ package models.renewal
 import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
 import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
 
@@ -71,12 +71,14 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       converted.msbSection.get.transactionsInNext12Months mustBe Some(models.moneyservicebusiness.TransactionsInNext12Months("2500"))
     }
 
-    /*"convert the 'MSB largest amounts' model" in new Fixture {
+    "convert the 'MSB largest amounts' model" in new Fixture {
       val model = MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
       val renewal = Renewal(sendTheLargestAmountsOfMoney = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.msbSection.get.sendTheLargestAmountsOfMoney mustBe Some(models.moneyservicebusiness.SendTheLargestAmountsOfMoney)
+      converted.msbSection.get.sendTheLargestAmountsOfMoney mustBe Some(
+        models.moneyservicebusiness.SendTheLargestAmountsOfMoney(
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US"))))
     }
 
     "convert the 'MSB most transactions' model" in new Fixture {
@@ -84,7 +86,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val renewal = Renewal(mostTransactions = Some(model))
       val converted = subscriptionRequest.withRenewalData((renewal))
 
-      converted.msbSection.get.mostTransactions mustBe Some(models.moneyservicebusiness.MostTransactions)
+      converted.msbSection.get.mostTransactions mustBe Some(models.moneyservicebusiness.MostTransactions(Seq(Country("United Kingdom", "GB"))))
     }
 
     "convert the 'MSB currency transactions' model" in new Fixture {
@@ -92,19 +94,19 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val renewal = Renewal(ceTransactions = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months)
+      converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months("12345678963"))
     }
 
     "convert the 'MSB which currencies' model" in new Fixture{
-      val model = MsbWhichCurrencies(Seq("EUR"),None,None,None,None)
+      val model = MsbWhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
       val renewal = Renewal(msbWhichCurrencies = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.msbSection.get.whichCurrencies mustBe Some(models.moneyservicebusiness.WhichCurrencies)
+      converted.msbSection.get.whichCurrencies mustBe Some(
+        models.moneyservicebusiness.WhichCurrencies(
+          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None))
 
     }
-    */
-
     "convert the 'HVD percentage' model" in new Fixture {
       val model = PercentageOfCashPaymentOver15000.First
       val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
@@ -121,9 +123,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       converted.hvdSection.get.receiveCashPayments mustBe Some(models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(true,true,Some("other")))))
 
     }
-
-
-
+    
   }
 
 }
