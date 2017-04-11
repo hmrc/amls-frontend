@@ -36,12 +36,12 @@ sealed trait CustomersOutsideUK0 {
 
       val boolR =
         bR andThen {
-          _ withMessage "error.required.ba.select.country"
+          _ withMessage "error.required.renewal.ba.select.country"
         }
 
       val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
-          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.ba.select.country")
+          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.country.name")
           .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
