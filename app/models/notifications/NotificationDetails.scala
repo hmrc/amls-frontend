@@ -43,7 +43,6 @@ object NotificationDetails {
     inputString.split("\\|").toList match {
       case date::ref::tail => convertMessageTextWithRefNo(date, ref)
       case d if d.length == 1 => {
-        println("**********" + d)
         convertEndDateMessageText(d.head)
       }
       case _ => None
