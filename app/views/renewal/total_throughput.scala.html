@@ -2,7 +2,7 @@
 @import forms._
 @import forms2._
 
-@import models.renewal.MsbThroughput
+@import models.renewal.TotalThroughput
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @header = {
@@ -17,7 +17,7 @@
 
     <p class="form-hint">@messages("renewal.msb.throughput.info")</p>
 
-    @form(f, controllers.renewal.routes.MsbThroughputController.post(edit)) {
+    @form(f, controllers.renewal.routes.TotalThroughputController.post(edit)) {
         @fieldset(
             f = f("throughput-fieldset"),
             legend = "renewal.msb.throughput.legend",
@@ -27,7 +27,7 @@
             @errorGroup(
                 field = f("throughput")
             ) {
-                @(MsbThroughput.throughputValues.map { v =>
+                @(TotalThroughput.throughputValues.map { v =>
                     radio(
                         f = f("throughput"),
                         labelText = v.label,

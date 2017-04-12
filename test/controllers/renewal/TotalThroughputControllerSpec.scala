@@ -2,23 +2,21 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.renewal.{MsbThroughput, Renewal}
+import models.renewal.{TotalThroughput, Renewal}
 import org.mockito.ArgumentCaptor
-import play.api.i18n.Messages
-import play.api.test.Helpers._
-import services.RenewalService
-import utils.{AuthorisedFixture, GenericTestHelper}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.mvc.{AnyContent, Result}
+import play.api.i18n.Messages
+import play.api.mvc.Result
+import play.api.test.Helpers._
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
 
-class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
+class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -32,7 +30,7 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
       renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(Some(renewal))
 
-    lazy val controller = new MsbThroughputController(
+    lazy val controller = new TotalThroughputController(
       self.authConnector,
       renewalService,
       dataCacheConnector
@@ -85,7 +83,7 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to the next page in the flow if edit = false" in new FormSubmissionFixture {
       post() { result =>
         result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.MsbMoneyTransfersController.get().url)
+        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
       }
     }
 
@@ -101,7 +99,7 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
-        captor.getValue.msbThroughput mustBe Some(MsbThroughput("01"))
+        captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
       }
     }
   }

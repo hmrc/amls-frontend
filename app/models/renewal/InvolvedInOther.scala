@@ -21,14 +21,14 @@ object InvolvedInOther {
 
   val maxOtherBusinessActivityTypeLength = 255
   val OtherBusinessActivityType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.ba.involved.in.other.text") andThen
+    notEmpty.withMessage("error.required.renewal.ba.involved.in.other.text") andThen
     maxWithMsg(maxOtherBusinessActivityTypeLength, "error.invalid.maxlength.255") andThen
     basicPunctuationPattern()
 
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
+    (__ \ "involvedInOther").read[Boolean].withMessage("error.required.renewal.ba.involved.in.other") flatMap {
       case true =>
         (__ \ "details").read(OtherBusinessActivityType) map InvolvedInOtherYes.apply
       case false => Rule.fromMapping { _ => Valid(InvolvedInOtherNo) }

@@ -10,9 +10,9 @@ class MsbThroughputSpec extends PlaySpec with MustMatchers {
   "The MsbThroughput model" must {
 
     "be able to be serialized and deserialized" in {
-      val model = MsbThroughput("01")
+      val model = TotalThroughput("01")
 
-      Json.fromJson[MsbThroughput](Json.toJson(model)).asOpt mustBe Some(model)
+      Json.fromJson[TotalThroughput](Json.toJson(model)).asOpt mustBe Some(model)
     }
 
     "fail form validation" when {
@@ -20,7 +20,7 @@ class MsbThroughputSpec extends PlaySpec with MustMatchers {
 
         val form = Map.empty[String, Seq[String]]
 
-        MsbThroughput.formReader.validate(form) must be(
+        TotalThroughput.formReader.validate(form) must be(
           Invalid(Seq(
             (Path \ "throughput") -> Seq(ValidationError("renewal.msb.throughput.selection.required"))
           ))
@@ -33,7 +33,7 @@ class MsbThroughputSpec extends PlaySpec with MustMatchers {
           "throughput" -> Seq("some invalid value")
         )
 
-        MsbThroughput.formReader.validate(form) must be(
+        TotalThroughput.formReader.validate(form) must be(
           Invalid(Seq(
             (Path \ "throughput") -> Seq(ValidationError("renewal.msb.throughput.selection.invalid"))
           ))
@@ -47,16 +47,16 @@ class MsbThroughputSpec extends PlaySpec with MustMatchers {
           "throughput" -> Seq("01")
         )
 
-        MsbThroughput.formReader.validate(form) must be(
-          Valid(MsbThroughput("01"))
+        TotalThroughput.formReader.validate(form) must be(
+          Valid(TotalThroughput("01"))
         )
       }
     }
 
     "write to the form correctly" in {
-      val model = MsbThroughput("01")
+      val model = TotalThroughput("01")
 
-      MsbThroughput.formWriter.writes(model) must be(
+      TotalThroughput.formWriter.writes(model) must be(
         Map("throughput" -> Seq("01"))
       )
     }

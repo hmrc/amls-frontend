@@ -7,7 +7,8 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
+import models.status._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -153,6 +154,23 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
     }
 
+    "query the payments service for the payments url for a renewal" in new Fixture {
+
+      when(controller.submissionService.getRenewal(any(), any(), any()))
+        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
+
+      setupStatus(ReadyForRenewal(Some(new LocalDate())))
+
+      val result = controller.get()(request)
+      val body = contentAsString(result)
+
+      verify(paymentsConnector).requestPaymentRedirectUrl(eqTo(PaymentRedirectRequest(paymentRefNo, 150, paymentsReturnLocation(paymentRefNo))))(any(), any(), any())
+
+      cookies(result) must contain(paymentCookie)
+
+      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
+    }
+
     "query the payments service for the payments url for a new submission" in new Fixture {
       setupStatus(SubmissionReady)
 
@@ -255,6 +273,19 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         status(result) mustBe OK
 
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+        contentAsString(result) must include(Messages("confirmation.no.fee"))
+        contentAsString(result) must include(companyName)
+      }
+
+      "a renewal has no payment reference" in new Fixture {
+        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when(controller.submissionService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq()))))
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
         Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
         contentAsString(result) must include(companyName)

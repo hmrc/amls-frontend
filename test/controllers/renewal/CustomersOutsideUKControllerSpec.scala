@@ -158,11 +158,12 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.MsbThroughputController.get().url))
+            redirectLocation(result) must be(Some(routes.TotalThroughputController.get().url))
           }
         }
 
       }
+
       "respond with BAD_REQUEST" when {
         "given invalid data represented by an empty string" in new Fixture {
 
@@ -182,7 +183,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
           status(result) must be(BAD_REQUEST)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#countries]").html() must include(Messages("error.required.country.name"))
+          document.select("a[href=#countries]").html() must include(Messages("error.required.renewal.country.name"))
         }
         "mandatory fields are missing" in new Fixture {
 
@@ -200,7 +201,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
           status(result) must be(BAD_REQUEST)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isOutside]").html() must include(Messages("error.required.ba.select.country"))
+          document.select("a[href=#isOutside]").html() must include(Messages("error.required.renewal.ba.select.country"))
         }
       }
     }

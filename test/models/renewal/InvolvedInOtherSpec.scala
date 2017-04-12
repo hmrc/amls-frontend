@@ -32,7 +32,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
 
       InvolvedInOther.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.required.ba.involved.in.other.text"))
+          (Path \ "details") -> Seq(ValidationError("error.required.renewal.ba.involved.in.other.text"))
         )))
     }
 
@@ -66,7 +66,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
 
       InvolvedInOther.formRule.validate(Map.empty) must
         be(Invalid(Seq(
-          (Path \ "involvedInOther") -> Seq(ValidationError("error.required.ba.involved.in.other"))
+          (Path \ "involvedInOther") -> Seq(ValidationError("error.required.renewal.ba.involved.in.other"))
         )))
     }
 

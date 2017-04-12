@@ -19,14 +19,25 @@ object Conversions {
         case _ => throw new Exception("[Conversions] Trying to process data for renewal, but no business activities data was found")
       }
 
-      val msbSection = request.msbSection match {
-        case Some(msb) => Some(msb.copy(
-          throughput = renewal.msbThroughput contramap MsbThroughput.convert
+      val msbSection = request.msbSection flatMap { msb =>
+        Some(msb.copy(
+          throughput = renewal.totalThroughput contramap TotalThroughput.convert,
+          transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
+          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
+          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
+          ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
+          whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert
+
         ))
-        case _ => None
       }
 
-      request.copy(businessActivitiesSection = baSection, msbSection = msbSection)
+      val hvdSection = request.hvdSection flatMap { hvd =>
+        Some(hvd.copy(
+          percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
+          receiveCashPayments = renewal.receiveCashPayments contramap ReceiveCashPayments.convert
+        ))
+      }
+      request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)
     }
 
   }
