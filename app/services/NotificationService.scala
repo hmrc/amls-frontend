@@ -35,10 +35,11 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
            ContactType.ReminderToPayForApplication |
            ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType)
 
-      case ContactType.ApplicationApproval |
-           ContactType.RenewalApproval |
+      case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
+
+      case ContactType.RenewalApproval |
            ContactType.AutoExpiryOfRegistration |
-           ContactType.RenewalReminder => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
+           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType)
 
       case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
@@ -60,6 +61,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
   private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType)
                                    (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+
     val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
     details.map {
@@ -72,6 +74,27 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
             s"notification.reminder.to.pay.$contactType",
             details.paymentAmount,
             details.referenceNumber
+          )))
+        }
+      }
+      case _ => None
+    }
+  }
+
+  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
+                                         (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+
+    val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
+
+    details.map {
+      case Some(notificationDetails) => {
+        for {
+          message <- notificationDetails.messageText
+          details <- NotificationDetails.convertEndDateMessageText(message)
+        } yield {
+          notificationDetails.copy(messageText = Some(messagesApi(
+            s"notification.message.with.end.date.$contactType",
+            details.endDate
           )))
         }
       }

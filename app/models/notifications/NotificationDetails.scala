@@ -1,16 +1,16 @@
 package models.notifications
 
 import models.confirmation.Currency
-import models.notifications.ContactType.{RegistrationVariationApproval, ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange}
+import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 import models.notifications.StatusType.DeRegistered
-import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
 import org.joda.time.LocalDate
+import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
 import play.api.libs.json.Json
 
-case class NotificationDetails(contactType : Option[ContactType],
-                               status : Option[Status],
-                               messageText : Option[String],
-                               variation : Boolean) {
+case class NotificationDetails(contactType: Option[ContactType],
+                               status: Option[Status],
+                               messageText: Option[String],
+                               variation: Boolean) {
 
   def getContactType: ContactType = {
 
@@ -21,9 +21,9 @@ case class NotificationDetails(contactType : Option[ContactType],
 
     contactType.getOrElse(
       (status, statusReason, variation) match {
-        case (Some(Status(Some(DeRegistered),_)),_,_) => DeRegistrationEffectiveDateChange
-        case (_, Some(r),_) => ApplicationAutorejectionForFailureToPay
-        case (_,_, true) => RegistrationVariationApproval
+        case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
+        case (_, Some(r), _) => ApplicationAutorejectionForFailureToPay
+        case (_, _, true) => RegistrationVariationApproval
         case _ => throw new RuntimeException("No matching ContactType found")
       }
     )
@@ -41,23 +41,19 @@ object NotificationDetails {
   def convertEndDateWithRefMessageText(inputString: String): Option[EndDateDetails] = {
 
     inputString.split("\\|").toList match {
-      case date::ref::tail => convertMessageTextWithRefNo(date, ref)
-      case d if d.length == 1 => {
-        convertEndDateMessageText(d.head)
+      case date :: ref :: Nil => {
+        val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
+        Some(EndDateDetails(dateValue, Some(splitByDash(ref))))
       }
       case _ => None
     }
   }
 
-  def convertMessageTextWithRefNo(date: String, ref: String): Some[EndDateDetails] = {
-    val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
-    Some(EndDateDetails(dateValue, Some(splitByDash(ref))))
-  }
-
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
-    inputString.split("-") match {
-      case dateString if dateString.length > 1 => {
-        val dateValue = LocalDate.parse(dateString(1), DateTimeFormat.forPattern("dd/MM/yyyy"))
+
+    inputString.split("-").toList match {
+      case label :: date :: Nil => {
+        val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
         Some(EndDateDetails(dateValue, None))
       }
       case _ => None
@@ -66,8 +62,8 @@ object NotificationDetails {
 
   def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
     inputString.split("\\|").toList match {
-      case amount::ref::tail =>
-        Some(ReminderDetails(Currency(splitByDash(amount).toDouble),splitByDash(ref)))
+      case amount :: ref :: tail =>
+        Some(ReminderDetails(Currency(splitByDash(amount).toDouble), splitByDash(ref)))
       case _ => None
     }
   }
