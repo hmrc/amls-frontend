@@ -443,8 +443,8 @@ POST        /renewal/turnover                                           @control
 GET         /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /renewal/employment                                         @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
-GET         /renewal/anticipated-totals                                 @controllers.renewal.MsbThroughputController.get(edit: Boolean ?= false)
-POST        /renewal/anticipated-totals                                 @controllers.renewal.MsbThroughputController.post(edit: Boolean ?= false)
+GET         /renewal/anticipated-totals                                 @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
+POST        /renewal/anticipated-totals                                 @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
 
 GET         /renewal/transfers                                          @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /renewal/transfers                                          @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)

@@ -88,12 +88,12 @@
 
     @bmMsbServices.map {services =>
 
-        @model.msbThroughput.map { m =>
+        @model.totalThroughput.map { m =>
             @checkYourAnswers(
                 question = messages("renewal.msb.throughput.header"),
-                editUrl = controllers.renewal.routes.MsbThroughputController.get(edit = true).url
+                editUrl = controllers.renewal.routes.TotalThroughputController.get(edit = true).url
             ) {
-                <p>@MsbThroughput.labelFor(m)</p>
+                <p>@TotalThroughput.labelFor(m)</p>
             }
         }
 
@@ -110,7 +110,7 @@
         @model.sendTheLargestAmountsOfMoney.map { lom =>
             @checkYourAnswers(
                 question = Messages("renewal.msb.largest.amounts.title"),
-                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
             ) {
                 <ul class="list list--comma">
                     @lom.countryList.map { country =>
@@ -139,7 +139,7 @@
             @model.ceTransactions.map{ trans =>
                 @checkYourAnswers(
                 question = Messages("renewals.msb.ce.transactions.expected.title"),
-                editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(true).toString
+                editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(edit = true).toString
             ) {
                 <p>@trans.ceTransaction</p>
                 }
@@ -148,7 +148,7 @@
             @model.msbWhichCurrencies.map { wc =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.whichcurrencies.header"),
-                    editUrl = controllers.renewal.routes.MsbWhichCurrenciesController.get(true).toString
+                    editUrl = controllers.renewal.routes.MsbWhichCurrenciesController.get(edit = true).toString
                 ) {
                 <ul class="list list--comma">
                     @wc.currencies.map { cur =>

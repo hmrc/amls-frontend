@@ -2,20 +2,20 @@ package views.renewal
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.MsbThroughput
+import models.renewal.TotalThroughput
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.renewal.msb_total_throughput
+import views.html.renewal.total_throughput
 
-class msb_throughputSpec extends GenericTestHelper with MustMatchers {
+class total_throughputSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = msb_total_throughput(EmptyForm, edit = false)
+    override def view = total_throughput(EmptyForm, edit = false)
   }
 
   trait InvalidFormFixture extends ViewFixture {
@@ -27,7 +27,7 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       Seq(Path \ "throughput" -> Seq(ValidationError(requiredMsg)))
     )
 
-    override def view = msb_total_throughput(invalidForm, edit = false)
+    override def view = total_throughput(invalidForm, edit = false)
   }
 
   "The MSB total throughput view" must {
@@ -47,7 +47,7 @@ class msb_throughputSpec extends GenericTestHelper with MustMatchers {
       doc.body().text must include(Messages("renewal.msb.throughput.info"))
     }
 
-    MsbThroughput.throughputValues foreach { selection =>
+    TotalThroughput.throughputValues foreach { selection =>
 
       val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.value}"]""")
 

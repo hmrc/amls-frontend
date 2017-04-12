@@ -1146,7 +1146,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.Second),
-        msbThroughput = Some(MsbThroughput("02")),
+        totalThroughput = Some(TotalThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),

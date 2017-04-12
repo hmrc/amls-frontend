@@ -62,7 +62,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
 
   private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
     ControllerHelper.getBusinessActivity(Some(businessMatching)) match {
-      case Some(activities) if activities.businessActivities contains MoneyServiceBusiness => Redirect(routes.MsbThroughputController.get())
+      case Some(activities) if activities.businessActivities contains MoneyServiceBusiness => Redirect(routes.TotalThroughputController.get())
       case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case _ => Redirect(routes.SummaryController.get())
     }
