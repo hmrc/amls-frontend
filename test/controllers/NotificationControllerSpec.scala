@@ -42,7 +42,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       status = None,
       contactType = None,
       contactNumber = None,
-      variation = false,
+      variation = true,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       false,
       IDType("132456")
@@ -90,6 +90,21 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
   }
 
   "getMessages" must {
+
+    "respond with OK and show the your_messages page when there is valid data" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(BusinessMatching(Some(ReviewDetails("businessName",None,Address("line1","line2",None,None,None,Country("countryName","US")),"safeId"))))))
+
+      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
+
+      when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      val result = controller.getMessages()(request)
+
+      status(result) mustBe OK
+    }
 
     "throw an exception" when {
       "business name cannot be retrieved" in new Fixture {
