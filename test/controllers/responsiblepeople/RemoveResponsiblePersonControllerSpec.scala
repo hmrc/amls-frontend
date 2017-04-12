@@ -376,7 +376,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
 
           val result = controller.remove(1, true, "person Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.future.date"))
+          contentAsString(result) must include(Messages("error.future.date"))
 
         }
 
