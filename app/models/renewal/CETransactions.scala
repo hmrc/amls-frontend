@@ -26,4 +26,8 @@ object CETransactions {
   implicit val formWrites: Write[CETransactions, UrlFormEncoded] = Write {x =>
     Map("ceTransaction" -> Seq(x.ceTransaction))
   }
+
+  implicit def convert(model: CETransactions): models.moneyservicebusiness.CETransactionsInNext12Months = {
+    models.moneyservicebusiness.CETransactionsInNext12Months(model.ceTransaction)
+  }
 }

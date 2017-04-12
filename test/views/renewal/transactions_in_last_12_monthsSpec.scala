@@ -2,20 +2,18 @@ package views.renewal
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.MsbThroughput
-import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 import views.html.renewal._
 
-class msb_transfersSpec extends GenericTestHelper with MustMatchers {
+class transactions_in_last_12_monthsSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = msb_money_transfers(EmptyForm, edit = false)
+    override def view = transactions_in_last_12_months(EmptyForm, edit = false)
   }
 
   trait InvalidFormFixture extends ViewFixture {
@@ -27,7 +25,7 @@ class msb_transfersSpec extends GenericTestHelper with MustMatchers {
       Seq(Path \ "transfers" -> Seq(ValidationError(requiredMsg)))
     )
 
-    override def view = msb_money_transfers(invalidForm, edit = false)
+    override def view = transactions_in_last_12_months(invalidForm, edit = false)
   }
 
   "The MSB money transfers view" must {

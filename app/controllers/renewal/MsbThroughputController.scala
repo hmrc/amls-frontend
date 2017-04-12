@@ -55,7 +55,7 @@ class MsbThroughputController @Inject()
     if (edit) {
       routes.SummaryController.get()
     } else {
-      routes.MsbMoneyTransfersController.get()
+      routes.TransactionsInLast12MonthsController.get()
     }
 
 }

@@ -3,7 +3,7 @@ package views.renewal
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
-import models.renewal.MsbSendTheLargestAmountsOfMoney
+import models.renewal.SendTheLargestAmountsOfMoney
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -19,7 +19,7 @@ class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatch
   "expected_business_turnover view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[MsbSendTheLargestAmountsOfMoney] = Form2(MsbSendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 
@@ -28,7 +28,7 @@ class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatch
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[MsbSendTheLargestAmountsOfMoney] = Form2(MsbSendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true)
 

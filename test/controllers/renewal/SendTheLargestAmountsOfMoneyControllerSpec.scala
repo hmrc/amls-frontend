@@ -2,7 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
-import models.renewal.{MsbSendTheLargestAmountsOfMoney, Renewal}
+import models.renewal.{SendTheLargestAmountsOfMoney, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -30,7 +30,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
-    val controller = new MsbSendTheLargestAmountsOfMoneyController(
+    val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService
@@ -58,7 +58,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
         when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(
-            Renewal(sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
+            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
           )))
 
         val result = controller.get()(request)
@@ -86,7 +86,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.MsbMostTransactionsController.get().url))
+          redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
         }
       }
 

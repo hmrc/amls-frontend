@@ -231,4 +231,13 @@ object MsbWhichCurrencies {
       )(x => (x.currencies, x.usesForeignCurrencies, x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
 
   }
+
+  implicit def convert(model: MsbWhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
+    models.moneyservicebusiness.WhichCurrencies(
+      model.currencies,
+      model.usesForeignCurrencies,
+      model.bankMoneySource,
+      model.wholesalerMoneySource,
+      model.customerMoneySource)
+  }
 }

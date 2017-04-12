@@ -97,10 +97,10 @@
             }
         }
 
-        @model.msbTransfers.map { m =>
+        @model.transactionsInLast12Months.map { m =>
             @checkYourAnswers(
                 question = messages("renewal.msb.transfers.header"),
-                editUrl = controllers.renewal.routes.MsbMoneyTransfersController.get(edit = true).url
+                editUrl = controllers.renewal.routes.TransactionsInLast12MonthsController.get(edit = true).url
             ) {
                 <p>@m.transfers</p>
             }
@@ -110,7 +110,7 @@
         @model.sendTheLargestAmountsOfMoney.map { lom =>
             @checkYourAnswers(
                 question = Messages("renewal.msb.largest.amounts.title"),
-                editUrl = controllers.renewal.routes.MsbSendTheLargestAmountsOfMoneyController.get(true).toString
+                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
             ) {
                 <ul class="list list--comma">
                     @lom.countryList.map { country =>
@@ -124,7 +124,7 @@
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
-                    editUrl = controllers.renewal.routes.MsbMostTransactionsController.get(edit = true).url
+                    editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
                 ) {
                     <ul class="list list--comma">
                         @mt.countries.map { country =>

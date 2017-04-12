@@ -11,9 +11,9 @@ case class Renewal(
                     receiveCashPayments: Option[ReceiveCashPayments] = None,
                     msbThroughput: Option[MsbThroughput] = None,
                     msbWhichCurrencies: Option[MsbWhichCurrencies] = None,
-                    msbTransfers: Option[MsbMoneyTransfers] = None,
-                    sendTheLargestAmountsOfMoney: Option[MsbSendTheLargestAmountsOfMoney] = None,
-                    mostTransactions: Option[MsbMostTransactions] = None,
+                    transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
+                    sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
+                    mostTransactions: Option[MostTransactions] = None,
                     ceTransactions: Option[CETransactions] = None,
                     hasChanged: Boolean = false
 ) {
@@ -49,16 +49,16 @@ case class Renewal(
   def msbWhichCurrencies(model: MsbWhichCurrencies): Renewal =
     this.copy(msbWhichCurrencies = Some(model), hasChanged = hasChanged || !this.msbWhichCurrencies.contains(model))
 
-  def msbTransfers(model: MsbMoneyTransfers): Renewal =
-    this.copy(msbTransfers = Some(model), hasChanged = hasChanged || !this.msbTransfers.contains(model))
+  def transactionsInLast12Months(model: TransactionsInLast12Months): Renewal =
+    this.copy(transactionsInLast12Months = Some(model), hasChanged = hasChanged || !this.transactionsInLast12Months.contains(model))
 
-  def sendTheLargestAmountsOfMoney(p: MsbSendTheLargestAmountsOfMoney): Renewal =
+  def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
 
   def ceTransactions(p: CETransactions): Renewal =
     this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
 
-  def mostTransactions(model: MsbMostTransactions): Renewal =
+  def mostTransactions(model: MostTransactions): Renewal =
     this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
 }
 

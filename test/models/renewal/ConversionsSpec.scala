@@ -2,7 +2,8 @@ package models.renewal
 
 import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
 
@@ -11,7 +12,8 @@ class ConversionsSpec extends WordSpec with MustMatchers {
   trait Fixture {
     val businessActivities = BusinessActivities()
     val msbSection = MoneyServiceBusiness()
-    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, Some(msbSection), None, None)
+    val hvdSection = Hvd()
+    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, Some(msbSection), Some(hvdSection), None)
   }
 
   "The renewal converter" must {
@@ -59,6 +61,68 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.msbSection.get.throughput mustBe Some(models.moneyservicebusiness.ExpectedThroughput.Third)
+    }
+
+    "convert the 'MSB money transfers' model" in new Fixture {
+      val model = TransactionsInLast12Months("2500")
+      val renewal = Renewal(transactionsInLast12Months = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.transactionsInNext12Months mustBe Some(models.moneyservicebusiness.TransactionsInNext12Months("2500"))
+    }
+
+    "convert the 'MSB largest amounts' model" in new Fixture {
+      val model = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
+      val renewal = Renewal(sendTheLargestAmountsOfMoney = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.sendTheLargestAmountsOfMoney mustBe Some(
+        models.moneyservicebusiness.SendTheLargestAmountsOfMoney(
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US"))))
+    }
+
+    "convert the 'MSB most transactions' model" in new Fixture {
+      val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
+      val renewal = Renewal(mostTransactions = Some(model))
+      val converted = subscriptionRequest.withRenewalData((renewal))
+
+      converted.msbSection.get.mostTransactions mustBe Some(models.moneyservicebusiness.MostTransactions(Seq(Country("United Kingdom", "GB"))))
+    }
+
+    "convert the 'MSB currency transactions' model" in new Fixture {
+      val model = CETransactions("12345678963")
+      val renewal = Renewal(ceTransactions = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months("12345678963"))
+    }
+
+    "convert the 'MSB which currencies' model" in new Fixture{
+      val model = MsbWhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
+      val renewal = Renewal(msbWhichCurrencies = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.whichCurrencies mustBe Some(
+        models.moneyservicebusiness.WhichCurrencies(
+          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None))
+
+    }
+
+    "convert the 'HVD percentage' model" in new Fixture {
+      val model = PercentageOfCashPaymentOver15000.First
+      val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.First)
+    }
+
+    "convert the 'HVD receive cash payments' model" in new Fixture {
+      val model = ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))
+      val renewal = Renewal(receiveCashPayments = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.receiveCashPayments mustBe Some(models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(true,true,Some("other")))))
+
     }
 
   }
