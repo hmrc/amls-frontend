@@ -11,14 +11,14 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
   "SendTheLargestAmountsOfMoney" must {
 
     "successfully validate the form Rule with option Yes" in {
-      MsbSendTheLargestAmountsOfMoney.formRule.validate(
+      SendTheLargestAmountsOfMoney.formRule.validate(
         Map(
           "country_1" -> Seq("AL"),
           "country_2" -> Seq("DZ"),
           "country_3" -> Seq("AS")
         )
       ) mustBe {
-        Valid(MsbSendTheLargestAmountsOfMoney(
+        Valid(SendTheLargestAmountsOfMoney(
           
             Country("Albania", "AL"),
             Some(Country("Algeria", "DZ")),
@@ -32,7 +32,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
     "validate mandatory field when isOutside is  selected as Yes and country with invalid data" in {
       val json = Map("country_1" -> Seq("ABC"))
 
-      MsbSendTheLargestAmountsOfMoney.formRule.validate(json) must
+      SendTheLargestAmountsOfMoney.formRule.validate(json) must
         be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.renewal.country.name"))
         )))
@@ -41,14 +41,14 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
     "validate mandatory field for min length when isOutside is  selected as Yes and country with invalid data" in {
       val json = Map("country_1" -> Seq("A"))
 
-      MsbSendTheLargestAmountsOfMoney.formRule.validate(json) must
+      SendTheLargestAmountsOfMoney.formRule.validate(json) must
         be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.renewal.country.name"))
         )))
     }
 
     "validate mandatory country field" in {
-      MsbSendTheLargestAmountsOfMoney.formRule.validate(Map("country_1" -> Seq(""))) must
+      SendTheLargestAmountsOfMoney.formRule.validate(Map("country_1" -> Seq(""))) must
         be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.renewal.country.name"))
         )))
@@ -56,8 +56,8 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
 
     "successfully write model with formWrite" in {
 
-      val model = MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
-      MsbSendTheLargestAmountsOfMoney.formWrites.writes(model) must
+      val model = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
+      SendTheLargestAmountsOfMoney.formWrites.writes(model) must
         contain allOf (
         "country_1" -> Seq("GB"),
         "country_2" -> Seq("GB")
@@ -66,9 +66,9 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
 
     "JSON validation" must {
       "successfully validate givcen values" in {
-        val data = MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
+        val data = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
-        MsbSendTheLargestAmountsOfMoney.format.reads(MsbSendTheLargestAmountsOfMoney.format.writes(data)) must
+        SendTheLargestAmountsOfMoney.format.reads(SendTheLargestAmountsOfMoney.format.writes(data)) must
           be(JsSuccess(data))
       }
      }

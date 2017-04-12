@@ -48,7 +48,7 @@ class TransactionsInLast12MonthsController @Inject()(val authConnector: AuthConn
     if (edit) {
       routes.SummaryController.get()
     } else {
-      routes.MsbSendTheLargestAmountsOfMoneyController.get()
+      routes.SendTheLargestAmountsOfMoneyController.get()
     }
   }
 }

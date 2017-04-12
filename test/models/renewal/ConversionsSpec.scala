@@ -72,7 +72,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB largest amounts' model" in new Fixture {
-      val model = MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
+      val model = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))
       val renewal = Renewal(sendTheLargestAmountsOfMoney = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 

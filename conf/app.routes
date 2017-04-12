@@ -449,8 +449,8 @@ POST        /renewal/anticipated-totals                                 @control
 GET         /renewal/transfers                                          @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /renewal/transfers                                          @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
-GET         /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
-POST        /renewal/largest-amounts                                    @controllers.renewal.MsbSendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+GET         /renewal/largest-amounts                                    @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /renewal/largest-amounts                                    @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
 GET         /renewal/most-transactions                                  @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
 POST        /renewal/most-transactions                                  @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
