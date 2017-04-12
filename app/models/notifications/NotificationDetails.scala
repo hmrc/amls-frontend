@@ -12,7 +12,11 @@ case class NotificationDetails(contactType: Option[ContactType],
                                messageText: Option[String],
                                variation: Boolean) {
 
-  def getContactType: ContactType = {
+  def subject = {
+    s"notifications.subject.$getContactType"
+  }
+
+  private def getContactType: ContactType = {
 
     val statusReason = for {
       st <- status
@@ -27,10 +31,6 @@ case class NotificationDetails(contactType: Option[ContactType],
         case _ => throw new RuntimeException("No matching ContactType found")
       }
     )
-  }
-
-  def subject = {
-    s"notifications.subject.$getContactType"
   }
 }
 

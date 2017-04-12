@@ -1,11 +1,43 @@
 package models.notifications
 
+import models.notifications.RejectedReason.FailedToPayCharges
+import models.notifications.StatusType.DeRegistered
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
 
 class NotificationDetailsSpec extends PlaySpec with MustMatchers {
+
+
+  "NotificationDetails.subject" must {
+
+    "return the correct contactType when contactType is present" in {
+      val details = NotificationDetails(Some(ContactType.AutoExpiryOfRegistration), None, None, false)
+      details.subject mustBe "notifications.subject.AutoExpiryOfRegistration"
+    }
+
+    "return the correct subject string when the contact type is DeRegistrationEffectiveDateChange" in {
+      val details = NotificationDetails(None, Some(Status(Some(DeRegistered), None)), None, false)
+      details.subject mustBe "notifications.subject.DeRegistrationEffectiveDateChange"
+    }
+    "return the correct subject string when the contact type is ApplicationAutorejectionForFailureToPay" in {
+      val details = NotificationDetails(None, Some(Status(None, Some(FailedToPayCharges))), None, false)
+      details.subject mustBe "notifications.subject.ApplicationAutorejectionForFailureToPay"
+    }
+    "return the correct subject string when the contact type is RegistrationVariationApproval" in {
+      val details = NotificationDetails(None, None, None, true)
+      details.subject mustBe "notifications.subject.RegistrationVariationApproval"
+    }
+    "return a runtime Exception when the contact type cannot be figured out" in {
+      val details = NotificationDetails(None, None, None, false)
+      val thrown = intercept[Exception] {
+        details.subject
+      }
+
+      assert(thrown.getMessage === "No matching ContactType found")
+    }
+  }
 
   "convertMessageText" must {
     "convert the input message text into the model" in {
