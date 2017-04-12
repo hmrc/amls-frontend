@@ -98,8 +98,8 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB which currencies' model" in new Fixture{
-      val model = MsbWhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
-      val renewal = Renewal(msbWhichCurrencies = Some(model))
+      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
+      val renewal = Renewal(whichCurrencies = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.msbSection.get.whichCurrencies mustBe Some(

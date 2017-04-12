@@ -458,8 +458,8 @@ POST        /renewal/most-transactions                                  @control
 GET         /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.get(edit: Boolean ?= false)
 POST        /renewal/transaction-currency                               @controllers.renewal.MsbCurrencyExchangeTransactionsController.post(edit: Boolean ?= false)
 
-GET         /renewal/currency                                           @controllers.renewal.MsbWhichCurrenciesController.get(edit: Boolean ?= false)
-POST        /renewal/currency                                           @controllers.renewal.MsbWhichCurrenciesController.post(edit: Boolean ?= false)
+GET         /renewal/currency                                           @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /renewal/currency                                           @controllers.renewal.WhichCurrenciesController.post(edit: Boolean ?= false)
 
 GET         /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 POST        /renewal/percentage                                         @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)

@@ -12,14 +12,14 @@ import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
 
-case class MsbWhichCurrencies(currencies: Seq[String],
-                              usesForeignCurrencies: Option[Boolean],
-                              bankMoneySource: Option[BankMoneySource],
-                              wholesalerMoneySource: Option[WholesalerMoneySource],
-                              customerMoneySource: Option[Boolean])
+case class WhichCurrencies(currencies: Seq[String],
+                           usesForeignCurrencies: Option[Boolean],
+                           bankMoneySource: Option[BankMoneySource],
+                           wholesalerMoneySource: Option[WholesalerMoneySource],
+                           customerMoneySource: Option[Boolean])
 
 
-object MsbWhichCurrencies {
+object WhichCurrencies {
 
   type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
   type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
@@ -59,7 +59,7 @@ object MsbWhichCurrencies {
     case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
   }
 
-  implicit def formR: Rule[UrlFormEncoded, MsbWhichCurrencies] = From[UrlFormEncoded] { __ =>
+  implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
@@ -96,20 +96,20 @@ object MsbWhichCurrencies {
 
     ApplicationConfig.release7 match {
       case true => (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateWhichCurrencies)).apply {
-        (a, b) => MsbWhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
+        (a, b) => WhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
       }
 
       case _ => (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources))
         .apply { (a: Traversable[String], b: MoneySourceValidation) =>
           (a, b) match {
-            case (c, (bms, wms, cms)) => MsbWhichCurrencies(c.toSeq, None, bms, wms, cms)
+            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, None, bms, wms, cms)
           }
         }
     }
 
   }
 
-  implicit val formW: Write[MsbWhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
 
     val bToS: (Boolean) => Option[String] = {
@@ -117,7 +117,7 @@ object MsbWhichCurrencies {
       case _ => Some("No")
     }
 
-    val defaultFlagValue: (MsbWhichCurrencies) => Option[String] = {
+    val defaultFlagValue: (WhichCurrencies) => Option[String] = {
       case x if ApplicationConfig.release7 && (x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined) =>
         Some("Yes")
       case _ if ApplicationConfig.release7 =>
@@ -197,7 +197,7 @@ object MsbWhichCurrencies {
     }
   }
 
-  implicit val jsonR: Reads[MsbWhichCurrencies] = {
+  implicit val jsonR: Reads[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
@@ -213,11 +213,11 @@ object MsbWhichCurrencies {
         case (_, x) => x
       }
 
-      MsbWhichCurrencies(currencies, flag, bms, wms, cms)
+      WhichCurrencies(currencies, flag, bms, wms, cms)
     })
   }
 
-  implicit val jsonW: Writes[MsbWhichCurrencies] = {
+  implicit val jsonW: Writes[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
@@ -232,7 +232,7 @@ object MsbWhichCurrencies {
 
   }
 
-  implicit def convert(model: MsbWhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
+  implicit def convert(model: WhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
     models.moneyservicebusiness.WhichCurrencies(
       model.currencies,
       model.usesForeignCurrencies,

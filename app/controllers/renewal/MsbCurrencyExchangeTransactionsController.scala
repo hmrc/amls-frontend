@@ -41,7 +41,7 @@ class MsbCurrencyExchangeTransactionsController @Inject()(
             _ <- dataCacheConnector.save[Renewal](Renewal.key, renewal.ceTransactions(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.MsbWhichCurrenciesController.get(edit))
+            case false => Redirect(routes.WhichCurrenciesController.get(edit))
           }
       }
     }

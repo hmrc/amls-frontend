@@ -145,10 +145,10 @@
                 }
             }
 
-            @model.msbWhichCurrencies.map { wc =>
+            @model.whichCurrencies.map { wc =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.whichcurrencies.header"),
-                    editUrl = controllers.renewal.routes.MsbWhichCurrenciesController.get(edit = true).toString
+                    editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
                 <ul class="list list--comma">
                     @wc.currencies.map { cur =>
@@ -231,7 +231,7 @@
     )
 }
 
-@whoUsesCurrencies(wc: MsbWhichCurrencies) = {
+@whoUsesCurrencies(wc: WhichCurrencies) = {
     @checkYourAnswersExtra(
     question = Messages("msb.which_currencies.who")
     ) {

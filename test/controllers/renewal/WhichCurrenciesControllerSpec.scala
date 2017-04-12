@@ -2,7 +2,7 @@ package controllers.renewal
 
 import cats.implicits._
 import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
-import models.renewal.{MsbWhichCurrencies, Renewal}
+import models.renewal.{WhichCurrencies, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
@@ -16,14 +16,14 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar {
+class WhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
 
-    lazy val controller = new MsbWhichCurrenciesController(self.authConnector, renewalService)
+    lazy val controller = new WhichCurrenciesController(self.authConnector, renewalService)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -65,14 +65,14 @@ class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSug
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select("form").first.attr("action") mustBe routes.MsbWhichCurrenciesController.post(true).url
+        doc.select("form").first.attr("action") mustBe routes.WhichCurrenciesController.post(true).url
       }
 
       "reads the current value from the renewals model" in new Fixture {
 
         when {
           renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(msbWhichCurrencies = MsbWhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
+        } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
 
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
@@ -106,7 +106,7 @@ class MsbWhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSug
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.msbWhichCurrencies mustBe Some(MsbWhichCurrencies(
+        captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
           Some(true),
           Some(BankMoneySource("Bank names")),
