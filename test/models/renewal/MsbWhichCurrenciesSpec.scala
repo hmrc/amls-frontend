@@ -15,7 +15,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
   "Which Currencies" when {
     "data is complete" should {
 
-      val fullModel = MsbWhichCurrencies(
+      val fullModel = WhichCurrencies(
         Seq("USD", "CHF", "EUR"),
         usesForeignCurrencies = Some(true),
         Some(BankMoneySource("Bank names")),
@@ -35,16 +35,16 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "Write correctly to a form" in {
-        MsbWhichCurrencies.formW.writes(fullModel) must be(fullFormData)
+        WhichCurrencies.formW.writes(fullModel) must be(fullFormData)
       }
 
       "Read correctly from a form" in {
-        MsbWhichCurrencies.formR.validate(fullFormData) must be(Valid(fullModel))
+        WhichCurrencies.formR.validate(fullFormData) must be(Valid(fullModel))
       }
 
       "Round trip through Json correctly" in {
         val js = Json.toJson(fullModel)
-        js.as[MsbWhichCurrencies] must be(fullModel)
+        js.as[WhichCurrencies] must be(fullModel)
       }
     }
 
@@ -58,22 +58,22 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
 
       "fail validation" in {
 
-        MsbWhichCurrencies.formR.validate(form) must be(Invalid(Seq(Path \ "usesForeignCurrencies" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
+        WhichCurrencies.formR.validate(form) must be(Invalid(Seq(Path \ "usesForeignCurrencies" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
 
       }
 
       "infer the value of usesForeignCurrencies correctly" when {
         "deserializing from JSON and there is no value set" in {
 
-          val json = Json.toJson(MsbWhichCurrencies(Seq("GBP", "USD"), None, Some(BankMoneySource("Some bank")), None, None))
-          val result = json.as[MsbWhichCurrencies]
+          val json = Json.toJson(WhichCurrencies(Seq("GBP", "USD"), None, Some(BankMoneySource("Some bank")), None, None))
+          val result = json.as[WhichCurrencies]
 
           result.usesForeignCurrencies must be(Some(true))
         }
 
         "deserializing from JSON and there is some value set" in {
-          val json = Json.toJson(MsbWhichCurrencies(Seq("GBP", "USD"), Some(false), Some(BankMoneySource("Some bank")), None, None))
-          val result = json.as[MsbWhichCurrencies]
+          val json = Json.toJson(WhichCurrencies(Seq("GBP", "USD"), Some(false), Some(BankMoneySource("Some bank")), None, None))
+          val result = json.as[WhichCurrencies]
 
           result.usesForeignCurrencies must be(Some(false))
         }
@@ -92,11 +92,11 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
         "usesForeignCurrencies" -> Seq("Yes")
       )
 
-      val model = MsbWhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
+      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
 
       "set usesForeignCurrencies to true" in {
 
-        MsbWhichCurrencies.formW.writes(model) must be(fullFormData)
+        WhichCurrencies.formW.writes(model) must be(fullFormData)
 
       }
 
@@ -104,7 +104,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
 
     "there is no bankMoneySource" should {
 
-      val model = MsbWhichCurrencies(
+      val model = WhichCurrencies(
         Seq("USD", "CHF", "EUR"),
         usesForeignCurrencies = Some(true),
         None,
@@ -122,16 +122,16 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "Write correctly to a form" in {
-        MsbWhichCurrencies.formW.writes(model) must be(formData)
+        WhichCurrencies.formW.writes(model) must be(formData)
       }
 
       "Read correctly from a form" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Valid(model))
+        WhichCurrencies.formR.validate(formData) must be(Valid(model))
       }
 
       "Round trip through Json correctly" in {
         val json = Json.toJson(model)
-        json.as[MsbWhichCurrencies] must be(model)
+        json.as[WhichCurrencies] must be(model)
       }
     }
 
@@ -154,7 +154,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")))))
       }
     }
 
@@ -169,7 +169,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames")))))
       }
     }
 
@@ -187,7 +187,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation " in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "bankNames") -> Seq(ValidationError("error.invalid.maxlength.140")),
           (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.maxlength.140"))
         )))
@@ -209,7 +209,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "bankNames") -> Seq(ValidationError("err.text.validation")),
           (Path \ "wholesalerNames") -> Seq(ValidationError("err.text.validation"))
         )))
@@ -232,7 +232,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")),
           (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames"))
         )))
@@ -257,7 +257,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "pass validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Valid(MsbWhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(alpha)),Some(WholesalerMoneySource(alpha)),Some(true))))
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(alpha)),Some(WholesalerMoneySource(alpha)),Some(true))))
       }
 
     }
@@ -279,7 +279,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "pass validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Valid(MsbWhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(accentedAlpha)),Some(WholesalerMoneySource(accentedAlpha)),Some(true))))
+        WhichCurrencies.formR.validate(formData) must be(Valid(WhichCurrencies(List("USD", "CHF", "EUR"),Some(true),Some(BankMoneySource(accentedAlpha)),Some(WholesalerMoneySource(accentedAlpha)),Some(true))))
       }
 
     }
@@ -298,7 +298,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
@@ -311,7 +311,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
           "usesForeignCurrencies" -> Seq("Yes")
         )
 
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources")))))
       }
     }
 
@@ -326,7 +326,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
           "usesForeignCurrencies" -> Seq("Yes")
         )
 
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
@@ -341,7 +341,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation with error messages" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))
         )))
@@ -360,7 +360,7 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
       )
 
       "fail validation with both error messages" in {
-        MsbWhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames"))
         )))
@@ -378,9 +378,9 @@ class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSu
 
       "not fail validation for the foreign currency fields" in {
 
-        val model = MsbWhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = Some(false), None, None, None)
+        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = Some(false), None, None, None)
 
-        MsbWhichCurrencies.formR.validate(formData) must be(Valid(model))
+        WhichCurrencies.formR.validate(formData) must be(Valid(model))
 
       }
 

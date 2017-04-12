@@ -79,7 +79,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
             Some(PercentageOfCashPaymentOver15000.First),
             Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
             Some(TotalThroughput("01")),
-            Some(MsbWhichCurrencies(Seq("EUR"),None,None,None,None)),
+            Some(WhichCurrencies(Seq("EUR"),None,None,None,None)),
             Some(TransactionsInLast12Months("1500")),
             Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
             Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),

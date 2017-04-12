@@ -10,7 +10,7 @@ case class Renewal(
                     percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
                     receiveCashPayments: Option[ReceiveCashPayments] = None,
                     totalThroughput: Option[TotalThroughput] = None,
-                    msbWhichCurrencies: Option[MsbWhichCurrencies] = None,
+                    whichCurrencies: Option[WhichCurrencies] = None,
                     transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
                     sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                     mostTransactions: Option[MostTransactions] = None,
@@ -46,8 +46,8 @@ case class Renewal(
   def totalThroughput(model: TotalThroughput): Renewal =
     this.copy(totalThroughput = Some(model), hasChanged = hasChanged || !this.totalThroughput.contains(model))
 
-  def msbWhichCurrencies(model: MsbWhichCurrencies): Renewal =
-    this.copy(msbWhichCurrencies = Some(model), hasChanged = hasChanged || !this.msbWhichCurrencies.contains(model))
+  def whichCurrencies(model: WhichCurrencies): Renewal =
+    this.copy(whichCurrencies = Some(model), hasChanged = hasChanged || !this.whichCurrencies.contains(model))
 
   def transactionsInLast12Months(model: TransactionsInLast12Months): Renewal =
     this.copy(transactionsInLast12Months = Some(model), hasChanged = hasChanged || !this.transactionsInLast12Months.contains(model))
