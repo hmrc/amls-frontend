@@ -2,13 +2,13 @@ package views.renewal
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.CETransactions
+import models.renewal.CETransactionsInLast12Months
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class ce_transactionsSpec extends GenericTestHelper with MustMatchers  {
+class ce_transactions_in_last_12_monthsSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -16,22 +16,22 @@ class ce_transactionsSpec extends GenericTestHelper with MustMatchers  {
 
   "ceTransactions view" must {
 
-    val ce = CETransactions("123")
+    val ce = CETransactionsInLast12Months("123")
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[CETransactions] = Form2(ce)
+      val form2: ValidForm[CETransactionsInLast12Months] = Form2(ce)
 
-      def view = views.html.renewal.ce_transactions(form2, true)
+      def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
       doc.title must startWith(Messages("renewals.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[CETransactions] = Form2(ce)
+      val form2: ValidForm[CETransactionsInLast12Months] = Form2(ce)
 
-      def view = views.html.renewal.ce_transactions(form2, true)
+      def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
       heading.html must be(Messages("renewals.msb.ce.transactions.expected.title"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -45,7 +45,7 @@ class ce_transactionsSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "ceTransaction") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.ce_transactions(form2, true)
+      def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

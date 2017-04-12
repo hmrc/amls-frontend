@@ -3,7 +3,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessMatching, ChequeCashingScrapMetal, CurrencyExchange, MsbServices}
-import models.renewal.{CETransactions, MostTransactions, Renewal}
+import models.renewal.{CETransactionsInLast12Months, MostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -116,7 +116,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get().url)
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInLast12MonthsController.get().url)
     }
 
     "on valid submission (no edit) (non-CE)" in new Fixture {
@@ -169,13 +169,13 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       )
 
       val incomingModel = Renewal(
-        ceTransactions = Some(CETransactions(
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months(
           "1223131"
         ))
       )
 
       val outgoingModel = Renewal(
-        ceTransactions = Some(CETransactions(
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months(
           "1223131"
         )),
         mostTransactions = Some(
@@ -241,7 +241,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.MsbCurrencyExchangeTransactionsController.get().url)
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInLast12MonthsController.get().url)
     }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {

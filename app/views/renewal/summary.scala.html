@@ -136,12 +136,12 @@
         }
 
         @if(services.msbServices.contains(CurrencyExchange)) {
-            @model.ceTransactions.map{ trans =>
+            @model.ceTransactionsInLast12Months.map{ trans =>
                 @checkYourAnswers(
-                question = Messages("renewals.msb.ce.transactions.expected.title"),
-                editUrl = controllers.renewal.routes.MsbCurrencyExchangeTransactionsController.get(edit = true).toString
-            ) {
-                <p>@trans.ceTransaction</p>
+                    question = Messages("renewals.msb.ce.transactions.expected.title"),
+                    editUrl = controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).toString
+                ) {
+                    <p>@trans.ceTransaction</p>
                 }
             }
 

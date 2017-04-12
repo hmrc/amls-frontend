@@ -31,7 +31,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
 
   private def standardRouting(services: Set[MsbService], edit: Boolean): Result =
     if ((services contains CurrencyExchange) && !edit) {
-      Redirect(routes.MsbCurrencyExchangeTransactionsController.get(edit))
+      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
     }
