@@ -89,7 +89,7 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
       verifyZeroInteractions(amlsNotificationConnector)
       result.get.messageText.get mustBe(
-          """<p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 has been rejected.</p>""" +
+          """<p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 has failed.</p>""" +
             """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
             """<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a>""" +
             """ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>""" +
