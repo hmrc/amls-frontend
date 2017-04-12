@@ -253,5 +253,40 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
       result.get.messageText.get mustBe message
     }
+
+    "return None" when {
+      "getMessageDetails returns None and message is of type with end date only message" in new Fixture {
+
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
+
+        result mustBe None
+
+      }
+
+      "getMessageDetails returns None and message is of type with end date and ref number message" in new Fixture {
+
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
+
+        result mustBe None
+
+      }
+
+      "getMessageDetails returns None and message is of type with ref number, amount and status message" in new Fixture {
+
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
+
+        result mustBe None
+
+      }
+    }
   }
 }
