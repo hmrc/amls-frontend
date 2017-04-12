@@ -2,7 +2,6 @@ package models.renewal
 import cats.Functor
 import cats.implicits._
 import models.SubscriptionRequest
-import models.moneyservicebusiness.WhichCurrencies
 
 object Conversions {
 
