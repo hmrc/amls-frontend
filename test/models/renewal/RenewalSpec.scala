@@ -32,7 +32,7 @@ class RenewalSpec extends GenericTestHelper {
           Some(TransactionsInLast12Months("1500")),
           Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-          Some(CETransactions("123")),
+          Some(CETransactionsInLast12Months("123")),
           hasChanged = true
         )
 
@@ -54,7 +54,7 @@ class RenewalSpec extends GenericTestHelper {
           Some(TransactionsInLast12Months("2300")),
           Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-          Some(CETransactions("123")),
+          Some(CETransactionsInLast12Months("123")),
           hasChanged = true
         )
 

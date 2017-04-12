@@ -85,7 +85,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
           Some(TransactionsInLast12Months("1500")),
           Some(SendTheLargestAmountsOfMoney(Country("France", "FR"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-          Some(CETransactions("123")),
+          Some(CETransactionsInLast12Months("123")),
           false
         )
 

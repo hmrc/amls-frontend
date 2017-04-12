@@ -14,7 +14,7 @@ case class Renewal(
                     transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
                     sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                     mostTransactions: Option[MostTransactions] = None,
-                    ceTransactions: Option[CETransactions] = None,
+                    ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
                     hasChanged: Boolean = false
 ) {
   def isComplete = {
@@ -55,8 +55,8 @@ case class Renewal(
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
 
-  def ceTransactions(p: CETransactions): Renewal =
-    this.copy(ceTransactions = Some(p), hasChanged = hasChanged || !this.ceTransactions.contains(p))
+  def ceTransactionsInLast12Months(p: CETransactionsInLast12Months): Renewal =
+    this.copy(ceTransactionsInLast12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInLast12Months.contains(p))
 
   def mostTransactions(model: MostTransactions): Renewal =
     this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))

@@ -26,7 +26,7 @@ object Conversions {
           transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
           sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
           mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
-          ceTransactionsInNext12Months = renewal.ceTransactions contramap CETransactions.convert,
+          ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
           whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert
 
         ))

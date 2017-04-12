@@ -90,8 +90,8 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB currency transactions' model" in new Fixture {
-      val model = CETransactions("12345678963")
-      val renewal = Renewal(ceTransactions = Some(model))
+      val model = CETransactionsInLast12Months("12345678963")
+      val renewal = Renewal(ceTransactionsInLast12Months = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months("12345678963"))

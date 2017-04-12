@@ -1,8 +1,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness._
-import models.renewal.{CETransactions, Renewal}
+import models.renewal.{CETransactionsInLast12Months, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -14,7 +13,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper with MockitoSugar  {
+class CETransactionsInLast12MonthsControllerSpec extends GenericTestHelper with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -22,7 +21,7 @@ class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper wi
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
 
-    val controller = new MsbCurrencyExchangeTransactionsController (
+    val controller = new CETransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService
@@ -47,7 +46,7 @@ class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper wi
 
       when(controller.dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(
-        ceTransactions = Some(CETransactions("12345678963"))))))
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -95,8 +94,8 @@ class MsbCurrencyExchangeTransactionsControllerSpec extends GenericTestHelper wi
       )
 
       val outgoingModel = incomingModel.copy(
-        ceTransactions = Some(
-          CETransactions("12345678963")
+        ceTransactionsInLast12Months = Some(
+          CETransactionsInLast12Months("12345678963")
         ), hasChanged = true
       )
 
