@@ -158,7 +158,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.MsbThroughputController.get().url))
+            redirectLocation(result) must be(Some(routes.TotalThroughputController.get().url))
           }
         }
 

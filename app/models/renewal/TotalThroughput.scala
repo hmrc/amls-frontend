@@ -10,9 +10,9 @@ import play.api.i18n.Messages
 import play.api.libs.json.Json
 import utils.MappingUtils.Implicits._
 
-case class MsbThroughput(throughput: String)
+case class TotalThroughput(throughput: String)
 
-object MsbThroughput {
+object TotalThroughput {
   private[renewal] case class Mapping(value: String, label: String, submissionModel: ExpectedThroughput)
 
   val throughputValues = Seq(
@@ -25,28 +25,28 @@ object MsbThroughput {
     Mapping("07", "renewal.msb.throughput.selection.7", ExpectedThroughput.Seventh)
   )
 
-  def labelFor(model: MsbThroughput)(implicit messages: Messages) = throughputValues.collectFirst {
+  def labelFor(model: TotalThroughput)(implicit messages: Messages) = throughputValues.collectFirst {
     case Mapping(model.throughput, label, _) => messages(label)
   }.getOrElse("")
 
-  implicit val format = Json.format[MsbThroughput]
+  implicit val format = Json.format[TotalThroughput]
 
   private val validSelectionRule: ValidationRule[String] = Rule.fromMapping[String, String] {
     case input if throughputValues.exists(_.value == input) => Success(input)
     case _ => Invalid(Seq(ValidationError("renewal.msb.throughput.selection.invalid")))
   }.repath(_ => Path \ "throughput")
 
-  implicit val formReader: Rule[UrlFormEncoded, MsbThroughput] = From[UrlFormEncoded] { __ =>
+  implicit val formReader: Rule[UrlFormEncoded, TotalThroughput] = From[UrlFormEncoded] { __ =>
     val fieldReader = (__ \ "throughput").read[String].withMessage("renewal.msb.throughput.selection.required")
 
-    fieldReader andThen validSelectionRule map MsbThroughput.apply
+    fieldReader andThen validSelectionRule map TotalThroughput.apply
   }
 
-  implicit val formWriter: Write[MsbThroughput, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWriter: Write[TotalThroughput, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     (__ \ "throughput").write[String] contramap(_.throughput)
   }
 
-  implicit def convert(model: MsbThroughput): ExpectedThroughput = {
+  implicit def convert(model: TotalThroughput): ExpectedThroughput = {
     throughputValues.collectFirst {
       case x if x.value == model.throughput => x.submissionModel
     }.getOrElse(throw new Exception("Invalid MSB throughput value"))

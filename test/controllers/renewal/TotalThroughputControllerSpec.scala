@@ -2,7 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.renewal.{MsbThroughput, Renewal}
+import models.renewal.{TotalThroughput, Renewal}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -16,7 +16,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
+class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -30,7 +30,7 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
       renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(Some(renewal))
 
-    lazy val controller = new MsbThroughputController(
+    lazy val controller = new TotalThroughputController(
       self.authConnector,
       renewalService,
       dataCacheConnector
@@ -99,7 +99,7 @@ class MsbThroughputControllerSpec extends GenericTestHelper with MockitoSugar {
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
-        captor.getValue.msbThroughput mustBe Some(MsbThroughput("01"))
+        captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
       }
     }
   }
