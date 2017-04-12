@@ -63,6 +63,7 @@ trait NotificationController extends BaseController {
 }
 
 object NotificationController extends NotificationController {
+  // $COVERAGE-OFF$
   override protected[controllers] val dataCacheConnector = DataCacheConnector
   override protected[controllers] val authEnrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
