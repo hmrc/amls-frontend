@@ -8,7 +8,7 @@ import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
 import services.{StatusService, SubmissionService}
@@ -78,6 +78,13 @@ trait ConfirmationController extends BaseController {
         } yield {
           Ok(confirm_amendvariation(payRef, total, rows, None, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         }
+      case ReadyForRenewal(_) =>
+        for {
+          fees@(payRef, total, rows, _) <- OptionT(getRenewalFees)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+        } yield {
+          Ok(confirm_amendvariation(payRef, total, rows, None, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
+        }
       case _ =>
         for {
           (paymentRef, total, rows) <- OptionT.liftF(submissionService.getSubscription)
@@ -126,6 +133,20 @@ trait ConfirmationController extends BaseController {
 
   private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionService.getVariation flatMap {
+      case Some((paymentRef, total, rows)) => {
+        paymentRef match {
+          case Some(payRef) if total.value > 0 =>
+            Future.successful(Some((payRef, total, rows, None)))
+          case _ =>
+            Future.successful(None)
+        }
+      }
+      case None => Future.failed(new Exception("Cannot get data from variation submission"))
+    }
+  }
+
+  private def getRenewalFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+    submissionService.getRenewal flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
           case Some(payRef) if total.value > 0 =>

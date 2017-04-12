@@ -6,14 +6,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
-import models.renewal.{MsbMostTransactions, Renewal}
+import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 @Singleton
-class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
+class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                                            val cache: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -24,14 +24,14 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
             val form = (for {
               msb <- response
               transactions <- msb.mostTransactions
-            } yield Form2[MsbMostTransactions](transactions)).getOrElse(EmptyForm)
+            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
             Ok(views.html.renewal.most_transactions(form, edit))
         }
   }
 
   private def standardRouting(services: Set[MsbService], edit: Boolean): Result =
     if ((services contains CurrencyExchange) && !edit) {
-      Redirect(routes.MsbCurrencyExchangeTransactionsController.get(edit))
+      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
     }
@@ -40,7 +40,7 @@ class MsbMostTransactionsController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[MsbMostTransactions](request.body) match {
+        Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit)))
           case ValidForm(_, data) =>

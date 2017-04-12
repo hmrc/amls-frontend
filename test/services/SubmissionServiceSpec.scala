@@ -10,6 +10,8 @@ import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
+import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
@@ -164,7 +166,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       reviewDetails.businessType
     } thenReturn Some(businessType)
-
     when {
       businessMatching.reviewDetails
     } thenReturn Some(reviewDetails)
@@ -174,7 +175,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       activities.businessActivities
     } thenReturn Set[BusinessActivity]()
-
     when {
       cache.getEntry[BusinessMatching](BusinessMatching.key)
     } thenReturn Some(businessMatching)
@@ -1124,6 +1124,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
        } thenReturn Some(MoneyServiceBusiness())
 
       when {
+        cache.getEntry[Hvd](eqTo(Hvd.key))(any())
+       } thenReturn Some(Hvd())
+
+      when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
@@ -1142,9 +1146,18 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.Second),
-        msbThroughput = Some(MsbThroughput("02")),
+        totalThroughput = Some(TotalThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
-        involvedInOtherActivities = Some(InvolvedInOtherNo)
+        involvedInOtherActivities = Some(InvolvedInOtherNo),
+        mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
+        whichCurrencies = Some(WhichCurrencies(
+          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
+        transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
+        percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other")))))
       )
 
       val result = await(TestSubmissionService.renewal(renewal))
@@ -1163,6 +1176,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       submission.msbSection mustBe defined
       submission.msbSection.get.throughput mustBe defined
+      submission.msbSection.get.mostTransactions mustBe defined
+      submission.msbSection.get.sendTheLargestAmountsOfMoney mustBe defined
+      submission.msbSection.get.whichCurrencies mustBe defined
+      submission.msbSection.get.ceTransactionsInNext12Months mustBe defined
+      submission.msbSection.get.transactionsInNext12Months mustBe defined
+
+      submission.hvdSection.get.percentageOfCashPaymentOver15000 mustBe defined
+      submission.hvdSection.get.receiveCashPayments mustBe defined
     }
 
   }

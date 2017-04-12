@@ -1,7 +1,7 @@
 package controllers.renewal
 
 import cats.implicits._
-import models.renewal.{MsbMoneyTransfers, Renewal}
+import models.renewal.{TransactionsInLast12Months, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
@@ -15,14 +15,14 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar {
+class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
 
-    lazy val controller = new MsbMoneyTransfersController(self.authConnector, renewalService)
+    lazy val controller = new TransactionsInLast12MonthsController(self.authConnector, renewalService)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -55,14 +55,14 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select("form").first.attr("action") mustBe routes.MsbMoneyTransfersController.post(true).url
+        doc.select("form").first.attr("action") mustBe routes.TransactionsInLast12MonthsController.post(true).url
       }
 
       "reads the current value from the renewals model" in new Fixture {
 
         when {
           renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(msbTransfers = MsbMoneyTransfers("2500").some).some)
+        } thenReturn Future.successful(Renewal(transactionsInLast12Months = TransactionsInLast12Months("2500").some).some)
 
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
@@ -80,7 +80,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
         val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe routes.MsbSendTheLargestAmountsOfMoneyController.get().url.some
+        redirectLocation(result) mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
@@ -105,7 +105,7 @@ class MsbMoneyTransferControllerSpec extends GenericTestHelper with MockitoSugar
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.msbTransfers mustBe MsbMoneyTransfers("1500").some
+        captor.getValue.transactionsInLast12Months mustBe TransactionsInLast12Months("1500").some
       }
     }
   }
