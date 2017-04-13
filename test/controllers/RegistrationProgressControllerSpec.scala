@@ -39,17 +39,19 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     val statusService : StatusService = mock[StatusService]
     val renewalService : RenewalService = mock[RenewalService]
 
-    val modules: Seq[GuiceableModule] = Seq(bind[DataCacheConnector].to(dataCache),
-      bind[ProgressService].to(progressService),
+    val modules: Seq[GuiceableModule] = Seq(
       bind[AuthEnrolmentsService].to(enrolmentsService),
       bind[StatusService].to(statusService),
-      bind[RenewalService].to(renewalService),
-      bind[AuthConnector].to(self.authConnector)
+      bind[RenewalService].to(renewalService)
     )
 
     lazy val app: Application = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .bindings(modules:_*).in(Mode.Test)
+      .overrides(bind[ProgressService].to(progressService))
+      .overrides(bind[DataCacheConnector].to(dataCache))
       .configure("Test.microservice.services.feature-toggle.amendments" -> true)
+      .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
     val controller = app.injector.instanceOf[RegistrationProgressController]
