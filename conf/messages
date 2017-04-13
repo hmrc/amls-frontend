@@ -1455,7 +1455,7 @@ notifications.subject.RenewalApproval = Renewal Approval
 notifications.subject.RejectionReasons = Application Rejection
 notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
-notifications.subject.AutoExpiryOfRegistration = Registration Expiry
+notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
 
 notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
 notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
@@ -1596,7 +1596,8 @@ notification.message.with.end.date.RenewalApproval = <p>Your renewal has been ap
 <p>You can find details of your registration on your status page.</p>
 
 notification.message.with.end.date.AutoExpiryOfRegistration = <p>Your registration to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 expired on {0}.</p>\
-<p>You need to be registered with a supervisory body if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
+<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
+ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
 <p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your status page.</p>
 
 notification.message.with.end.date.RenewalReminder = <p>You need to renew your registration before {0}.</p>\
