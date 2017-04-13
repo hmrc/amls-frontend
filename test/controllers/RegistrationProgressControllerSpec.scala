@@ -1,6 +1,6 @@
 package controllers
 
-import connectors.{AuthConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.responsiblepeople._
@@ -23,34 +23,34 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
 class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
 
-  val progressService: ProgressService = mock[ProgressService]
-  val dataCache: DataCacheConnector = mock[DataCacheConnector]
-  val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-  val statusService : StatusService = mock[StatusService]
-  val renewalService : RenewalService = mock[RenewalService]
-
-  val modules: Seq[GuiceableModule] = Seq(bind[DataCacheConnector].to(dataCache),
-    bind[ProgressService].to(progressService),
-    bind[AuthEnrolmentsService].to(enrolmentsService),
-    bind[StatusService].to(statusService),
-    bind[RenewalService].to(renewalService)
-  )
-
-  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .bindings(modules:_*).in(Mode.Test)
-    .configure("Test.microservice.services.feature-toggle.amendments" -> true)
-    .build()
-
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    override val authConnector = self.authConnector
+    val progressService: ProgressService = mock[ProgressService]
+    val dataCache: DataCacheConnector = mock[DataCacheConnector]
+    val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    val statusService : StatusService = mock[StatusService]
+    val renewalService : RenewalService = mock[RenewalService]
+
+    val modules: Seq[GuiceableModule] = Seq(bind[DataCacheConnector].to(dataCache),
+      bind[ProgressService].to(progressService),
+      bind[AuthEnrolmentsService].to(enrolmentsService),
+      bind[StatusService].to(statusService),
+      bind[RenewalService].to(renewalService),
+      bind[AuthConnector].to(self.authConnector)
+    )
+
+    lazy val app: Application = new GuiceApplicationBuilder()
+      .bindings(modules:_*).in(Mode.Test)
+      .configure("Test.microservice.services.feature-toggle.amendments" -> true)
+      .build()
 
     val controller = app.injector.instanceOf[RegistrationProgressController]
 
