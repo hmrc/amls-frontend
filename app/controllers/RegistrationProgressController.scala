@@ -1,14 +1,14 @@
 package controllers
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
 import models.responsiblepeople.ResponsiblePeople
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
-import play.api.Logger
+import models.status._
 import play.api.mvc.{Action, AnyContent, Request}
-import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -16,20 +16,19 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.ControllerHelper
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
+import views.html.renewal.renewal_progress
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-trait RegistrationProgressController extends BaseController {
-
-  protected[controllers] def progressService: ProgressService
-
-  protected[controllers] def dataCache: DataCacheConnector
-
-  protected[controllers] def enrolmentsService: AuthEnrolmentsService
-
-  protected[controllers] def statusService: StatusService
+@Singleton
+class RegistrationProgressController @Inject()(val authConnector: AuthConnector,
+                                               val progressService: ProgressService,
+                                               val dataCache: DataCacheConnector,
+                                               val enrolmentsService: AuthEnrolmentsService,
+                                               val statusService: StatusService,
+                                               val renewalService: RenewalService
+                                              ) extends BaseController {
 
   private def declarationAvailable(seq: Seq[Section]): Boolean =
     seq forall {
@@ -47,18 +46,34 @@ trait RegistrationProgressController extends BaseController {
     }
   }
 
+  private def redirectBasedOnStatus(cacheMap: CacheMap, sections: Seq[Section])(implicit hc: HeaderCarrier,
+                                                                                authContext: AuthContext,
+                                                                                request: Request[AnyContent]) = {
+    statusService.getStatus map {
+      case ReadyForRenewal(_) => {
+        renewalService.getSection(cacheMap) match {
+          case Some(renewalSection) if renewalSection.status == Completed => Ok(renewal_progress(renewalSection, sections, true))
+          case Some(renewalSection) => Ok(renewal_progress(renewalSection, sections, false))
+        }
+      }
+      case _ => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+    }
+
+  }
+
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         dataCache.fetchAll.flatMap {
           _.map { cacheMap =>
             val sections = progressService.sections(cacheMap)
 
-            preApplicationComplete(cacheMap) map {
+            preApplicationComplete(cacheMap) flatMap {
               case Some(x) => x match {
-                case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-                case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
+                case true => redirectBasedOnStatus(cacheMap, sections)
+                case _ => Future.successful(Ok(registration_progress(sections, declarationAvailable(sections))))
               }
-              case None => Redirect(controllers.routes.LandingController.get())
+              case None => Future.successful(Redirect(controllers.routes.LandingController.get()))
             }
 
           }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
@@ -111,13 +126,4 @@ trait RegistrationProgressController extends BaseController {
           case false => redirectBusinessNominatedOfficer(amendmentFlow)
         }
   }
-}
-
-object RegistrationProgressController extends RegistrationProgressController {
-  // $COVERAGE-OFF$
-  override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
-  override protected[controllers] val progressService = ProgressService
-  override protected[controllers] val dataCache = DataCacheConnector
-  override protected[controllers] val enrolmentsService = AuthEnrolmentsService
-  override protected[controllers] val statusService = StatusService
 }

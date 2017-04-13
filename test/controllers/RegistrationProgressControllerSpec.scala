@@ -1,17 +1,16 @@
 package controllers
 
-import connectors.DataCacheConnector
+import connectors.{AuthConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.responsiblepeople._
-import models.status.{SubmissionDecisionApproved, SubmissionReady}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
-import play.api.test.FakeApplication
-import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -19,27 +18,45 @@ import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
 import org.mockito.Matchers.any
+import play.api.{Application, Mode}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+
+  val progressService: ProgressService = mock[ProgressService]
+  val dataCache: DataCacheConnector = mock[DataCacheConnector]
+  val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+  val statusService : StatusService = mock[StatusService]
+  val renewalService : RenewalService = mock[RenewalService]
+
+  val modules: Seq[GuiceableModule] = Seq(bind[DataCacheConnector].to(dataCache),
+    bind[ProgressService].to(progressService),
+    bind[AuthEnrolmentsService].to(enrolmentsService),
+    bind[StatusService].to(statusService),
+    bind[RenewalService].to(renewalService)
+  )
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .bindings(modules:_*).in(Mode.Test)
+    .configure("Test.microservice.services.feature-toggle.amendments" -> true)
+    .build()
+
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new RegistrationProgressController {
-      override val authConnector = self.authConnector
-      override protected[controllers] val progressService: ProgressService = mock[ProgressService]
-      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
-      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override protected[controllers] val statusService : StatusService = mock[StatusService]
-    }
+
+    override val authConnector = self.authConnector
+
+    val controller = app.injector.instanceOf[RegistrationProgressController]
 
     protected val mockCacheMap = mock[CacheMap]
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
@@ -64,6 +81,42 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           Messages("title.yapp") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
         Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+      }
+    }
+
+    "renewal sections are complete and" when {
+      "a no other sections is changed" must {
+        "enable the submission button" in new Fixture {
+          val complete = mock[BusinessMatching]
+          when(complete.isComplete) thenReturn true
+
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.progressService.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be(OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          val pageTitle = Messages("renewal.progress.title") + " - " +
+            Messages("title.yapp") + " - " +
+            Messages("title.amls") + " - " + Messages("title.gov")
+          Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+          submitButtons.size() must be(1)
+          submitButtons.first().hasAttr("disabled") must be(false)
+        }
       }
     }
 
