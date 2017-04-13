@@ -19,11 +19,11 @@ object TransactionsInLast12Months {
     notEmpty.withMessage("renewal.msb.transfers.value.invalid") andThen transferRegex
 
   implicit val formReader: Rule[UrlFormEncoded, TransactionsInLast12Months] = From[UrlFormEncoded] { __ =>
-    (__ \ "transfers").read(transferType) map TransactionsInLast12Months.apply
+    (__ \ "txnAmount").read(transferType) map TransactionsInLast12Months.apply
   }
 
   implicit val formWriter: Write[TransactionsInLast12Months, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    (__ \ "transfers").write[String] contramap(_.transfers)
+    (__ \ "txnAmount").write[String] contramap(_.transfers)
   }
 
   implicit def convert(model: TransactionsInLast12Months): models.moneyservicebusiness.TransactionsInNext12Months = {

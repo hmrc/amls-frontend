@@ -30,7 +30,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormData = "transfers" -> "1500"
+    val validFormData = "txnAmount" -> "1500"
     val validFormRequest = request.withFormUrlEncodedBody(validFormData)
 
     when {
@@ -67,7 +67,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select("input[name=transfers]").first.attr("value") mustBe "2500"
+        doc.select("input[name=txnAmount]").first.attr("value") mustBe "2500"
 
         verify(renewalService).getRenewal(any(), any(), any())
       }

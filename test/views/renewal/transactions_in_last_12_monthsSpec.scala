@@ -22,7 +22,7 @@ class transactions_in_last_12_monthsSpec extends GenericTestHelper with MustMatc
 
     val invalidForm = InvalidForm(
       Map.empty[String, Seq[String]],
-      Seq(Path \ "transfers" -> Seq(ValidationError(requiredMsg)))
+      Seq(Path \ "txnAmount" -> Seq(ValidationError(requiredMsg)))
     )
 
     override def view = transactions_in_last_12_months(invalidForm, edit = false)
@@ -52,7 +52,7 @@ class transactions_in_last_12_monthsSpec extends GenericTestHelper with MustMatc
     }
 
     "display the validation error next to the field" in new InvalidFormFixture {
-      val validationMsg = doc.select("label[for=transfers] .error-notification").first
+      val validationMsg = doc.select("label[for=txnAmount] .error-notification").first
       Option(validationMsg) mustBe defined
       validationMsg.text must include(requiredMsg)
     }

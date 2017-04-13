@@ -5,7 +5,7 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class MsbThroughputSpec extends PlaySpec with MustMatchers {
+class TotalThroughputSpec extends PlaySpec with MustMatchers {
 
   "The MsbThroughput model" must {
 
