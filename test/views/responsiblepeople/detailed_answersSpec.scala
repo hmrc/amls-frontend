@@ -203,7 +203,7 @@ class detailed_answersSpec extends GenericTestHelper with MustMatchers with Tabl
       def view = {
         views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, true)
       }
-      
+
       forAll(sectionChecks) { (key, check) => {
         val headers = doc.select("section.check-your-answers h2")
         val header = headers.toList.find(e => e.text() == key)
@@ -218,6 +218,73 @@ class detailed_answersSpec extends GenericTestHelper with MustMatchers with Tabl
 
       }
       }
+    }
+
+    "include the provided data for a non-uk resident, non-uk passport" in new ViewFixture {
+
+      val nonUKPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+        personResidenceType = Some(PersonResidenceType(
+          NonUKResidence(new LocalDate(1990,2,25), NonUKPassport("1234567890")),
+          Country("Uganda", "UG"),
+          Some(Country("Italy", "ITA"))
+        ))
+      )
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 1234567890"))
+      )
+
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true)
+      }
+
+      forAll(sectionChecks) { (key, check) => {
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == key)
+
+        header must not be None
+        val section = header.get.parents().select("section").first()
+        check(section) must be(true)
+
+      }
+      }
+
+    }
+
+    "include the provided data for a non-uk resident, uk passport" in new ViewFixture {
+
+      val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+        personResidenceType = Some(PersonResidenceType(
+          NonUKResidence(new LocalDate(1990,2,25), UKPassport("1234567890")),
+          Country("Uganda", "UG"),
+          Some(Country("Italy", "ITA"))
+        ))
+      )
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 1234567890"))       )
+
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+      }
+
+      forAll(sectionChecks) { (key, check) => {
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == key)
+
+        header must not be None
+        val section = header.get.parents().select("section").first()
+        check(section) must be(true)
+
+      }
+      }
+
     }
 
     "display address on separate lines" in new Fixture {
