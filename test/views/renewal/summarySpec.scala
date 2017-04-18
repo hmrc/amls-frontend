@@ -7,12 +7,15 @@ import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import utils.GenericTestHelper
-import views.Fixture
+import views.{Fixture, HtmlAssertions}
 import org.jsoup.nodes.Element
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
+class summarySpec extends GenericTestHelper
+  with MustMatchers
+  with TableDrivenPropertyChecks
+  with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -35,14 +38,6 @@ class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenP
     def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
       val texts = parent.select("li").toSet.map((el:Element) => el.text())
       texts must be (keysToFind.map(k => Messages(k)))
-      true
-    }
-
-    def checkElementTextIncludes(el:Element, keys : String*) = {
-      val t = el.text()
-      keys.foreach { k =>
-        t must include (Messages(k))
-      }
       true
     }
 

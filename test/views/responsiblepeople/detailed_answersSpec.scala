@@ -10,11 +10,14 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import play.api.i18n.Messages
 import utils.GenericTestHelper
-import views.Fixture
+import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class detailed_answersSpec extends GenericTestHelper with MustMatchers with TableDrivenPropertyChecks {
+class detailed_answersSpec extends GenericTestHelper
+  with MustMatchers
+  with TableDrivenPropertyChecks
+  with HtmlAssertions{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -33,23 +36,6 @@ class detailed_answersSpec extends GenericTestHelper with MustMatchers with Tabl
 
       heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
-    }
-
-    def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
-      val texts = parent.select("li").toSet.map((el: Element) => el.text())
-      texts must be(keysToFind.map(k => Messages(k)))
-      true
-    }
-
-    def checkElementTextIncludes(el: Element, keys: String*) = {
-      val t = el.text()
-      val l = el.getElementsByTag("a").attr("href")
-      val p = l.substring(l.indexOf("?"))
-      keys.foreach { k =>
-        t must include(Messages(k))
-        p must include("edit=true")
-      }
-      true
     }
 
     val sectionChecks = Table[String, Element => Boolean](
