@@ -1,14 +1,13 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import play.api.mvc.{Action, AnyContent}
-import services.{AuthEnrolmentsService, ProgressService, RenewalService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -20,14 +19,16 @@ import views.html.registrationprogress.registration_progress
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-@Singleton
-class RegistrationProgressController @Inject()(val authConnector: AuthConnector,
-                                               val progressService: ProgressService,
-                                               val dataCache: DataCacheConnector,
-                                               val enrolmentsService: AuthEnrolmentsService,
-                                               val statusService: StatusService,
-                                               val renewalService: RenewalService
-                                              ) extends BaseController {
+
+trait RegistrationProgressController extends BaseController {
+
+  protected[controllers] def progressService: ProgressService
+
+  protected[controllers] def dataCache: DataCacheConnector
+
+  protected[controllers] def enrolmentsService: AuthEnrolmentsService
+
+  protected[controllers] def statusService: StatusService
 
   private def declarationAvailable(seq: Seq[Section]): Boolean =
     seq forall {
@@ -48,8 +49,15 @@ class RegistrationProgressController @Inject()(val authConnector: AuthConnector,
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
+
+        statusService.getStatus map { status =>
+          println("=============status======================================================"+status)
+
+        }
         statusService.getStatus flatMap {
-          case ReadyForRenewal(_) => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
+          case ReadyForRenewal(_) => {
+            Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
+          }
           case _ => {
             dataCache.fetchAll.flatMap {
               _.map { cacheMap =>
@@ -116,4 +124,13 @@ class RegistrationProgressController @Inject()(val authConnector: AuthConnector,
           case false => redirectBusinessNominatedOfficer(amendmentFlow)
         }
   }
+}
+
+object RegistrationProgressController extends RegistrationProgressController {
+  // $COVERAGE-OFF$
+  override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
+  override protected[controllers] val progressService = ProgressService
+  override protected[controllers] val dataCache = DataCacheConnector
+  override protected[controllers] val enrolmentsService = AuthEnrolmentsService
+  override protected[controllers] val statusService = StatusService
 }

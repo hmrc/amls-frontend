@@ -10,8 +10,8 @@ POST        /subscribe                                                  controll
 
 GET         /unauthorised                                               controllers.AmlsController.unauthorised
 
-GET         /registration-progress                                      @controllers.RegistrationProgressController.get()
-POST        /registration-progress                                      @controllers.RegistrationProgressController.post()
+GET         /registration-progress                                      controllers.RegistrationProgressController.get()
+POST        /registration-progress                                      controllers.RegistrationProgressController.post()
 
 GET         /application-status                                         controllers.StatusController.get()
 

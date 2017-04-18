@@ -10,7 +10,7 @@ import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
-import services.{AuthEnrolmentsService, ProgressService, RenewalService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -18,12 +18,8 @@ import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
 import org.mockito.Matchers.any
-import play.api.{Application, Mode}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,29 +28,13 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-
-    val progressService: ProgressService = mock[ProgressService]
-    val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-    val statusService : StatusService = mock[StatusService]
-    val renewalService : RenewalService = mock[RenewalService]
-
-    val modules: Seq[GuiceableModule] = Seq(
-      bind[AuthEnrolmentsService].to(enrolmentsService),
-      bind[StatusService].to(statusService),
-      bind[RenewalService].to(renewalService)
-    )
-
-    lazy val app: Application = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .bindings(modules:_*).in(Mode.Test)
-      .overrides(bind[ProgressService].to(progressService))
-      .overrides(bind[DataCacheConnector].to(dataCache))
-      .configure("Test.microservice.services.feature-toggle.amendments" -> true)
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
-
-    val controller = app.injector.instanceOf[RegistrationProgressController]
+    val controller = new RegistrationProgressController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val progressService: ProgressService = mock[ProgressService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService : StatusService = mock[StatusService]
+    }
 
     protected val mockCacheMap = mock[CacheMap]
 
