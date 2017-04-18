@@ -276,6 +276,40 @@ class detailed_answersSpec extends GenericTestHelper
 
     }
 
+    "include the provided data for a non-uk resident, no passport" in new ViewFixture {
+
+      val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+        personResidenceType = Some(PersonResidenceType(
+          NonUKResidence(new LocalDate(1990,2,25), NoPassport),
+          Country("Uganda", "UG"),
+          Some(Country("Italy", "ITA"))
+        ))
+      )
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+        (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No passport"))
+      )
+
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+      }
+
+      forAll(sectionChecks) { (key, check) => {
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == key)
+
+        header must not be None
+        val section = header.get.parents().select("section").first()
+        check(section) must be(true)
+
+      }
+      }
+
+    }
+
     "display address on separate lines" in new Fixture {
       def view = {
         views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(addressHistory = Some(addressHistory))), 1, true)
