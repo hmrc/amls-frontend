@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -57,6 +57,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     val controller = app.injector.instanceOf[RegistrationProgressController]
 
     protected val mockCacheMap = mock[CacheMap]
+
+    when(controller.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
   }
 
 
@@ -92,32 +95,11 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
           val complete = mock[BusinessMatching]
           when(complete.isComplete) thenReturn true
 
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some("AMLSREFNO")))
-
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.progressService.sections(mockCacheMap))
-            .thenReturn(Seq(
-              Section("TESTSECTION1", Completed, false, mock[Call]),
-              Section("TESTSECTION2", Completed, true, mock[Call])
-            ))
-
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
           val responseF = controller.get()(request)
-          status(responseF) must be(OK)
-          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-          val pageTitle = Messages("renewal.progress.title") + " - " +
-            Messages("title.yapp") + " - " +
-            Messages("title.amls") + " - " + Messages("title.gov")
-          Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
-          submitButtons.size() must be(1)
-          submitButtons.first().hasAttr("disabled") must be(false)
+          status(responseF) must be(SEE_OTHER)
         }
       }
     }

@@ -7,7 +7,7 @@ import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent}
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -16,7 +16,6 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.ControllerHelper
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
-import views.html.renewal.renewal_progress
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,38 +45,29 @@ class RegistrationProgressController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def redirectBasedOnStatus(cacheMap: CacheMap, sections: Seq[Section])(implicit hc: HeaderCarrier,
-                                                                                authContext: AuthContext,
-                                                                                request: Request[AnyContent]) = {
-    statusService.getStatus map {
-      case ReadyForRenewal(_) => {
-        renewalService.getSection(cacheMap) match {
-          case Some(renewalSection) if renewalSection.status == Completed => Ok(renewal_progress(renewalSection, sections, true))
-          case Some(renewalSection) => Ok(renewal_progress(renewalSection, sections, false))
-        }
-      }
-      case _ => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-    }
-
-  }
-
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCache.fetchAll.flatMap {
-          _.map { cacheMap =>
-            val sections = progressService.sections(cacheMap)
+        statusService.getStatus flatMap {
+          case ReadyForRenewal(_) => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
+          case _ => {
+            dataCache.fetchAll.flatMap {
+              _.map { cacheMap =>
+                val sections = progressService.sections(cacheMap)
 
-            preApplicationComplete(cacheMap) flatMap {
-              case Some(x) => x match {
-                case true => redirectBasedOnStatus(cacheMap, sections)
-                case _ => Future.successful(Ok(registration_progress(sections, declarationAvailable(sections))))
-              }
-              case None => Future.successful(Redirect(controllers.routes.LandingController.get()))
+                preApplicationComplete(cacheMap) map {
+                  case Some(x) => x match {
+                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+                    case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
+                  }
+                  case None => Redirect(controllers.routes.LandingController.get())
+                }
+
+              }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
             }
-
-          }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
+          }
         }
+
   }
 
   private def preApplicationComplete(cache: CacheMap)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
