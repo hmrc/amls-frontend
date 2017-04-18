@@ -19,7 +19,7 @@
     @form(f, controllers.renewal.routes.TransactionsInLast12MonthsController.post(edit)) {
 
         @input(
-            field = f("transfers"),
+            field = f("txnAmount"),
             labelText = "Transfers",
             labelHidden = true,
             attrType = "number",

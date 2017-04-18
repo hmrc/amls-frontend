@@ -8,7 +8,7 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 
-class MsbWhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
+class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 

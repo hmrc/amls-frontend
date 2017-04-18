@@ -161,7 +161,7 @@
             editUrl = controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true).toString(),
             dataItem = person.addressHistory.flatMap(_.currentAddress)
         ) { a =>
-            <ul class="list list--comma">
+            <ul class="list">
                 @a.personAddress.toLines.map { l => <li>@l</li> }
             </ul>
         }
@@ -180,7 +180,7 @@
                 editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true).toString(),
                 dataItem = Some(pa)
             ) { a =>
-                <ul class="list list--comma">
+                <ul class="list">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
             }
@@ -201,7 +201,7 @@
                 editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true).toString(),
                 dataItem = Some(pa)
             ) { a =>
-                <ul class="list list--comma">
+                <ul class="list">
                     @a.personAddress.toLines.map { l => <li>@l</li> }
                 </ul>
             }
