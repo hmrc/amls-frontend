@@ -7,6 +7,7 @@ import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.prop.Tables.Table
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
@@ -157,7 +158,7 @@ class detailed_answersSpec extends GenericTestHelper with MustMatchers with Tabl
       hasAlreadyPassedFitAndProper = Some(true)
     )
 
-    "include the provided data" in new ViewFixture {
+    "include the provided data for a full uk address history" in new ViewFixture {
       def view = {
         views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true)
       }
@@ -169,6 +170,52 @@ class detailed_answersSpec extends GenericTestHelper with MustMatchers with Tabl
         header must not be None
         val section = header.get.parents().select("section").first()
         check(section) must be(true)
+      }
+      }
+    }
+
+    "include the provided data for a single non-uk address" in new ViewFixture {
+
+      val nonUkresponsiblePeopleModel = responsiblePeopleModel.copy(
+        addressHistory = Some(
+          ResponsiblePersonAddressHistory(
+            currentAddress = Some(ResponsiblePersonCurrentAddress(
+              personAddress = PersonAddressNonUK(
+                "addressLine1","addressLine2",Some("addressLine3"),Some("addressLine4"),Country("spain","esp")
+              ),
+              timeAtAddress = Some(ZeroToFiveMonths),
+              dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+            ))
+          )
+        )
+      )
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
+        (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
+        (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
+        //      (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_,  "6 to 11 months")),
+        (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
+        //      (Messages("responsiblepeople.timeataddress.address_history.heading"), checkElementTextIncludes(_, "EUR")),
+      )
+
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, true)
+      }
+      
+      forAll(sectionChecks) { (key, check) => {
+        val headers = doc.select("section.check-your-answers h2")
+        val header = headers.toList.find(e => e.text() == key)
+
+        if(key.equals(Messages("responsiblepeople.detailed_answers.address")) || key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))){
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+        } else {
+          header mustBe None
+        }
+
       }
       }
     }
