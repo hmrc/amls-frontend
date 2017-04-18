@@ -3,6 +3,7 @@ package controllers
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
+import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
@@ -40,6 +41,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
     when(controller.statusService.getStatus(any(), any(), any()))
       .thenReturn(Future.successful(SubmissionReady))
+    when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(None))
   }
 
 
@@ -69,17 +71,47 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
     }
 
-    "renewal sections are complete and" when {
-      "a no other sections is changed" must {
-        "enable the submission button" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
+    "redirect to renewal registration progress" when {
+      "status is ready for renewal and" must {
+        "renewal data exists in save4later" in new Fixture {
+          when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
 
           val responseF = controller.get()(request)
           status(responseF) must be(SEE_OTHER)
+        }
+      }
+    }
+
+    "redirect to registration progress" when {
+      "status is ready for renewal and" must {
+        "there is no renewal data in save4later" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          val complete = mock[BusinessMatching]
+          when(complete.isComplete) thenReturn true
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.progressService.sections(mockCacheMap))
+            .thenReturn(Seq.empty[Section])
+
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(None))
+
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val pageTitle = Messages("progress.title") + " - " +
+            Messages("title.yapp") + " - " +
+            Messages("title.amls") + " - " + Messages("title.gov")
+          Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+
         }
       }
     }
