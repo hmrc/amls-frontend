@@ -14,7 +14,6 @@ import scala.collection.JavaConversions._
 
 class summarySpec extends GenericTestHelper
   with MustMatchers
-
   with HtmlAssertions
   with TableDrivenPropertyChecks {
 

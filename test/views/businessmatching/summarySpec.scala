@@ -15,8 +15,6 @@ import scala.collection.JavaConversions._
 
 class businessmatchingSpec extends GenericTestHelper
   with MustMatchers
-
-  with HtmlAssertions
   with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
@@ -40,6 +38,20 @@ class businessmatchingSpec extends GenericTestHelper
 
     }
 
+    def checkElementTextIncludes(el:Element, keys : String*) = {
+      val t = el.text()
+      keys.foreach { k =>
+        t must include (Messages(k))
+      }
+      true
+    }
+
+    def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
+      val texts = parent.select("li").toSet.map((el:Element) => el.text())
+      texts must be (keysToFind.map(k => Messages(k)))
+      true
+    }
+
     "include the provided data when MoneyServicesBusiness and TransmittingMoney were selected for a Limited Company" in new ViewFixture {
 
       val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
@@ -57,8 +69,7 @@ class businessmatchingSpec extends GenericTestHelper
         Some(msbServices),
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberModel),
-        hasChanged = false)
+        Some(BusinessAppliedForPSRNumberModel))
 
       def view = views.html.businessmatching.summary(testBusinessMatching)
 
@@ -84,7 +95,7 @@ class businessmatchingSpec extends GenericTestHelper
 
       html must not include Messages("businessmatching.typeofbusiness.title")
 
-      html must not include (Messages("button.logout"))
+      html must not include Messages("button.logout")
       html must include(Messages("businessmatching.button.confirm.start"))
 
 
@@ -92,7 +103,7 @@ class businessmatchingSpec extends GenericTestHelper
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }
@@ -122,8 +133,7 @@ class businessmatchingSpec extends GenericTestHelper
         Some(msbServices),
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberModel),
-        hasChanged = false)
+        Some(BusinessAppliedForPSRNumberModel))
 
       def view = views.html.businessmatching.summary(testBusinessMatching)
 
@@ -151,7 +161,7 @@ class businessmatchingSpec extends GenericTestHelper
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }
