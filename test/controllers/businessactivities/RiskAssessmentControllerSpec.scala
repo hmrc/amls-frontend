@@ -199,7 +199,7 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "when edit is true" must {
-        "on post with valid data in edit mode" in new Fixture {
+        "redirect to the SummaryController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
