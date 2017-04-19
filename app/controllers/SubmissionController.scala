@@ -20,7 +20,7 @@ trait SubmissionController extends BaseController {
         case SubmissionReadyForReview => subscriptionService.update
         case SubmissionDecisionApproved => subscriptionService.variation
         case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
-          case Some(r) => subscriptionService.renewal(r)
+          case Some(r) =>subscriptionService.renewal(r)
           case _ => subscriptionService.variation
         }
         case _ => subscriptionService.subscribe
