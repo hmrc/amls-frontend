@@ -27,9 +27,9 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "AccountantForAMLSRegulationsController" must {
+  "AccountantForAMLSRegulationsController" when {
 
-    "Get Option:" must {
+    "get is called" must {
 
       "load the Accountant For AMLSRegulations page" in new Fixture {
 
@@ -80,94 +80,103 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
       }
     }
 
-    "Post" must {
+    "Post is called" must {
 
-      "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
+      "respond with SEE_OTHER" when {
+        "edit is true" must {
+          "redirect to the WhoIsYourAccountantController when 'yes' is selected'" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+              .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+          }
+
+          "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "accountantForAMLSRegulations" -> "false"
+            )
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          }
+        }
+
+        "edit is false" must {
+          "redirect to the WhoIsYourAccountantController on selection of 'Yes'" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+          }
+
+          "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "accountantForAMLSRegulations" -> "false"
+            )
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          }
+        }
       }
 
-      "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+      "respond with BAD_REQUEST" when {
+        "no options are selected so that the request body is empty" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          val newRequest = request.withFormUrlEncodedBody()
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.required.ba.business.use.accountant"))
+
+        }
+
+        "given invalid json" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "WhatYouNeedController" -> ""
+          )
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("err.summary"))
+
+        }
       }
-
-    }
-
-    "successfully redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "accountantForAMLSRegulations" -> "false"
-      )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
-    }
-
-    "successfully redirect to the page on selection of Option 'No' when edit mode is off" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "accountantForAMLSRegulations" -> "false"
-      )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
-    }
-
-
-    "on post invalid data show error" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.ba.business.use.accountant"))
-
-    }
-
-    "on post with invalid data show error" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "WhatYouNeedController" -> ""
-      )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("err.summary"))
-
     }
   }
 }

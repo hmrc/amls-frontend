@@ -633,6 +633,9 @@ confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
 confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 
+confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
+confirmation.payment.renewal.title = You have submitted your renewal and paid
+
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service

@@ -18,9 +18,13 @@ trait HtmlAssertions {
 
   def checkElementTextIncludes(el:Element, keys : String*) = {
     val t = el.text()
+    val l = el.getElementsByTag("a").attr("href")
+    val p = l.substring(l.indexOf("?"))
     keys.foreach { k =>
       t must include (Messages(k))
+      p must include("edit=true")
     }
     true
   }
 }
+

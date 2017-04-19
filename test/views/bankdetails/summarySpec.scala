@@ -8,11 +8,14 @@ import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
 import utils.{GenericTestHelper, StatusConstants}
-import views.Fixture
+import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper with MustMatchers with PropertyChecks {
+class summarySpec extends GenericTestHelper
+  with MustMatchers
+  with PropertyChecks
+  with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -66,13 +69,6 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
   def checkListContainsItems(parent: Element, keysToFind: List[String]) = {
     parent.select("li").toList.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
-    true
-  }
-
-  def checkElementTextIncludes(el: Element, keys: String*) = {
-    keys.foreach { k =>
-      el.text() must include(Messages(k))
-    }
     true
   }
 
