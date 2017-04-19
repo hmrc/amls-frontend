@@ -35,15 +35,15 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       ) shouldBe JsSuccess(DefaultWhoIsYourAccountant)
     }
 
-    "Successfully complete a round trip to a Url Encoded form" when {
+    "pass validation" when {
       "The accountant deals with tax matters" in {
         WhoIsYourAccountant.formRule.validate(
           WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
-                                                  DefaultTradingName,
-                                                  DefaultUKAddress))
-        ) should be (Valid(WhoIsYourAccountant(DefaultName,
-                      DefaultTradingName,
-                      DefaultUKAddress)))
+            DefaultTradingName,
+            DefaultUKAddress))
+        ) should be(Valid(WhoIsYourAccountant(DefaultName,
+          DefaultTradingName,
+          DefaultUKAddress)))
       }
 
       "The accountant does not deal with tax matters" in {
@@ -51,12 +51,14 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
             DefaultTradingName,
             DefaultUKAddress))
-        ) should be (Valid(WhoIsYourAccountant(DefaultName,
-                            DefaultTradingName,
-                            DefaultUKAddress)))
+        ) should be(Valid(WhoIsYourAccountant(DefaultName,
+          DefaultTradingName,
+          DefaultUKAddress)))
       }
+    }
 
-      "fail to validate given an empty name" in {
+    "fail validation" when {
+      "given an empty name" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant("",
           DefaultTradingName,
           DefaultUKAddress)
@@ -67,8 +69,8 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         )))
       }
 
-      "fail to validate given a name with too many characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("zxzxcz"*50,
+      "given a name with too many characters" in {
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("a" * 141,
           DefaultTradingName,
           DefaultUKAddress)
 
@@ -78,7 +80,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         )))
       }
 
-      "fail to validate given a name with invalid characters" in {
+      "given a name with invalid characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant("sasdasd{}sdfsdf",
           DefaultTradingName,
           DefaultUKAddress)
@@ -89,9 +91,9 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         )))
       }
 
-      "fail to validate given a trading name with too many characters" in {
+      "given a trading name with too many characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
-          Some("zxzxcz"*50),
+          Some("a"*121),
           DefaultUKAddress
         )
 
@@ -101,7 +103,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
         )))
       }
 
-      "fail to validate given a trading name with invalid characters" in {
+      "given a trading name with invalid characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
           Some("sasdasd{}sdfsdf"),
           DefaultUKAddress)
@@ -113,5 +115,4 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       }
     }
   }
-
 }
