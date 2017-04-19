@@ -48,7 +48,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
         )
 
         RiskAssessmentPolicy.formReads.validate(model) must
-          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
 
       "given missing hasPolicy data represented by an empty string" in {
@@ -58,7 +58,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
         )
 
         RiskAssessmentPolicy.formReads.validate(model) must
-          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
     }
 
