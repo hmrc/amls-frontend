@@ -1,11 +1,11 @@
 package controllers.aboutthebusiness
 
-import config.{AMLSAuthConnector}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
@@ -48,7 +48,7 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
               status <- statusService.getStatus
             } yield {
               status match {
-                case SubmissionDecisionApproved if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
+                case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
                   Redirect(routes.RegisteredOfficeDateOfChangeController.get())
                 case _ => edit match {
                   case true => Redirect(routes.SummaryController.get())
