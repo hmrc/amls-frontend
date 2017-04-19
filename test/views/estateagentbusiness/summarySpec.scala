@@ -67,7 +67,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  {
       val section = doc.select("section.check-your-answers")
 
       section.size must be(3)
-      section.html() must not include(Messages("estateagentbusiness.registered.redress.title"))
+      section.html() must not include Messages("estateagentbusiness.registered.redress.title")
 
     }
   }
