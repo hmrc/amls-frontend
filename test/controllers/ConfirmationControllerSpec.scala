@@ -343,6 +343,23 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
+      "the application status is 'ready for renewal'" in new Fixture {
+        setupStatus(ReadyForRenewal(Some(new LocalDate())))
+
+        val paymentReference = "XH8439483944"
+        val result = controller.paymentConfirmation(paymentReference)(request)
+
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.title must include(Messages("confirmation.payment.renewal.title"))
+        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
+        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(companyName)
+        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+      }
+
       "there is no business name" in new Fixture {
         setupStatus(SubmissionReady)
 
