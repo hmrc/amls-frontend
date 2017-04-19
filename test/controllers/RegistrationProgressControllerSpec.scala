@@ -3,14 +3,14 @@ package controllers
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
+import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.responsiblepeople._
-import models.status.{SubmissionDecisionApproved, SubmissionReady}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
-import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -25,7 +25,8 @@ import play.api.i18n.Messages
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
+
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
     val controller = new RegistrationProgressController {
@@ -37,9 +38,12 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
     }
 
     protected val mockCacheMap = mock[CacheMap]
+
+    when(controller.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
+    when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(None))
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
@@ -64,6 +68,51 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
           Messages("title.yapp") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
         Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+      }
+    }
+
+    "redirect to renewal registration progress" when {
+      "status is ready for renewal and" must {
+        "renewal data exists in save4later" in new Fixture {
+          when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be(SEE_OTHER)
+        }
+      }
+    }
+
+    "redirect to registration progress" when {
+      "status is ready for renewal and" must {
+        "there is no renewal data in save4later" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          val complete = mock[BusinessMatching]
+          when(complete.isComplete) thenReturn true
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.progressService.sections(mockCacheMap))
+            .thenReturn(Seq.empty[Section])
+
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(None))
+
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val pageTitle = Messages("progress.title") + " - " +
+            Messages("title.yapp") + " - " +
+            Messages("title.amls") + " - " + Messages("title.gov")
+          Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+
+        }
       }
     }
 
