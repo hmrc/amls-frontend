@@ -36,19 +36,6 @@ class contact_detailsSpec extends GenericTestHelper with MustMatchers {
 
     }
 
-    "populate fields with data given a populated model" in new ViewFixture {
-
-      val phoneNumber = "09876"
-      val emailAddress = "mail.com"
-
-      val form2: ValidForm[ContactDetails] = Form2(ContactDetails(phoneNumber, emailAddress))
-
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, false, "firstName lastName")
-
-      doc.getElementById("phoneNumber").`val`() mustBe phoneNumber
-      doc.getElementById("emailAddress").`val`() mustBe emailAddress
-    }
-
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
