@@ -2,13 +2,13 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import models.asp._
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -140,6 +140,27 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
           .thenReturn(Future.successful(emptyCache))
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "services[0]" -> "02",
+          "services[1]" -> "01",
+          "services[2]" -> "03")
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get().url))
+      }
+    }
+
+    "go to the date of change page" when {
+      "status is ready for renewal and services selection has changed" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Asp](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[0]" -> "02",
