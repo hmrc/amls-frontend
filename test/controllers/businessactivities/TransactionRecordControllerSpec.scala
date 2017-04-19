@@ -29,113 +29,121 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "TransactionRecordController" must {
+  "TransactionRecordController" when {
 
-    "load the Customer Record Page" in new Fixture  {
+    "get is called" must {
+      "load the Customer Record Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.keep.customer.records.title"))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("businessactivities.keep.customer.records.title"))
 
+      }
+
+      "pre-populate the Customer Record Page" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper)))))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[value=01]").hasAttr("checked") must be(true)
+
+      }
     }
 
-    "pre-populate the Customer Record Page" in new Fixture  {
+    "post is called" must {
+      "respond with SEE_OTHER" when {
+        "given valid data not in edit mode" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper)))))))
+          val newRequest = request.withFormUrlEncodedBody(
+            "isRecorded" -> "true",
+            "transactions[0]" -> "01",
+            "transactions[1]" -> "02"
+          )
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-    }
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.IdentifySuspiciousActivityController.get().url))
+        }
 
-    "on post with valid data" in new Fixture {
+        "given valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isRecorded" -> "true",
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
-      )
+          val newRequest = request.withFormUrlEncodedBody(
+            "isRecorded" -> "true",
+            "transactions[0]" -> "01",
+            "transactions[1]" -> "02",
+            "transactions[2]" -> "03",
+            "name" -> "test"
+          )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.IdentifySuspiciousActivityController.get().url))
-    }
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+      }
 
-    "on post with valid data in edit mode" in new Fixture {
+      "respond with BAD_REQUEST" when {
+        "given invalid data missing isRecorded field" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isRecorded" -> "true",
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02",
-        "transactions[2]" -> "03",
-        "name" -> "test"
-      )
+          val newRequest = request.withFormUrlEncodedBody(
+            "transactions[0]" -> "01",
+            "transactions[1]" -> "02"
+          )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
 
-    "on post with invalid data" in new Fixture {
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#isRecorded]").html() must include(Messages("error.required.ba.select.transaction.record"))
+        }
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
-      )
+        "given invalid data with isRecorded value of true and no name information" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+          val newRequest = request.withFormUrlEncodedBody(
+            "isRecorded" -> "true",
+            "transactions[0]" -> "01",
+            "transactions[1]" -> "02",
+            "transactions[2]" -> "03",
+            "name" -> ""
+          )
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isRecorded]").html() must include(Messages("error.required.ba.select.transaction.record"))
-    }
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
 
-    "on post with invalid data1" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isRecorded" -> "true",
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02",
-        "transactions[2]" -> "03",
-        "name" -> ""
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#name]").html() must include(Messages("error.required.ba.software.package.name"))
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#name]").html() must include(Messages("error.required.ba.software.package.name"))
+        }
+      }
     }
   }
 
