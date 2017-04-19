@@ -59,22 +59,22 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
         errorSummary.html() must include("fifth not a message Key")
         errorSummary.html() must include("sixth not a message Key")
 
-        doc.getElementById("id1")
+        doc.getElementById("isUK")
           .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-        doc.getElementById("id2")
+        doc.getElementById("addressLine1").parent()
           .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
-        doc.getElementById("id3")
+        doc.getElementById("addressLine2").parent()
           .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
-        doc.getElementById("id1")
+        doc.getElementById("addressLine3").parent()
           .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
 
-        doc.getElementById("id2")
+        doc.getElementById("addressLine4").parent()
           .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
 
-        doc.getElementById("id3")
+        doc.getElementById("postCode").parent()
           .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
 
       }
@@ -100,22 +100,22 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
         errorSummary.html() must include("fifth not a message Key")
         errorSummary.html() must include("sixth not a message Key")
 
-        doc.getElementById("id1")
+        doc.getElementById("isUK")
           .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-        doc.getElementById("id2")
+        doc.getElementById("addressLineNonUK1").parent()
           .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
-        doc.getElementById("id3")
+        doc.getElementById("addressLineNonUK2").parent()
           .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
-        doc.getElementById("id1")
+        doc.getElementById("addressLineNonUK3").parent()
           .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
 
-        doc.getElementById("id2")
+        doc.getElementById("addressLineNonUK4").parent()
           .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
 
-        doc.getElementById("id3")
+        doc.getElementById("country").parent()
           .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
 
       }
