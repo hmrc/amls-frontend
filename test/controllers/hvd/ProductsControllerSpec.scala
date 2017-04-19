@@ -2,7 +2,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -14,7 +14,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{GenericTestHelper, AuthorisedFixture}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -180,6 +180,28 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
+    }
+
+    "redirect to dateOfChange when a change is made and decision is ready for renewal" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "products[0]" -> "01",
+        "products[1]" -> "02",
+        "products[2]" -> "12",
+        "otherDetails" -> "test"
+      )
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(ReadyForRenewal(None)))
 
       when(controller.dataCacheConnector.fetch[Hvd](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))

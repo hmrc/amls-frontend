@@ -2,7 +2,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{ExciseGoods, Hvd}
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -11,7 +11,7 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{GenericTestHelper, AuthorisedFixture}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -125,6 +125,25 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
       redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
     }
 
+    "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture{
+
+      val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+
+      val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(hvd)))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+    }
   }
 
 }
