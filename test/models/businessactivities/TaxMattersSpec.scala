@@ -7,19 +7,27 @@ import jto.validation.ValidationError
 class TaxMattersSpec extends PlaySpec {
 
   "Form Validation" must {
-    "Fail if neither option is picked" in {
-      TaxMatters.formRule.validate(Map()) must be(Invalid(Seq(
-        (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("error.required.ba.tax.matters")))))
+    "pass" when {
+      "yes option is picked" in {
+        TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("true"))) must be(Valid(TaxMatters(true)))
+      }
+      "no option is picked" in {
+        TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("false"))) must be(Valid(TaxMatters(false)))
+      }
     }
-    "Succeed if yes option is picked" in {
-      TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("true"))) must be(Valid(TaxMatters(true)))
-    }
-    "Succeed if no option is picked" in {
-      TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("false"))) must be(Valid(TaxMatters(false)))
-    }
-    "Fail if an invalid value is passed" in {
-      TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("random"))) must be(Invalid(Seq(
-        (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("error.required.ba.tax.matters")))))
+    "fail" when {
+      "neither option is picked, represented by an empty map" in {
+        TaxMatters.formRule.validate(Map.empty) must be(Invalid(Seq(
+          (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("error.required.ba.tax.matters")))))
+      }
+      "neither option is picked, represented by an empty string" in {
+        TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq(""))) must be(Invalid(Seq(
+          (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("error.required.ba.tax.matters")))))
+      }
+      "an invalid value is passed" in {
+        TaxMatters.formRule.validate(Map("manageYourTaxAffairs" -> Seq("random"))) must be(Invalid(Seq(
+          (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("error.required.ba.tax.matters")))))
+      }
     }
   }
 
