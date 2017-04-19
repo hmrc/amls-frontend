@@ -37,30 +37,88 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
 
     }
 
-    "show errors in the correct locations" in new ViewFixture {
+    "show errors in the correct locations" when {
+      "UK" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
-        ))
+        val form2: InvalidForm = InvalidForm(Map.empty,
+          Seq(
+            (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
+            (Path \ "addressLine1") -> Seq(ValidationError("second not a message Key")),
+            (Path \ "addressLine2") -> Seq(ValidationError("third not a message Key")),
+            (Path \ "addressLine3") -> Seq(ValidationError("fourth not a message Key")),
+            (Path \ "addressLine4") -> Seq(ValidationError("fifth not a message Key")),
+            (Path \ "postCode") -> Seq(ValidationError("sixth not a message Key"))
+          ))
 
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
 
-      errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
+        errorSummary.html() must include("not a message Key")
+        errorSummary.html() must include("second not a message Key")
+        errorSummary.html() must include("third not a message Key")
+        errorSummary.html() must include("fourth not a message Key")
+        errorSummary.html() must include("fifth not a message Key")
+        errorSummary.html() must include("sixth not a message Key")
 
-      doc.getElementById("id1")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+        doc.getElementById("id1")
+          .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("id2")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+        doc.getElementById("id2")
+          .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
-      doc.getElementById("id3")
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+        doc.getElementById("id3")
+          .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
+        doc.getElementById("id1")
+          .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
+
+        doc.getElementById("id2")
+          .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
+
+        doc.getElementById("id3")
+          .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
+
+      }
+
+      "non UK" in new ViewFixture {
+
+        val form2: InvalidForm = InvalidForm(Map.empty,
+          Seq(
+            (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
+            (Path \ "addressLineNonUK1") -> Seq(ValidationError("second not a message Key")),
+            (Path \ "addressLineNonUK2") -> Seq(ValidationError("third not a message Key")),
+            (Path \ "addressLineNonUK3") -> Seq(ValidationError("fourth not a message Key")),
+            (Path \ "addressLineNonUK4") -> Seq(ValidationError("fifth not a message Key")),
+            (Path \ "country") -> Seq(ValidationError("sixth not a message Key"))
+          ))
+
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+
+        errorSummary.html() must include("not a message Key")
+        errorSummary.html() must include("second not a message Key")
+        errorSummary.html() must include("third not a message Key")
+        errorSummary.html() must include("fourth not a message Key")
+        errorSummary.html() must include("fifth not a message Key")
+        errorSummary.html() must include("sixth not a message Key")
+
+        doc.getElementById("id1")
+          .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+        doc.getElementById("id2")
+          .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+
+        doc.getElementById("id3")
+          .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+
+        doc.getElementById("id1")
+          .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
+
+        doc.getElementById("id2")
+          .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
+
+        doc.getElementById("id3")
+          .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
+
+      }
     }
   }
 }
