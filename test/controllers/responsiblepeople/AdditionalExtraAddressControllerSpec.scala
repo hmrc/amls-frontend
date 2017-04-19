@@ -40,90 +40,26 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
   "AdditionalExtraAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.additional_extra_address.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
-
 
     "get is called" must {
 
-      "display the persons page when no existing data in keystore" in new Fixture {
+      "display the persons page" in new Fixture {
 
         val responsiblePeople = ResponsiblePeople(personName)
 
-        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = additionalExtraAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
-        document.select("input[name=addressLine1]").`val` must be("")
-        document.select("input[name=addressLine2]").`val` must be("")
-        document.select("input[name=addressLine3]").`val` must be("")
-        document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=addressLineNonUK1]").`val` must be("")
-        document.select("input[name=addressLineNonUK2]").`val` must be("")
-        document.select("input[name=addressLineNonUK3]").`val` must be("")
-        document.select("input[name=addressLineNonUK4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("")
-        document.select("input[name=country]").`val` must be("")
-      }
-
-      "display the previous home address with UK fields populated" in new Fixture {
-
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
-
-        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-        val result = additionalExtraAddressController.get(RecordId)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=addressLine1]").`val` must be("Line 1")
-        document.select("input[name=addressLine2]").`val` must be("Line 2")
-        document.select("input[name=addressLine3]").`val` must be("Line 3")
-        document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("AA1 1AA")
-      }
-
-      "display the previous home address with non-UK fields populated" in new Fixture {
-
-        val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalExtraAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
-        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalExtraAddress))
-        val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
-
-        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-        val result = additionalExtraAddressController.get(RecordId)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
-        document.select("input[name=addressLineNonUK1]").`val` must be("Line 1")
-        document.select("input[name=addressLineNonUK2]").`val` must be("Line 2")
-        document.select("input[name=addressLineNonUK3]").`val` must be("")
-        document.select("input[name=addressLineNonUK4]").`val` must be("")
-        document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
 
       "display 404 Not Found" when {
         "name cannot be found" in new Fixture {
-          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
           val result = additionalExtraAddressController.get(RecordId)(request)
           status(result) must be(NOT_FOUND)
@@ -258,7 +194,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
           }
         }
-
 
       }
 

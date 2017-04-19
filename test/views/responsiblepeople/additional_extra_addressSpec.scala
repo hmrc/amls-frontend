@@ -1,11 +1,12 @@
 package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
+import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
 import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
+import models.Country
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -23,7 +24,7 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
 
-      doc.title must startWith(Messages("responsiblepeople.additional_extra_address.heading", "firstName lastName"))
+      doc.title must startWith (Messages("responsiblepeople.additional_extra_address.heading", "firstName lastName"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -35,6 +36,49 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
       heading.html must be(Messages("responsiblepeople.additional_extra_address.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
+    }
+
+    "populate fields with data given a populated model" when {
+      "UK" in new ViewFixture {
+
+        val address = PersonAddressUK(
+          "existingAddressLine1",
+          "existingAddressLine1",
+          Some("existingAddressLine3"),
+          Some("existingAddressLine4"),
+          "PS33DE"
+        )
+
+        val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(address, None))
+
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+
+        doc.getElementById("addressLine1").`val`() mustBe address.addressLine1
+        doc.getElementById("addressLine2").`val`() mustBe address.addressLine2
+        doc.getElementById("addressLine3").`val`() mustBe address.addressLine3.get
+        doc.getElementById("addressLine4").`val`() mustBe address.addressLine4.get
+        doc.getElementById("postCode").`val`() mustBe address.postCode
+      }
+      "non UK" in new ViewFixture {
+
+        val address = PersonAddressNonUK(
+          "existingAddressLine1",
+          "existingAddressLine1",
+          Some("existingAddressLine3"),
+          Some("existingAddressLine4"),
+          Country("Spain", "ES")
+        )
+
+        val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(address, None))
+
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+
+        doc.getElementById("addressLineNonUK1").`val`() mustBe address.addressLineNonUK1
+        doc.getElementById("addressLineNonUK2").`val`() mustBe address.addressLineNonUK2
+        doc.getElementById("addressLineNonUK3").`val`() mustBe address.addressLineNonUK3.get
+        doc.getElementById("addressLineNonUK4").`val`() mustBe address.addressLineNonUK4.get
+        doc.getElementById("country").getElementsByAttributeValue("value", address.country.code).hasAttr("selected") mustBe true
+      }
     }
 
     "show errors in the correct locations" when {
