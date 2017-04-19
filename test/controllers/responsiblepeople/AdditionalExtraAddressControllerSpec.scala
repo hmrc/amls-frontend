@@ -36,6 +36,8 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
   val emptyCache = CacheMap("", Map.empty)
 
+  val mockCacheMap = mock[CacheMap]
+
   "AdditionalExtraAddressController" when {
 
     val pageTitle = Messages("responsiblepeople.additional_extra_address.title", "firstname lastname") + " - " +
@@ -145,8 +147,9 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        val mockCacheMap = mock[CacheMap]
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
@@ -165,8 +168,9 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        val mockCacheMap = mock[CacheMap]
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
@@ -180,8 +184,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           val result = additionalExtraAddressController.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)
 
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isUK]").html() must include(Messages("error.required.uk.or.overseas"))
         }
 
         "default fields for UK is not given" in new Fixture {
@@ -196,10 +198,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
         }
 
         "default fields for overseas is not given" in new Fixture {
@@ -214,10 +212,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           val result = additionalExtraAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
         }
 
         "an invalid uk address is given" when {
@@ -234,18 +228,13 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
             when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            val mockCacheMap = mock[CacheMap]
-            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-            val document: Document = Jsoup.parse(contentAsString(result))
-            document.title must be(pageTitle)
-            val errorCount = 2
-            val elementsWithError: Elements = document.getElementsByClass("error-notification")
-            elementsWithError.size() must be(errorCount)
-            for (ele: Element <- elementsWithError) {
-              ele.html() must include(Messages("err.text.validation"))
-            }
+            status(result) must be(BAD_REQUEST)
+
           }
           "editing" in new Fixture {
 
@@ -260,17 +249,13 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
             when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            val mockCacheMap = mock[CacheMap]
-            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-            val document: Document = Jsoup.parse(contentAsString(result))
-            val errorCount = 2
-            val elementsWithError: Elements = document.getElementsByClass("error-notification")
-            elementsWithError.size() must be(errorCount)
-            for (ele: Element <- elementsWithError) {
-              ele.html() must include(Messages("err.text.validation"))
-            }
+            status(result) must be(BAD_REQUEST)
+
           }
         }
 
@@ -293,8 +278,9 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        val mockCacheMap = mock[CacheMap]
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
         status(result) must be(SEE_OTHER)
@@ -302,6 +288,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       }
 
       "go to timeAtAdditionalExtraAddress" when {
+
         "edit mode is off" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -315,8 +302,9 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          val mockCacheMap = mock[CacheMap]
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
           status(result) must be(SEE_OTHER)
@@ -335,8 +323,9 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          val mockCacheMap = mock[CacheMap]
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
           status(result) must be(SEE_OTHER)
