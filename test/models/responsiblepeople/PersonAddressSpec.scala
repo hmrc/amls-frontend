@@ -74,16 +74,16 @@ class PersonAddressSpec extends PlaySpec {
   "personAddress" must {
 
     "validate toLines for UK address" in {
-      DefaultUKAddress.toLines must be (Seq("Default Line 1",
-                                            "Default Line 2",
-                                            "Default Line 3",
-                                            "Default Line 4",
-                                            "NE1 7YX"))
+      DefaultUKAddress.toLines must be(Seq("Default Line 1",
+        "Default Line 2",
+        "Default Line 3",
+        "Default Line 4",
+        "NE1 7YX"))
 
     }
 
     "validate toLines for Non UK address" in {
-      DefaultNonUKAddress.toLines must be (Seq(
+      DefaultNonUKAddress.toLines must be(Seq(
         "Default Line 1",
         "Default Line 2",
         "Default Line 3",
@@ -91,110 +91,132 @@ class PersonAddressSpec extends PlaySpec {
         "United Kingdom"))
     }
 
-    "Form validation" must {
-      "Read UK Address" in {
-        PersonAddress.formRule.validate(DefaultUKModel) must be (Valid(DefaultUKAddress))
+    "pass validation" when {
+      "Reading UK Address" in {
+        PersonAddress.formRule.validate(DefaultUKModel) must be(Valid(DefaultUKAddress))
       }
-
-      "throw error when mandatory fields are missing" in {
-        PersonAddress.formRule.validate(Map.empty) must be
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          ))
-      }
-
-      "throw error when there is an invalid data" in {
-        val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
-        PersonAddress.formRule.validate(model) must be(
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          )))
-      }
-
-      "throw error when length of country exceeds max length" in {
-       val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
-        PersonAddress.formRule.validate(model) must be(
-          Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
-          )))
-      }
-
-      "fail to validation for not filling mandatory field" in {
-        val data = Map(
-          "isUK" -> Seq("true"),
-          "addressLine1" -> Seq(""),
-          "addressLine2" -> Seq(""),
-          "postCode" -> Seq("")
-        )
-
-        PersonAddress.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-            (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
-            (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
-          )))
-      }
-
-      "fail to validation for not filling non UK mandatory field" in {
-        val data = Map(
-          "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq(""),
-          "addressLineNonUK2" -> Seq(""),
-          "country" -> Seq("")
-        )
-
-        PersonAddress.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-            (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
-            (Path \ "country") -> Seq(ValidationError("error.required.country"))
-          )))
-      }
-
-
       "Read Non UK Address" in {
-        PersonAddress.formRule.validate(DefaultNonUKModel) must be (Valid(DefaultNonUKAddress))
-      }
-
-      "write correct UK Address" in {
-        PersonAddress.formWrites.writes(DefaultUKAddress) must be (DefaultUKModel)
-      }
-
-      "write correct Non UK Address" in {
-        PersonAddress.formWrites.writes(DefaultNonUKAddress) must be (DefaultNonUKModel)
+        PersonAddress.formRule.validate(DefaultNonUKModel) must be(Valid(DefaultNonUKAddress))
       }
     }
 
-    "JSON validation" must {
+    "throw error" when {
+      "mandatory fields are missing" when {
+        "isUK has not been selected" in {
+          PersonAddress.formRule.validate(DefaultUKModel) must be
+          Invalid(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
+          ))
+        }
+        "address lines are missing" when {
+          "UK" in {
+            val data = Map(
+              "isUK" -> Seq("true"),
+              "addressLine1" -> Seq(""),
+              "addressLine2" -> Seq(""),
+              "postCode" -> Seq("")
+            )
 
-      "Round trip a UK Address correctly through serialisation" in {
-        PersonAddress.jsonReads.reads(
-          PersonAddress.jsonWrites.writes(DefaultUKAddress)
-        ) must be (JsSuccess(DefaultUKAddress))
+            PersonAddress.formRule.validate(data) must
+              be(Invalid(Seq(
+                (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
+                (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
+                (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
+              )))
+          }
+          "non UK" in {
+            val data = Map(
+              "isUK" -> Seq("false"),
+              "addressLineNonUK1" -> Seq(""),
+              "addressLineNonUK2" -> Seq(""),
+              "country" -> Seq("")
+            )
+
+            PersonAddress.formRule.validate(data) must
+              be(Invalid(Seq(
+                (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
+                (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
+                (Path \ "country") -> Seq(ValidationError("error.required.country"))
+              )))
+          }
+        }
       }
-
-      "Round trip a Non UK Address correctly through serialisation" in {
-        PersonAddress.jsonReads.reads(
-          PersonAddress.jsonWrites.writes(DefaultNonUKAddress)
-        ) must be (JsSuccess(DefaultNonUKAddress))
+      "values given are too long" when {
+        "UK" in {
+          val data = Map(
+            "isUK" -> Seq("true"),
+            "addressLine1" -> Seq("abc" * 35),
+            "addressLine2" -> Seq("abc" * 35),
+            "postCode" -> Seq("abc" * 35)
+          )
+          PersonAddress.formRule.validate(data) must be(
+            Invalid(Seq(
+              (Path \ "addressLine1") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
+            )))
+        }
+        "non UK" in {
+          val data = Map(
+            "isUK" -> Seq("false"),
+            "addressLineNonUK1" -> Seq("abc" * 35),
+            "addressLineNonUK2" -> Seq("abc" * 35),
+            "country" -> Seq("abc" * 35)
+          )
+          PersonAddress.formRule.validate(data) must be(
+            Invalid(Seq(
+              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
+            )))
+        }
       }
-
-      "Serialise UK address as expected" in {
-        Json.toJson(DefaultUKAddress) must be(DefaultUKJson)
+      "there is invalid data" in {
+        val model = DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
+        PersonAddress.formRule.validate(model) must be(
+          Invalid(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
+          )))
       }
+    }
 
-      "Serialise non-UK address as expected" in {
-        Json.toJson(DefaultNonUKAddress) must be(DefaultNonUKJson)
-      }
+    "write correct UK Address" in {
+      PersonAddress.formWrites.writes(DefaultUKAddress) must be(DefaultUKModel)
+    }
 
-      "Deserialise UK address as expected" in {
-        DefaultUKJson.as[PersonAddress] must be(DefaultUKAddress)
-      }
+    "write correct Non UK Address" in {
+      PersonAddress.formWrites.writes(DefaultNonUKAddress) must be(DefaultNonUKModel)
+    }
+  }
 
-      "Deserialise non-UK address as expected" in {
-        DefaultNonUKJson.as[PersonAddress] must be(DefaultNonUKAddress)
-      }
+  "JSON validation" must {
 
+    "Round trip a UK Address correctly through serialisation" in {
+      PersonAddress.jsonReads.reads(
+        PersonAddress.jsonWrites.writes(DefaultUKAddress)
+      ) must be(JsSuccess(DefaultUKAddress))
+    }
+
+    "Round trip a Non UK Address correctly through serialisation" in {
+      PersonAddress.jsonReads.reads(
+        PersonAddress.jsonWrites.writes(DefaultNonUKAddress)
+      ) must be(JsSuccess(DefaultNonUKAddress))
+    }
+
+    "Serialise UK address as expected" in {
+      Json.toJson(DefaultUKAddress) must be(DefaultUKJson)
+    }
+
+    "Serialise non-UK address as expected" in {
+      Json.toJson(DefaultNonUKAddress) must be(DefaultNonUKJson)
+    }
+
+    "Deserialise UK address as expected" in {
+      DefaultUKJson.as[PersonAddress] must be(DefaultUKAddress)
+    }
+
+    "Deserialise non-UK address as expected" in {
+      DefaultNonUKJson.as[PersonAddress] must be(DefaultNonUKAddress)
     }
 
   }
