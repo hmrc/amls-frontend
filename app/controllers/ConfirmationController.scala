@@ -73,7 +73,6 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  // scalastyle:off
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
@@ -112,7 +111,7 @@ trait ConfirmationController extends BaseController {
 
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
-  // scalastyle:on
+
   private def requestPaymentsUrl(data: ViewData, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
   : Future[PaymentServiceRedirect] = data match {
     case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
