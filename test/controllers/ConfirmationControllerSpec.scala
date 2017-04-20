@@ -7,6 +7,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
+import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -97,6 +98,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       when {
         controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       } thenReturn Future.successful(Some(model))
+
+      when {
+        controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+      } thenReturn Future.successful(None)
     }
 
     def setupStatus(status: SubmissionStatus): Unit = {
@@ -104,6 +109,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
     }
+
   }
 
   "ConfirmationController" must {
@@ -156,6 +162,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "query the payments service for the payments url for a renewal" in new Fixture {
 
+      when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
       when(controller.submissionService.getRenewal(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
@@ -278,8 +285,27 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(companyName)
       }
 
+      "a variation when status is ready for renewal and no renewal data in save4later" in new Fixture {
+        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when(controller.submissionService.getVariation(any(), any(), any()))
+          .thenReturn(Future.successful(Some((Some(""), Currency.fromInt(0), Seq()))))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+        contentAsString(result) must include(Messages("confirmation.no.fee"))
+        contentAsString(result) must include(companyName)
+      }
+
       "a renewal has no payment reference" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(Renewal(Some(InvolvedInOtherNo))))
 
         when(controller.submissionService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq()))))
