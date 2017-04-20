@@ -44,10 +44,11 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
           Messages("title.amls") + " - " + Messages("title.gov")
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe pageTitle
+        htmlValue.getElementById("accountantForAMLSRegulations-true").hasAttr("checked") must be(false)
+        htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
       }
 
-      "load Yes when accountant For AMLS Regulations from save4later returns True" in new Fixture {
+      "lpre-populate the form when data is already present" in new Fixture {
 
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
@@ -59,23 +60,8 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-true").attr("checked") mustBe "checked"
-
-      }
-
-      "load No when accountant For AMLS Regulations from save4later returns No" in new Fixture {
-
-        val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(false))
-        val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
-
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(activities)))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-false").attr("checked") mustBe "checked"
+        htmlValue.getElementById("accountantForAMLSRegulations-true").hasAttr("checked") must be(true)
+        htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
 
       }
     }
