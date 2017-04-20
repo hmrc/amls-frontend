@@ -6,7 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.{MsbServices, TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.mvc.Result
@@ -81,6 +81,24 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       }
   }
 
+  private def redirectBasedOnstatus(status: SubmissionStatus,
+                                    tradingPremises: Option[TradingPremises],
+                                    data: WhatDoesYourBusinessDo,
+                                    edit: Boolean, index: Int) = {
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) if !data.activities.contains(MoneyServiceBusiness)
+        && redirectToDateOfChange(tradingPremises, data) && edit =>
+        Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+      case _ => data.activities.contains(MoneyServiceBusiness) match {
+        case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
+        case _ => edit match {
+          case true => Redirect (routes.SummaryController.getIndividual (index) )
+          case false => Redirect (routes.PremisesRegisteredController.get (index) )
+        }
+      }
+    }
+  }
+
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       data(index, edit) flatMap {
@@ -114,17 +132,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                     )
                 }
                 status <- statusService.getStatus
-              } yield status match {
-                case SubmissionDecisionApproved if !data.activities.contains(MoneyServiceBusiness) && redirectToDateOfChange(tradingPremises, data) && edit =>
-                  Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
-                case _ => data.activities.contains(MoneyServiceBusiness) match {
-                  case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-                  case _ => edit match {
-                    case true => Redirect (routes.SummaryController.getIndividual (index) )
-                    case false => Redirect (routes.PremisesRegisteredController.get (index) )
-                  }
-                }
-              }
+              } yield redirectBasedOnstatus(status, tradingPremises, data, edit, index)
             }.recoverWith{
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
@@ -135,7 +143,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
 
   def dateOfChange(index: Int) = Authorised {
     implicit authContext => implicit request =>
-      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index)))
+      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index)))
   }
 
   def saveDateOfChange(index: Int) = Authorised.async {
