@@ -100,6 +100,31 @@ class BranchesOrAgentsControllerSpec extends GenericTestHelper with MockitoSugar
       redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
     }
 
+    "return a redirect to the 'Linked Transactions' page when the user has selected 'yes' from options and has filled " +
+      "the mandatory auto suggested country field" in new Fixture {
+
+      val model = MoneyServiceBusiness(
+        branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+        hasChanged = true
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "hasCountries" -> "true",
+        "countries" -> "GB"
+      )
+
+      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = false)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
+    }
+
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
 
       val model = MoneyServiceBusiness(
