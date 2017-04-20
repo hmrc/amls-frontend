@@ -1,43 +1,65 @@
 package views.msb
 
-import forms.Form2
-import models.Country
+import forms.{Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.BranchesOrAgents
-import org.jsoup.Jsoup
-import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import  utils.GenericTestHelper
-import play.api.mvc.Request
-import play.api.test.FakeRequest
+import utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
+import models.Country
+import play.api.i18n.Messages
 import views.Fixture
 
-class branches_or_agentsSpec extends GenericTestHelper with MustMatchers  {
 
+class branches_or_agentsSpec extends GenericTestHelper with MustMatchers {
 
-  implicit val requestWithToken = addToken(FakeRequest())
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
-  "branches_or_agents view" when {
-    "The model contains no countries" must {
-      "check the no radio button" in {
+  "branches_or_agents view" must {
+    "have correct title" in new ViewFixture {
 
-        val model= BranchesOrAgents(Some(Seq.empty[Country]))
-        val view = views.html.msb.branches_or_agents(Form2(model), false)
-        val dom = Jsoup.parse(view.body)
-        val noRadio = dom.select("input[id=hasCountries-false]")
-        noRadio.hasAttr("checked") must be (true)
-      }
+      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
+
+      def view = views.html.msb.branches_or_agents(form2, true)
+
+      doc.title must be(Messages("msb.branchesoragents.title") +
+        " - " + Messages("summary.msb") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
     }
 
-    "The model contains some countries" must {
-      "check the yes radio button" in {
+    "have correct headings" in new ViewFixture {
 
-        val model= BranchesOrAgents(Some(Seq(Country("COUNTRTY NAME", "CODE"))))
-        val form = Form2(model)
-        val view = views.html.msb.branches_or_agents(form, false)
-        val dom = Jsoup.parse(view.body)
-        val yesRadio = dom.select("input[id=hasCountries-true]")
-        yesRadio.hasAttr("checked") must be (true)
-      }
+      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
+
+      def view = views.html.msb.branches_or_agents(form2, true)
+
+      heading.html must be(Messages("msb.branchesoragents.title"))
+      subHeading.html must include(Messages("summary.msb"))
+
+    }
+
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "hasCountries") -> Seq(ValidationError("not a message Key")),
+          (Path \ "countries") -> Seq(ValidationError("second not a message Key"))
+        ))
+
+      def view = views.html.msb.branches_or_agents(form2, true)
+
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
+
+      doc.getElementById("hasCountries")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+      doc.getElementById("countries")
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+
     }
   }
 }
