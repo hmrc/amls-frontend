@@ -54,7 +54,6 @@ class PersonAddressSpec extends PlaySpec {
     "country" -> Seq(DefaultCountry.code)
   )
 
-
   val DefaultUKJson = Json.obj(
     "personAddressLine1" -> DefaultAddressLine1,
     "personAddressLine2" -> DefaultAddressLine2,
@@ -147,12 +146,16 @@ class PersonAddressSpec extends PlaySpec {
             "isUK" -> Seq("true"),
             "addressLine1" -> Seq("abc" * 35),
             "addressLine2" -> Seq("abc" * 35),
+            "addressLine3" -> Seq("abc" * 35),
+            "addressLine4" -> Seq("abc" * 35),
             "postCode" -> Seq("abc" * 35)
           )
           PersonAddress.formRule.validate(data) must be(
             Invalid(Seq(
               (Path \ "addressLine1") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
             )))
         }
@@ -161,12 +164,16 @@ class PersonAddressSpec extends PlaySpec {
             "isUK" -> Seq("false"),
             "addressLineNonUK1" -> Seq("abc" * 35),
             "addressLineNonUK2" -> Seq("abc" * 35),
+            "addressLineNonUK3" -> Seq("abc" * 35),
+            "addressLineNonUK4" -> Seq("abc" * 35),
             "country" -> Seq("abc" * 35)
           )
           PersonAddress.formRule.validate(data) must be(
             Invalid(Seq(
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }
