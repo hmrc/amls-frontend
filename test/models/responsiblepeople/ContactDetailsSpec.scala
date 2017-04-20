@@ -20,68 +20,94 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         ContactDetails.formReads.validate(urlFormEncoded) must be(Valid(ContactDetails("07702755869", "myname@example.com")))
       }
 
-      "fail validation when no option is selected" in {
+      "fail to validate" when {
 
-        val emptyForm = Map(
-          "phoneNumber" -> Seq(""),
-          "emailAddress" -> Seq("")
-        )
+        "no option is selected" in {
 
-        ContactDetails.formReads.validate(emptyForm) must
-          be(Invalid(Seq(
-            (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number")),
-            (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
-          )))
-      }
+          val emptyForm = Map(
+            "phoneNumber" -> Seq(""),
+            "emailAddress" -> Seq("")
+          )
 
-      "fail to validate when phone number is missing" in {
+          ContactDetails.formReads.validate(emptyForm) must
+            be(Invalid(Seq(
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number")),
+              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
+            )))
+        }
 
-        val urlFormEncoded = Map(
-          "phoneNumber" -> Seq(""),
-          "emailAddress" -> Seq("myname@example.com")
-        )
+        "phone number is missing" in {
 
-        ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number"))
-          )))
-      }
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq(""),
+            "emailAddress" -> Seq("myname@example.com")
+          )
 
-      "fail to validate when email is missing" in {
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number"))
+            )))
+        }
 
-        val urlFormEncoded = Map(
-          "phoneNumber" -> Seq("07702755869"),
-          "emailAddress" -> Seq("")
-        )
+        "email is missing" in {
 
-        ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
-          )))
-      }
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq("07702755869"),
+            "emailAddress" -> Seq("")
+          )
 
-      "fail to validate when email is invalid" in {
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
+            )))
+        }
 
-        val urlFormEncoded = Map(
-          "phoneNumber" -> Seq("07702755869"),
-          "emailAddress" -> Seq("invalid-email.com")
-        )
-        ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.rp.email"))
-          )))
-      }
+        "email is invalid" in {
 
-      "fail to validate when phone number is invalid" in {
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq("07702755869"),
+            "emailAddress" -> Seq("invalid-email.com")
+          )
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.rp.email"))
+            )))
+        }
 
-        val urlFormEncoded = Map(
-          "phoneNumber" -> Seq("invalid phone"),
-          "emailAddress" -> Seq("myname@example.com")
-        )
-        ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "phoneNumber") -> Seq(ValidationError("err.invalid.phone.number"))
-          )))
+        "phone number is invalid" in {
+
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq("invalid phone"),
+            "emailAddress" -> Seq("myname@example.com")
+          )
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "phoneNumber") -> Seq(ValidationError("err.invalid.phone.number"))
+            )))
+        }
+
+        "email is too long" in {
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq("07702755869"),
+            "emailAddress" -> Seq("email.com" * 100)
+          )
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "emailAddress") -> Seq(ValidationError("error.max.length.rp.email"))
+            )))
+        }
+
+        "phone number is too long" in {
+          val urlFormEncoded = Map(
+            "phoneNumber" -> Seq("0987654" * 30),
+            "emailAddress" -> Seq("myname@example.com")
+          )
+          ContactDetails.formReads.validate(urlFormEncoded) must
+            be(Invalid(Seq(
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.max.length.phone"))
+            )))
+        }
+
       }
 
     }

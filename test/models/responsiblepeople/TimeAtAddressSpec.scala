@@ -18,17 +18,17 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
     val MoreThanThreeForm = Map(FieldName -> Seq("04"))
 
     "successfully validate given an enum value" in {
-      TimeAtAddress.formRule.validate(ZeroToFiveForm)    must be(Valid(TimeAtAddress.ZeroToFiveMonths))
-      TimeAtAddress.formRule.validate(SixToElevenForm)   must be(Valid(TimeAtAddress.SixToElevenMonths))
-      TimeAtAddress.formRule.validate(OneToThreeForm)    must be(Valid(TimeAtAddress.OneToThreeYears))
+      TimeAtAddress.formRule.validate(ZeroToFiveForm) must be(Valid(TimeAtAddress.ZeroToFiveMonths))
+      TimeAtAddress.formRule.validate(SixToElevenForm) must be(Valid(TimeAtAddress.SixToElevenMonths))
+      TimeAtAddress.formRule.validate(OneToThreeForm) must be(Valid(TimeAtAddress.OneToThreeYears))
       TimeAtAddress.formRule.validate(MoreThanThreeForm) must be(Valid(TimeAtAddress.ThreeYearsPlus))
     }
 
     "write correct data from enum value" in {
-      TimeAtAddress.formWrites.writes(TimeAtAddress.ZeroToFiveMonths)  must be(ZeroToFiveForm)
+      TimeAtAddress.formWrites.writes(TimeAtAddress.ZeroToFiveMonths) must be(ZeroToFiveForm)
       TimeAtAddress.formWrites.writes(TimeAtAddress.SixToElevenMonths) must be(SixToElevenForm)
-      TimeAtAddress.formWrites.writes(TimeAtAddress.OneToThreeYears)   must be(OneToThreeForm)
-      TimeAtAddress.formWrites.writes(TimeAtAddress.ThreeYearsPlus)    must be(MoreThanThreeForm)
+      TimeAtAddress.formWrites.writes(TimeAtAddress.OneToThreeYears) must be(OneToThreeForm)
+      TimeAtAddress.formWrites.writes(TimeAtAddress.ThreeYearsPlus) must be(MoreThanThreeForm)
     }
 
     "throw error on invalid data" in {
