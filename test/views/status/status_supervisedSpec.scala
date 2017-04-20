@@ -55,8 +55,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
         be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))
 
-      val p = doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please"))
-      println(p)
+     doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
     }
 
   }
