@@ -15,7 +15,7 @@ class status_expiredSpec extends GenericTestHelper with MustMatchers {
   "status_expired view" must {
     val pageTitleSuffix = " - Your registration - " +Messages("title.amls") + " - " + Messages("title.gov")
 
-    "have correct title, heading and sub heading and static content" in new ViewFixture {
+    "have correct title, heading and sub heading" in new ViewFixture {
 
       val form2 = EmptyForm
 

@@ -286,15 +286,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-
-        document.title() must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.success.description")).text must be(Messages("status.submissiondecisionsupervised.success.description"))
-        val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
-        Messages("status.submissiondecisionsupervised.enddate.text", date)
       }
 
 
@@ -361,13 +352,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-
-        document.title() must be(Messages("status.submissiondecisionexpired.title") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionexpired.description")).text must be(Messages("status.submissiondecisionexpired.description"))
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionexpired.description2")).text must be(Messages("status.submissiondecisionexpired.description2"))
       }
 
       "decision made (Revoked)" in new Fixture {
@@ -436,13 +420,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-
-      contentAsString(result) must include(Messages("status.readyforrenewal.warning",DateHelper.formatDate(renewalDate)))
-
-      val document = Jsoup.parse(contentAsString(result))
-
-      document.title() must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
-
     }
 
     "show the correct content to edit submission" when {
