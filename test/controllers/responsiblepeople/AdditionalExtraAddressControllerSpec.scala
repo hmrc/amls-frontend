@@ -57,8 +57,18 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=phoneNumber]").`val` must be("")
-        document.select("input[name=emailAddress]").`val` must be("")
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
+        document.select("input[name=addressLine1]").`val` must be("")
+        document.select("input[name=addressLine2]").`val` must be("")
+        document.select("input[name=addressLine3]").`val` must be("")
+        document.select("input[name=addressLine4]").`val` must be("")
+        document.select("input[name=addressLineNonUK1]").`val` must be("")
+        document.select("input[name=addressLineNonUK2]").`val` must be("")
+        document.select("input[name=addressLineNonUK3]").`val` must be("")
+        document.select("input[name=addressLineNonUK4]").`val` must be("")
+        document.select("input[name=postcode]").`val` must be("")
+        document.select("input[name=country]").`val` must be("")
 
       }
       "display the persons page with pre-populated data" in new Fixture {
@@ -154,7 +164,6 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
         }
-
       }
 
       "go to DetailedAnswersController" when {
