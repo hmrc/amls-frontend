@@ -33,23 +33,7 @@ class ExpectedAMLSTurnoverControllerSpec extends GenericTestHelper with MockitoS
 
     val mockCache = mock[CacheMap]
 
-    //    val businessMatching = BusinessMatching(
-    //      activities = Some(Activities(Set.empty))
-    //    )
-
     def model: Option[BusinessActivities] = None
-
-    //    when(controller.statusService.getStatus(any(), any(), any()))
-    //      .thenReturn(Future.successful(NotCompleted))
-    //
-    //    when(controller.dataCacheConnector.fetchAll(any(), any()))
-    //      .thenReturn(Future.successful(Some(cache)))
-    //
-    //    when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-    //      .thenReturn(Some(businessMatching))
-    //
-    //    when(cache.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
-    //      .thenReturn(model)
   }
 
   val emptyCache = CacheMap("", Map.empty)
