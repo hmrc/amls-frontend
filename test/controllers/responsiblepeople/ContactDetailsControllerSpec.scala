@@ -1,18 +1,15 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, ContactDetails, ResponsiblePeople}
+import models.responsiblepeople.{ContactDetails, PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -32,9 +29,6 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
 
   "ContactDetailsController" when {
 
-    val pageTitle = Messages("responsiblepeople.contact_details.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
     "get is called" must {
@@ -46,7 +40,6 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
         document.select("input[name=phoneNumber]").`val` must be("")
         document.select("input[name=emailAddress]").`val` must be("")
 
@@ -64,9 +57,8 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=phoneNumber]").`val` must be("07702745869")
-        document.select("input[name=emailAddress]").`val` must be("test@test.com")
+        document.select("input[name=phoneNumber]").`val` must be(contact.phoneNumber)
+        document.select("input[name=emailAddress]").`val` must be(contact.emailAddress)
       }
 
       "respond with NOT_FOUND" when {
