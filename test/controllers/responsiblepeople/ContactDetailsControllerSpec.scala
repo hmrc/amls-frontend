@@ -8,7 +8,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -19,7 +19,8 @@ import scala.concurrent.Future
 class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new ContactDetailsController {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -29,212 +30,159 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "ContactDetailsController" must {
+  "ContactDetailsController" when {
 
     val pageTitle = Messages("responsiblepeople.contact_details.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-    "on get display the contact details page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-    }
+    "get is called" must {
+      "display the contact details page" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
-    "on get display the contact details page with pre populated data" in new Fixture {
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
 
-      val contact = ContactDetails("07702745869", "test@test.com")
-      val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
+        document.select("input[name=phoneNumber]").`val` must be("")
+        document.select("input[name=emailAddress]").`val` must be("")
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(res))))
-
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      document.select("input[name=phoneNumber]").`val` must be("07702745869")
-      document.select("input[name=emailAddress]").`val` must be("test@test.com")
-    }
-
-    "on post with valid data" when {
-      "this is the first responsible person" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "07702745869",
-          "emailAddress" -> "test@test.com"
-        )
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-        when(controller.dataCacheConnector.save[ContactDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ConfirmAddressController.get(1).url))
       }
 
-      "this is not the first responsible person" in new Fixture {
+      "display the contact details page with pre populated data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "07702745869",
-          "emailAddress" -> "test@test.com"
-        )
+        val contact = ContactDetails("07702745869", "test@test.com")
+        val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(res))))
 
-        when(controller.dataCacheConnector.save[ContactDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
 
-        val result = controller.post(2)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(2).url))
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must be(pageTitle)
+        document.select("input[name=phoneNumber]").`val` must be("07702745869")
+        document.select("input[name=emailAddress]").`val` must be("test@test.com")
+      }
+
+      "respond with NOT_FOUND" when {
+        "there is no responsible person for the index" in new Fixture {
+          val contact = ContactDetails("07702745869", "test@test.com")
+          val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(res))))
+
+          val result = controller.get(0)(request)
+          status(result) must be(NOT_FOUND)
+        }
       }
     }
 
-     "fail submission on invalid phone number" in new Fixture {
+    "post is called" when {
+      "given a valid form" when {
+        "index of the responsible person is 1" must {
+          "go to ConfirmAddressController" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "<077>02745869",
-        "emailAddress" -> "test@test.com"
-      )
+            val newRequest = request.withFormUrlEncodedBody(
+              "phoneNumber" -> "07702745869",
+              "emailAddress" -> "test@test.com"
+            )
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      when(controller.dataCacheConnector.save[ContactDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ConfirmAddressController.get(1).url))
+          }
+        }
+        "index of the responsible person is greater than 1" must {
+          "go to CurrentAddressController" in new Fixture {
 
-      val document: Document  = Jsoup.parse(contentAsString(result))
-       document.title must be(pageTitle)
-      document.getElementsByClass("error-notification").html() must include(Messages("err.invalid.phone.number"))
+            val newRequest = request.withFormUrlEncodedBody(
+              "phoneNumber" -> "07702745869",
+              "emailAddress" -> "test@test.com"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(2)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(2).url))
+          }
+        }
+        "there is no responsible person for the index" must {
+          "respond with NOT_FOUND" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "phoneNumber" -> "07702745869",
+              "emailAddress" -> "test@test.com"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(0)(newRequest)
+            status(result) must be(NOT_FOUND)
+          }
+        }
+        "in edit mode" must {
+          "go to DetailedAnswersController" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "phoneNumber" -> "07702745869",
+              "emailAddress" -> "test@test.com"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          }
+        }
+      }
+
+      "given an invalid form" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "phoneNumber" -> "<077>02745869",
+            "emailAddress" -> "test@test.com"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
+          when(controller.dataCacheConnector.save[ContactDetails](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
     }
 
-    "on post with missing phone data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "",
-        "emailAddress" -> "test@test.com"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      contentAsString(result) must include(Messages("error.required.phone.number"))
-    }
-
-    "on post with missing email data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "07702745869",
-        "emailAddress" -> ""
-      )
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      contentAsString(result) must include(Messages("error.required.rp.email"))
-    }
-
-    "on post with invalid phone data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "invalid",
-        "emailAddress" -> "test@test.com"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      contentAsString(result) must include(Messages("err.invalid.phone.number"))
-    }
-
-    "on post with invalid email data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "07702745869",
-        "emailAddress" -> "invalid-email.com"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      contentAsString(result) must include(Messages("error.invalid.rp.email"))
-    }
-
-    "on post with greater than max length phone data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "1234567890123456789012345678901",
-        "emailAddress" -> "test@test.com"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#phoneNumber]").text() must include(Messages("error.max.length.phone"))
-    }
-
-    "on post with greater than max length email data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "07702745869",
-        "emailAddress" -> ("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz@" +
-                           "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz.com")
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#emailAddress]").text() must include(Messages("error.max.length.rp.email"))
-    }
-
-    "on post with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "phoneNumber" -> "07702745869",
-        "emailAddress" -> "test@test.com"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-      when(controller.dataCacheConnector.save[ContactDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
-    }
   }
 }
 
