@@ -4,7 +4,6 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress._
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}

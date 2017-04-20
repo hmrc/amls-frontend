@@ -256,7 +256,6 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         }
       }
 
-
       "redirect to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
