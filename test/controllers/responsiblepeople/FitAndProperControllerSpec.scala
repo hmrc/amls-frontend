@@ -78,6 +78,22 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "post is called" must {
+      "respond with NOT_FOUND" when {
+        "the index is out of bounds" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "hasAlreadyPassedFitAndProper" -> "true"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = testFitAndProper)))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(99)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
+      }
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
