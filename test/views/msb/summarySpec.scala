@@ -1,35 +1,96 @@
 package views.msb
 
-import models.businessmatching.{CurrencyExchange, MsbServices}
-import models.moneyservicebusiness.{MoneyServiceBusiness, WhichCurrencies}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.i18n.Messages
-import play.api.test.FakeApplication
+import models.Country
+import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbServices, TransmittingMoney}
+import models.moneyservicebusiness._
+import org.jsoup.nodes.Element
+import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.MustMatchers
 import utils.GenericTestHelper
-import views.Fixture
+import play.api.i18n.Messages
+import views.{Fixture, HtmlAssertions}
+
+import scala.collection.JavaConversions._
 
 
-class summarySpec extends GenericTestHelper with MustMatchers {
+class summarySpec extends GenericTestHelper
+  with MustMatchers
+  with HtmlAssertions
+  with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
+  "summary view" must {
+    "have correct title" in new ViewFixture {
 
-  "MSB Summary page" should {
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true)
 
-    "indicate whether foreign currencies are used" in new ViewFixture {
+      doc.title must be(Messages("title.cya") +
+        " - " + Messages("summary.msb") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
+    }
 
-      val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP"), Some(true), None, None, None)))
+    "have correct headings" in new ViewFixture {
 
-      def view = views.html.msb.summary(model, Some(MsbServices(Set(CurrencyExchange))), false)
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true)
 
-      html.contains(Messages("msb.which_currencies.foreign_currencies_question")) must be(true)
+      heading.html must be(Messages("title.cya"))
+      subHeading.html must include(Messages("summary.msb"))
 
     }
 
-  }
+    val sectionChecks = Table[String, Element => Boolean](
+      ("title key", "check"),
+      ("msb.throughput.title",checkElementTextIncludes(_, "msb.throughput.lbl.01")),
+      ("msb.ipsp.title",checkElementTextIncludes(_, "lbl.no")),
+      ("msb.linked.txn.title",checkElementTextIncludes(_, "lbl.no")),
+      ("msb.which_currencies.title",checkElementTextIncludes(_, "USD","GBP","EUR","bank names","Wholesaler Names")),
+      ("msb.send.money.title",checkElementTextIncludes(_, "lbl.yes")),
+      ("msb.fundstransfer.title",checkElementTextIncludes(_, "lbl.no")),
+      ("msb.branchesoragents.title",checkElementTextIncludes(_, "United Kingdom")),
+      ("msb.send.the.largest.amounts.of.money.title",checkElementTextIncludes(_, "United Kingdom")),
+      ("msb.most.transactions.title",checkElementTextIncludes(_, "United Kingdom")),
+      ("msb.transactions.expected.title",checkElementTextIncludes(_, "10")),
+      ("msb.ce.transactions.expected.in.12.months.title",checkElementTextIncludes(_, "10"))
+    )
 
+    "include the provided data" in new ViewFixture {
+
+      def view = views.html.msb.summary(
+        MoneyServiceBusiness(
+          Some(ExpectedThroughput.First),
+          Some(BusinessUseAnIPSPNo),
+          Some(IdentifyLinkedTransactions(false)),
+          Some(WhichCurrencies(Seq("USD", "GBP", "EUR"),
+            usesForeignCurrencies = Some(true),
+            Some(BankMoneySource("bank names")),
+            Some(WholesalerMoneySource("Wholesaler Names")),
+            Some(true))),
+          Some(SendMoneyToOtherCountry(true)),
+          Some(FundsTransfer(false)),
+          Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(TransactionsInNext12Months("10")),
+          Some(CETransactionsInNext12Months("10"))
+        ),
+        Some(MsbServices(Set(CurrencyExchange, TransmittingMoney))),
+        true
+      )
+
+      forAll(sectionChecks) { (key, check) => {
+        val hTwos = doc.select("section.check-your-answers h2")
+
+        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+
+        hTwo must not be (None)
+        val section = hTwo.get.parents().select("section").first()
+        check(section) must be(true)
+      }
+      }
+    }
+  }
 }
