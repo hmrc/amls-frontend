@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.FeeConnector
 import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
@@ -58,6 +58,8 @@ trait StatusController extends BaseController {
       case (ReadyForRenewal(renewalDate), _) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
         renewalDate, true))
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
       case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
     }
   }

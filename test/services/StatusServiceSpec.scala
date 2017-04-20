@@ -82,6 +82,26 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
+    "return SubmissionDecisionRevoked" in {
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Revoked")))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual SubmissionDecisionRevoked
+      }
+    }
+
+    "return SubmissionDecisionExpired" in {
+
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Expired")))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual SubmissionDecisionExpired
+      }
+    }
+
     "return ReadyForRenewal" in {
       val renewalDate = LocalDate.now().plusDays(15)
 
@@ -129,7 +149,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
       when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected", currentRegYearEndDate = Some(renewalDate))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))))
       whenReady(TestStatusService.getStatus.failed) {
         _.getMessage mustBe("ETMP returned status is inconsistent")
       }

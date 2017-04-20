@@ -166,7 +166,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         document.getElementsByTag("details").html() must be("")
       }
 
-
       "under review" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -330,12 +329,78 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
+      }
+
+      "decision made (Expired)" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Expired", None, None, None, None, false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
 
-        document.title() must be(Messages("status.submissiondecisionrejected.heading") + pageTitleSuffix)
+        document.title() must be(Messages("status.submissiondecisionexpired.title") + pageTitleSuffix)
 
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description")).text must be(Messages("status.submissiondecisionrejected.description"))
-        document.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description2")).text must be(Messages("status.submissiondecisionrejected.description2"))
+        document.getElementsMatchingOwnText(Messages("status.submissiondecisionexpired.description")).text must be(Messages("status.submissiondecisionexpired.description"))
+        document.getElementsMatchingOwnText(Messages("status.submissiondecisionexpired.description2")).text must be(Messages("status.submissiondecisionexpired.description2"))
+      }
+
+      "decision made (Revoked)" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Revoked", None, None, None, None, false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
       }
     }
 
