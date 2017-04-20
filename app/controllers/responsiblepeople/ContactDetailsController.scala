@@ -22,8 +22,7 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
           => Ok(contact_details(Form2[ContactDetails](name), edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _,_))
           => Ok(contact_details(EmptyForm, edit, index, fromDeclaration, personName.titleName))
-          case _
-          => NotFound(notFoundView)
+          case _ => NotFound(notFoundView)
         }
     }
 
@@ -38,7 +37,7 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
             }
           case ValidForm(_, data) => {
             for {
-              result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.contactDetails(data)
               }
             } yield edit match {
