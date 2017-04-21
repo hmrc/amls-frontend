@@ -198,18 +198,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
-
-//    "return the correct index of the section" when {
-//      "the section has a completed model, an empty one and an incomplete one" in {
-//        val mockCacheMap = mock[CacheMap]
-//
-//        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-//          .thenReturn(Some(Seq(completeModel, BankDetails(), incompleteModel)))
-//
-//        BankDetails.section(mockCacheMap).index must be(3)
-//      }
-//    }
-
+    
     "Amendment and Variation flow" when {
       "the section is complete with all the bank details being removed" must {
         "successfully redirect to what you need page" in {
