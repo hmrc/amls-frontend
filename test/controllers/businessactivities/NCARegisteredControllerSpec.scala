@@ -27,11 +27,10 @@ class NCARegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "NCARegisteredController" must {
+  "NCARegisteredController" when {
 
-    "Get Option:" must {
-
-      "load the NCA Registered page" in new Fixture {
+    "get is called" must {
+      "load the NCA Registered page with an empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -39,12 +38,9 @@ class NCARegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val pageTitle = Messages("businessactivities.ncaRegistered.title") + " - " +
-          Messages("summary.businessactivities") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe pageTitle
+        htmlValue.getElementById("ncaRegistered-true").hasAttr("checked") must be(false)
+        htmlValue.getElementById("ncaRegistered-false").hasAttr("checked") must be(false)
       }
 
       "load Yes when ncaRegistered from save4later returns True" in new Fixture {
@@ -59,28 +55,11 @@ class NCARegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("ncaRegistered-true").attr("checked") mustBe "checked"
-
-      }
-
-      "load No when ncaRegistered from save4later returns No" in new Fixture {
-
-        val ncaRegistered = Some(NCARegistered(false))
-        val activities = BusinessActivities(ncaRegistered = ncaRegistered)
-
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(activities)))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("ncaRegistered-false").attr("checked") mustBe "checked"
-
+        htmlValue.getElementById("ncaRegistered-true").hasAttr("checked") must be(true)
       }
     }
 
-    "Post" must {
+    "post is called" must {
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
 
@@ -154,19 +133,6 @@ class NCARegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.required.ba.select.nca"))
-
-    }
-
-    "on post with invalid data show error" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "ncaRegistered" -> ""
-      )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("err.summary"))
 
     }
   }
