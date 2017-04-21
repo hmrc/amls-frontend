@@ -1,10 +1,8 @@
 package views.status
 
 import forms.EmptyForm
-import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.api.test.Helpers.contentAsString
 import utils.GenericTestHelper
 import views.Fixture
 

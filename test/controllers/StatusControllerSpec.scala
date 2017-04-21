@@ -164,25 +164,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-
-        for (index <- 0 to 1) {
-          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
-        }
-
-        document.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
-
-        document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description")).text must be(Messages("status.submissionreadyforreview.description"))
-        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text must be(Messages("status.submissionreadyforreview.description2"))
-        document.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
-
-        val date = DateHelper.formatDate(LocalDate.now())
-        document.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must be
-        Messages("status.submittedForReview.submitteddate.text", date)
       }
-
 
       "under review and FeeResponse is failed" in new Fixture {
 
@@ -212,19 +194,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-
-        for (index <- 0 to 1) {
-          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
-        }
-
-        document.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
-
-        document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description")).text must be(Messages("status.submissionreadyforreview.description"))
-        document.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text must be(Messages("status.submissionreadyforreview.description2"))
-        document.getElementsByTag("details").html() must be("")
       }
 
       "decision made (approved)" in new Fixture {
