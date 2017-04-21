@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{RepeatingSection, StatusConstants}
@@ -27,7 +27,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         status <- statusService.getStatus
       } yield (tp, status) match {
 
-        case (Some(_), SubmissionDecisionApproved) =>
+        case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_)) =>
           Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
             tp.yourTradingPremises.fold("")(_.tradingName), showDateField = tp.lineId.isDefined))
 

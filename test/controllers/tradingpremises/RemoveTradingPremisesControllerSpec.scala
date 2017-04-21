@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -115,6 +115,28 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get(1, false)(request)
+
+        val contentString = contentAsString(result)
+
+        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
+          Messages("summary.tradingpremises") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
+        val document = Jsoup.parse(contentString)
+        document.title() mustBe pageTitle
+        document.getElementById("endDate-day").`val`() must be("")
+
+      }
+
+      "application status is ready for renewal" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val result = controller.get(1, false)(request)
 
