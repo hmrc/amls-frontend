@@ -30,81 +30,93 @@ class IdentifiySuspiciousActivityControllerSpec extends GenericTestHelper with M
     }
   }
 
-  "IdentifySuspiciousActivityController" must {
+  "IdentifySuspiciousActivityController" when {
 
+    "get is called" must {
+      "display the Identify suspicious activity page with an empty form" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val page = Jsoup.parse(contentAsString(result))
+
+        page.select("input[type=radio][name=hasWrittenGuidance][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=hasWrittenGuidance][value=false]").hasAttr("checked") must be(false)
+
+      }
+
+      "display the identify suspicious activity page with pre populated data" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))
+          ))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val page = Jsoup.parse(contentAsString(result))
+
+        page.select("input[type=radio][name=hasWrittenGuidance][value=true]").hasAttr("checked") must be(true)
+
+      }
+    }
+
+    "post is called" must {
+      "on post with valid data" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "hasWrittenGuidance" -> "true"
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.NCARegisteredController.get(false).url))
+      }
+
+      "on post with invalid data" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "hasWrittenGuidance" -> "grrrrr"
+        )
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.select("span").html() must include(Messages("error.required.ba.suspicious.activity"))
+      }
+
+      "on post with valid data in edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "hasWrittenGuidance" -> "true"
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+    }
+  }
+
+  it must {
     "use correct services" in new Fixture {
       IdentifySuspiciousActivityController.dataCacheConnector must be(DataCacheConnector)
-    }
-
-    "on get, display the Identify suspicious activity page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.identify-suspicious-activity.title"))
-    }
-
-    "on get, display the identify suspicious activity page with pre populated data" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))))))
-      val result = controller.get()(request)
-
-      status(result) must be(OK)
-
-      val page = Jsoup.parse(contentAsString(result))
-
-      page.select("input[type=radio][name=hasWrittenGuidance][value=true][checked]").size must be (1)
-      page.select("input[type=radio][name=hasWrittenGuidance][value=false]").size must be (1)
-      page.select("input[type=radio][name=hasWrittenGuidance][value=false][checked]").size must be (0)
-
-    }
-
-    "on post with valid data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "hasWrittenGuidance" -> "true"
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.NCARegisteredController.get(false).url))
-    }
-
-    "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "hasWrittenGuidance" -> "grrrrr"
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.ba.suspicious.activity"))
-    }
-
-    //ignored until summary page is available to redirect to
-    "on post with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "hasWrittenGuidance" -> "true"
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
   }
 }
