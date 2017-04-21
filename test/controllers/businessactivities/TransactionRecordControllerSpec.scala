@@ -32,27 +32,41 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
   "TransactionRecordController" when {
 
     "get is called" must {
-      "load the Customer Record Page" in new Fixture {
+      "load the Customer Record Page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("businessactivities.keep.customer.records.title"))
 
+        val page = Jsoup.parse(contentAsString(result))
+        page.getElementById("isRecorded-true").hasAttr("checked") must be(false)
+        page.getElementById("isRecorded-false").hasAttr("checked") must be(false)
+        page.getElementById("transactions-01").hasAttr("checked") must be(false)
+        page.getElementById("transactions-02").hasAttr("checked") must be(false)
+        page.getElementById("transactions-03").hasAttr("checked") must be(false)
+        page.getElementById("name").`val` must be("")
       }
 
       "pre-populate the Customer Record Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper)))))))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            transactionRecord = Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test"))))
+          ))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        val page = Jsoup.parse(contentAsString(result))
+        page.getElementById("isRecorded-true").hasAttr("checked") must be(true)
+        page.getElementById("isRecorded-false").hasAttr("checked") must be(false)
+        page.getElementById("transactions-01").hasAttr("checked") must be(true)
+        page.getElementById("transactions-02").hasAttr("checked") must be(true)
+        page.getElementById("transactions-03").hasAttr("checked") must be(true)
+        page.getElementById("name").`val` must be("test")
 
       }
     }
