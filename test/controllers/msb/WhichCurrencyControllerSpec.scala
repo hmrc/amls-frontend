@@ -71,7 +71,7 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
 
     "post is called " when {
       "data is valid" should {
-        "redirect to check your answers" in new Fixture {
+        "user deals in foreign currency, redirect to check your answers" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody (
             "currencies[0]" -> "USD",
             "currencies[1]" -> "GBP",
@@ -82,6 +82,20 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
             "wholesalerNames" -> "wholesaler names",
             "customerMoneySource" -> "Yes",
             "usesForeignCurrencies" -> "Yes"
+          )
+
+          val result = controller.post(false).apply(newRequest)
+
+          status(result) must be (SEE_OTHER)
+          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+        }
+
+        "user does not in foreign currency, redirect to check your answers" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody (
+            "currencies[0]" -> "USD",
+            "currencies[1]" -> "GBP",
+            "currencies[2]" -> "BOB",
+            "usesForeignCurrencies" -> "No"
           )
 
           val result = controller.post(false).apply(newRequest)
