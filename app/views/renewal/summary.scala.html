@@ -159,7 +159,7 @@
                 @if(config.ApplicationConfig.release7) {
                     @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
                     @checkYourAnswersExtra(
-                        question = Messages("msb.which_currencies.foreign_currencies_question")
+                        question = Messages("renewal.msb.which_currencies.foreign_currencies_question")
                     ) {
                         <p>@usesForeignCurrencies match {
                             case true => {@Messages("lbl.yes")}
