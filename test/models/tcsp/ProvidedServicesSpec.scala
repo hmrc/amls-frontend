@@ -122,6 +122,11 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       Json.fromJson[ProvidedServices](json) must be(expected)
     }
 
+    "fail when invalid data given" in {
+      Json.fromJson[ProvidedServices](Json.obj("services" -> Set("99"))) must
+        be(JsError((JsPath \ "services") -> ValidationError("error.invalid")))
+    }
+
     "fail when on invalid data" in {
       Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("40"))) must
         be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
