@@ -79,6 +79,23 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
         page.select("textarea[name=details]").`val` must be("")
       }
 
+      "display the is your involved in other page when there is no cache data" in new Fixture {
+
+        val businessMatching = BusinessMatching(
+          activities = Some(BMActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService,
+            HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+        )
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+      }
 
       "display the involved in other page with pre populated data" in new Fixture {
 
