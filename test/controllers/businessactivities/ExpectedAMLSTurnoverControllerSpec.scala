@@ -192,10 +192,8 @@ class ExpectedAMLSTurnoverControllerSpec extends GenericTestHelper with MockitoS
           .thenReturn(Future.successful(Some(businessMatching)))
 
         val result = controller.post(true)(request)
-        val document = Jsoup.parse(contentAsString(result))
 
         status(result) mustBe BAD_REQUEST
-        document.select(".amls-error-summary").size mustEqual 1
       }
     }
   }
