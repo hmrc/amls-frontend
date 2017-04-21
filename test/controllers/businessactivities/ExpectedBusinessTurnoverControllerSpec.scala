@@ -99,7 +99,7 @@ class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with Mock
           status(result) must be(BAD_REQUEST)
         }
       }
-      
+
       "respond with SEE_OTHER" when {
         "edit is false and redirect to the ExpectedAMLSTurnoverController" in new Fixture {
 
