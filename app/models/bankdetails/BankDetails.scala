@@ -45,20 +45,23 @@ object BankDetails {
 
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())
-
+    
     cache.getEntry[Seq[BankDetails]](key).fold(defaultSection){ bds =>
-      filter(bds) match {
-        case Nil => Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
-        case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
-        case model if model forall {
-          _.isComplete
-        } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
-        case model => {
-          val index = model.indexWhere {
-            case bdModel if !bdModel.isComplete => true
-            case _ => false
+      if(filter(bds).equals(Nil)){
+        Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
+      } else {
+        bds match {
+          case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
+          case model if model forall {
+            _.isComplete
+          } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
+          case model => {
+            val index = model.indexWhere {
+              case bdModel if !bdModel.isComplete => true
+              case _ => false
+            }
+            Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
           }
-          Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
         }
       }
     }

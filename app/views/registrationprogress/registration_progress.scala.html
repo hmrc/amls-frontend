@@ -28,7 +28,7 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
 
         @* Main section *@
         <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
-            @sections.map { case Section(name, status, _, call) =>
+            @sections.map { case Section(name, status, _, call, index) =>
             @section(name, status, call)
             }
         </ul>

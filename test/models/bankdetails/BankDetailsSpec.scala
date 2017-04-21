@@ -85,7 +85,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       accountTypeJson.as[BankDetails] must be(accountTypePartialModel)
     }
   }
-  
+
   "Bank details with partially complete model containing only bankAccount" must {
     "serialise as expected" in {
       Json.toJson[BankDetails](bankAccountPartialModel) must be(bankAccountJson)
@@ -145,25 +145,25 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       BankDetails.section(cache) must be(completedSection)
     }
 
-    "return a Started Section when model is incomplete" in {
-      val incomplete = Seq(accountTypePartialModel)
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
-
-      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
-
-      BankDetails.section(cache) must be(startedSection)
-    }
-
     "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAcount = Seq(BankDetails(None, None, true, false, None))
+      val noBankAccount = Seq(BankDetails(None, None, true, false, None))
       val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
-      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAccount)
 
       val section = BankDetails.section(cache)
       section.hasChanged must be(true)
       section.status must be(Completed)
       BankDetails.section(cache) must be(completedSection)
+    }
+
+    "return a Started Section when model is incomplete" in {
+      val incomplete = Seq(accountTypePartialModel)
+      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1), 1)
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
+
+      BankDetails.section(cache) must be(startedSection)
     }
 
     "return a result indicating NotStarted" when {
@@ -198,6 +198,17 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
+
+//    "return the correct index of the section" when {
+//      "the section has a completed model, an empty one and an incomplete one" in {
+//        val mockCacheMap = mock[CacheMap]
+//
+//        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+//          .thenReturn(Some(Seq(completeModel, BankDetails(), incompleteModel)))
+//
+//        BankDetails.section(mockCacheMap).index must be(3)
+//      }
+//    }
 
     "Amendment and Variation flow" when {
       "the section is complete with all the bank details being removed" must {
