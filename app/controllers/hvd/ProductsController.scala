@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import utils.DateOfChangeHelper
 import views.html.hvd.products
@@ -43,7 +43,7 @@ trait ProductsController extends BaseController with DateOfChangeHelper {
                 hvd.products(data)
               )
             } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange[Products](hvd.products, data) =>
+              case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[Products](hvd.products, data) =>
                 Redirect(routes.HvdDateOfChangeController.get())
               case _ => if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
                 Redirect(routes.ExciseGoodsController.get(edit))

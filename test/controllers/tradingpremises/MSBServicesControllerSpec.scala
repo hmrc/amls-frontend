@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.TradingPremisesSection
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -289,6 +289,36 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
     }
+
+
+    "redirect to the dateOfChange page when the services have changed for a ready for renewal status" in new Fixture {
+
+      val model = TradingPremises(
+        lineId = Some(1),
+        msbServices = Some(MsbServices(
+          Set(TransmittingMoney)
+        ))
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[0]" -> "01",
+        "msbServices[1]" -> "02"
+      )
+
+      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
+
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(1, edit = true)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
+    }
+
 
     "redirect to the dateOfChange page when the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
 
