@@ -135,15 +135,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("declaration").first().child(0).html() must be(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("status-list").first().child(0).hasClass("status-list--complete") must be(true)
-        document.getElementsByClass("status-list").first().child(1).hasClass("status-list--pending") must be(true)
-        document.getElementsByClass("status-list").first().child(2).hasClass("status-list--upcoming") must be(true)
-
-        document.title() must be(Messages("status.submissionready.heading") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.submissionready.description")).text() must be(Messages("status.submissionready.description"))
-        document.getElementsByTag("details").html() must be("")
       }
 
       "under review" in new Fixture {
@@ -424,16 +415,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-
-        document.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
-
-        document.html() must not include Messages("survey.satisfaction.beforeyougo")
-
-        document.getElementsByClass("govuk-box-highlight messaging").size() mustBe 0
-
       }
 
       "application is in review" in new Fixture {
