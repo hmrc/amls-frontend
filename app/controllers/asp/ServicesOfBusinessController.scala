@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.asp.{Asp, ServicesOfBusiness}
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import utils.DateOfChangeHelper
 import views.html.asp._
@@ -42,7 +42,7 @@ trait ServicesOfBusinessController extends BaseController with DateOfChangeHelpe
               businessServices.services(data))
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange[ServicesOfBusiness](businessServices.services, data) =>
+            case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[ServicesOfBusiness](businessServices.services, data) =>
               Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
             case _ => edit match {
               case true => Redirect(routes.SummaryController.get())

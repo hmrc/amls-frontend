@@ -3,13 +3,13 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness._
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -177,6 +177,31 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(
+          services = Some(Services(Set(Residential, Commercial, Auction)))))))
+
+        when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+      }
+    }
+
+    "successfully redirect to dateOfChange page" when {
+      "status is ready for renewal and user edits services option" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "services[0]" -> "01",
+          "services[1]" -> "02",
+          "services[2]" -> "07"
+        )
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(

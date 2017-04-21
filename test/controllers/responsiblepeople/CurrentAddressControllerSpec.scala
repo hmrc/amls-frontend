@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -15,6 +15,7 @@ import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
+
 import scala.collection.JavaConversions._
 import play.api.test.Helpers._
 import services.StatusService
@@ -218,6 +219,34 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
           when(currentAddressController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+
+        }
+      }
+
+      "redirect to CurrentAddressDateOfChangeController" when {
+        "address changed and in ready for renewal state" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "AA1 1AA"
+          )
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 

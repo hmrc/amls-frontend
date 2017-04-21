@@ -4,9 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress._
 import models.responsiblepeople._
-import models.status.{SubmissionDecisionApproved, SubmissionStatus}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -83,12 +82,14 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
 
-        if (status == SubmissionDecisionApproved && redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress) && originalResponsiblePerson.flatMap {
-          orp => orp.lineId
-        }.isDefined && originalAddress.isDefined) {
-          Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-        } else {
-          Redirect(routes.DetailedAnswersController.get(index, edit))
+        status match {
+          case SubmissionDecisionApproved | ReadyForRenewal(_)
+            if(redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress)
+              && originalResponsiblePerson.flatMap {
+              orp => orp.lineId
+            }.isDefined && originalAddress.isDefined) =>
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          case _ => Redirect(routes.DetailedAnswersController.get(index, edit))
         }
       } else {
         Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))

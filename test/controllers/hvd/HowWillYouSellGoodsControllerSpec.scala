@@ -2,11 +2,11 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
@@ -108,6 +108,26 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
     when(controller.statusService.getStatus(any(),any(),any()))
       .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(hvd)))
+
+    when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(emptyCache))
+
+    val result = controller.post(true)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+  }
+
+  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture{
+
+    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
+
+    val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+
+    when(controller.statusService.getStatus(any(),any(),any()))
+      .thenReturn(Future.successful(ReadyForRenewal(None)))
 
     when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(hvd)))
