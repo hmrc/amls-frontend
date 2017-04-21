@@ -386,37 +386,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
       }
 
-      "application is in review" in new Fixture {
-
-        when(controller.landingService.cacheMap(any(), any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("XAML00000567890")))
-
-        when(controller.statusService.getDetailedStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview, None))
-
-        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-          .thenReturn(Future.successful(feeResponse))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-
-        document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
-
-        document.html() must include(Messages("survey.satisfaction.beforeyougo"))
-        document.html() must include(Messages("survey.satisfaction.please"))
-        document.html() must include(Messages("survey.satisfaction.answer"))
-        document.html() must include(Messages("survey.satisfaction.helpus"))
-
-        document.getElementsByClass("messaging").size() mustBe 1
-
-      }
-
       "application has been approved" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))

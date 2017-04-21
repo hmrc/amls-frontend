@@ -44,7 +44,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       Messages("status.submissiondecisionsupervised.enddate.text", date)
     }
 
-    "contain the expected content elements in renewal period" in new ViewFixture {
+    "contain the expected content elements when status is ready for renewal" in new ViewFixture {
       def view =  views.html.status.status_supervised("XAML00000567890", Some("business Name"), Some(LocalDate.now), true)
 
       val renewalDate = LocalDate.now().plusDays(15)
