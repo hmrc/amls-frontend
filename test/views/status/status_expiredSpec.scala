@@ -33,6 +33,10 @@ class status_expiredSpec extends GenericTestHelper with MustMatchers {
         Messages("status.submissiondecisionexpired.description"))
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionexpired.description2")).text must be(
         Messages("status.submissiondecisionexpired.description2"))
+
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+
     }
 
   }

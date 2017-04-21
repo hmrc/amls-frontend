@@ -55,6 +55,10 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text() must be(
         Messages("status.submissionreadyforreview.description2"))
+
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+
     }
 
     "contains 'update/amend information' content and link" in new ViewFixture {
@@ -89,7 +93,6 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
       val date = DateHelper.formatDate(LocalDate.now())
       doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must be
       Messages("status.submittedForReview.submitteddate.text", date)
-
       doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
 

@@ -42,6 +42,10 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
       Messages("status.submissiondecisionsupervised.enddate.text", date)
+
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+
     }
 
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {

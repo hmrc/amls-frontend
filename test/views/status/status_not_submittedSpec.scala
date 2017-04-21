@@ -49,7 +49,7 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
     }
 
-    "contains 'update/amend information' content and link" in new ViewFixture {
+    "contains expected content 'update/amend information'" in new ViewFixture {
 
       def view = views.html.status.status_not_submitted("XAML00000567890", Some("business Name"))
 
@@ -58,7 +58,8 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.html() must not include Messages("survey.satisfaction.beforeyougo")
 
-      doc.getElementsByClass("govuk-box-highlight messaging").size() mustBe 0
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(false)
+
     }
 
     "do not show business name when 'business name' is empty" in new ViewFixture {

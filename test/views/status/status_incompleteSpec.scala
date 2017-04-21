@@ -47,8 +47,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
       def view = views.html.status.status_incomplete("XAML00000567890", None)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
-
-
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).isEmpty must be(true)
     }
   }
 }
