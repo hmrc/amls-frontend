@@ -28,10 +28,17 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture {
+
       def view =  views.html.status.status_supervised("XAML00000567890", Some("business Name"), Some(LocalDate.now), false)
+
+      doc.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
+      doc.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.success.description")).text must be(
         Messages("status.submissiondecisionsupervised.success.description"))
+
+      doc.getElementsByClass("messaging").size() mustBe 1
+
       val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
       Messages("status.submissiondecisionsupervised.enddate.text", date)

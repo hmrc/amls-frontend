@@ -65,16 +65,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-
-      document.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      document.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
-
-      document.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
-      document.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
-      document.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
-
     }
 
     "show business name" in new Fixture {
@@ -121,16 +111,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Future.successful((NotCompleted, None)))
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("status-list").first().child(0).hasClass("status-list--start") must be(true)
-
-        for (index <- 1 to 2) {
-          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--start") must be(false)
-        }
-        document.title() must be(Messages("status.incomplete.heading") + pageTitleSuffix)
-
-        document.getElementsMatchingOwnText(Messages("status.incomplete.description")).text must be(Messages("status.incomplete.description"))
 
       }
 
@@ -503,19 +483,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-
-        document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
-
-        document.html() must include(Messages("survey.satisfaction.beforeyougo"))
-        document.html() must include(Messages("survey.satisfaction.please"))
-        document.html() must include(Messages("survey.satisfaction.answer"))
-        document.html() must include(Messages("survey.satisfaction.helpus"))
-
-        document.getElementsByClass("messaging").size() mustBe 1
-
       }
     }
   }
