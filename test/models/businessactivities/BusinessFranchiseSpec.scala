@@ -63,6 +63,19 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
+    "fail to validate given a franchise name containing invalid characters" in {
+
+      val data = Map(
+        "businessFranchise" -> Seq("true"),
+        "franchiseName" -> Seq("test{}test1")
+      )
+
+      BusinessFranchise.formRule.validate(data) must
+        be(Invalid(Seq(
+          (Path \ "franchiseName") -> Seq(ValidationError("err.text.validation"))
+        )))
+    }
+
     "fail to validate when neither 'yes' nor 'no' are selected" when {
       val reps = Seq[(String, Map[String, Seq[String]])] (
         "missing field" -> Map.empty[String, Seq[String]],

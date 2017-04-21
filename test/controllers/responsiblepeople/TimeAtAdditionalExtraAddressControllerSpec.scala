@@ -26,7 +26,8 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val timeAtAdditionalExtraAddressController = new TimeAtAdditionalExtraAddressController {
       override val dataCacheConnector = mockDataCacheConnector
@@ -44,18 +45,25 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
 
     "get is called" must {
       "display status 200" when {
-        "without timeAtAddress" in new Fixture {
+        "without existing data" in new Fixture {
 
           val responsiblePeople = ResponsiblePeople(personName)
 
-          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = timeAtAdditionalExtraAddressController.get(RecordId)(request)
           status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
         }
 
-        "with time at address" in new Fixture {
+        "with existing data" in new Fixture {
 
           val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
@@ -64,11 +72,18 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
           val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
-          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = timeAtAdditionalExtraAddressController.get(RecordId)(request)
           status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
+          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
         }
       }
 
@@ -77,8 +92,8 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = timeAtAdditionalExtraAddressController.get(outOfBounds)(request)
           status(result) must be(NOT_FOUND)
@@ -87,107 +102,74 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
     }
 
     "post is called" must {
-      "must pass with all the mandatory non-UK parameters given" in new Fixture {
 
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "timeAtAddress" -> "03"
-        )
+      "go to DetailedAnswersController" when {
+        "edit is true" in new Fixture {
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "timeAtAddress" -> "02"
+          )
 
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-        val result = timeAtAdditionalExtraAddressController.post(RecordId)(requestWithParams)
-        status(result) must be(SEE_OTHER)
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          val result = timeAtAdditionalExtraAddressController.post(RecordId, true)(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+        }
       }
 
-      "must go to the correct location when edit mode is on" in new Fixture {
+      "go to PositionWithinBusinessController" when {
+        "edit is false" in new Fixture {
 
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "timeAtAddress" -> "02"
-        )
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "timeAtAddress" -> "02"
+          )
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
-        val result = timeAtAdditionalExtraAddressController.post(RecordId, true)(requestWithParams)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-      }
-
-      "must go to the correct location when edit mode is off" in new Fixture {
-
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "timeAtAddress" -> "02"
-        )
-
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
-
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
-
-        val result = timeAtAdditionalExtraAddressController.post(RecordId)(requestWithParams)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
+          val result = timeAtAdditionalExtraAddressController.post(RecordId)(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
+        }
       }
 
       "respond with BAD_REQUEST on submission" when {
 
-        "nothing is selected" when {
+        "given an invalid form" in new Fixture {
 
-          "editing" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "timeAtAddress" -> ""
+          )
 
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "timeAtAddress" -> ""
-            )
+          val responsiblePeople = ResponsiblePeople()
 
-            val responsiblePeople = ResponsiblePeople()
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
-            when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
+          val result = timeAtAdditionalExtraAddressController.post(RecordId, true)(requestWithParams)
 
-            val result = timeAtAdditionalExtraAddressController.post(RecordId, true)(requestWithParams)
-            val document: Document  = Jsoup.parse(contentAsString(result))
-            val errorCount = 1
-            val elementsWithError : Elements = document.getElementsByClass("error-notification")
-            elementsWithError.size() must be(errorCount)
-            for (ele: Element <- elementsWithError) {
-              ele.html() must include(Messages("error.required.timeAtAddress"))
-            }
+          status(result) mustBe BAD_REQUEST
 
-          }
-
-          "not editing" in new Fixture {
-
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "timeAtAddress" -> ""
-            )
-
-            val result = timeAtAdditionalExtraAddressController.post(RecordId)(requestWithParams)
-            status(result) must be(BAD_REQUEST)
-
-          }
         }
+
       }
 
       "respond with NOT_FOUND" when {
