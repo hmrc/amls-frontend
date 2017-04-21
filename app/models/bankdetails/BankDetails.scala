@@ -36,25 +36,33 @@ object BankDetails {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged || x.status.contains(StatusConstants.Deleted)}
+  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists {x => x.hasChanged || x.status.contains(StatusConstants.Deleted)}
 
   def section(implicit cache: CacheMap): Section = {
-    val msgKey = "bankdetails"
     Logger.debug(s"[BankDetails][section] $cache")
-    cache.getEntry[Seq[BankDetails]](key).fold(Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())){ bds =>
-      bds.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_.equals(BankDetails())) match {
+
+    def filter(bds: Seq[BankDetails]) = bds.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_.equals(BankDetails()))
+
+    val msgKey = "bankdetails"
+    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())
+
+    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection){ bds =>
+      filter(bds) match {
         case Nil => Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
         case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
-        case model if model forall { _.isComplete } => Section(msgKey, Completed, anyChanged(bds),
-          controllers.bankdetails.routes.SummaryController.get(true))
-        case model =>
+        case model if model forall {
+          _.isComplete
+        } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
+        case model => {
           val index = model.indexWhere {
             case bdModel if !bdModel.isComplete => true
             case _ => false
           }
           Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+        }
       }
     }
+
   }
 
   val key = "bank-details"
