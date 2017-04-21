@@ -4,7 +4,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.{MsbServices, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -31,6 +31,23 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       }
   }
 
+  private def redirectBasedOnStatus(status: SubmissionStatus,
+                            tradingPremises: Option[TradingPremises],
+                            data:MsbServices,
+                            edit: Boolean,
+                            changed:Boolean,
+                            index:Int) = {
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) if this.redirectToDateOfChange(tradingPremises, data, changed)
+        && edit && tradingPremises.lineId.isDefined =>
+        Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+      case _ => edit match {
+        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case false => Redirect(routes.PremisesRegisteredController.get(index))
+      }
+    }
+  }
+
   def post(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[MsbServices](request.body) match {
@@ -43,14 +60,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
               tp.msbServices(data)
             }
             status <- statusService.getStatus
-          } yield status match {
-            case SubmissionDecisionApproved if this.redirectToDateOfChange(tradingPremises, data, changed) && edit && tradingPremises.lineId.isDefined =>
-              Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
-            case _ => edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.PremisesRegisteredController.get(index))
-            }
-          }
+          } yield redirectBasedOnStatus(status, tradingPremises, data, edit, changed, index)
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

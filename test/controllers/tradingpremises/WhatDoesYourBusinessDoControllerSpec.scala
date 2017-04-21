@@ -6,8 +6,8 @@ import connectors.DataCacheConnector
 import models.{DateOfChange, TradingPremisesSection}
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.status.{SubmissionDecisionApproved, SubmissionReady}
-import models.tradingpremises.{MsbServices => _, TransmittingMoney => _, _}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
+import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -16,7 +16,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -273,6 +273,32 @@ class WhatDoesYourBusinessDoControllerSpec extends GenericTestHelper with Mockit
 
         }
 
+        "ready for renewal status" must {
+
+          "redirect to the dateOfChange page when no money services have been added" in new Fixture {
+
+            when(whatDoesYourBusinessDoController.statusService.getStatus(any(), any(), any())).
+              thenReturn(Future.successful(ReadyForRenewal(None)))
+
+            val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
+            val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None, lineId = Some(1))
+            val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
+
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(tradingPremises)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
+
+            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
+
+            val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.dateOfChange(recordId1).url))
+
+          }
+        }
 
         "given a Valid Request in EDIT Mode and show the trading premises summary with record id" in new Fixture {
 

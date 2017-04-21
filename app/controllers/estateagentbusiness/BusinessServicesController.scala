@@ -3,10 +3,9 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.asp.ServicesOfBusiness
-import models.estateagentbusiness.{Services, Residential, EstateAgentBusiness}
-import models.status.SubmissionDecisionApproved
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import utils.DateOfChangeHelper
 import views.html.estateagentbusiness._
@@ -63,7 +62,7 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
               updateData(estateAgentBusiness.services(data), data))
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange[Services](estateAgentBusiness.services, data) =>
+            case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[Services](estateAgentBusiness.services, data) =>
               Redirect(routes.ServicesDateOfChangeController.get())
             case _ => redirectToNextPage(edit, data)
           }

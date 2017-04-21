@@ -38,26 +38,33 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
     "get is called" must {
       "load the Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.riskassessment.policy.title"))
-
-      }
-
-      "pre-populate the Risk assessment Page" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased)))))))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.getElementById("hasPolicy-true").hasAttr("checked") must be(false)
+        document.getElementById("hasPolicy-false").hasAttr("checked") must be(false)
+        document.getElementById("riskassessments-01").hasAttr("checked") must be(false)
+        document.getElementById("riskassessments-02").hasAttr("checked") must be(false)
+      }
 
+      "pre-populate the Risk assessment Page" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))
+          ))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("hasPolicy-true").hasAttr("checked") must be(true)
+        document.getElementById("riskassessments-01").hasAttr("checked") must be(true)
+        document.getElementById("riskassessments-02").hasAttr("checked") must be(true)
       }
     }
 
@@ -107,6 +114,22 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get().url))
+        }
+
+        "redirect to the SummaryController when there is no cache data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "hasPolicy" -> "true",
+            "riskassessments[0]" -> "01",
+            "riskassessments[1]" -> "02"
+          )
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
         }
 
         "respond with BAD_REQUEST" when {
