@@ -14,7 +14,7 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector, renewalS
   def get = Authorised.async {
     implicit authContext => implicit request =>
       renewalService.getSection map {
-        case Section(_,NotStarted | Started,_,_,_) => Ok(what_you_need())
+        case Section(_,NotStarted | Started,_,_) => Ok(what_you_need())
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }

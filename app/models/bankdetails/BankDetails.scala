@@ -45,7 +45,7 @@ object BankDetails {
 
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())
-    
+
     cache.getEntry[Seq[BankDetails]](key).fold(defaultSection){ bds =>
       if(filter(bds).equals(Nil)){
         Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())

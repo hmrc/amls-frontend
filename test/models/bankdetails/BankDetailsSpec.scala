@@ -159,7 +159,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1), 1)
+      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
 
