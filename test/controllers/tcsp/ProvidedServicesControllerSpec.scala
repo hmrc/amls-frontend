@@ -35,7 +35,6 @@ class ProvidedServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("tcsp.provided_services.title"))
       }
 
       "load the provided services page with existing data" in new Fixture {
@@ -47,8 +46,6 @@ class ProvidedServicesControllerSpec extends GenericTestHelper with MockitoSugar
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-
-        document.title() must be (s"${Messages("tcsp.provided_services.title")} - ${Messages("summary.tcsp")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
 
         document.select("input[id=services-08]").attr("checked") must be("checked")
         document.select("input[name=details]").`val` must be ("some other service")
@@ -91,7 +88,7 @@ class ProvidedServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
 
-      "show an error when services data not sent" in new Fixture {
+      "show an error when no option been selected" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody()
 
@@ -104,7 +101,7 @@ class ProvidedServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
 
 
-      "show an error when other data not sent" in new Fixture {
+      "show an error when other option been selected and not providing the mandatory data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[]" -> "08",
