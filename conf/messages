@@ -257,7 +257,6 @@ error.required.msb.throughput = Select one option to show how much throughput yo
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
