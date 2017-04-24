@@ -4,11 +4,12 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -49,8 +50,11 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))))))
 
       val result = controller.get()(request)
+      val document = Jsoup.parse(contentAsString(result))
+
       status(result) must be(OK)
       contentAsString(result) must include(Messages("msb.send.money.title"))
+      document.select("input[name=money][checked]").`val` mustEqual "true"
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
