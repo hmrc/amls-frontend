@@ -33,10 +33,6 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
     val emptyCache = CacheMap("", Map.empty)
     "GET:" must {
 
-      val pageTitle = Messages("tradingpremises.startDate.title", "firstname lastname") + " - " +
-        Messages("summary.tradingpremises") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
       "successfully load activity start page with empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -44,9 +40,6 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
 
         val result = controller.get(1, false)(request)
         status(result) must be(OK)
-        val document = Jsoup.parse(contentAsString(result))
-        document.title mustBe pageTitle
-
       }
 
       "redirect  to not found page when YourTradingPremises is None" in new Fixture {
@@ -65,7 +58,6 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
         val result = controller.get(1, false)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        document.title mustBe pageTitle
         document.select("input[name=startDate.day]").`val` must include("10")
         document.select("input[name=startDate.month]").`val` must include("10")
         document.select("input[name=startDate.year]").`val` must include("2010")
