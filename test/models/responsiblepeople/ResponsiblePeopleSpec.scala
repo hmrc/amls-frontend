@@ -2,34 +2,33 @@ package models.responsiblepeople
 
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
-import org.joda.time.{DateTimeUtils, LocalDate}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
-import org.mockito.Mockito._
-import org.mockito.Matchers.{any, eq => meq}
 import utils.StatusConstants
-
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
 
   "ResponsiblePeople" must {
 
-    "validate complete json" must {
+    "validate complete json" when {
 
-      "Serialise as expected" in {
-        Json.toJson(CompleteResponsiblePeople) must be(CompleteJson)
+      "Serialising" in {
+        Json.toJson(completeResponsiblePeople) must be(CompleteJson)
       }
 
-      "Deserialise as expected" in {
-        CompleteJson.as[ResponsiblePeople] must be(CompleteResponsiblePeople)
+      "Deserialising" in {
+        CompleteJson.as[ResponsiblePeople] must be(completeResponsiblePeople)
       }
     }
 
     "implicitly return an existing Model if one present" in {
-      val responsiblePeople = ResponsiblePeople.default(Some(CompleteResponsiblePeople))
-      responsiblePeople must be(CompleteResponsiblePeople)
+      val responsiblePeople = ResponsiblePeople.default(Some(completeResponsiblePeople))
+      responsiblePeople must be(completeResponsiblePeople)
     }
 
     "implicitly return an empty Model if not present" in {
@@ -38,8 +37,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     }
   }
 
-  it when {
-    "the section has not been started" must {
+  "the section" when {
+    "has not been started" must {
       "direct the user to the add controller with what you need guidance requested" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -50,30 +49,30 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
-    "the section is complete" must {
+    "is complete" must {
       "direct the user to the summary page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(CompleteResponsiblePeople)))
+          .thenReturn(Some(Seq(completeResponsiblePeople)))
 
         ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
       }
     }
 
-    "the section is partially complete" must {
+    "is partially complete" must {
       "direct the user to the start of the the journey at the correct index for the incomplete item" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(CompleteResponsiblePeople, CompleteResponsiblePeople, InCompleteResponsiblePeople)))
+          .thenReturn(Some(Seq(completeResponsiblePeople, completeResponsiblePeople, incompleteResponsiblePeople)))
 
         ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
 
       }
     }
 
-    "the section consistes of just 1 empty Responsible Person" must {
+    "consists of just 1 empty Responsible Person" must {
       "return a result indicating NotStarted" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -84,30 +83,41 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
-    "the section consists of a partially complete model followed by a completely empty one" must {
+    "consists of a partially complete model followed by a completely empty one" must {
       "return a result indicating partial completeness" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(InCompleteResponsiblePeople, ResponsiblePeople())))
+          .thenReturn(Some(Seq(incompleteResponsiblePeople, ResponsiblePeople())))
 
         ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Started)
       }
     }
 
-    "the section consists of a complete model followed by an empty one" must {
+    "consists of a complete model followed by an empty one" must {
       "return a result indicating completeness" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(CompleteResponsiblePeople, ResponsiblePeople())))
+          .thenReturn(Some(Seq(completeResponsiblePeople, ResponsiblePeople())))
 
         ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
+
+    "has a completed model, an empty one and an incomplete one" when {
+      "return the correct index" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(completeResponsiblePeople, ResponsiblePeople(), incompleteResponsiblePeople)))
+
+        ResponsiblePeople.section(mockCacheMap).call.url must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3).url)
+      }
+    }
   }
 
-  "None" when {
+  "The Default Model" when {
 
     val EmptyResponsiblePeople: Option[ResponsiblePeople] = None
 
@@ -138,7 +148,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         result must be(ResponsiblePeople(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
       }
     }
-
 
     "Merged with Positions" must {
       "return ResponsiblePeople with correct Positions" in {
@@ -187,19 +196,19 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   "Successfully validate if the model is complete" when {
 
     "the model is fully complete" in {
-      CompleteResponsiblePeople.isComplete must be(true)
+      completeResponsiblePeople.isComplete must be(true)
     }
 
     "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
-      CompleteResponsiblePeople.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
+      completeResponsiblePeople.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
     }
 
     "the model partially complete with vat registration model is empty" in {
-      CompleteResponsiblePeople.copy(vatRegistered = None).isComplete must be(false)
+      completeResponsiblePeople.copy(vatRegistered = None).isComplete must be(false)
     }
 
     "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
-      CompleteResponsiblePeople.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+      completeResponsiblePeople.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
         vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
     }
 
@@ -215,20 +224,20 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   }
 
-  "ResponsiblePeople class" when {
+  it when {
     "personName value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.personName(DefaultValues.personName)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.personName(DefaultValues.personName)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.personName(NewValues.personName)
-          result must be(CompleteResponsiblePeople.copy(personName = Some(NewValues.personName), hasChanged = true))
+          val result = completeResponsiblePeople.personName(NewValues.personName)
+          result must be(completeResponsiblePeople.copy(personName = Some(NewValues.personName), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -236,16 +245,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "personResidenceType value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.personResidenceType(DefaultValues.personResidenceType)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.personResidenceType(DefaultValues.personResidenceType)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.personResidenceType(NewValues.personResidenceType)
-          result must be(CompleteResponsiblePeople.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
+          val result = completeResponsiblePeople.personResidenceType(NewValues.personResidenceType)
+          result must be(completeResponsiblePeople.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -253,16 +262,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "contactDetails value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.contactDetails(DefaultValues.contactDetails)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.contactDetails(DefaultValues.contactDetails)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.contactDetails(NewValues.contactDetails)
-          result must be(CompleteResponsiblePeople.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
+          val result = completeResponsiblePeople.contactDetails(NewValues.contactDetails)
+          result must be(completeResponsiblePeople.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -270,16 +279,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "addressHistory value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.addressHistory(DefaultValues.addressHistory)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.addressHistory(DefaultValues.addressHistory)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.addressHistory(NewValues.addressHistory)
-          result must be(CompleteResponsiblePeople.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
+          val result = completeResponsiblePeople.addressHistory(NewValues.addressHistory)
+          result must be(completeResponsiblePeople.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -287,16 +296,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "positions value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.positions(DefaultValues.positions)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.positions(DefaultValues.positions)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.positions(NewValues.positions)
-          result must be(CompleteResponsiblePeople.copy(positions = Some(NewValues.positions), hasChanged = true))
+          val result = completeResponsiblePeople.positions(NewValues.positions)
+          result must be(completeResponsiblePeople.copy(positions = Some(NewValues.positions), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -304,16 +313,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "saRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.saRegistered(DefaultValues.saRegistered)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.saRegistered(DefaultValues.saRegistered)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.saRegistered(NewValues.saRegistered)
-          result must be(CompleteResponsiblePeople.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
+          val result = completeResponsiblePeople.saRegistered(NewValues.saRegistered)
+          result must be(completeResponsiblePeople.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -321,16 +330,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "vatRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.vatRegistered(DefaultValues.vatRegistered)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.vatRegistered(DefaultValues.vatRegistered)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.vatRegistered(NewValues.vatRegistered)
-          result must be(CompleteResponsiblePeople.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
+          val result = completeResponsiblePeople.vatRegistered(NewValues.vatRegistered)
+          result must be(completeResponsiblePeople.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -338,16 +347,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "experienceTraining value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.experienceTraining(DefaultValues.experienceTraining)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.experienceTraining(DefaultValues.experienceTraining)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
-          result must be(CompleteResponsiblePeople.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
+          val result = completeResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+          result must be(completeResponsiblePeople.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -355,16 +364,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "training value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.training(DefaultValues.training)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.training(DefaultValues.training)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.training(NewValues.training)
-          result must be(CompleteResponsiblePeople.copy(training = Some(NewValues.training), hasChanged = true))
+          val result = completeResponsiblePeople.training(NewValues.training)
+          result must be(completeResponsiblePeople.copy(training = Some(NewValues.training), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -372,16 +381,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "hasAlreadyPassedFitAndProper value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(true)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.hasAlreadyPassedFitAndProper(true)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(false)
-          result must be(CompleteResponsiblePeople.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+          val result = completeResponsiblePeople.hasAlreadyPassedFitAndProper(false)
+          result must be(completeResponsiblePeople.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -389,16 +398,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "status value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = CompleteResponsiblePeople.status(StatusConstants.Unchanged)
-          result must be(CompleteResponsiblePeople)
+          val result = completeResponsiblePeople.status(StatusConstants.Unchanged)
+          result must be(completeResponsiblePeople)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = CompleteResponsiblePeople.status(StatusConstants.Deleted)
-          result must be(CompleteResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+          val result = completeResponsiblePeople.status(StatusConstants.Deleted)
+          result must be(completeResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -406,9 +415,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   }
 
   "anyChanged" must {
-    val originalResponsiblePeople = Seq(CompleteResponsiblePeople)
-    val responsiblePeopleChanged = Seq(CompleteResponsiblePeople.copy(hasChanged=true))
-    val responsiblePeopleDeleted = Seq(CompleteResponsiblePeople.copy(status=Some(StatusConstants.Deleted)))
+    val originalResponsiblePeople = Seq(completeResponsiblePeople)
+    val responsiblePeopleChanged = Seq(completeResponsiblePeople.copy(hasChanged=true))
 
     "return false" when {
       "no ResponsiblePeople within the sequence have changed" in {
@@ -426,10 +434,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 }
 
 trait ResponsiblePeopleValues {
-
-  import DefaultValues._
-
-
 
   private val startDate = Some(new LocalDate())
 
@@ -481,7 +485,7 @@ trait ResponsiblePeopleValues {
     val training = TrainingNo
   }
 
-  val CompleteResponsiblePeople = ResponsiblePeople(
+  val completeResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
     Some(DefaultValues.contactDetails),
@@ -499,7 +503,7 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
-  val InCompleteResponsiblePeople = ResponsiblePeople(
+  val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
     Some(DefaultValues.contactDetails),
@@ -579,6 +583,6 @@ trait ResponsiblePeopleValues {
   )
 
   /** Make sure Responsible People model is complete */
-  assert(CompleteResponsiblePeople.isComplete)
+  assert(completeResponsiblePeople.isComplete)
 
 }
