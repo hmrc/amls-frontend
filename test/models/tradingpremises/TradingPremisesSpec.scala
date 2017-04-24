@@ -80,52 +80,54 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
   "TradingPremises" must {
 
-    "return a tp model with the given 'your agent' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.businessStructure(LimitedLiabilityPartnership)
-      newTP must be(tp.copy(businessStructure = Some(LimitedLiabilityPartnership), hasChanged = true))
-    }
+    "return a TP model reflecting the provided data" when {
+      "given 'your agent' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.businessStructure(LimitedLiabilityPartnership)
+        newTP must be(tp.copy(businessStructure = Some(LimitedLiabilityPartnership), hasChanged = true))
+      }
 
-    "return a tp model with the given 'agent name' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.agentName(agentName)
-      newTP must be(tp.copy(agentName = Some(agentName), hasChanged = true))
-    }
+      "given 'agent name' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.agentName(agentName)
+        newTP must be(tp.copy(agentName = Some(agentName), hasChanged = true))
+      }
 
-    "return a tp model with the given 'agent company name' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.agentCompanyDetails(agentCompanyName)
-      newTP must be(tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
-    }
+      "given 'agent company name' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.agentCompanyDetails(agentCompanyName)
+        newTP must be(tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
+      }
 
-    "return a tp model with the given 'agent partnership' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.agentPartnership(agentPartnership)
-      newTP must be(tp.copy(agentPartnership = Some(agentPartnership), hasChanged = true))
-    }
+      "given 'agent partnership' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.agentPartnership(agentPartnership)
+        newTP must be(tp.copy(agentPartnership = Some(agentPartnership), hasChanged = true))
+      }
 
-    "return a tp model with the given 'your trading premises' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.yourTradingPremises(ytp)
-      newTP must be(tp.copy(yourTradingPremises = Some(ytp), hasChanged = true))
-    }
+      "given 'your trading premises' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.yourTradingPremises(ytp)
+        newTP must be(tp.copy(yourTradingPremises = Some(ytp), hasChanged = true))
+      }
 
-    "return a tp model with the given 'what does your business do' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.whatDoesYourBusinessDoAtThisAddress(wdbd)
-      newTP must be(tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(wdbd), hasChanged = true))
-    }
+      "given 'what does your business do' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.whatDoesYourBusinessDoAtThisAddress(wdbd)
+        newTP must be(tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(wdbd), hasChanged = true))
+      }
 
-    "return a tp model with the given 'agent premises' data" in {
-      val tp = TradingPremises()
-      val newTP = tp.registeringAgentPremises(RegisteringAgentPremises(true))
-      newTP must be(tp.copy(registeringAgentPremises = Some(RegisteringAgentPremises(true)), hasChanged = true))
-    }
+      "given 'agent premises' data" in {
+        val tp = TradingPremises()
+        val newTP = tp.registeringAgentPremises(RegisteringAgentPremises(true))
+        newTP must be(tp.copy(registeringAgentPremises = Some(RegisteringAgentPremises(true)), hasChanged = true))
+      }
 
-    "return a tp model with the given 'msb' data" in {
-      val tp = TradingPremises(None, None, None)
-      val newTP = tp.msbServices(msbServices)
-      newTP must be(tp.copy(msbServices = Some(msbServices), hasChanged = true))
+      "given 'msb' data" in {
+        val tp = TradingPremises(None, None, None)
+        val newTP = tp.msbServices(msbServices)
+        newTP must be(tp.copy(msbServices = Some(msbServices), hasChanged = true))
+      }
     }
 
     "Serialise as expected" in {
@@ -143,19 +145,23 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     }
 
     "isComplete" must {
-      "return true when tradingPremises contains complete data" in {
-        completeModel.isComplete must be(true)
+      "return true" when {
+        "tradingPremises contains complete data" in {
+          completeModel.isComplete must be(true)
+        }
       }
 
-      "return false when tradingPremises contains incomplete data" in {
-        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), None)
-        tradingPremises.isComplete must be(false)
+      "return false" when {
+        "tradingPremises contains incomplete data" in {
+          val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), None)
+          tradingPremises.isComplete must be(false)
+        }
+        "tradingPremises no data" in {
+          val tradingPremises = TradingPremises(None, None)
+          tradingPremises.isComplete must be(true)
+        }
       }
 
-      "return false when tradingPremises no data" in {
-        val tradingPremises = TradingPremises(None, None)
-        tradingPremises.isComplete must be(true)
-      }
     }
   }
 
@@ -271,10 +277,21 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
       }
     }
 
+    "has a completed model, an empty one and an incomplete one" when {
+      "return the correct index" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, TradingPremises(), incompleteModel)))
+
+        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.WhatYouNeedController.get(3).url)
+      }
+    }
+
   }
 
   "anyChanged" must {
-    val originalBankDetails = Seq(TradingPremises(None, None, hasChanged = false))
+    val originalBankDetails = Seq(TradingPremises(None, None))
     val originalBankDetailsChanged = Seq(TradingPremises(None, None, hasChanged = true))
 
     "return false" when {
