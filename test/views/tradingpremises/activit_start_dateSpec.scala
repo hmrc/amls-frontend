@@ -1,12 +1,10 @@
 package views.tradingpremises
 
-import forms.{EmptyForm, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
 import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
-import models.tradingpremises.ActivityStartDate
-import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -43,7 +41,7 @@ class activit_start_dateSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "startDate") -> Seq(ValidationError("not a message Key"))
+          (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.tradingpremises.activity_start_date(form2, 1, true)
