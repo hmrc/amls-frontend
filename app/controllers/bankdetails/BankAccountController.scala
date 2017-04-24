@@ -21,13 +21,9 @@ trait BankAccountController extends RepeatingSection with BaseController {
         bankDetails <- getData[BankDetails](index)
         allowedToEdit <- ControllerHelper.allowedToEdit(edit)
       } yield bankDetails match {
-        case Some(BankDetails(_, Some(data),_,_,_)) if allowedToEdit =>
-          Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
-        case Some(_) if allowedToEdit =>
-          Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
-        case _ => {
-          NotFound(notFoundView)
-        }
+        case Some(BankDetails(_, Some(data),_,_,_)) if allowedToEdit => Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
+        case Some(_) if allowedToEdit => Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
+        case _ => NotFound(notFoundView)
       }
   }
 

@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.hvd.{ExciseGoods, Hvd}
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import utils.DateOfChangeHelper
 import views.html.hvd.excise_goods
@@ -46,7 +46,7 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
                 hvd.exciseGoods(data)
               )
             } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange[ExciseGoods](hvd.exciseGoods, data) =>
+              case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[ExciseGoods](hvd.exciseGoods, data) =>
                 Redirect(routes.HvdDateOfChangeController.get())
               case _ => edit match {
                 case true => Redirect(routes.SummaryController.get())

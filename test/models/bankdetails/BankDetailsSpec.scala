@@ -34,6 +34,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
+  val incompleteModel = BankDetails(Some(accountType), None)
   val completeJson = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
     "bankAccount" -> Json.obj("accountName" -> "My Account",
@@ -84,6 +85,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       accountTypeJson.as[BankDetails] must be(accountTypePartialModel)
     }
   }
+
   "Bank details with partially complete model containing only bankAccount" must {
     "serialise as expected" in {
       Json.toJson[BankDetails](bankAccountPartialModel) must be(bankAccountJson)
@@ -143,6 +145,18 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       BankDetails.section(cache) must be(completedSection)
     }
 
+    "return a completed Section when model is complete with No bankaccount option selected" in {
+      val noBankAccount = Seq(BankDetails(None, None, true, false, None))
+      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAccount)
+
+      val section = BankDetails.section(cache)
+      section.hasChanged must be(true)
+      section.status must be(Completed)
+      BankDetails.section(cache) must be(completedSection)
+    }
+
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
       val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
@@ -152,18 +166,50 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       BankDetails.section(cache) must be(startedSection)
     }
 
-    "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAcount = Seq(BankDetails(None, None, true, false, None))
-      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+    "return a result indicating NotStarted" when {
+      "the section consists of just 1 empty Bank details" in {
+        val mockCacheMap = mock[CacheMap]
 
-      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(BankDetails())))
 
-      val section = BankDetails.section(cache)
-      section.hasChanged must be(true)
-      section.status must be(Completed)
-      BankDetails.section(cache) must be(completedSection)
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
+      }
     }
 
+    "return a result indicating partial completeness" when {
+      "the section consists of a partially complete model followed by a completely empty one" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(incompleteModel, BankDetails())))
+
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Started)
+      }
+    }
+
+    "return a result indicating completeness" when {
+      "the section consists of a complete model followed by an empty one" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(completeModel, BankDetails())))
+
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+      }
+    }
+
+    "return the correct index of the section" when {
+      "the section has a completed model, an empty one and an incomplete one" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(completeModel, BankDetails(), incompleteModel)))
+
+        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(3).url)
+      }
+    }
+    
     "Amendment and Variation flow" when {
       "the section is complete with all the bank details being removed" must {
         "successfully redirect to what you need page" in {
@@ -221,7 +267,6 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         }
       }
 
-
       "exclude Nobank account and deleted bank accounts before sending to ETMP" in {
 
         val completeModel = BankDetails(Some(accountType), Some(bankAccount), status = Some(StatusConstants.Deleted))
@@ -235,46 +280,6 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
           case false => Some(Seq.empty)
         }
         test must be(Some(Seq(completeModelChanged)))
-      }
-    }
-  }
-
-  it when {
-    val completeModel = BankDetails(Some(PersonalAccount), Some(BankAccount("ACCOUNTNAME", UKAccount("ACCOUNTNUMBER", "SORTCODE"))))
-    val incompleteModel = BankDetails(Some(PersonalAccount), None)
-
-    "the section consists of just 1 empty Bank details" must {
-      "return a result indicating NotStarted" in {
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(BankDetails())))
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
-      }
-    }
-
-    "the section consists of a partially complete model followed by a completely empty one" must {
-
-
-      "return a result indicating partial completeness" in {
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(incompleteModel, BankDetails())))
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Started)
-      }
-    }
-
-    "the section consists of a complete model followed by an empty one" must {
-      "return a result indicating completeness" in {
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(completeModel, BankDetails())))
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
   }
@@ -298,7 +303,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     }
   }
 
-  "BankDetails class" when {
+  it when {
     "bankAccountType value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
@@ -378,6 +383,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       Account.ibanType.validate("ab{}kfg  ") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
     }
+
     "fail validation if IBAN contains only whitespace" in {
       Account.ibanType.validate("    ") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
@@ -393,10 +399,12 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       Account.nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
     }
+
     "fail validation if Non UK Account no contains invalid characters" in {
       Account.nonUKBankAccountNumberType.validate("ab{}kfg  ") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
     }
+
     "fail validation if Non UK Account no contains only whitespace" in {
       Account.nonUKBankAccountNumberType.validate("    ") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))

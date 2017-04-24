@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models._
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -13,8 +13,9 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
+
 import scala.collection.JavaConversions._
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
@@ -325,6 +326,35 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.post(1, edit = true)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.dateOfChange(1).url))
+    }
+  }
+
+  "go to the date of change page" when {
+    "the status id ready for renewal and trading name has changed" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "AA1 1AA"
+      )
+
+      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(ReadyForRenewal(None)))
 
       val result = controller.post(1, edit = true)(initRequest)
 

@@ -90,7 +90,7 @@ trait ConfirmationController extends BaseController {
             fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
             paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
           } yield {
-            Ok(confirm_amendvariation(payRef, total, rows, None, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+            Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
           }
       case _ =>
         for {

@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.hvd.{HowWillYouSellGoods, Hvd, SalesChannel}
-import models.status.SubmissionDecisionApproved
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import play.api.Logger
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -47,7 +47,7 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
                 hvd.howWillYouSellGoods(model)
               )
             } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange[HowWillYouSellGoods](hvd.howWillYouSellGoods, model) =>
+              case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[HowWillYouSellGoods](hvd.howWillYouSellGoods, model) =>
                 Redirect(routes.HvdDateOfChangeController.get())
               case _ => edit match {
                 case true => Redirect(routes.SummaryController.get())
