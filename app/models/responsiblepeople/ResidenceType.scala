@@ -28,7 +28,7 @@ object ResidenceType {
         (
           (__ \ "dateOfBirth").read(localDateRule) ~
             __.read[PassportType]
-          ) (NonUKResidence.apply _)
+          ) (NonUKResidence)
     }
   }
 
