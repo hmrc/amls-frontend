@@ -40,7 +40,8 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         val personName = PersonName("firstname", None, "lastname", None, None)
         val nino = "ab123456l"
-        val residenceType = UKResidence(nino)
+        val residenceTypeUK = UKResidence(nino)
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("1234567890"))
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))
@@ -71,7 +72,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val responsiblePeople = ResponsiblePeople(
             personName = Some(personName),
             personResidenceType = Some(PersonResidenceType(
-              isUKResidence = residenceType,
+              isUKResidence = residenceTypeUK,
               countryOfBirth = Country("United Kingdom", "GB"),
               nationality = Some(Country("United Kingdom", "GB"))))
           )
@@ -85,15 +86,10 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val document = Jsoup.parse(contentAsString(result))
           document.select("input[name=isUKResidence]").`val` must be("true")
           document.select("input[name=nino]").`val` must be(nino)
-          document.select("input[name=countryOfBirth]").`val` must be("GB")
-          document.select("input[name=passportType]").`val` must be("01")
-          document.select("input[name=dateOfBirth.day]").`val` must be("02")
-          document.select("input[name=dateOfBirth.month]").`val` must be("12")
-          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
-          document.select("input[name=ukPassportNumber]").`val` must be("987654321")
-          document.select("input[name=nonUKPassportNumber]").`val` must be("1234567890")
+          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
 
         }
+
       }
 
       "return NOT_FOUND" when {
@@ -280,7 +276,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         }
       }
     }
-
 
 
   }
