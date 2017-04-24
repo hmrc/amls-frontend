@@ -23,8 +23,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
           => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(person_residence_type(EmptyForm, edit, index, fromDeclaration, personName.titleName))
-          case _
-          => NotFound(notFoundView)
+          case _ => NotFound(notFoundView)
         }
     }
 
@@ -39,7 +38,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             }
           case ValidForm(_, data) => {
             for {
-              result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
                 val updatedData = data.copy(nationality = nationality)
                 rp.personResidenceType(updatedData)
