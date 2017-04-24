@@ -10,56 +10,87 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
-    "utrType" must {
-
-      "successfully validate" in {
-
-        SaRegistered.utrType.validate("1234567890") must
-          be(Valid("1234567890"))
+    "pass validation" when {
+      "successfully validate given a 'no' value" in {
+        SaRegistered.formRule.validate(Map("saRegistered" -> Seq("false"))) must
+          be(Valid(SaRegisteredNo))
       }
 
-      "fail to validate an empty string" in {
+      "successfully validate given an `Yes` value with a valid utr" in {
+        val data = Map(
+          "saRegistered" -> Seq("true"),
+          "utrNumber" -> Seq("0123456789")
+        )
 
-        SaRegistered.utrType.validate("") must
+        SaRegistered.formRule.validate(data) must
+          be(Valid(SaRegisteredYes("0123456789")))
+      }
+    }
+
+    "fail validation" when {
+      "fail to validate given an `Yes` with no value" in {
+
+        val data = Map(
+          "saRegistered" -> Seq("true")
+        )
+
+        SaRegistered.formRule.validate(data) must
           be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.required.utr.number"))
+            (Path \ "utrNumber") -> Seq(ValidationError("error.required"))
           )))
       }
 
-      "fail to validate a string longer than 10" in {
+      "utr contains an empty string" in {
 
-        SaRegistered.utrType.validate("1" * 11) must
+        val data = Map(
+          "saRegistered" -> Seq("true"),
+          "utrNumber" -> Seq("")
+        )
+
+        SaRegistered.formRule.validate(data) must
           be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.invalid.length.utr.number"))
+            (Path \ "utrNumber") -> Seq(ValidationError("error.required.utr.number"))
           )))
       }
-    }
 
-    "successfully validate given an enum value" in {
-      SaRegistered.formRule.validate(Map("saRegistered" -> Seq("false"))) must
-        be(Valid(SaRegisteredNo))
-    }
+      "utr contains only whitespace" in {
 
-    "successfully validate given an `Yes` value" in {
-      val data = Map(
-        "saRegistered" -> Seq("true"),
-        "utrNumber" -> Seq("0123456789")
-      )
+        val data = Map(
+          "saRegistered" -> Seq("true"),
+          "utrNumber" -> Seq("   ")
+        )
 
-      SaRegistered.formRule.validate(data) must
-        be(Valid(SaRegisteredYes("0123456789")))
-    }
+        SaRegistered.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "utrNumber") -> Seq(ValidationError("error.invalid.length.utr.number"))
+          )))
+      }
 
-    "fail to validate given an `Yes` with no value" in {
+      "utr contains invalid characters" in {
 
-      val data = Map(
-        "saRegistered" -> Seq("true")
-      )
+        val data = Map(
+          "saRegistered" -> Seq("true"),
+          "utrNumber" -> Seq("12ab{}1230")
+        )
 
-      SaRegistered.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "utrNumber") -> Seq(ValidationError("error.required"))
-        )))
+        SaRegistered.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "utrNumber") -> Seq(ValidationError("error.invalid.length.utr.number"))
+          )))
+      }
+
+      "utr contains too many numbers" in {
+
+        val data = Map(
+          "saRegistered" -> Seq("true"),
+          "utrNumber" -> Seq("1" * 11)
+        )
+
+        SaRegistered.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "utrNumber") -> Seq(ValidationError("error.invalid.length.utr.number"))
+          )))
+      }
     }
 
     "write correct data from enum value" in {
