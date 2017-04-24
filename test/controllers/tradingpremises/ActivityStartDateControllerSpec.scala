@@ -115,8 +115,7 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with ScalaFuture
 
         val result = controller.post(1, false)(postRequest)
         status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("error-notification").html() must include(Messages("error.expected.jodadate.format"))
+
       }
     }
 
