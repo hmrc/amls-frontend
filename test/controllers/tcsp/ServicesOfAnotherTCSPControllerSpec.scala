@@ -36,7 +36,6 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("tcsp.servicesOfAnotherTcsp.title"))
     }
 
     "on get display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
@@ -44,7 +43,6 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
       (any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes("12345678"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include("12345678")
     }
 
     "on post with valid data" in new Fixture {
@@ -73,10 +71,6 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.mlr.number"))
-
     }
 
     "On post with missing boolean data" in new Fixture {
@@ -87,9 +81,6 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.tcsp.services.another.tcsp"))
     }
 
     "On post with missing mlr reference number" in new Fixture {
@@ -101,9 +92,6 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.mlr.number"))
     }
 
     "on post with valid data in edit mode" in new Fixture {
