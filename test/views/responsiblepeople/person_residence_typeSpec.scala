@@ -25,15 +25,15 @@ class person_residence_typeSpec extends GenericTestHelper with MustMatchers {
       heading.html must be(Messages("responsiblepeople.person.a.resident.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "isUKResidence")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "countryOfBirth")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "nino")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "passportType")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "ukPassportNumber")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "nonUKPassportNumber")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "dateOfBirth-day")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "dateOfBirth-month")
-      noException must be thrownBy doc.getElementsByAttributeValue("name", "dateOfBirth-year")
+      doc.getElementsByAttributeValue("name", "isUKResidence") must not be empty
+      doc.getElementsByAttributeValue("name", "countryOfBirth") must not be empty
+      doc.getElementsByAttributeValue("name", "nino") must not be empty
+      doc.getElementsByAttributeValue("name", "passportType") must not be empty
+      doc.getElementsByAttributeValue("name", "ukPassportNumber") must not be empty
+      doc.getElementsByAttributeValue("name", "nonUKPassportNumber") must not be empty
+      doc.getElementsByAttributeValue("name", "dateOfBirth.day") must not be empty
+      doc.getElementsByAttributeValue("name", "dateOfBirth.month") must not be empty
+      doc.getElementsByAttributeValue("name", "dateOfBirth.year") must not be empty
 
     }
     "show errors in the correct locations" in new ViewFixture {
