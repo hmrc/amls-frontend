@@ -101,24 +101,32 @@ object ResponsiblePeople {
   implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePeople]]
 
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
 
-    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {rp =>
-      rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople()) match {
-        case Nil => Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
-        case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
-          _.isComplete
-        } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
-        case responsiblePeople => {
-          val index = responsiblePeople.indexWhere {
-            case model if !model.isComplete => true
-            case _ => false
+    val messageKey = "responsiblepeople"
+    val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
+
+    def filter(rp: Seq[ResponsiblePeople]) = rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
+
+    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) { rp =>
+
+      if(filter(rp).equals(Nil)) {
+        Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
+      } else {
+        rp match {
+          case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
+            _.isComplete
+          } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
+          case responsiblePeople => {
+            val index = responsiblePeople.indexWhere {
+              case model if !model.isComplete => true
+              case _ => false
+            }
+            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
           }
-          Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
         }
       }
     }
+
   }
 
   import play.api.libs.json._

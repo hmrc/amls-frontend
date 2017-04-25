@@ -2,6 +2,7 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.businessmatching._
 import models.responsiblepeople.{PersonName, ResponsiblePeople, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -14,12 +15,13 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import org.mockito.Matchers.{eq => meq, _}
 
 import scala.concurrent.Future
 
 class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  val RecordId = 1
+  val recordId = 1
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -28,102 +30,195 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
-
-    when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(CacheMap("testCacheMap", Map()))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
+  val mockCacheMap = mock[CacheMap]
 
-  "TrainingController" must {
+  "TrainingController" when {
 
     val pageTitle = Messages("responsiblepeople.training.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-    "use correct services" in new Fixture {
-        TrainingController.authConnector must be(AMLSAuthConnector)
-        TrainingController.dataCacheConnector must be(DataCacheConnector)
-      }
 
-    "get" must {
 
-      "load the page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-        val result = controller.get(RecordId)(request)
+    "get is called" must {
+
+      "display the page with pre populated data" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingYes("test")))))))
+
+        val result = controller.get(recordId)(request)
         status(result) must be(OK)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
+
+        val page: Document = Jsoup.parse(contentAsString(result))
+        page.getElementById("training-true").hasAttr("checked") must be(true)
+        page.getElementById("information").`val` must be("test")
+      }
+
+      "display the page without pre populated data" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+
+        val result = controller.get(recordId)(request)
+        status(result) must be(OK)
+
+        val page: Document = Jsoup.parse(contentAsString(result))
+        page.getElementById("training-true").hasAttr("checked") must be(false)
+        page.getElementById("training-false").hasAttr("checked") must be(false)
+        page.getElementById("information").`val` must be("")
+      }
+
+      "respond with NOT_FOUND when there is no personName" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+        val result = controller.get(recordId)(request)
+        status(result) must be(NOT_FOUND)
       }
     }
 
-    "on get display the page with pre populated data for the Yes Option" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,training = Some(TrainingYes("I do not remember when I did the training")))))))
-      val result = controller.get(RecordId)(request)
-      status(result) must be(OK)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      contentAsString(result) must include ("I do not remember when I did the training")
+    "post is called" when {
+      "index is out of bounds, must respond with NOT_FOUND" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "training" -> "true",
+          "information" -> "test"
+        )
+
+        when(controller.dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople())))
+
+        val result = controller.post(99)(newRequest)
+        status(result) must be(NOT_FOUND)
+      }
+
+      "given valid data" when {
+        "there is no cache data, must redirect to the PersonRegisteredController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "training" -> "true",
+            "information" -> "test"
+          )
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post(recordId, false)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PersonRegisteredController.get(recordId).url))
+        }
+
+        "edit is false" must {
+          "redirect to PersonRegisteredController when training is yes" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "training" -> "true",
+              "information" -> "test"
+            )
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(emptyCache)))
+
+            val result = controller.post(recordId, false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.PersonRegisteredController.get(recordId).url))
+          }
+
+          "redirect to FitAndProperController when businessActivities includes TrustAndCompanyServices" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "training" -> "true",
+              "information" -> "I do not remember when I did the training"
+            )
+
+            val testCacheMap = CacheMap("", Map(
+
+            ))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+              .thenReturn(Some(
+                BusinessMatching(activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing))))
+              ))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+              .thenReturn(Some(Seq(ResponsiblePeople())))
+
+            val result = controller.post(recordId, false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+          }
+          "redirect to FitAndProperController when businessActivities includes MoneyServiceBusiness" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "training" -> "true",
+              "information" -> "I do not remember when I did the training"
+            )
+
+            val testCacheMap = CacheMap("", Map(
+
+            ))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+              .thenReturn(Some(
+                BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
+              ))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+              .thenReturn(Some(Seq(ResponsiblePeople())))
+
+            val result = controller.post(recordId, false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+          }
+        }
+        "edit is true" must {
+          "on post with valid data in edit mode" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "training" -> "true",
+              "information" -> "I do not remember when I did the training"
+            )
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(emptyCache)))
+
+            val result = controller.post(recordId, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
+          }
+
+
+        }
+      }
+
+      "given invalid data, must respond with BAD_REQUEST" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "training" -> "not a boolean value"
+        )
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+
+        val result = controller.post(recordId)(newRequest)
+        status(result) must be(BAD_REQUEST)
+      }
+
+
+
     }
+  }
 
-
-    "on get display the page with pre populated data with No Data for the information" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingNo))))))
-      val result = controller.get(RecordId)(request)
-      status(result) must be(OK)
-      contentAsString(result) must not include ("I do not remember when I did the training")
-    }
-
-
-    "on post with valid data and training selected yes" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "training" -> "true",
-        "information" -> "I do not remember when I did the training"
-      )
-
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
-      //redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
-    }
-
-    "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "training" -> "not a boolean value"
-      )
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
-
-      val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-    }
-
-
-    "on post with valid data in edit mode" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "training" -> "true",
-        "information" -> "I do not remember when I did the training"
-      )
-
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(RecordId, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+  it must {
+    "use correct services" in new Fixture {
+      TrainingController.authConnector must be(AMLSAuthConnector)
+      TrainingController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

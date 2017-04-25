@@ -32,15 +32,6 @@ class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
     "load the what you need page" in new Fixture {
       when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(None))
         val result = controller.get(1)(request)
-        status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-
-      val pageTitle = Messages("title.wyn") + " - " +
-        Messages("summary.tradingpremises") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      document.title() must be(pageTitle)
-
       status(result) mustBe OK
     }
 

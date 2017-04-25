@@ -21,7 +21,8 @@ import scala.concurrent.Future
 class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new PersonResidentTypeController {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -31,268 +32,251 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "PersonResidentTypeController" must {
+  "PersonResidentTypeController" when {
 
-    "display person a UK resident page" in new Fixture {
-      val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
+    "get" must {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("responsiblepeople.person.a.resident.title", "firstname lastname"))
+      "return OK" when {
+
+        val personName = PersonName("firstname", None, "lastname", None, None)
+        val nino = "ab123456l"
+        val residenceTypeUK = UKResidence(nino)
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("1234567890"))
+
+        "without pre-populated data" in new Fixture {
+          val responsiblePeople = ResponsiblePeople(Some(personName))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-false").hasAttr("checked") must be(false)
+          document.select("input[name=nino]").`val` must be("")
+          document.select("input[name=countryOfBirth]").`val` must be("")
+          document.getElementById("passportType-01").hasAttr("checked") must be(false)
+          document.getElementById("passportType-02").hasAttr("checked") must be(false)
+          document.getElementById("passportType-03").hasAttr("checked") must be(false)
+          document.select("input[name=dateOfBirth.day]").`val` must be("")
+          document.select("input[name=dateOfBirth.month]").`val` must be("")
+          document.select("input[name=dateOfBirth.year]").`val` must be("")
+          document.select("input[name=ukPassportNumber]").`val` must be("")
+          document.select("input[name=nonUKPassportNumber]").`val` must be("")
+
+        }
+
+        "with pre-populated data" in new Fixture {
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName),
+            personResidenceType = Some(PersonResidenceType(
+              isUKResidence = residenceTypeUK,
+              countryOfBirth = Country("United Kingdom", "GB"),
+              nationality = Some(Country("United Kingdom", "GB"))))
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[name=isUKResidence]").`val` must be("true")
+          document.select("input[name=nino]").`val` must be(nino)
+          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+
+        }
+
+      }
+
+      "return NOT_FOUND" when {
+        "neither RP personName nor residenceType is found" in new Fixture {
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(0)(request)
+
+          status(result) must be(NOT_FOUND)
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+        }
+      }
+
     }
 
-    "load 'not found' error page" when {
-      "get throws an error " in new Fixture {
-        val responsiblePeople = ResponsiblePeople()
+    "post" must {
+      "submit with a valid form" which {
+        "goes to NationalityController" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        val result = controller.get(10)(request)
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUKResidence" -> "true",
+            "nino" -> "AA346464B",
+            "countryOfBirth" -> "GB",
+            "nationality" -> "GB"
+          )
 
-        status(result) must be(NOT_FOUND)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+        }
+        "goes to DetailedAnswersController" when {
+          "in edit mode" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "isUKResidence" -> "true",
+              "nino" -> "AA346464B",
+              "countryOfBirth" -> "GB",
+              "nationality" -> "GB"
+            )
+
+            val responsiblePeople = ResponsiblePeople()
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          }
+        }
+
+        "transforms the NINO to uppercase" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUKResidence" -> "true",
+            "nino" -> "aa346464b",
+            "countryOfBirth" -> "GB",
+            "nationality" -> "GB"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
+          verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
+
+          captor.getValue must have size 1
+
+          (for {
+            person <- captor.getValue.headOption
+            residence <- person.personResidenceType
+            nino <- residence.isUKResidence match {
+              case UKResidence(n) => Some(n)
+              case _ => None
+            }
+          } yield nino) foreach {
+            _ mustBe "AA346464B"
+          }
+
+        }
+
+        "remove spaces and dashes" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUKResidence" -> "true",
+            "nino" -> "AA 34 64- 64 B",
+            "countryOfBirth" -> "GB",
+            "nationality" -> "GB"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
+          verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
+
+          captor.getValue must have size 1
+
+          (for {
+            person <- captor.getValue.headOption
+            residence <- person.personResidenceType
+            nino <- residence.isUKResidence match {
+              case UKResidence(n) => Some(n)
+              case _ => None
+            }
+          } yield nino) foreach {
+            _ mustBe "AA346464B"
+          }
+
+        }
+      }
+
+      "respond with BAD_REQUEST" when {
+        "invalid form is submitted" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "ukPassportNumber" -> "12346464688"
+          )
+          val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "return NOT_FOUND" when {
+        "index is out of bounds" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUKResidence" -> "true",
+            "nino" -> "AA346464B",
+            "countryOfBirth" -> "GB",
+            "nationality" -> "GB"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(10, false)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
       }
     }
 
-    "submit with valid Non UK data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "AA346464B",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
-    }
-
-    "show error with year field too long" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "false",
-        "dateOfBirth.day" -> "12",
-        "dateOfBirth.month" -> "12",
-        "dateOfBirth.year" -> "12345678",
-        "passportType" -> "01",
-        "ukPassportNumber" -> "12346464688",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-      val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1)(newRequest)
-      val pageTitle = Messages("responsiblepeople.person.a.resident.title", "firstname lastname") + " - " +
-        Messages("summary.responsiblepeople") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    }
-
-    "Prepopulate UI with saved data" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
-          Some(PersonName("firstname", None, "lastname", None, None)),
-          Some(PersonResidenceType(
-            NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
-            Country("United Kingdom", "GB"),
-            Some(Country("United Kingdom", "GB")))
-          ),
-          None)))))
-
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-
-      val pageTitle = Messages("responsiblepeople.person.a.resident.title", "firstname lastname") + " - " +
-        Messages("summary.responsiblepeople") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
-      document.select("input[name=ukPassportNumber]").`val`() must include("12346464646")
-    }
-
-    "submit with valid UK model data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "AA346464B",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
-    }
-
-    "submit with valid UK model data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "AA346464B",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, false)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
-    }
-
-    "submit with valid UK data, transforming the NINO to uppercase" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "aa346464b",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, edit = false)(newRequest)
-      status(result) must be(SEE_OTHER)
-
-      val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
-      verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
-
-      captor.getValue must have size 1
-
-      (for {
-        person <- captor.getValue.headOption
-        residence <- person.personResidenceType
-        nino <- residence.isUKResidence match {
-          case UKResidence(n) => Some(n)
-          case _ => None
-        }
-      } yield nino) map { _ mustBe "AA346464B" }
-
-    }
-
-    "submit with valid UK data, removing spaces and dashes" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "AA 34 64- 64 B",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, edit = false)(newRequest)
-      status(result) must be(SEE_OTHER)
-
-      val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
-      verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
-
-      captor.getValue must have size 1
-
-      (for {
-        person <- captor.getValue.headOption
-        residence <- person.personResidenceType
-        nino <- residence.isUKResidence match {
-          case UKResidence(n) => Some(n)
-          case _ => None
-        }
-      } yield nino) map { _ mustBe "AA346464B" }
-
-    }
-    "throw error message when data is not valid" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "nino" -> "AA346464B",
-        "countryOfBirth" -> "GB",
-        "nationality" -> "GB"
-      )
-
-      val responsiblePeople = ResponsiblePeople()
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, false)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isUKResidence]").html() must include(Messages("error.required.rp.is.uk.resident"))
-    }
-
-    "redirect to 'not found' error page" when {
-      "post throws exception" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "isUKResidence" -> "true",
-          "nino" -> "AA346464B",
-          "countryOfBirth" -> "GB",
-          "nationality" -> "GB"
-        )
-
-        val responsiblePeople = ResponsiblePeople()
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(10, false)(newRequest)
-        status(result) must be(NOT_FOUND)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      }
-    }
   }
 }

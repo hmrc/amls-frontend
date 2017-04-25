@@ -50,7 +50,7 @@ trait TrainingController extends RepeatingSection with BaseController {
       }
     }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], fromDeclaration: Boolean = false): Result = {
+  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], fromDeclaration: Boolean): Result = {
     cacheMapOpt match {
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
