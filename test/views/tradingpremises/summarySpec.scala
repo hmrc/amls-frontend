@@ -8,7 +8,7 @@ import play.api.test.FakeRequest
 import utils.{GenericTestHelper, StatusConstants}
 import views.Fixture
 
-trait ViewTestHelper extends GenericTestHelper {
+sealed trait ViewTestHelper extends GenericTestHelper {
   val tradingPremises = Seq(TradingPremises(
     registeringAgentPremises = Some(RegisteringAgentPremises(true)),
     status = Some(StatusConstants.Added),

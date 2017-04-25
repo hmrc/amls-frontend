@@ -49,11 +49,6 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val htmlValue = Jsoup.parse(contentAsString(result))
-
-        val title = s"${Messages("tradingpremises.agent.premises.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        htmlValue.title mustBe title
       }
 
       "load Yes when save4later returns true" in new Fixture {
@@ -103,6 +98,25 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
 
       }
 
+      "respond with NOT_FOUND when there is no data" in new Fixture {
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(None))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(None)
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(NOT_FOUND)
+      }
+
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
         val model = TradingPremises(
           registeringAgentPremises = Some(
@@ -130,8 +144,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
         val newRequest = request.withFormUrlEncodedBody()
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("tradingpremises.agent.premises.title"))
-        contentAsString(result) must include(Messages("err.summary"))
+
       }
 
       "redirect to the Trading Premises details page on submitting false and edit true" in new Fixture {
