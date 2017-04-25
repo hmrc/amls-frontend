@@ -79,10 +79,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         val document = Jsoup.parse(contentAsString(result))
 
         hstatus(result) must be(OK)
-        contentAsString(result) must include(Messages("tradingpremises.yourtradingpremises.title"))
-        for (field <- fields)
-          document.select(s"input[id=$field]").`val`() must be(empty)
-
+        
       }
 
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
