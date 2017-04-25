@@ -117,17 +117,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get(1, false)(request)
-
-        val contentString = contentAsString(result)
-
-        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
-          Messages("summary.tradingpremises") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        val document = Jsoup.parse(contentString)
-        document.title() mustBe pageTitle
-        document.getElementById("endDate-day").`val`() must be("")
-
       }
 
       "application status is ready for renewal" in new Fixture {
@@ -142,14 +131,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
         val contentString = contentAsString(result)
 
-        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
-          Messages("summary.tradingpremises") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        val document = Jsoup.parse(contentString)
-        document.title() mustBe pageTitle
-        document.getElementById("endDate-day").`val`() must be("")
-
       }
 
       "application status is NotCompleted" in new Fixture {
@@ -162,14 +143,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
         val result = controller.get(1, false)(request)
 
-        val contentString = contentAsString(result)
-
-        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
-          Messages("summary.tradingpremises") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        val document = Jsoup.parse(contentString)
-        document.title() mustBe pageTitle
       }
     }
 
@@ -183,14 +156,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
       val result = controller.get(1, false)(request)
 
-      val contentString = contentAsString(result)
-
-      val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
-        Messages("summary.tradingpremises") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      val document = Jsoup.parse(contentString)
-      document.title() mustBe pageTitle
     }
 
     "respond with NOT_FOUND" when {
@@ -219,14 +184,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
       val result = controller.get(1)(request)
 
       status(result) must be(OK)
-
-      val doc = Jsoup.parse(contentAsString(result))
-
-      Option(doc.getElementById("endDate")).isDefined must be(false)
-
     }
-
-
   }
 
   it when {
@@ -384,7 +342,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
         "removing a trading premises from an application a year too great in length" in new Fixture {
@@ -405,7 +362,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
 
@@ -427,7 +383,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.future.date"))
 
         }
 
@@ -452,7 +407,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.tp.date.after.start", "24-02-1990"))
 
         }
       }
