@@ -10,63 +10,82 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
-    "information" must {
-
-      "successfully validate" in {
-
-        Training.informationType.validate("did the training for the anti money laundering. Dont know when") must
-          be(Valid("did the training for the anti money laundering. Dont know when"))
+    "pass validation" when {
+      "training is false" in {
+        Training.formRule.validate(Map("training" -> Seq("false"))) must
+          be(Valid(TrainingNo))
       }
 
-      "fail to validate an empty string" in {
+      "given an `Yes` value with a valid information string" in {
+        val data = Map(
+          "training" -> Seq("true"),
+          "information" -> Seq("test")
+        )
 
-        Training.informationType.validate("") must
-          be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.required.rp.training.information"))
-          )))
-      }
-
-      "fail to validate a string longer than 255 characters" in {
-
-        Training.informationType.validate("A" * 256) must
-          be(Invalid(Seq(
-            Path -> Seq(ValidationError("error.invalid.maxlength.255"))
-          )))
-      }
-
-      "fail to validate a string with invlaid characters" in {
-
-        Training.informationType.validate("AAA{}AAA") must
-          be(Invalid(Seq(
-            Path -> Seq(ValidationError("err.text.validation"))
-          )))
+        Training.formRule.validate(data) must be(Valid(TrainingYes("test")))
       }
     }
 
-    "successfully validate given an enum value" in {
-      Training.formRule.validate(Map("training" -> Seq("false"))) must
-        be(Valid(TrainingNo))
-    }
+    "fail validation" when {
+      "given an `Yes` with no value" in {
 
-    "successfully validate given an `Yes` value" in {
-      val data = Map(
-        "training" -> Seq("true"),
-        "information" -> Seq("0123456789")
-      )
+        val data = Map(
+          "training" -> Seq("true")
+        )
 
-      Training.formRule.validate(data) must be(Valid(TrainingYes("0123456789")))
-    }
+        Training.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "information") -> Seq(ValidationError("error.required"))
+          )))
+      }
+      "given an `Yes` with an empty string" in {
 
-    "fail to validate given an `Yes` with no value" in {
+        val data = Map(
+          "training" -> Seq("true"),
+          "information" -> Seq("")
+        )
 
-      val data = Map(
-        "training" -> Seq("true")
-      )
+        Training.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "information") -> Seq(ValidationError("error.required.rp.training.information"))
+          )))
+      }
+      "given an `Yes` with a sequence of whitespace" in {
 
-      Training.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "information") -> Seq(ValidationError("error.required"))
-        )))
+        val data = Map(
+          "training" -> Seq("true"),
+          "information" -> Seq("   ")
+        )
+
+        Training.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "information") -> Seq(ValidationError("error.required.rp.training.information"))
+          )))
+      }
+      "given an `Yes` with too many characters" in {
+
+        val data = Map(
+          "training" -> Seq("true"),
+          "information" -> Seq("a" * 256)
+        )
+
+        Training.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "information") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          )))
+      }
+      "given an `Yes` with invalid characters" in {
+
+        val data = Map(
+          "training" -> Seq("true"),
+          "information" -> Seq("AAA{}AAA")
+        )
+
+        Training.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "information") -> Seq(ValidationError("err.text.validation"))
+          )))
+      }
     }
 
     "write correct data from enum value" in {

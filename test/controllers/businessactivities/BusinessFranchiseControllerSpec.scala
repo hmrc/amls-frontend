@@ -33,8 +33,8 @@ class BusinessFranchiseControllerSpec extends GenericTestHelper with MockitoSuga
 
     "get is called" must {
       "on get display the is your business a franchise page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("businessactivities.businessfranchise.title"))
@@ -47,8 +47,8 @@ class BusinessFranchiseControllerSpec extends GenericTestHelper with MockitoSuga
       }
 
       "on get display the is your business a franchise page with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
         val result = controller.get()(request)
         status(result) must be(OK)
 

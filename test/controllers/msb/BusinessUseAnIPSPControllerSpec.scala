@@ -49,6 +49,8 @@ class BusinessUseAnIPSPControllerSpec  extends GenericTestHelper {
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[value=true]").hasAttr("checked") must be(true)
+      document.select("input[name=name]").`val` mustEqual "test"
+      document.select("input[name=referenceNumber]").`val` mustEqual "123456789123456"
     }
 
 

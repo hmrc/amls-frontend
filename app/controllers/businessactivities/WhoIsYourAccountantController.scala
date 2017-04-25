@@ -23,7 +23,9 @@ trait WhoIsYourAccountantController extends BaseController {
           val form = (for {
             businessActivities <- response
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant
-          } yield Form2[WhoIsYourAccountant](whoIsYourAccountant)).getOrElse(Form2(defaultValues))
+          } yield {
+            Form2[WhoIsYourAccountant](whoIsYourAccountant)
+          }).getOrElse(Form2(defaultValues))
           Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
       }
   }
@@ -39,7 +41,11 @@ trait WhoIsYourAccountantController extends BaseController {
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivity.whoIsYourAccountant(data)
             )
-          } yield Redirect(routes.TaxMattersController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get())
+          } else {
+            Redirect(routes.TaxMattersController.get())
+          }
         }
       }
   }
