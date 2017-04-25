@@ -2,11 +2,9 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
-import scala.collection.JavaConversions._
 import views.Fixture
 
 
@@ -21,7 +19,7 @@ class business_structureSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      val pageTitle = Messages("tradingpremises.businessStructure.title", "firstname lastname") + " - " +
+      val pageTitle = Messages("tradingpremises.businessStructure.title") + " - " +
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
@@ -32,11 +30,6 @@ class business_structureSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.tradingpremises"))
 
       doc.select("input[type=radio]").size mustBe 5
-      val values:Seq[String] = Seq("01", "02", "03", "04", "05")
-      val elements = doc.select("input[type=radio]")
-      for (ele: Element <- elements) {
-        values must contain(ele.`val`())
-      }
     }
 
     "show errors in the correct locations" in new ViewFixture {

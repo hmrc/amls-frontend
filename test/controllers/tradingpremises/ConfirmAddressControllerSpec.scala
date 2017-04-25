@@ -42,7 +42,7 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(Some(bm)))
         val result = controller.get(1)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("tradingpremises.confirmaddress.title"))
+        contentAsString(result) must include(Messages("line1"))
       }
 
       "redirect to where is your trading premises page" when {
@@ -127,7 +127,6 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.tp.confirm.address"))
       }
 
     }
