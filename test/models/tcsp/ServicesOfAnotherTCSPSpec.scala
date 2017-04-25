@@ -8,91 +8,101 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
-  "Form Validation" must {
+  "services of another Tcsp" must {
 
-    "successfully validate given enum value" in {
-      ServicesOfAnotherTCSP.formRule.validate(Map("servicesOfAnotherTCSP" -> Seq("false"))) must
-        be(Valid(ServicesOfAnotherTCSPNo))
-    }
+    "pass validation" must {
 
-    "successfully validate given an `Yes` value" in {
-
-      val data = Map(
-        "servicesOfAnotherTCSP" -> Seq("true"),
-        "mlrRefNumber" -> Seq("12345678")
-      )
-
-      ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Valid(ServicesOfAnotherTCSPYes("12345678")))
-    }
-
-    "successfully validate given an alphanumeric mlr number" in {
-
-      val data = Map(
-        "servicesOfAnotherTCSP" -> Seq("true"),
-        "mlrRefNumber" -> Seq("i9w9834ubkid89n")
-      )
-
-      ServicesOfAnotherTCSP.formRule.validate(data) must be {
-        Valid(ServicesOfAnotherTCSPYes("i9w9834ubkid89n"))
+      "successfully validate if no option selected" in {
+        ServicesOfAnotherTCSP.formRule.validate(Map("servicesOfAnotherTCSP" -> Seq("false"))) must
+          be(Valid(ServicesOfAnotherTCSPNo))
       }
 
+      "successfully validate if `Yes` option selected and mandatory mlr number given" in {
+
+        val data = Map(
+          "servicesOfAnotherTCSP" -> Seq("true"),
+          "mlrRefNumber" -> Seq("12345678")
+        )
+
+        ServicesOfAnotherTCSP.formRule.validate(data) must
+          be(Valid(ServicesOfAnotherTCSPYes("12345678")))
+      }
+
+      "successfully validate if `Yes` option selected and mandatory mlr number given with alphanumeric value" in {
+
+        val data = Map(
+          "servicesOfAnotherTCSP" -> Seq("true"),
+          "mlrRefNumber" -> Seq("i9w9834ubkid89n")
+        )
+
+        ServicesOfAnotherTCSP.formRule.validate(data) must be {
+          Valid(ServicesOfAnotherTCSPYes("i9w9834ubkid89n"))
+        }
+
+      }
     }
 
-    "fail when mandatory fields are missing" in {
-      ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp"))
-        )))
+    "fail validation" when {
 
+      "fail when no option selected" in {
+        ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
+          be(Invalid(Seq(
+            (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp"))
+          )))
+
+      }
+
+      "fail to validate when `Yes` option selected with no value for the mlr number" in {
+
+        val data = Map(
+          "servicesOfAnotherTCSP" -> Seq("true"),
+          "mlrRefNumber" -> Seq("")
+        )
+
+        ServicesOfAnotherTCSP.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
+          )))
+      }
+
+
+      "fail to when `Yes` option selected with invalid value for the mlr number" in {
+
+        val data = Map(
+          "servicesOfAnotherTCSP" -> Seq("true"),
+          "mlrRefNumber" -> Seq("123qed")
+        )
+
+        ServicesOfAnotherTCSP.formRule.validate(data) must be(
+          Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
+          )))
+      }
     }
 
-    "fail to validate given an `Yes` with no value" in {
+    "form validation" when {
 
-      val data = Map(
-        "servicesOfAnotherTCSP" -> Seq("true"),
-        "mlrRefNumber" -> Seq("")
-      )
+      "write correct data from enum value" in {
 
-      ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
+        ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPNo) must
+          be(Map("servicesOfAnotherTCSP" -> Seq("false")))
+
+      }
+
+      "write correct data from `yes` value" in {
+
+        ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPYes("12345678")) must
+          be(Map("servicesOfAnotherTCSP" -> Seq("true"), "mlrRefNumber" -> Seq("12345678")))
+
+      }
     }
 
-    "fail to validate given an `Yes` with invalid value" in {
-
-      val data = Map(
-        "servicesOfAnotherTCSP" -> Seq("true"),
-        "mlrRefNumber" -> Seq("123qed")
-      )
-
-      ServicesOfAnotherTCSP.formRule.validate(data) must be(
-        Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
-    }
-
-    "write correct data from enum value" in {
-
-      ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPNo) must
-        be(Map("servicesOfAnotherTCSP" -> Seq("false")))
-
-    }
-
-    "write correct data from `yes` value" in {
-
-      ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPYes("12345678")) must
-        be(Map("servicesOfAnotherTCSP" -> Seq("true"), "mlrRefNumber" -> Seq("12345678")))
-
-    }
-
-    "JSON validation" must {
+    "JSON validation" when {
       import play.api.data.validation.ValidationError
 
       "successfully validate given an enum value" in {
 
         Json.fromJson[ServicesOfAnotherTCSP](Json.obj("servicesOfAnotherTCSP" -> false)) must
-          be(JsSuccess(ServicesOfAnotherTCSPNo, JsPath ))
+          be(JsSuccess(ServicesOfAnotherTCSPNo, JsPath))
       }
 
       "successfully validate given an `Yes` value" in {

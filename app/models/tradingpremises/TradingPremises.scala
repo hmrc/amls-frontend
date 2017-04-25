@@ -14,12 +14,12 @@ case class TradingPremises(
                             agentName: Option[AgentName] = None,
                             agentCompanyDetails: Option[AgentCompanyDetails] = None,
                             agentPartnership: Option[AgentPartnership] = None,
-                            whatDoesYourBusinessDoAtThisAddress : Option[WhatDoesYourBusinessDo] = None,
+                            whatDoesYourBusinessDoAtThisAddress: Option[WhatDoesYourBusinessDo] = None,
                             msbServices: Option[MsbServices] = None,
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
                             status: Option[String] = None,
-                            endDate:Option[ActivityEndDate] = None,
+                            endDate: Option[ActivityEndDate] = None,
                             removalReason: Option[String] = None,
                             removalReasonOther: Option[String] = None
                           ) {
@@ -53,9 +53,9 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_,_,_) => true
-      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_,_,_,_) => true
-      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _) => true
+      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
+      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -68,30 +68,36 @@ object TradingPremises {
 
   implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
 
-  def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
-    newModel exists { _.hasChanged }
-  }
+  def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists { _.hasChanged }
 
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
 
-    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {tp =>
-      tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises()) match {
-        case Nil => Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
-        case premises if premises.nonEmpty && premises.forall {
-          _.isComplete
-        } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
-        case _ => {
-          val premise = tp.filterNot(_ == TradingPremises())
-          val index = premise.indexWhere {
-            case model if !model.isComplete => true
-            case _ => false
+    val messageKey = "tradingpremises"
+    val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get())
+
+    def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
+
+    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
+
+      if (filter(tp).equals(Nil)) {
+        Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get())
+      } else {
+        tp match {
+          case premises if premises.nonEmpty && premises.forall {
+            _.isComplete
+          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
+          case _ => {
+            val index = tp.indexWhere {
+              case model if !model.isComplete => true
+              case _ => false
+            }
+            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
           }
-          Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
       }
+
     }
+
   }
 
   implicit val mongoKey = new MongoKey[TradingPremises] {
@@ -102,13 +108,17 @@ object TradingPremises {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
-    def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
-      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read(Reads.optionNoError[T])
+    def backCompatibleReads[T](fieldName: String)(implicit rds: Reads[T]) = {
+      (__ \ fieldName).read[T].map[Option[T]] {
+        Some(_)
+      } orElse __.read(Reads.optionNoError[T])
     }
 
     def readAgentCompanyDetails = {
-      (__ \ "agentCompanyDetails").read[AgentCompanyDetails].map[Option[AgentCompanyDetails]]{Some(_)} orElse
-        (__ \ "agentCompanyName").readNullable[AgentCompanyName].map[Option[AgentCompanyDetails]]{
+      (__ \ "agentCompanyDetails").read[AgentCompanyDetails].map[Option[AgentCompanyDetails]] {
+        Some(_)
+      } orElse
+        (__ \ "agentCompanyName").readNullable[AgentCompanyName].map[Option[AgentCompanyDetails]] {
           case Some(agc) => Some(AgentCompanyName(agc.agentCompanyName))
           case _ => None
         }
@@ -123,7 +133,9 @@ object TradingPremises {
         backCompatibleReads[AgentPartnership]("agentPartnership") and
         backCompatibleReads[WhatDoesYourBusinessDo]("whatDoesYourBusinessDoAtThisAddress") and
         backCompatibleReads[MsbServices]("msbServices") and
-        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "hasChanged").readNullable[Boolean].map {
+          _.getOrElse(false)
+        } and
         (__ \ "lineId").readNullable[Int] and
         (__ \ "status").readNullable[String] and
         (__ \ "endDate").readNullable[ActivityEndDate] and

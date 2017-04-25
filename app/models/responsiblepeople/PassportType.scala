@@ -69,11 +69,11 @@ object PassportType {
       (__ \ "passportType").read[String].flatMap[PassportType] {
         case "01" =>
           (__ \ "ukPassportNumber").read[String] map {
-            UKPassport(_)
+            UKPassport
           }
         case "02" =>
           (__ \ "nonUKPassportNumber").read[String] map {
-            NonUKPassport(_)
+            NonUKPassport
           }
         case "03" => NoPassport
         case _ =>

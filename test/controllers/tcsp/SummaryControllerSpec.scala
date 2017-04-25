@@ -44,27 +44,6 @@ class SummaryControllerSpec extends GenericTestHelper {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      val document: Document = Jsoup.parseBodyFragment(contentAsString(result))
-
-      val pageTitle = Messages("title.cya") + " - " +
-        Messages("summary.tcsp") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      document.title mustBe pageTitle
-
-      val content = contentAsString(result)
-
-      content must include(Messages("tcsp.kind.of.service.provider.title"))
-      content must include(Messages("tcsp.service.provider.lbl.03"))
-      content must include(Messages("tcsp.service.provider.lbl.05"))
-
-      content must include(Messages("tcsp.provided_services.title"))
-      content must include(Messages("tcsp.provided_services.service.lbl.01"))
-      content must include(Messages("tcsp.provided_services.service.lbl.08"))
-
-      content must include(Messages("tcsp.servicesOfAnotherTcsp.title"))
-      content must include(Messages("lbl.yes"))
-      content must include("12345678")
 
     }
 

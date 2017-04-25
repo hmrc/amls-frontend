@@ -28,88 +28,95 @@ class TaxMattersControllerSpec extends GenericTestHelper with MockitoSugar with 
     }
   }
 
-  "TaxMattersController" must {
+  "TaxMattersController" when {
 
+    "get is called" must {
+      "display the 'Manage Your Tax Affairs?' page with an empty form" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val page = Jsoup.parse(contentAsString(result))
+
+        page.getElementById("manageYourTaxAffairs-true").hasAttr("checked") must be(false)
+        page.getElementById("manageYourTaxAffairs-false").hasAttr("checked") must be(false)
+      }
+
+      "display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true))))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val page = Jsoup.parse(contentAsString(result))
+
+        page.getElementById("manageYourTaxAffairs-true").hasAttr("checked") must be(true)
+        page.getElementById("manageYourTaxAffairs-false").hasAttr("checked") must be(false)
+      }
+    }
+
+    "post is called" must {
+      "redirect to Check Your Answers on post with valid data" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "manageYourTaxAffairs" -> "true"
+        )
+
+        when(
+          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
+        ).thenReturn(Future.successful(None))
+        when(
+          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
+        ).thenReturn(
+          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
+        )
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+
+      "respond with Bad Request on post with invalid data" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "manageYourTaxAffairs" -> "grrrrr"
+        )
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.select("span").html() must include(Messages("error.required.ba.tax.matters"))
+      }
+
+      "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "manageYourTaxAffairs" -> "true"
+        )
+
+        when(
+          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
+        ).thenReturn(Future.successful(None))
+
+        when(
+          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
+        ).thenReturn(
+          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
+        )
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+    }
+  }
+
+  it must {
     "use correct services" in new Fixture {
       TaxMattersController.dataCacheConnector must be(DataCacheConnector)
-    }
-
-    "on get, display the 'Manage Your Tax Affairs?' page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.tax.matters.title"))
-    }
-
-    "on get, display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
-
-      when(
-        controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-      ).thenReturn(
-        Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true)))))
-      )
-      val result = controller.get()(request)
-
-      status(result) must be(OK)
-
-      val page = Jsoup.parse(contentAsString(result))
-
-      page.select("input[type=radio][name=manageYourTaxAffairs][value=true][checked]").size must be (1)
-      page.select("input[type=radio][name=manageYourTaxAffairs][value=false]").size must be (1)
-      page.select("input[type=radio][name=manageYourTaxAffairs][value=false][checked]").size must be (0)
-
-    }
-
-    "redirect to Check Your Answers on post with valid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "manageYourTaxAffairs" -> "true"
-      )
-
-      when(
-        controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-      ).thenReturn(Future.successful(None))
-      when(
-        controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-      ).thenReturn(
-        Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-    "respond with Bad Request on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "manageYourTaxAffairs" -> "grrrrr"
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.ba.tax.matters"))
-    }
-
-    "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "manageYourTaxAffairs" -> "true"
-      )
-
-      when(
-        controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-      ).thenReturn(Future.successful(None))
-
-      when(
-        controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-      ).thenReturn(
-        Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-      )
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
   }
 }

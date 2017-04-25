@@ -257,7 +257,6 @@ error.required.msb.throughput = Select one option to show how much throughput yo
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
-error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
@@ -478,9 +477,17 @@ status.submissiondecisionsupervised.success.description = Your business is regis
 status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
-status.submissiondecisionrejected.heading = Not supervised
+status.submissiondecision.not.supervised.heading = Not supervised
+status.submissiondecisionrejected.title = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionrevoked.title = Application revoked
+status.submissiondecisionrevoked.description = Your application has been revoked.
+status.submissiondecisionrevoked.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionexpired.title = Application expired
+status.submissiondecisionexpired.description = Your supervision has expired.
+status.submissiondecisionexpired.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
@@ -1519,7 +1526,7 @@ renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
-
+renewal.msb.which_currencies.foreign_currencies_question =  Did you deal in physical foreign currencies in the last 12 months?
 renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?

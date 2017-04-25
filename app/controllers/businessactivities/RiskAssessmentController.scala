@@ -43,17 +43,19 @@ trait RiskAssessmentController extends BaseController {
               } yield {
                 dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
                   businessActivity.riskAssessmentPolicy(data))
-                edit match {
-                  case true => Redirect(routes.SummaryController.get())
-                  case false => bmBusinessActivity.businessActivities.contains(AccountancyServices) match {
-                    case true => Redirect(routes.SummaryController.get())
-                    case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
-                  }
-                }
+                redirectDependingOnEdit(edit, bmBusinessActivity)
               }).getOrElse(Redirect(routes.SummaryController.get()))
           }
         }
       }
+  }
+
+  private def redirectDependingOnEdit(edit: Boolean, bmBusinessActivity: models.businessmatching.BusinessActivities) = edit match {
+    case true => Redirect(routes.SummaryController.get())
+    case false => bmBusinessActivity.businessActivities.contains(AccountancyServices) match {
+      case true => Redirect(routes.SummaryController.get())
+      case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
+    }
   }
 }
 

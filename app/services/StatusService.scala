@@ -21,20 +21,38 @@ trait StatusService {
 
   private val renewalPeriod = 30
 
+  val Pending = "Pending"
+  val Approved = "Approved"
+  val Rejected = "Rejected"
+  val Revoked = "Revoked"
+  val Expired = "Expired"
 
-  def etmpStatusInformation(mlrRegNumber: String) (implicit hc: HeaderCarrier,
-                                                   auth: AuthContext, ec: ExecutionContext) : Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+  private def getApprovedStatus(response: ReadStatusResponse) = {
+    (response.currentRegYearEndDate, response.renewalConFlag) match {
+      case (Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)) =>
+        ReadyForRenewal(response.currentRegYearEndDate)
+      case (_, true) => RenewalSubmitted(response.currentRegYearEndDate)
+      case _ => SubmissionDecisionApproved
+    }
+  }
+
+  private def getETMPStatus(response: ReadStatusResponse) = {
+    response.formBundleStatus match {
+      case `Pending` => SubmissionReadyForReview
+      case `Approved` => getApprovedStatus(response)
+      case `Rejected` => SubmissionDecisionRejected
+      case `Revoked` => SubmissionDecisionRevoked
+      case `Expired` => SubmissionDecisionExpired
+      case _ => throw new RuntimeException("ETMP returned status is inconsistent")
+    }
+  }
+
+  private def etmpStatusInformation(mlrRegNumber: String)(implicit hc: HeaderCarrier,
+                                                          auth: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsConnector.status(mlrRegNumber) map {
       response =>
-        (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
-          case ("Pending", None, false) => (SubmissionReadyForReview, Some(response))
-          case ("Rejected", None, false) => (SubmissionDecisionRejected, Some(response))
-          case ("Approved", Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod))
-          => (ReadyForRenewal(response.currentRegYearEndDate), Some(response))
-          case ("Approved", _, true) => (RenewalSubmitted(response.currentRegYearEndDate), Some(response))
-          case ("Approved", _, false) => (SubmissionDecisionApproved, Some(response))
-          case _ => throw new RuntimeException("ETMP returned status is inconsistent")
-        }
+        val status = getETMPStatus(response)
+        (status, Some(response))
     }
   }
 
@@ -43,7 +61,7 @@ trait StatusService {
       case Some(mlrRegNumber) =>
         etmpStatusInformation(mlrRegNumber)(hc, authContext, ec)
       case None =>
-        notYetSubmitted(hc, authContext, ec) map {status =>
+        notYetSubmitted(hc, authContext, ec) map { status =>
           (status, None)
         }
     }
@@ -79,15 +97,7 @@ trait StatusService {
     {
       amlsConnector.status(amlsRefNumber) map {
         response =>
-          (response.formBundleStatus, response.currentRegYearEndDate, response.renewalConFlag) match {
-            case ("Pending", None, false) => SubmissionReadyForReview
-            case ("Rejected", None, false) => SubmissionDecisionRejected
-            case ("Approved", Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod))
-            => ReadyForRenewal(response.currentRegYearEndDate)
-            case ("Approved", _, true) => RenewalSubmitted(response.currentRegYearEndDate)
-            case ("Approved", _, false) => SubmissionDecisionApproved
-            case _ => throw new RuntimeException("ETMP returned status is inconsistent")
-          }
+          getETMPStatus(response)
       }
     }
   }

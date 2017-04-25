@@ -6,12 +6,12 @@
 
 @(regNo: String, businessName: Option[String])(implicit request: Request[_],m:Messages)
 
-@main2(title = Messages("status.submissiondecisionrejected.heading") + " - Your registration") {
+@main2(title = Messages("status.submissiondecisionrejected.title") + " - Your registration") {
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <header class="page-header">
-                <h1 class="heading-xlarge">@Messages("status.submissiondecisionrejected.heading")</h1>
+                <h1 class="heading-xlarge">@Messages("status.submissiondecision.not.supervised.heading")</h1>
                 <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
             </header>
         </div>

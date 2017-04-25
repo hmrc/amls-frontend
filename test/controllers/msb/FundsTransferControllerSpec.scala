@@ -62,7 +62,7 @@ class FundsTransferControllerSpec extends GenericTestHelper with MockitoSugar wi
       document.select("span").html() must include(Messages("error.required.msb.fundsTransfer"))
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data when user selects Yes" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
@@ -73,6 +73,23 @@ class FundsTransferControllerSpec extends GenericTestHelper with MockitoSugar wi
 
       when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get().url))
+    }
+
+    "on post with valid data whe user selects No" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "transferWithoutFormalSystems" -> "false"
+      )
+
+      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

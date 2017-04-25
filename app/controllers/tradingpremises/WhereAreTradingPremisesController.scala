@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.status.{SubmissionDecisionApproved, SubmissionStatus}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
@@ -64,7 +64,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus) = {
     status match {
-      case SubmissionDecisionApproved if redirectToDateOfChange(tp, ytp) && edit =>
+      case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange(tp, ytp) && edit =>
         Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
       case _ => edit match {
         case true => Redirect(routes.SummaryController.getIndividual(index))

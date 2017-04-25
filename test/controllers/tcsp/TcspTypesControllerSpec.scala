@@ -30,16 +30,15 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   "TcspTypesController" must {
 
-    "Get:" must {
+    "Get is called" must {
 
-      "load the Kind of Tcsp are you page" in new Fixture {
+      "load the what kind of Tcsp are you page" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Tcsp](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("tcsp.kind.of.service.provider.title"))
       }
 
       "load the Kind of Tcsp are you page with pre-populated data" in new Fixture {
@@ -52,7 +51,6 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("tcsp.kind.of.service.provider.title"))
         document.select("input[value=01]").hasAttr("checked") must be(true)
         document.select("input[value=02]").hasAttr("checked") must be(true)
         document.select("input[value=04]").hasAttr("checked") must be(true)
@@ -61,7 +59,7 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "Post" must {
 
-      "successfully navigate to next page when option selected is Registered office/business address/virtual office services" in  new Fixture {
+      "successfully navigate to Which services does your business provide? page when the option Registered office is selected" in  new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "serviceProviders[0]" -> "01",
@@ -80,7 +78,7 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
 
       }
 
-      "successfully navigate to next page when other then Registered office/business address/virtual office services option is selected " in  new Fixture {
+      "successfully navigate to services of another tcsp page when other than Registered office option is selected " in  new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "serviceProviders[]" -> "01"
@@ -113,6 +111,9 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
         redirectLocation(result) must be (Some(controllers.tcsp.routes.SummaryController.get().url))
       }
 
+    }
+
+    "respond with BAD_REQUEST" when {
 
       "throw error an invalid data entry" in  new Fixture {
         val newrequest = request.withFormUrlEncodedBody(
@@ -123,9 +124,6 @@ class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result =  controller.post() (newrequest)
         status(result) must be(BAD_REQUEST)
-        val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#onlyOffTheShelfCompsSold]").text must include(Messages("error.required.tcsp.off.the.shelf.companies"))
-        document.select("a[href=#complexCorpStructureCreation]").text must include(Messages("error.required.tcsp.complex.corporate.structures"))
       }
     }
   }

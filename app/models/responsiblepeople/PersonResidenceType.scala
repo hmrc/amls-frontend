@@ -21,7 +21,7 @@ object PersonResidenceType {
       __.read[ResidenceType] ~
       (__ \ "countryOfBirth").read[Country].withMessage("error.required.rp.birth.country") ~
       (__ \ "nationality").read[Option[Country]].withMessage("error.required.nationality")
-      )(PersonResidenceType.apply _)
+      )(PersonResidenceType.apply)
   }
 
   implicit val formWrites: Write[PersonResidenceType, UrlFormEncoded] = To[UrlFormEncoded] { __ =>

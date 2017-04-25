@@ -4,11 +4,12 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -54,8 +55,12 @@ class IdentifyLinkedTransactionsControllerSpec extends GenericTestHelper with Mo
         identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true))))))
 
       val result = controller.get()(request)
+      val document = Jsoup.parse(contentAsString(result))
+
       status(result) must be(OK)
       contentAsString(result) must include(Messages("msb.linked.txn.title"))
+
+      document.select("input[name=linkedTxn][checked]").`val` mustEqual "true"
 
     }
 
@@ -116,7 +121,7 @@ class IdentifyLinkedTransactionsControllerSpec extends GenericTestHelper with Mo
       redirectLocation(result) must be(Some(controllers.msb.routes.BusinessUseAnIPSPController.get().url))
     }
 
-    "Navigate to next page if they have selected CE as a service" in new Fixture {
+    "user selects Yes and nvigate to next page if they have selected CE as a service" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
@@ -136,6 +141,46 @@ class IdentifyLinkedTransactionsControllerSpec extends GenericTestHelper with Mo
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
+        ), hasChanged = true
+      )
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+    }
+
+    "user selects No and navigates to next page if they have selected CE as a service" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody (
+        "linkedTxn" -> "false"
+      )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        identifyLinkedTransactions = Some(
+          IdentifyLinkedTransactions(false)
         ), hasChanged = true
       )
 

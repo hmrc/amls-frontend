@@ -25,26 +25,23 @@
     @if(msbExists) {
         <h3 class="heading-medium">@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
         <p>@Messages("tradingpremises.whatyouneed.agents.desc")</p>
-
-
     }
 
-
-        @if(msbExists) {
-            @anchor(
-                attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
-                attrRole = true,
-                linkText = Messages("button.continue"),
-                visuallyhidden = Messages("summary.tradingpremises")
-            )
-        } else {
-            @anchor(
-                attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
-                attrRole = true,
-                linkText = Messages("button.continue"),
-                visuallyhidden = Messages("summary.tradingpremises")
-            )
-        }
+    @if(msbExists) {
+        @anchor(
+            attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
+            attrRole = true,
+            linkText = Messages("button.continue"),
+            visuallyhidden = Messages("summary.tradingpremises")
+        )
+    } else {
+        @anchor(
+            attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
+            attrRole = true,
+            linkText = Messages("button.continue"),
+            visuallyhidden = Messages("summary.tradingpremises")
+        )
+    }
 
 
 }

@@ -56,13 +56,7 @@ trait InvolvedInOtherController extends BaseController {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, getUpdatedBA(businessActivities, data))
 
-          } yield data match {
-            case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
-            case InvolvedInOtherNo => edit match {
-              case false => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
-              case true => Redirect(routes.SummaryController.get())
-            }
-          }
+          } yield redirectDependingOnResponse(data, edit)
       }
     }
   }
@@ -72,6 +66,14 @@ trait InvolvedInOtherController extends BaseController {
       case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data))
       case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
       case (_, _) => BusinessActivities(involvedInOther = Some(data))
+    }
+  }
+
+  private def redirectDependingOnResponse(data: InvolvedInOther, edit: Boolean) = data match {
+    case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
+    case InvolvedInOtherNo => edit match {
+      case false => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
+      case true => Redirect(routes.SummaryController.get())
     }
   }
 
