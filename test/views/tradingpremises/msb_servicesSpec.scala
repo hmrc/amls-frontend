@@ -36,7 +36,7 @@ class msb_servicesSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "some path") -> Seq(ValidationError("not a message Key"))
+          (Path \ "msbServices[0]") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.tradingpremises.msb_services(form2, 1, true, false)

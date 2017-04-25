@@ -40,7 +40,7 @@ class confirm_addressSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "some path") -> Seq(ValidationError("not a message Key"))
+          (Path \ "confirmAddress") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.tradingpremises.confirm_address(form2, address, 1)
