@@ -21,10 +21,11 @@ class agent_partnershipSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.tradingpremises.agent_partnership(form2, 1, false)
 
-      doc.title() must startWith(Messages("summary.detailedanswers.title") + " - " + Messages("summary.tradingpremises"))
-      heading.html() must be(Messages("summary.detailedanswers.title"))
+      doc.title() must startWith(Messages("tradingpremises.agentpartnership.title") + " - " + Messages("summary.tradingpremises"))
+      heading.html() must be(Messages("tradingpremises.agentpartnership.title"))
       subHeading.html() must include(Messages("summary.tradingpremises"))
 
+      doc.getElementById(Messages("agentPartnership")).tagName() must be("input")
     }
 
     "show errors in the correct locations" in new ViewFixture {

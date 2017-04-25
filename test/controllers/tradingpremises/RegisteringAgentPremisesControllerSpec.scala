@@ -98,6 +98,25 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
 
       }
 
+      "respond with NOT_FOUND when there is no data" in new Fixture {
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(None))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(None)
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(NOT_FOUND)
+      }
+
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
         val model = TradingPremises(
           registeringAgentPremises = Some(

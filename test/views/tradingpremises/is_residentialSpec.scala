@@ -14,20 +14,20 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
     implicit val requestWithToken = addToken(request)
   }
 
-  "registering_agent_premises view" must {
+  "is_residentialSpec view" must {
 
       "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
-      val pageTitle = Messages("tradingpremises.agent.premises.title") + " - " +
+      val pageTitle = Messages("tradingpremises.isResidential.title") + " - " +
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.registering_agent_premises(form2, 1, false)
+      def view = views.html.tradingpremises.is_residential(form2, 1, false)
 
       doc.title must be(pageTitle)
-      heading.html must be(Messages("tradingpremises.agent.premises.title"))
+      heading.html must be(Messages("tradingpremises.isResidential.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
         doc.select("input[type=radio]").size() must be(2)
@@ -41,7 +41,7 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.registering_agent_premises(form2, 1, true)
+      def view = views.html.tradingpremises.is_residential(form2, 1, true)
 
       errorSummary.html() must include("not a message Key")
     }
