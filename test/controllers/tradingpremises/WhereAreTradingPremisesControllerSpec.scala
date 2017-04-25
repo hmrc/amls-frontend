@@ -79,7 +79,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
         val document = Jsoup.parse(contentAsString(result))
 
         hstatus(result) must be(OK)
-        
+
       }
 
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {

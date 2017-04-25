@@ -49,11 +49,6 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val htmlValue = Jsoup.parse(contentAsString(result))
-
-        val title = s"${Messages("tradingpremises.agent.premises.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        htmlValue.title mustBe title
       }
 
       "load Yes when save4later returns true" in new Fixture {
@@ -130,8 +125,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
         val newRequest = request.withFormUrlEncodedBody()
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("tradingpremises.agent.premises.title"))
-        contentAsString(result) must include(Messages("err.summary"))
+
       }
 
       "redirect to the Trading Premises details page on submitting false and edit true" in new Fixture {
