@@ -16,12 +16,14 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
     implicit val requestWithToken = addToken(request)
   }
 
+  val name = "Person Name"
+
   "registered_for_self_assessment view" must {
     "have correct title" in new ViewFixture {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, "personName")
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
       doc.title must be(Messages("responsiblepeople.registeredforselfassessment.title") + " - " +
         Messages("summary.responsiblepeople") +
@@ -33,9 +35,9 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, "personName")
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
-      heading.html must be(Messages("responsiblepeople.registeredforselfassessment.heading", "personName"))
+      heading.html must be(Messages("responsiblepeople.registeredforselfassessment.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }
@@ -44,13 +46,10 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, false, 0, false, name)
 
-      println(doc)
-      doc.getElementById("id1lihsgfiawuef") //??? how is this not throwing an exception?
-      noException must be thrownBy(doc.getElementById("id1lihsgfiawuef"))
-      noException must be thrownBy doc.getElementById("id2")
-      noException must be thrownBy doc.getElementById("id3")
+      doc.getElementsByAttributeValue("name", "saRegistered") must not be empty
+      doc.getElementsByAttributeValue("name", "utrNumber") must not be empty
 
     }
 
@@ -58,16 +57,14 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "saRegistered") -> Seq(ValidationError("not a message Key")),
+          (Path \ "utrNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, "personName")
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
 
     }
   }
