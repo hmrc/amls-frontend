@@ -30,94 +30,128 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val pageTitle = Messages("responsiblepeople.registeredforvat.title", "firstname lastname") + " - " +
-    Messages("summary.responsiblepeople") + " - " +
-    Messages("title.amls") + " - " + Messages("title.gov")
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-  "BusinessRegisteredForVATController" when {
+  "RegisteredForVATController" when {
 
     "get is called" must {
-      "on get display the registered for VAT page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
+      "display the Registered for VAT page" when {
+        "with pre populated data" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[value=false]").hasAttr("checked") must be(true)
+          document.select("input[value=true]").hasAttr("checked") must be(false)
+        }
+
+        "without data" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("input[value=true]").hasAttr("checked") must be(false)
+          document.select("input[value=false]").hasAttr("checked") must be(false)
+        }
       }
 
+      "display Not Found" when {
+        "a populated ResponsiblePeople model cannot be found" in new Fixture {
 
-      "on get display the registered for VAT page with pre populated data" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[value=false]").hasAttr("checked") must be(true)
+          val result = controller.get(1)(request)
+          status(result) must be(NOT_FOUND)
+        }
       }
     }
 
-    "when post is called" must {
-      "respond with BAD_REQUEST when given invalid data" in new Fixture {
+    "post is called" when {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVATYes" -> "1234567890",
-          "personName" -> "Person Name"
-        )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+      "given valid data" must {
+        "go to RegisteredForSelfAssessmentController" when {
+          "edit = false" in new Fixture {
 
-        val result = controller.post(1)(newRequest)
-        status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVAT" -> "true",
+              "vrnNumber" -> "123456789",
+              "personName" -> "Person Name"
+            )
 
-        contentAsString(result) must include(Messages("error.required.rp.registered.for.vat", "firstname lastname"))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit = true" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVAT" -> "true",
+              "vrnNumber" -> "123456789",
+              "personName" -> "Person Name"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          }
+        }
       }
 
-      "when given valid data and edit = false redirect to the RegisteredForSelfAssessmentController" in new Fixture {
+      "given invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789",
-          "personName" -> "Person Name"
-        )
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVATYes" -> "1234567890",
+              "personName" -> "Person Name"
+            )
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+            val result = controller.post(1)(newRequest)
+            status(result) must be(BAD_REQUEST)
+         }
       }
 
+      "Responsible Person cannot be found with given index" must {
+        "respond with NOT_FOUND" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "registeredForVAT" -> "true",
+            "vrnNumber" -> "123456789",
+            "personName" -> "Person Name"
+          )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
 
-      "when given valid data and edit = true redirect to the RegisteredForSelfAssessmentController" in new Fixture {
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789",
-          "personName" -> "Person Name"
-        )
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1, true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          val result = controller.post(3)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
       }
+
     }
   }
 }
