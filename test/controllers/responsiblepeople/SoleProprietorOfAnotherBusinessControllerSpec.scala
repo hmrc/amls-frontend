@@ -29,9 +29,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val pageTitle = Messages("responsiblepeople.sole.proprietor.another.business.title", "firstname lastname") + " - " +
-    Messages("summary.responsiblepeople") + " - " +
-    Messages("title.amls") + " - " + Messages("title.gov")
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
   val soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
 
@@ -47,9 +44,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
         status(result) must be(OK)
       }
-    }
 
-    "get" must {
       "display page and prepopulate data from save4later" in new Fixture {
 
         when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -57,35 +52,30 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[name=soleProprietorOfAnotherBusiness]").`val` must be("true")
 
       }
-    }
 
-    "post is called" must {
-      "when edit is true" must {
-        "redirect to the detailed answers controller" in new Fixture {
-
-          val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody(
-            "soleProprietorOfAnotherBusiness" -> "false",
-            "personName" -> "Person Name")
+      "display page Not Found" when {
+        "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          val result = controller.get(1)(request)
+          status(result) must be(NOT_FOUND)
 
-
-          val result = controller.post(1,true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
         }
       }
-      "when edit is false" must {
-        "redirect to the vat registered controller when yes is selected" in new Fixture {
+
+    }
+
+    "post is called" when {
+
+      "soleProprietorOfAnotherBusiness is set to true" must {
+        "go to VATRegisteredController" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody(
@@ -102,55 +92,66 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1).url))
 
-          verify(controller.dataCacheConnector).save(any(),
-            meq(Seq(ResponsiblePeople(hasChanged = false,
-              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = Some(VATRegisteredNo)))))(any(), any(), any())
+          verify(controller.dataCacheConnector).save(
+            any(),
+            meq(Seq(ResponsiblePeople(
+              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = Some(VATRegisteredNo)
+            )))
+          )(any(), any(), any())
 
         }
+      }
 
-        "redirect to the vat registered controller when yes is selected and edit is true" in new Fixture {
+      "soleProprietorOfAnotherBusiness is set to false" when {
 
-          val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody(
-            "soleProprietorOfAnotherBusiness" -> "true",
-            "personName" -> "Person Name")
+        "edit is true" must {
+          "go to DetailedAnswersController" in new Fixture {
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            val mockCacheMap = mock[CacheMap]
+            val newRequest = request.withFormUrlEncodedBody(
+              "soleProprietorOfAnotherBusiness" -> "false",
+              "personName" -> "Person Name")
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-          val result = controller.post(1, true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1, true).url))
+            when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post(1,true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          }
         }
 
-        "redirect to the sole proprietor another business controller when another type is selected" in new Fixture {
+        "edit is false" must {
+          "go to RegisteredForSelfAssessmentController" in new Fixture {
 
-          val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody(
-            "soleProprietorOfAnotherBusiness" -> "false",
-            "personName" -> "Person Name")
+            val mockCacheMap = mock[CacheMap]
+            val newRequest = request.withFormUrlEncodedBody(
+              "soleProprietorOfAnotherBusiness" -> "false",
+              "personName" -> "Person Name")
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+            when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
-          val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
 
-          verify(controller.dataCacheConnector).save(any(),
-            meq(Seq(ResponsiblePeople(hasChanged = false,
-              soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))))))(any(), any(), any())
+            verify(controller.dataCacheConnector).save(
+              any(),
+              meq(Seq(ResponsiblePeople(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)))))
+            )(any(), any(), any())
+          }
         }
       }
 
       "respond with BAD_REQUEST" when {
-        "fail submission on empty string" in new Fixture {
+        "given an invalid form" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "",
@@ -162,16 +163,11 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
 
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.title mustBe(pageTitle)
-          document.select("a[href=#soleProprietorOfAnotherBusiness]").html() must
-            include(Messages("error.required.rp.sole_proprietor", personName.get.fullName))
-
         }
       }
 
       "respond with NOT_FOUND" when {
-        "return not found when no rps" in new Fixture {
+        "ResponsiblePeople model cannot be found with given index" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
