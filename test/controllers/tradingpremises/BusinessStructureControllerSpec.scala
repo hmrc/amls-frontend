@@ -44,9 +44,6 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
 
       status(result) mustBe OK
 
-      document.select("input[type=radio]").size mustBe 5
-      document.select("input[type=radio][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
     }
 
     "Load Business Structure page with pre-populatd data" in new Fixture {
@@ -75,10 +72,6 @@ class BusinessStructureControllerSpec extends GenericTestHelper with ScalaFuture
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe BAD_REQUEST
-
-      document.select("input[type=radio]").size mustBe 5
-      document.select("input[type=radio][selected]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 1
     }
 
     "successfully submit and navigate to next page when user selects the option SoleProprietor" in new Fixture {
