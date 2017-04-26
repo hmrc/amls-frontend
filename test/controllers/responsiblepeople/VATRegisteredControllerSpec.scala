@@ -1,7 +1,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo, VATRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -14,7 +14,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
-
 
 class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
@@ -39,14 +38,15 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         "with pre populated data" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredYes("123456789")))))))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[value=false]").hasAttr("checked") must be(true)
-          document.select("input[value=true]").hasAttr("checked") must be(false)
+          document.select("input[value=false]").hasAttr("checked") must be(false)
+          document.select("input[value=true]").hasAttr("checked") must be(true)
+          document.getElementById("vrnNumber").`val`() must be("123456789")
         }
 
         "without data" in new Fixture {
