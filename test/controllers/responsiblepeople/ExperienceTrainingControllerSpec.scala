@@ -159,6 +159,35 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
       redirectLocation(result) must be(Some(routes.TrainingController.get(RecordId).url))
     }
 
+    "on post with valid data and training selected no" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "experienceTraining" -> "false"
+      )
+
+
+      val mockCacheMap = mock[CacheMap]
+
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
+      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+        .thenReturn(Some(businessActivities))
+
+      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+
+      when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(RecordId)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.TrainingController.get(RecordId).url))
+    }
+
     "on post with invalid data" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "experienceTraining" -> "not a boolean value"

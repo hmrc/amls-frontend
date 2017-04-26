@@ -26,8 +26,10 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
-      doc.title() must startWith(Messages("responsiblepeople.experiencetraining.title", "FirstName LastName") + " - " + Messages("summary.responsiblepeople"))
-
+      doc.title must be(Messages("responsiblepeople.experiencetraining.title") +
+        " - " + Messages("summary.responsiblepeople") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
     }
 
     "have correct heading" in new ViewFixture {
@@ -45,20 +47,16 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val messageKey1 = "definitely not a message key"
       val messageKey2 = "also not a message key"
-      val experienceTrainingField = "experienceTraining"
-      val experienceInformationField = "experienceInformation"
+
       val form2: InvalidForm = InvalidForm(Map("thing" -> Seq("thing")),
-        Seq((Path \ experienceTrainingField, Seq(ValidationError(messageKey1))),
-          (Path \ experienceInformationField, Seq(ValidationError(messageKey2)))))
+        Seq((Path \ "experienceTraining", Seq(ValidationError(messageKey1))),
+          (Path \ "experienceInformation", Seq(ValidationError(messageKey2)))))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
       errorSummary.html() must include(messageKey2)
-
-      doc.getElementById(experienceTrainingField).html() must include(messageKey1)
-      doc.getElementById(experienceInformationField + "-fieldset").html() must include(messageKey2)
     }
   }
 }
