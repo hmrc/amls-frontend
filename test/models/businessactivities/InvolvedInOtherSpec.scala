@@ -24,6 +24,20 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
         be(Valid(InvolvedInOtherYes("test")))
     }
 
+    "successfully validate given an `Yes` value with carriage return" in {
+
+      val value = "test \n" +
+        "test \n" +
+        "test"
+      val data = Map(
+        "involvedInOther" -> Seq("true"),
+        "details" -> Seq(value)
+      )
+
+      InvolvedInOther.formRule.validate(data) must
+        be(Valid(InvolvedInOtherYes(value)))
+    }
+
     "fail to validate given an `Yes` with no value" in {
 
       val data = Map(
