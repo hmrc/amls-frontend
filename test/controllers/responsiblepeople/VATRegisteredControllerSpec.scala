@@ -32,7 +32,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-  "BusinessRegisteredForVATController" when {
+  "RegisteredForVATController" when {
 
     "get is called" must {
       "display the Registered for VAT page" when {
@@ -73,60 +73,85 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
       }
     }
 
-    "when post is called" must {
-      "respond with BAD_REQUEST when given invalid data" in new Fixture {
+    "post is called" when {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVATYes" -> "1234567890",
-          "personName" -> "Person Name"
-        )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+      "given valid data" must {
+        "go to RegisteredForSelfAssessmentController" when {
+          "edit = false" in new Fixture {
 
-        val result = controller.post(1)(newRequest)
-        status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVAT" -> "true",
+              "vrnNumber" -> "123456789",
+              "personName" -> "Person Name"
+            )
 
-        contentAsString(result) must include(Messages("error.required.rp.registered.for.vat", "firstname lastname"))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit = true" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVAT" -> "true",
+              "vrnNumber" -> "123456789",
+              "personName" -> "Person Name"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          }
+        }
       }
 
-      "when given valid data and edit = false redirect to the RegisteredForSelfAssessmentController" in new Fixture {
+      "given invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789",
-          "personName" -> "Person Name"
-        )
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForVATYes" -> "1234567890",
+              "personName" -> "Person Name"
+            )
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+            val result = controller.post(1)(newRequest)
+            status(result) must be(BAD_REQUEST)
+         }
       }
 
-      "when given valid data and edit = true redirect to the RegisteredForSelfAssessmentController" in new Fixture {
+      "Responsible Person cannot be found with given index" must {
+        "respond with NOT_FOUND" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "registeredForVAT" -> "true",
+            "vrnNumber" -> "123456789",
+            "personName" -> "Person Name"
+          )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "registeredForVAT" -> "true",
-          "vrnNumber" -> "123456789",
-          "personName" -> "Person Name"
-        )
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1, true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          val result = controller.post(3)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
       }
+
     }
   }
 }
