@@ -469,6 +469,10 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
       basicPunctuationPattern().validate("FirstName LastName^") mustBe Valid("FirstName LastName^")
     }
 
+    "successfully validate a valid name with carriage return" in {
+      basicPunctuationPattern().validate("FirstName LastName \n  sdsfsdfsdf \n  gdafsdga") mustBe Valid("FirstName LastName \n  sdsfsdfsdf \n  gdafsdga")
+    }
+
     "successfully validate a valid name with special chars" in {
       basicPunctuationPattern().validate("& - +=1234567890ABCDEZMN.,_*%£:;~@") mustBe Valid("& - +=1234567890ABCDEZMN.,_*%£:;~@")
     }
