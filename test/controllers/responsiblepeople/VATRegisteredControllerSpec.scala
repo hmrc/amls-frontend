@@ -30,35 +30,46 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val pageTitle = Messages("responsiblepeople.registeredforvat.title", "firstname lastname") + " - " +
-    Messages("summary.responsiblepeople") + " - " +
-    Messages("title.amls") + " - " + Messages("title.gov")
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
   "BusinessRegisteredForVATController" when {
 
     "get is called" must {
-      "on get display the registered for VAT page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
+      "display the Registered for VAT page" when {
+        "with pre populated data" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[value=false]").hasAttr("checked") must be(true)
+          document.select("input[value=true]").hasAttr("checked") must be(false)
+        }
+
+        "without data" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("input[value=true]").hasAttr("checked") must be(false)
+          document.select("input[value=false]").hasAttr("checked") must be(false)
+        }
       }
 
+      "display Not Found" when {
+        "a populated ResponsiblePeople model cannot be found" in new Fixture {
 
-      "on get display the registered for VAT page with pre populated data" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredNo))))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[value=false]").hasAttr("checked") must be(true)
+          val result = controller.get(1)(request)
+          status(result) must be(NOT_FOUND)
+        }
       }
     }
 
@@ -75,7 +86,6 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
 
         contentAsString(result) must include(Messages("error.required.rp.registered.for.vat", "firstname lastname"))
       }
@@ -98,7 +108,6 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
       }
-
 
       "when given valid data and edit = true redirect to the RegisteredForSelfAssessmentController" in new Fixture {
 
