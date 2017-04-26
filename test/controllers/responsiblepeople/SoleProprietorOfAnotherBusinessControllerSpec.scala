@@ -43,6 +43,10 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         val result = controller.get(1)(request)
 
         status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
+        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
       }
 
       "display page and prepopulate data from save4later" in new Fixture {
@@ -54,7 +58,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=soleProprietorOfAnotherBusiness]").`val` must be("true")
+        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
+        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
 
       }
 
