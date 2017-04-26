@@ -10,43 +10,68 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
+    "successfully validate" when {
+      "given an enum value" in {
 
-    "successfully validate given an enum value" in {
+        VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
+          be(Valid(VATRegisteredNo))
+      }
 
-      VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
-        be(Valid(VATRegisteredNo))
+      "given a `Yes` value" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("123456789")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Valid(VATRegisteredYes("123456789")))
+      }
     }
 
-    "successfully validate given an `Yes` value" in {
+    "fail to validate" when {
 
-      val data = Map(
-        "registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq("123456789")
-      )
+      "registeredForVAT has no value" in {
 
-      VATRegistered.formRule.validate(data) must
-        be(Valid(VATRegisteredYes("123456789")))
-    }
+        VATRegistered.formRule.validate(Map.empty) must
+          be(Invalid(Seq(
+            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
+          )))
+      }
 
-    "fail to validate given invalid field" in {
+      "given an invalid field" in {
 
-      VATRegistered.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
-        )))
-    }
+        VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("123456789"))) must
+          be(Invalid(Seq(
+            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
+          )))
+      }
 
-    "fail to validate given an `Yes` with no value" in {
+      "registeredForVAT is true and vrnNumber has no value" in {
 
-      val data = Map(
-        "registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq("")
-      )
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("")
+        )
 
-      VATRegistered.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
-        )))
+        VATRegistered.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
+          )))
+      }
+
+      "registeredForVAT is true and vrnNumber has invalid data" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("%^&*(")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
+          )))
+      }
     }
 
     "write correct data from enum value" in {
@@ -99,6 +124,5 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
         ))
     }
   }
-
 
 }
