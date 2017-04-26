@@ -35,52 +35,62 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "AddPersonController" must {
+  "PersonNameController" when {
 
-    "use the correct services" in new Fixture {
-      PersonNameController.dataCacheConnector must be(DataCacheConnector)
-      PersonNameController.authConnector must be(AMLSAuthConnector)
-    }
+    "get is called" must {
 
-    "on get display the persons page" in new Fixture {
+      "display the persons page with blank fields" in new Fixture {
 
-      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      val result = personNameController.get(RecordId)(request)
-      status(result) must be(OK)
-    }
+        val result = personNameController.get(RecordId)(request)
+        status(result) must be(OK)
 
-    "on get display the persons page with blank fields" in new Fixture {
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstName]").`val` must be("")
+        document.select("input[name=middleName]").`val` must be("")
+        document.select("input[name=lastName]").`val` must be("")
+        document.getElementById("hasPreviousName-true").hasAttr("checked") must be(false)
+        document.getElementById("hasPreviousName-false").hasAttr("checked") must be(false)
+        document.select("input[name=previous.firstName]").`val` must be("")
+        document.select("input[name=previous.middleName]").`val` must be("")
+        document.select("input[name=previous.lastName]").`val` must be("")
+        document.select("input[name=previous.date.day]").`val` must be("")
+        document.select("input[name=previous.date.month]").`val` must be("")
+        document.select("input[name=previous.date.year]").`val` must be("")
+        document.getElementById("hasOtherNames-true").hasAttr("checked") must be(false)
+        document.getElementById("hasOtherNames-false").hasAttr("checked") must be(false)
+        document.select("input[name=otherNames]").`val` must be("")
+      }
 
-      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+      "display the persons page with fields populated" in new Fixture {
 
-      val result = personNameController.get(RecordId)(request)
-      status(result) must be(OK)
+        val addPerson = PersonName("John", Some("Envy"), "Doe", None, None)
+        val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=firstName]").`val` must be("")
-      document.select("input[name=middleName]").`val` must be("")
-      document.select("input[name=lastName]").`val` must be("")
-    }
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-    "on get display the persons page with fields populated" in new Fixture {
+        val result = personNameController.get(RecordId)(request)
+        status(result) must be(OK)
 
-      val addPerson = PersonName("John", Some("Envy"), "Doe", None, None)
-      val responsiblePeople = ResponsiblePeople(Some(addPerson))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstName]").`val` must be("John")
+        document.select("input[name=middleName]").`val` must be("Envy")
+        document.select("input[name=lastName]").`val` must be("Doe")
+        document.select("input[isKnownByOtherNames=false]").hasAttr("checked") must be(false)
+      }
 
-      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      "display Not Found" when {
+        "ResponsiblePeople model cannot be found" in new Fixture {
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-      val result = personNameController.get(RecordId)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=firstName]").`val` must be("John")
-      document.select("input[name=middleName]").`val` must be("Envy")
-      document.select("input[name=lastName]").`val` must be("Doe")
-      document.select("input[isKnownByOtherNames=false]").hasAttr("checked") must be(false)
+          val result = personNameController.get(RecordId)(request)
+          status(result) must be(NOT_FOUND)
+        }
+      }
     }
 
     "must pass on post with all the mandatory parameters supplied" in new Fixture {
@@ -170,6 +180,14 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
+  }
+
+
+  it must {
+    "use the correct services" in new Fixture {
+      PersonNameController.dataCacheConnector must be(DataCacheConnector)
+      PersonNameController.authConnector must be(AMLSAuthConnector)
+    }
   }
 
 }
