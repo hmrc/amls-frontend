@@ -93,91 +93,71 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
       }
     }
 
-    "must pass on post with all the mandatory parameters supplied" in new Fixture {
+    "post is called" when {
 
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
-        "hasPreviousName" -> "false",
-        "hasOtherNames" -> "false"
-      )
+      "form is valid" must {
+        "go to PersonResidentTypeController" when {
+          "edit is false" in new Fixture {
 
-      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "firstName" -> "John",
+              "lastName" -> "Doe",
+              "hasPreviousName" -> "false",
+              "hasOtherNames" -> "false"
+            )
 
-      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      val result = personNameController.post(RecordId)(requestWithParams)
-      status(result) must be(SEE_OTHER)
-    }
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
-    "must fail on post if first name not supplied" in new Fixture {
+            val result = personNameController.post(RecordId)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+        }
+        "go to DetailedAnswersController" when {
+          "edit is true" in new Fixture {
 
-      val firstNameMissingInRequest = request.withFormUrlEncodedBody(
-        "lastName" -> "Doe",
-        "isKnownByOtherNames" -> "false"
-      )
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "firstName" -> "John",
+              "lastName" -> "Doe",
+              "hasPreviousName" -> "false",
+              "hasOtherNames" -> "false"
+            )
 
-      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-      val result = personNameController.post(RecordId)(firstNameMissingInRequest)
-      status(result) must be(BAD_REQUEST)
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#firstName]").html() must include("This field is required")
-    }
+            val result = personNameController.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+        }
+      }
 
-    "must fail on post if last name not supplied" in new Fixture {
+      "form is invalid" must {
+        "return BAD_REQUEST" in new Fixture {
 
-      val lastNameMissingInRequest = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "isKnownByOtherNames" -> "false"
-      )
+          val firstNameMissingInRequest = request.withFormUrlEncodedBody(
+            "lastName" -> "Doe",
+            "isKnownByOtherNames" -> "false"
+          )
 
-      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = personNameController.post(RecordId)(lastNameMissingInRequest)
-      status(result) must be(BAD_REQUEST)
+          val result = personNameController.post(RecordId)(firstNameMissingInRequest)
+          status(result) must be(BAD_REQUEST)
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#lastName]").html() must include("This field is required")
-    }
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#firstName]").html() must include("This field is required")
+        }
 
-    "show error with year field too short" in new Fixture {
+      }
 
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
-        "hasPreviousName" -> "true",
-        "hasOtherNames" -> "false",
-        "previous.date.year" -> "67",
-        "previous.date.month" -> "11",
-        "previous.date.day" -> "12"
-      )
-
-      val result = personNameController.post(RecordId)(requestWithParams)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    }
-
-    "show error with year field too long" in new Fixture {
-
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
-        "hasPreviousName" -> "true",
-        "hasOtherNames" -> "false",
-        "previous.date.year" -> "19497",
-        "previous.date.month" -> "11",
-        "previous.date.day" -> "12"
-      )
-
-      val result = personNameController.post(RecordId)(requestWithParams)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
   }
