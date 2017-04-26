@@ -125,105 +125,148 @@ class PersonResidenceTypeSpec extends PlaySpec {
         }
 
         "non UK" when {
-          "dateOfBirth is missing" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq(""),
-              "dateOfBirth.month" -> Seq(""),
-              "dateOfBirth.year" -> Seq(""),
-              "passportType" -> Seq("01"),
-              "ukPassportNumber" -> Seq("123456789"),
-              "countryOfBirth" -> Seq("GB"),
-              "nationality" -> Seq("GB")
-            )
 
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(
-                Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-              )))
+          "missing" when {
+            "dateOfBirth" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq(""),
+                "dateOfBirth.month" -> Seq(""),
+                "dateOfBirth.year" -> Seq(""),
+                "passportType" -> Seq("01"),
+                "ukPassportNumber" -> Seq("123456789"),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
+
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(
+                  Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+                )))
+            }
+
+            "passportType" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("01"),
+                "dateOfBirth.month" -> Seq("02"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "ukPassportNumber" -> Seq("123456789"),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
+
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(
+                  Path \ "passportType" -> Seq(ValidationError("error.required.rp.passport.option"))
+                )))
+            }
+
+            "countryOfBirth" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("01"),
+                "dateOfBirth.month" -> Seq("02"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "passportType" -> Seq("01"),
+                "ukPassportNumber" -> Seq("123456789"),
+                "countryOfBirth" -> Seq(""),
+                "nationality" -> Seq("GB")
+              )
+
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(
+                  Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country"))
+                )))
+            }
+
+            "non uk passport number" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("24"),
+                "dateOfBirth.month" -> Seq("2"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "passportType" -> Seq("02"),
+                "nonUKPassportNumber" -> Seq(""),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
+
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.required.non.uk.passport")))))
+            }
+
           }
 
-          "passportType is missing" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq("01"),
-              "dateOfBirth.month" -> Seq("02"),
-              "dateOfBirth.year" -> Seq("1990"),
-              "ukPassportNumber" -> Seq("123456789"),
-              "countryOfBirth" -> Seq("GB"),
-              "nationality" -> Seq("GB")
-            )
+          "invalid" when {
+            "uk passport" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("24"),
+                "dateOfBirth.month" -> Seq("2"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "passportType" -> Seq("01"),
+                "ukPassportNumber" -> Seq("$87654321"),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
 
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(
-                Path \ "passportType" -> Seq(ValidationError("error.required.rp.passport.option"))
-              )))
-          }
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(Path \ "ukPassportNumber" -> Seq(ValidationError("error.invalid.uk.passport")))))
+            }
 
-          "countryOfBirth is missing" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq("01"),
-              "dateOfBirth.month" -> Seq("02"),
-              "dateOfBirth.year" -> Seq("1990"),
-              "passportType" -> Seq("01"),
-              "ukPassportNumber" -> Seq("123456789"),
-              "countryOfBirth" -> Seq(""),
-              "nationality" -> Seq("GB")
-            )
+            "non UK passport is too long" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("24"),
+                "dateOfBirth.month" -> Seq("2"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "passportType" -> Seq("02"),
+                "nonUKPassportNumber" -> Seq("abc" * 40),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
 
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(
-                Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country"))
-              )))
-          }
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.invalid.non.uk.passport")))))
+            }
 
-          "uk passport is invalid" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq("24"),
-              "dateOfBirth.month" -> Seq("2"),
-              "dateOfBirth.year" -> Seq("1990"),
-              "passportType" -> Seq("01"),
-              "ukPassportNumber" -> Seq("$87654321"),
-              "countryOfBirth" -> Seq("GB"),
-              "nationality" -> Seq("GB")
-            )
+            "countryOfBirth" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("01"),
+                "dateOfBirth.month" -> Seq("02"),
+                "dateOfBirth.year" -> Seq("1990"),
+                "passportType" -> Seq("01"),
+                "ukPassportNumber" -> Seq("123456789"),
+                "countryOfBirth" -> Seq("sdfghjklkjhgfd"),
+                "nationality" -> Seq("GB")
+              )
 
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(Path \ "ukPassportNumber" -> Seq(ValidationError("error.invalid.uk.passport")))))
-          }
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(
+                  Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country"))
+                )))
+            }
 
-          "non UK passport is too long" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq("24"),
-              "dateOfBirth.month" -> Seq("2"),
-              "dateOfBirth.year" -> Seq("1990"),
-              "passportType" -> Seq("02"),
-              "nonUKPassportNumber" -> Seq("abc" * 40),
-              "countryOfBirth" -> Seq("GB"),
-              "nationality" -> Seq("GB")
-            )
+            "dateOfBirth" in {
+              val ukModel = Map(
+                "isUKResidence" -> Seq("false"),
+                "dateOfBirth.day" -> Seq("c"),
+                "dateOfBirth.month" -> Seq("b"),
+                "dateOfBirth.year" -> Seq("a"),
+                "passportType" -> Seq("01"),
+                "ukPassportNumber" -> Seq("123456789"),
+                "countryOfBirth" -> Seq("GB"),
+                "nationality" -> Seq("GB")
+              )
 
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.invalid.non.uk.passport")))))
-          }
+              PersonResidenceType.formRule.validate(ukModel) must
+                be(Invalid(Seq(
+                  Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+                )))
+            }
 
-          "non uk missing non uk passport number" in {
-            val ukModel = Map(
-              "isUKResidence" -> Seq("false"),
-              "dateOfBirth.day" -> Seq("24"),
-              "dateOfBirth.month" -> Seq("2"),
-              "dateOfBirth.year" -> Seq("1990"),
-              "passportType" -> Seq("02"),
-              "nonUKPassportNumber" -> Seq(""),
-              "countryOfBirth" -> Seq("GB"),
-              "nationality" -> Seq("GB")
-            )
-
-            PersonResidenceType.formRule.validate(ukModel) must
-              be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.required.non.uk.passport")))))
           }
 
         }

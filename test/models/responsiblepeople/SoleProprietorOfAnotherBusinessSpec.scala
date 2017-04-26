@@ -9,7 +9,7 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
 
   "Form validation" must {
     "pass validation" when {
-      "given a valid answer" in {
+      "soleProprietorOfAnotherBusiness is a boolean" in {
 
         val model = Map(
           "soleProprietorOfAnotherBusiness" -> Seq("true")
@@ -23,6 +23,12 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
       "given missing data represented by an empty Map" in {
 
         SoleProprietorOfAnotherBusiness.formRule.validate(Map.empty) must be(Invalid(Seq(
+          Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor"))
+        )))
+      }
+
+      "given invalid data" in {
+        SoleProprietorOfAnotherBusiness.formRule.validate(Map("soleProprietorOfAnotherBusiness" -> Seq("abc123"))) must be(Invalid(Seq(
           Path \ "soleProprietorOfAnotherBusiness" -> Seq(ValidationError("error.required.rp.sole_proprietor"))
         )))
       }
