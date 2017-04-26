@@ -28,7 +28,15 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
     }
 
     "fail validation" when {
-      "fail to validate given an `Yes` with no value" in {
+      "fail to validate given saRegistered has no value" in {
+
+        SaRegistered.formRule.validate(Map.empty) must
+          be(Invalid(Seq(
+            (Path \ "saRegistered") -> Seq(ValidationError("error.required.sa.registration"))
+          )))
+      }
+
+      "fail to validate given saRegistered is true and utrNumber has no value" in {
 
         val data = Map(
           "saRegistered" -> Seq("true")
