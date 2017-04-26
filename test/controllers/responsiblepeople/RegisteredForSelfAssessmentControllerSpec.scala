@@ -49,14 +49,19 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
       }
 
       "display the page with pre populated data" in new Fixture {
+
+        val utr = "0123456789"
+
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, saRegistered = Some(SaRegisteredYes("0123456789")))))))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, saRegistered = Some(SaRegisteredYes(utr)))))))
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.getElementById("saRegistered-true").hasAttr("checked") must be(true)
+        document.getElementById("saRegistered-false").hasAttr("checked") must be(false)
+        document.getElementById("utrNumber").`val` must be(utr)
       }
 
       "respond with NOT_FOUND when there is no responsiblePeople data" in new Fixture {
