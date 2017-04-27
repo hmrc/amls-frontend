@@ -57,6 +57,7 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Beneficial owner")),
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.detailed_answers.position_start"), checkElementTextIncludes(_, "24 February 1990")),
+      (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
       (Messages("responsiblepeople.detailed_answers.previous_experience"), checkElementTextIncludes(_, "experience")),
@@ -144,7 +145,8 @@ class detailed_answersSpec extends GenericTestHelper
       saRegistered = Some(SaRegisteredYes("sa")),
       experienceTraining = Some(ExperienceTrainingYes("experience")),
       training = Some(TrainingYes("training")),
-      hasAlreadyPassedFitAndProper = Some(true)
+      hasAlreadyPassedFitAndProper = Some(true),
+      soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))
     )
 
     "include the provided data" when {
@@ -344,6 +346,21 @@ class detailed_answersSpec extends GenericTestHelper
         check(section) must be(false)
       }
       }
+    }
+
+    "display timeAtAddress for corresponding addresses" in new Fixture {
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))), 1, true)
+      }
+
+      val timeAtAddresses = doc.getElementsContainingText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
+
+      println(">>>" + timeAtAddresses)
+
+      timeAtAddresses.foreach { timeAtAddress =>
+        timeAtAddress.nextElementSibling().text() must contain("!")
+      }
+
     }
   }
 }
