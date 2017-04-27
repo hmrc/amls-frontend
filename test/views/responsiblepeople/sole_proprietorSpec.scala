@@ -22,7 +22,12 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
-      doc.title must startWith(Messages("responsiblepeople.sole.proprietor.another.business.title"))
+      doc.title must be(Messages("responsiblepeople.sole.proprietor.another.business.title") +
+        " - " + Messages("summary.responsiblepeople") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
+
+      doc.getElementsByAttributeValue("name", "soleProprietorOfAnotherBusiness") must not be empty
     }
 
     "have correct headings" in new ViewFixture {
@@ -46,9 +51,6 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
       def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
       errorSummary.html() must include("not a message Key")
-
-      doc.getElementById("soleProprietorOfAnotherBusiness")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
   }
