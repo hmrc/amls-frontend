@@ -15,6 +15,7 @@ import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
+
 import scala.collection.JavaConversions._
 import play.api.test.Helpers._
 import services.StatusService
@@ -51,7 +52,7 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
       "display the page" when {
 
-       "timeAtAddress exists" in new Fixture {
+       "with existing data" in new Fixture {
 
          val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
@@ -65,6 +66,13 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
           val result = timeAtAddressController.get(RecordId)(request)
           status(result) must be(OK)
+
+         val document: Document = Jsoup.parse(contentAsString(result))
+
+         document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
+         document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+         document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+         document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
         }
 
         "timeAtAddress does not exist" in new Fixture {
@@ -76,6 +84,13 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
 
           val result = timeAtAddressController.get(RecordId)(request)
           status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
         }
 
 
