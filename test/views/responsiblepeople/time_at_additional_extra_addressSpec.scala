@@ -13,6 +13,8 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val name = "FirstName LastName"
   }
 
   "time_at_additional_extra_address view" must {
@@ -21,20 +23,21 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view =
-        views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, "FirstName LastName")
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, name)
 
-      doc.title() must startWith(Messages("responsiblepeople.timeataddress.address_history.title") + " - " + Messages("summary.responsiblepeople"))
+      doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
+        " - " + Messages("summary.responsiblepeople") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
     }
 
     "have correct heading" in new ViewFixture {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view =
-        views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, "FirstName LastName")
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, name)
 
-      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", "FirstName LastName"))
+      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", name))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
@@ -48,12 +51,9 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
         Seq((Path \ timeAtAddress, Seq(ValidationError(messageKey1))))
       )
 
-      def view =
-        views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, "FirstName LastName")
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false,name)
 
       errorSummary.html() must include(messageKey1)
-
-      doc.getElementById(timeAtAddress).html() must include(messageKey1)
     }
   }
 
