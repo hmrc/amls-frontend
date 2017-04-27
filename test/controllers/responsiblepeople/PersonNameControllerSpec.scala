@@ -146,16 +146,35 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
             "isKnownByOtherNames" -> "false"
           )
 
-          when(personNameController.dataCacheConnector.save[PersonName](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = personNameController.post(RecordId)(firstNameMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#firstName]").html() must include("This field is required")
         }
 
+      }
+
+      "model cannot be found with given index" must {
+        "return NOT_FOUND" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "firstName" -> "John",
+            "lastName" -> "Doe",
+            "hasPreviousName" -> "false",
+            "hasOtherNames" -> "false"
+          )
+
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = personNameController.post(2)(requestWithParams)
+          status(result) must be(NOT_FOUND)
+        }
       }
 
     }
