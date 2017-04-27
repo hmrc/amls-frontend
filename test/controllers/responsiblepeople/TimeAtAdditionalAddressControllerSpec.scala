@@ -46,7 +46,7 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
     "get is called" must {
 
       "display the page" when {
-        "timeAtAddress has been previously saved" in new Fixture {
+        "with existing data" in new Fixture {
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
@@ -59,6 +59,13 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
           val result = timeAtAdditionalAddressController.get(RecordId)(request)
           status(result) must be(OK)
 
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
+          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
+
         }
         "timeAtAddress has not been previously saved" in new Fixture {
 
@@ -69,6 +76,13 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
 
           val result = timeAtAdditionalAddressController.get(RecordId)(request)
           status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
 
         }
 
