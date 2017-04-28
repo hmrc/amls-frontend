@@ -1,6 +1,7 @@
 package views.businessactivities
 
-import forms.EmptyForm
+import forms.{InvalidForm, EmptyForm}
+import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessMatching
 import org.scalatest.{MustMatchers}
 import utils.GenericTestHelper
@@ -44,29 +45,26 @@ class involved_in_other_nameSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
 
-      noException must be thrownBy doc.getElementById("id1")
-      noException must be thrownBy doc.getElementById("id2")
-      noException must be thrownBy doc.getElementById("id3")
+      doc.getElementsByAttributeValue("name", "involvedInOther") must not be empty
+      doc.getElementsByAttributeValue("name", "details") must not be empty
 
     }
 
-//    "show errors in the correct locations" in new ViewFixture {
-//
-//      val form2: InvalidForm = InvalidForm(Map.empty,
-//        Seq(
-//          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-//          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-//          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
-//        ))
-//
-//      def view = views.html.businessactivities.involved_in_other_name(form2, true)
-//
-//      errorSummary.html() must include("not a message Key")
-//      errorSummary.html() must include("second not a message Key")
-//      errorSummary.html() must include("third not a message Key")
-//
-//    }
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "involvedInOther") -> Seq(ValidationError("not a message Key")),
+          (Path \ "details") -> Seq(ValidationError("second not a message Key"))
+        ))
+
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
+
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
+
+    }
   }
 }
