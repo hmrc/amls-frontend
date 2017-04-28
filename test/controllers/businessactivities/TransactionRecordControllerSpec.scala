@@ -124,8 +124,6 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
-        }
-
       }
     }
   }
