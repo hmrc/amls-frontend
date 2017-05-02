@@ -74,11 +74,11 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
     }
 
     "Deserialise UK address as expected" in {
-      testUKAccountantJson.as[AccountantsAddress] should be(testWhoIsYourAccountantUk)
+      testUKAccountantJson.as[WhoIsYourAccountant] should be(testWhoIsYourAccountantUk)
     }
 
     "Deserialise non-UK address as expected" in {
-      testNonUKAccountantJson.as[AccountantsAddress] should be(testWhoIsYourAccountantNonUk)
+      testNonUKAccountantJson.as[WhoIsYourAccountant] should be(testWhoIsYourAccountantNonUk)
     }
 
     "pass validation" when {

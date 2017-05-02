@@ -105,15 +105,23 @@ class AccountantsAddressSpec extends PlaySpec {
             )))
         }
 
-        "enum fields are given invalid data" in {
+        "isUK is given invalid data" in {
           val model = testNonUKModel ++ Map(
-            "isUK" -> Seq("HGHHHH"),
-          "country" -> Seq("HGHHHH")
-          )
+            "isUK" -> Seq("HGHHHH"))
           AccountantsAddress.formRule.validate(model) must be(
             Invalid(Seq(
               (Path \ "isUK") -> Seq(
-                ValidationError("error.required.uk.or.overseas"),
+                ValidationError("error.required.uk.or.overseas")
+              )
+            )))
+        }
+
+        "country is given invalid data" in {
+          val model = testNonUKModel ++ Map(
+            "country" -> Seq("HGHHHH"))
+          AccountantsAddress.formRule.validate(model) must be(
+            Invalid(Seq(
+              (Path \ "country") -> Seq(
                 ValidationError("error.invalid.country")
               )
             )))
