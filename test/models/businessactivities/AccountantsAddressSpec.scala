@@ -8,12 +8,12 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class AccountantsAddressSpec extends PlaySpec {
 
-  val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = "Default Line 2"
-  val DefaultAddressLine3 = Some("Default Line 3")
-  val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = Country("United Kingdom", "GB")
+  val testAddressLine1 = "Default Line 1"
+  val testAddressLine2 = "Default Line 2"
+  val testAddressLine3 = Some("Default Line 3")
+  val testAddressLine4 = Some("Default Line 4")
+  val testPostcode = "NE1 7YX"
+  val testCountry = Country("United Kingdom", "GB")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"
@@ -21,57 +21,57 @@ class AccountantsAddressSpec extends PlaySpec {
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "CR6 5HG"
 
-  val DefaultUKAddress = UkAccountantsAddress(DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultPostcode)
+  val testUKAddress = UkAccountantsAddress(testAddressLine1,
+    testAddressLine2,
+    testAddressLine3,
+    testAddressLine4,
+    testPostcode)
 
-  val DefaultNonUKAddress = NonUkAccountantsAddress(DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultCountry)
+  val testNonUKAddress = NonUkAccountantsAddress(testAddressLine1,
+    testAddressLine2,
+    testAddressLine3,
+    testAddressLine4,
+    testCountry)
 
-  val DefaultUKJson = Json.obj(
-    "accountantsAddressLine1" -> DefaultAddressLine1,
-    "accountantsAddressLine2" -> DefaultAddressLine2,
-    "accountantsAddressLine3" -> DefaultAddressLine3,
-    "accountantsAddressLine4" -> DefaultAddressLine4,
-    "accountantsAddressPostCode" -> DefaultPostcode
+  val testUKJson = Json.obj(
+    "accountantsAddressLine1" -> testAddressLine1,
+    "accountantsAddressLine2" -> testAddressLine2,
+    "accountantsAddressLine3" -> testAddressLine3,
+    "accountantsAddressLine4" -> testAddressLine4,
+    "accountantsAddressPostCode" -> testPostcode
   )
 
-  val DefaultNonUKJson = Json.obj(
-    "accountantsAddressLine1" -> DefaultAddressLine1,
-    "accountantsAddressLine2" -> DefaultAddressLine2,
-    "accountantsAddressLine3" -> DefaultAddressLine3,
-    "accountantsAddressLine4" -> DefaultAddressLine4,
-    "accountantsAddressCountry" -> DefaultCountry.code
+  val testNonUKJson = Json.obj(
+    "accountantsAddressLine1" -> testAddressLine1,
+    "accountantsAddressLine2" -> testAddressLine2,
+    "accountantsAddressLine3" -> testAddressLine3,
+    "accountantsAddressLine4" -> testAddressLine4,
+    "accountantsAddressCountry" -> testCountry.code
   )
 
-  val DefaultUKModel = Map(
+  val testUKModel = Map(
     "isUK" -> Seq("true"),
-    "addressLine1" -> Seq(DefaultAddressLine1),
-    "addressLine2" -> Seq(DefaultAddressLine2),
+    "addressLine1" -> Seq(testAddressLine1),
+    "addressLine2" -> Seq(testAddressLine2),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
-    "postCode" -> Seq(DefaultPostcode)
+    "postCode" -> Seq(testPostcode)
   )
 
-  val DefaultNonUKModel = Map(
+  val testNonUKModel = Map(
     "isUK" -> Seq("false"),
-    "addressLine1" -> Seq(DefaultAddressLine1),
-    "addressLine2" -> Seq(DefaultAddressLine2),
+    "addressLine1" -> Seq(testAddressLine1),
+    "addressLine2" -> Seq(testAddressLine2),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
-    "country" -> Seq(DefaultCountry.code)
+    "country" -> Seq(testCountry.code)
   )
 
 
   "AccountantsAddress" must {
 
     "validate toLines for UK address" in {
-      DefaultUKAddress.toLines must be (Seq("Default Line 1",
+      testUKAddress.toLines must be (Seq("Default Line 1",
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
@@ -79,7 +79,7 @@ class AccountantsAddressSpec extends PlaySpec {
     }
 
     "validate toLines for Non UK address" in {
-      DefaultNonUKAddress.toLines must be (Seq("Default Line 1",
+      testNonUKAddress.toLines must be (Seq("Default Line 1",
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
@@ -87,67 +87,68 @@ class AccountantsAddressSpec extends PlaySpec {
     }
 
     "Form validation" must {
-      "Read UK Address" in {
-        AccountantsAddress.formRule.validate(DefaultUKModel) must be (Valid(DefaultUKAddress))
+      "pass validation" when {
+        "given valid Uk address data" in {
+          AccountantsAddress.formRule.validate(testUKModel) must be(Valid(testUKAddress))
+        }
+
+        "given valid Non-Uk address data" in {
+          AccountantsAddress.formRule.validate(testNonUKModel) must be (Valid(testNonUKAddress))
+        }
       }
 
-      "throw error when mandatory fields are missing" in {
-        AccountantsAddress.formRule.validate(Map.empty) must be(
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          )))
-      }
+      "fail validation" when {
+        "mandatory fields are missing" in {
+          AccountantsAddress.formRule.validate(Map.empty) must be(
+            Invalid(Seq(
+              (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
+            )))
+        }
 
-      "throw error when there is an invalid data" in {
-        val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
-        AccountantsAddress.formRule.validate(model) must be(
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          )))
+        "enum fields are given invalid data" in {
+          val model = testNonUKModel ++ Map(
+            "isUK" -> Seq("HGHHHH"),
+          "country" -> Seq("HGHHHH")
+          )
+          AccountantsAddress.formRule.validate(model) must be(
+            Invalid(Seq(
+              (Path \ "isUK") -> Seq(
+                ValidationError("error.required.uk.or.overseas"),
+                ValidationError("error.invalid.country")
+              )
+            )))
+        }
       }
-
-      "throw error when length of country exceeds max length" in {
-        val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
-        AccountantsAddress.formRule.validate(model) must be(
-          Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
-          )))
-      }
-
-      "Read Non UK Address" in {
-        AccountantsAddress.formRule.validate(DefaultNonUKModel) must be (Valid(DefaultNonUKAddress))
-      }
-
     }
 
     "JSON validation" must {
 
       "Round trip a UK Address correctly" in {
         AccountantsAddress.jsonReads.reads(
-          AccountantsAddress.jsonWrites.writes(DefaultUKAddress)
-        ) must be (JsSuccess(DefaultUKAddress))
+          AccountantsAddress.jsonWrites.writes(testUKAddress)
+        ) must be (JsSuccess(testUKAddress))
       }
 
       "Round trip a Non UK Address correctly" in {
         AccountantsAddress.jsonReads.reads(
-          AccountantsAddress.jsonWrites.writes(DefaultNonUKAddress)
-        ) must be (JsSuccess(DefaultNonUKAddress))
+          AccountantsAddress.jsonWrites.writes(testNonUKAddress)
+        ) must be (JsSuccess(testNonUKAddress))
       }
 
       "Serialise UK address as expected" in {
-        Json.toJson(DefaultUKAddress) must be(DefaultUKJson)
+        Json.toJson(testUKAddress) must be(testUKJson)
       }
 
       "Serialise non-UK address as expected" in {
-        Json.toJson(DefaultNonUKAddress) must be(DefaultNonUKJson)
+        Json.toJson(testNonUKAddress) must be(testNonUKJson)
       }
 
       "Deserialise UK address as expected" in {
-        DefaultUKJson.as[AccountantsAddress] must be(DefaultUKAddress)
+        testUKJson.as[AccountantsAddress] must be(testUKAddress)
       }
 
       "Deserialise non-UK address as expected" in {
-        DefaultNonUKJson.as[AccountantsAddress] must be(DefaultNonUKAddress)
+        testNonUKJson.as[AccountantsAddress] must be(testNonUKAddress)
       }
     }
   }

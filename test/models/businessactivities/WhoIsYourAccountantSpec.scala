@@ -1,10 +1,9 @@
 package models.businessactivities
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.Country
-import org.scalatest.{Matchers, MustMatchers, WordSpec}
-import play.api.libs.json.{JsPath, JsSuccess, Json}
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import org.scalatest.{Matchers, WordSpec}
+import play.api.libs.json.{JsSuccess, Json}
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
@@ -38,12 +37,48 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
     testTradingName,
     testNonUkAddress)
 
+  val testUKAccountantJson = Json.obj(
+    "accountantsName" -> testName,
+    "accountantsTradingName" -> testTradingName,
+    "accountantsAddressLine1" -> testAddressLine1,
+    "accountantsAddressLine2" -> testAddressLine2,
+    "accountantsAddressLine3" -> testAddressLine3,
+    "accountantsAddressLine4" -> testAddressLine4,
+    "accountantsAddressPostCode" -> testPostcode
+  )
+
+  val testNonUKAccountantJson = Json.obj(
+    "accountantsName" -> testName,
+    "accountantsTradingName" -> testTradingName,
+    "accountantsAddressLine1" -> testAddressLine1,
+    "accountantsAddressLine2" -> testAddressLine2,
+    "accountantsAddressLine3" -> testAddressLine3,
+    "accountantsAddressLine4" -> testAddressLine4,
+    "accountantsAddressCountry" -> testCountry.code
+  )
+
   "WhoIsYourAccountant" must {
 
     "successfully complete a round trip json conversion" in {
       WhoIsYourAccountant.jsonReads.reads(
         WhoIsYourAccountant.jsonWrites.writes(testWhoIsYourAccountantUk)
       ) shouldBe JsSuccess(testWhoIsYourAccountantUk)
+    }
+
+    "Serialise UK address as expected" in {
+      Json.toJson(testWhoIsYourAccountantUk) should be(testUKAccountantJson)
+    }
+
+    "Serialise non-UK address as expected" in {
+      Json.toJson(testWhoIsYourAccountantNonUk) should be(testNonUKAccountantJson)
+    }
+
+    "Deserialise UK address as expected" in {
+      testUKAccountantJson.as[AccountantsAddress] should be(testWhoIsYourAccountantUk)
+    }
+
+    "Deserialise non-UK address as expected" in {
+      testNonUKAccountantJson.as[AccountantsAddress] should be(testWhoIsYourAccountantNonUk)
     }
 
     "pass validation" when {
@@ -68,7 +103,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
-        ) should be (Invalid(Seq(
+        ) should be(Invalid(Seq(
           (Path \ "name") -> Seq(ValidationError("error.required.ba.advisor.name"))
         )))
       }
@@ -79,7 +114,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
-        ) should be (Invalid(Seq(
+        ) should be(Invalid(Seq(
           (Path \ "name") -> Seq(ValidationError("error.invalid.maxlength.140"))
         )))
       }
@@ -90,19 +125,19 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
-        ) should be (Invalid(Seq(
+        ) should be(Invalid(Seq(
           (Path \ "name") -> Seq(ValidationError("err.text.validation"))
         )))
       }
 
       "given a trading name with too many characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant(testName,
-          Some("a"*121),
+          Some("a" * 121),
           testUKAddress
         )
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
-        ) should be (Invalid(Seq(
+        ) should be(Invalid(Seq(
           (Path \ "tradingName") -> Seq(ValidationError("error.invalid.maxlength.120"))
         )))
       }
@@ -113,7 +148,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
-        ) should be (Invalid(Seq(
+        ) should be(Invalid(Seq(
           (Path \ "tradingName") -> Seq(ValidationError("err.text.validation"))
         )))
       }
