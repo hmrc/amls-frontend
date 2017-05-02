@@ -1246,6 +1246,9 @@ responsiblepeople.remove.responsible.person.enddate.lbl = When did this person s
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
 responsiblepeople.confirmaddress.title = Is this this person’s home address?
+responsiblepeople.new.home.date.of.change.heading = When did {0} move?
+responsiblepeople.new.home.date.of.change.title = When did this person move?
+
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
