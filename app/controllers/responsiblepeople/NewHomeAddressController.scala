@@ -47,11 +47,9 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
   }
 
   def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange]) = {
-    val t = ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
+    ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
       getTimeAtAddress(dateOfMove),
       dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))))
-    println("=====================>"+t)
-    t
   }
 
   def post(index: Int, edit: Boolean = false) =
@@ -61,7 +59,6 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
           (Form2[NewHomeAddress](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map { rp =>
-                println("======gg========>"+f)
                 BadRequest(new_home_address(f, edit, index, ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
