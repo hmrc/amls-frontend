@@ -1,5 +1,6 @@
 package models.businessactivities
 
+import models.Country
 import org.scalatest.{Matchers, MustMatchers, WordSpec}
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 import jto.validation.{Invalid, Path, Valid}
@@ -7,61 +8,64 @@ import jto.validation.ValidationError
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
-  val DefaultName = "Default Name"
-  val DefaultTradingName = Some("Default Trading Name")
+  val testName = "Default Name"
+  val testTradingName = Some("Default Trading Name")
 
-  val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = "Default Line 2"
-  val DefaultAddressLine3 = Some("Default Line 3")
-  val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = "Default Country"
+  val testAddressLine1 = "Default Line 1"
+  val testAddressLine2 = "Default Line 2"
+  val testAddressLine3 = Some("Default Line 3")
+  val testAddressLine4 = Some("Default Line 4")
+  val testPostcode = "NE1 7YX"
+  val testCountry = Country("United States", "US")
 
-  val DefaultUKAddress = UkAccountantsAddress(DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultPostcode)
+  val testUKAddress = UkAccountantsAddress(testAddressLine1,
+    testAddressLine2,
+    testAddressLine3,
+    testAddressLine4,
+    testPostcode)
 
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
-    DefaultTradingName,
-    DefaultUKAddress)
+  val testNonUkAddress = NonUkAccountantsAddress(testAddressLine1,
+    testAddressLine2,
+    testAddressLine3,
+    testAddressLine4,
+    testCountry)
+
+  val testWhoIsYourAccountantUk = WhoIsYourAccountant(testName,
+    testTradingName,
+    testUKAddress)
+
+  val testWhoIsYourAccountantNonUk = WhoIsYourAccountant(testName,
+    testTradingName,
+    testNonUkAddress)
 
   "WhoIsYourAccountant" must {
 
     "successfully complete a round trip json conversion" in {
       WhoIsYourAccountant.jsonReads.reads(
-        WhoIsYourAccountant.jsonWrites.writes(DefaultWhoIsYourAccountant)
-      ) shouldBe JsSuccess(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountant.jsonWrites.writes(testWhoIsYourAccountantUk)
+      ) shouldBe JsSuccess(testWhoIsYourAccountantUk)
     }
 
     "pass validation" when {
-      "The accountant deals with tax matters" in {
+      "given valid data with a UK address" in {
         WhoIsYourAccountant.formRule.validate(
-          WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
-            DefaultTradingName,
-            DefaultUKAddress))
-        ) should be(Valid(WhoIsYourAccountant(DefaultName,
-          DefaultTradingName,
-          DefaultUKAddress)))
+          WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantUk)
+        ) should be(Valid(testWhoIsYourAccountantUk))
       }
 
-      "The accountant does not deal with tax matters" in {
+      "given valid data with a Non UK address" in {
+        println("*******" + WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantNonUk))
         WhoIsYourAccountant.formRule.validate(
-          WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
-            DefaultTradingName,
-            DefaultUKAddress))
-        ) should be(Valid(WhoIsYourAccountant(DefaultName,
-          DefaultTradingName,
-          DefaultUKAddress)))
+          WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantNonUk)
+        ) should be(Valid(testWhoIsYourAccountantNonUk))
       }
     }
 
     "fail validation" when {
       "given an empty name" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant("",
-          DefaultTradingName,
-          DefaultUKAddress)
+          testTradingName,
+          testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be (Invalid(Seq(
@@ -71,8 +75,8 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
       "given a name with too many characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant("a" * 141,
-          DefaultTradingName,
-          DefaultUKAddress)
+          testTradingName,
+          testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be (Invalid(Seq(
@@ -82,8 +86,8 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
       "given a name with invalid characters" in {
         val DefaultWhoIsYourAccountant = WhoIsYourAccountant("sasdasd{}sdfsdf",
-          DefaultTradingName,
-          DefaultUKAddress)
+          testTradingName,
+          testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be (Invalid(Seq(
@@ -92,9 +96,9 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       }
 
       "given a trading name with too many characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(testName,
           Some("a"*121),
-          DefaultUKAddress
+          testUKAddress
         )
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
@@ -104,9 +108,9 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       }
 
       "given a trading name with invalid characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(DefaultName,
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(testName,
           Some("sasdasd{}sdfsdf"),
-          DefaultUKAddress)
+          testUKAddress)
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be (Invalid(Seq(

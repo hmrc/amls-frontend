@@ -44,7 +44,7 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
         htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
       }
 
-      "lpre-populate the form when data is already present" in new Fixture {
+      "pre-populate the form when data is already present" in new Fixture {
 
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
