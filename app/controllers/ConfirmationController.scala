@@ -85,13 +85,20 @@ trait ConfirmationController extends BaseController {
         } yield {
           Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
         }
-      case SubmissionDecisionApproved | ReadyForRenewal(_)=>
+      case SubmissionDecisionApproved =>
         for {
             fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
             paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
           } yield {
             Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
           }
+      case ReadyForRenewal(_) =>
+        for {
+          fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+        } yield {
+          Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+        }
       case _ =>
         for {
           (paymentRef, total, rows) <- OptionT.liftF(submissionService.getSubscription)
