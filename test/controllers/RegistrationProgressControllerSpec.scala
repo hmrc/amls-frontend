@@ -278,14 +278,14 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReady))
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
-          .thenReturn(Future.successful(Some(respinsiblePeople)))
+          .thenReturn(Future.successful(Some(responsiblePeople)))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
@@ -293,14 +293,14 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer and status id amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
-          .thenReturn(Future.successful(Some(respinsiblePeople)))
+          .thenReturn(Future.successful(Some(responsiblePeople)))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url)
@@ -320,15 +320,15 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     "redirect to 'Who is the business’s nominated officer?'" when {
       "no one is nominated officer in responsible people" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReady))
 
         when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
-          thenReturn(Future.successful(Some(respinsiblePeople)))
+          thenReturn(Future.successful(Some(responsiblePeople)))
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
@@ -336,9 +336,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "no one is nominated officer in responsible people and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val responsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
