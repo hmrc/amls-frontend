@@ -3,7 +3,7 @@
 @import models.aboutthebusiness._
 @import utils._
 
-@(model: AboutTheBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: AboutTheBusiness, showRegisteredForMLR: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.aboutbusiness")
@@ -14,14 +14,16 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("aboutthebusiness.registeredformlr.title"),
-        editUrl = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true).toString
-    ) {
-        <p>@model.previouslyRegistered.map {
-            case PreviouslyRegisteredNo => { @Messages("lbl.no") }
-            case PreviouslyRegisteredYes(v) => { @Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"): @v }
-        }</p>
+    @if(showRegisteredForMLR) {
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.registeredformlr.title"),
+            editUrl = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true).toString
+        ) {
+            <p>@model.previouslyRegistered.map {
+                case PreviouslyRegisteredNo => { @Messages("lbl.no") }
+                case PreviouslyRegisteredYes(v) => { @Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"): @v }
+            }</p>
+        }
     }
 
     @model.activityStartDate.map { activityStartDate =>
