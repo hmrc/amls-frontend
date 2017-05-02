@@ -1,7 +1,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.Country
+import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -76,44 +76,48 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now())))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
+
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now()))))
+
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](meq(ResponsiblePeople.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople)))(any(), any(), any())
         }
+
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
-            "addressLineNonUK1" -> "Line 11",
-            "addressLineNonUK2" -> "Line 22",
-            "country" -> "UK"
+            "addressLineNonUK1" -> "Line 1",
+            "addressLineNonUK2" -> "Line 2",
+            "country" -> "ES"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val nUkAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("UK", "United Kingdom"))
-          val nAdditionalAddress = ResponsiblePersonCurrentAddress(nUkAddress, Some(ZeroToFiveMonths))
-          val nHistory =  ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("ES","Spain"))
+          val currentAddress = ResponsiblePersonCurrentAddress(NonUKAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any())(any(), any(), any()))
+
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now()))))
-          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
+
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
@@ -121,7 +125,8 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
-          verify(controllers.dataCacheConnector.save[ResponsiblePeople](any(), meq(responsiblePeople.copy(addressHistory = Some(nHistory))))(any(),any(), any()))
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+            meq(Seq(responsiblePeople.copy(addressHistory = Some(history)))))(any(),any(), any())
         }
 
       }
