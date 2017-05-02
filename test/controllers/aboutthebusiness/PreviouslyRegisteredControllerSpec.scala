@@ -87,7 +87,7 @@ class PreviouslyRegisteredControllerSpec extends GenericTestHelper with MockitoS
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
@@ -111,7 +111,7 @@ class PreviouslyRegisteredControllerSpec extends GenericTestHelper with MockitoS
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"),Country("United Kingdom", "GB")), "ghghg")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"),Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
@@ -135,7 +135,7 @@ class PreviouslyRegisteredControllerSpec extends GenericTestHelper with MockitoS
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 

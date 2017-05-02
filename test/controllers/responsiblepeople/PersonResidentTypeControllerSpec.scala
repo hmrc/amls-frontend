@@ -18,7 +18,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar {
+class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar with NinoUtil {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -39,9 +39,9 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
       "return OK" when {
 
         val personName = PersonName("firstname", None, "lastname", None, None)
-        val nino = "ab123456l"
+        val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("1234567890"))
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("0000000000"))
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))
@@ -115,7 +115,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA346464B",
+            "nino" -> nextNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -137,7 +137,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
             val newRequest = request.withFormUrlEncodedBody(
               "isUKResidence" -> "true",
-              "nino" -> "AA346464B",
+              "nino" -> nextNino,
               "countryOfBirth" -> "GB",
               "nationality" -> "GB"
             )
@@ -158,9 +158,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         "transforms the NINO to uppercase" in new Fixture {
 
+          val testNino = nextNino
+
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "aa346464b",
+            "nino" -> testNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -189,16 +191,20 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case _ => None
             }
           } yield nino) foreach {
-            _ mustBe "AA346464B"
+            _ mustBe testNino
           }
 
         }
 
         "remove spaces and dashes" in new Fixture {
 
+          val testNino = nextNino
+          val spacedNino = testNino.grouped(2).mkString(" ")
+          val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
+
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA 34 64- 64 B",
+            "nino" -> withDashes,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -227,7 +233,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case _ => None
             }
           } yield nino) foreach {
-            _ mustBe "AA346464B"
+            _ mustBe testNino
           }
 
         }
@@ -258,7 +264,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA346464B",
+            "nino" -> nextNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )

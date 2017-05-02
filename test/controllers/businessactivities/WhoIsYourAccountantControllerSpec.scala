@@ -112,7 +112,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
             "addressLine4" -> "line4",
-            "postCode" -> "AB12CD"
+            "postCode" -> "AA11AA"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -139,7 +139,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
             "addressLine4" -> "line4",
-            "postCode" -> "AB12CD"
+            "postCode" -> "AA11AA"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())
