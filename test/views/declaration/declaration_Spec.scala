@@ -6,7 +6,7 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class declareSpec extends GenericTestHelper with MustMatchers  {
+class declaration_Spec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
