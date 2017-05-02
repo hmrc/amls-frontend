@@ -64,7 +64,16 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
     }
 
     "post is called" must {
-      "on post with valid data" in new Fixture {
+      "respond with BAD_REQUEST when given invalid data" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "employeeCount" -> "",
+          "employeeCountAMLSSupervision" -> ""
+        )
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+      }
+
+      "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "employeeCount" -> "456",
@@ -77,35 +86,12 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
         when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post()(newRequest)
+        val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
       }
 
-      "on post without data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "",
-          "employeeCountAMLSSupervision" -> ""
-        )
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.ba.employee.count1"))
-      }
-
-
-      "on post with data longer than field length of 11 permitted" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "12345678912345"
-        )
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.max.length.ba.employee.count"))
-      }
-
-
-      "on post with valid data when edit is true" in new Fixture {
+      "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "employeeCount" -> "54321",
@@ -124,24 +110,6 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
 
-      "on post with valid data when edit is false" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "54321",
-          "employeeCountAMLSSupervision" -> "12345"
-        )
-
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val resultTrue = controller.post(false)(newRequest)
-        status(resultTrue) must be(SEE_OTHER)
-        redirectLocation(resultTrue) must be(Some(routes.TransactionRecordController.get().url))
-
-      }
     }
   }
 

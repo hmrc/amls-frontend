@@ -515,34 +515,38 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate a address lines" in {
       validateAddress.validate(symbols8) must be(Valid(symbols8))
-      validateAddress.validate("second cross(2nd cross),test") must be(Valid("second cross(2nd cross),test"))
-      validateAddress.validate("some road.Oh!") must be(Valid("some road.Oh!"))
+      validateAddress.validate("aa (1aa),aa") must be(Valid("aa (1aa),aa"))
+      validateAddress.validate("aa.b!") must be(Valid("aa.b!"))
 
     }
 
-    "fail validation on invalid number" in {
-      validateAddress.validate(addresses) must be(Invalid(Seq(
-        Path -> Seq(ValidationError("error.max.length.address.line"))
-      )))
+    "fail validation" when {
+      "given too many characters" in {
+        validateAddress.validate("a" * 36) must be(Invalid(Seq(
+          Path -> Seq(ValidationError("error.max.length.address.line"))
+        )))
+      }
 
-      validateAddress.validate("second bock & 3rd cross") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+      "given invalid characters" in {
+        validateAddress.validate("aa & aa") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("%%") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("%%") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("$$$$$$$") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("$$$$$$$") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("#######") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
-      validateAddress.validate("******") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("#######") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
+        validateAddress.validate("******") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
+      }
     }
   }
 

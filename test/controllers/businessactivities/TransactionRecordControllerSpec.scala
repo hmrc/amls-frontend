@@ -39,7 +39,6 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.keep.customer.records.title"))
 
         val page = Jsoup.parse(contentAsString(result))
         page.getElementById("isRecorded-true").hasAttr("checked") must be(false)
@@ -62,11 +61,6 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
 
         val page = Jsoup.parse(contentAsString(result))
         page.getElementById("isRecorded-true").hasAttr("checked") must be(true)
-        page.getElementById("isRecorded-false").hasAttr("checked") must be(false)
-        page.getElementById("transactions-01").hasAttr("checked") must be(true)
-        page.getElementById("transactions-02").hasAttr("checked") must be(true)
-        page.getElementById("transactions-03").hasAttr("checked") must be(true)
-        page.getElementById("name").`val` must be("test")
 
       }
     }
@@ -114,8 +108,7 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
         }
       }
 
-      "respond with BAD_REQUEST" when {
-        "given invalid data missing isRecorded field" in new Fixture {
+      "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "transactions[0]" -> "01",
@@ -131,32 +124,6 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isRecorded]").html() must include(Messages("error.required.ba.select.transaction.record"))
-        }
-
-        "given invalid data with isRecorded value of true and no name information" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "isRecorded" -> "true",
-            "transactions[0]" -> "01",
-            "transactions[1]" -> "02",
-            "transactions[2]" -> "03",
-            "name" -> ""
-          )
-
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#name]").html() must include(Messages("error.required.ba.software.package.name"))
-        }
       }
     }
   }

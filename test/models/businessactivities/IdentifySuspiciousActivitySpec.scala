@@ -3,6 +3,8 @@ package models.businessactivities
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+
 
 class IdentifySuspiciousActivitySpec extends PlaySpec {
 
@@ -25,6 +27,7 @@ class IdentifySuspiciousActivitySpec extends PlaySpec {
         (Path \ "hasWrittenGuidance") -> Seq(ValidationError("error.required.ba.suspicious.activity")))))
     }
   }
+
   "Form Writes" must {
     "Write true into form" in {
       IdentifySuspiciousActivity.formWrites.writes(IdentifySuspiciousActivity(true)) must be(Map("hasWrittenGuidance" -> Seq("true")))
@@ -33,6 +36,20 @@ class IdentifySuspiciousActivitySpec extends PlaySpec {
     "Write false into form" in {
       IdentifySuspiciousActivity.formWrites.writes(IdentifySuspiciousActivity(false)) must be(Map("hasWrittenGuidance" -> Seq("false")))
     }
+  }
 
+  "Json reads and writes" must {
+    "write Json correctly when given true value" in {
+      Json.toJson(IdentifySuspiciousActivity(true)) must be(Json.obj("hasWrittenGuidance" -> true))
+    }
+    "write Json correctly when given false value" in {
+      Json.toJson(IdentifySuspiciousActivity(false)) must be(Json.obj("hasWrittenGuidance" -> false))
+    }
+    "read Json correctly when given true value" in {
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> true)) must be(JsSuccess(IdentifySuspiciousActivity(true), JsPath \ "hasWrittenGuidance"))
+    }
+    "read Json correctly when given false value" in {
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> false)) must be(JsSuccess(IdentifySuspiciousActivity(false), JsPath \ "hasWrittenGuidance"))
+    }
   }
 }

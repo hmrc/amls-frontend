@@ -1,7 +1,8 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, UKCorrespondenceAddress}
+import models.Country
+import models.aboutthebusiness.{NonUKCorrespondenceAddress, AboutTheBusiness, UKCorrespondenceAddress}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -36,23 +37,33 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = UKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, "Test")
+        val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
         val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, Some(correspondenceAddress))
-        val fetchResult = Future.successful(Some(aboutTheBusiness))
 
-        when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.get(false)(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title must include(Messages("aboutthebusiness.correspondenceaddress.title"))
-        Jsoup.parse(contentAsString(result)).select("#yourName").`val` must include("Name Test")
+
+        val page = Jsoup.parse(contentAsString(result))
+        page.getElementById("yourName").`val` must be("Name Test")
+        page.getElementById("businessName").`val` must be("Test")
+        page.getElementById("isUK-true").hasAttr("checked") must be(false)
+        page.getElementById("isUK-false").hasAttr("checked") must be(true)
+        page.getElementById("addressLineNonUK1").`val` must be("Test")
+        page.getElementById("addressLineNonUK2").`val` must be("Test")
+        page.getElementById("addressLineNonUK3").`val` must be("test")
+        page.getElementById("addressLineNonUK4").`val` must be("")
+        page.getElementById("postCode").`val` must be("")
+        page.select("#country option[selected]").attr("value") must be("AL")
 
       }
 
       "no data exists in the keystore" in new Fixture {
 
-        val fetchResult = Future.successful(None)
-        when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
         status(result) must be(OK)

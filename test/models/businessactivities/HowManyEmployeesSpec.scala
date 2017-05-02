@@ -8,14 +8,55 @@ import scala.language.postfixOps
 
 class HowManyEmployeesSpec extends PlaySpec {
 
-  "Form Validation" must {
+  "HowManyEmployees" must {
 
-    "read and validate the input url encoded fields" in {
+    "pass validation" when {
+      "read and validate the input url encoded fields" in {
 
-      HowManyEmployees.formRule.validate(
-        Map("employeeCount" -> Seq("123456789"),
-          "employeeCountAMLSSupervision" -> Seq("12345678"))) must
-        be(Valid(HowManyEmployees("123456789", "12345678")))
+        HowManyEmployees.formRule.validate(
+          Map("employeeCount" -> Seq("123456789"),
+            "employeeCountAMLSSupervision" -> Seq("12345678"))) must
+          be(Valid(HowManyEmployees("123456789", "12345678")))
+      }
+    }
+
+    "fail validation" when {
+
+      "mandatory fields are not filled" in {
+
+        val data = Map("employeeCount" -> Seq(""),
+          "employeeCountAMLSSupervision" -> Seq(""))
+
+        HowManyEmployees.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "employeeCount") -> Seq(ValidationError("error.required.ba.employee.count1")),
+            (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.required.ba.employee.count2"))
+          )))
+      }
+
+      "given invalid characters" in {
+
+        val data = Map("employeeCount" -> Seq("abcd"),
+          "employeeCountAMLSSupervision" -> Seq("abcd"))
+
+        HowManyEmployees.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "employeeCount") -> Seq(ValidationError("error.invalid.ba.employee.count")),
+            (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
+          )))
+      }
+
+      "fail to validate given too many numbers" in {
+
+        val data = Map("employeeCount" -> Seq("1" * 12),
+          "employeeCountAMLSSupervision" -> Seq("1" * 12))
+
+        HowManyEmployees.formRule.validate(data) must
+          be(Invalid(Seq(
+            (Path \ "employeeCount") -> Seq(ValidationError("error.max.length.ba.employee.count")),
+            (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
+          )))
+      }
     }
 
     "write the model fields to url encoded response" in {
@@ -24,40 +65,6 @@ class HowManyEmployeesSpec extends PlaySpec {
         be(Map("employeeCount" -> Seq("123456789"),
           "employeeCountAMLSSupervision" -> Seq("12345678")))
 
-    }
-
-    "fail when mandatory fields not filled" in {
-
-      val data = Map("employeeCount" -> Seq(""),
-        "employeeCountAMLSSupervision" -> Seq(""))
-
-      HowManyEmployees.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "employeeCount") -> Seq(ValidationError("error.required.ba.employee.count1")),
-          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.required.ba.employee.count2"))
-        )))
-    }
-
-    "fail to validate given invalid data" in {
-
-      val data = Map("employeeCount" -> Seq("124545"),
-        "employeeCountAMLSSupervision" -> Seq("ghjgj"))
-
-      HowManyEmployees.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
-        )))
-    }
-
-    "fail to validate given max value" in {
-
-      val data = Map("employeeCount" -> Seq("12454"),
-        "employeeCountAMLSSupervision" -> Seq("111111111111"))
-
-      HowManyEmployees.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
-        )))
     }
   }
 

@@ -197,9 +197,6 @@ POST        /business-activities/business-turnover                      controll
 GET         /business-activities/records                                controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
 POST        /business-activities/records                                controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
-GET         /business-activities/employment                             controllers.businessactivities.CustomersOutsideUKController.get(edit: Boolean ?= false)
-POST        /business-activities/employment                             controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
-
 GET         /business-activities/crime-agency                           controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
 POST        /business-activities/crime-agency                           controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
