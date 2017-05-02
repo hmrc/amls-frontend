@@ -5,8 +5,10 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
+import models.DateOfChange
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate, Months}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.new_home_address
@@ -31,15 +33,24 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
           }
     }
 
- /* def getTimeAtAddress(dateOfMove: ResponsiblePersonEndDate): Option[TimeAtAddress] = {
-    dateOfMove.endDate.compareTo(LocalDate.now)
+  def getTimeAtAddress(dateOfMove:  Option[NewHomeDateOfChange]): Option[TimeAtAddress] = {
+    dateOfMove map {
+      date =>
+        Months.monthsBetween(LocalDate.now(), date.dateOfChange).getMonths match {
+          case m if 0 until 5 contains m  => ZeroToFiveMonths
+          case m if 6 until 11 contains m => SixToElevenMonths
+          case m if 12 until 36 contains m => OneToThreeYears
+          case _ => ThreeYearsPlus
+          //case _ => ZeroToFiveMonths
+        }
+    }
   }
 
-  def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[ResponsiblePersonEndDate]) = {
+  def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange]) = {
     ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
       getTimeAtAddress(dateOfMove),
-      dateOfMove)))
-  }*/
+      dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))))
+  }
 
   def post(index: Int, edit: Boolean = false) =
     Authorised.async {
@@ -52,10 +63,11 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
               }
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp => rp
-                  //rp.addressHistory(convertToCurrentAddress(data, rp.endDate))
+                  moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.addressHistory(convertToCurrentAddress(data, moveDate))
                 }
-              } yield Redirect(routes.CurrentAddressDateOfChangeController.get(index))
+              } yield Redirect(routes.DetailedAnswersController.get(index))
             }
           }).recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

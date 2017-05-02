@@ -1,9 +1,11 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
-import org.mockito.Matchers._
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
@@ -29,7 +31,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    val newHomeAddressController = app.injector.instanceOf[NewHomeAddressController]
+    val controllers = app.injector.instanceOf[NewHomeAddressController]
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -43,10 +45,10 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePeople()
 
-        when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        val result = newHomeAddressController.get(40)(request)
+        val result = controllers.get(40)(request)
         status(result) must be(NOT_FOUND)
       }
 
@@ -54,10 +56,10 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val responsiblePeople = ResponsiblePeople(personName)
 
-        when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        val result = newHomeAddressController.get(RecordId)(request)
+        val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
 
       }
@@ -79,15 +81,15 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = newHomeAddressController.post(RecordId)(requestWithParams)
+          val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
         }
 
@@ -95,25 +97,31 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
-            "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
-            "country" -> "ES"
+            "addressLineNonUK1" -> "Line 11",
+            "addressLineNonUK2" -> "Line 22",
+            "country" -> "UK"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val nUkAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("UK", "United Kingdom"))
+          val nAdditionalAddress = ResponsiblePersonCurrentAddress(nUkAddress, Some(ZeroToFiveMonths))
+          val nHistory =  ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now()))))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = newHomeAddressController.post(RecordId)(requestWithParams)
+          val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
+          verify(controllers.dataCacheConnector.save[ResponsiblePeople](any(), meq(responsiblePeople.copy(addressHistory = Some(nHistory))))(any(),any(), any()))
         }
 
       }
@@ -133,12 +141,12 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(personName = personName, addressHistory = Some(history))
 
-          when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = newHomeAddressController.post(RecordId)(requestWithParams)
+          val result = controllers.post(RecordId)(requestWithParams)
           status(result) must be(BAD_REQUEST)
         }
 
@@ -146,9 +154,9 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val line1MissingRequest = request.withFormUrlEncodedBody()
 
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          val result = newHomeAddressController.post(RecordId)(line1MissingRequest)
+          val result = controllers.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)
         }
 
@@ -161,10 +169,10 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> ""
           )
 
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = newHomeAddressController.post(RecordId)(requestWithMissingParams)
+          val result = controllers.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
         }
 
@@ -177,10 +185,10 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "country" -> ""
           )
 
-          when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = newHomeAddressController.post(RecordId)(requestWithMissingParams)
+          val result = controllers.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
         }
@@ -200,12 +208,12 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-            when(newHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(newHomeAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val result = newHomeAddressController.post(outOfBounds, true)(requestWithParams)
+            val result = controllers.post(outOfBounds, true)(requestWithParams)
 
             status(result) must be(NOT_FOUND)
           }
