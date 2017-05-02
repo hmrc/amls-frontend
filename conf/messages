@@ -624,6 +624,12 @@ confirmation.variation.lede = You’ve updated your information
 confirmation.variation.info = You need to pay a fee for the updates you’ve made. Your changes won’t be reviewed by HMRC Revenue and Customs until the fee is paid.
 confirmation.variation.summary = This shows your total fees for each item.
 
+confirmation.renewal.title = Renewal fee and reference
+confirmation.renewal.header = Renewal fee and reference
+confirmation.renewal.info = Your renewal won’t be processed by HM Revenue and Customs until the fee is paid.
+confirmation.renewal.header.secondary = Submit renewal
+confirmation.renewal.summary = This shows your total renewal fees for each item.
+
 confirmation.payment.title = You’ve submitted
 confirmation.payment.lede = You’ve submitted
 confirmation.payment.reference_header = Payment reference: {0}
