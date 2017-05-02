@@ -31,7 +31,7 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
 
     "get is called" must {
 
-      "load the Accountant For AMLSRegulations page" in new Fixture {
+      "load the Accountant For AMLSRegulations page with an empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -39,16 +39,12 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val pageTitle = Messages("businessactivities.accountantForAMLSRegulations.title") + " - " +
-          Messages("progress.businessactivities.name") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
         val htmlValue = Jsoup.parse(contentAsString(result))
         htmlValue.getElementById("accountantForAMLSRegulations-true").hasAttr("checked") must be(false)
         htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
       }
 
-      "lpre-populate the form when data is already present" in new Fixture {
+      "pre-populate the form when data is already present" in new Fixture {
 
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
