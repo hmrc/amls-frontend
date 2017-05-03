@@ -8,7 +8,7 @@ import play.api.libs.json.Json
 
 class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
-  val DefaultCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), Some(ZeroToFiveMonths))
+  val DefaultCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA"), Some(ZeroToFiveMonths))
   val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), Some(SixToElevenMonths))
   val DefaultAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE1234"), Some(OneToThreeYears))
 
@@ -72,7 +72,7 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
           "personAddress" -> Json.obj(
             "personAddressLine1" -> "Line 1",
             "personAddressLine2" -> "Line 2",
-            "personAddressPostCode" -> "AA1234"
+            "personAddressPostCode" -> "NE1234"
           ),
           "timeAtAddress" -> Json.obj(
             "timeAtAddress" -> "03"

@@ -28,7 +28,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "address 2",
     Some("address 3"),
     Some("address 4"),
-    "NE77 0QQ")
+    "AA11 1AA")
 
   val completeModel = AboutTheBusiness(
     previouslyRegistered = Some(previouslyRegistered),

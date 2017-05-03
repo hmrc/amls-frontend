@@ -359,7 +359,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         BankDetails.reads.reads(input) must be (JsSuccess(
           BankDetails(
             Some(PersonalAccount),
-            Some(BankAccount("sadfjkl", UKAccount("12345678", "123456"))),
+            Some(BankAccount("sadfjkl", UKAccount("12345678", "000000"))),
             false,
             false,
             None
