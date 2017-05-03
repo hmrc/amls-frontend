@@ -1501,7 +1501,9 @@ renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to sho
 renewal.whatyouneed.line_1 = your net profit
 renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
 renewal.progress.title = Your renewal progress
-renewal.progress.intro = In order to submit your renewal you will need to complete the renewal section. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
+renewal.progress.tpandrp.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
+  Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+renewal.progress.tponly.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new trading premises.\n\
   Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.

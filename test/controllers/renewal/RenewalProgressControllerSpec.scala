@@ -1,6 +1,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -16,8 +17,8 @@ import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
@@ -61,11 +62,24 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       renewalService.getSection(any(), any(), any())
     } thenReturn Future.successful(renewalSection)
 
+    val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(bm)
+
   }
 
   "The Renewal Progress Controller" must {
 
     "load the page" in new Fixture {
+
+      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
+      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(bmWithoutTCSPOrMSB)
+
       val result = controller.get()(request)
 
       status(result) mustBe OK

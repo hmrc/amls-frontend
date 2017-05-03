@@ -6,10 +6,12 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
 import play.api.i18n.MessagesApi
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
@@ -35,11 +37,13 @@ class RenewalProgressController @Inject()
             cache <- OptionT(dataCacheConnector.fetchAll)
           } yield {
             val variationSections = progressService.sections(cache)
+            val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
+            val msbOrTcspExists = ControllerHelper.isMSBSelected(businessMatching) || ControllerHelper.isTCSPSelected(businessMatching)
 
-            Ok(renewal_progress(renewalSection, variationSections, canSubmit))
+            Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists))
           }
 
-          block getOrElse Ok(renewal_progress(renewalSection, Seq.empty, canSubmit))
+          block getOrElse Ok(renewal_progress(renewalSection, Seq.empty, canSubmit, true))
         }
   }
 
