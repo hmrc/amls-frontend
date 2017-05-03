@@ -135,9 +135,12 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().plusMonths(37))))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().plusMonths(37))))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val updatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = None, additionalExtraAddress = None)
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -152,7 +155,8 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople)))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+            meq(Seq(responsiblePeople.copy(addressHistory = Some(updatedHistory)))))(any(), any(), any())
         }
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
@@ -275,7 +279,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             when(controllers.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val result = controllers.post(outOfBounds, true)(requestWithParams)
+            val result = controllers.post(outOfBounds)(requestWithParams)
 
             status(result) must be(NOT_FOUND)
           }

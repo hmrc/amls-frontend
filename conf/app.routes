@@ -274,11 +274,11 @@ GET         /responsible-people/person-details/:index                   controll
 GET         /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
-GET         /responsible-people/address-new/:index                      @controllers.responsiblepeople.NewHomeAddressController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/address-new/:index                      @controllers.responsiblepeople.NewHomeAddressController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/address-new/:index                      @controllers.responsiblepeople.NewHomeAddressController.get(index:Int)
+POST        /responsible-people/address-new/:index                      @controllers.responsiblepeople.NewHomeAddressController.post(index:Int)
 
-GET         /responsible-people/date-change-moved/:index                      @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.get(index:Int)
-POST        /responsible-people/date-change-moved/:index                      @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.post(index:Int)
+GET         /responsible-people/date-change-moved/:index                @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.get(index:Int)
+POST        /responsible-people/date-change-moved/:index                @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.post(index:Int)
 
 GET         /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/time-at-additional-address/:index       controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)

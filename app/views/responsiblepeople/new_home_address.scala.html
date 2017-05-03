@@ -2,19 +2,19 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.wherepersonlives.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.new.home.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.wherepersonlives.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.new.home.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.NewHomeAddressController.post(index,edit)) {
+    @form(f, controllers.responsiblepeople.routes.NewHomeAddressController.post(index)) {
 
         <div class="form-group">
             @fieldset(
@@ -41,7 +41,7 @@
 
         <div class="form-group">
             @fieldset(
-                legend = "responsiblepeople.wherepersonlives.title",
+                legend = "responsiblepeople.new.home.title",
                 legendHidden = true,
                 panel = false,
                 classes = Seq("ukAddress-fieldset"),
@@ -74,7 +74,7 @@
             }
 
         @fieldset(
-            legend = "responsiblepeople.wherepersonlives.title",
+            legend = "responsiblepeople.new.home.title",
             legendHidden = true,
             panel = false,
             classes = Seq("nonUkAddress-fieldset"),
@@ -107,7 +107,7 @@
 
         </div>
 
-        @submit(edit, Some("button.saveandcontinue"))
+        @submit(false, Some("button.saveandcontinue"))
     }
 }
 

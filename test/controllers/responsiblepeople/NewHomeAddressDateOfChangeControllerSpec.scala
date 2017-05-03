@@ -88,7 +88,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends GenericTestHelper {
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
         val result = controller.post(1)(postRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.NewHomeAddressController.get(1, false).url))
+        redirectLocation(result) must be(Some(routes.NewHomeAddressController.get(1).url))
       }
 
       "fail validation on invalid input" in new Fixture {

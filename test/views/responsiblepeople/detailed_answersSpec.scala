@@ -151,8 +151,11 @@ class detailed_answersSpec extends GenericTestHelper
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
         }
+        val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+        element.hasAttr("href") must be(true)
+        element.attr("href") must be("/anti-money-laundering/responsible-people/date-change-moved/1")
 
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")

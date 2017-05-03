@@ -4,13 +4,15 @@
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
 
-@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
     editUrl: String = "",
     dataItem: Option[T]
 )(content: T => Html)(implicit lang: Lang) = {
+
+
 
 <section class="check-your-answers">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
@@ -53,7 +55,18 @@
 
     @model.map { person =>
 
-
+            @person.personName.map { pName =>
+                <div class="panel panel-border-wide">
+                    <p>
+                        <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                            @showHide match {
+                                case true => { @Messages("responsiblepeople.detailed_answer.tell.us.moved", pName.fullName) }
+                                case false => {}
+                            }
+                        </a>
+                    </p>
+                </div>
+            }
 
         <h2 class="heading-large">
             @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):

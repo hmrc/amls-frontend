@@ -21,13 +21,13 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
-  def get(index: Int, edit: Boolean = false) =
+  def get(index: Int) =
     Authorised.async {
       implicit authContext =>
         implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-            => Ok(new_home_address(Form2(DefaultAddressHistory), edit, index, personName.titleName))
+            => Ok(new_home_address(Form2(DefaultAddressHistory), index, personName.titleName))
             case _
             => NotFound(notFoundView)
           }
@@ -41,7 +41,6 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
           case m if 6 until 11 contains m => SixToElevenMonths
           case m if 12 until 36 contains m => OneToThreeYears
           case _ => ThreeYearsPlus
-          //case _ => ZeroToFiveMonths
         }
     }
   }
@@ -52,14 +51,14 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
       dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))))
   }
 
-  def post(index: Int, edit: Boolean = false) =
+  def post(index: Int) =
     Authorised.async {
       implicit authContext =>
         implicit request =>
           (Form2[NewHomeAddress](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map { rp =>
-                BadRequest(new_home_address(f, edit, index, ControllerHelper.rpTitleName(rp)))
+                BadRequest(new_home_address(f, index, ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
               for {
