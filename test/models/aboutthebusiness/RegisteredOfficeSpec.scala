@@ -197,7 +197,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "json read the given non UK address" in {
 
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "AA1 1AA")
+      val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA")
       val jsonObj = Json.obj("postCode" -> "AA1 1AA")
 
       Json.fromJson[RegisteredOffice](jsonObj) must be
@@ -205,12 +205,12 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "write correct value to json with date of change" in {
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "AA1 1AA", Some(DateOfChange(new LocalDate(2017,1,1))))
+      val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA", Some(DateOfChange(new LocalDate(2017,1,1))))
 
       Json.toJson(data) must
         be(Json.obj(
           "addressLine1" -> "38B",
-          "addressLine2" -> "Longbenton",
+          "addressLine2" -> "area",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
           "postCode" -> "AA1 1AA",
