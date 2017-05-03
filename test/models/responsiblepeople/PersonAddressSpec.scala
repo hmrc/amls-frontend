@@ -12,14 +12,14 @@ class PersonAddressSpec extends PlaySpec {
   val DefaultAddressLine2 = "Default Line 2"
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "NE1 7YX"
+  val DefaultPostcode = "AA1 1AA"
   val DefaultCountry = Country("United Kingdom", "GB")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
-  val NewPostcode = "CR6 5HG"
+  val NewPostcode = "AA1 1AA"
   val NewCountry = "AB"
 
   val DefaultUKAddress = PersonAddressUK(
@@ -77,7 +77,7 @@ class PersonAddressSpec extends PlaySpec {
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
-        "NE1 7YX"))
+        "AA1 1AA"))
 
     }
 

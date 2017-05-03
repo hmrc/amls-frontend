@@ -52,7 +52,7 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
           "personAddress" -> Json.obj(
             "personAddressLine1" -> "Line 1",
             "personAddressLine2" -> "Line 2",
-            "personAddressPostCode" -> "NE981ZZ"
+            "personAddressPostCode" -> "AA111AA"
           ),
           "timeAtAddress" -> Json.obj(
             "timeAtAddress" -> "01"
@@ -72,7 +72,7 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
           "personAddress" -> Json.obj(
             "personAddressLine1" -> "Line 1",
             "personAddressLine2" -> "Line 2",
-            "personAddressPostCode" -> "NE1234"
+            "personAddressPostCode" -> "AA1234"
           ),
           "timeAtAddress" -> Json.obj(
             "timeAtAddress" -> "03"

@@ -26,7 +26,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
     val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
     val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB"))
-    val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0001234567890")
+    val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0000000000000")
     val TypeOfBusinessModel = TypeOfBusiness("test")
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
     val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
@@ -41,10 +41,10 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         "line_2" -> "line2",
         "line_3" -> "line3",
         "line_4" -> "line4",
-        "postcode" -> "NE77 0QQ",
+        "postcode" -> "AA11 1AA",
         "country" -> "GB"
       ),
-      "safeId" -> "XE0001234567890",
+      "safeId" -> "XE0000000000000",
       "typeOfBusiness" -> "test",
       "companyRegistrationNumber" -> "12345678",
       "appliedFor" -> true,
@@ -124,11 +124,11 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           businessMatching.copy(companyRegistrationNumber = None).isComplete mustBe true
         }
         "reviewDetails, activites and crn are set and BusinessType contains LimitedCompany" in {
-          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0001234567890")
+          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
           businessMatching.copy(typeOfBusiness = None, reviewDetails = Some(ReviewDetailsModel)).isComplete mustBe true
         }
         "reviewDetails, activites and crn are set and BusinessType contains LPrLLP" in {
-          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0001234567890")
+          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")
           businessMatching.copy(typeOfBusiness = None, reviewDetails = Some(ReviewDetailsModel)).isComplete mustBe true
         }
 
@@ -176,14 +176,14 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         }
         "reviewDetails and activites are set, type is set and UnincorporatedBody is not set" in {
           val testModel = businessMatching.copy(
-            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0001234567890")),
+            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")),
             companyRegistrationNumber = None
           )
           testModel.isComplete mustBe false
         }
         "reviewDetails and activites are set, crn is set, LimitedCompany and UnincorporatedBody are not set" in {
           val testModel = businessMatching.copy(
-            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")),
+            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")),
             typeOfBusiness = None
           )
           testModel.isComplete mustBe false

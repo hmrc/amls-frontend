@@ -13,7 +13,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
     "tradingName" -> Seq("foo"),
     "addressLine1" -> Seq("1"),
     "addressLine2" -> Seq("2"),
-    "postcode" -> Seq("AA03 5BB"),
+    "postcode" -> Seq("AA11 1AA"),
     "isResidential" -> Seq("true"),
     "startDate.day" -> Seq("24"),
     "startDate.month" -> Seq("2"),
@@ -27,7 +27,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "2",
       None,
       None,
-      "AA03 5BB"
+      "AA11 1AA"
     ),
     Some(true),
     Some(new LocalDate(1990, 2, 24))
@@ -39,8 +39,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foo"),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB")
-      )) must be (Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA03 5BB",None),None,None,None)))
+        "postcode" -> Seq("AA11 1AA")
+      )) must be (Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA11 1AA",None),None,None,None)))
 
     }
 
@@ -48,7 +48,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foooo"*50),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB"),
+        "postcode" -> Seq("AA11 1AA"),
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
@@ -60,7 +60,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq(""),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB"),
+        "postcode" -> Seq("AA11 1AA"),
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
@@ -72,7 +72,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("   "),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB"),
+        "postcode" -> Seq("AA11 1AA"),
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
@@ -84,7 +84,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("{}{}}"),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA03 5BB"),
+        "postcode" -> Seq("AA11 1AA"),
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
@@ -114,7 +114,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "addressLine1" -> "1",
       "addressLine2" -> "2",
       "addressDateOfChange" -> new LocalDate(1997, 7, 1),
-      "postcode" -> "AA03 5BB",
+      "postcode" -> "AA11 1AA",
       "isResidential" -> true,
       "startDate" -> new LocalDate(1990, 2, 24),
       "tradingNameChangeDate" -> new LocalDate(2016,1,12)
