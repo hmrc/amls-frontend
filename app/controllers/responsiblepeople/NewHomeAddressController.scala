@@ -10,14 +10,14 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonth
 import models.responsiblepeople._
 import org.joda.time.{LocalDate, Months}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.new_home_address
 
 import scala.concurrent.Future
 
 @Singleton
 class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
-                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController with DateOfChangeHelper {
+                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
@@ -33,7 +33,7 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
           }
     }
 
-  def getTimeAtAddress(dateOfMove:  Option[NewHomeDateOfChange]): Option[TimeAtAddress] = {
+  private def getTimeAtAddress(dateOfMove:  Option[NewHomeDateOfChange]): Option[TimeAtAddress] = {
     dateOfMove map {
       date =>
         Months.monthsBetween(LocalDate.now(), date.dateOfChange).getMonths match {
@@ -45,10 +45,14 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange]) = {
+  private def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePeople) = {
+    println("================================================================="+addr)
     ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
       getTimeAtAddress(dateOfMove),
-      dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))))
+      dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))),
+      rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalAddress),
+      rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalExtraAddress)
+    )
   }
 
   def post(index: Int) =
@@ -62,9 +66,9 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
               }
             case ValidForm(_, data) => {
               for {
-                  moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.addressHistory(convertToCurrentAddress(data, moveDate))
+                moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
+                result <- updateDataStrict[ResponsiblePeople](index) { rp => rp
+                  //rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
               } yield Redirect(routes.DetailedAnswersController.get(index))
             }

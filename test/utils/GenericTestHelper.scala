@@ -15,10 +15,9 @@ trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   protected val bindModules: Seq[GuiceableModule] = Seq()
 
-  val dataCacheConnector = mock[DataCacheConnector]
+
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .bindings(bindModules:_*).in(Mode.Test)
-    .overrides(bind[DataCacheConnector].to(dataCacheConnector))
     .build()
 
   implicit val messagesApi = app.injector.instanceOf[MessagesApi]

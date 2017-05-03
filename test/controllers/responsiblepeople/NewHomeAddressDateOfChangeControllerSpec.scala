@@ -19,6 +19,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends GenericTestHelper {
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
+    val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
