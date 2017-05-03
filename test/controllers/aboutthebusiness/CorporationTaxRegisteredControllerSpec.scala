@@ -53,7 +53,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
     "on get display the registered for corporation tax page with pre populated data" in new Fixture {
 
-      val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1234567890")))
+      val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(data)))
@@ -62,7 +62,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-      document.getElementById("corporationTaxReference").`val` must be("1234567890")
+      document.getElementById("corporationTaxReference").`val` must be("1111111111")
     }
 
     "on get display an empty form when no previous entry" in new Fixture {
@@ -85,7 +85,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
       val newRequest = request.withFormUrlEncodedBody(
         "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> "1234567890"
+        "corporationTaxReference" -> "1111111111"
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
@@ -103,7 +103,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
       val newRequest = request.withFormUrlEncodedBody(
         "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> "1234567890"
+        "corporationTaxReference" -> "1111111111"
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())

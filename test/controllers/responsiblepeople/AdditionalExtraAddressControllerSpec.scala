@@ -78,7 +78,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           "existingAddressLine1",
           Some("existingAddressLine3"),
           Some("existingAddressLine4"),
-          "PS33DE"
+          "AA11AA"
         )
 
         val responsiblePeople = ResponsiblePeople(

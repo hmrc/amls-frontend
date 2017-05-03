@@ -61,7 +61,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "display position within the business page" in new Fixture {
         val mockCacheMap = mock[CacheMap]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -88,7 +88,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "display position within the business page when business Type is SoleProprietor" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
@@ -112,7 +112,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "display position within the business page when business Type is Partnership" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.Partnership),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
@@ -136,7 +136,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "display position within the business page when business Type is UnincorporatedBody" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
@@ -161,7 +161,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "display position within the business page when business Type is LPrLLP" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
         val positions = Positions(Set(BeneficialOwner, Director, NominatedOfficer, DesignatedMember), startDate)
         val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
@@ -191,7 +191,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         val positions = Positions(Set(BeneficialOwner), startDate)
         val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
@@ -224,7 +224,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
@@ -339,7 +339,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
           val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "10")
           val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-            Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
           val businessMatching = BusinessMatching(Some(reviewDtls))
 
           val mockCacheMap = mock[CacheMap]

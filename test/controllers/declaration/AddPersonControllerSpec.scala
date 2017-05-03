@@ -55,7 +55,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
     "on get display the persons page" when {
       "status is pending" in new Fixture {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
@@ -131,8 +131,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
       "status is pending" in new Fixture {
 
         val requestWithParams = request.withFormUrlEncodedBody(
-          "firstName" -> "John",
-          "lastName" -> "Doe",
+          "firstName" -> "firstName",
+          "lastName" -> "lastName",
           "roleWithinBusiness" -> "01"
         )
 
@@ -149,8 +149,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
       "status is pre-submission" in new Fixture {
 
         val requestWithParams = request.withFormUrlEncodedBody(
-          "firstName" -> "John",
-          "lastName" -> "Doe",
+          "firstName" -> "firstName",
+          "lastName" -> "lastName",
           "roleWithinBusiness" -> "01"
         )
 
@@ -169,7 +169,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
     "must fail on post if first name not supplied" in new Fixture {
 
       val firstNameMissingInRequest = request.withFormUrlEncodedBody(
-        "lastName" -> "Doe",
+        "lastName" -> "lastName",
         "roleWithinBusiness" -> "01"
       )
 
@@ -189,7 +189,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
     "must fail on post if last name not supplied" in new Fixture {
 
       val lastNameNissingInRequest = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
+        "firstName" -> "firstName",
         "roleWithinBusiness" -> "01"
       )
 
@@ -209,8 +209,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
     "must fail on post if roleWithinBusiness not supplied" in new Fixture {
 
       val roleMissingInRequest = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe"
+        "firstName" -> "firstName",
+        "lastName" -> "lastName"
       )
 
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -259,8 +259,8 @@ class AddPersonRelease7Spec extends GenericTestHelper with MockitoSugar {
     "status is pending" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
+        "firstName" -> "firstName",
+        "lastName" -> "lastName",
         "roleWithinBusiness[]" -> "BeneficialShareholder"
       )
 
@@ -277,8 +277,8 @@ class AddPersonRelease7Spec extends GenericTestHelper with MockitoSugar {
     "status is pre-submission" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
+        "firstName" -> "firstName",
+        "lastName" -> "lastName",
         "roleWithinBusiness[]" -> "BeneficialShareholder"
       )
 
@@ -341,8 +341,8 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
       "status is pending" in new Fixture {
 
         val requestWithParams = request.withFormUrlEncodedBody(
-          "firstName" -> "John",
-          "lastName" -> "Doe",
+          "firstName" -> "firstName",
+          "lastName" -> "lastName",
           "roleWithinBusiness" -> "01"
         )
 
@@ -389,8 +389,8 @@ class AddPersonControllerWithoutAmendmentSpecRelease7 extends GenericTestHelper 
       "status is pending" in new Fixture {
 
         val requestWithParams = request.withFormUrlEncodedBody(
-          "firstName" -> "John",
-          "lastName" -> "Doe",
+          "firstName" -> "firstName",
+          "lastName" -> "lastName",
           "roleWithinBusiness[]" -> "BeneficialShareholder"
         )
 

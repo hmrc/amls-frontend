@@ -44,11 +44,11 @@ class YourAnswersControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "show the 'Add a responsible person' link" in new Fixture {
 
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)))
+        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1", None, None)))
+        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2", None, None)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(mark, john))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -62,18 +62,18 @@ class YourAnswersControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "correctly display responsible people's full names" in new Fixture {
 
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)))
+        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1", None, None)))
+        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2", None, None)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(mark, john))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = contentAsString(result)
-        document must include ("John Alan Smith")
-        document must include ("Mark Smith")
+        document must include ("firstName1 middleName lastName1")
+        document must include ("firstName2 lastName2")
 
       }
 

@@ -50,7 +50,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
         }
 
         "there is already bank account detail information" in new Fixture {
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
@@ -79,7 +79,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
         }
         "editing an amendment" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
@@ -94,7 +94,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
         }
         "editing a variaton" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
