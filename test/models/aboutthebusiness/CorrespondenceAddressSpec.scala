@@ -20,7 +20,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
           "Default Line 2",
           "Default Line 3",
           "Default Line 4",
-          "NE1 7YX"))
+          "AA1 1AA"))
 
       }
 
@@ -204,7 +204,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   val DefaultAddressLine2 = "Default Line 2"
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "NE1 7YX"
+  val DefaultPostcode = "AA1 1AA"
   val DefaultCountry = Country("United Kingdom", "GB")
 
   val NewYourName = "New Your Name"
@@ -213,7 +213,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   val NewAddressLine2 = "New Line 2"
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
-  val NewPostcode = "CR6 5HG"
+  val NewPostcode = "AA1 1AA"
   val NewCountry = "AB"
 
   val DefaultUKAddress = UKCorrespondenceAddress(DefaultYourName,
