@@ -70,7 +70,19 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
       radioButtons.size must be(people.size + 1)
       radioButtons.get(0).parent().html() must include("A Name 1")
       radioButtons.get(1).parent().html() must include("A Name 2")
+    }
 
+    "pre-populates the form" in new ViewFixture {
+      val f = Form2(WhoIsRegistering("APerson"))
+
+      val people = Seq(
+        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1", None, None))),
+        ResponsiblePeople(personName = Some(PersonName("A",  None, "Person", None, None)))
+      )
+
+      def view = views.html.declaration.who_is_registering(("string1", "string2"), f, people)
+
+      doc.select("form input[type=radio][checked]").`val` mustBe "APerson"
     }
   }
 }
