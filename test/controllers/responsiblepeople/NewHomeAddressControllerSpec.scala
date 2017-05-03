@@ -107,9 +107,15 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
+      
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+
+          val upHistory = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
+            additionalAddress = Some(additionalAddress),
+            additionalExtraAddress = Some(additionalExtraAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(upHistory))
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -153,14 +159,15 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople1))))
 
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key),
-            meq(Seq(responsiblePeople1)))(any(), any(), any()))
+            any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+            meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any(), any(), any())
         }
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {

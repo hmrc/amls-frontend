@@ -45,13 +45,28 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  def getAddress(rp: ResponsiblePeople, dateOfMove: Option[TimeAtAddress]): Option[ResponsiblePersonAddress] = {
+    dateOfMove match {
+      case Some(OneToThreeYears) | Some(ThreeYearsPlus) => None
+      case _ => rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalAddress)
+    }
+  }
+
+  def getExtraAddress(rp: ResponsiblePeople, dateOfMove: Option[TimeAtAddress]): Option[ResponsiblePersonAddress] = {
+    dateOfMove match {
+      case Some(OneToThreeYears) | Some(ThreeYearsPlus) => None
+      case _ => rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalExtraAddress)
+    }
+  }
+
   private def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePeople) = {
+    val currentTimeAtAddress = getTimeAtAddress(dateOfMove)
     println("================================================================="+addr)
     ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
-      getTimeAtAddress(dateOfMove),
+      currentTimeAtAddress,
       dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))),
-      rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalAddress),
-      rp.addressHistory.fold[Option[ResponsiblePersonAddress] ](None)(_.additionalExtraAddress)
+      getAddress(rp, currentTimeAtAddress),
+      getExtraAddress(rp, currentTimeAtAddress)
     )
   }
 
@@ -67,8 +82,8 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
             case ValidForm(_, data) => {
               for {
                 moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
-                result <- updateDataStrict[ResponsiblePeople](index) { rp => rp
-                  //rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
               } yield Redirect(routes.DetailedAnswersController.get(index))
             }
