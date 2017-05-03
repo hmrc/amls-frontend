@@ -19,7 +19,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_incomplete("XAML00000567890", Some("business Name"))
+      def view = views.html.status.status_incomplete("XAML00000000000", Some("business Name"))
 
       doc.title must be(Messages("status.incomplete.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.incomplete.heading"))
@@ -28,7 +28,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view = views.html.status.status_incomplete("XAML00000567890", Some("business Name"))
+      def view = views.html.status.status_incomplete("XAML00000000000", Some("business Name"))
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -44,7 +44,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
 
     "do not show business name when 'business name' is empty" in new ViewFixture {
 
-      def view = views.html.status.status_incomplete("XAML00000567890", None)
+      def view = views.html.status.status_incomplete("XAML00000000000", None)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).isEmpty must be(true)
