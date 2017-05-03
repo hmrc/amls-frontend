@@ -122,7 +122,7 @@ class businessmatchingSpec extends GenericTestHelper
         TelephonePaymentService))
       val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-      val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
+      val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
       val TypeOfBusinessModel = TypeOfBusiness("test")
       val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
       val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberNo

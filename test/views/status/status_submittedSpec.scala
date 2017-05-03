@@ -23,7 +23,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
 
       doc.title must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissionreadyforreview.heading"))
@@ -32,7 +32,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view = views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -63,7 +63,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contains 'update/amend information' content and link" in new ViewFixture {
 
-      def view = views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
 
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.amendment.edit"))
@@ -71,7 +71,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "do not show specific content when view input is none" in new ViewFixture {
 
-      def view = views.html.status.status_submitted("XAML00000567890", None, None, None)
+      def view = views.html.status.status_submitted("XAML00000000000", None, None, None)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
 
@@ -83,12 +83,12 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "show specific content when view input has feeData and submitted date" in new ViewFixture {
 
-      val feeResponse = FeeResponse(SubscriptionResponseType, "XAML00000567890"
-      , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
+      val feeResponse = FeeResponse(SubscriptionResponseType, "XAML00000000000"
+      , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
 
-      def view = views.html.status.status_submitted("XAML00000567890", Some("business name"), Some(feeResponse), Some(LocalDateTime.now()))
+      def view = views.html.status.status_submitted("XAML0000000000", Some("business name"), Some(feeResponse), Some(LocalDateTime.now()))
 
       val date = DateHelper.formatDate(LocalDate.now())
       doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must be
@@ -98,7 +98,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
 
     "contains expected survey link for supervised status" in new ViewFixture {
-      def view =  views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view =  views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
         be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))
