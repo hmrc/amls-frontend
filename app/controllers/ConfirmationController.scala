@@ -106,7 +106,7 @@ trait ConfirmationController extends BaseController {
             routes.ConfirmationController.paymentConfirmation(paymentRef).url))
         } yield {
           ApplicationConfig.paymentsUrlLookupToggle match {
-            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url, status)).withCookies(paymentsRedirect.responseCookies: _*)
             case _ => Ok(confirmation(paymentRef, total, rows))
           }
         }
