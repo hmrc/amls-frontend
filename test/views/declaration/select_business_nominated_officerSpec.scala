@@ -25,6 +25,7 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
       doc.title mustBe s"${Messages("declaration.who.is.business.nominated.officer")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.business.nominated.officer"))
       subHeading.html must include("subheading")
+      doc.text() must include(Messages("declaration.who.is.business.nominated.officer.text"))
     }
 
     "have a list of responsible people" in new ViewFixture {
