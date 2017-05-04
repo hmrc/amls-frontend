@@ -26,7 +26,7 @@ object NewHomeDateOfChange {
       case NewHomeDateOfChange(b) =>Map(
         "dateOfChange.day" -> Seq(b.fold("")(_.get(DateTimeFieldType.dayOfMonth()).toString)),
         "dateOfChange.month" -> Seq(b.fold("")(_.get(DateTimeFieldType.monthOfYear()).toString)),
-        "dateOfChange.year" -> Seq(b.fold("")(_.(DateTimeFieldType.year()).toString)
+        "dateOfChange.year" -> Seq(b.fold("")(_.get(DateTimeFieldType.year()).toString)
       )
     }
 }
