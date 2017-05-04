@@ -1,0 +1,72 @@
+@import include._
+@import models.status._
+@import config.ApplicationConfig
+@import org.joda.time.LocalDateTime
+@import org.joda.time.LocalDate
+@import utils.DateHelper
+
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean)(implicit request: Request[_],m:Messages)
+
+@main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration") {
+
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <header class="page-header">
+            <h1 class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
+            <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+        </header>
+    </div>
+    <div class="grid-layout__column grid-layout__column--1-3">
+        @* empty for layout reasons *@
+    </div>
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            @businessName.map {bn =>
+            <p class="heading-small">@Messages("status.business")</p>
+            <p>@bn</p>
+            }
+            <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.renewalsubmitted.text")</p>
+        </div>
+    </div>
+    <div class="grid-layout__column grid-layout__column--1-3">
+        @if(ApplicationConfig.notificationsToggle) {
+        <div class="govuk-box-highlight messaging">
+            <!-- <i class="icon icon-information"></i>  -->
+            <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
+        </div>
+        }
+        <div class="grid-row statusblock declaration">
+            <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
+            <ul>
+                <li><a href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--1-3">
+        <ol class="list list-number status-list">
+            <li class="status-list--complete">@Messages("status.complete") <span class="status-list--icon"></span></li>
+            <li class="status-list--complete">@Messages("status.submitted") <span class="status-list--icon"></span></li>
+            <li class="status-list--pending status-list--end">@Messages("status.underreview") <span class="status-list--icon"></span></li>
+        </ol>
+    </div>
+    <div class="grid-layout__column grid-layout__column--2-3">
+        @include.status.rightpanel_renewalsubmitted()
+    </div>
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
+        <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
+    </div>
+    <div class="grid-layout__column grid-layout__column--1-3">
+        @* empty for layout reasons *@
+    </div>
+</div>
+}

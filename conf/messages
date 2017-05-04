@@ -487,6 +487,12 @@ status.submissiondecisionexpired.title = Application expired
 status.submissiondecisionexpired.description = Your supervision has expired.
 status.submissiondecisionexpired.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 
+status.renewalsubmitted.text = Currently supervised, renewal under review
+status.renewalsubmitted.description = Renewal under review
+status.renewalsubmitted.description2 = Your renewal application will be reviewed by HM Revenue and Customs.
+status.renewalsubmitted.description3 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
+status.renewalsubmitted.description4 = You’re still registered for anti-money laundering supervision and can continue trading while your application is reviewed.
+
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee

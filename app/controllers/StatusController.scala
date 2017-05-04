@@ -1,5 +1,6 @@
 package controllers
 
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.FeeConnector
 import models.{FeeResponse, ReadStatusResponse}
@@ -7,8 +8,9 @@ import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseTy
 import models.businessmatching.BusinessMatching
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
+import play.api.Play
 import play.api.mvc.{AnyContent, Request}
-import services.{AuthEnrolmentsService, LandingService, _}
+import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 import views.html.status._
@@ -26,43 +28,7 @@ trait StatusController extends BaseController {
 
   private[controllers] def feeConnector: FeeConnector
 
-  def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
-                                                                                       headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
-    (mlrRegNumber, submissionStatus) match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
-        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0)=> Some(x)
-          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
-          case _ => None
-        })
-      }.recoverWith {
-        case _: NotFoundException => Future.successful(None)
-      }
-      case _ => Future.successful(None)
-    }
-  }
-
-  private def redirectBasedOnStatus(mlrRegNumber: Option[String],
-                            statusInfo: (SubmissionStatus,
-                            Option[ReadStatusResponse]),
-                            businessNameOption: Option[String],
-                            feeResponse: Option[FeeResponse])(implicit request: Request[AnyContent]) = {
-
-    statusInfo match {
-      case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
-        businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x =>Some(x.processingDate))))
-      case (SubmissionDecisionApproved, statusDtls) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
-        statusDtls.fold[Option[LocalDate]](None)(x =>x.currentRegYearEndDate), false))
-      case (ReadyForRenewal(renewalDate), _) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
-        renewalDate, true))
-      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-    }
-  }
+  private[controllers] def renewalService: RenewalService
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -81,7 +47,93 @@ trait StatusController extends BaseController {
           statusInfo <-  statusService.getDetailedStatus
           businessNameOption <- businessName
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-        } yield redirectBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse)
+        } yield getPageBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse)
+  }
+
+  def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
+                                                                                       headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
+    (mlrRegNumber, submissionStatus) match {
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
+        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
+          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0)=> Some(x)
+          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
+          case _ => None
+        })
+      }.recoverWith {
+        case _: NotFoundException => Future.successful(None)
+      }
+      case _ => Future.successful(None)
+    }
+  }
+
+  private def getPageBasedOnStatus(mlrRegNumber: Option[String],
+                            statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
+                            businessNameOption: Option[String],
+                            feeResponse: Option[FeeResponse])(implicit request: Request[AnyContent]) = {
+
+    statusInfo match {
+      case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
+        getInitialSubmissionPage(mlrRegNumber,statusInfo, businessNameOption, feeResponse)
+      case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
+           (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) =>
+        getDecisionPage(mlrRegNumber, statusInfo, businessNameOption)
+      case (ReadyForRenewal(renewalDate), _) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
+        renewalDate, true))
+      case (RenewalSubmitted(renewalDate), _) => Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+      case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+    }
+  }
+
+  private def getInitialSubmissionPage(mlrRegNumber: Option[String],
+                                       statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
+                                       businessNameOption: Option[String],
+                                       feeResponse: Option[FeeResponse])(implicit request: Request[AnyContent]) = {
+    statusInfo match {
+      case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+        businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x =>Some(x.processingDate))))
+    }
+  }
+
+  private def getDecisionPage(mlrRegNumber: Option[String],
+                              statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
+                              businessNameOption: Option[String])(implicit request: Request[AnyContent]) = {
+    statusInfo match {
+      case (SubmissionDecisionApproved, statusDtls) =>
+        Ok(status_supervised(mlrRegNumber.getOrElse(""),
+          businessNameOption,
+          statusDtls.fold[Option[LocalDate]](None)(x =>x.currentRegYearEndDate), false)
+        )
+      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
+    }
+  }
+
+  private def getRenewalFlowPage(mlrRegNumber: Option[String],
+                                 statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
+                                 businessNameOption: Option[String])
+                                (implicit request: Request[AnyContent],
+                                 authContext: AuthContext) = {
+
+    // here get renewal model out.
+    val renewal = renewalService.getRenewal
+
+//    val test = for {
+//      renewal <- OptionT(renewalService.getRenewal)
+//    } yield renewal
+
+    renewal.map {
+      case Some(r) if r.isComplete => ???
+    }
+
+    statusInfo match {
+      case (ReadyForRenewal(renewalDate), _) =>
+        Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+      case (RenewalSubmitted(renewalDate), _) =>
+        Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+    }
   }
 }
 
@@ -92,6 +144,7 @@ object StatusController extends StatusController {
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
+  override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
   // $COVERAGE-ON$
 
 }

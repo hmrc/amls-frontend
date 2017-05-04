@@ -89,7 +89,6 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       }
 
       "given valid data with a Non UK address" in {
-        println("*******" + WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantNonUk))
         WhoIsYourAccountant.formRule.validate(
           WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantNonUk)
         ) should be(Valid(testWhoIsYourAccountantNonUk))
