@@ -24,7 +24,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
 
-      doc.title must startWith("string1")
+      doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
 
     "have correct headings" in new ViewFixture {

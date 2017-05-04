@@ -19,12 +19,11 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
 
   "who_is_registering view" must {
     "have correct title" in new ViewFixture {
-
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
       def view = views.html.declaration.who_is_registering(("string1", "string2"), form2, Seq(ResponsiblePeople()))
 
-      doc.title must startWith("string1")
+      doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
 
     "have correct headings" in new ViewFixture {

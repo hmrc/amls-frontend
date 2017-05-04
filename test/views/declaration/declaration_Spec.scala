@@ -14,10 +14,9 @@ class declaration_Spec extends GenericTestHelper with MustMatchers  {
 
   "declaration view" must {
     "have correct title" in new ViewFixture {
-
       def view = views.html.declaration.declare(("string1", "string2"), "Name")
 
-      doc.title must startWith("string1")
+      doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
 
     "have correct headings" in new ViewFixture {
