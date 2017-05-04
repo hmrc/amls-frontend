@@ -1,8 +1,11 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import models.ReadStatusResponse
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section}
+import models.status.ReadyForRenewal
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -10,7 +13,7 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{ProgressService, RenewalService}
+import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.inject.bind
@@ -33,6 +36,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     val dataCacheConnector = mock[DataCacheConnector]
     val progressService = mock[ProgressService]
     val renewalService = mock[RenewalService]
+    val statusService = mock[StatusService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -40,6 +44,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .bindings(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[StatusService].to(statusService))
       .build()
 
     val controller = app.injector.instanceOf[RenewalProgressController]
@@ -67,6 +72,14 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
       .thenReturn(bm)
+
+    val renewalDate = LocalDate.now().plusDays(15)
+
+    val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+
+
+    when(statusService.getDetailedStatus(any(), any(), any()))
+      .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
   }
 
@@ -106,15 +119,14 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
     }
 
-    "displays the renewal page with an empty sequence when no sections are returned" in new Fixture {
+    "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
       when {
         dataCacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.get()(request)
-      val html = Jsoup.parse(contentAsString(result))
+      status(result) mustBe 500
 
-      html.select(".progress-step--details").size() mustBe 1
     }
 
     "redirect to the declaration page when the form is posted" in new Fixture {
