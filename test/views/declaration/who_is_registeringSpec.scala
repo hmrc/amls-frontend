@@ -21,7 +21,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
     "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
-      def view = views.html.declaration.who_is_registering(("string1", "string2"), form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering("string1", "string2", form2, Seq(ResponsiblePeople()))
 
       doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
@@ -30,7 +30,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
-      def view = views.html.declaration.who_is_registering(("string1", "string2"), form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering("string1", "string2", form2, Seq(ResponsiblePeople()))
 
       heading.html must be(Messages("declaration.who.is.registering.title"))
       subHeading.html must include("string2")
@@ -44,7 +44,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering(("string1", "string2"), form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering("string1", "string2", form2, Seq(ResponsiblePeople()))
 
       errorSummary.html() must include("not a message Key")
 
@@ -62,7 +62,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
         ResponsiblePeople(personName = Some(PersonName("A",  None, "Name 2", None, None)))
       )
 
-      def view = views.html.declaration.who_is_registering(("string1", "string2"), form2, people)
+      def view = views.html.declaration.who_is_registering("string1", "string2", form2, people)
 
       val radioButtons = doc.select("form input[type=radio]")
 
@@ -79,7 +79,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
         ResponsiblePeople(personName = Some(PersonName("A",  None, "Person", None, None)))
       )
 
-      def view = views.html.declaration.who_is_registering(("string1", "string2"), f, people)
+      def view = views.html.declaration.who_is_registering("string1", "string2", f, people)
 
       doc.select("form input[type=radio][checked]").`val` mustBe "APerson"
     }
