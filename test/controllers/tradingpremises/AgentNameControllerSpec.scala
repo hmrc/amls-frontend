@@ -245,7 +245,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
         }
       }
 
-      "reditect to WhereAreTradingPremises Page" when {
+      "redirect to WhereAreTradingPremises Page" when {
         "status is SubmissionDecisionApproved" in new Fixture {
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -268,7 +268,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           val result = controller.post(1, false)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
       }
 
