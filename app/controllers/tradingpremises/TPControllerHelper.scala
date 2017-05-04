@@ -7,12 +7,6 @@ import utils.{ControllerHelper, StatusConstants}
 
 object TPControllerHelper {
 
-  def isFirstTradingPremises(cache: CacheMap): Option[Boolean] = {
-    cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map { tps =>
-      tps.filterNot(_.status.contains(StatusConstants.Deleted)).size == 1
-    }
-  }
-
   def redirectToNextPage(maybeCache: Option[CacheMap], index: Int, edit: Boolean)(implicit request: Request[AnyContent]) = {
     maybeCache map { cache =>
 
