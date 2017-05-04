@@ -108,7 +108,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
-      
+
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
 
