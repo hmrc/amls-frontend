@@ -1,15 +1,13 @@
 package views.declaration
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.declaration.BusinessNominatedOfficer
-import org.scalatest.MustMatchers
-import utils.GenericTestHelper
-import jto.validation.Path
-import jto.validation.ValidationError
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
-import play.api.i18n.Messages
-import views.Fixture
 import cats.implicits._
+import forms.{EmptyForm, Form2}
+import models.declaration.BusinessNominatedOfficer
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import org.scalatest.MustMatchers
+import play.api.i18n.Messages
+import utils.GenericTestHelper
+import views.Fixture
 
 class select_business_nominated_officerSpec extends GenericTestHelper with MustMatchers {
 
@@ -38,7 +36,7 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
       def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, people)
 
       people map(_.personName.get) foreach { n =>
-        val id = s"value-${n.firstName}${n.lastName}"
+        val id = s"value-${n.fullNameWithoutSpace}"
         val e = doc.getElementById(id)
 
         Option(e) must be(defined)
@@ -63,6 +61,13 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
 
       doc.select("input[type=radio][id=value-TestPerson1").hasAttr("checked") mustBe true
 
+    }
+
+    "show the 'register someone else' radio button" in new ViewFixture {
+      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
+
+      Option(doc.select("input[type=radio][id=value--1]")) must be(defined)
+      doc.select("label[for=value--1]").text() must include(Messages("lbl.register.some.one.else"))
     }
 
   }
