@@ -34,13 +34,15 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     }
 
   private def getTimeAtAddress(dateOfMove: Option[NewHomeDateOfChange]): Option[TimeAtAddress] = {
-    dateOfMove map {
-      date =>
-        Months.monthsBetween(LocalDate.now(), date.dateOfChange).getMonths match {
-          case m if 0 until 5 contains m => ZeroToFiveMonths
-          case m if 6 until 11 contains m => SixToElevenMonths
-          case m if 12 until 36 contains m => OneToThreeYears
-          case _ => ThreeYearsPlus
+    dateOfMove flatMap {
+      dateOp =>
+        dateOp.dateOfChange map {date =>
+          Months.monthsBetween(date, LocalDate.now()).getMonths match {
+            case m if 0 until 5 contains m => ZeroToFiveMonths
+            case m if 6 until 11 contains m => SixToElevenMonths
+            case m if 12 until 36 contains m => OneToThreeYears
+            case _ => ThreeYearsPlus
+          }
         }
     }
   }
@@ -60,9 +62,10 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
   private def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePeople) = {
     val currentTimeAtAddress = getTimeAtAddress(dateOfMove)
     val (additionalAddress, extraAdditionalAddress) = getUpdatedAddrAndExtraAddr(rp, currentTimeAtAddress)
+
     ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
       currentTimeAtAddress,
-      dateOfMove.fold[Option[DateOfChange]](None)(x => Some(DateOfChange(x.dateOfChange))))),
+      dateOfMove.fold[Option[DateOfChange]](None)(x => x.dateOfChange.map(DateOfChange(_))))),
       additionalAddress,
       extraAdditionalAddress)
   }
@@ -82,8 +85,10 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
                 _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
-                _ <- dataCacheConnector.remove(NewHomeDateOfChange.key)
-              } yield Redirect(routes.DetailedAnswersController.get(index))
+                _ <- dataCacheConnector.save[NewHomeDateOfChange](NewHomeDateOfChange.key, NewHomeDateOfChange(None))
+              } yield {
+                Redirect(routes.DetailedAnswersController.get(index))
+              }
             }
           }).recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

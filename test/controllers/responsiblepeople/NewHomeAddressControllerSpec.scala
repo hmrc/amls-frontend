@@ -78,7 +78,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears), Some(DateOfChange(LocalDate.now().plusMonths(13))))
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears), Some(DateOfChange(LocalDate.now().minusMonths(13))))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -86,10 +86,12 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now().plusMonths(13)))))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(13))))))
 
           when(controllers.dataCacheConnector.save[ResponsiblePeople](meq(ResponsiblePeople.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
@@ -107,8 +109,8 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
-          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA"), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA"), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
 
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
@@ -132,11 +134,12 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now().plusMonths(7)))))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(7))))))
 
           when(controllers.dataCacheConnector.save[ResponsiblePeople](meq(ResponsiblePeople.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
-
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -153,7 +156,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "postCode" -> "AA1 1AA"
           )
           val ukAddress1 = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().plusMonths(37))))
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
@@ -164,15 +167,16 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val updatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = None, additionalExtraAddress = None)
 
           when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now().plusMonths(37)))))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(37))))))
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople1))))
 
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key),
-            any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+            any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -212,7 +216,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(NewHomeDateOfChange(LocalDate.now()))))
+            .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now())))))
 
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))

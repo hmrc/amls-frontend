@@ -16,7 +16,7 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
         "dateOfChange.year" -> Seq("1990")
       )
 
-      NewHomeDateOfChange.formRule.validate(model) must be (Valid(NewHomeDateOfChange(new LocalDate(1990, 2, 24))))
+      NewHomeDateOfChange.formRule.validate(model) must be (Valid(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24)))))
 
     }
 
@@ -51,13 +51,13 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
     }
 
     "Read and write successfully" in {
-      NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(NewHomeDateOfChange(new LocalDate(1990, 2, 24)), JsPath \ "dateOfChange"))
+      NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))))) must be(
+        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath \ "dateOfChange"))
 
     }
 
     "write successfully" in {
-      NewHomeDateOfChange.format.writes(NewHomeDateOfChange(new LocalDate(1990, 2, 24))) must be(Json.obj("dateOfChange" ->"1990-02-24"))
+      NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24)))) must be(Json.obj("dateOfChange" ->"1990-02-24"))
     }
   }
 }

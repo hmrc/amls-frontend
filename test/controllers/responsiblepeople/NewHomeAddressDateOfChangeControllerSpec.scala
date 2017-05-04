@@ -44,7 +44,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends GenericTestHelper {
 
           when(cacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
-          when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(Some(NewHomeDateOfChange(LocalDate.now())))
+          when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(Some(NewHomeDateOfChange(Some(LocalDate.now()))))
           when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
@@ -85,7 +85,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends GenericTestHelper {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
+        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
         val result = controller.post(1)(postRequest)
         status(result) must be(SEE_OTHER)
