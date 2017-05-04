@@ -5,8 +5,10 @@
 @import views.html.registrationamendment.section_list
 @import utils.Strings._
 @import views.html.helper.CSRF
+@import org.joda.time.LocalDate
+@import utils.DateHelper
 
-@(renewalSection: Section, sections: Seq[Section], canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
+@(renewalSection: Section, sections: Seq[Section], canSubmit: Boolean, msbOrTcspExists: Boolean, endDate: Option[LocalDate])(implicit messages: Messages, request: Request[_])
 
 @header = {
     @heading("renewal.progress.title", "summary.status")
@@ -24,7 +26,13 @@
     <div class="grid-layout grid-layout--stacked">
 
         <div class="grid-layout__column grid-layout__column--2-3">
-            <p>@messages("renewal.progress.intro").convertLinkBreaksH</p>
+            @endDate.map {date =>
+                @if(msbOrTcspExists) {
+                    <p>@messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(date)).convertLinkBreaksH</p>
+                } else {
+                <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLinkBreaksH</p>
+                }
+            }
 
             <div class="grid-layout grid-layout--stacked renewal-progress-section">
                 <ul>
