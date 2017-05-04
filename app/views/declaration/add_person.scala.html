@@ -3,7 +3,7 @@
 @import include.forms2._
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(content: (String,String), businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang)
+@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -11,11 +11,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("declaration.addperson.title", content._2)
+    @heading("declaration.addperson.title", subtitle)
 }
 
 @main(
-    title = Messages(content._1),
+    title = Messages(title),
     heading = header
 ) {
 

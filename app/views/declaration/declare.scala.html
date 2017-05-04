@@ -2,14 +2,14 @@
 @import include._
 @import include.forms2._
 
-@(content: (String,String), name: String)(implicit request: Request[_],m:Messages)
+@(title: String, subtitle: String, name: String, isAmendment: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading("declaration.declaration.title", content._2)
+    @heading("declaration.declaration.title", subtitle)
 }
 
 @main(
-    title = Messages(content._1),
+    title = Messages(title),
     heading = header
 ) {
 
@@ -20,7 +20,7 @@
     <p>@Messages("declaration.declaration.declare")</p>
 
     <ul class="list list-bullet">
-        @if(Messages(content._2).equals(Messages("submit.amendment.application"))) {
+        @if(isAmendment) {
             <li>@Messages("declaration.declaration.amendment.correctinformation")</li>
         } else {
             <li>@Messages("declaration.declaration.correctinformation")</li>
