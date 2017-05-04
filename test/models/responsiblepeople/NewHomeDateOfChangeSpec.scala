@@ -20,6 +20,17 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
 
     }
 
+    "write form data correctly" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      NewHomeDateOfChange.formWrites.writes(NewHomeDateOfChange(None)) must be(model)
+
+    }
+
     "fail form validation when given a future date" in {
       val model =    Map (
         "dateOfChange.day" -> Seq("24"),
