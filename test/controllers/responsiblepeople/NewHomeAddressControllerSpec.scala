@@ -106,16 +106,27 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
+          val ukAddress = PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA")
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA"), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().plusMonths(7))))
 
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
 
-          val upHistory = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
             additionalAddress = Some(additionalAddress),
             additionalExtraAddress = Some(additionalExtraAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(upHistory))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA"), Some(ZeroToFiveMonths))
+          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+
+
+          val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
+            additionalAddress = Some(pushCurrentToAdditional),
+            additionalExtraAddress = Some(pushCurrentToExtraAdditional))
+          val nResponsiblePeople = ResponsiblePeople(addressHistory = Some(upDatedHistory), hasChanged = true)
+
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -130,7 +141,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople)))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(nResponsiblePeople)))(any(), any(), any())
         }
 
         "all the mandatory UK parameters are supplied and date of move is more then 3 years" in new Fixture {
@@ -141,8 +152,8 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "addressLine2" -> "Line 21",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().plusMonths(37))))
+          val ukAddress1 = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
+          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().plusMonths(37))))
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
@@ -174,14 +185,28 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
-            "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
+            "addressLineNonUK1" -> "new address line1",
+            "addressLineNonUK2" -> "new address line2",
             "country" -> "ES"
           )
-          val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain","ES"))
+          val NonUKAddress = PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES"))
           val currentAddress = ResponsiblePersonCurrentAddress(NonUKAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
+            additionalAddress = Some(additionalAddress),
+            additionalExtraAddress = Some(additionalExtraAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES")), Some(ZeroToFiveMonths))
+          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES")),
+            Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
+          val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
+            additionalAddress = Some(pushCurrentToAdditional),
+            additionalExtraAddress = Some(pushCurrentToExtraAdditional))
+          val nResponsiblePeople = ResponsiblePeople(addressHistory = Some(upDatedHistory), hasChanged = true)
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -198,7 +223,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
           verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
-            meq(Seq(responsiblePeople.copy(addressHistory = Some(history)))))(any(),any(), any())
+            meq(Seq(nResponsiblePeople)))(any(),any(), any())
         }
 
       }
