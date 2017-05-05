@@ -38,6 +38,8 @@ trait WhoIsRegisteringController extends BaseController {
 
   def getWithAmendment = get
 
+  def getWithRenewal = get
+
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
     val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))

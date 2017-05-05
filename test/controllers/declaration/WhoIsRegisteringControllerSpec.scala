@@ -4,13 +4,13 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.responsiblepeople._
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -18,7 +18,7 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{StatusConstants, AuthorisedFixture}
+import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -110,6 +110,32 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
           contentAsString(result) must include(Messages("submit.registration"))
+        }
+
+        "status is renewal" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+          htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+
+          contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
         }
       }
 
