@@ -1,0 +1,29 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], index: Int, personName: String)(implicit request: Request[_],m:Messages)
+
+@header = {
+  @errorSummary(f)
+  @headingWithPlaceholder(("responsiblepeople.new.home.date.of.change.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+  title = Messages("responsiblepeople.new.home.date.of.change.title", personName) + " - " + Messages("summary.responsiblepeople"),
+  heading = header
+) {
+
+  @form(f, controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.post(index)) {
+
+    @date(
+      f = f,
+      p = "dateOfChange",
+      labelText = "responsiblepeople.new.home.date.of.change.title",
+      example = true,
+      legendHidden = true
+    )
+
+    @submit(false, Some(Messages("button.saveandcontinue")))
+
+  }
+}
