@@ -442,7 +442,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.renewalcomplete.description"))
+        contentAsString(result) must include(Messages("status.renewalnotsubmitted.description"))
 
       }
     }
