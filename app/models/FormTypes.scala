@@ -138,7 +138,7 @@ object FormTypes {
 
   private val emailRequired = required("error.required.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
-  private val emailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
+  private val emailPattern = email.withMessage("error.invalid.rp.email")
 
   private val dayRequired = required("error.required.tp.date")
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
