@@ -20,11 +20,12 @@ class who_is_registering_this_renewalSpec extends GenericTestHelper with MustMat
     "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
+
       def view = views.html.declaration.who_is_registering_this_renewal(form2, Seq(ResponsiblePeople()))
 
       doc.title mustBe s"${Messages("declaration.renewal.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.renewal.who.is.registering.heading"))
-      subHeading.html must include("summary.submit.renewal")
+      subHeading.html must include(Messages("summary.submit.renewal"))
     }
   }
 }
