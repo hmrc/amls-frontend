@@ -496,6 +496,11 @@ status.renewalsubmitted.description4 = You’re still registered for anti-money 
 status.renewalincomplete.description = Renewal incomplete
 status.renewalincomplete.description2 = You’ve started the renewal application but you haven’t finished it. Your supervision will expire on {0} unless you renew before then.
 
+status.renewalnotsubmitted.description = Renewal not submitted
+status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
+status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
+
+
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
