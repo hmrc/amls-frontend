@@ -51,7 +51,7 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "load yourAnswers page when the status is approved" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), None)
+      val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
       when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
@@ -64,9 +64,24 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
       element.hasAttr("href") must be(true)
     }
 
+    "load yourAnswers page when the status is approved and has no lineId" in new Fixture {
+      val personName = PersonName("first name", None, "last name", None, None)
+      val model = ResponsiblePeople(Some(personName), None, lineId = None)
+      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.get(1, true)(request)
+      status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      element.hasAttr("href") must be(false)
+    }
+
     "load yourAnswers page when the status is ready for renewal" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), None)
+      val model = ResponsiblePeople(Some(personName), lineId = Some(121212))
       when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 

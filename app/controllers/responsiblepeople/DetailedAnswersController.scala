@@ -16,9 +16,9 @@ trait DetailedAnswersController extends BaseController {
   protected def dataCache: DataCacheConnector
   protected def statusService: StatusService
 
-  private def showHideAddressMove()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
+  private def showHideAddressMove(lineId: Option[Int])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus map {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) => true
+      case SubmissionDecisionApproved | ReadyForRenewal(_) if lineId.isDefined => true
       case _ => false
     }
   }
@@ -29,7 +29,7 @@ trait DetailedAnswersController extends BaseController {
         dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
           case Some(data) => {
             data.lift(index - 1) match {
-              case Some(x) => showHideAddressMove map {showHide =>
+              case Some(x) => showHideAddressMove(x.lineId) map {showHide =>
                 Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide))
               }
               case _ => Future.successful(NotFound(notFoundView))
