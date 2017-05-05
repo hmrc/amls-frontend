@@ -1,5 +1,5 @@
 @(endDate: String)(implicit request: Request[_],m:Messages)
-<p>@Messages("status.renewalnotsubmitted.description")</p>
+<h2>@Messages("status.renewalnotsubmitted.description")</h2>
 <p>@Messages("status.renewalnotsubmitted.description2")</p>
 <p>@Messages("status.renewalnotsubmitted.description3", endDate)</p>
 <a href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>
