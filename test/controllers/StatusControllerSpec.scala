@@ -4,7 +4,7 @@ import connectors.FeeConnector
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.renewal.Renewal
+import models.renewal._
 import models.status._
 import models.{Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
@@ -389,7 +389,60 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("???"))
+        contentAsString(result) must include(Messages("status.renewalincomplete.description"))
+
+      }
+
+      "application status is ReadyForRenewal, and the renewal is complete but not submitted" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        private val completeRenewal = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+          Some(TotalThroughput("01")),
+          Some(WhichCurrencies(Seq("EUR"),None,None,None,None)),
+          Some(TransactionsInLast12Months("1500")),
+          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactionsInLast12Months("123")),
+          hasChanged = true
+        )
+
+        when(controller.renewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(Some(completeRenewal)))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.renewalcomplete.description"))
 
       }
     }

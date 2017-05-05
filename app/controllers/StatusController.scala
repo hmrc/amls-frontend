@@ -126,7 +126,7 @@ trait StatusController extends BaseController {
       case (ReadyForRenewal(renewalDate), _) => {
         val test = renewalService.getRenewal map {
           case None => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
-          case Some(r) if !r.isComplete => Ok // renewal incomplete
+          case Some(r) if !r.isComplete => Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""),businessNameOption,renewalDate))
           case Some(r) if r.isComplete => Ok // renewal not submitted
         }
         test
