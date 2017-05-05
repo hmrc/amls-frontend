@@ -4,13 +4,14 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, IsKnownByOtherNamesNo, IsKnownByOtherNamesYes, ResponsiblePeople}
+import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -66,7 +67,22 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "display the persons page with fields populated" in new Fixture {
 
-        val addPerson = PersonName("John", Some("Envy"), "Doe", None, None)
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last",
+          previousName = Some(
+            PreviousName(
+              firstName = Some("oldFirst"),
+              middleName = Some("oldMiddle"),
+              lastName = Some("oldLast"),
+              // scalastyle:off magic.number
+              date = new LocalDate(1990, 2, 24)
+            )
+          ),
+          otherNames = Some("Doc")
+        )
+
         val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
         when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -76,10 +92,21 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("John")
-        document.select("input[name=middleName]").`val` must be("Envy")
-        document.select("input[name=lastName]").`val` must be("Doe")
-        document.select("input[isKnownByOtherNames=false]").hasAttr("checked") must be(false)
+
+        document.select("input[name=firstName]").`val` must be("first")
+        document.select("input[name=middleName]").`val` must be("middle")
+        document.select("input[name=lastName]").`val` must be("last")
+        document.getElementById("hasPreviousName-true").hasAttr("checked") must be(true)
+        document.getElementById("hasPreviousName-false").hasAttr("checked") must be(false)
+        document.select("input[name=previous.firstName]").`val` must be("oldFirst")
+        document.select("input[name=previous.middleName]").`val` must be("oldMiddle")
+        document.select("input[name=previous.lastName]").`val` must be("oldLast")
+        document.select("input[name=previous.date.day]").`val` must be("24")
+        document.select("input[name=previous.date.month]").`val` must be("2")
+        document.select("input[name=previous.date.year]").`val` must be("1990")
+        document.getElementById("hasOtherNames-true").hasAttr("checked") must be(true)
+        document.getElementById("hasOtherNames-false").hasAttr("checked") must be(false)
+        document.select("input[name=otherNames]").`val` must be("Doc")
       }
 
       "display Not Found" when {
@@ -100,10 +127,18 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
           "edit is false" in new Fixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
-              "firstName" -> "John",
-              "lastName" -> "Doe",
-              "hasPreviousName" -> "false",
-              "hasOtherNames" -> "false"
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last",
+              "hasPreviousName" -> "true",
+              "previous.firstName" -> "oldFirst",
+              "previous.middleName" -> "oldMiddle",
+              "previous.lastName" -> "oldLast",
+              "previous.date.year" -> "1990",
+              "previous.date.month" -> "02",
+              "previous.date.day" -> "24",
+              "hasOtherNames" -> "true",
+              "otherNames" -> "Doc"
             )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -120,10 +155,18 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
           "edit is true" in new Fixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
-              "firstName" -> "John",
-              "lastName" -> "Doe",
-              "hasPreviousName" -> "false",
-              "hasOtherNames" -> "false"
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last",
+              "hasPreviousName" -> "true",
+              "previous.firstName" -> "oldFirst",
+              "previous.middleName" -> "oldMiddle",
+              "previous.lastName" -> "oldLast",
+              "previous.date.year" -> "1990",
+              "previous.date.month" -> "02",
+              "previous.date.day" -> "24",
+              "hasOtherNames" -> "true",
+              "otherNames" -> "Doc"
             )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
