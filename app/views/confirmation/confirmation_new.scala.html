@@ -2,16 +2,8 @@
 @import forms2._
 @import models.confirmation._
 @import config.ApplicationConfig
-@import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 
-@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String, status: SubmissionStatus)(implicit request: Request[_],m:Messages)
-
-@secondary = {
-    status match {
-        case SubmissionReadyForReview => @Messages("confirmation.header.secondary")
-        case _ => @Messages("confirmation.header.secondary")
-    }
-}
+@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @main(
     title = Messages("confirmation.title")
@@ -19,7 +11,7 @@
 
     <header class="page-header">
         <h1 class="heading-xlarge">@Messages("confirmation.header")</h1>
-        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@secondary</p>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("submit.registration")</p>
     </header>
 
     <div class="panel-indent panel-indent--gutter panel-border-wide">
