@@ -37,7 +37,6 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     dateOfMove flatMap {
       dateOp =>
         dateOp.dateOfChange map {date =>
-          println("================================================"+Months.monthsBetween(date, LocalDate.now()).getMonths)
           Months.monthsBetween(date, LocalDate.now()).getMonths match {
             case m if 0 until 6 contains m => ZeroToFiveMonths
             case m if 6 until 12 contains m => SixToElevenMonths
