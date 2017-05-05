@@ -94,15 +94,15 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
         Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("00000000000")),
-          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")))), None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(true)
+      document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
+      document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(true)
     }
 
     "fail submission on error" in new Fixture {
