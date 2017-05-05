@@ -4,6 +4,7 @@ import connectors.FeeConnector
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.renewal.Renewal
 import models.status._
 import models.{Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
@@ -201,40 +202,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
       }
 
-      "application status is ReadyForRenewal" in new Fixture {
-
-        when(controller.landingService.cacheMap(any(), any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
-
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("amlsRegNo")))
-
-        when(authConnector.currentAuthority(any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
-        val renewalDate = LocalDate.now().plusDays(15)
-
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
-
-        when(controller.statusService.getDetailedStatus(any(), any(), any()))
-          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-          .thenReturn(Future.successful(feeResponse))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
-
-      }
-
       "application status is SubmissionDecisionRejected" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
@@ -349,7 +316,81 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
+        contentAsString(result) must include(Messages("status.renewalsubmitted.description"))
+      }
+
+      "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.renewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+      }
+
+      "application status is ReadyForRenewal, and the renewal has been started but is incomplete" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.renewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("???"))
+
       }
     }
   }

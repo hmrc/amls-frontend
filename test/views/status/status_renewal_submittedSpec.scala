@@ -22,7 +22,7 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None, true)
+      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -31,7 +31,7 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None, true)
+      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -68,7 +68,7 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contains 'update/amend information' content and link" in new ViewFixture {
 
-      def view = views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None)
 
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.amendment.edit"))
@@ -76,7 +76,7 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "do not show specific content when view input is none" in new ViewFixture {
 
-      def view = views.html.status.status_submitted("XAML00000567890", None, None, None)
+      def view = views.html.status.status_renewal_submitted("XAML00000567890", None, None)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
 
@@ -86,7 +86,7 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contains expected survey link for supervised status" in new ViewFixture {
-      def view =  views.html.status.status_submitted("XAML00000567890", Some("business Name"), None, None)
+      def view =  views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
         be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))

@@ -31,8 +31,8 @@ trait StatusController extends BaseController {
   private[controllers] def renewalService: RenewalService
 
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
+    implicit authContext => implicit request =>
+
         val businessName = landingService.cacheMap map {
           case Some(cache) => {
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -42,12 +42,14 @@ trait StatusController extends BaseController {
           }
           case None => None
         }
+
         for {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
           statusInfo <-  statusService.getDetailedStatus
           businessNameOption <- businessName
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-        } yield getPageBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse)
+          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse)
+        } yield page
   }
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
@@ -69,18 +71,19 @@ trait StatusController extends BaseController {
   private def getPageBasedOnStatus(mlrRegNumber: Option[String],
                             statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                             businessNameOption: Option[String],
-                            feeResponse: Option[FeeResponse])(implicit request: Request[AnyContent]) = {
+                            feeResponse: Option[FeeResponse])
+                                  (implicit request: Request[AnyContent],
+                                   authContext: AuthContext) = {
 
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber,statusInfo, businessNameOption, feeResponse)
+        Future.successful(getInitialSubmissionPage(mlrRegNumber,statusInfo, businessNameOption, feeResponse))
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) =>
-        getDecisionPage(mlrRegNumber, statusInfo, businessNameOption)
-      case (ReadyForRenewal(renewalDate), _) => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption,
-        renewalDate, true))
-      case (RenewalSubmitted(renewalDate), _) => Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
-      case (_, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
+      case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
+        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
+      case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
     }
   }
 
@@ -117,23 +120,19 @@ trait StatusController extends BaseController {
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
 
-    // here get renewal model out.
-    val renewal = renewalService.getRenewal
-
-//    val test = for {
-//      renewal <- OptionT(renewalService.getRenewal)
-//    } yield renewal
-
-    renewal.map {
-      case Some(r) if r.isComplete => ???
-    }
-
-    statusInfo match {
-      case (ReadyForRenewal(renewalDate), _) =>
-        Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+    val thing = statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+      case (ReadyForRenewal(renewalDate), _) => {
+        val test = renewalService.getRenewal map {
+          case None => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
+          case Some(r) if !r.isComplete => Ok // renewal incomplete
+          case Some(r) if r.isComplete => Ok // renewal not submitted
+        }
+        test
+      }
     }
+    thing
   }
 }
 
