@@ -50,6 +50,20 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         }
 
+        "there is a PersonName but has not passed fit and proper" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = Some(false))))))
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=hasAlreadyPassedFitAndProper][value=true]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=hasAlreadyPassedFitAndProper][value=false]").hasAttr("checked") must be(true)
+
+        }
+
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
