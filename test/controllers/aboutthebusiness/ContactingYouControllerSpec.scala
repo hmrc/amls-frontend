@@ -23,7 +23,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou("+44 (0)123 456-7890", "test@test.com"))
-  val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+  val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
   val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
 
   trait Fixture extends AuthorisedFixture {

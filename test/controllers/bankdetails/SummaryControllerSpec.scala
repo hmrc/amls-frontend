@@ -82,7 +82,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = BankDetails(
         Some(PersonalAccount),
-        Some(BankAccount("Account Name", UKAccount("12341234","121212")))
+        Some(BankAccount("Account Name", UKAccount("12341234","000000")))
       )
 
       when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
@@ -104,7 +104,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       contentString must include("Account Name")
       contentString must include("Account number: 12341234")
-      contentString must include("Sort code: 12-12-12")
+      contentString must include("Sort code: 00-00-00")
       contentString must include("UK Bank Account")
       contentString must include("Personal")
     }
@@ -130,7 +130,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          Some(BankAccount("Account Name", UKAccount("12341234","121212")))
+          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
         when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
@@ -159,7 +159,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          Some(BankAccount("Account Name", UKAccount("12341234","121212")))
+          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
         when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
@@ -188,7 +188,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          Some(BankAccount("Account Name", UKAccount("12341234","121212")))
+          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
         when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
@@ -216,7 +216,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          Some(BankAccount("Account Name", UKAccount("12341234","121212")))
+          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
         when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))

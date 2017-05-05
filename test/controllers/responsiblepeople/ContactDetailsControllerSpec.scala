@@ -63,7 +63,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
 
       "respond with NOT_FOUND" when {
         "there is no responsible person for the index" in new Fixture {
-          val contact = ContactDetails("07702745869", "test@test.com")
+          val contact = ContactDetails("07000000000", "test@test.com")
           val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -81,7 +81,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
           "go to ConfirmAddressController" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "phoneNumber" -> "07702745869",
+              "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
 
@@ -100,7 +100,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
           "go to CurrentAddressController" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "phoneNumber" -> "07702745869",
+              "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
 
@@ -119,7 +119,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
           "respond with NOT_FOUND" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "phoneNumber" -> "07702745869",
+              "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
 
@@ -137,7 +137,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
           "go to DetailedAnswersController" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "phoneNumber" -> "07702745869",
+              "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
 
@@ -158,7 +158,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "phoneNumber" -> "<077>02745869",
+            "phoneNumber" -> "<070>00000000",
             "emailAddress" -> "test@test.com"
           )
 

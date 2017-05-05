@@ -45,7 +45,7 @@ class CorporationTaxRegisteredControllerRelease7Spec extends GenericTestHelper w
     "on get retrieve the corporation tax reference from business customer api if no previous entry and feature flag is high" in new Fixture {
 
       val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
-      when(reviewDetailsModel.utr) thenReturn Some("0987654321")
+      when(reviewDetailsModel.utr) thenReturn Some("1111111111")
 
       when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
 
@@ -60,7 +60,7 @@ class CorporationTaxRegisteredControllerRelease7Spec extends GenericTestHelper w
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-      document.getElementById("corporationTaxReference").`val` must be("0987654321")
+      document.getElementById("corporationTaxReference").`val` must be("1111111111")
     }
 
   }

@@ -50,8 +50,8 @@ trait AddPersonController extends BaseController {
       val businessType = ControllerHelper.getBusinessType(bm)
         statusService.getStatus map {
           case SubmissionReadyForReview if AmendmentsToggle.feature =>
-            status(views.html.declaration.add_person(("declaration.addperson.amendment.title", "submit.amendment.application"), businessType, form))
-          case _ => status(views.html.declaration.add_person(("declaration.addperson.title", "submit.registration"), businessType, form))
+            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+          case _ => status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
         }
       }
     }

@@ -63,7 +63,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
       "go to RegisteredOfficeController if customer is a Partnership" in new Fixture {
 
         val partnership = ReviewDetails("BusinessName", Some(Partnership),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         val mockCacheMap = mock[CacheMap]
 
@@ -89,7 +89,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
       "go to CorporationTaxRegistered if customer is not a partnership" in new Fixture {
 
         val partnership = ReviewDetails("BusinessName", Some(LPrLLP),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         val mockCacheMap = mock[CacheMap]
 

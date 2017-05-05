@@ -17,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
+class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with NinoUtil {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -26,6 +26,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -71,7 +72,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "successfully load nationality page when nationality is none" in new Fixture {
 
-      val pResidenceType = PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -92,7 +93,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
-        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
+        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("00000000000")),
           Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
 
       val result = controller.get(1)(request)
@@ -167,7 +168,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
         "nationality" -> "02"
       )
 
-      val pResidenceType = PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())

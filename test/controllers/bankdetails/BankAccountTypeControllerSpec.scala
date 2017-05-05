@@ -188,7 +188,7 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(
               Some(PersonalAccount),
-              Some(BankAccount("AccountName", UKAccount("12341234", "121212"))))))))
+              Some(BankAccount("AccountName", UKAccount("12341234", "000000"))))))))
           when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 

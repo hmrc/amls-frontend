@@ -252,7 +252,7 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
 
         }
       }

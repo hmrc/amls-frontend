@@ -11,7 +11,7 @@ class PaymentConfirmedRenewalViewSpec extends GenericTestHelper with MustMatcher
     implicit val requestWithToken = addToken(request)
 
     val businessName = "Test Business Ltd"
-    val paymentReference = "XMHSG357567686"
+    val paymentReference = "XMHSG000000000"
 
     override def view = views.html.confirmation.payment_confirmation_renewal(businessName, paymentReference)
 

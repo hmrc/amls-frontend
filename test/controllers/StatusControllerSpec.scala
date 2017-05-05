@@ -38,9 +38,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "StatusController" should {
-    val amlsRegistrationNumber = "XAML00000567890"
+    val amlsRegistrationNumber = "XAML00000000000"
     val feeResponse = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber
-      , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
+      , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
     val pageTitleSuffix = " - Your registration - " +Messages("title.amls") + " - " + Messages("title.gov")
@@ -49,7 +49,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
     "load the status page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
@@ -70,7 +70,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
     "show business name" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
 
@@ -96,7 +96,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "submission incomplete" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -117,7 +117,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "submission completed" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -140,7 +140,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "under review" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -169,7 +169,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "under review and FeeResponse is failed" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -199,7 +199,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "decision made (approved)" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -232,7 +232,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "decision made (rejected)" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -265,7 +265,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "decision made (Expired)" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -297,7 +297,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
       "decision made (Revoked)" in new Fixture {
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -331,7 +331,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
     "ready for renewal" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
@@ -365,7 +365,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
     "show the correct content to edit submission" when {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
         .thenReturn(
@@ -392,7 +392,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("XBML00000567890")))
+          .thenReturn(Future.successful(Some("XBML00000000000")))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved, None))

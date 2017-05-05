@@ -57,7 +57,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCacheConnector = mock[DataCacheConnector]
     }
 
-    val paymentRefNo = "XA111123451111"
+    val paymentRefNo = "XA000000000000"
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -323,7 +323,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "the application status is 'new submission'" in new Fixture {
         setupStatus(SubmissionReady)
 
-        val paymentReference = "XMHSG357567686"
+        val paymentReference = "X0000000000000"
         val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
@@ -338,7 +338,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "the application status is 'pending'" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        val paymentReference = "XMHSG3575324788"
+        val paymentReference = "X00000000000000"
         val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
@@ -355,7 +355,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "the application status is 'approved'" in new Fixture {
         setupStatus(SubmissionDecisionApproved)
 
-        val paymentReference = "XH8439483944"
+        val paymentReference = "X00000000000"
         val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
@@ -372,7 +372,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "the application status is 'ready for renewal'" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
-        val paymentReference = "XH8439483944"
+        val paymentReference = "X00000000000"
         val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
@@ -389,7 +389,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "there is no business name" in new Fixture {
         setupStatus(SubmissionReady)
 
-        val paymentReference = "XMHSG3579873439478"
+        val paymentReference = "X00000000000000000"
 
         when {
           controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
@@ -437,7 +437,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       override val dataCacheConnector = mock[DataCacheConnector]
     }
 
-    val paymentRefNo = "XA111123451111"
+    val paymentRefNo = "XA000000000000"
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",

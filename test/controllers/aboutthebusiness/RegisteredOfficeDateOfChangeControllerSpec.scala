@@ -47,7 +47,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends GenericTestHelper with 
         "dateOfChange.day" -> "01"
       )
 
-      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       val business = AboutTheBusiness(registeredOffice = Some(office))
@@ -126,7 +126,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends GenericTestHelper with 
         "dateOfChange.day" -> "01"
       )
 
-      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       val business = AboutTheBusiness(

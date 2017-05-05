@@ -11,7 +11,7 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
   "Validate definitions" must {
 
     "successfully validate the name" in {
-      IsKnownByOtherNames.otherFirstNameType.validate("John") must be(Valid("John"))
+      IsKnownByOtherNames.otherFirstNameType.validate("first") must be(Valid("first"))
     }
 
     "pass validation if the middle name is not provided" in {
@@ -30,20 +30,20 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
     "successfully validate given all fields" in {
       val urlFormEncoded = Map(
         "isKnownByOtherNames" -> Seq("true"),
-        "otherfirstnames" -> Seq("John"),
-        "othermiddlenames" -> Seq("Envy"),
-        "otherlastnames" -> Seq("Doe")
+        "otherfirstnames" -> Seq("first"),
+        "othermiddlenames" -> Seq("middle"),
+        "otherlastnames" -> Seq("last")
       )
-      IsKnownByOtherNames.formRule.validate(urlFormEncoded) must be(Valid(IsKnownByOtherNamesYes("John", Some("Envy"), "Doe")))
+      IsKnownByOtherNames.formRule.validate(urlFormEncoded) must be(Valid(IsKnownByOtherNamesYes("first", Some("middle"), "last")))
     }
 
     "successfully validate given the middle name is optional" in {
       val urlFormEncoded = Map(
         "isKnownByOtherNames" -> Seq("true"),
-        "otherfirstnames" -> Seq("John"),
-        "otherlastnames" -> Seq("Doe")
+        "otherfirstnames" -> Seq("first"),
+        "otherlastnames" -> Seq("last")
       )
-      IsKnownByOtherNames.formRule.validate(urlFormEncoded) must be(Valid(IsKnownByOtherNamesYes("John", None, "Doe")))
+      IsKnownByOtherNames.formRule.validate(urlFormEncoded) must be(Valid(IsKnownByOtherNamesYes("first", None, "last")))
     }
 
 
@@ -72,7 +72,7 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isKnownByOtherNames" -> Seq("true"),
-        "otherlastnames" -> Seq("Doe")
+        "otherlastnames" -> Seq("last")
       )
 
       IsKnownByOtherNames.formRule.validate(urlFormEncoded) must
@@ -85,7 +85,7 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isKnownByOtherNames" -> Seq("true"),
-        "otherfirstnames" -> Seq("John")
+        "otherfirstnames" -> Seq("first")
       )
 
       IsKnownByOtherNames.formRule.validate(urlFormEncoded) must
@@ -117,24 +117,24 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       val json = Json.obj(
         "isKnownByOtherNames" -> true,
-        "otherfirstnames" -> "John",
-        "othermiddlenames" -> "Envy",
-        "otherlastnames" -> "Doe"
+        "otherfirstnames" -> "first",
+        "othermiddlenames" -> "middle",
+        "otherlastnames" -> "last"
       )
 
       IsKnownByOtherNames.jsonReads.reads(json) must
-        be(JsSuccess(IsKnownByOtherNamesYes("John", Some("Envy"), "Doe"), JsPath ))
+        be(JsSuccess(IsKnownByOtherNamesYes("first", Some("middle"), "last"), JsPath ))
     }
 
     "Write the json successfully from the InKnownByOtherNamesYes domain object created" in {
 
-      val isKnownByOtherNamesYes = IsKnownByOtherNamesYes("John", Some("Envy"), "Doe")
+      val isKnownByOtherNamesYes = IsKnownByOtherNamesYes("first", Some("middle"), "last")
 
       val json = Json.obj(
         "isKnownByOtherNames" -> true,
-        "otherfirstnames" -> "John",
-        "othermiddlenames" -> "Envy",
-        "otherlastnames" -> "Doe"
+        "otherfirstnames" -> "first",
+        "othermiddlenames" -> "middle",
+        "otherlastnames" -> "last"
       )
 
       IsKnownByOtherNames.jsonWrites.writes(isKnownByOtherNamesYes) must be(json)
