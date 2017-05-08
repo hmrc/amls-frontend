@@ -46,7 +46,7 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
 
     "get is called" must {
 
-      "display the page with pre populated data" in new Fixture {
+      "display the page with pre populated data (training is set to Yes)" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingYes("test")))))))
 
@@ -56,6 +56,18 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
         val page: Document = Jsoup.parse(contentAsString(result))
         page.getElementById("training-true").hasAttr("checked") must be(true)
         page.getElementById("information").`val` must be("test")
+      }
+
+      "display the page with pre populated data (training is set to No)" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingNo))))))
+
+        val result = controller.get(recordId)(request)
+        status(result) must be(OK)
+
+        val page: Document = Jsoup.parse(contentAsString(result))
+        page.getElementById("training-true").hasAttr("checked") must be(false)
+        page.getElementById("training-false").hasAttr("checked") must be(true)
       }
 
       "display the page without pre populated data" in new Fixture {

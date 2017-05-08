@@ -18,6 +18,8 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         val nino = nextNino
         val ukModel = Map(
           "isUKResidence" -> Seq("true"),
+          "passportType" -> Seq("01"),
+          "ukPassportNumber" -> Seq("000000000"),
           "nino" -> Seq(nino),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("GB")
@@ -33,14 +35,13 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
           "dateOfBirth.day" -> Seq("24"),
           "dateOfBirth.month" -> Seq("2"),
           "dateOfBirth.year" -> Seq("1990"),
-          "passportType" -> Seq("01"),
-          "ukPassportNumber" -> Seq("000000000"),
+          "passportType" -> Seq("03"),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("GB")
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Valid(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("000000000")),
+          be(Valid(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), NoPassport),
             Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 

@@ -68,7 +68,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         }
 
-        "with pre-populated data" in new Fixture {
+        "with pre-populated data (uk)" in new Fixture {
           val responsiblePeople = ResponsiblePeople(
             personName = Some(personName),
             personResidenceType = Some(PersonResidenceType(
@@ -87,6 +87,33 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.select("input[name=isUKResidence]").`val` must be("true")
           document.select("input[name=nino]").`val` must be(nino)
           document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+
+        }
+
+        "with pre-populated data (non uk)" in new Fixture {
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName),
+            personResidenceType = Some(PersonResidenceType(
+              isUKResidence = residenceTypeNonUK,
+              countryOfBirth = Country("United Kingdom", "GB"),
+              nationality = Some(Country("United Kingdom", "GB"))))
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          println(document)
+          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
+          document.select("input[name=dateOfBirth.day]").`val` must be("2")
+          document.select("input[name=dateOfBirth.month]").`val` must be("12")
+          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
+          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
 
         }
 
@@ -136,7 +163,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           "in edit mode" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
+              "isUKResidence" -> "false",
+              "dateOfBirth.day" -> "24",
+              "dateOfBirth.month" -> "2",
+              "dateOfBirth.year" -> "1990",
+              "passportType" -> "03",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
               "nationality" -> "GB"

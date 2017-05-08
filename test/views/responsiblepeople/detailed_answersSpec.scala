@@ -61,6 +61,7 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Beneficial owner")),
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.detailed_answers.position_start"), checkElementTextIncludes(_, "24 February 1990")),
+      (Messages("responsiblepeople.check_your_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
       (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
       (Messages("responsiblepeople.detailed_answers.previous_experience"), checkElementTextIncludes(_, "experience")),
@@ -148,15 +149,19 @@ class detailed_answersSpec extends GenericTestHelper
       saRegistered = Some(SaRegisteredYes("sa")),
       experienceTraining = Some(ExperienceTrainingYes("experience")),
       training = Some(TrainingYes("training")),
-      hasAlreadyPassedFitAndProper = Some(true)
+      hasAlreadyPassedFitAndProper = Some(true),
+      soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
     )
 
     "include the provided data" when {
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
         }
+        val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+        element.hasAttr("href") must be(true)
+        element.attr("href") must be("/anti-money-laundering/responsible-people/date-change-moved/1")
 
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
