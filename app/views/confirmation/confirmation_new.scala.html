@@ -5,17 +5,17 @@
 
 @(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
+@header = {
+    @heading("confirmation.header", "submit.registration")
+}
+
 @main(
-    title = Messages("confirmation.title")
+    title = Messages("confirmation.header") + " - " + Messages("submit.registration"),
+    heading = header
 ) {
 
-    <header class="page-header">
-        <h1 class="heading-xlarge">@Messages("confirmation.header")</h1>
-        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("submit.registration")</p>
-    </header>
-
     <div class="panel-indent panel-indent--gutter panel-border-wide">
-    @Messages("confirmation.submission.info")
+        @Messages("confirmation.submission.info")
     </div>
 
     <div class="reg-online--pay-fee">
