@@ -19,7 +19,7 @@ class status_revokedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_revoked("XAML00000567890", Some("business Name"))
+      def view = views.html.status.status_revoked("XAML00000000000", Some("business Name"))
 
       doc.title must be(Messages("status.submissiondecisionrevoked.title") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecision.not.supervised.heading"))
@@ -27,7 +27,7 @@ class status_revokedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture {
-      def view =  views.html.status.status_revoked("XAML00000567890", Some("business Name"))
+      def view =  views.html.status.status_revoked("XAML00000000000", Some("business Name"))
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description")).text must be(
         Messages("status.submissiondecisionrevoked.description"))

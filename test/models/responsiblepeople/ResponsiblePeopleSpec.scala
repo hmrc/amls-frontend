@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import org.joda.time.LocalDate
@@ -433,23 +434,24 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   }
 }
 
-trait ResponsiblePeopleValues {
+trait ResponsiblePeopleValues extends NinoUtil{
 
   private val startDate = Some(new LocalDate())
+  private val nino = nextNino
 
   object DefaultValues {
 
-    private val residence = UKResidence("AB123456B")
+    private val residence = UKResidence(nino)
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
-    private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
+    private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
     private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
     private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
     private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
     val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
-    val previousName = PreviousName(Some("previousFirstName"), Some("previousMiddleName"), Some("previousLastName"), new LocalDate(1990, 2, 24))
-    val personName = PersonName("firstName", Some("middleName"), "lastName", Some(previousName), Some("name"))
+    val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), new LocalDate(1990, 2, 24))
+    val personName = PersonName("first", Some("middle"), "last", Some(previousName), Some("name"))
     val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
     val saRegistered = SaRegisteredYes("0123456789")
     val contactDetails = ContactDetails("07702743555", "test@test.com")
@@ -466,7 +468,7 @@ trait ResponsiblePeopleValues {
     private val residenceMonth = 2
     private val residenceDay = 24
     private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
-    private val residence = NonUKResidence(residenceDate, UKPassport("123464646"))
+    private val residence = NonUKResidence(residenceDate, UKPassport("000000000"))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
@@ -475,7 +477,7 @@ trait ResponsiblePeopleValues {
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
     val personName = PersonName("first", Some("middle"), "last", None, None)
-    val contactDetails = ContactDetails("07702743444", "new@test.com")
+    val contactDetails = ContactDetails("07000000000", "new@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
     val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
     val saRegistered = SaRegisteredNo
@@ -512,19 +514,19 @@ trait ResponsiblePeopleValues {
 
   val CompleteJson = Json.obj(
     "personName" -> Json.obj(
-      "firstName" -> "firstName",
-      "middleName" -> "middleName",
-      "lastName" -> "lastName",
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
       "previousName" -> Json.obj(
-        "firstName" -> "previousFirstName",
-        "middleName" -> "previousMiddleName",
-        "lastName" -> "previousLastName",
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
         "date" -> "1990-02-24"
       ),
       "otherNames" -> "name"
     ),
     "personResidenceType" -> Json.obj(
-      "nino" -> "AB123456B",
+      "nino" -> nino,
       "countryOfBirth" -> "GB",
       "nationality" -> "GB"
     ),
@@ -537,7 +539,7 @@ trait ResponsiblePeopleValues {
         "personAddress" -> Json.obj(
           "personAddressLine1" -> "Line 1",
           "personAddressLine2" -> "Line 2",
-          "personAddressPostCode" -> "AA11AA"
+          "personAddressPostCode" -> "AA111AA"
         ),
         "timeAtAddress" -> Json.obj(
           "timeAtAddress" -> "01"

@@ -79,7 +79,7 @@ class summarySpec extends GenericTestHelper
       private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
 
       private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.sortcode") + ": 12-34-56",
+        Messages("bankdetails.bankaccount.sortcode") + ": 00-00-00",
         Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890",
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.yes"),
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
@@ -88,7 +88,7 @@ class summarySpec extends GenericTestHelper
       private val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
         ("title key", "check"),
         (title, checkElementTextIncludes(_,
-          "12-34-56",
+          "00-00-00",
           "1234567890",
           "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.yes",
           "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
@@ -96,7 +96,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "123456")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
 
         views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }

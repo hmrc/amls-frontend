@@ -227,7 +227,7 @@ error.required.tcsp.complex.corporate.structures = Select yes if you create comp
 error.required.tcsp.services.another.tcsp = Select yes if you use the services of another Trust or Company Service Provider
 
 ############################### Accountancy service provide ###############################
-error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other business’s tax matters
+error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other businesses’ tax matters
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
@@ -676,9 +676,8 @@ summary.visuallyhidden.your.answer.for = your answer for
 
 summary.checkyouranswers.title = Check your answers
 summary.youranswers.title = Your answers
-summary.checkyouranswers.businesspremises.title = Your business’ premises
+summary.checkyouranswers.businesspremises.title = Your business’s premises
 summary.detailedanswers.title = Detailed answers
-summary.checkyouranswers.businesspremises.title = Your business’ premises
 summary.checkyouranswers.businesspremises.section1 = Premises
 summary.checkyouranswers.businesspremises.section2 = Trading activities
 summary.checkyouranswers.agentspremises.title = Your agents’ premises
@@ -1064,7 +1063,7 @@ declaration.addperson.lbl.09 = Designated member
 declaration.addperson.lbl.08 = Other
 declaration.declaration.title = Declaration
 declaration.declaration.amendment.title = Declaration
-declaration.declaration.fullname = You’ve told us you are
+declaration.declaration.fullname = You’ve told us you are {0}
 declaration.declaration.declare = I declare that:
 declaration.declaration.correctinformation = all the information in this application is correct
 declaration.declaration.amendment.correctinformation = all the information in this submission is correct
@@ -1252,6 +1251,12 @@ responsiblepeople.remove.responsible.person.enddate.lbl = When did this person s
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
 responsiblepeople.confirmaddress.title = Is this this person’s home address?
+responsiblepeople.new.home.date.of.change.heading = When did {0} move?
+responsiblepeople.new.home.date.of.change.title = When did this person move?
+responsiblepeople.new.home.heading = What’s {0}’s new home address?
+responsiblepeople.new.home.title = what is this persons new home address?
+responsiblepeople.detailed_answer.tell.us.moved = Tell us that {0} has moved
+
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
@@ -1286,9 +1291,9 @@ tcsp.provided_services.service.lbl.details = Please give details
 #ASP
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
 asp.whatyouneed.line_1 = what services you provide
-asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other business’ tax matters
+asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
 asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if you have one
-asp.other.business.tax.matters.title = Are you registered with HMRC to handle other business’ tax matters?
+asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme
 asp.services.title = Which services does your business provide?
@@ -1501,8 +1506,10 @@ renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to sho
 renewal.whatyouneed.line_1 = your net profit
 renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
 renewal.progress.title = Your renewal progress
-renewal.progress.intro = In order to submit your renewal you will need to complete the renewal section. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
-  Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+renewal.progress.tpandrp.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
+  Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
+renewal.progress.tponly.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new trading premises.\n\
+  Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
 progress.renewal.name = Renewal

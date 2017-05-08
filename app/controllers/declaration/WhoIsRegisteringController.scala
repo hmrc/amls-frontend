@@ -104,8 +104,8 @@ trait WhoIsRegisteringController extends BaseController {
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
       case SubmissionReadyForReview if AmendmentsToggle.feature =>
-        status(who_is_registering(("declaration.who.is.registering.amendment.title","submit.amendment.application"), form, rp))
-      case _ => status(who_is_registering(("declaration.who.is.registering.title","submit.registration"), form, rp))
+        status(who_is_registering("declaration.who.is.registering.amendment.title", "submit.amendment.application", form, rp))
+      case _ => status(who_is_registering("declaration.who.is.registering.title", "submit.registration", form, rp))
     }
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =

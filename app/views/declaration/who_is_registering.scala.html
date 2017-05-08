@@ -2,15 +2,15 @@
 @import models.responsiblepeople._
 @import forms2._
 
-@(content: (String,String), f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(title: String, subtitle: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
-    @heading("declaration.who.is.registering.title", content._2)
+    @heading("declaration.who.is.registering.title", subtitle)
 }
 
 @main(
-    title = Messages(content._1),
+    title = Messages(title),
     heading = header
 ) {
     @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
