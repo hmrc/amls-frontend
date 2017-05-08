@@ -14,13 +14,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       "given all fields" in {
 
         val data = Map(
-          "firstName" -> Seq("John"),
-          "middleName" -> Seq("Envy"),
-          "lastName" -> Seq("Doe"),
+          "firstName" -> Seq("firstName"),
+          "middleName" -> Seq("middleName"),
+          "lastName" -> Seq("lastName"),
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("Marty"),
-          "previous.middleName" -> Seq("Mc"),
-          "previous.lastName" -> Seq("Fly"),
+          "previous.firstName" -> Seq("previousFirstName"),
+          "previous.middleName" -> Seq("previousMiddleName"),
+          "previous.lastName" -> Seq("previousLastName"),
           "previous.date.year" -> Seq("1990"),
           "previous.date.month" -> Seq("02"),
           "previous.date.day" -> Seq("24"),
@@ -29,14 +29,14 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         )
 
         val validPerson = PersonName(
-          firstName = "John",
-          middleName = Some("Envy"),
-          lastName = "Doe",
+          firstName = "firstName",
+          middleName = Some("middleName"),
+          lastName = "lastName",
           previousName = Some(
             PreviousName(
-              firstName = Some("Marty"),
-              middleName = Some("Mc"),
-              lastName = Some("Fly"),
+              firstName = Some("previousFirstName"),
+              middleName = Some("previousMiddleName"),
+              lastName = Some("previousLastName"),
               // scalastyle:off magic.number
               date = new LocalDate(1990, 2, 24)
             )
@@ -50,16 +50,16 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       "the middle name is optional and previous/other names are not required" in {
 
         val data = Map(
-          "firstName" -> Seq("John"),
-          "lastName" -> Seq("Doe"),
+          "firstName" -> Seq("firstName"),
+          "lastName" -> Seq("lastName"),
           "hasPreviousName" -> Seq("false"),
           "hasOtherNames" -> Seq("false")
         )
 
         val validPerson = PersonName(
-          firstName = "John",
+          firstName = "firstName",
           middleName = None,
-          lastName = "Doe",
+          lastName = "lastName",
           previousName = None,
           otherNames = None
         )
@@ -112,13 +112,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       "input length is too great" in {
 
         val data = Map(
-          "firstName" -> Seq("John" * 36),
-          "middleName" -> Seq("John" * 36),
-          "lastName" -> Seq("Doe" * 36),
+          "firstName" -> Seq("firstName" * 36),
+          "middleName" -> Seq("middleName" * 36),
+          "lastName" -> Seq("lastName" * 36),
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("Marty" * 36),
-          "previous.middleName" -> Seq("Mc" * 36),
-          "previous.lastName" -> Seq("Fly" * 36),
+          "previous.firstName" -> Seq("previousFirstName" * 36),
+          "previous.middleName" -> Seq("previousMiddleName" * 36),
+          "previous.lastName" -> Seq("previousLastName" * 36),
           "hasOtherNames" -> Seq("true"),
           "otherNames" -> Seq("D" * 141),
           "previous.date.year" -> Seq("1990"),
@@ -141,13 +141,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       "date is invalid" in {
 
         val data = Map(
-          "firstName" -> Seq("John"),
-          "middleName" -> Seq("Envy"),
-          "lastName" -> Seq("Doe"),
+          "firstName" -> Seq("firstName"),
+          "middleName" -> Seq("middleName"),
+          "lastName" -> Seq("lastName"),
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("Marty"),
-          "previous.middleName" -> Seq("Mc"),
-          "previous.lastName" -> Seq("Fly"),
+          "previous.firstName" -> Seq("previousFirstName"),
+          "previous.middleName" -> Seq("previousMiddleName"),
+          "previous.lastName" -> Seq("previousLastName"),
           "previous.date.year" -> Seq("199000"),
           "previous.date.month" -> Seq("02"),
           "previous.date.day" -> Seq("24"),
@@ -193,8 +193,8 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
   "fullName" must {
     "return a correctly formatted name" in {
-      PersonName("John", Some("Paul"), "Smith", None, None).fullName must be("John Paul Smith")
-      PersonName("John", None, "Smith", None, None).fullName must be("John Smith")
+      PersonName("firstName", Some("middleName"), "lastName", None, None).fullName must be("firstName middleName lastName")
+      PersonName("firstName", None, "lastName", None, None).fullName must be("firstName lastName")
     }
   }
 }

@@ -10,11 +10,11 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
   import FormTypes._
 
   "successfully validate the middle name" in {
-    middleNameType.validate("John") must be(Valid("John"))
+    middleNameType.validate("middleName") must be(Valid("middleName"))
   }
 
   "fail validation if the middle name is more than 35 characters" in {
-    middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
+    middleNameType.validate("middleNamemiddleNamemiddleNamemiddleNamemiddleNamemiddleName") must
       be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
   }
 
@@ -103,7 +103,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
   "generic common name rule" must {
 
     "pass with a normal name" in {
-      genericNameRule("required error", "length error").validate("Joe Bloggs") must be(Valid("Joe Bloggs"))
+      genericNameRule("required error", "length error").validate("firstName lastName") must be(Valid("firstName lastName"))
     }
 
     "fail with a name with invalid characters" in {
