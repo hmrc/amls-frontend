@@ -17,6 +17,15 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
 
         SoleProprietorOfAnotherBusiness.formRule.validate(model) must be(Valid(SoleProprietorOfAnotherBusiness(true)))
       }
+
+      "soleProprietorOfAnotherBusiness is a boolean and is false" in {
+
+        val model = Map(
+          "soleProprietorOfAnotherBusiness" -> Seq("false")
+        )
+
+        SoleProprietorOfAnotherBusiness.formRule.validate(model) must be(Valid(SoleProprietorOfAnotherBusiness(false)))
+      }
     }
 
     "fail validation" when {
