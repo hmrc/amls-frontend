@@ -185,7 +185,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         "return BAD_REQUEST" in new Fixture {
 
           val firstNameMissingInRequest = request.withFormUrlEncodedBody(
-            "lastName" -> "Doe",
+            "lastName" -> "last",
             "isKnownByOtherNames" -> "false"
           )
 
@@ -203,8 +203,8 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         "return NOT_FOUND" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
-            "firstName" -> "John",
-            "lastName" -> "Doe",
+            "firstName" -> "first",
+            "lastName" -> "last",
             "hasPreviousName" -> "false",
             "hasOtherNames" -> "false"
           )
