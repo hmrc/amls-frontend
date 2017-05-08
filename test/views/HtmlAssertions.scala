@@ -21,7 +21,7 @@ trait HtmlAssertions {
     val l = el.getElementsByTag("a").attr("href")
     val p = l.substring(l.indexOf("?"))
     keys.foreach { k =>
-      t must include (Messages(k))
+      t must include(Messages(k))
       p must include("edit=true")
     }
     true

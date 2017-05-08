@@ -11,11 +11,11 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
   import FormTypes._
 
   "successfully validate the middle name" in {
-    middleNameType.validate("John") must be(Valid("John"))
+    middleNameType.validate("middleName") must be(Valid("middleName"))
   }
 
   "fail validation if the middle name is more than 35 characters" in {
-    middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
+    middleNameType.validate("middleNamemiddleNamemiddleNamemiddleNamemiddleNamemiddleName") must
       be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
   }
 
@@ -104,7 +104,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
   "generic common name rule" must {
 
     "pass with a normal name" in {
-      genericNameRule("required error", "length error").validate("Joe Bloggs") must be(Valid("Joe Bloggs"))
+      genericNameRule("required error", "length error").validate("firstName lastName") must be(Valid("firstName lastName"))
     }
 
     "fail with a name with invalid characters" in {
@@ -124,10 +124,22 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
   "emailType" must {
 
     val validEmailAddresses = Seq(
-      "test@test.com", "blah76@blah.com", "t@t", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com"
+      "test@test.com", "blah76@blah.com", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com"
     )
     val invalidEmailAddresses = Seq(
-      "test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com", "test@-fdhkf-.com", "email@addrese.com;secondemail@address.com"
+      "test@-test.com",
+      "foo@bar,com",
+      "foo",
+      "test@jhfd_jkj.com",
+      "test@blah-.com",
+      "test@-fdhkf-.com",
+      "email@addrese.com;secondemail@address.com",
+      "email withaspace@invalid.com",
+      "\"email withaspace\"@invalid.com",
+      "invalid@domain withaspace.com",
+      "invalid@\"domain withaspace.com",
+      "invalid@domain.with aspace",
+      "invalid@domain.\"with aspace\""
     )
 
     validEmailAddresses.foreach { testData =>
