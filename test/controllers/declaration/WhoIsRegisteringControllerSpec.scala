@@ -86,6 +86,32 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
 
+        "status is approved" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+
         "status is pre-submission" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
