@@ -14,7 +14,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
-import views.html.declaration.who_is_registering
+import views.html.declaration.{who_is_registering, who_is_registering_this_renewal}
 
 import scala.concurrent.Future
 
@@ -107,6 +107,7 @@ trait WhoIsRegisteringController extends BaseController {
     statusService.getStatus map {
       case SubmissionReadyForReview if AmendmentsToggle.feature =>
         status(who_is_registering("declaration.who.is.registering.amendment.title", "submit.amendment.application", form, rp))
+      case ReadyForRenewal(_) => status(who_is_registering_this_renewal(form, rp))
       case _ => status(who_is_registering("declaration.who.is.registering.title", "submit.registration", form, rp))
     }
 

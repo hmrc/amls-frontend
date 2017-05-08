@@ -220,18 +220,18 @@ GET         /business-activities/check-your-answers                     controll
 GET         /submit-application/who-is-registering                      controllers.declaration.WhoIsRegisteringController.get()
 POST        /submit-application/who-is-registering                      controllers.declaration.WhoIsRegisteringController.post()
 
-GET         /amend-application/who-is-registering                       controllers.declaration.WhoIsRegisteringController.getWithAmendment()
-GET         /amend-application/who-is-registering-renewal               controllers.declaration.WhoIsRegisteringController.getWithRenewal()
+GET         /update-information/who-is-registering                       controllers.declaration.WhoIsRegisteringController.getWithAmendment()
+GET         /update-information/who-is-registering-renewal               controllers.declaration.WhoIsRegisteringController.getWithRenewal()
 
 GET         /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 POST        /submit-application/nominated-officer                       controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
-GET         /amend-application/nominated-officer                        controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+GET         /update-information/nominated-officer                        controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
 
 GET         /declaration/add-person                                     controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                     controllers.declaration.AddPersonController.post()
 
-GET         /amend-application/add-person                               controllers.declaration.AddPersonController.getWithAmendment()
+GET         /update-information/add-person                               controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
 GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()

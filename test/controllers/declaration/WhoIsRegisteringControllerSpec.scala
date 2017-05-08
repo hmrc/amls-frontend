@@ -128,17 +128,14 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
             .thenReturn(None)
 
-          val result = controller.get()(request)
+          val result = controller.getWithRenewal(request)
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
           contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
         }
       }
-
     }
 
     "Post" must {

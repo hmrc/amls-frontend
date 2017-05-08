@@ -48,7 +48,6 @@ class RenewalProgressController @Inject()
               case _ => throw new Exception("Cannot get renewal date")
             }
 
-
           }
 
           block getOrElse InternalServerError("Cannot get business matching or renewal date")
