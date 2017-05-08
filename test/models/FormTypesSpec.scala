@@ -127,7 +127,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       "test@test.com", "blah76@blah.com", "t@t", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com"
     )
     val invalidEmailAddresses = Seq(
-      "test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com", "test@-fdhkf-.com", "email@addrese.com;secondemail@address.com"
+      "test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com", "test@-fdhkf-.com", "email@addrese.com;secondemail@address.com", "email withaspace@invalid.com", "\"email withaspace\"@invalid.com"
     )
 
     validEmailAddresses.foreach { testData =>
