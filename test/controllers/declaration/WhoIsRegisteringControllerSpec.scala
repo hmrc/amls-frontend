@@ -3,6 +3,7 @@ package controllers.declaration
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
+import models.renewal.Renewal
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -14,7 +15,7 @@ import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -31,11 +32,14 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
       override val authConnector = self.authConnector
       override val amlsConnector = mock[AmlsConnector]
       override val statusService: StatusService = mock[StatusService]
+      override private[controllers] val renewalService = mock[RenewalService]
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
-
+    when {
+      controller.renewalService.getRenewal(any(), any(), any())
+    } thenReturn Future.successful(None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -153,6 +157,9 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
           when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
             .thenReturn(None)
+          when {
+            controller.renewalService.getRenewal(any(), any(), any())
+          } thenReturn Future.successful(Some(mock[Renewal]))
 
           val result = controller.getWithRenewal(request)
           status(result) must be(OK)
@@ -322,6 +329,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       override val authConnector = self.authConnector
       override val amlsConnector = mock[AmlsConnector]
       override val statusService: StatusService = mock[StatusService]
+      override private[controllers] val renewalService = mock[RenewalService]
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
@@ -339,6 +347,10 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       status = Some(StatusConstants.Deleted)
     )
     val responsiblePeoples = Seq(rp, rp1)
+
+    when {
+      controller.renewalService.getRenewal(any(), any(), any())
+    } thenReturn Future.successful(None)
 
   }
 
