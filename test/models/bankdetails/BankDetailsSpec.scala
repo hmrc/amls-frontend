@@ -22,13 +22,13 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
   val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false)
   val accountTypeNew = BelongsToBusiness
 
-  val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
+  val bankAccount = BankAccount("My Account", UKAccount("111111", "00-00-00"))
   val bankAccountPartialModel = BankDetails(None, Some(bankAccount))
   val bankAccountJson = Json.obj("bankAccount" -> Json.obj(
     "accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11"),
+    "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
     "refreshedFromServer" -> false)
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
@@ -40,7 +40,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     "bankAccount" -> Json.obj("accountName" -> "My Account",
       "isUK" -> true,
       "accountNumber" -> "111111",
-      "sortCode" -> "11-11-11"),
+      "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
     "refreshedFromServer" -> false)
   val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
@@ -49,7 +49,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     "bankAccount" -> Json.obj("accountName" -> "My Account",
       "isUK" -> true,
       "accountNumber" -> "111111",
-      "sortCode" -> "11-11-11"),
+      "sortCode" -> "00-00-00"),
     "hasChanged" -> true,
     "refreshedFromServer" -> false)
 
@@ -97,7 +97,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
   "isComplete" must {
     "return true when BankDetails contains complete data" in {
-      val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+      val bankAccount = BankAccount("My Account", UKAccount("123456", "00-00-00"))
       val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
 
       bankDetails.isComplete must be(true)
@@ -352,14 +352,14 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
             | "accountName":"sadfjkl",
             | "isUK":true,
             | "accountNumber":"12345678",
-            | "sortCode":"123456"
+            | "sortCode":"000000"
             |}
           """.stripMargin)
 
         BankDetails.reads.reads(input) must be (JsSuccess(
           BankDetails(
             Some(PersonalAccount),
-            Some(BankAccount("sadfjkl", UKAccount("12345678", "123456"))),
+            Some(BankAccount("sadfjkl", UKAccount("12345678", "000000"))),
             false,
             false,
             None
@@ -371,7 +371,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
   "ibanType" must {
     "validate IBAN supplied " in {
-      Account.ibanType.validate("IBAN_4323268686686") must be(Valid("IBAN_4323268686686"))
+      Account.ibanType.validate("IBAN_0000000000000") must be(Valid("IBAN_0000000000000"))
     }
 
     "fail validation if IBAN is longer than the permissible length" in {
@@ -392,7 +392,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
   "nonUKBankAccountNumberType" must {
     "validate Non UK Account supplied " in {
-      Account.nonUKBankAccountNumberType.validate("IND22380310500093") must be(Valid("IND22380310500093"))
+      Account.nonUKBankAccountNumberType.validate("IND00000000000000") must be(Valid("IND00000000000000"))
     }
 
     "fail validation if Non UK Account is longer than the permissible length" in {
@@ -414,7 +414,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
   "ukBankAccountNumberType" must {
 
     "validate when 8 digits are supplied " in {
-      Account.ukBankAccountNumberType.validate("87654321") must be(Valid("87654321"))
+      Account.ukBankAccountNumberType.validate("00000000") must be(Valid("00000000"))
     }
 
     "fail validation when less than 8 characters are supplied" in {
@@ -431,7 +431,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
   "sortCodeType" must {
 
     "validate when 6 digits are supplied without - " in {
-      Account.sortCodeType.validate("654321") must be(Valid("654321"))
+      Account.sortCodeType.validate("000000") must be(Valid("000000"))
     }
 
     "fail validation when more than 6 digits are supplied without - " in {

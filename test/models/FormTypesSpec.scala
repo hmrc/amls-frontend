@@ -1,20 +1,21 @@
 package models
 
+import controllers.responsiblepeople.NinoUtil
 import org.scalatestplus.play.PlaySpec
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
-class FormTypesSpec extends PlaySpec with CharacterSets {
+class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
   import FormTypes._
 
   "successfully validate the middle name" in {
-    middleNameType.validate("John") must be(Valid("John"))
+    middleNameType.validate("middleName") must be(Valid("middleName"))
   }
 
   "fail validation if the middle name is more than 35 characters" in {
-    middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
+    middleNameType.validate("middleNamemiddleNamemiddleNamemiddleNamemiddleNamemiddleName") must
       be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
   }
 
@@ -22,8 +23,8 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate" in {
 
-      postcodeType.validate("AA03 5BB") must
-        be(Valid("AA03 5BB"))
+      postcodeType.validate("AA11 1AA") must
+        be(Valid("AA11 1AA"))
     }
 
     "fail to validate given an invalid postcode" in {
@@ -103,7 +104,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
   "generic common name rule" must {
 
     "pass with a normal name" in {
-      genericNameRule("required error", "length error").validate("Joe Bloggs") must be(Valid("Joe Bloggs"))
+      genericNameRule("required error", "length error").validate("firstName lastName") must be(Valid("firstName lastName"))
     }
 
     "fail with a name with invalid characters" in {
@@ -123,10 +124,22 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
   "emailType" must {
 
     val validEmailAddresses = Seq(
-      "test@test.com", "blah76@blah.com", "t@t", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com"
+      "test@test.com", "blah76@blah.com", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com"
     )
     val invalidEmailAddresses = Seq(
-      "test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com", "test@-fdhkf-.com", "email@addrese.com;secondemail@address.com"
+      "test@-test.com",
+      "foo@bar,com",
+      "foo",
+      "test@jhfd_jkj.com",
+      "test@blah-.com",
+      "test@-fdhkf-.com",
+      "email@addrese.com;secondemail@address.com",
+      "email withaspace@invalid.com",
+      "\"email withaspace\"@invalid.com",
+      "invalid@domain withaspace.com",
+      "invalid@\"domain withaspace.com",
+      "invalid@domain.with aspace",
+      "invalid@domain.\"with aspace\""
     )
 
     validEmailAddresses.foreach { testData =>
@@ -424,16 +437,22 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate" in {
 
-      ninoType.validate("AB123456B") must
-        be(Valid("AB123456B"))
+      val nino = nextNino
+
+      ninoType.validate(nino) must
+        be(Valid(nino))
     }
 
     "successfully validate disregarding case" in {
-      ninoType.validate("ab123456c") mustBe Valid("AB123456C")
+      val nino = nextNino
+      ninoType.validate(nino.toLowerCase) mustBe Valid(nino)
     }
 
     "successfully validate nino including spaces and dashes" in {
-      ninoType.validate("AB 36 72- 73 B") mustBe Valid("AB367273B")
+      val testNino = nextNino
+      val spacedNino = testNino.grouped(2).mkString(" ")
+      val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
+      ninoType.validate(withDashes) mustBe Valid(testNino)
     }
 
     "fail to validate an empty string" in {
@@ -515,34 +534,38 @@ class FormTypesSpec extends PlaySpec with CharacterSets {
 
     "successfully validate a address lines" in {
       validateAddress.validate(symbols8) must be(Valid(symbols8))
-      validateAddress.validate("second cross(2nd cross),test") must be(Valid("second cross(2nd cross),test"))
-      validateAddress.validate("some road.Oh!") must be(Valid("some road.Oh!"))
+      validateAddress.validate("aa (1aa),aa") must be(Valid("aa (1aa),aa"))
+      validateAddress.validate("aa.b!") must be(Valid("aa.b!"))
 
     }
 
-    "fail validation on invalid number" in {
-      validateAddress.validate(addresses) must be(Invalid(Seq(
-        Path -> Seq(ValidationError("error.max.length.address.line"))
-      )))
+    "fail validation" when {
+      "given too many characters" in {
+        validateAddress.validate("a" * 36) must be(Invalid(Seq(
+          Path -> Seq(ValidationError("error.max.length.address.line"))
+        )))
+      }
 
-      validateAddress.validate("second bock & 3rd cross") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+      "given invalid characters" in {
+        validateAddress.validate("aa & aa") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("%%") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("%%") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("$$$$$$$") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("$$$$$$$") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
 
-      validateAddress.validate("#######") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
-      validateAddress.validate("******") must be(Invalid(Seq(
-        Path -> Seq(ValidationError("err.text.validation"))
-      )))
+        validateAddress.validate("#######") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
+        validateAddress.validate("******") must be(Invalid(Seq(
+          Path -> Seq(ValidationError("err.text.validation"))
+        )))
+      }
     }
   }
 

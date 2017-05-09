@@ -20,7 +20,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
   val contactingYou = ContactingYou("1234567890", "test@test.com")
 
-  val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")
+  val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
   val uKCorrespondenceAddress = UKCorrespondenceAddress("Name",
     "Business Name",
@@ -28,7 +28,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "address 2",
     Some("address 3"),
     Some("address 4"),
-    "NE77 0QQ")
+    "AA11 1AA")
 
   val completeModel = AboutTheBusiness(
     previouslyRegistered = Some(previouslyRegistered),
@@ -54,10 +54,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "email" -> "test@test.com"),
     "registeredOffice" -> Json.obj(
       "addressLine1" -> "38B",
-      "addressLine2" -> "Longbenton",
+      "addressLine2" -> "line2",
       "addressLine3" -> JsNull,
       "addressLine4" -> JsNull,
-      "postCode" -> "NE7 7DX",
+      "postCode" -> "AA1 1AA",
       "dateOfChange" -> JsNull),
     "correspondenceAddress" -> Json.obj(
       "yourName" -> "Name",
@@ -66,7 +66,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "correspondenceAddressLine2" -> "address 2",
       "correspondenceAddressLine3" -> "address 3",
       "correspondenceAddressLine4" -> "address 4",
-      "correspondencePostCode" -> "NE77 0QQ"
+      "correspondencePostCode" -> "AA11 1AA"
     ),
     "hasChanged" -> false
   )
@@ -238,9 +238,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
       "is different" must {
         "set the hasChanged & contactingYou Properties" in {
-          val res = completeModel.contactingYou(ContactingYou("9876655564", "new@testvalue.com"))
+          val res = completeModel.contactingYou(ContactingYou("0000000000", "new@testvalue.com"))
           res.hasChanged must be (true)
-          res.contactingYou must be (Some(ContactingYou("9876655564", "new@testvalue.com")))
+          res.contactingYou must be (Some(ContactingYou("0000000000", "new@testvalue.com")))
         }
       }
     }

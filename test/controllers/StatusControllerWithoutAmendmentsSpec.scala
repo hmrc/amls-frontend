@@ -16,7 +16,7 @@ import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, LandingService, StatusService}
+import services.{RenewalService, AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.NotFoundException
 import utils.AuthorisedFixture
@@ -34,6 +34,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override private[controllers] val statusService: StatusService = mock[StatusService]
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
     }
   }
 
@@ -43,7 +44,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
     "hide amendment/variation link when amendments toggle is off" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
@@ -52,7 +53,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
         .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-        .thenReturn(Future.successful(Some("XAML00000567890")))
+        .thenReturn(Future.successful(Some("XAML00000000000")))
 
       when(controller.statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview, None))

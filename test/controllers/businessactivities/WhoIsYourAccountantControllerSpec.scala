@@ -55,7 +55,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
         page.getElementById("addressLine3").`val` must be("")
         page.getElementById("addressLine4").`val` must be("")
         page.getElementById("postCode").`val` must be("")
-        page.getElementById("country").`val` must be("")
+        page.select("#country option[selected]").attr("value") must be("")
       }
 
       "show the who is your accountant page when there is existing data" in new Fixture {
@@ -82,7 +82,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
         page.getElementById("addressLine3").`val` must be("line3")
         page.getElementById("addressLine4").`val` must be("line4")
         page.getElementById("postCode").`val` must be("")
-        page.getElementById("country").`val` must be("") // TODO: This is a bug - should be pre-populated.  Look in the form writes compared to other non-uk address form writes.
+        page.select("#country option[selected]").attr("value") must be("AL")
       }
     }
 
@@ -112,7 +112,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
             "addressLine4" -> "line4",
-            "postCode" -> "AB12CD"
+            "postCode" -> "AA11AA"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -139,7 +139,7 @@ class WhoIsYourAccountantControllerSpec extends GenericTestHelper
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
             "addressLine4" -> "line4",
-            "postCode" -> "AB12CD"
+            "postCode" -> "AA11AA"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())

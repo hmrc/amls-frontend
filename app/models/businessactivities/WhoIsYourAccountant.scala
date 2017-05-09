@@ -53,7 +53,7 @@ object WhoIsYourAccountant {
           "addressLine2" -> Seq(address.addressLine2),
           "addressLine3" -> address.addressLine3.toSeq,
           "addressLine4" -> address.addressLine4.toSeq,
-          "country" -> Seq(address.country.toString)
+          "country" -> Seq(address.country.code)
         )
       })
     }

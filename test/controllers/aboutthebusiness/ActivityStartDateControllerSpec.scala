@@ -74,7 +74,7 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with MockitoSuga
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -100,7 +100,7 @@ class ActivityStartDateControllerSpec extends GenericTestHelper with MockitoSuga
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 

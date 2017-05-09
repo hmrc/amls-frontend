@@ -1,0 +1,4 @@
+@(endDate: String)(implicit request: Request[_],m:Messages)
+<h2 class="heading-medium no-margin">@Messages("status.renewalincomplete.description")</h2>
+<p>@Messages("status.renewalincomplete.description2", endDate)</p>
+<a href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>

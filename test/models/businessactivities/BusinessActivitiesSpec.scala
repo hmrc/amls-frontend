@@ -44,7 +44,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
     "newName",
     Some("newTradingName"),
-    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "NE27 0QQ")
+    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "AA11 1AA")
   )
   val NewTaxMatters = TaxMatters(true)
 

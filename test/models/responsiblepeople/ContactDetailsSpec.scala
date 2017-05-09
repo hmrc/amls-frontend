@@ -13,11 +13,11 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
       "successfully validate given all fields" in {
 
         val urlFormEncoded = Map(
-          "phoneNumber" -> Seq("07702755869"),
+          "phoneNumber" -> Seq("07000000000"),
           "emailAddress" -> Seq("myname@example.com")
         )
 
-        ContactDetails.formReads.validate(urlFormEncoded) must be(Valid(ContactDetails("07702755869", "myname@example.com")))
+        ContactDetails.formReads.validate(urlFormEncoded) must be(Valid(ContactDetails("07000000000", "myname@example.com")))
       }
 
       "fail to validate" when {
@@ -52,7 +52,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         "email is missing" in {
 
           val urlFormEncoded = Map(
-            "phoneNumber" -> Seq("07702755869"),
+            "phoneNumber" -> Seq("07000000000"),
             "emailAddress" -> Seq("")
           )
 
@@ -65,7 +65,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         "email is invalid" in {
 
           val urlFormEncoded = Map(
-            "phoneNumber" -> Seq("07702755869"),
+            "phoneNumber" -> Seq("07000000000"),
             "emailAddress" -> Seq("invalid-email.com")
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
@@ -88,7 +88,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
 
         "email is too long" in {
           val urlFormEncoded = Map(
-            "phoneNumber" -> Seq("07702755869"),
+            "phoneNumber" -> Seq("07000000000"),
             "emailAddress" -> Seq("email.com" * 100)
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
@@ -117,20 +117,20 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
       "Read the json and return the InKnownByOtherNamesYes domain object successfully" in {
 
         val json = Json.obj(
-          "phoneNumber" -> "07702755869",
+          "phoneNumber" -> "07000000000",
           "emailAddress" -> "myname@example.com"
         )
 
         ContactDetails.formats.reads(json) must
-          be(JsSuccess(ContactDetails("07702755869", "myname@example.com")))
+          be(JsSuccess(ContactDetails("07000000000", "myname@example.com")))
       }
 
       "Write the json successfully from the InKnownByOtherNamesYes domain object created" in {
 
-        val contactDetails = ContactDetails("07702755869", "myname@example.com")
+        val contactDetails = ContactDetails("07000000000", "myname@example.com")
 
         val json = Json.obj(
-          "phoneNumber" -> "07702755869",
+          "phoneNumber" -> "07000000000",
           "emailAddress" -> "myname@example.com"
         )
 

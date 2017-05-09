@@ -50,7 +50,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   "AmlsNotificationConnector" must {
     "retrieve notifications" when {
       "given amlsRegNo" in new Fixture {
-        val amlsRegistrationNumber = "XAML00000567890"
+        val amlsRegistrationNumber = "XAML00000000000"
         val response = Seq(
           NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, IDType(""))
         )

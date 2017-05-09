@@ -53,6 +53,14 @@ object ControllerHelper {
     }
   }
 
+  def isTCSPSelected(bm: Option[BusinessMatching]): Boolean = {
+    bm match {
+      case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
+        y.businessActivities.contains(TrustAndCompanyServices)
+      }
+    }
+  }
+
   //For repeating section
   def allowedToEdit(edit: Boolean)(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
     statusService.getStatus map {

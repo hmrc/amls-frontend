@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
-  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
+  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -164,7 +164,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "first middle last")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
@@ -185,7 +185,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "first middle last")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
@@ -206,7 +206,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, true, "John Envy Doe")(request)
+          val result = controller.remove(1, true, "first middle last")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
 
@@ -228,7 +228,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "first middle last")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
@@ -256,7 +256,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
-          val result = controller.remove(1, complete = false, "John Envy Doe")(newRequest)
+          val result = controller.remove(1, complete = false, "first middle last")(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
@@ -410,19 +410,19 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     }
   }
 
-  private val residence = UKResidence("AA3464646")
+  private val residence = UKResidence(nextNino)
   private val residenceCountry = Country("United Kingdom", "GB")
   private val residenceNationality = Country("United Kingdom", "GB")
-  private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ")
+  private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
   private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
-  private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH")
+  private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
   private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
   //scalastyle:off magic.number
-  val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
-  val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
+  val previousName = PreviousName(Some("previousFirstName"), Some("previousMiddleName"), Some("previousLastName"), new LocalDate(1990, 2, 24))
+  val personName = PersonName("firstName", Some("middleName"), "lastName", Some(previousName), Some("name"))
   val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
   val saRegistered = SaRegisteredYes("0123456789")
-  val contactDetails = ContactDetails("07702743555", "test@test.com")
+  val contactDetails = ContactDetails("07000000000", "test@test.com")
   val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
   val vatRegistered = VATRegisteredNo
   val training = TrainingYes("test")

@@ -101,7 +101,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
         "addressLine2"->"line2",
         "addressLine3"->"",
         "addressLine4"->"",
-        "postCode"->"NE7 7DS")
+        "postCode"->"AA1 1AA")
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))

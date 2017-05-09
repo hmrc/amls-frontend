@@ -203,7 +203,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "firstname lastname")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 
@@ -225,7 +225,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "firstname lastname")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 
@@ -249,7 +249,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, false, "John Envy Doe")(request)
+          val result = controller.remove(1, false, "firstname lastname")(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 
@@ -279,7 +279,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
-          val result = controller.remove(1, false, "John Envy Doe")(newRequest)
+          val result = controller.remove(1, false, "firstname lastname")(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 

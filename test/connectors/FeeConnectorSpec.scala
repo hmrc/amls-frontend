@@ -44,9 +44,9 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     None, None)
 
   "FeeConnector" must {
-    val amlsRegistrationNumber = "XAML00000567890"
+    val amlsRegistrationNumber = "XAML00000000000"
     val feeResponse = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber
-      , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
+      , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
     "successfully receive feeResponse" in {

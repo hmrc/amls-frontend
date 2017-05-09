@@ -50,7 +50,7 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -63,7 +63,7 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
     "display Registration Number page for LLP" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -76,7 +76,7 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
     "display Type of Business Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -89,7 +89,7 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
     "display Register Services Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -107,7 +107,7 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
       )
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))

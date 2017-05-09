@@ -3,12 +3,14 @@ package controllers.aboutthebusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
+import models.status.SubmissionReady
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
+import services.StatusService
 
 import scala.concurrent.Future
 
@@ -20,6 +22,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -37,6 +40,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.dataCache.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = controller.get()(request)
       status(result) must be(OK)
     }
@@ -46,8 +52,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.dataCache.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
     }
+
   }
 }

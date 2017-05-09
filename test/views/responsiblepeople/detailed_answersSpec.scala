@@ -1,5 +1,6 @@
 package views.responsiblepeople
 
+import controllers.responsiblepeople.NinoUtil
 import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
@@ -17,13 +18,16 @@ import scala.collection.JavaConversions._
 class detailed_answersSpec extends GenericTestHelper
   with MustMatchers
   with TableDrivenPropertyChecks
-  with HtmlAssertions{
+  with HtmlAssertions
+  with NinoUtil {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
   "summary view" must {
+
+    val nino = nextNino
 
     "have correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
@@ -43,7 +47,7 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "firstName middleName lastName")),
       (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "24 February 1990")),
       (Messages("responsiblepeople.detailed_answers.other_names"), checkElementTextIncludes(_, "otherName")),
-      (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "AA346464B")),
+      (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, nino)),
       (Messages("responsiblepeople.detailed_answers.country_of_birth"), checkElementTextIncludes(_, "Uganda")),
       (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
       (Messages("responsiblepeople.detailed_answers.phone_number"), checkElementTextIncludes(_, "098765")),
@@ -81,7 +85,7 @@ class detailed_answersSpec extends GenericTestHelper
     )
 
     val residenceType = PersonResidenceType(
-      UKResidence("AA346464B"),
+      UKResidence(nino),
       Country("Uganda", "UG"),
       Some(Country("United Kingdom", "GB"))
     )
@@ -153,8 +157,11 @@ class detailed_answersSpec extends GenericTestHelper
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
         }
+        val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+        element.hasAttr("href") must be(true)
+        element.attr("href") must be("/anti-money-laundering/responsible-people/date-change-moved/1")
 
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
@@ -217,7 +224,7 @@ class detailed_answersSpec extends GenericTestHelper
 
         val nonUKPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
           personResidenceType = Some(PersonResidenceType(
-            NonUKResidence(new LocalDate(1990, 2, 25), NonUKPassport("1234567890")),
+            NonUKResidence(new LocalDate(1990, 2, 25), NonUKPassport("0000000000")),
             Country("Uganda", "UG"),
             Some(Country("Italy", "ITA"))
           ))
@@ -227,7 +234,7 @@ class detailed_answersSpec extends GenericTestHelper
           ("title key", "check"),
           (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
           (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 1234567890"))
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000"))
         )
 
         def view = {
@@ -251,7 +258,7 @@ class detailed_answersSpec extends GenericTestHelper
 
         val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
           personResidenceType = Some(PersonResidenceType(
-            NonUKResidence(new LocalDate(1990, 2, 25), UKPassport("1234567890")),
+            NonUKResidence(new LocalDate(1990, 2, 25), UKPassport("0000000000")),
             Country("Uganda", "UG"),
             Some(Country("Italy", "ITA"))
           ))
@@ -261,7 +268,7 @@ class detailed_answersSpec extends GenericTestHelper
           ("title key", "check"),
           (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
           (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 1234567890")))
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000")))
 
         def view = {
           views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
@@ -353,13 +360,9 @@ class detailed_answersSpec extends GenericTestHelper
         views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))), 1, true)
       }
 
-      val timeAtAddresses = doc.getElementsContainingText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
-
-      println(">>>" + timeAtAddresses)
-
-      timeAtAddresses.foreach { timeAtAddress =>
-        timeAtAddress.nextElementSibling().text() must contain("!")
-      }
+      val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
+      
+      timeAtAddresses(0).nextElementSibling().text() must contain("!")
 
     }
   }

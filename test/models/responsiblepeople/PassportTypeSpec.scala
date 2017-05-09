@@ -83,9 +83,9 @@ class PassportTypeSpec extends PlaySpec {
     "successfully pass validation for uk passport number" in {
       val urlFormEncoded = Map(
         "passportType" -> Seq("01"),
-        "ukPassportNumber" -> Seq("123456789")
+        "ukPassportNumber" -> Seq("000000000")
       )
-      PassportType.formRule.validate(urlFormEncoded) must be(Valid(UKPassport("123456789")))
+      PassportType.formRule.validate(urlFormEncoded) must be(Valid(UKPassport("000000000")))
     }
 
     "successfully pass validation for non uk passport number" in {
