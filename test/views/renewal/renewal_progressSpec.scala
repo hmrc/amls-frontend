@@ -7,6 +7,7 @@ import utils.GenericTestHelper
 import views.Fixture
 import utils.DateHelper
 import utils.Strings.TextHelpers
+import org.scalatest.MustMatchers
 
 class renewal_progressSpec extends GenericTestHelper {
 
@@ -20,6 +21,19 @@ class renewal_progressSpec extends GenericTestHelper {
   }
 
   "The renewal progress view" must {
+
+    "Have the correct title" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
+
+      doc.title must startWith(Messages("renewal.progress.title"))
+    }
+
+    "Have the correct Headings" in new ViewFixture{
+      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
+
+      heading.html must be (Messages("renewal.progress.title"))
+      subHeading.html must include (Messages("summary.status"))
+    }
 
     "enable the submit registration button" in new ViewFixture {
 
