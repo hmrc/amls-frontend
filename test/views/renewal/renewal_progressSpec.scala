@@ -22,18 +22,19 @@ class renewal_progressSpec extends GenericTestHelper {
 
   "The renewal progress view" must {
 
-    "Have the correct title" in new ViewFixture {
+    "Have the correct title and headings " in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
 
       doc.title must startWith(Messages("renewal.progress.title"))
+
+      doc.title must be(Messages("renewal.progress.title") +
+        " - " + Messages("summary.status") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
+      heading.html must be(Messages("renewal.progress.title"))
+      subHeading.html must include(Messages("summary.status"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
-
-      heading.html must be (Messages("renewal.progress.title"))
-      subHeading.html must include (Messages("summary.status"))
-    }
 
     "enable the submit registration button" in new ViewFixture {
 
