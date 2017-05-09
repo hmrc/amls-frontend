@@ -151,5 +151,5 @@ trait AmlsConnector {
 object AmlsConnector extends AmlsConnector {
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
-  override private[connectors] val url = ApplicationConfig.subscriptionUrl
+  override private[connectors] def url = ApplicationConfig.subscriptionUrl
 }

@@ -50,7 +50,6 @@ class ce_transaction_in_next_12_monthsSpec extends GenericTestHelper with MustMa
 
       errorSummary.html() must include("not a message Key")
 
-      println(doc)
       doc.getElementById("ceTransaction").parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
