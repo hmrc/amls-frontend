@@ -120,19 +120,17 @@ trait StatusController extends BaseController {
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
 
-    val thing = statusInfo match {
+    statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
         Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
       case (ReadyForRenewal(renewalDate), _) => {
-        val test = renewalService.getRenewal map {
+        renewalService.getRenewal map {
           case None => Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true))
           case Some(r) if !r.isComplete => Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""),businessNameOption,renewalDate))
           case Some(r) if r.isComplete => Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""),businessNameOption,renewalDate))
         }
-        test
       }
     }
-    thing
   }
 }
 
