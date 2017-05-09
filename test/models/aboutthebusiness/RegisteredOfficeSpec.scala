@@ -20,8 +20,8 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine1" -> Seq("38B"),
           "addressLine2" -> Seq("building"),
           "addressLine3" -> Seq("street"),
-          "addressLine4" -> Seq("Longbenton"),
-          "postCode" -> Seq("NE7 7DX")
+          "addressLine4" -> Seq("area"),
+          "postCode" -> Seq("AA1 1AA")
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
@@ -29,8 +29,8 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             "38B",
             "building",
             Some("street"),
-            Some("Longbenton"),
-            "NE7 7DX",
+            Some("area"),
+            "AA1 1AA",
             None
           )))
       }
@@ -158,9 +158,9 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
 
     "validate toLines for UK address" in {
-      RegisteredOfficeUK("38B", "some street", None, None, "NE7 7ST").toLines must be(Seq("38B",
+      RegisteredOfficeUK("38B", "some street", None, None, "AA1 1AA").toLines must be(Seq("38B",
         "some street",
-        "NE7 7ST"))
+        "AA1 1AA"))
 
     }
 
@@ -173,14 +173,14 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "write correct UK address to the model" in {
 
-      val data = RegisteredOfficeUK("38B", "Some building", Some("street"), Some("Longbenton"), "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Some building", Some("street"), Some("area"), "AA1 1AA")
 
       RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
         "addressLine2" -> Seq("Some building"),
         "addressLine3" -> Seq("street"),
-        "addressLine4" -> Seq("Longbenton"),
-        "postCode" -> Seq("NE7 7DX"))
+        "addressLine4" -> Seq("area"),
+        "postCode" -> Seq("AA1 1AA"))
     }
 
     "write correct Non UK address to the model" in {
@@ -197,37 +197,37 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "json read the given non UK address" in {
 
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
-      val jsonObj = Json.obj("postCode" -> "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA")
+      val jsonObj = Json.obj("postCode" -> "AA1 1AA")
 
       Json.fromJson[RegisteredOffice](jsonObj) must be
       JsSuccess(data, JsPath \ "postCode")
     }
 
     "write correct value to json with date of change" in {
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX", Some(DateOfChange(new LocalDate(2017,1,1))))
+      val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA", Some(DateOfChange(new LocalDate(2017,1,1))))
 
       Json.toJson(data) must
         be(Json.obj(
           "addressLine1" -> "38B",
-          "addressLine2" -> "Longbenton",
+          "addressLine2" -> "area",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
-          "postCode" -> "NE7 7DX",
+          "postCode" -> "AA1 1AA",
           "dateOfChange" -> "2017-01-01")
         )
     }
 
     "write correct value to json without date of change" in {
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX", None)
+      val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA", None)
 
       Json.toJson(data) must
         be(Json.obj(
           "addressLine1" -> "38B",
-          "addressLine2" -> "Longbenton",
+          "addressLine2" -> "area",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
-          "postCode" -> "NE7 7DX",
+          "postCode" -> "AA1 1AA",
           "dateOfChange" -> JsNull)
         )
     }
@@ -261,9 +261,9 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "convert Business Customer Address to RegisteredOfficeUK" in {
-      val address = Address("addr1", "addr2", Some("line3"), Some("line4"), Some("NE2 6GH"), Country("United Kingdom", "GB"))
+      val address = Address("addr1", "addr2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeUK("addr1", "addr2", Some("line3"), Some("line4"), "NE2 6GH"))
+      RegisteredOffice.convert(address) must be(RegisteredOfficeUK("addr1", "addr2", Some("line3"), Some("line4"), "AA1 1AA"))
     }
 
     "convert Business Customer Address to RegisteredOfficeNonUK" in {

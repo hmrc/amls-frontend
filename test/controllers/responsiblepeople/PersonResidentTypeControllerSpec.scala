@@ -18,7 +18,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar {
+class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar with NinoUtil {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -39,9 +39,9 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
       "return OK" when {
 
         val personName = PersonName("firstname", None, "lastname", None, None)
-        val nino = "ab123456l"
+        val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("1234567890"))
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("0000000000"))
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))
@@ -68,7 +68,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         }
 
-        "with pre-populated data" in new Fixture {
+        "with pre-populated data (uk)" in new Fixture {
           val responsiblePeople = ResponsiblePeople(
             personName = Some(personName),
             personResidenceType = Some(PersonResidenceType(
@@ -87,6 +87,33 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.select("input[name=isUKResidence]").`val` must be("true")
           document.select("input[name=nino]").`val` must be(nino)
           document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+
+        }
+
+        "with pre-populated data (non uk)" in new Fixture {
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName),
+            personResidenceType = Some(PersonResidenceType(
+              isUKResidence = residenceTypeNonUK,
+              countryOfBirth = Country("United Kingdom", "GB"),
+              nationality = Some(Country("United Kingdom", "GB"))))
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          println(document)
+          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
+          document.select("input[name=dateOfBirth.day]").`val` must be("2")
+          document.select("input[name=dateOfBirth.month]").`val` must be("12")
+          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
+          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
 
         }
 
@@ -115,7 +142,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA346464B",
+            "nino" -> nextNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -136,8 +163,12 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           "in edit mode" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
-              "nino" -> "AA346464B",
+              "isUKResidence" -> "false",
+              "dateOfBirth.day" -> "24",
+              "dateOfBirth.month" -> "2",
+              "dateOfBirth.year" -> "1990",
+              "passportType" -> "03",
+              "nino" -> nextNino,
               "countryOfBirth" -> "GB",
               "nationality" -> "GB"
             )
@@ -158,9 +189,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         "transforms the NINO to uppercase" in new Fixture {
 
+          val testNino = nextNino
+
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "aa346464b",
+            "nino" -> testNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -189,16 +222,20 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case _ => None
             }
           } yield nino) foreach {
-            _ mustBe "AA346464B"
+            _ mustBe testNino
           }
 
         }
 
         "remove spaces and dashes" in new Fixture {
 
+          val testNino = nextNino
+          val spacedNino = testNino.grouped(2).mkString(" ")
+          val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
+
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA 34 64- 64 B",
+            "nino" -> withDashes,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
@@ -227,7 +264,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case _ => None
             }
           } yield nino) foreach {
-            _ mustBe "AA346464B"
+            _ mustBe testNino
           }
 
         }
@@ -258,7 +295,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val newRequest = request.withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> "AA346464B",
+            "nino" -> nextNino,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )

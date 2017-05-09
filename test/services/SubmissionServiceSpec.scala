@@ -100,7 +100,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       premiseFee = 0,
       premiseFeeRate = None,
       totalFees = 100,
-      paymentReference = Some("XA111123451111"),
+      paymentReference = Some("XA000000000000"),
       difference = Some(0)
     )
 
@@ -113,7 +113,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       premiseFee = 150,
       premiseFeeRate = Some(150),
       totalFees = 100,
-      paymentReference = Some("XA111123451111"),
+      paymentReference = Some("XA000000000000"),
       difference = Some(0)
     )
 
@@ -296,7 +296,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
       )
 
-      val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+      val response = Some(Some("XA000000000000"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
       whenReady(TestSubmissionService.getAmendment) {
         result =>
@@ -330,7 +330,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
       )
 
-      val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+      val response = Some(Some("XA000000000000"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
       whenReady(TestSubmissionService.getAmendment) {
         result =>

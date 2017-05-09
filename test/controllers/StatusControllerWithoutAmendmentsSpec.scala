@@ -44,7 +44,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
     "hide amendment/variation link when amendments toggle is off" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
@@ -53,7 +53,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
         .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-        .thenReturn(Future.successful(Some("XAML00000567890")))
+        .thenReturn(Future.successful(Some("XAML00000000000")))
 
       when(controller.statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview, None))

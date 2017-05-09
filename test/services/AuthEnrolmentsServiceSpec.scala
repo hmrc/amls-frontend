@@ -22,10 +22,10 @@ class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFut
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
 
-  private val amlsRegistrationNumber = "XXML00000100105"
+  private val amlsRegistrationNumber = "XXML00000000000"
 
   private val enrolmentsList = List[GovernmentGatewayEnrolment](GovernmentGatewayEnrolment("HMCE-VATVAR-ORG",
-    List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "999900449")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
+    List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
     List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
   "AuthEnrolmentsService" must {

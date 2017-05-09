@@ -14,7 +14,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
   val testAddressLine2 = "Default Line 2"
   val testAddressLine3 = Some("Default Line 3")
   val testAddressLine4 = Some("Default Line 4")
-  val testPostcode = "NE1 7YX"
+  val testPostcode = "AA1 1AA"
   val testCountry = Country("United States", "US")
 
   val testUKAddress = UkAccountantsAddress(testAddressLine1,

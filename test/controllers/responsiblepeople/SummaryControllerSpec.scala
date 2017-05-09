@@ -67,12 +67,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "successfully redirect to 'Who is the business’s nominated officer?'" when {
       "'fromDeclaration flat set to true and status is pending'" in  new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
-          thenReturn(Future.successful(Some(respinsiblePeople)))
+          thenReturn(Future.successful(Some(responsiblePeople)))
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReady))
         val result = controller.post(true)(request)
@@ -84,12 +84,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "successfully redirect to 'Who is the business’s nominated officer?'" when {
       "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-        val respinsiblePeople = Seq(john, mark)
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())).
-          thenReturn(Future.successful(Some(respinsiblePeople)))
+          thenReturn(Future.successful(Some(responsiblePeople)))
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
         val result = controller.post(true)(request)
@@ -102,12 +102,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       "successfully redirect to 'Who is registering this business?'" when {
         "'fromDeclaration flat set to true and status is pending'" in  new Fixture {
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-          val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-          val respinsiblePeople = Seq(john, mark)
+          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+          val responsiblePeople = Seq(rp1, rp2)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
-            thenReturn(Future.successful(Some(respinsiblePeople)))
+            thenReturn(Future.successful(Some(responsiblePeople)))
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionReady))
           val result = controller.post(true)(request)
@@ -119,12 +119,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       "successfully redirect to 'Who is registering this business?'" when {
         "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in  new Fixture {
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)), None, None, None, Some(positions))
-          val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)), None, None, None, Some(positions))
-          val respinsiblePeople = Seq(john, mark)
+          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+          val responsiblePeople = Seq(rp1, rp2)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any())).
-            thenReturn(Future.successful(Some(respinsiblePeople)))
+            thenReturn(Future.successful(Some(responsiblePeople)))
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
           val result = controller.post(true)(request)

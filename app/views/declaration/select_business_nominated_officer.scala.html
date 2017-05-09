@@ -2,11 +2,11 @@
 @import models.responsiblepeople._
 @import forms2._
 
-@(content: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(subtitle: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
-    @heading("declaration.who.is.business.nominated.officer", content)
+    @heading("declaration.who.is.business.nominated.officer", subtitle)
 }
 
 @main(

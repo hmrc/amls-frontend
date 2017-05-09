@@ -17,7 +17,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "accountName" -> Seq(""),
           "isUK" -> Seq("true"),
           "accountNumber" -> Seq("12345678"),
-          "sortCode" -> Seq("112233")
+          "sortCode" -> Seq("000000")
         )
 
         BankAccount.formRule.validate(urlFormEncoded) must
@@ -30,7 +30,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "accountName" -> Seq("A" * 41),
           "isUK" -> Seq("true"),
           "accountNumber" -> Seq("12345678"),
-          "sortCode" -> Seq("112233")
+          "sortCode" -> Seq("000000")
         )
 
         BankAccount.formRule.validate(urlFormEncoded) must
@@ -52,7 +52,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "accountName" -> Seq("test"),
           "isUK" -> Seq("true"),
           "accountNumber" -> Seq(""),
-          "sortCode" -> Seq("112233")
+          "sortCode" -> Seq("000000")
         )
 
         Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
@@ -63,7 +63,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "accountName" -> Seq("test"),
           "isUK" -> Seq("true"),
           "accountNumber" -> Seq("1" * 9),
-          "sortCode" -> Seq("112233")
+          "sortCode" -> Seq("000000")
         )
 
         Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
@@ -74,7 +74,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "accountName" -> Seq("test"),
           "isUK" -> Seq("true"),
           "accountNumber" -> Seq("A2345678"),
-          "sortCode" -> Seq("112233")
+          "sortCode" -> Seq("000000")
         )
 
         Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
@@ -169,18 +169,18 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "accountName" -> Seq("test"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("112233")
+        "sortCode" -> Seq("000000")
       )
 
-      Account.formRead.validate(urlFormEncoded) must be(Valid(UKAccount("12345678", "112233")))
+      Account.formRead.validate(urlFormEncoded) must be(Valid(UKAccount("12345678", "000000")))
     }
 
     "displaySortCode" must {
       "return the sort code formatted for display" in {
 
-        val account = UKAccount("12341234", "123456")
+        val account = UKAccount("12341234", "000000")
 
-        account.displaySortCode must be("12-34-56")
+        account.displaySortCode must be("00-00-00")
       }
     }
 
@@ -208,12 +208,12 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
     "Form Write is successful for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "112233")
+      val ukAccount = UKAccount("12345678", "000000")
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("112233")
+        "sortCode" -> Seq("000000")
       )
 
       Account.formWrites.writes(ukAccount) must be(urlFormEncoded)
@@ -248,20 +248,20 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val jsObject = Json.obj(
         "isUK" -> true,
         "accountNumber" -> "12345678",
-        "sortCode" -> "112233"
+        "sortCode" -> "000000"
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "112233"), JsPath))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "000000"), JsPath))
     }
 
     "JSON Write is successful for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "112233")
+      val ukAccount = UKAccount("12345678", "000000")
 
       val jsObject = Json.obj(
         "isUK" -> true,
         "accountNumber" -> "12345678",
-        "sortCode" -> "112233"
+        "sortCode" -> "000000"
       )
 
       Account.jsonWrites.writes(ukAccount) must be(jsObject)
@@ -348,22 +348,22 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "accountName" -> Seq("test"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("112233")
+        "sortCode" -> Seq("000000")
       )
 
-      BankAccount.formRule.validate(urlFormEncoded) must be(Valid(BankAccount("test", UKAccount("12345678", "112233"))))
+      BankAccount.formRule.validate(urlFormEncoded) must be(Valid(BankAccount("test", UKAccount("12345678", "000000"))))
     }
 
     "Form Write validation for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "112233")
+      val ukAccount = UKAccount("12345678", "000000")
       val bankAccount = BankAccount("My Account", ukAccount)
 
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("112233")
+        "sortCode" -> Seq("000000")
       )
 
       BankAccount.formWrite.writes(bankAccount) must be(urlFormEncoded)

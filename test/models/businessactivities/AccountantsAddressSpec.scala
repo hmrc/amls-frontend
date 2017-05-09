@@ -12,14 +12,14 @@ class AccountantsAddressSpec extends PlaySpec {
   val testAddressLine2 = "Default Line 2"
   val testAddressLine3 = Some("Default Line 3")
   val testAddressLine4 = Some("Default Line 4")
-  val testPostcode = "NE1 7YX"
+  val testPostcode = "AA1 1AA"
   val testCountry = Country("United Kingdom", "GB")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
-  val NewPostcode = "CR6 5HG"
+  val NewPostcode = "AA1 1AA"
 
   val testUKAddress = UkAccountantsAddress(testAddressLine1,
     testAddressLine2,
@@ -75,7 +75,7 @@ class AccountantsAddressSpec extends PlaySpec {
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
-        "NE1 7YX"))
+        "AA1 1AA"))
     }
 
     "validate toLines for Non UK address" in {

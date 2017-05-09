@@ -158,7 +158,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
             None,None,None,
             Some(LocalDate.now.plusDays(15)),
             true,None,None,None
-            ))
+          ))
 
           when(controller.statusService.getDetailedStatus(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, readStatusResponse)))
@@ -448,6 +448,3 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
     }
   }
 }
-
-
-
