@@ -40,8 +40,11 @@ class status_renewal_incompleteSpec extends GenericTestHelper with MustMatchers 
       doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
+      doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--pending status-list--start")
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
+      doc.getElementsByClass("list").first().child(1).attr("class") must be("status-list--upcoming")
       doc.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
+      doc.getElementsByClass("list").first().child(2).attr("class") must be("status-list--upcoming")
 
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description")).text must be(Messages("status.renewalincomplete.description"))
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description2", endDateFormatted)).text must be(Messages("status.renewalincomplete.description2", endDateFormatted))

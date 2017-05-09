@@ -39,9 +39,12 @@ class status_renewal_not_submittedSpec extends GenericTestHelper with MustMatche
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
       doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
-      doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
+      doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
+      doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--complete")
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
+      doc.getElementsByClass("list").first().child(1).attr("class") must be("status-list--pending")
       doc.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
+      doc.getElementsByClass("list").first().child(2).attr("class") must be("status-list--upcoming")
 
       doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description")).text must be(Messages("status.renewalnotsubmitted.description"))
       doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description2")).text must be(Messages("status.renewalnotsubmitted.description2"))

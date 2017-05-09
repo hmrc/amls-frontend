@@ -40,8 +40,11 @@ class status_renewal_submittedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
+      doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--complete")
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
+      doc.getElementsByClass("list").first().child(1).attr("class") must be("status-list--complete")
       doc.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
+      doc.getElementsByClass("list").first().child(2).attr("class") must be("status-list--pending status-list--end")
 
       for (index <- 0 to 1) {
         doc.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
