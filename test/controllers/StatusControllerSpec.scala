@@ -373,6 +373,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
+        when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
+          .thenReturn(Future.successful(true))
+
         val renewalDate = LocalDate.now().plusDays(15)
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
@@ -406,6 +409,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
+          .thenReturn(Future.successful(true))
 
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))

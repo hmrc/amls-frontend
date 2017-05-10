@@ -17,22 +17,6 @@ case class Renewal(
                     ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
                     hasChanged: Boolean = false
 ) {
-  def isComplete = {
-    this match {
-//      // MSB, HVD and CE
-//      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
-//      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
-//
-//      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
-//      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
-
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _,_, _, _, _, _, _, _, _) => true
-
-      case _ => false
-    }
-  }
-
   def involvedInOtherActivities(model: InvolvedInOther): Renewal =
     this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model))
 

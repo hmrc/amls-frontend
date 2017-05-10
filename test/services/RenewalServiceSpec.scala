@@ -71,12 +71,25 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "the renewal is complete and has been started" in new Fixture {
+
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              MoneyServiceBusiness,
+              HighValueDealing
+            ))),
+            msbServices = Some(MsbServices(Set(CurrencyExchange)))
+          )))
+
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(Some(completeModel))
 
         val section = await(service.getSection)
 
+        await(service.isRenewalComplete(completeModel)) mustBe true
         section mustBe Section("renewal", Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
 
       }
@@ -85,7 +98,11 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val renewal = mock[Renewal]
         when(renewal.hasChanged) thenReturn true
-        when(renewal.isComplete) thenReturn false
+
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching()))
 
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
@@ -99,6 +116,11 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "the renewal model is not complete and not started" in new Fixture {
         val renewal = Renewal(None)
+
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching()))
 
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
@@ -514,6 +536,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
         }
       }
     }
+
     "be false" when {
       "it is an MSB" when {
         "it is an HVD" when {
