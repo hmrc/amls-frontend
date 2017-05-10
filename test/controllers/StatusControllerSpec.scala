@@ -1,9 +1,9 @@
 package controllers
 
-import connectors.FeeConnector
+import connectors.{DataCacheConnector, FeeConnector}
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType}
+import models.businessmatching._
 import models.renewal._
 import models.status._
 import models.{Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
@@ -401,8 +401,14 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(cacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              MoneyServiceBusiness,
+              HighValueDealing
+            ))),
+            msbServices = Some(MsbServices(Set(CurrencyExchange)))
+          )))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
@@ -410,8 +416,13 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
+        val dataCache = mock[DataCacheConnector]
+
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
         when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
-          .thenReturn(Future.successful(true))
+          .thenReturn(Future.successful(false))
 
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
