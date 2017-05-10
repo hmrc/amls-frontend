@@ -40,6 +40,16 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
       )))
     }
 
+    "fail validation if invalid Other value" in {
+      val urlFormEncoded = Map(
+        "nationality" -> Seq("03"),
+        "otherCountry" -> Seq("invalid")
+      )
+      Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
+        (Path \ "otherCountry") -> Seq(ValidationError("error.invalid.country"))
+      )))
+    }
+
     "fail validation when user has not selected at least one of the options" in {
       Nationality.formRule.validate(Map.empty) must be(Invalid(Seq(
         (Path \ "nationality") -> Seq(ValidationError("error.required.nationality"))

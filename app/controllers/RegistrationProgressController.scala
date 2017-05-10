@@ -100,24 +100,18 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
-  def redirectWhoIsRegistering(amendmentFlow: Boolean) = {
-    amendmentFlow match {
-      case true => Redirect(declaration.routes.WhoIsRegisteringController.getWithAmendment())
-      case false => Redirect(declaration.routes.WhoIsRegisteringController.get())
+  def redirectBusinessNominatedOfficer(status: SubmissionStatus) = {
+    status match {
+      case SubmissionReady | NotCompleted | SubmissionReadyForReview => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+      case _ => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
     }
   }
 
-  def redirectBusinessNominatedOfficer(amendmentFlow: Boolean) = {
-    amendmentFlow match {
-      case true => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
-      case false => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-    }
-  }
-
-  def isAmendment(status: Future[SubmissionStatus]) = {
-    status map {
-      case SubmissionReady | NotCompleted | SubmissionReadyForReview => false
-      case _ => true
+  def redirectWhoIsRegistering(status: SubmissionStatus) = {
+    status match {
+      case SubmissionReady | NotCompleted | SubmissionReadyForReview => Redirect(declaration.routes.WhoIsRegisteringController.get())
+      case ReadyForRenewal(_) => Redirect(declaration.routes.WhoIsRegisteringController.getWithRenewal())
+      case _ => Redirect(declaration.routes.WhoIsRegisteringController.getWithAmendment())
     }
   }
 
@@ -125,11 +119,11 @@ trait RegistrationProgressController extends BaseController {
     implicit authContext =>
       implicit request =>
         for {
-          amendmentFlow <- isAmendment(statusService.getStatus)
+          status <- statusService.getStatus
           hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
         } yield hasNominatedOfficer match {
-          case true => redirectWhoIsRegistering(amendmentFlow)
-          case false => redirectBusinessNominatedOfficer(amendmentFlow)
+          case true => redirectWhoIsRegistering(status)
+          case false => redirectBusinessNominatedOfficer(status)
         }
   }
 }

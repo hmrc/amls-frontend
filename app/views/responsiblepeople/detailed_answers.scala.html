@@ -56,16 +56,18 @@
     @model.map { person =>
 
             @person.personName.map { pName =>
-                <div class="panel-indent panel-indent--gutter panel-border-wide info">
-                    <p>
-                        <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
-                            @showHide match {
-                                case true => { @Messages("responsiblepeople.detailed_answer.tell.us.moved", pName.fullName) }
-                                case false => {}
+                @showHide match {
+                    case true => {
+                        <div class="panel-indent panel-indent--gutter panel-border-wide info">
+                            <p>
+                                <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                                     @Messages("responsiblepeople.detailed_answer.tell.us.moved", pName.fullName)
+                                </a>
+                            </p>
+                        </div>
                             }
-                        </a>
-                    </p>
-                </div>
+                    case false => {}
+                }
             }
 
         <h2 class="heading-large">

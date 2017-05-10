@@ -28,19 +28,8 @@ object FormTypes {
   val vrnTypeRegex = "^[0-9]{9}$".r
   private val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
   private val addressTypeRegex = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$".r
-  val emailRegex = ("^[^,@]+" + //Any character 1 or more times
-    "@" + //@ symbol
-    "(" + //start of DNS label group
-    "(?!\\-)" + //does not start with hyphen
-    "[a-zA-Z0-9\\-]+" + //one or more alphanumerics or hyphen
-    "(?<!\\-)" + //does not end with a hyphen
-    "\\." + //dot
-    ")*" + //zero or more dns labels followed by dot
-    "(" + //start of Top level dns label (same as a DNS label but not dot after it)
-    "(?!\\-)" +
-    "[a-zA-Z0-9\\-]+" +
-    "(?<!\\-)" +
-    ")$").r
+  val emailRegex = "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])".r
+  
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegexPost1900 = "((19|20)\\d\\d)".r

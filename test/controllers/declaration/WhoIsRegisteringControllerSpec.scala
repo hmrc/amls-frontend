@@ -3,22 +3,23 @@ package controllers.declaration
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
+import models.renewal.Renewal
 import models.responsiblepeople._
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{StatusConstants, AuthorisedFixture}
+import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -31,11 +32,14 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
       override val authConnector = self.authConnector
       override val amlsConnector = mock[AmlsConnector]
       override val statusService: StatusService = mock[StatusService]
+      override private[controllers] val renewalService = mock[RenewalService]
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
-
+    when {
+      controller.renewalService.getRenewal(any(), any(), any())
+    } thenReturn Future.successful(None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -86,6 +90,32 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
 
+        "status is approved" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+
         "status is pre-submission" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
@@ -111,8 +141,34 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
           contentAsString(result) must include(Messages("submit.registration"))
         }
-      }
 
+        "status is renewal" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+          when {
+            controller.renewalService.getRenewal(any(), any(), any())
+          } thenReturn Future.successful(Some(mock[Renewal]))
+
+          val result = controller.getWithRenewal(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+
+          contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
+        }
+      }
     }
 
     "Post" must {
@@ -273,6 +329,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       override val authConnector = self.authConnector
       override val amlsConnector = mock[AmlsConnector]
       override val statusService: StatusService = mock[StatusService]
+      override private[controllers] val renewalService = mock[RenewalService]
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
@@ -290,6 +347,10 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       status = Some(StatusConstants.Deleted)
     )
     val responsiblePeoples = Seq(rp, rp1)
+
+    when {
+      controller.renewalService.getRenewal(any(), any(), any())
+    } thenReturn Future.successful(None)
 
   }
 

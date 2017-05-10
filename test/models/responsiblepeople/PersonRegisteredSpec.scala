@@ -11,11 +11,11 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "validate the given model" in {
       val data = Map(
-        "registerAnotherPerson" -> Seq("true")
+        "registerAnotherPerson" -> Seq("false")
       )
 
       PersonRegistered.formRule.validate(data) must
-        be(Valid(PersonRegistered(true)))
+        be(Valid(PersonRegistered(false)))
     }
 
     "successfully validate given a data model" in {

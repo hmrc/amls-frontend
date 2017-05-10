@@ -125,7 +125,11 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+
       contentAsString(result) must not include "I do not remember when I did the training"
+      document.select("input[name=experienceTraining][value=true]").hasAttr("checked") must be(false)
+      document.select("input[name=experienceTraining][value=false]").hasAttr("checked") must be(true)
     }
 
 

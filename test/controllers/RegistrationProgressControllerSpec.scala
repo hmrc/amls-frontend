@@ -291,7 +291,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
       }
 
-      "at least one of the person in responsible people is nominated officer and status id amendment" in new Fixture {
+      "at least one of the person in responsible people is nominated officer and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
@@ -304,6 +304,21 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         val result = controller.post()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url)
+      }
+
+      "at least one of the person in responsible people is nominated officer and status is renewal" in new Fixture {
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, Some(positions))
+        val responsiblePeople = Seq(rp1, rp2)
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(ReadyForRenewal(None)))
+        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(),any()))
+          .thenReturn(Future.successful(Some(responsiblePeople)))
+        val result = controller.post()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithRenewal().url)
       }
 
       "no respnsible people" in new Fixture {
