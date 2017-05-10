@@ -212,7 +212,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your application")
+      Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
       contentAsString(result) must include(paymentRefNo)
     }
 
