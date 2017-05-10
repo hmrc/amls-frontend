@@ -1,6 +1,6 @@
 package controllers.declaration
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -8,13 +8,14 @@ import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
 import models.status._
+import play.api.Play
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
-import views.html.declaration.who_is_registering
+import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future
 
@@ -23,6 +24,7 @@ trait WhoIsRegisteringController extends BaseController {
   private[controllers] def amlsConnector: AmlsConnector
   def dataCacheConnector: DataCacheConnector
   def statusService: StatusService
+  private[controllers] def renewalService: RenewalService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -38,6 +40,8 @@ trait WhoIsRegisteringController extends BaseController {
 
   def getWithAmendment = get
 
+  def getWithRenewal = get
+
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
     val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
@@ -48,7 +52,6 @@ trait WhoIsRegisteringController extends BaseController {
         rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
       case _ => None
     }
-
   }
 
   implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
@@ -102,21 +105,24 @@ trait WhoIsRegisteringController extends BaseController {
 
   private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReadyForReview if AmendmentsToggle.feature =>
-        status(who_is_registering("declaration.who.is.registering.amendment.title", "submit.amendment.application", form, rp))
-      case _ => status(who_is_registering("declaration.who.is.registering.title", "submit.registration", form, rp))
+    statusService.getStatus flatMap {
+      case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) if AmendmentsToggle.feature =>
+        renewalService.getRenewal map {
+          case Some(_) => status(who_is_registering_this_renewal(form, rp))
+          case _ => status(who_is_registering_this_update(form, rp))
+        }
+      case _ => Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
+      case SubmissionReadyForReview | SubmissionDecisionApproved if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
     }
 
   private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
+      case SubmissionReadyForReview | SubmissionDecisionApproved if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
       case _ => Redirect(routes.AddPersonController.get())
     }
 
@@ -125,6 +131,7 @@ trait WhoIsRegisteringController extends BaseController {
 object WhoIsRegisteringController extends WhoIsRegisteringController {
   // $COVERAGE-OFF$
   override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
+  override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override val statusService: StatusService = StatusService

@@ -70,7 +70,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
-          case Some(_) if rp.timeAtAddress.contains(ThreeYearsPlus) | rp.timeAtAddress.contains(ThreeYearsPlus) =>
+          case Some(_) if rp.timeAtAddress.contains(OneToThreeYears) | rp.timeAtAddress.contains(ThreeYearsPlus) =>
             ResponsiblePersonAddressHistory(currentAddress = Some(rp))
           case Some(a) => a.currentAddress(rp)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(rp))

@@ -171,7 +171,6 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
             status(result) must be(BAD_REQUEST)
 
             val document = Jsoup.parse(contentAsString(result))
-            println(document)
             document.select("a[href=#hasPolicy]").html() must include(Messages("error.required.ba.option.risk.assessment"))
           }
 
@@ -191,7 +190,6 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
             status(result) must be(BAD_REQUEST)
 
             val document = Jsoup.parse(contentAsString(result))
-            println(document)
             document.select("a[href=#riskassessments]").html() must include(Messages("error.required.ba.risk.assessment.format"))
           }
 
@@ -213,8 +211,6 @@ class RiskAssessmentControllerSpec extends GenericTestHelper with MockitoSugar {
             status(result) must be(BAD_REQUEST)
 
             val document = Jsoup.parse(contentAsString(result))
-
-            println(document)
 
             document.select("a[href=#riskassessments[0]-riskassessments]").html() must include(Messages("error.invalid"))
           }
