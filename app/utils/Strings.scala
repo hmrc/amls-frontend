@@ -13,12 +13,14 @@ object Strings {
   }
 
   implicit val defaultLineBreakConverter = new LineBreakConverter {
-    override def convert(input: String) = input.replace("\n", "</p><p>")
+    override def convert(input: String) = input.replaceAll("""\s*\n\s*""", "</p><p>")
   }
 
   implicit class TextHelpers(s: String) {
     def convertLineBreaks(implicit converter: LineBreakConverter) = converter.convert(s)
-    def convertLinkBreaksH(implicit converter: LineBreakConverter) = Html(converter.convert(s))
+    def convertLineBreaksH(implicit converter: LineBreakConverter) = Html(converter.convert(s))
+    def paragraphize(implicit converter: LineBreakConverter) = s"<p>${converter.convert(s)}</p>"
+    def paragraphizeH(implicit converter: LineBreakConverter) = Html(s"<p>${converter.convert(s)}</p>")
   }
 
 }

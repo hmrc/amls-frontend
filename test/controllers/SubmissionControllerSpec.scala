@@ -10,6 +10,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.Upstream4xxResponse
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -81,6 +82,19 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+    }
+
+    "post must return a 'Duplicate Business Partner' error page when 422 is returned from the middle tier" in new Fixture {
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(Upstream4xxResponse("Error", 422, 500))
+
+      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.post()(request)
+
+      status(result) mustBe UNPROCESSABLE_ENTITY
     }
   }
 

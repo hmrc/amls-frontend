@@ -28,9 +28,9 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             @endDate.map {date =>
                 @if(msbOrTcspExists) {
-                    <p>@messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(date)).convertLinkBreaksH</p>
+                    <p>@messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
                 } else {
-                <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLinkBreaksH</p>
+                <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
                 }
             }
 

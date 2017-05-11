@@ -13,7 +13,8 @@
     linkElement : Option[Html] = None,
     nameBusiness : Option[String] = None,
     userLoggedIn : Boolean = true,
-    heading: Html = HtmlFormat.empty
+    heading: Html = HtmlFormat.empty,
+    showGetHelpForm: Boolean = true
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
@@ -100,9 +101,11 @@
                     }
                 </div>
             </div>
-          <div class="get-help-form">
-              @getHelpForm
-          </div>
+            @if(showGetHelpForm) {
+                <div class="get-help-form">
+                   @getHelpForm
+                </div>
+            }
         </div>
     </main>
 }

@@ -6,6 +6,8 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import play.api.Play
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.Upstream4xxResponse
+import views.html.duplicate_submission
 
 trait SubmissionController extends BaseController {
 
@@ -27,6 +29,8 @@ trait SubmissionController extends BaseController {
       }
     }.map {
       _ => Redirect(controllers.routes.ConfirmationController.get())
+    } recover {
+      case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
     }
   }
 }

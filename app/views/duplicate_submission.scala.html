@@ -1,0 +1,16 @@
+@import include._
+@import utils.Strings._
+
+@()(implicit messages: Messages, request: Request[AnyContent])
+
+@main(title = messages("error.submission.duplicate.title"), showGetHelpForm = false) {
+
+    @heading(
+        messages("error.submission.duplicate.title")
+    )
+
+    <div id="page-content">
+        @messages("error.submission.duplicate.content").paragraphizeH
+    </div>
+
+}
