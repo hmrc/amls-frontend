@@ -241,16 +241,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       )))
     }
 
-    "fail to validate an invalid month" in {
-      localDateFutureRule.validate(Map(
-        "day" -> Seq("24"),
-        "month" -> Seq("13"),
-        "year" -> Seq("1990")
-      )) must be(Invalid(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-      )))
-    }
-
     "fail to validate an invalid day" in {
       localDateFutureRule.validate(Map(
         "day" -> Seq("45"),
