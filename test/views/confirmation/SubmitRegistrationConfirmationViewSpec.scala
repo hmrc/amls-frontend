@@ -21,7 +21,7 @@ class SubmitRegistrationConfirmationViewSpec extends GenericTestHelper with Must
   "The amendment confirmation view" must {
 
     "show the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("confirmation.title"))
+      doc.title must startWith(Messages("confirmation.header"))
     }
 
     "show the correct header" in new ViewFixture {

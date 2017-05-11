@@ -61,7 +61,7 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Beneficial owner")),
       (Messages("responsiblepeople.detailed_answers.position"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.detailed_answers.position_start"), checkElementTextIncludes(_, "24 February 1990")),
-      (Messages("responsiblepeople.check_your_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
       (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
       (Messages("responsiblepeople.detailed_answers.previous_experience"), checkElementTextIncludes(_, "experience")),
@@ -353,6 +353,19 @@ class detailed_answersSpec extends GenericTestHelper
         check(section) must be(false)
       }
       }
+    }
+
+    "display timeAtAddress for corresponding addresses" in new Fixture {
+      def view = {
+        views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))), 1, true)
+      }
+
+      val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
+
+      timeAtAddresses(0).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.5_months_history"))
+      timeAtAddresses(2).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.11_months_history"))
+      timeAtAddresses(4).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.3_years_history"))
+
     }
   }
 }

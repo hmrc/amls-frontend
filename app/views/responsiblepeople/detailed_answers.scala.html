@@ -260,7 +260,7 @@
 
         @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
             @detailedAnswers(
-            question = Messages("responsiblepeople.check_your_answers.soleproprietor_for_other_business"),
+            question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
             editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true).toString(),
             dataItem = Some(anotherBusiness)
             ) { vr2 =>
