@@ -54,8 +54,8 @@ object AnotherBody {
       case true =>
 
         val r = (__ \ "supervisorName").read(supervisorRule) ~
-          (__ \ "startDate").read(localDateRule) ~
-          (__ \ "endDate").read(localDateRule) ~
+          (__ \ "startDate").read(localDateFutureRule) ~
+          (__ \ "endDate").read(localDateFutureRule) ~
           (__ \ "endingReason").read(reasonRule)
 
         r.tupled andThen validationRule andThen Rule.fromMapping[ValidationRuleType, AnotherBody]( x => {

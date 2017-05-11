@@ -41,6 +41,16 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
     }
 
     "fail validation" when {
+      "given a future date" in {
+
+        val data = AnotherBody.formWrites.writes(AnotherBodyYes("Name", LocalDate.now().plusDays(1), LocalDate.now().plusMonths(1), "Reason"))
+        AnotherBody.formRule.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
+          ValidationError("error.future.date")),Path \ "endDate" -> Seq(
+          ValidationError("error.future.date")))))
+      }
+    }
+
+    "fail validation" when {
       "missing values when Yes selected" in {
         val urlFormEncoded = Map("anotherBody" -> Seq("true"))
         val expected = Invalid(

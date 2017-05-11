@@ -26,7 +26,7 @@ object ResidenceType {
         (__ \ "nino").read(ninoType).map(UKResidence.apply)
       case false =>
         (
-          (__ \ "dateOfBirth").read(localDateRule) ~
+          (__ \ "dateOfBirth").read(localDateFutureRule) ~
             __.read[PassportType]
           ) (NonUKResidence)
     }

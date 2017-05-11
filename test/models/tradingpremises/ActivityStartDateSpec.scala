@@ -2,6 +2,7 @@ package models.tradingpremises
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
+import models.aboutthebusiness.ActivityStartDate
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -35,6 +36,15 @@ class ActivityStartDateSpec extends PlaySpec {
 
         ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(Path \ "startDate" -> Seq(
           ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+      }
+
+      "fail validation" when {
+        "given a future date" in {
+
+          val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
+          ActivityStartDate.formRule.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
+            ValidationError("error.future.date")))))
+        }
       }
 
       "given missing data represented by an empty string" in {

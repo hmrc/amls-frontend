@@ -38,7 +38,7 @@ object AgentName {
     import jto.validation.forms.Rules._
     ((__ \ "agentName").read(agentNameType) ~
       {ApplicationConfig.release7 match {
-      case true => (__ \ "agentDateOfBirth").read(localDateRule).map(x=>Some(x))
+      case true => (__ \ "agentDateOfBirth").read(localDateFutureRule).map(x=>Some(x))
       case false => Rule[UrlFormEncoded, Option[LocalDate]](_ => Valid(None))
     }}) (AgentName.applyWithoutDateOfChange _)
   }

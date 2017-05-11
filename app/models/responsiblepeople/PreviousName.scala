@@ -58,7 +58,7 @@ object PreviousName {
         (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name"))) ~
         (__ \ "middleName").read(optionR(genericNameRule())) ~
         (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
-      ).tupled andThen iR) ~ (__ \ "date").read(localDateRule))(builder)
+      ).tupled andThen iR) ~ (__ \ "date").read(localDateFutureRule))(builder)
     }
 
   implicit val formW: Write[PreviousName, UrlFormEncoded] =

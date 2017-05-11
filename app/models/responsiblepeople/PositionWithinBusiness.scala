@@ -96,7 +96,7 @@ object Positions {
       ((__ \ "positions")
         .read(minLengthR[Set[PositionWithinBusiness]](1)
           .withMessage("error.required.positionWithinBusiness")) ~
-        (__ \ "startDate").read(localDateRule.map { x: LocalDate => Some(x) })) (Positions.apply _)
+        (__ \ "startDate").read(localDateFutureRule.map { x: LocalDate => Some(x) })) (Positions.apply _)
     }
 
   implicit def formWrites
