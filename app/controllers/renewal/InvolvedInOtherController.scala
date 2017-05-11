@@ -71,7 +71,7 @@ class InvolvedInOtherController @Inject()(
             }
           case ValidForm(_, data) =>
             for {
-              renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
+              renewal <- renewalService.getRenewal
               _ <- renewalService.updateRenewal(getUpdatedRenewal(renewal, data))
             } yield data match {
               case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
@@ -84,15 +84,12 @@ class InvolvedInOtherController @Inject()(
   private def getUpdatedRenewal(renewal: Option[Renewal], data: InvolvedInOther): Renewal = {
     (renewal, data) match {
       case (Some(renew), InvolvedInOtherYes(_)) => {
-        println("***** involvedInOtherYes - " + renew.copy(involvedInOtherActivities = Some(data)))
         renewal.involvedInOtherActivities(data)
       }
       case (Some(renew), InvolvedInOtherNo) => {
-        println("***** involvedInOtherNo - " + renew.copy(involvedInOtherActivities = Some(data), businessTurnover = None))
         renewal.involvedInOtherActivities(data).resetBusinessTurnover
       }
       case (None, _) => {
-        println("***** OTHER - " + Renewal(involvedInOtherActivities = Some(data)))
         Renewal(involvedInOtherActivities = Some(data), hasChanged = true)
       }
     }

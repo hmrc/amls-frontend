@@ -38,8 +38,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
           Future.successful(BadRequest(send_largest_amounts_of_money(f, edit)))
         case ValidForm(_, data) =>
           for {
-            renewal <-
-            dataCacheConnector.fetch[Renewal](Renewal.key)
+            renewal <- renewalService.getRenewal
             _ <- renewalService.updateRenewal(renewal.sendTheLargestAmountsOfMoney(data))
           } yield redirectDependingOnEdit(edit)
       }
