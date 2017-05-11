@@ -21,7 +21,7 @@ object CashPayment {
     import jto.validation.forms.Rules._
     (__ \ "acceptedAnyPayment").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
       case true =>
-        (__ \ "paymentDate").read(localDateRule) map CashPaymentYes.apply
+        (__ \ "paymentDate").read(localDateFutureRule) map CashPaymentYes.apply
       case false => Rule.fromMapping { _ => Valid(CashPaymentNo) }
     }
   }
