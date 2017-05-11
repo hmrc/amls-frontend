@@ -1,5 +1,6 @@
 package models.tradingpremises
 
+import cats.data.Validated.Invalid
 import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
@@ -54,6 +55,15 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "startDate.month" -> Seq("02"),
         "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
       )))
+    }
+
+    "fail validation" when {
+      "given a future date" in {
+
+        val data = YourTradingPremises.formW.writes(model.copy( startDate = Some(LocalDate.now().plusDays(1))))
+        YourTradingPremises.formR.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
+          ValidationError("error.future.date")))))
+      }
     }
 
     "fail validation when trading name is empty" in {
