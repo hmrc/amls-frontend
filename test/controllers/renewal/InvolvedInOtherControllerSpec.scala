@@ -2,8 +2,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => BMActivities, _}
-import models.renewal.{Renewal, InvolvedInOtherYes, InvolvedInOther}
-import models.status.NotCompleted
+import models.renewal.{InvolvedInOtherYes, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -222,75 +221,112 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "when post is called" must {
+      "when there is pre-existing Renewal Data" must {
+        "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
 
-      "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "true",
+            "details" -> "test"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "involvedInOther" -> "true",
-          "details" -> "test"
-        )
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Renewal())))
 
-        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
+        }
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
+        "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "false"
+          )
+
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Renewal())))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
+        }
       }
+      "when there is no Renewal data at all yet" must {
+        "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
 
-      "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "true",
+            "details" -> "test"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "involvedInOther" -> "false"
-        )
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
+        }
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
-      }
+        "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
 
-      "redirect to SummaryController with valid data with option no in edit mode" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "false"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "involvedInOther" -> "false"
-        )
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
+        }
 
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-      }
+        "redirect to SummaryController with valid data with option no in edit mode" in new Fixture {
 
-      "redirect to BusinessTurnoverController with valid data in edit mode" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "false"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "involvedInOther" -> "true",
-          "details" -> "test"
-        )
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-        when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
 
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get(true).url))
+        "redirect to BusinessTurnoverController with valid data in edit mode" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "involvedInOther" -> "true",
+            "details" -> "test"
+          )
+
+          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get(true).url))
+        }
       }
 
       "respond with BAD_REQUEST" when {

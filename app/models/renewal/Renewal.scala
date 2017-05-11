@@ -23,6 +23,9 @@ case class Renewal(
   def businessTurnover(model: BusinessTurnover): Renewal =
     this.copy(businessTurnover = Some(model), hasChanged = hasChanged || !this.businessTurnover.contains(model))
 
+  def resetBusinessTurnover: Renewal =
+    this.copy(businessTurnover = None, hasChanged = hasChanged || !this.businessTurnover.isEmpty)
+
   def turnover(model: AMLSTurnover): Renewal =
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model))
 

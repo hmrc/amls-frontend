@@ -719,8 +719,8 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
-              Some(BusinessTurnover.First),
-              Some(AMLSTurnover.First),
+              None,
+              None,
               None,
               None,
               None,

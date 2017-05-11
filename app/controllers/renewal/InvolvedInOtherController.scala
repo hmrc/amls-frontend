@@ -83,9 +83,18 @@ class InvolvedInOtherController @Inject()(
 
   private def getUpdatedRenewal(renewal: Option[Renewal], data: InvolvedInOther): Renewal = {
     (renewal, data) match {
-      case (Some(renew), InvolvedInOtherYes(_)) => renew.copy(involvedInOtherActivities = Some(data))
-      case (Some(renew), InvolvedInOtherNo) => renew.copy(involvedInOtherActivities = Some(data), businessTurnover = None)
-      case (_, _) => Renewal(involvedInOtherActivities = Some(data))
+      case (Some(renew), InvolvedInOtherYes(_)) => {
+        println("***** involvedInOtherYes - " + renew.copy(involvedInOtherActivities = Some(data)))
+        renewal.involvedInOtherActivities(data)
+      }
+      case (Some(renew), InvolvedInOtherNo) => {
+        println("***** involvedInOtherNo - " + renew.copy(involvedInOtherActivities = Some(data), businessTurnover = None))
+        renewal.involvedInOtherActivities(data).resetBusinessTurnover
+      }
+      case (None, _) => {
+        println("***** OTHER - " + Renewal(involvedInOtherActivities = Some(data)))
+        Renewal(involvedInOtherActivities = Some(data), hasChanged = true)
+      }
     }
   }
 
