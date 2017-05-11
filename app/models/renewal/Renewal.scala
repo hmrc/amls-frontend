@@ -17,19 +17,14 @@ case class Renewal(
                     ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
                     hasChanged: Boolean = false
 ) {
-  def isComplete = {
-    this match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _,_, _, _, _, _, _, _, _) => true
-      case _ => false
-    }
-  }
-
   def involvedInOtherActivities(model: InvolvedInOther): Renewal =
     this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model))
 
   def businessTurnover(model: BusinessTurnover): Renewal =
     this.copy(businessTurnover = Some(model), hasChanged = hasChanged || !this.businessTurnover.contains(model))
+
+  def resetBusinessTurnover: Renewal =
+    this.copy(businessTurnover = None, hasChanged = hasChanged || !this.businessTurnover.isEmpty)
 
   def turnover(model: AMLSTurnover): Renewal =
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model))

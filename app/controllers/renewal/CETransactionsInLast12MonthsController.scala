@@ -38,7 +38,7 @@ class CETransactionsInLast12MonthsController @Inject()(
         case ValidForm(_, data) =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-            _ <- dataCacheConnector.save[Renewal](Renewal.key, renewal.ceTransactionsInLast12Months(data))
+            _ <- renewalService.updateRenewal(renewal.ceTransactionsInLast12Months(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.WhichCurrenciesController.get(edit))

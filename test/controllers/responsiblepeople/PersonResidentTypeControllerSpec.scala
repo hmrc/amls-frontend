@@ -106,7 +106,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          println(document)
           document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
           document.select("input[name=dateOfBirth.day]").`val` must be("2")

@@ -41,8 +41,8 @@ class ReceiveCashPaymentsController @Inject()(
           Future.successful(BadRequest(receiving(f, edit)))
         case ValidForm(_, data) =>
           for {
-            renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-            _ <- dataCacheConnector.save[Renewal](Renewal.key, renewal.receiveCashPayments(data))
+            renewal <- renewalService.getRenewal
+            _ <- renewalService.updateRenewal(renewal.receiveCashPayments(data))
           } yield Redirect(routes.SummaryController.get())
       }
     }

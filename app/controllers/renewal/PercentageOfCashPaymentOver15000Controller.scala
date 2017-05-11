@@ -39,7 +39,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(
         case f: InvalidForm => Future.successful(BadRequest(views.html.renewal.percentage(f, edit)))
         case ValidForm(_, data) =>
           for {
-            renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
+            renewal <- renewalService.getRenewal
             _ <- renewalService.updateRenewal(renewal.percentageOfCashPaymentOver15000(data))
           } yield redirectDependingOnEdit(edit)
       }
