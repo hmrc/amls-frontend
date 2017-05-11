@@ -374,7 +374,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
-          .thenReturn(Future.successful(true))
+          .thenReturn(Future.successful(false))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -422,7 +422,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
-          .thenReturn(Future.successful(false))
+          .thenReturn(Future.successful(true))
 
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
