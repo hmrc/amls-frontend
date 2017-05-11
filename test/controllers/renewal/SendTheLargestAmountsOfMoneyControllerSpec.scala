@@ -78,7 +78,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
             "country_1" -> "GS"
           )
 
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
@@ -97,7 +97,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
             "country_1" -> "GB"
           )
 
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))

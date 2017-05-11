@@ -30,10 +30,10 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       renewalService = mockRenewalService
     )
 
-    when(mockDataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any()))
+    when(mockRenewalService.getRenewal(any(),any(),any()))
       .thenReturn(Future.successful(None))
 
-    when(mockDataCacheConnector.save[Renewal](eqTo(Renewal.key), any())(any(), any(), any()))
+    when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -43,7 +43,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       "load the page" when {
         "renewal data is found for receiving payments" in new Fixture {
 
-          when(mockDataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)

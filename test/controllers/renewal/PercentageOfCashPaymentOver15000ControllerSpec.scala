@@ -72,12 +72,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
         val newRequest = request.withFormUrlEncodedBody(
         )
 
-        when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[Renewal](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.required.renewal.hvd.percentage"))
@@ -90,7 +84,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
             "percentage" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
@@ -109,7 +103,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
             "percentage" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
