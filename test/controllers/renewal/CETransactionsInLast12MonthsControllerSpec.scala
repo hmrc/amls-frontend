@@ -63,8 +63,8 @@ class CETransactionsInLast12MonthsControllerSpec extends GenericTestHelper with 
       when(controller.dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Renewal](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -80,8 +80,8 @@ class CETransactionsInLast12MonthsControllerSpec extends GenericTestHelper with 
       when(controller.dataCacheConnector.fetch[Renewal](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Renewal](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -106,8 +106,8 @@ class CETransactionsInLast12MonthsControllerSpec extends GenericTestHelper with 
       when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))
         (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(controller.dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

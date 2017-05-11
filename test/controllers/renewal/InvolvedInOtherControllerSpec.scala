@@ -232,7 +232,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -249,7 +249,7 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -268,8 +268,8 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -285,8 +285,8 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -302,8 +302,8 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -320,8 +320,8 @@ class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar 
           when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockDataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)

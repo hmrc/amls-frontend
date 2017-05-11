@@ -22,7 +22,7 @@ class ReceiveCashPaymentsController @Inject()(
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Renewal](Renewal.key) map {
+      renewalService.getRenewal map {
         response =>
           val form: Form2[ReceiveCashPayments] = (for {
             renewal <- response
