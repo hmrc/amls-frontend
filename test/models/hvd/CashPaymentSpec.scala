@@ -53,6 +53,13 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
+      "fail to validate given an future date" in {
+        val model = CashPayment.formWrites.writes(CashPaymentYes(LocalDate.now.plusMonths(1)))
+
+        CashPayment.formRule.validate(model) must
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.future.date")))))
+      }
+
       "fail to validate given missing day" in {
 
         val data = Map(
