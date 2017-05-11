@@ -41,6 +41,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
   lazy val reportAProblemUrl = contactHost + getConfigString("contact-frontend.report-a-problem-url")
+  lazy val reportAProblemAjaxUrl = contactHost + getConfigString("contact-frontend.report-a-problem-ajax-url")
 
   lazy val loginUrl = getConfigString("login.url")
   lazy val logoutUrl = getConfigString("logout.url")

@@ -1232,3 +1232,11 @@ details {
         width: 12.5%;
     }
 }
+
+#duplicate-get-help > h2 {
+  display: none
+}
+
+#duplicate-get-help > p {
+  display: none
+}

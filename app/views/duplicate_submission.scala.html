@@ -1,7 +1,7 @@
 @import include._
 @import utils.Strings._
 
-@()(implicit messages: Messages, request: Request[AnyContent])
+@(getHelpView: Html)(implicit messages: Messages, request: Request[AnyContent])
 
 @main(title = messages("error.submission.duplicate.title"), showGetHelpForm = false) {
 
@@ -13,4 +13,7 @@
         @messages("error.submission.duplicate.content").paragraphizeH
     </div>
 
+    <div id="duplicate-get-help" class="report-error">
+        @getHelpView
+    </div>
 }
