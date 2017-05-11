@@ -44,7 +44,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   def isRenewalComplete(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
-    val test = for {
+    val isComplete = for {
       cache <- OptionT(dataCache.fetchAll)
       bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
       ba <- OptionT.fromOption[Future](bm.activities)
@@ -68,7 +68,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
         }
     }
 
-    test.getOrElse(false)
+    isComplete.getOrElse(false)
 
   }
 
