@@ -143,13 +143,13 @@ object FormTypes {
   val emailType = emailRequired andThen emailLength andThen emailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
-  val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
-  val yearType: Rule[String, String] = yearRequired andThen yearPattern
+  private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
+  private val yearType: Rule[String, String] = yearRequired andThen yearPattern
 
-  def localDateRuleWithPattern(yearTypeRule: Rule[String, String]) : Rule[UrlFormEncoded, LocalDate] = {
+  def localDateRuleWithPattern : Rule[UrlFormEncoded, LocalDate] = {
       From[UrlFormEncoded] { __ =>
         (
-          (__ \ "year").read(yearTypeRule) ~
+          (__ \ "year").read(yearType) ~
             (__ \ "month").read(monthType) ~
             (__ \ "day").read(dayType)
           ) ((y, m, d) => s"$y-$m-$d") orElse
@@ -169,7 +169,7 @@ object FormTypes {
     }
 
   val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
-  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern(yearTypePost1900) andThen futureDateRule
+  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen futureDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)

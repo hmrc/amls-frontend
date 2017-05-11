@@ -173,46 +173,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
     }
   }
 
-  "yearType" must {
-    "successfully validate" in {
-
-      yearType.validate("1934") must
-        be(Valid("1934"))
-    }
-
-    "fail to validate an empty string" in {
-
-      yearType.validate("") must
-        be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.required.tp.year"))
-        )))
-    }
-
-    "fail to validate a string longer than 4 digits" in {
-
-      yearType.validate("19999") must
-        be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.year"))
-        )))
-    }
-
-    "fail to validate a string shorter than 4 digits" in {
-
-      yearType.validate("1") must
-        be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.year"))
-        )))
-    }
-
-    "fail to validate year before 1990" in {
-
-      yearTypePost1900.validate("1899") must
-        be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.year.post1900"))
-        )))
-    }
-  }
-
   "premisesEndDateRule" must {
 
     import org.joda.time.LocalDate
@@ -268,6 +228,16 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("2020")
       )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.future.date"))
+      )))
+    }
+
+    "fail to validate an invalid month" in {
+      localDateFutureRule.validate(Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("13"),
+        "year" -> Seq("1990")
+      )) must be(Invalid(Seq(
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
