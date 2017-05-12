@@ -15,7 +15,7 @@ class PreviousNameSpec extends PlaySpec {
       // scalastyle:off magic.number
       val first = PreviousName(Some("oldfirst"), None, None, new LocalDate(1990, 2, 24))
       val middle = PreviousName(None, Some("oldmiddle"), None, new LocalDate(1990, 2, 24))
-      val last = PreviousName(None, None, Some("oldsurname"), new LocalDate(1990, 2, 24))
+      val last = PreviousName(None, None, Some("oldlast"), new LocalDate(1990, 2, 24))
 
       val personName = PersonName("First", Some("Middle"), "Last", None, None)
 

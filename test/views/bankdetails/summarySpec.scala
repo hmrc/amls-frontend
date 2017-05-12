@@ -168,7 +168,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("890834561")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("000000000")))))
 
         views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
