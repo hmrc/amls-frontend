@@ -1233,10 +1233,7 @@ details {
     }
 }
 
-#duplicate-get-help > h2 {
-  display: none
-}
-
-#duplicate-get-help > p {
-  display: none
+.duplicate-submission-page .report-error__content > h2,
+.duplicate-submission-page .report-error__content > p {
+    display: none
 }

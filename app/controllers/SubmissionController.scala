@@ -16,9 +16,6 @@ trait SubmissionController extends BaseController {
   private[controllers] def statusService: StatusService
   private[controllers] def renewalService: RenewalService
 
-  def getHelpView(implicit request: Request[_]) =
-      config.CachedStaticHtmlPartialProvider.getPartialContent(ApplicationConfig.reportAProblemAjaxUrl)
-
   def post() = Authorised.async {
     implicit authContext => implicit request => {
       statusService.getStatus.flatMap[SubmissionResponse] {
@@ -33,7 +30,7 @@ trait SubmissionController extends BaseController {
     }.map {
       _ => Redirect(controllers.routes.ConfirmationController.get())
     } recover {
-      case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission(getHelpView))
+      case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
     }
   }
 }

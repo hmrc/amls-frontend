@@ -11,7 +11,7 @@ class DuplicateSubmissionViewSpec extends GenericTestHelper {
 
     val getHelpView = Html("<p>Get help here</p>")
 
-    def view = views.html.duplicate_submission(getHelpView)
+    def view = views.html.duplicate_submission()
 
   }
 
