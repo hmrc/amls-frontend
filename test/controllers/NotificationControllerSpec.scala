@@ -200,12 +200,12 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]
 
-    val testBusinessName = "Ubunchews Accountancy Services"
+    val testBusinessName = "Test Business Name"
     val testReviewDetails = ReviewDetails(
       testBusinessName,
       Some(BusinessType.LimitedCompany),
-      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
-      "XE0001234567890"
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+      "XE0000000000000"
     )
     val testBusinessMatch = BusinessMatching(
       reviewDetails = Some(testReviewDetails)

@@ -153,7 +153,7 @@ class summarySpec extends GenericTestHelper
       private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
 
       private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.iban") + ": 890834561",
+        Messages("bankdetails.bankaccount.iban") + ": 000000000",
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
         Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
       )
@@ -161,7 +161,7 @@ class summarySpec extends GenericTestHelper
       val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
         ("title key", "check"),
         (title, checkElementTextIncludes(_,
-          "890834561",
+          "000000000",
           "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.no",
           "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
         ), (title, checkListContainsItems(_, bankDetailsSet))

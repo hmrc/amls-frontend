@@ -1,23 +1,10 @@
 amls-frontend
 =============
 
-To update from Nexus and start all Services from the SNAPSHOT
+**Anti-Money Laundering Supervision Frontend**
 
- sm --start AMLS_ALL -f
+[![Apache-2.0 license](http://img.shields.io/badge/license-Apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Build Status](https://travis-ci.org/hmrc/amls-frontend.svg?branch=master)](https://travis-ci.org/hmrc/amls-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/amls-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/amls-frontend/_latestVersion)
 
-To update from Nexus and start all Services from the RELEASE Version instead of SNAPSHOT
+This is the repository for the Anti-Money Laundering Supervision front end. This service provides users the ability to register for Supervision and update or vary their supervision details.
 
- sm --start AMLS_ALL -r
-
-To stop the Services
-
- sm --stop AMLS_ALL
-
-To start the app locally, kill the service AMLS_FRONTEND and then start using the command below
-
- sbt "run 9222"
-
-To update Service Manager, do as below
-
- sudo pip install servicemanager --upgrade
-
+To run the project clone the repository and in terminal $sbt "run $PORT"

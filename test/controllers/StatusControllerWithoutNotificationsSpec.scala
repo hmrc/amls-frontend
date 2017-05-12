@@ -44,7 +44,7 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
     "hide notifications when notifications toggle is off" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))

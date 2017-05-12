@@ -13,15 +13,15 @@ class PreviousNameSpec extends PlaySpec {
     "have the formattedPreviousName function correctly return the value" in {
 
       // scalastyle:off magic.number
-      val first = PreviousName(Some("Matt"), None, None, new LocalDate(1990, 2, 24))
-      val middle = PreviousName(None, Some("Matt"), None, new LocalDate(1990, 2, 24))
-      val last = PreviousName(None, None, Some("Matt"), new LocalDate(1990, 2, 24))
+      val first = PreviousName(Some("oldfirst"), None, None, new LocalDate(1990, 2, 24))
+      val middle = PreviousName(None, Some("oldmiddle"), None, new LocalDate(1990, 2, 24))
+      val last = PreviousName(None, None, Some("oldsurname"), new LocalDate(1990, 2, 24))
 
-      val personName = PersonName("John", Some("Paul"), "Smith", None, None)
+      val personName = PersonName("First", Some("Middle"), "Last", None, None)
 
-      first.formattedPreviousName(personName) must be ("Matt Paul Smith")
-      middle.formattedPreviousName(personName) must be ("John Matt Smith")
-      last.formattedPreviousName(personName) must be ("John Paul Matt")
+      first.formattedPreviousName(personName) must be ("oldfirst Middle Last")
+      middle.formattedPreviousName(personName) must be ("First oldmiddle Last")
+      last.formattedPreviousName(personName) must be ("First Middle oldlast")
 
     }
 
