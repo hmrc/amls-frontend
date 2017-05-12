@@ -102,7 +102,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
           "2",
           None,
           None,
-          "AA03 5BB"
+          "AA11 1AA"
         ),
         Some(true),
         Some(new LocalDate(1990, 2, 24))

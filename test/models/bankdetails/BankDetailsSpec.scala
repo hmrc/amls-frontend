@@ -31,7 +31,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
     "refreshedFromServer" -> false)
-  val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+  val bankAccountNew = BankAccount("My Account", UKAccount("123456", "00-00-00"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
   val incompleteModel = BankDetails(Some(accountType), None)

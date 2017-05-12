@@ -147,7 +147,7 @@ class PassportTypeSpec extends PlaySpec {
       }
 
       "Read the json and return UKPassport" in {
-        val model = UKPassport("AA2132131")
+        val model = UKPassport("AA0000000")
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(model)) must
           be(JsSuccess(model, JsPath \ "ukPassportNumber"))
       }
