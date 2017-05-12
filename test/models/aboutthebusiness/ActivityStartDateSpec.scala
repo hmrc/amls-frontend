@@ -29,8 +29,7 @@ class ActivityStartDateSpec extends PlaySpec {
       "given a future date" in {
 
        val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
-        ActivityStartDate.formRule.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.future.date")))))
+        ActivityStartDate.formRule.validate(data) must be(Valid(ActivityStartDate(LocalDate.now().plusDays(1))))
       }
     }
 
