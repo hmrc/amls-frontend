@@ -195,4 +195,12 @@ $(function () {
         e.preventDefault();
   });
 
+  var duplicateErrorWrapper = $('.duplicate-submission-page');
+  var duplicateErrorForm = duplicateErrorWrapper.find('form');
+
+  if (duplicateErrorForm.length) {
+    duplicateErrorWrapper.find('.report-error__content.js-hidden').removeClass('js-hidden');
+    duplicateErrorWrapper.find('.report-error__toggle').remove();
+  }
+
 });

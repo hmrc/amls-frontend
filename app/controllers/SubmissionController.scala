@@ -1,18 +1,20 @@
 package controllers
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import models.SubmissionResponse
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.Play
+import play.api.mvc.Request
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.Upstream4xxResponse
+import views.html.duplicate_submission
 
 trait SubmissionController extends BaseController {
 
   private[controllers] def subscriptionService: SubmissionService
   private[controllers] def statusService: StatusService
   private[controllers] def renewalService: RenewalService
-
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
@@ -27,6 +29,8 @@ trait SubmissionController extends BaseController {
       }
     }.map {
       _ => Redirect(controllers.routes.ConfirmationController.get())
+    } recover {
+      case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
     }
   }
 }

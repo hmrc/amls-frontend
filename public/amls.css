@@ -1232,3 +1232,8 @@ details {
         width: 12.5%;
     }
 }
+
+.duplicate-submission-page .report-error__content > h2,
+.duplicate-submission-page .report-error__content > p {
+    display: none
+}

@@ -1,0 +1,15 @@
+@import include._
+@import utils.Strings._
+
+@()(implicit messages: Messages, request: Request[AnyContent])
+
+@main(title = messages("error.submission.duplicate.title"), bodyClasses = Some("duplicate-submission-page")) {
+
+    @heading(
+        messages("error.submission.duplicate.title")
+    )
+
+    <div id="page-content">
+        @messages("error.submission.duplicate.content").paragraphizeH
+    </div>
+}
