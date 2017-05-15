@@ -21,13 +21,16 @@ import models.Country
 import models.aboutthebusiness._
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -42,7 +45,7 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
     }
   }
 
-  private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
+  private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
   private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
@@ -81,12 +84,19 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(aboutTheBusiness))
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ContactingYouController.get().url))
+        verify(controller.dataCache).save[AboutTheBusiness](any(), meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any())
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
@@ -94,8 +104,6 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -106,9 +114,8 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
 
         val newRequest = request.withFormUrlEncodedBody(
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
-
+        when(controller.dataCache.fetch[BusinessMatching](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(bm)))
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.required.atb.confirm.office"))
@@ -119,8 +126,8 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+        when(controller.dataCache.fetch[BusinessMatching](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(bm)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
