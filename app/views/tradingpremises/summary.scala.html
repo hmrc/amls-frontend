@@ -1,0 +1,79 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.tradingpremises._
+@import utils.StatusConstants
+@import controllers.tradingpremises.ModelHelpers._
+@import models.status._
+
+@(model: Seq[TradingPremises], add: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading(if(add) "title.ya" else "title.cya", "summary.tradingpremises")
+}
+
+@main(
+    title = if(add) {
+        Messages("title.ya") + " - " + Messages("summary.tradingpremises")
+    } else {
+        Messages("title.cya") + " - " + Messages("summary.tradingpremises")
+    },
+    heading = header
+) {
+
+    @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))) {
+        @panel(
+            wide = true,
+            jsHidden = false,
+            gutter = true
+        ) {
+            <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
+        }
+    }
+
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0) {
+        @panel(
+            wide = true,
+            jsHidden = false,
+            gutter = true
+        ) {
+            <p>@Messages("tradingpremises.summary.no.trading.premises")</p>
+            <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
+        }
+    }
+
+    <ul class="list">
+    @model.zipWithIndex.map { case (tp, y) =>
+        @if(!tp.status.contains(StatusConstants.Deleted)) {
+            @tp.yourTradingPremises.map { ytp =>
+                @checkYourAnswersListing(
+                    item = ytp.tradingPremisesAddress.toLines.mkString(", ").toString,
+                    editUrl = controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1).toString,
+                    removeUrl = tp.removeUrl(y + 1, add, status)
+                )
+            }
+        }
+    }
+    </ul>
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}

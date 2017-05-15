@@ -1,0 +1,124 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import models.businessmatching.{BusinessType, BusinessMatching}
+
+@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang)
+
+@target = @{
+    s"""${f("other").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("declaration.addperson.title", subtitle)
+}
+
+@main(
+    title = Messages(title),
+    heading = header
+) {
+
+    @form(f, controllers.declaration.routes.AddPersonController.post()) {
+
+        <div class="form-group">
+            @fieldset(
+                panel = false,
+                f = f("declaration-addperson"),
+                legend = "declaration.addperson.title",
+                legendHidden = true
+
+            ) {
+                @input(
+                    field = f("firstName"),
+                    labelText = Messages("declaration.addperson.firstname")
+                )
+
+                @input(
+                    field = f("middleName"),
+                    labelText = Messages("declaration.addperson.middlename")
+                )
+
+                @input(
+                    field = f("lastName"),
+                    labelText = Messages("declaration.addperson.lastname")
+                )
+
+            }
+        </div>
+
+        @if(config.ApplicationConfig.release7) {
+            @fieldset(
+                f = f("roleWithinBusiness"),
+                legend = "declaration.addperson.whatsyourrole",
+                bold = false,
+                panel = false
+            ) {
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.01", value = "BeneficialShareholder")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.02", value = "Director")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.03", value = "ExternalAccountant")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.04", value = "InternalAccountant")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.05", value = "NominatedOfficer")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.06", value = "Partner")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.07", value = "SoleProprietor")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.09", value = "DesignatedMember")
+                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.08", value = "Other", target = s"#$target")
+            }
+
+            @fieldset(
+                legend = "declaration.addperson.lbl.08",
+                legendHidden = true,
+                jsHidden = true,
+                classes = Seq("roleWithinBusinessOther-fieldset"),
+                f = f(target)
+            ) {
+                @input(
+                    field = f("roleWithinBusinessOther"),
+                    labelText = "lbl.pleasespecify"
+                )
+            }
+        } else {
+            @fieldset(
+                f = f("roleWithinBusiness"),
+                legend = "declaration.addperson.whatsyourrole",
+                bold = false,
+                panel = false
+            ) {
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.02", "02")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.03", "03")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.04", "04")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.05", "05")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
+            }
+
+            @fieldset(
+                legend = "declaration.addperson.lbl.08",
+                legendHidden = true,
+                f = f(target)
+            ) {
+                @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
+            }
+        }
+
+        @submit()
+  }
+}

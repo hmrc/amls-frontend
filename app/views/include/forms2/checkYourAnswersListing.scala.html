@@ -1,0 +1,31 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(
+    item: String,
+    editUrl: String = "",
+    removeUrl: String = ""
+)(implicit lang:Lang, m: Messages)
+
+<li class="group grid-layout check-your-answers__listing">
+    <div class="grid-layout__column grid-layout__column--3-4">
+      <span class="visuallyhidden">@Messages("visuallyhidden.you.have.registered") </span> @item
+    </div>
+    @if(editUrl.nonEmpty){<footer class="grid-layout__column grid-layout__column--1-4 check-your-answers__footer">
+        <a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @item</span></a>
+          @if(removeUrl.nonEmpty){@Messages("lbl.or") <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> @item @Messages("visuallyhidden.from.your.application")</span></a>}
+    </footer>}
+</li>

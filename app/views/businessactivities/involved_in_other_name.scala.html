@@ -1,0 +1,91 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.businessmatching._
+
+@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("details").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("businessactivities.involved.other.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.involved.other.title") + " - " + Messages("summary.businessactivities"),
+    heading = header
+)  {
+
+   @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+        ) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
+    }
+
+    <p>@Messages("businessactivities.involved.other.hint")</p>
+
+    @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
+
+        @fieldset(
+            f = f("involvedInOther-fieldset"),
+            legend = "businessactivities.involved.other.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("involvedInOther")
+            ) {
+                @radio(
+                    f = f("involvedInOther"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("involvedInOther"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            id = target
+        ) {
+            @textarea(
+                field = f("details"),
+                labelText = "businessactivities.confirm-activities.lbl.details",
+                bold = false,
+                largeWidth = true,
+                rows = "6",
+                cols = "30"
+            )
+        }
+
+        @submit(false)
+    }
+}

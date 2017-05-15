@@ -1,0 +1,102 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+  @errorSummary(f)
+  @heading("renewal.receiving.title", "summary.renewal")
+}
+
+@main(
+  title = Messages("renewal.receiving.title") + " - " + Messages("summary.renewal"),
+  heading = header
+) {
+
+  <span class="form-hint">@Messages("hvd.receiving.convert.currency.text")</span>
+
+  @form(f, controllers.renewal.routes.ReceiveCashPaymentsController.post(edit)) {
+
+    @fieldset(
+        f = f("receivePayments-fieldset"),
+        legend = "hvd.receiving.title",
+        legendHidden = true,
+        panel = false
+    ) {
+        @errorGroup(
+            field = f("receivePayments")
+        ) {
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.yes",
+              value = "true",
+              inline = true,
+              target = s".paymentMethods-fieldset"
+          )
+          @radio(
+              f = f("receivePayments"),
+              labelText = "lbl.no",
+              value = "false",
+              inline = true
+          )
+        }
+    }
+
+    @fieldset(
+          f = f("paymentMethods-fieldset"),
+          legend = "renewal.receiving.expect.to.receive",
+          classes = Seq("paymentMethods-fieldset"),
+          hint = "lbl.select.all"
+      ) {
+        @errorGroup(
+            field = f("paymentMethods")
+        ) {
+            @checkbox(
+                f = f("paymentMethods.courier"),
+                labelText = "hvd.receiving.option.01",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.direct"),
+                labelText = "hvd.receiving.option.02",
+                value = "true"
+            )
+            @checkbox(
+                f = f("paymentMethods.other"),
+                labelText = "hvd.receiving.option.03",
+                value = "true",
+                target = s"#paymentMethods-details-fieldset"
+            )
+
+            @panel(
+                field = Some(f("paymentMethods-details-fieldset")),
+                jsHidden = true,
+                panel = false
+            ) {
+                @input(
+                    field = f("paymentMethods.details"),
+                    labelText = "hvd.receiving.give.details.lbl"
+                )
+            }
+        }
+    }
+
+    @submit(edit)
+  }
+}

@@ -1,0 +1,110 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.tcsp._
+
+@(model: Tcsp)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.tcsp")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.tcsp"),
+    heading = header
+) {
+
+    @checkYourAnswers(
+        question = Messages("tcsp.kind.of.service.provider.title"),
+        editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
+    ) {
+        @model.tcspTypes.map { v =>
+        <ul class="list list--semicolon">
+            @v.serviceProviders.map { x =>
+                <li>@x match {
+                    case NomineeShareholdersProvider => {@Messages("tcsp.service.provider.lbl.01")}
+                    case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
+                    case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
+                    case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
+                    case CompanyFormationAgent(_, _) => {@Messages("tcsp.service.provider.lbl.05")}
+                }</li>
+            }
+        </ul>
+        }
+        @model.tcspTypes.map { v =>
+            @v.serviceProviders.map { x =>
+                @x match {
+                    case CompanyFormationAgent(shelf, corp) => {
+                        @checkYourAnswersExtra(
+                            question = Messages("tcsp.off-the-shelf.companies.lbl")
+                        ) {
+                            @shelf match {
+                                case true => {<p>@Messages("lbl.yes")</p>}
+                                case false => {<p>@Messages("lbl.no")</p>}
+                            }
+                        }
+                        @checkYourAnswersExtra(
+                            question = Messages("tcsp.create.complex.corporate.structures.lbl")
+                        ) {
+                            @corp match {
+                                case true => {<p>@Messages("lbl.yes")</p>}
+                                case false => {<p>@Messages("lbl.no")</p>}
+                            }
+                        }
+                    }
+                    case _ => {
+
+                    }
+                }
+            }
+        }
+    }
+
+    @model.tcspTypes.map { v =>
+        @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
+            @checkYourAnswers(
+                question = Messages("tcsp.provided_services.title"),
+                editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
+            ) {
+                <ul class="list list--comma">
+                    @model.providedServices.map { a =>
+                        @a.services.map { x =>
+                            <li>@x.getMessage</li>
+                        }
+                    }
+                </ul>
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("tcsp.servicesOfAnotherTcsp.title"),
+        editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
+    ) {
+        <p>@model.servicesOfAnotherTCSP.map {
+            case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
+            case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
+        }</p>
+    }
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}

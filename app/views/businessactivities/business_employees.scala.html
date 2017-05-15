@@ -1,0 +1,69 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("franchiseName").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("businessactivities.employees.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.employees.title") + " - " + Messages("summary.businessactivities"),
+    heading = header
+)  {
+
+    @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
+
+        @fieldset(
+            f = f("employees"),
+            legend = "businessactivities.employees.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                attrMin = "1",
+                attrPattern = "[0-9]*",
+                attrStep = "1",
+                attrType = "number",
+                bold = false,
+                field = f("employeeCount"),
+                hintText = "businessactivities.employees.line1.hint",
+                labelText = "businessactivities.employees.line1.text"
+            )
+            @input(
+                attrMin = "1",
+                attrPattern = "[0-9]*",
+                attrStep = "1",
+                attrType = "number",
+                bold = false,
+                field = f("employeeCountAMLSSupervision"),
+                hintText = "businessactivities.employees.line2.hint",
+                labelText = "businessactivities.employees.line2.text"
+            )
+        }
+
+        @submit(edit)
+
+    }
+}

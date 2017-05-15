@@ -1,0 +1,142 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("msb.which_currencies.title", "summary.msb")
+}
+
+@main(
+    title = Messages("msb.which_currencies.title") + " - " + Messages("summary.msb"),
+    heading = header
+) {
+
+    @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
+
+        @hint(
+            id = "currencies[0]",
+            hint = "msb.which_currencies.uptoThree.hint",
+            hint2 = "msb.which_currencies.uptoThree.hint2"
+        )
+
+        @fieldset(
+            f = f("currencies-fieldset"),
+            legend = "msb.which_currencies.title",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("form-group")
+        ) {
+            @errorGroup(f("currencies")) {
+                @currency(
+                    field = f("currencies[0]"),
+                    labelText = "lbl.currency.line1"
+                )
+                @currency(
+                    field = f("currencies[1]"),
+                    labelText = "lbl.currency.line2"
+                )
+                @currency(
+                    field = f("currencies[2]"),
+                    labelText = "lbl.currency.line3"
+                )
+            }
+        }
+
+        @fieldset(
+            f = f("usesForeignCurrencies-fieldset"),
+            legend = Messages("msb.which_currencies.foreign_currencies_question"),
+            panel = false
+        ) {
+
+            @errorGroup(f("usesForeignCurrencies")) {
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.yes",
+                    value = "Yes",
+                    target = "#usesForeignCurrency-fieldset",
+                    inline = true
+                )
+
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.no",
+                    value = "No",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f("usesForeignCurrency-fieldset")),
+            jsHidden = false
+        ) {
+            @fieldset(
+                f = f("usesForeignCurrencies-fieldset"),
+                legend = "msb.which_currencies.who.will",
+                hint = "lbl.select.all",
+                jsHidden = false,
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("WhoWillSupply")
+                ) {
+                    @checkbox(
+                        f = f("bankMoneySource"),
+                        labelText = "msb.which_currencies.source.banks",
+                        value = "Yes",
+                        target = "[data-reveal='banks']"
+                    )
+                    @input(
+                        field = f("bankNames"),
+                        labelText = "msb.which_currencies.source.which_banks",
+                        panel = true,
+                        jsHidden = true,
+                        data = "banks"
+                    )
+                    @checkbox(
+                        f = f("wholesalerMoneySource"),
+                        labelText = "msb.which_currencies.source.wholesalers",
+                        value = "Yes",
+                        target = "[data-reveal='wholesalers']"
+                    )
+                    @input(
+                        field = f("wholesalerNames"),
+                        labelText = "msb.which_currencies.source.which_wholesalers",
+                        panel = true,
+                        jsHidden = true,
+                        data = "wholesalers"
+                    )
+                    @checkbox(
+                        f = f("customerMoneySource"),
+                        labelText = "msb.which_currencies.source.customers",
+                        value = "Yes"
+                    )
+                }
+            }
+        }
+
+    <div class="clear">
+        @submit()
+    </div>
+
+    }
+}

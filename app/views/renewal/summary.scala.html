@@ -1,0 +1,266 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.renewal._
+@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
+
+@(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.renewal")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+    @model.involvedInOtherActivities.map{ inv =>
+        @checkYourAnswers(
+            question = Messages("renewal.involvedinother.title"),
+            editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+        ) {
+            <p>@model.involvedInOtherActivities.map {
+                case InvolvedInOtherNo => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(v) => { @v }
+            }</p>
+        }
+    }
+
+    @model.businessTurnover.map { turnover =>
+        @checkYourAnswers(
+            question = Messages("renewal.business-turnover.title"),
+            editUrl = controllers.renewal.routes.BusinessTurnoverController.get(true).toString
+        ) {
+            <p>@turnover match {
+                case BusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
+                case BusinessTurnover.Second => { @Messages("businessactivities.turnover.lbl.02") }
+                case BusinessTurnover.Third => { @Messages("businessactivities.turnover.lbl.03") }
+                case BusinessTurnover.Fourth => { @Messages("businessactivities.turnover.lbl.04") }
+                case BusinessTurnover.Fifth => { @Messages("businessactivities.turnover.lbl.05") }
+                case BusinessTurnover.Sixth => { @Messages("businessactivities.turnover.lbl.06") }
+                case BusinessTurnover.Seventh => { @Messages("businessactivities.turnover.lbl.07") }
+            }</p>
+        }
+    }
+
+    @model.turnover.map { turnover =>
+        @checkYourAnswers(
+            question = Messages("renewal.turnover.title"),
+            editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
+        ) {
+            <ul class="list list-bullet">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
+
+            </ul>
+
+            <p>@turnover match {
+                case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                case AMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                case AMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                case AMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                case AMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                case AMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                case AMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
+            }</p>
+        }
+    }
+
+    @model.customersOutsideUK.map { boa =>
+        @checkYourAnswers(
+            question = Messages("renewal.customer.outside.uk.title"),
+            editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
+        ) {
+            @boa.countries.fold {
+                <p>@Messages("lbl.no")</p>
+            } { branches =>
+                <ul class="list list-bullet">
+                    @branches.map { country =>
+                    <li>@country</li>
+                    }
+                </ul>
+            }
+        }
+    }
+
+    @bmMsbServices.map {services =>
+
+        @model.totalThroughput.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.throughput.header"),
+                editUrl = controllers.renewal.routes.TotalThroughputController.get(edit = true).url
+            ) {
+                <p>@TotalThroughput.labelFor(m)</p>
+            }
+        }
+
+        @model.transactionsInLast12Months.map { m =>
+            @checkYourAnswers(
+                question = messages("renewal.msb.transfers.header"),
+                editUrl = controllers.renewal.routes.TransactionsInLast12MonthsController.get(edit = true).url
+            ) {
+                <p>@m.transfers</p>
+            }
+        }
+
+
+        @model.sendTheLargestAmountsOfMoney.map { lom =>
+            @checkYourAnswers(
+                question = Messages("renewal.msb.largest.amounts.title"),
+                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
+            ) {
+                <ul class="list list--comma">
+                    @lom.countryList.map { country =>
+                        <li>@country.name</li>
+                    }
+                </ul>
+            }
+        }
+
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            @model.mostTransactions.map { mt =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.most.transactions.title"),
+                    editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
+                ) {
+                    <ul class="list list--comma">
+                        @mt.countries.map { country =>
+                            <li>@country.name</li>
+                        }
+                    </ul>
+                }
+            }
+        }
+
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            @model.ceTransactionsInLast12Months.map{ trans =>
+                @checkYourAnswers(
+                    question = Messages("renewals.msb.ce.transactions.expected.title"),
+                    editUrl = controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).toString
+                ) {
+                    <p>@trans.ceTransaction</p>
+                }
+            }
+
+            @model.whichCurrencies.map { wc =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.whichcurrencies.header"),
+                    editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
+                ) {
+                <ul class="list list--comma">
+                    @wc.currencies.map { cur =>
+                        <li>@cur</li>
+                    }
+                </ul>
+
+                @if(config.ApplicationConfig.release7) {
+                    @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
+                    @checkYourAnswersExtra(
+                        question = Messages("renewal.msb.which_currencies.foreign_currencies_question")
+                    ) {
+                        <p>@usesForeignCurrencies match {
+                            case true => {@Messages("lbl.yes")}
+                            case _ => {@Messages("lbl.no")}
+                        }</p>
+                    }
+
+                    @if(usesForeignCurrencies) {
+                        @whoUsesCurrencies(wc)
+                    }
+                }
+                } else {
+                    @whoUsesCurrencies(wc)
+                }
+            }
+            }
+        }
+    }
+
+    @model.percentageOfCashPaymentOver15000.map { p =>
+        @checkYourAnswers(
+            question = Messages("renewal.hvd.percentage.title"),
+            editUrl = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+        ) {
+            <p>@p match {
+                case PercentageOfCashPaymentOver15000.First => {@Messages("hvd.percentage.lbl.01")}
+                case PercentageOfCashPaymentOver15000.Second => {@Messages("hvd.percentage.lbl.02")}
+                case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
+                case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
+            }
+        }
+
+        @model.receiveCashPayments.map { rcp =>
+            @checkYourAnswers(
+                question = Messages("renewal.receiving.title"),
+                editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
+            ) {
+                @rcp.paymentMethods match {
+                    case None => {<p>@Messages("lbl.no")</p>}
+                    case Some(pm:PaymentMethods) => {
+                        <p>@Messages("lbl.yes")</p>
+                        @checkYourAnswersExtra(
+                            question = Messages("renewal.receiving.expect.to.receive")
+                        ) {
+                            <ul class="list list--comma">
+                                <li>@pm match {
+                                    case PaymentMethods(false, false, None) => { Unknown }
+                                    case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                    case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                    case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                                    }</li>
+                            </ul>
+                        }
+                    }
+                }
+        }
+    }
+
+    @anchor(
+        attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}
+
+@whoUsesCurrencies(wc: WhichCurrencies) = {
+    @checkYourAnswersExtra(
+    question = Messages("msb.which_currencies.who")
+    ) {
+    <ul class="list">
+        @wc.bankMoneySource.map { bms =>
+        <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+        }
+        @wc.wholesalerMoneySource.map { wms =>
+        <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+        }
+        @if(wc.customerMoneySource) {
+        <li>@Messages("msb.which_currencies.source.customers")</li>
+        }
+    </ul>
+    }
+}

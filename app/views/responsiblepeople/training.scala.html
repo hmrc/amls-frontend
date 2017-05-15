@@ -1,0 +1,86 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@target = @{
+    s"""${f("information").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.training.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.training.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    <p>@Messages("responsiblepeople.training.hinttext")</p>
+
+    @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit, fromDeclaration)) {
+
+        @fieldset(
+            f = f("training-fieldset"),
+            legend = "responsiblepeople.training.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("training")
+            ) {
+                @radio(
+                    f = f("training"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s"#$target"
+                )
+                @radio(
+                    f = f("training"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "responsiblepeople.training.information.lbl",
+            hint = "responsiblepeople.training.information.hint",
+            jsHidden = false
+        ) {
+            <span>@Messages("responsiblepeople.training.information")</span>
+            @textarea(
+                field = f("information"),
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows ="8"
+            )
+        }
+
+        @submit(edit)
+
+    }
+
+}

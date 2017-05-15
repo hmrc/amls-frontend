@@ -1,0 +1,84 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Field, Form2}
+
+@(
+    f: Form2[_],
+    p: String = "",
+    labelText: String = "",
+    hintText: String = "",
+    example: Boolean = true,
+    hintId: String = "",
+    jsHidden: Boolean = false,
+    legendHidden: Boolean = false
+)(implicit lang:Lang,  m: Messages)
+
+@field = @{ f(p) }
+
+<fieldset class="form-field form-date" id="@field.id">
+    @legend(
+        legend = labelText,
+        legendHidden = legendHidden
+    )
+    @if(hintText.nonEmpty) {
+        <span class="form-field--hint">@Messages(hintText)</span>
+    }
+    @if(example) {
+        <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
+    }
+    @if(field.hasErrors) {
+        <div class="form-field--error">
+            <span class="error-notification">@field.error</span>
+    }
+    @input(
+        labelText = "lbl.day",
+        field = f(s"${p}.day"),
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "day",
+        attrType = "number",
+        attrMin = "1",
+        attrMax = "31",
+        attrPattern = "[0-9]{2}",
+        attrStep = "1",
+        attrDescribedBy = s"${hintId}"
+    )
+    @input(
+        labelText = "lbl.month",
+        field = f(s"${p}.month"),
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "month",
+        attrType = "number",
+        attrMin = "1",
+        attrMax = "12",
+        attrStep = "1",
+        attrPattern = "[0-9]{2}"
+    )
+    @input(
+        labelText = "lbl.year",
+        field = f(s"${p}.year"),
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "year",
+        attrType = "number",
+        attrMin = "1800",
+        attrStep = "1",
+        attrPattern = "[1-9][0-9]{3}"
+    )
+    @if(field.hasErrors) {</div>}
+</fieldset>

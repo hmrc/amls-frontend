@@ -1,0 +1,55 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.EmptyForm
+@import include._
+@import include.forms2._
+
+@(title: String, subtitle: String, name: String, isAmendment: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @heading("declaration.declaration.title", subtitle)
+}
+
+@main(
+    title = Messages(title),
+    heading = header
+) {
+
+    @notice(
+        notice = Messages("declaration.declaration.fullname", name)
+    )
+
+    <p>@Messages("declaration.declaration.declare")</p>
+
+    <ul class="list list-bullet">
+        @if(isAmendment) {
+            <li>@Messages("declaration.declaration.amendment.correctinformation")</li>
+        } else {
+            <li>@Messages("declaration.declaration.correctinformation")</li>
+        }
+        <li>@Messages("declaration.declaration.tellhmrc")</li>
+        <li>@Messages("declaration.declaration.noncompliance")</li>
+        <li>@Messages("declaration.declaration.confirm") <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("declaration.declaration.guidance")</a></li>
+    </ul>
+
+    @form(EmptyForm, controllers.routes.SubmissionController.post()) {
+
+        <input type="submit" name="submit" class="button" value="@Messages("button.confirmandsubmit")" />
+
+    }
+
+}

@@ -1,0 +1,169 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.tradingpremises._
+@import models.businessmatching.MoneyServiceBusiness
+@import utils._
+
+@(model: TradingPremises, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("summary.detailedanswers.title", "summary.tradingpremises")
+}
+@main(
+    title = Messages("summary.detailedanswers.title") + " - " + Messages("summary.tradingpremises"),
+    heading = header
+) {
+    @model.yourTradingPremises.map { yta =>
+
+        <h2 class="heading-large">@yta.tradingName</h2>
+
+        @checkYourAnswers(
+            question = Messages("tradingpremises.summary.address"),
+            editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
+        ) {
+            <p>@yta.tradingPremisesAddress.toLines.map { l =>
+                @l<br />
+            }</p>
+        }
+
+        @yta.startDate.map {startDate =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.summary.tradingstartdate"),
+                editUrl = controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).toString
+            ) {
+                <p>@DateHelper.formatDate(startDate)</p>
+            }
+        }
+        @yta.isResidential.map {residential =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.summary.residential"),
+                editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
+            ) {
+                <p>@residential match {
+                    case true => { @Messages("lbl.yes") }
+                    case false => { @Messages("lbl.no") }
+                }</p>
+            }
+        }
+
+        @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.summary.services"),
+                editUrl = controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString
+            ) {
+                <ul class="list list--comma">
+                @ba.activities.map { a =>
+                    <li>@a.getMessage</li>
+                }
+                </ul>
+            }
+        }
+
+        @model.msbServices.map{ msb =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.msb.services.title"),
+                editUrl = controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString
+            ) {
+
+                <ul class="list list--comma">
+                    @msb.services.map { line =>
+                    <li>@line match {
+                        case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
+                        case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
+                        case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
+                        case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
+                        }
+                    </li>
+                    }
+                </ul>
+            }
+        }
+
+        @checkYourAnswers(
+            question = Messages("tradingpremises.summary.who-uses"),
+            editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
+        ) {
+            <p>@model.businessStructure.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
+                @Messages("tradingpremises.summary.agents")
+            }</p>
+        }
+        @model.businessStructure.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.businessStructure.title"),
+                editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
+            ) {
+                <p>@Messages(x.message)</p>
+            }
+        }
+
+        @model.agentName.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agentname.title"),
+                editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
+            ) {
+
+            <p>@x.agentName,
+            @x.agentDateOfBirth match {
+                case Some(y) => {born @DateHelper.formatDate(y)}
+                case None => {}
+            }
+            </p>
+
+            }
+        }
+
+        @model.agentPartnership.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agentpartnership.title"),
+                editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
+            ) {
+                <p>@x.agentPartnership</p>
+            }
+        }
+
+        @model.agentCompanyDetails.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agentcompanyname.title"),
+                editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+            ) {
+                <p>@x.agentCompanyName</p>
+            }
+        }
+
+        @model.agentCompanyDetails.map { x =>
+            @x.companyRegistrationNumber.map { crn =>
+                @checkYourAnswers(
+                    question = Messages("tradingpremises.youragent.crn"),
+                    editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+                ) {
+                    <p>@crn</p>
+                }
+            }
+        }
+
+
+
+    }
+
+    @anchor(
+        attrHref = controllers.tradingpremises.routes.SummaryController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.confirmandcontinue")
+    )
+}

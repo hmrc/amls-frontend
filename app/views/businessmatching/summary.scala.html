@@ -1,0 +1,157 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.businessmatching._
+@import config.{ApplicationConfig => appConfig}
+@(model: BusinessMatching)(implicit request: Request[_],messages:Messages)
+
+@header = {
+    @heading("title.cya", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.businessmatching"),
+    heading = header
+) {
+
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ) {
+        @Messages("businessmatching.summary.icon.title")
+    }
+
+    @model.reviewDetails.map { review =>
+        @checkYourAnswers(
+            question = Messages("businessmatching.summary.business.address.lbl")
+        ) {
+            <p>@review.businessAddress.toLines.map { line =>
+                @line<br />
+            }</p>
+        }
+
+        @review.businessType.map { m =>
+            @m match {
+                case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
+                    @checkYourAnswers(
+                        question = Messages("businessmatching.registrationnumber.title"),
+                        editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
+                    ) {
+                        <p>@model.companyRegistrationNumber.map { number =>
+                            @number.companyRegistrationNumber
+                        }</p>
+                    }
+                }
+                case BusinessType.UnincorporatedBody => {
+                    @checkYourAnswers(
+                        question = Messages("businessmatching.typeofbusiness.title"),
+                        editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString
+                    ) {
+                        <p>@model.typeOfBusiness.map { business =>
+                            @business.typeOfBusiness
+                        }</p>
+                    }
+                }
+                case _ => {}
+            }
+        }
+    }
+
+    @model.activities.map { activity =>
+        @checkYourAnswers(
+            question = Messages("businessmatching.registerservices.title"),
+            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+        ) {
+            <ul class="list list--comma">
+                @activity.businessActivities.map { line =>
+                    <li>@line match {
+                        case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
+                        case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
+                        case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
+                        case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
+                        case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
+                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
+                        case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+                    }</li>
+                }
+            </ul>
+        }
+
+        @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
+            @model.msbServices.map { services =>
+                @checkYourAnswers(
+                    question = Messages("msb.services.title"),
+                    editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
+                ) {
+                    <ul class="list list--comma">
+                    @services.msbServices.map { svc =>
+                        <li>@svc match {
+                            case TransmittingMoney => {@Messages("services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("services.list.lbl.04")}
+                        }</li>
+                    }
+                    </ul>
+                }
+
+                @if(services.msbServices.contains(TransmittingMoney)) {
+                    @model.businessAppliedForPSRNumber.map { psr =>
+                        @checkYourAnswers(
+                            question = Messages("businessmatching.psr.number.title"),
+                            editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString
+                        ) {
+                            <p>@psr match {
+                                case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
+                                case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
+                            }</p>
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @model.businessAppliedForPSRNumber.map { psr =>
+        @psr match {
+            case BusinessAppliedForPSRNumberNo => {
+                @anchor(
+                    attrHref = appConfig.logoutUrl.toString,
+                    attrRole = true,
+                    linkText = Messages("button.logout")
+                )
+            }
+            case BusinessAppliedForPSRNumberYes(number) => {
+                @anchor(
+                    attrHref = controllers.routes.RegistrationProgressController.get().toString,
+                    attrRole = true,
+                    linkText = Messages("businessmatching.button.confirm.start")
+                )
+            }
+        }
+    }
+
+    @if(model.businessAppliedForPSRNumber.isEmpty) {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("businessmatching.button.confirm.start")
+        )
+    }
+}

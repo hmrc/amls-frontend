@@ -1,0 +1,45 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Field, Form2}
+
+@* Use this one when you need to hide only the label – not the field – e.g. address fields *@
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = false,
+    classes: Seq[String] = Seq.empty,
+    panel: Boolean = false,
+    jsHidden: Boolean = false
+)(implicit lang:Lang,  m: Messages)
+
+<div class="form-group @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent}">
+    <label for="@field.id" class="@if(jsHidden){amls-js-hidden}">
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+    </label>
+    <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value"
+        id="@field.id" @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" } >
+</div>

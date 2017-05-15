@@ -1,0 +1,124 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("businessactivities.whoisyouraccountant.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.whoisyouraccountant.title") + " - " + Messages("summary.businessactivities"),
+    heading = header
+) {
+
+    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
+
+        @fieldset(
+            legend = "businessactivities.whoisyouraccountant.title",
+            legendHidden = true,
+            panel = false,
+            f = f("whoisyouraccountant-fieldset"),
+            classes = Seq("form-group")
+        ) {
+                @input(
+                    field = f("name"),
+                    labelText = "businessactivities.whoisyouraccountant.name"
+                )
+
+                @input(
+                    field = f("tradingName"),
+                    labelText = "businessactivities.whoisyouraccountant.tradingName"
+                )
+        }
+
+        @fieldset(
+            f = f("isUK"),
+            legend = "businessactivities.whoisyouraccountant.address.location",
+            panel = false,
+            classes = Seq("form-group")
+        ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s"#${f("postCode").id}-field"
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true,
+                target = s"#${f("country").id}-field"
+            )
+        }
+
+        @fieldset(
+            legend = "businessactivities.whoisyouraccountant.address",
+            legendHidden = true,
+            panel = false,
+            f = f("whoisyouraccountant-address-fieldset")
+        ) {
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true
+            )
+            @panel(
+                field = Some(f(s"${f("postCode").id}-field")),
+                panel = false
+            ) {
+                @input(
+                    field = f("postCode"),
+                    labelText = "businessactivities.whoisyouraccountant.postCode",
+                    classes = Seq("postcode")
+                )
+            }
+            @panel(
+                field = Some(f(s"${f("country").id}-field")),
+                panel = false
+            ) {
+                @country(
+                    field = f("country"),
+                    labelText = "businessactivities.whoisyouraccountant.country"
+                )
+            }
+        }
+
+        @submit(edit)
+
+    }
+}

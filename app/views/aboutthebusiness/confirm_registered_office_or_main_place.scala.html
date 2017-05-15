@@ -1,0 +1,67 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include.{main, heading, registered_office_helper}
+@import include.forms2._
+@import models.aboutthebusiness._
+@import play.api.i18n.Messages
+
+@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("aboutthebusiness.confirmingyouraddress.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.confirmingyouraddress.title") + " - " + Messages("summary.aboutbusiness"),
+    heading = header
+) {
+
+    @form(f, controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.post(edit)) {
+
+        @registered_office_helper(model)
+
+        @fieldset(
+            f = f("confirmingyouraddress-fieldset"),
+            legend = "aboutthebusiness.confirmingyouraddress.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("isRegOfficeOrMainPlaceOfBusiness")
+            ) {
+
+                @radio(
+                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit(edit)
+    }
+}

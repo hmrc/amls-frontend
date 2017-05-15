@@ -1,0 +1,46 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Form2, ValidField, InvalidField}
+@import include._
+@import include.forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("msb.ce.transactions.expected.in.12.months.title", "summary.msb")
+}
+
+@main(
+    title = Messages("msb.ce.transactions.expected.in.12.months.title") + " - " + Messages("summary.msb"),
+    heading = header
+) {
+
+    @form(f, controllers.msb.routes.CETransactionsInNext12MonthsController.post(edit)) {
+
+        @input(
+            attrMin = "1",
+            attrStep = "1",
+            attrType = "number",
+            field = f("ceTransaction"),
+            labelHidden = true,
+            labelText = "msb.ce.transactions.expected.in.12.months.title"
+        )
+
+        @submit(edit)
+    }
+}

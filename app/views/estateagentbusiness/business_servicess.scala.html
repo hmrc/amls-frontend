@@ -1,0 +1,58 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include.{main, heading, registered_office_helper}
+@import include.forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("estateagentbusiness.services.title", "summary.estateagentbusiness")
+}
+
+@main(
+    title = Messages("estateagentbusiness.services.title") + " - " + Messages("summary.estateagentbusiness"),
+    heading = header
+) {
+
+    <p>@Messages("lbl.select.all")</p>
+    @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
+        @fieldset(
+            f = f("services-fieldset"),
+            legend = "estateagentbusiness.services.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("services")
+            ) {
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.01", value = "01")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.02", value = "02")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.03", value = "03")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.04", value = "04")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.05", value = "05")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.06", value = "06")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.07", value = "07")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.08", value = "08")
+                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.09", value = "09")
+            }
+        }
+
+        @submit(false)
+    }
+}

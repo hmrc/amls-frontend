@@ -1,0 +1,111 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.supervision._
+@import utils._
+
+@(model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.supervision")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.supervision"),
+    heading = header
+) {
+
+    @checkYourAnswers(
+        question = Messages("supervision.another_body.title"),
+        editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+    ) {
+        @model.anotherBody.map {
+            case AnotherBodyNo => { <p>@Messages("lbl.no")</p> }
+            case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
+                <p>@Messages("lbl.yes")</p>
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.lbl.supervisor")
+                ) {
+                    <p>@supervisorName</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.startDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(startDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(endDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endingReason.lbl")
+                ) {
+                    <p>@endingReason</p>
+                }
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("supervision.memberofprofessionalbody.title"),
+        editUrl = controllers.supervision.routes.ProfessionalBodyMemberController.get(true).toString
+    ) {
+        @model.professionalBodyMember.map {
+            case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
+            case ProfessionalBodyMemberYes(v) => {
+            <ul class="list list--semicolon">
+                @v.map { x=>
+                <li>@x match {
+                        case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
+                        case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
+                        case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
+                        case TaxationTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.04")}
+                        case ManagementAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.05")}
+                        case InstituteOfTaxation => {@Messages("supervision.memberofprofessionalbody.lbl.06")}
+                        case Bookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.07")}
+                        case AccountantsIreland => {@Messages("supervision.memberofprofessionalbody.lbl.08")}
+                        case AccountantsScotland => {@Messages("supervision.memberofprofessionalbody.lbl.09")}
+                        case AccountantsEnglandandWales => {@Messages("supervision.memberofprofessionalbody.lbl.10")}
+                        case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
+                        case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
+                        case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
+                        case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
+                    }</li>
+                }
+            </ul>
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("supervision.penalisedbyprofessional.title"),
+        editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
+    ) {
+        <p>@model.professionalBody.map {
+            case ProfessionalBodyNo => { @Messages("lbl.no") }
+            case ProfessionalBodyYes(v) => { @v }
+        }</p>
+    }
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}

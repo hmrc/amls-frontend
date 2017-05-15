@@ -1,0 +1,96 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("hvd.cash.payment.title", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.cash.payment.title") + " - " + Messages("summary.hvd"),
+    heading = header
+)  {
+
+    <p>@Messages("hvd.cash.payment.convert.currency.text")</p>
+
+    @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
+
+        <div class="form-group">
+        @fieldset(
+            f = f("acceptedAnyPayment-fieldset"),
+            legend = "hvd.cash.payment.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("acceptedAnyPayment")
+            ) {
+                @radio(
+                    f = f("acceptedAnyPayment"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".paymentDate-fieldset"
+                )
+                @radio(
+                    f = f("acceptedAnyPayment"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            jsHidden = true,
+            field = Some(f("paymentDate-fieldset")),
+            classes = Seq("paymentDate-fieldset")
+        ) {
+            @date(
+                f = f,
+                p = "paymentDate",
+                labelText = "hvd.cash.payment.data.text",
+                hintText = "hvd.cash.payment.date.example",
+                example = false
+            )
+        }
+        </div>
+
+        @detailsSummary(
+            summary = Messages("hvd.cash.payment.data.details.summary")
+        ) {
+            @panel(
+                jsHidden = false
+            ) {
+            <p>@Messages("hvd.cash.payment.data.details.summary.details")</p>
+            <p>@Messages("hvd.cash.payment.data.details.summary.details.start")</p>
+
+            <ul class="list list-bullet">
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.01")</li>
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.02")</li>
+                <li>@Messages("hvd.cash.payment.data.details.summary.details.03")</li>
+            </ul>
+            }
+        }
+
+        @submit(edit)
+   }
+}

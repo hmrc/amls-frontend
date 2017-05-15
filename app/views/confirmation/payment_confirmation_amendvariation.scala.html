@@ -1,0 +1,44 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+
+@(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages)
+
+@main(title = messages("confirmation.payment.amendvariation.title")){
+
+    <div class="confirmation">
+        <h1 class="heading-large">@Messages("confirmation.payment.amendvariation.lede")</h1>
+        <p>
+            @companyName
+            <br>
+            @messages("confirmation.payment.reference_header", paymentReference)
+        </p>
+    </div>
+
+    <h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
+
+    <p>@messages("confirmation.payment.amendvariation.info.keep_up_to_date")</p>
+
+    <ul class="list list-bullet">
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item2")</li>
+        <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
+    </ul>
+
+    <a class="button" href="@controllers.routes.LandingController.get()" role="button">@Messages("confirmation.payment.status_button.text")</a>
+
+}

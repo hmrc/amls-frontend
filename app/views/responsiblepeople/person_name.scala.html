@@ -1,0 +1,146 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("responsiblepeople.personName.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.personName.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+    @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit, fromDeclaration)) {
+
+        @fieldset(
+            panel = false,
+            legend = "responsiblepeople.personName.title",
+            legendHidden = true,
+            jsHidden = false,
+            f = f("personname-fieldset")
+        ) {
+
+            @input(
+                field = f("firstName"),
+                labelText = Messages("responsiblepeople.personName.firstname")
+            )
+
+            @input(
+                field = f("middleName"),
+                labelText = Messages("responsiblepeople.personName.middlename")
+            )
+
+            @input(
+                field = f("lastName"),
+                labelText = Messages("responsiblepeople.personName.lastname")
+            )
+        }
+
+        <div class="form-group">
+        @fieldset(
+            f = f("hasPreviousName-fieldset"),
+            legend = "responsiblepeople.personName.isknownbyothernames",
+            panel=false
+        ) {
+            @errorGroup(
+                field = f("hasPreviousName")
+            ) {
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = "#previous-panel",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f("previous-panel")),
+            panel = false,
+            jsHidden = true
+        ) {
+            @fieldset(
+                f = f("previous-fieldset"),
+                legend = "responsiblepeople.personName.isknownbyothernames",
+                legendHidden = true,
+                panel = false
+            ) {
+                @errorGroup(
+                    f("previous"),
+                    classes = Seq("section")
+                ) {
+                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                }
+            }
+            @date(
+                f = f,
+                p = "previous.date",
+                labelText = "responsiblepeople.personName.previous.date.lbl"
+            )
+        }
+
+        </div>
+
+        @fieldset(
+            f = f("hasOtherNames-fieldset"),
+            legend = "responsiblepeople.personName.hasOtherNames",
+            panel = false
+
+        ) {
+            @errorGroup(
+                field = f("hasOtherNames")
+            ) {
+                @radio(
+                    f = f("hasOtherNames"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = ".otherNames-panel",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasOtherNames"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+
+            @panel(
+                jsHidden = true,
+                classes = Seq("otherNames-panel")
+            ) {
+                @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+            }
+        }
+
+        @submit(edit)
+    }
+}

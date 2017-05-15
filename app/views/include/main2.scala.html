@@ -1,0 +1,112 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import layouts.{govuk_template => hmrcGovUkTemplate}
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+
+@(
+    title: String,
+    mainClass: Option[String] = None,
+    mainDataAttributes: Option[Html] = None,
+    bodyClasses: Option[String] = None,
+    sidebar: Html = HtmlFormat.empty,
+    contentHeader: Html = HtmlFormat.empty,
+    scriptElem: Option[Html] = None,
+    linkElement : Option[Html] = None,
+    nameBusiness : Option[String] = None,
+    userLoggedIn : Boolean = true
+)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
+
+@styles = {
+    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
+    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
+    @linkElement
+}
+
+@scripts = {
+    <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
+    <script src="@routes.AssetsController.at("amls.js")"></script>
+    @scriptElem
+}
+
+@head = {
+    @uiLayouts.head(
+        linkElem = Some(styles),
+        headScripts = None
+    )
+    <meta name="format-detection" content="telephone=no" />
+}
+
+@navLinks = {
+    <li><a href="@appConfig.logoutUrl">Sign out</a></li>
+}
+
+@insideHeader = {
+    @uiLayouts.header_nav(
+        navTitle = Some(Messages("title.amls")),
+        navTitleLink = None,
+        showBetaLink = false,
+        navLinks = Some(navLinks)
+    )
+}
+
+@bodyEnd = {
+    @uiLayouts.footer(
+        analyticsToken = appConfig.analyticsToken,
+        analyticsHost = appConfig.analyticsHost,
+        ssoUrl = None,
+        scriptElem = Some(scripts),
+        gaCalls = None
+    )
+}
+
+@betaBanner = {
+    @uiLayouts.betaBanner(
+        userLoggedIn = userLoggedIn,
+        betaFeedbackUrl = appConfig.betaFeedbackUrl,
+        betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
+        showFeedbackLinkInBetaBanner = true
+    )
+}
+
+@getHelpForm = {
+    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+}
+
+@content = {
+    <main id="wrapper" role="main">
+        <div id="content">
+            <div class="service-info">
+                @betaBanner
+            </div>
+            @mainContent
+        </div>
+    </main>
+}
+
+@hmrcGovUkTemplate(
+    Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
+    bodyClasses
+)(
+    head,
+    bodyEnd,
+    insideHeader,
+    HtmlFormat.empty,
+    HtmlFormat.empty,
+    Some(uiLayouts.footer_links()),
+    true
+)(content)

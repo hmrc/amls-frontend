@@ -1,0 +1,110 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import config.ApplicationConfig
+@import models.businessmatching.{BusinessType, BusinessMatching}
+
+@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, fromDeclaration: Boolean = false, personName: String)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.position_within_business.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.position_within_business.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+
+
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, fromDeclaration)) {
+
+        <div class="form-group">
+            @fieldset(
+                f = f("positions"),
+                legend = "responsiblepeople.position_within_business.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @businessType match {
+                    case BusinessType.SoleProprietor => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.06",
+                            value = "06"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                    }
+                    case BusinessType.Partnership => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.05",
+                            value = "05"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                    }
+                    case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.01",
+                            value = "01"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.02",
+                            value = "02"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                        @if(ApplicationConfig.release7 && (businessType == BusinessType.LPrLLP)) {
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.07",
+                                value = "07"
+                            )
+                        }
+                    }
+                }
+            }
+        </div>
+
+        @date(
+            f = f,
+            p = "startDate",
+            labelText = "responsiblepeople.position_within_business.startDate.lbl",
+            hintText = "responsiblepeople.position_within_business.startDate.hint",
+            example = false
+        )
+
+        @submit()
+    }
+}

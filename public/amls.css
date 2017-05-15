@@ -1,0 +1,1239 @@
+/*
+ * Copyright 2015 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+a.block-link {
+  display: block;
+}
+
+.flash .heading-medium {
+  font-weight: bold;
+  margin: 0;
+}
+
+/* new-style page headers */
+
+.page-header {
+  clear: both;
+  display: table;
+  margin-top: 1.8em;
+}
+
+.page-header .heading-xlarge {
+  margin: .15em 0 1.25em;
+}
+
+.page-header .heading-secondary {
+  color: #6f777b;
+  display: table-header-group;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.11111;
+  margin-bottom: 0;
+  text-transform: none;
+}
+
+@media screen and (min-width: 641px) {
+  .page-header .heading-secondary {
+    font-size: 27px;
+    line-height: 1.11111;
+    padding-bottom: 6px;
+    padding-top: 4px;
+  }
+}
+
+
+/* -- application progress page -- */
+
+.grid-layout {
+  table-layout: fixed;
+}
+
+
+/* -- Progress Step -- */
+
+.progress-steps {
+  margin-bottom: 12px;
+}
+
+.progress-steps li {
+  margin-bottom: 0;
+  margin-top: 12px;
+}
+
+.progress-steps li:first-child,
+.progress-steps__amend li:first-child + li {
+  margin-top: 0;
+}
+
+.progress-steps__amend li:first-child {
+  display: none;
+  visibility: hidden;
+}
+
+.renewal-progress-section {
+  border-bottom: 10px solid #e2e2e2;
+  margin-bottom: 40px!important;
+  padding-bottom: 30px;
+}
+
+
+/* -- Progress Step: assets (tick & chevrons) -- */
+
+.progress-step--status,
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
+  background-position: 90%;
+  background-repeat: no-repeat;
+  background-size: 33%;
+}
+
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+}
+
+.progress-step__started .progress-step--status,
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
+}
+
+.no-svg .progress-step__started .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status,
+.no-svg .progress-step:hover .progress-step--status,
+.no-svg .progress-step__started:focus .progress-step--status,
+.no-svg .progress-step__started:hover .progress-step--status,
+.no-svg .progress-steps__amend .progress-step_changed {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
+}
+
+.no-svg .progress-step--status,
+.no-svg .progress-step__started .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status,
+.no-svg .progress-step:hover .progress-step--status,
+.no-svg .progress-step__started:focus .progress-step--status,
+.no-svg .progress-step__started:hover .progress-step--status,
+.no-svg .progress-step__completed {
+  background-repeat: no-repeat;
+}
+
+.status-list .status-list--complete,
+.progress-step__complete .progress-step--status,
+.progress-step__complete:focus .progress-step--status,
+.progress-step__complete:hover .progress-step--status,
+.no-svg .progress-step__complete .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/tick.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 33%;
+}
+
+.no-svg .status-list .status-list--complete,
+.no-svg .progress-step__complete .progress-step--status,
+.no-svg .progress-step__complete:hover .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/tick.png");
+}
+
+.status-list--hidden {
+    display:none
+}
+
+
+/* qualified attribute selector required here, otherwise
+   all text colour takes on regular anchor colour  */
+
+a.progress-step {
+  background-color: #dee0e2;
+  color: #0b0c0c;
+  display: block;
+  /* for IE8 */
+  display: flex;
+  /* for everything else */
+  margin-bottom: 0;
+  padding: 0;
+  overflow: hidden;
+  /* fix for firefox focus bug */
+  position: relative;
+  text-decoration: none;
+  transition: .25s ease-in;
+  transition-property: background-color, outline;
+}
+
+
+/* give the whole step component a focus outline */
+
+.progress-step:focus {
+  outline: 3px solid #ffbf47;
+}
+
+
+/* mimic the anchor colours inside this block-level component */
+
+.progress-step__edit {
+  color: #005ea5;
+}
+
+.progress-step__edit:focus,
+.progress-step__edit:hover {
+  color: #2e8aca;
+}
+
+a.progress-step,
+.progress-step--status,
+.progress-step--details {
+  box-sizing: border-box;
+}
+
+
+/* `display:block` fixes a layout issue in IE & Firefox */
+
+.progress-step--status,
+.progress-step--details {
+  display: block;
+}
+
+
+/* -- Progress Step: details -- */
+
+.progress-step--details {
+  background-color: #f8f8f8;
+  border-bottom: 3px solid #dee0e2;
+  padding: 5px 10px 15px;
+}
+
+.progress-step--details p {
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+
+/* -- Progress Step: status -- */
+
+.progress-step--status {
+  border-bottom: 3px solid #cdcdcd;
+  color: #364747;
+  padding: 5px 10px;
+  position: relative;
+  transition: .25s ease-in;
+}
+
+.progress-step__started .progress-step--status,
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed {
+  color: #fff;
+}
+
+.progress-step--status-time {
+  padding: 15px 0 0;
+}
+
+.progress-step--status-time p span {
+  display: block;
+  margin: 0;
+}
+
+
+/* -- Progress Step: not started -- */
+
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status {
+  background-color: #006435;
+  border-bottom-color: #01552e;
+}
+
+
+/* -- Progress Step: started -- */
+
+.progress-step__started .progress-step--status {
+  background-color: #f47738;
+  border-bottom-color: #f9641a;
+}
+
+.progress-step__started .progress-step--status,
+.progress-steps__amend .progress-step .progress-step--status {
+  display: flex;
+}
+
+.progress-step__started .progress-step--status-time,
+.progress-steps__amend .progress-step .progress-step--status-time {
+  align-self: center;
+  padding-bottom: 15px;
+}
+
+.progress-step__started .progress-step--status-time .font-xsmall,
+.progress-steps__amend .progress-step .progress-step--status-time .font-xsmall {
+  margin: 0;
+}
+
+
+/* -- Progress Step: completed -- */
+
+.progress-step__complete .progress-step--status,
+.progress-step__complete:focus .progress-step--status,
+.progress-step__complete:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed {
+  background-color: #006435;
+  border-bottom-color: #01552e;
+}
+
+@media screen and (max-width: 480px) {
+  .progress-step--status,
+  .no-svg .progress-step--status {
+    background-position: 90% 90%;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .progress-step {
+    margin: 0 -0.78947em 12px;
+  }
+  .progress-step .grid-layout__column--1-3 {
+    float: left;
+    width: 33.33333%;
+  }
+  .progress-step .grid-layout__column--2-3 {
+    float: left;
+    width: 66.66667%;
+  }
+  .progress-step--status {
+    background-size: 20%;
+  }
+  /* bump down for smaller screens */
+  .progress-step--status-time .heading-medium {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 767px) {
+  .progress-step--status {
+    background-position: 90% 90%;
+    background-size: 25%;
+  }
+}
+
+
+/* -- TODO: fix this – IE10+ needs a chevron kick
+@media all and
+  (-ms-high-contrast: none) and (max-width: 640px),
+  (-ms-high-contrast: active) and (max-width: 640px) {
+  .progress-step--status {
+    background-position: 90%;
+  }
+} */
+
+@media all and
+  (-ms-high-contrast: none),
+  (-ms-high-contrast: active) {
+  /* IE10+ hacks here */
+  .progress-step--status {
+    background-position: 140%;
+    background-size: 66%;
+  }
+  .progress-step--status__completed {
+    background-position: 50%;
+    background-size: 50%;
+  }
+}
+
+
+/* Having to specify these widths for IE8 until a better fix appears.
+   We can get away with this because IE8 isn't responsive */
+
+.lte-ie8 .progress-step:before,
+.lte-ie8 .progress-step:after {
+  content: '';
+  display: table;
+}
+
+.lte-ie8 .progress-step:after {
+  clear: both;
+}
+
+.lte-ie8 .progress-step {
+  *zoom: 1;
+}
+
+.lte-ie8 .progress-step--status {
+  width: 213px;
+}
+
+.lte-ie8 .progress-step--details,
+.lte-ie8 .progress-step--status,
+.lte-ie8 .progress-step--status__started,
+.lte-ie8 .progress-step--status__not-started {
+  min-height: 136px;
+}
+
+.lte-ie8 .progress-step__complete .progress-step--status,
+.lte-ie8 .progress-step__complete .progress-step--details {
+  min-height: 90px;
+}
+
+.lte-ie8 .progress-step--details {
+  width: 427px;
+}
+
+.lte-ie8 .progress-step--status,
+.lte-ie8 .progress-step--details {
+  float: left;
+}
+
+
+/* -- // application progress page -- */
+
+
+/* vvv added the below until we update assets-frontend vvv */
+
+
+/********************************************************************/
+
+
+/* add back some margins */
+
+.list {
+  margin-bottom: 1.05263em;
+  margin-top: 5px;
+}
+
+
+/* Fixes the indent with the grids - not sure if there is any other way around this at present */
+
+div.grid-layout {
+  margin: 0;
+}
+
+.panel-wide {
+  border-left: solid 10px #bfc1c3;
+}
+
+
+/********************************************************************/
+
+
+/* ^^^ added the above until we update assets-frontend ^^^ */
+
+.application-submit,
+.user-attention {
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin-left: 30px;
+  padding: 20px;
+  padding-bottom: 30px;
+}
+
+@media screen and (max-width: 640px) {
+  .application-submit,
+  .user-attention {
+    margin: 0 -0.78947em;
+  }
+}
+
+
+/* required as js-hidden in assets frontend is !important */
+
+.amls-js-hidden {
+  display: none;
+}
+
+
+/* Confirmation */
+
+.confirmation {
+  background-color: #28a197;
+  color: #fff;
+  margin: 40px 0;
+  padding: 20px 40px;
+  text-align: center;
+}
+
+.confirmation > h1 {
+  margin: 0;
+}
+
+td.numeric,
+th.numeric {
+  text-align: right;
+}
+
+
+/* adding this for now
+ * TODO: we really need to re-jig the markup for this */
+
+@media screen and (max-width: 640px) {
+  .user-attention {
+    margin: 0;
+  }
+}
+
+
+/* postcode */
+/* TODO, determine if there's a class in Assets Frontend for this
+ * …
+ * seems there is: `.form-control-1-4`
+ * http://govuk-elements.herokuapp.com/form-elements/example-form-elements/
+*/
+
+form input[type=text].form-control.postcode {
+  width: 20%;
+}
+
+
+/* select box for countries */
+
+select {
+  border: 2px solid #6f777b;
+  margin: 0;
+  padding: 4px;
+  width: 50%;
+}
+
+
+/* form errors */
+
+.amls-error-summary {
+  background-color: #fff;
+  border: 4px solid #b10e1e;
+}
+
+.amls-error-summary li,
+.form-field--error span.error-notification  {
+  font-weight: bold;
+}
+
+.error-notification,
+.amls-error-summary li > a {
+  color: #b10e1e;
+}
+
+.form-field--error {
+  border-color: #b10e1e;
+  border-left-width: 4px;
+}
+
+.form-field--error:before,
+.form-field--error:after {
+  content: '';
+  display: table;
+}
+
+.form-field--error:after {
+  clear: both;
+}
+
+.form-field--error {
+  *zoom: 1;
+}
+
+
+/* forms */
+
+
+/* full-width buttons for smaller screens, until they're in assets-frontend */
+
+@media (max-width: 640px) {
+  button,
+  .button,
+  .button--get-started {
+    box-sizing: border-box;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+
+/*.form-group {
+    padding-top: 0;
+    padding-bottom: 0;
+}*/
+
+
+/* Add some space under the last fieldset in a .panel-indent,
+   otherwise it butts up against the submit button.
+   I'd rather not have to do this. */
+
+
+/* These are all prefixed with `form` to override some stuff (apparently) */
+
+.form-date .form-group-year {
+  width: 70px;
+}
+
+form .form-label-bold {
+  font-size: 19px;
+  line-height: 1.31579;
+  margin-bottom: 0.5em;
+}
+
+form .block-label + fieldset {
+  float: left;
+  margin-top: 10px;
+}
+
+form .inline .block-label + fieldset {
+  float: none;
+  margin-top: 0;
+}
+
+form .date .form-field,
+form .date .form-group {
+  clear: none;
+  float: left;
+  margin-right: 20px;
+  width: 60px;
+}
+
+form .date .form-field input[type="text"],
+form .date .form-group input[type="text"],
+form .date .form-field input[type="number"],
+form .date .form-group input[type="number"] {
+  width: 100%;
+}
+
+form .inline > label.block-label {
+  clear: none;
+}
+
+form .inline .block-label {
+  clear: both;
+}
+
+
+.clear:before,
+.clear:after {
+  content: '';
+  display: table;
+}
+
+.clear:after {
+  clear: both;
+}
+
+.clear {
+  *zoom: 1;
+}
+
+.visuallyhidden-legend > legend {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+
+/* summary styles */
+
+table.summary-title {
+  width: 88%;
+}
+
+table.summary {
+  table-layout: fixed;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+table.summary th {
+  vertical-align: top;
+}
+
+table.summary th.edit {
+  font-weight: normal;
+}
+
+table.summary td {
+  word-break: break-all;
+}
+
+table.summary ul li {
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.panel-indent {
+  /*margin-bottom: 40px;*/
+}
+
+fieldset .panel-indent {
+  margin-bottom: 0;
+}
+
+.check-your-answers {
+  margin-bottom: 20px;
+  word-break: break-word;
+}
+
+.check-your-answers__listing {
+  margin: 0 0 10px;
+}
+
+.check-your-answers,
+.check-your-answers__listing {
+  border-bottom: 1px solid #bfc1c3;
+  padding: 0 0 .52632em 0;
+  word-break: break-word;
+}
+
+
+/* class for older browsers; pseudo-class for modern browsers */
+
+.check-your-answers__last,
+.check-your-answers:last-of-type,
+.check-your-answers__listing:last-of-type {
+  border: 0;
+}
+
+.check-your-answers header {
+  padding: 0;
+}
+
+.check-your-answers h2 {
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0 0 .52632em 0;
+}
+
+.check-your-answers .list,
+.check-your-answers .list li,
+.check-your-answers p {
+  margin-top: 0;
+  margin-bottom: 1.05263em;
+}
+
+.check-your-answers .list li {
+  margin-bottom: .05263em;
+}
+
+.check-your-answers .edit,
+.check-your-answers--list li,
+.check-your-answers--header .heading-xsmall {
+  font-size: 16px;
+  word-wrap: break-word;
+}
+
+.check-your-answers .change-answer {
+  color: #005ea5;
+  font-weight: bold;
+  line-height: 1.25;
+  margin: 0 0 .21053em;
+  text-decoration: underline;
+}
+
+.check-your-answers__footer {
+  text-align: right;
+  vertical-align: middle;
+}
+
+.list--listing .check-your-answers__footer {
+  text-align: left;
+}
+
+
+/* cheap fix before S&T */
+
+.check-your-answers .question {
+  word-break: break-word;
+}
+
+.check-your-answers .answer {
+  width: 120px;
+}
+
+@media (max-width: 640px) {
+  .check-your-answers .grid-layout--stacked .grid-layout__column {
+    display: table-cell;
+  }
+  .check-your-answers dd,
+  .check-your-answers dt,
+  .check-your-answers .edit,
+  .check-your-answers--list li,
+  .check-your-answers--header .heading-xsmall {
+    font-size: 14px;
+  }
+  form .form-control {
+    width: 100%;
+  }
+}
+
+.list--comma li,
+.list--semicolon li,
+.list--inline li {
+  display: inline;
+  padding-right: 0;
+}
+
+.lte-ie8 .list--comma li,
+.lte-ie8 .list--semicolon li,
+.lte-ie8 .list--inline li {
+  display: list-item;
+}
+
+.list--comma li::after {
+  content: ', ';
+}
+
+.list--semicolon li::after {
+  content: '; ';
+}
+
+.list--comma li:last-child::after,
+.list--semicolon li:last-child::after {
+  content: '';
+}
+
+.icon-confirmed {
+  /* we're using the same tick as the progress page,
+     which is HUGE, so we need to resize it */
+  background-size: cover;
+  height: 55px;
+  margin: -15px 0 -15px -15px;
+  width: 55px;
+}
+
+.touchevents .date-of-birth {
+  display: block;
+}
+
+.summary-table a:link,
+.summary-table a:visited,
+.summary-table a:hover {
+  color: #005ea5;
+}
+
+.summary-table a:link,
+.summary-table a:visited {
+  text-decoration: none;
+}
+
+.summary-table a:hover {
+  text-decoration: underline;
+}
+
+.summary-table .first-section {
+  border-top: 1px solid #bfc1c3;
+}
+
+.summary-table th {
+  font-size: 24px;
+  padding-bottom: 10px;
+  padding-top: 15px;
+}
+
+.login-name {
+  float: right;
+  font-size: 16px;
+  margin-top: 10px;
+  margin: 0;
+  padding: 10px 0 10px 0;
+  text-align: right;
+}
+
+.heading-secondary {
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 9px;
+}
+
+.locked,
+.heading-secondary {
+  color: #6f777b;
+}
+
+.panel-border-wide {
+  border-left-width: 10px;
+}
+
+
+/* style the selects as close to inputs as possible,
+ * because they'll flash on the screen before being replaced. */
+
+.js [data-auto-complete],
+.js .custom-combobox-input,
+.js .ui-autocomplete-input {
+  -webkit-appearance: none;
+  background-color: transparent;
+  border-radius: 0;
+  height: 37px;
+  width: 220px;
+}
+
+.js *[data-toggle-new] {
+  display: none;
+}
+
+fieldset.panel-indent {
+  box-sizing: border-box;
+  padding-top: 10px;
+}
+
+fieldset.panel-indent legend {
+  float: left;
+}
+
+.reg-online--pay-fee .heading-large {
+  display: block;
+  margin: 0;
+}
+
+
+/* status page */
+
+.status-list {
+  margin-left: 0;
+  margin-right: 30px;
+  padding-left: 0;
+}
+
+.status-list li {
+  line-height: 1.25;
+  list-style-position: inside;
+  padding: 18px 55px 10px 10px;
+  position: relative;
+}
+
+.status-list--start {
+  border-top: 3px solid #bfc1c3;
+}
+
+.status-list--end {
+  border-bottom: 3px solid #bfc1c3;
+}
+
+.status-list--upcoming {
+  background: #bfc1c3;
+  color: #fff;
+}
+
+@media screen and (max-width: 640px) {
+  .status-list {
+    margin-right: 0;
+  }
+}
+
+.status-list .status-list--complete {
+  background-color: #006435;
+  background-position: 96%;
+  background-size: 12%;
+  color: #fff;
+}
+
+.declaration {
+  background: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin: 0;
+  padding: 20px;
+}
+
+.panel-border-wide {
+  border-left-width: 10px;
+}
+
+.progress-steps__amend .progress-step--status {
+  display: flex;
+}
+
+.progress-steps__amend .progress-step--status-time {
+  align-self: center;
+  flex: 1;
+  padding-bottom: 15px;
+}
+
+
+/* -- What you need: column source order is different on this page -- */
+
+.what-you-need > .grid-layout__column--1-3 {
+  float: right;
+}
+
+.what-you-need > .grid-layout__column--2-3 {
+  float: left;
+}
+
+@media screen and (max-width: 640px) {
+  .what-you-need > .grid-layout__column--1-3 {
+    margin: 0 auto 15px;
+  }
+  .declaration p {
+    margin: 0;
+  }
+}
+
+
+/* Bits from Gov Elements */
+
+.notice {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.notice .icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -17px;
+}
+
+.notice strong {
+  display: block;
+  padding-left: 65px;
+  margin-left: -15px;
+}
+
+.icon {
+  display: inline-block;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.icon-important {
+  width: 35px;
+  height: 35px;
+  background-image: url("/anti-money-laundering/assets/images/icon-important.png");
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  .icon-important {
+    background-image: url("/anti-money-laundering/assets/images/icon-important-2x.png");
+    background-size: 100%;
+  }
+}
+
+/* Temp override */
+
+.details__inner li {
+  margin-bottom: 20px;
+}
+
+/* .details__inner .panel-indent,
+.details__inner li:last-of-type {
+  margin-bottom: 0;
+} */
+
+
+/* -- notifications -- */
+
+table.notifications thead th,
+table.notifications thead td {
+  background-color: #005ea5;
+  color: #fff;
+}
+
+.unread td {
+  background-color: #f8f8f8;
+  font-weight: 700;
+}
+
+.message-unread {
+  width: 5%;
+}
+
+.message-type,
+.message-date {
+  width: 20%;
+}
+
+.circle {
+  display: none;
+}
+
+.unread .circle {
+  background: #00823b;
+  border-radius: 50%;
+  display: block;
+  font-size: 12px;
+  height: 12px;
+  margin-left: 10px;
+  width: 12px;
+}
+
+.column-full {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0 15px;
+}
+
+@media (min-width: 641px) {
+  .column-full {
+    float: left;
+    width: 100%;
+  }
+}
+
+.messaging {
+  background-color: #005ea5;
+  margin: 0;
+  padding-left: 20px;
+  padding: 10px 20px;
+  text-align: left;
+}
+
+.messaging .icon {
+  float: left;
+}
+
+.messaging a:link,
+.messaging a:visited {
+  color: #fff;
+}
+
+
+/* Overrides the stupid Assets Frontend - what were they thinking! */
+
+button,
+.button{
+  line-height: 1.25em;
+  padding: 0.5em 0.6em 0.3em 0.6em;
+  font-size: 1em;
+}
+
+/* stops the massive overhang on focus in firefox */
+.button .visuallyhidden {
+  left: 0;
+}
+
+.button--get-started {
+  line-height: 1.25em;
+  padding: 0.36842em 2.15789em 0.21053em 0.84211em;
+  padding-right: 40px;
+  font-size: 24px;
+}
+
+#wrapper {
+  padding-bottom: 0;
+}
+
+@media (min-width: 769px) {
+  #wrapper {
+    padding-bottom: 0;
+  }
+}
+
+.form-hint {
+  margin-top: 0;
+}
+
+.form-field,
+.form-field-group {
+  margin-bottom: 30px;
+}
+
+details {
+  margin: 0;
+}
+
+.form-group-footer {
+  padding-top: 30px;
+}
+
+.panel-indent--gutter {
+  margin-top: 0;
+}
+
+/* more GDS stuff overridden by Assets Frontend D: */
+
+.input--no-spinner {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.form-control {
+  -webkit-appearance: none;
+  background-color: #fff;
+  border-radius: 0;
+  border: 2px solid #6f777b;
+  box-sizing: border-box;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.31579;
+  padding: 4px;
+  text-transform: none;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .form-control {
+    font-size: 16px;
+    line-height: 1.25
+  }
+}
+
+@media (min-width: 641px) {
+  .form-control,
+  .panel-indent .form-control {
+    width: 50%
+  }
+}
+
+.form-control-3-4,
+.form-control-2-3,
+.form-control-1-2,
+.form-control-1-3,
+.form-control-1-4,
+.form-control-1-8 {
+    width: 100%;
+}
+
+@media (min-width: 641px) {
+    .form-control-3-4,
+    .form-control-3-4.form-control-3-4 {
+        width: 75%;
+    }
+
+    .form-control-2-3,
+    .form-control-2-3.form-control-2-3 {
+        width: 66.66%;
+    }
+
+    .form-control-1-2,
+    .form-control-1-2.form-control-1-2 {
+        width: 50%;
+    }
+
+    .form-control-1-3,
+    .form-control-1-3.form-control-1-3 {
+        width: 33.33%;
+    }
+
+    .form-control-1-4,
+    .form-control-1-4.form-control-1-4 {
+        width: 25%;
+    }
+
+    .form-control-1-8,
+    .form-control-1-8.form-control-1-8 {
+        width: 12.5%;
+    }
+}
+
+.duplicate-submission-page .report-error__content > h2,
+.duplicate-submission-page .report-error__content > p {
+    display: none
+}

@@ -1,0 +1,99 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.estateagentbusiness._
+
+@(model: EstateAgentBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.estateagentbusiness")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.estateagentbusiness"),
+    heading = header
+) {
+
+    @model.services.map { a =>
+        @checkYourAnswers(
+            question = Messages("estateagentbusiness.services.title"),
+            editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
+        ) {
+            <ul class="list list--comma">
+            @a.services.map { line =>
+                <li>@line match {
+                    case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
+                    case Commercial => {@Messages("estateagentbusiness.service.lbl.02")}
+                    case Auction => {@Messages("estateagentbusiness.service.lbl.03")}
+                    case Relocation => {@Messages("estateagentbusiness.service.lbl.04")}
+                    case BusinessTransfer => {@Messages("estateagentbusiness.service.lbl.05")}
+                    case AssetManagement => {@Messages("estateagentbusiness.service.lbl.06")}
+                    case LandManagement => {@Messages("estateagentbusiness.service.lbl.07")}
+                    case Development => {@Messages("estateagentbusiness.service.lbl.08")}
+                    case SocialHousing => {@Messages("estateagentbusiness.service.lbl.09")}
+                }</li>
+            }
+            </ul>
+        }
+    }
+
+    @model.services.map { a =>
+        @if(a.services.contains(Residential)) {
+            @checkYourAnswers(
+                question = Messages("estateagentbusiness.registered.redress.title"),
+                editUrl = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString
+            ) {
+                @model.redressScheme.map { a =>
+                    <p>@a match {
+                        case ThePropertyOmbudsman => {@Messages("estateagentbusiness.redress.lbl.01") }
+                        case OmbudsmanServices => {@Messages("estateagentbusiness.redress.lbl.02") }
+                        case PropertyRedressScheme => {@Messages("estateagentbusiness.redress.lbl.03") }
+                        case Other(value) => {@value }
+                        case RedressSchemedNo => {@Messages("lbl.no")}
+                    }</p>
+                }
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("estateagentbusiness.penalisedbyprofessional.title"),
+        editUrl = controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true).toString
+    ) {
+        <p>@model.professionalBody.map {
+            case ProfessionalBodyNo => { @Messages("lbl.no") }
+            case ProfessionalBodyYes(v) => { @v }
+        }</p>
+    }
+
+    @checkYourAnswers(
+        question = Messages("estateagentbusiness.penalisedunderestateagentsact.title"),
+        editUrl = controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true).toString
+    ) {
+        <p>@model.penalisedUnderEstateAgentsAct.map {
+            case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.no") }
+            case PenalisedUnderEstateAgentsActYes(v) => { @v }
+        }</p>
+    }
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}

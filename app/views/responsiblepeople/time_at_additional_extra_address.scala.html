@@ -1,0 +1,54 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.timeataddress.address_history.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.timeataddress.address_history.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.post(index,edit,fromDeclaration)) {
+
+        @fieldset(
+            f = f("timeAtAddress-fieldset"),
+            legend = "responsiblepeople.additional_extra_address.how_long",
+            legendHidden = true,
+            jsHidden = false,
+            panel = false,
+            id = s"""${f("address-history").id}-fieldset"""
+        ) {
+            @errorGroup(
+                field = f("timeAtAddress")
+            ) {
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
+                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
+            }
+        }
+        @submit(edit, Some("button.saveandcontinue"))
+    }
+}

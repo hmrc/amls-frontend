@@ -1,0 +1,73 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.businessmatching._
+
+@(f: forms.Form2[_])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+@errorSummary(f)
+@heading("survey.satisfaction.title", "survey.satisfaction.heading")
+}
+
+@main(
+title = Messages("survey.satisfaction.title") + " - " + Messages("survey.satisfaction.heading"),
+heading = header
+) {
+
+@form(f, controllers.routes.SatisfactionSurveyController.post()) {
+
+    @fieldset(
+        legend = "survey.satisfaction.text.1",
+        f = f("satisfaction"),
+        panel = false,
+        bold = true
+    ) {
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.01", value = "01")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.02", value = "02")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.03", value = "03")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.04", value = "04")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.05", value = "05")
+    }
+
+    @fieldset(
+        legend = "survey.satisfaction.text.2",
+        f = f("details"),
+        panel = false,
+        classes = Seq("heading-medium"),
+        bold = true
+    ) {
+        @textarea(
+            field = f("details"),
+            labelText = "lbl.pleasespecify",
+            labelHidden = true,
+            hintText = "survey.satisfaction.hint",
+            cols = "50",
+            rows = "6",
+            maxLength = "1200",
+            charCount = true
+        )
+    }
+
+<input type="submit" name="submit" class="button" value="@Messages("button.send.feedback")" />
+}
+}
+
+$('input:radio').click(function(){
+ga('send', 'event', this.id, 'click');
+});

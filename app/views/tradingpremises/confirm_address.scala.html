@@ -1,0 +1,66 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include.{main, heading, registered_office_helper}
+@import include.forms2._
+@import play.api.i18n.Messages
+@import models.businesscustomer.Address
+
+@(f: Form2[_], model: Address, index: Int)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("tradingpremises.confirmaddress.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.confirmaddress.title") + " - " + Messages("summary.tradingpremises"),
+    heading = header
+) {
+
+    @form(f, controllers.tradingpremises.routes.ConfirmAddressController.post(index)) {
+
+        @registered_office_helper(model)
+
+        @fieldset(
+            f = f("confirmAddress-fieldset"),
+            legend = "tradingpremises.confirmaddress.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("confirmAddress")
+            ) {
+                @radio(
+                    f = f("confirmAddress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("confirmAddress"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit(false)
+    }
+}

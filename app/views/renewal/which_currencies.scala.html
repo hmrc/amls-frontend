@@ -1,0 +1,131 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.msb.whichcurrencies.header", "summary.msb")
+}
+
+@main(
+    title = Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.msb"),
+    heading = header
+) {
+
+    @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
+
+        @fieldset(
+            f = f("currencies-fieldset"),
+            legend = "msb.which_currencies.title",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("form-group"),
+            hint = "msb.which_currencies.uptoThree.hint"
+        ) {
+            @errorGroup(f("currencies")) {
+                @currency(field=f("currencies[0]"))
+                @currency(field=f("currencies[1]"))
+                @currency(field=f("currencies[2]"))
+            }
+        }
+
+    @if(config.ApplicationConfig.release7) {
+
+        @fieldset(
+            f = f("usesForeignCurrencies-fieldset"),
+            legend = Messages("renewal.msb.which_currencies.foreign_currencies_question"),
+            panel = false
+        ) {
+
+            @errorGroup(f("usesForeignCurrencies")) {
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.yes",
+                    value = "Yes",
+                    target = "#usesForeignCurrency-fieldset",
+                    inline = true
+                )
+
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.no",
+                    value = "No",
+                    inline = true
+                )
+            }
+
+            @panel(
+                field = Some(f("usesForeignCurrency-fieldset")),
+                jsHidden = false
+            ) {
+                @panelContents
+            }
+        }
+
+    } else {
+        @panelContents
+    }
+
+    <div class="clear">
+        @submit()
+    </div>
+
+    }
+}
+
+@panelContents = {
+    <p class="form-label">@Messages("msb.which_currencies.who")</p>
+    <span class="form-hint">@Messages("lbl.select.all")</span>
+
+    @errorGroup(
+        field = f("WhoWillSupply")
+    ) {
+        @checkbox(
+            f = f("bankMoneySource"),
+            labelText = "msb.which_currencies.source.banks",
+            value = "Yes",
+            target = "[data-reveal='banks']"
+        )
+        @input(
+            field = f("bankNames"),
+            labelText = "msb.which_currencies.source.which_banks",
+            jsHidden = true,
+            data = "banks"
+        )
+        @checkbox(
+            f = f("wholesalerMoneySource"),
+            labelText = "msb.which_currencies.source.wholesalers",
+            value = "Yes",
+            target = "[data-reveal='wholesalers']"
+        )
+        @input(
+            field = f("wholesalerNames"),
+            labelText = "msb.which_currencies.source.which_wholesalers",
+            jsHidden = true,
+            data = "wholesalers"
+        )
+        @checkbox(
+            f = f("customerMoneySource"),
+            labelText = "msb.which_currencies.source.customers",
+            value = "Yes"
+        )
+    }
+}

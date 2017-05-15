@@ -1,0 +1,90 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+@import models.aboutthebusiness._
+@import play.api.i18n.Messages
+
+@(f: Form2[_], model: RegisteredOffice, edit: Boolean)(implicit request: Request[_],m:Messages, lang:Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("aboutthebusiness.contactingyou.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.contactingyou.title") + " - " + Messages("summary.aboutbusiness"),
+    heading = header
+) {
+
+    <p>@Messages("aboutthebusiness.contactingyou.lbl")</p>
+
+    @form(f, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) {
+
+        @fieldset(
+            f = f("contactingyou-fieldset"),
+            legend = "aboutthebusiness.contactingyou.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("email"),
+                labelText = "aboutthebusiness.contactingyou.email.lbl",
+                hintText = "aboutthebusiness.contactingyou.email.hint",
+                attrType = "email"
+            )
+
+            @input(
+                field = f("phoneNumber"),
+                labelText = "aboutthebusiness.contactingyou.phone.lbl",
+                hintText = "aboutthebusiness.contactingyou.phone.hint",
+                attrMaxlength = "24",
+                attrPattern = "[0-9()+\\- ]{1,24}"
+            )
+        }
+
+        @registered_office_helper(model)
+
+        @fieldset(
+            f = f("letterToThisAddress-fieldset"),
+            legend = "aboutthebusiness.contactingyou.sendletter.lbl",
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("letterToThisAddress")
+            ) {
+
+                @radio(
+                    f = f("letterToThisAddress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("letterToThisAddress"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit()
+    }
+}

@@ -1,0 +1,65 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import models.notifications._
+
+@(businessName: String, notifications: Seq[NotificationRow])(implicit request: Request[_],m:Messages)
+
+@header = {
+    @heading("notifications.header", "summary.status")
+}
+
+@notifications_your_messages(
+    title = Messages("notifications.header"),
+    heading = header
+) {
+
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--2-3">
+            <div class="panel-indent panel-indent--gutter">
+                <p><span class="heading-small">Your Business:</span>
+                    <br /><span>@businessName</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="full-width">
+        <table class="notifications">
+            <thead>
+                <tr>
+                    <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
+                    <th scope="col">@Messages("notifications.table.header.subject")</th>
+                    <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
+                    <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
+                </tr>
+            </thead>
+            <tbody>
+            @notifications.map { comms =>
+                <tr class="@if(!comms.isRead){unread}">
+                    <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
+                    <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id,comms.getContactType)">@Messages(comms.subject)</a></td>
+                    <!--<td></td>-->
+                    <td>@comms.dateReceived</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <a href="@controllers.routes.StatusController.get().url" class="back-link">@Messages("button.back")</a>
+}

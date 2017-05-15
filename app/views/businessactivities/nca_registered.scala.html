@@ -1,0 +1,63 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("businessactivities.ncaRegistered.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.ncaRegistered.title") + " - " + Messages("summary.businessactivities"),
+    heading = header
+) {
+
+    <p>@Messages("businessactivities.ncaRegistered.subtitle")</p>
+
+    @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
+
+        @fieldset(
+            f = f("ncaRegistered-fieldset"),
+            legend = "businessactivities.ncaRegistered.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("ncaRegistered")
+            ) {
+                @radio(
+                    f = f("ncaRegistered"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("ncaRegistered"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit(edit)
+
+    }
+}

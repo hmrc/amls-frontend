@@ -1,0 +1,88 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import models.businessmatching._
+
+
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.experiencetraining.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.experiencetraining.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
+    <ul class="list list-bullet">
+        @bamodel.businessActivities.map { ba =>
+        <li>@Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))</li>
+        }
+    </ul>
+
+    @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, fromDeclaration)) {
+
+        @fieldset(
+            f = f("experienceTraining-fieldset"),
+            legend = "responsiblepeople.experiencetraining.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("experienceTraining")
+            ) {
+                @radio(
+                    f = f("experienceTraining"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = ".more-information"
+                )
+                @radio(
+                    f = f("experienceTraining"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @fieldset(
+            legend = "responsiblepeople.experiencetraining.information.lbl",
+            jsHidden = true,
+            classes = Seq("more-information"),
+            hint = "responsiblepeople.experiencetraining.information.hint",
+            f = f("experienceInformation-fieldset")
+        ) {
+            <span>@Messages("responsiblepeople.experiencetraining.information")</span>
+            @textarea(
+                field = f("experienceInformation"),
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows ="8"
+            )
+        }
+
+        @submit(edit)
+    }
+}

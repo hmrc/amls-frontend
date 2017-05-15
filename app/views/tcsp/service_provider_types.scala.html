@@ -1,0 +1,112 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target = @{
+    s"""${f("agent").id}-options"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("tcsp.kind.of.service.provider.title", "summary.tcsp")
+}
+
+@main(
+    title = Messages("tcsp.kind.of.service.provider.title") + " - " + Messages("summary.tcsp"),
+    heading = header
+) {
+
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
+
+        @fieldset(
+            f = f("serviceProviders-fieldset"),
+            legend = "tcsp.kind.of.service.provider.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("serviceProviders")
+            ) {
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#$target")
+            }
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = true
+        ) {
+            @fieldset(
+                legend = "tcsp.off-the-shelf.companies.lbl",
+                f = f("onlyOffTheShelfCompsSold-fieldset"),
+                classes = Seq("form-group"),
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("onlyOffTheShelfCompsSold")
+                ) {
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
+            }
+
+            @fieldset(
+                legend = "tcsp.create.complex.corporate.structures.lbl",
+                f = f("complexCorpStructureCreation-fieldset"),
+                classes = Seq("form-group"),
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("complexCorpStructureCreation")
+                ) {
+                    @radio(
+                        f = f("complexCorpStructureCreation"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("complexCorpStructureCreation"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
+            }
+        }
+
+        @submit(false)
+    }
+}

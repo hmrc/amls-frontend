@@ -1,0 +1,1 @@
+sbt -jvm-debug 5005 "run 9222" -Dapplication.router=testOnlyDoNotUseInAppConf.Routes

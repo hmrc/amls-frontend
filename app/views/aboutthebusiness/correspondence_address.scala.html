@@ -1,0 +1,157 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@target = @{
+    s"""${f("postCode").id}-fieldset"""
+}
+
+@target1 = @{
+    s"""${f("country").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.correspondenceaddress.title") + " - " + Messages("summary.aboutbusiness"),
+    heading = header
+) {
+
+    @panel(
+        wide = true,
+        gutter = true,
+        jsHidden = false
+    ) {
+        <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+    }
+
+    @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
+
+        @fieldset(
+            legend = "aboutthebusiness.correspondenceaddress.contact.info",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("form-group"),
+            f = f("correspondenceaddress-fieldset")
+        ) {
+            @input(
+                field = f("yourName"),
+                labelText = "aboutthebusiness.correspondenceaddress.yourName"
+            )
+            @input(
+                field = f("businessName"),
+                labelText = "aboutthebusiness.correspondenceaddress.businessName"
+            )
+        }
+
+        @fieldset(
+            f = f("isUK"),
+            legend = "aboutthebusiness.correspondenceaddress.lbl",
+            legendHidden = false,
+            panel = false,
+            classes = Seq("form-group")
+        ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                value = "false",
+                target = s"#$target1",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "aboutthebusiness.correspondenceaddress.address",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true
+            )
+            @input(
+                field = f("postCode"),
+                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                classes = Seq("form-control-1-4")
+            )
+        }
+
+        @fieldset(
+            f = f(s"$target1"),
+            legend = "aboutthebusiness.correspondenceaddress.address",
+            legendHidden = true,
+            panel = false,
+            jsHidden = false
+        ) {
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true
+            )
+            @country(
+                field = f("country"),
+                labelText = "aboutthebusiness.correspondenceaddress.country"
+            )
+        }
+
+        @submit(edit)
+    }
+}

@@ -1,0 +1,57 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.confirmation._
+
+@(amount: Currency, breakdown: Seq[BreakdownRow], summary: String)(implicit messages: Messages, request: Request[_])
+
+<details class="details">
+    <summary class="summary">@Messages("confirmation.itemisedfeelink")</summary>
+    <div class="details__inner">
+        <ul class="list">
+            <p>@summary</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @breakdown.map {
+                    case BreakdownRow(label, quantity, perItem, total) => {
+                        <tr>
+                            <td>@Messages(label)</td>
+                            <td class="numeric">@quantity</td>
+                            <td class="numeric">@perItem</td>
+                            <td class="numeric">@total</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">@Messages("confirmation.total")</th>
+                        <td class="numeric">@amount</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </ul>
+    </div>
+</details>

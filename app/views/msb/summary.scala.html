@@ -1,0 +1,228 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.moneyservicebusiness._
+@import models.businessmatching._
+@import models.Country
+
+@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.msb")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.msb"),
+    heading = header
+) {
+
+    @bmMsbServices.map{ services =>
+        @model.throughput.map{ throughput =>
+            @checkYourAnswers(
+                question = Messages("msb.throughput.title"),
+                editUrl = if(isEditable){controllers.msb.routes.ExpectedThroughputController.get(true).toString} else ""
+            ) {
+                <p>@throughput match {
+                    case ExpectedThroughput.First => {@Messages("msb.throughput.lbl.01")}
+                    case ExpectedThroughput.Second => {@Messages("msb.throughput.lbl.02")}
+                    case ExpectedThroughput.Third => {@Messages("msb.throughput.lbl.03")}
+                    case ExpectedThroughput.Fourth => {@Messages("msb.throughput.lbl.04")}
+                    case ExpectedThroughput.Fifth => {@Messages("msb.throughput.lbl.05")}
+                    case ExpectedThroughput.Sixth => {@Messages("msb.throughput.lbl.06")}
+                    case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
+                }</p>
+            }
+        }
+
+        @model.branchesOrAgents.map { boa =>
+            @checkYourAnswers(
+                question = Messages("msb.branchesoragents.title"),
+                editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
+            ) {
+                @boa.branches.fold {
+                    <p>@Messages("lbl.no")</p>
+                    } { branches =>
+                    <ul class="list list--comma">
+                        @branches.map { country =>
+                        <li>@country</li>
+                        }
+                    </ul>
+                }
+            }
+        }
+
+        @model.identifyLinkedTransactions.map { ilt =>
+            @checkYourAnswers(
+                question = Messages("msb.linked.txn.title"),
+                editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
+            ) {
+                <p>@ilt.linkedTxn match {
+                    case true => {@Messages("lbl.yes")}
+                    case _ => {@Messages("lbl.no")}
+                }</p>
+            }
+        }
+
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            @model.businessUseAnIPSP.map { ipsp =>
+                @checkYourAnswers(
+                    question = Messages("msb.ipsp.title"),
+                    editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
+                ) {
+                    @ipsp match {
+                        case BusinessUseAnIPSPNo => {<p>@Messages("lbl.no")</p>}
+                        case BusinessUseAnIPSPYes(name , reference) => {
+                        <ul class="list">
+                            <li>@Messages("msb.summary.ipsp-name"): @name</li>
+                            <li>@Messages("msb.summary.ipsp-registration-number"): @reference</li>
+                        </ul>
+                        }
+                    }
+                }
+            }
+
+            @model.fundsTransfer.map { ft =>
+                @checkYourAnswers(
+                    question = Messages("msb.fundstransfer.title"),
+                    editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
+                ) {
+                    <p>@ft.transferWithoutFormalSystems match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }</p>
+                }
+            }
+
+            @model.transactionsInNext12Months.map{ trans =>
+                @checkYourAnswers(
+                    question = Messages("msb.transactions.expected.title"),
+                    editUrl = if(isEditable){controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString} else ""
+                ) {
+                    <p>@trans.txnAmount</p>
+                }
+            }
+
+            @model.sendMoneyToOtherCountry.map{ otherCountries =>
+                @checkYourAnswers(
+                    question = Messages("msb.send.money.title"),
+                    editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
+                ) {
+                    <p>@otherCountries.money match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }</p>
+                }
+
+                @if(otherCountries.money) {
+                    @model.sendTheLargestAmountsOfMoney.map { lom =>
+                        @checkYourAnswers(
+                            question = Messages("msb.send.the.largest.amounts.of.money.title"),
+                            editUrl = if(isEditable){controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString} else ""
+                        ) {
+                            <ul class="list list--comma">
+                                @lom.countryList.map { country =>
+                                <li>@country.name</li>
+                                }
+                            </ul>
+                        }
+                    }
+
+                    @model.mostTransactions.map { mt =>
+                        @checkYourAnswers(
+                            question = Messages("msb.most.transactions.title"),
+                            editUrl = if(isEditable){controllers.msb.routes.MostTransactionsController.get(true).toString} else ""
+                        ) {
+                            <ul class="list list--comma">
+                                @mt.countries.map { country =>
+                                <li>@country.name</li>
+                                }
+                            </ul>
+                        }
+                    }
+                }
+            }
+        }
+
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            @model.ceTransactionsInNext12Months.map{ trans =>
+                @checkYourAnswers(
+                    question = Messages("msb.ce.transactions.expected.in.12.months.title"),
+                    editUrl = if(isEditable){controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString} else ""
+                ) {
+                    <p>@trans.ceTransaction</p>
+                }
+            }
+
+            @model.whichCurrencies.map { wc =>
+                @checkYourAnswers(
+                    question = Messages("msb.which_currencies.title"),
+                    editUrl = if(isEditable){controllers.msb.routes.WhichCurrenciesController.get(true).toString} else ""
+                ) {
+                    <ul class="list list--comma">
+                        @wc.currencies.map { cur =>
+                        <li>@cur</li>
+                        }
+                    </ul>
+
+                    @if(config.ApplicationConfig.release7) {
+                        @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
+                            @checkYourAnswersExtra(
+                                question = Messages("msb.which_currencies.foreign_currencies_question")
+                            ) {
+                                <p>@usesForeignCurrencies match {
+                                    case true => {@Messages("lbl.yes")}
+                                    case _ => {@Messages("lbl.no")}
+                                }</p>
+                            }
+
+                            @if(usesForeignCurrencies) {
+                                @whoUsesCurrencies(wc)
+                            }
+                        }
+                    } else {
+                        @whoUsesCurrencies(wc)
+                    }
+                }
+            }
+        }
+    }
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
+}
+
+@whoUsesCurrencies(wc: WhichCurrencies) = {
+    @checkYourAnswersExtra(
+        question = Messages("msb.which_currencies.who.will")
+    ) {
+        <ul class="list">
+            @wc.bankMoneySource.map { bms =>
+            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+            }
+            @wc.wholesalerMoneySource.map { wms =>
+            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+            }
+            @if(wc.customerMoneySource) {
+            <li>@Messages("msb.which_currencies.source.customers")</li>
+            }
+        </ul>
+    }
+}

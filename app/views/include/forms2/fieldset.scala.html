@@ -1,0 +1,39 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(
+    legend: String,
+    legendHidden: Boolean = false,
+    jsHidden: Boolean = false,
+    panel: Boolean = true,
+    id: String = "",
+    classes: Seq[String] = Seq.empty,
+    data: Seq[String] = Seq.empty,
+    bold: Boolean = false,
+    hint: String = "",
+    f: forms.Field
+)(content: Html)(implicit lang:Lang,  m: Messages)
+
+<fieldset
+    @if(f.id.nonEmpty){ id="@f.id"}
+    class="@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+
+        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
+        @if(f.hasErrors) {
+            <span class="error-notification">@f.error</span>
+        }
+        @content
+</fieldset>

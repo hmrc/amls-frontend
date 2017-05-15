@@ -1,0 +1,82 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Form2, ValidField, InvalidField}
+@import include._
+@import include.forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target = @{
+    s"""${f("isOutside").id}-panel"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("renewal.customer.outside.uk.title", "summary.renewal")
+}
+
+@main(
+    title = Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+    @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
+
+        @fieldset(
+            legend = "renewal.customer.outside.uk.title",
+            legendHidden = true,
+            panel = false,
+            f = f("isOutside")
+        ) {
+
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            data = Seq("data-toggle-new")
+        ) {
+
+            @fieldset(
+                legend = "renewal.customers.outside.uk.hint.lbl",
+                f = f("countries"),
+                hint = "businessactivities.hight.value.customer.lbl.hint",
+                panel = false
+            ) {
+                @addRemove("lbl.add.another.country") {
+                    @for(i <- 0 until 10) {@country(f(s"countries[$i]"))}
+                }
+            }
+
+        }
+
+        @submit(edit)
+    }
+
+}

@@ -1,0 +1,55 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Field, Form2}
+
+@(
+    field: Field,
+    labelText: String = "",
+    labelHidden: Boolean = false,
+    hintText: String = "",
+    bold: Boolean = true,
+    classes: Seq[String] = Seq.empty,
+    cols: String = "",
+    rows: String = "",
+    maxLength: String = "",
+    charCount: Boolean = false,
+    largeWidth: Boolean = false
+)(implicit lang:Lang,  m: Messages)
+
+<div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
+    <label>
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}@if(labelHidden){ visuallyhidden}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+        <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
+            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
+            @if(cols.nonEmpty) { cols="@cols" }
+            @if(rows.nonEmpty) { rows="@rows" }
+            @if(maxLength.nonEmpty) { maxlength="@maxLength" }
+            @if(largeWidth) { class="textarea--3-4" }
+            >@field.value</textarea>
+        @if(charCount) {
+            <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
+        }
+    </label>
+</div>

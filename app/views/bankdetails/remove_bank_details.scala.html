@@ -1,0 +1,43 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@(f: forms.Form2[_],index: Int, accountName:String, complete:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @heading("bankdetails.remove.bank.account.title", "summary.bankdetails")
+}
+
+@main(
+    title = Messages("bankdetails.remove.bank.account.title") + " - " + Messages("summary.bankdetails"),
+    heading = header
+) {
+
+    @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
+
+        @panel(
+            wide = true,
+            jsHidden = false
+        ) {
+            <p>@Messages("bankdetails.remove.bank.account.text", accountName)</p>
+        }
+
+        @submit(false, Some(Messages("bankdetails.remove.bank.account.btn")))
+    }
+}

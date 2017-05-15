@@ -1,0 +1,107 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("estateagentbusiness.registered.redress.title", "summary.estateagentbusiness")
+}
+
+@main(
+    title = Messages("estateagentbusiness.registered.redress.title") + " - " + Messages("summary.estateagentbusiness"),
+    heading = header
+) {
+
+    @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
+
+        <p>@Messages("estateagentbusiness.registered.redress.text")</p>
+
+        @fieldset(
+            f = f("isRedress-fieldset"),
+            legend = "estateagentbusiness.registered.redress.title",
+            panel = false,
+            legendHidden = true
+        ) {
+            @errorGroup(
+                field = f("isRedress")
+            ) {
+                @radio(
+                    f = f("isRedress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".propertyRedress-fieldset"
+                )
+                @radio(
+                    f = f("isRedress"),
+                    labelText = "lbl.no",
+                    inline = true,
+                    value = "false"
+                )
+            }
+        }
+
+        @fieldset(
+            f = f("propertyRedressScheme-fieldset"),
+            legend = "estateagentbusiness.which.redress.scheme.lbl",
+            classes = Seq("propertyRedress-fieldset")
+        ) {
+            @errorGroup(
+                field = f("propertyRedressScheme")
+            ) {
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.04",
+                    value = "04",
+                    target = s".other-fieldset"
+                )
+            }
+        }
+
+        @fieldset(
+            legend = "estateagentbusiness.redress.lbl.04",
+            legendHidden = true,
+            classes = Seq("other-fieldset"),
+            f = f("other-fieldset")
+        ) {
+            @input(
+                field = f("other"),
+                labelText = "lbl.pleasespecify"
+            )
+        }
+
+        @submit(edit)
+    }
+}

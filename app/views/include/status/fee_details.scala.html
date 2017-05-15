@@ -1,0 +1,44 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import models.ResponseType.{SubscriptionResponseType,AmendOrVariationResponseType}
+@import models.confirmation.Currency
+@import config.ApplicationConfig
+
+@(feeResponse: FeeResponse)(implicit request: Request[_],m:Messages, lang: Lang)
+
+<p>@Messages("fee.details.heading")</p>
+
+<div class="list panel-indent reg-online--pay-fee">
+    <div class="form-field-group">
+        @Messages("fee.details.registration.fee.lbl")
+        <p class="heading-large numeric">
+        @feeResponse.responseType match {
+            case SubscriptionResponseType => {@Currency.fromBD(feeResponse.totalFees)}
+            case AmendOrVariationResponseType => {@Currency.fromBD(feeResponse.difference.getOrElse(0))}
+        }
+        </p>
+    </div>
+    <div class="form-field-group">
+        @Messages("fee.reference.number.lbl")
+        <p class="heading-large numeric">@feeResponse.paymentReference </p>
+    </div>
+    <p>@Messages("fee.details.note")</p>
+
+</div>
+
+<p><a class="button" href="@ApplicationConfig.paymentsUrl">@Messages("button.payfee")</a></p>

@@ -1,0 +1,84 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("msb.ipsp.title", "summary.msb")
+}
+
+@main(
+    title = Messages("msb.ipsp.title") + " - " + Messages("summary.msb"),
+    heading = header
+) {
+
+    <p>@Messages("msb.throughput.ipsp.hint")</p>
+
+    @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
+
+        @fieldset(
+            f = f("useAnIPSP-fieldset"),
+            hint = "msb.throughput.ipsp.hint",
+            legend = "msb.ipsp.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("useAnIPSP")
+            ) {
+                @radio(
+                    f = f("useAnIPSP"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#${f("name").id}-panel",
+                    inline = true
+                )
+                @radio(
+                    f = f("useAnIPSP"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f(s"${f("name").id}-panel")),
+            jsHidden = true
+        ) {
+            @input(
+                f("name"),
+                labelText = "msb.ipsp.name.lbl",
+                bold = false
+            )
+
+            @input(
+                attrMaxlength = "15",
+                attrPattern = "[0-9a-z-A-Z]{1,15}",
+                bold = false,
+                field = f("referenceNumber"),
+                hintText = "msb.ipsp.referenceNumber.hint",
+                labelText = "msb.ipsp.referenceNumber.lbl"
+            )
+        }
+
+        @submit(edit)
+    }
+}

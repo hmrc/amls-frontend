@@ -1,0 +1,84 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import models.registrationprogress.Section
+@import models.registrationprogress._
+@import views.html.registrationprogress._
+@import views.html.registrationamendment.section_list
+@import utils.Strings._
+@import views.html.helper.CSRF
+@import org.joda.time.LocalDate
+@import utils.DateHelper
+
+@(renewalSection: Section, sections: Seq[Section], canSubmit: Boolean, msbOrTcspExists: Boolean, endDate: Option[LocalDate])(implicit messages: Messages, request: Request[_])
+
+@header = {
+    @heading("renewal.progress.title", "summary.status")
+}
+
+@main2(s"${messages("renewal.progress.title")} - ${messages("summary.status")}") {
+
+    @* Heading *@
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @header
+        </div>
+    </div>
+
+    <div class="grid-layout grid-layout--stacked">
+
+        <div class="grid-layout__column grid-layout__column--2-3">
+            @endDate.map {date =>
+                @if(msbOrTcspExists) {
+                    <p>@messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
+                } else {
+                <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
+                }
+            }
+
+            <div class="grid-layout grid-layout--stacked renewal-progress-section">
+                <ul>
+                    @section(renewalSection.name, renewalSection.status, renewalSection.call)
+                </ul>
+            </div>
+
+            <div class="grid-layout grid-layout--stacked">
+                @section_list(sections)
+            </div>
+
+        </div>
+
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @* Sidebar *@
+            <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
+                <div class="application-submit">
+                    <h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
+
+                    <p>@messages("renewal.progress.submit.intro")</p>
+
+                    <form method="post" action="@controllers.routes.RegistrationProgressController.post().url">
+                        @CSRF.formField
+                        <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
+                            @messages("progress.submit")
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,49 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@(index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @heading("title.wyn", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("title.wyn") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    <p>@Messages("responsiblepeople.whatyouneed.requiredinfo")</p>
+    <p>@Messages("responsiblepeople.whatyouneed.possiblerequiredinfo")</p>
+
+
+     <ul class="list list-bullet">
+        <li>@Messages("responsiblepeople.whatyouneed.line_1")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_2")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_3")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_4")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_5")</li>
+    </ul>
+
+    @anchor(
+        attrHref = controllers.responsiblepeople.routes.PersonNameController.get(index, false, fromDeclaration).toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.responsiblepeople")
+    )
+
+}

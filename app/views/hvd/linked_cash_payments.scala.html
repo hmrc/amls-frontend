@@ -1,0 +1,63 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("hvd.identify.linked.cash.payment.title", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.identify.linked.cash.payment.title") + " - " + Messages("summary.hvd"),
+    heading = header
+) {
+
+    <p>@Messages("hvd.identify.linked.cash.payments.subtitle")</p>
+
+    @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
+
+        @fieldset(
+            f = f("linkedCashPayments-fieldset"),
+            legend = "hvd.identify.linked.cash.payment.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("linkedCashPayments")
+            ) {
+                @radio(
+                    f = f("linkedCashPayments"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("linkedCashPayments"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @submit(edit)
+
+    }
+}

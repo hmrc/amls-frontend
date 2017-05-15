@@ -1,0 +1,42 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+
+@()(implicit request: Request[_],m:Messages)
+
+@header = {
+    @heading("start.title")
+}
+
+@main(
+    title = Messages("start.title") + " - " + Messages("summary.start"),
+    heading = header,
+    userLoggedIn = false
+) {
+    <p>@Messages("start.line1")</p>
+    <p>@Messages("start.line2")</p>
+    <p>@Html(Messages("start.line3", "<a href=\"/\">here</a>"))</p>
+
+    <a class="button button--get-started" href="@controllers.routes.LandingController.get()" role="button">@Messages("start.button.text")</a>
+
+    <p class="heading-medium">@Messages("start.before.heading")</p>
+
+    <p class="heading-small">@Messages("start.utr.heading1")</p>
+    <p>@Html(Messages("start.before.line1", "<a href=\"/\">here</a>"))</p>
+    <p class="heading-small">@Messages("start.utr.heading")</p>
+    <p>@Messages("start.utr.line1")</p>
+}
