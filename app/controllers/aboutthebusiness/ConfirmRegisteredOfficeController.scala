@@ -20,27 +20,30 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{RegisteredOffice, AboutTheBusiness, ConfirmRegisteredOffice}
+import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice, RegisteredOffice}
+import models.businesscustomer.Address
+import models.businessmatching.BusinessMatching
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait ConfirmRegisteredOfficeController extends BaseController {
 
   def dataCache: DataCacheConnector
 
+  def getAddress(businessMatching: Future[Option[BusinessMatching]]): Future[Option[Address]] = {
+    businessMatching map {
+      case Some(bm) => bm.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
+      case _ => None
+    }
+  }
+
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        response =>
-          val regOffice: Option[RegisteredOffice] = (for {
-            aboutTheBusiness <- response
-            registeredOffice <- aboutTheBusiness.registeredOffice
-          } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
-          regOffice match {
+      getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)) map {
             case Some(data) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
             case _ => Redirect(routes.RegisteredOfficeController.get())
-          }
       }
   }
 

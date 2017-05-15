@@ -17,7 +17,10 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
+import models.Country
 import models.aboutthebusiness._
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -41,6 +44,9 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
   private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None)
+  val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+    Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
+  val bm = BusinessMatching(Some(reviewDtls))
 
   "ConfirmRegisteredOfficeController" must {
 
@@ -48,8 +54,7 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
 
       "load register Office" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+        when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(Some(bm)))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))

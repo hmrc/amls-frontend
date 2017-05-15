@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq, _}
