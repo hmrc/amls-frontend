@@ -57,8 +57,9 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
           }
         }
         case ValidForm(_, data) => {
-          dataCacheConnector.remove(BusinessMatching.key)
-          Future.successful(Redirect(routes.CannotContinueWithTheApplicationController.get()))
+          dataCacheConnector.save[BusinessMatching](BusinessMatching.key, None) map { _ =>
+            Redirect(routes.CannotContinueWithTheApplicationController.get())
+          }
         }
       }
     }
