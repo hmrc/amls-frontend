@@ -139,9 +139,6 @@ trait AmlsConnector {
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
-
-
-
   }
 
   def renewal(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String)
@@ -154,6 +151,25 @@ trait AmlsConnector {
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
     val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewal] $msg")
+
+    log(s"Request body: ${Json.toJson(subscriptionRequest)}")
+
+    httpPost.POST[SubscriptionRequest, RenewalResponse](postUrl, subscriptionRequest) map { response =>
+      log(s"Response body: ${Json.toJson(response)}")
+      response
+    }
+  }
+
+  def renewalAmendment(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String)
+             (implicit headerCarrier: HeaderCarrier,
+              ec: ExecutionContext,
+              authContext: AuthContext
+             ): Future[RenewalResponse] = {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewalAmendment"
+    val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewalAmendment] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
