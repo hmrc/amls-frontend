@@ -141,10 +141,7 @@ trait LandingService {
    ac: AuthContext
   ): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
-    val atb = AboutTheBusiness(registeredOffice = Some(reviewDetails.businessAddress))
-    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm) flatMap {
-      _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, atb)
-    }
+    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
   }
 }
 
