@@ -48,6 +48,10 @@ POST        /about-the-business/address-for-letters                     controll
 GET         /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
 POST        /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)
 
+GET         /about-the-business/letters-address                         controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
+POST        /about-the-business/letters-address                         controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
+
+
 GET         /about-the-business/what-you-need                           controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /about-the-business/check-your-answers                      controllers.aboutthebusiness.SummaryController.get()

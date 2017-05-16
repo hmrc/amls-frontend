@@ -781,6 +781,7 @@ aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
+aboutthebusiness.lettersaddress.title = Is this the right address to send you letters?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll be asked for things like:
