@@ -79,14 +79,17 @@ trait LandingService {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
+    import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}
 
     val data = Renewal(
       involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i =>BAInvolvedInOther.convert(i)),
       businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data =>ExpectedBusinessTurnover.convert(data)),
       turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data =>ExpectedAMLSTurnover.convert(data)),
       customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
-      percentageOfCashPaymentOver15000 = None,
-      receiveCashPayments = None,
+      percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
+      (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
+      receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
+        (_.receiveCashPayments.map(r => ReceiveCashPayments(r.paymentMethods))),
       totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
       whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
       transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
