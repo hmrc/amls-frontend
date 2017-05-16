@@ -16,21 +16,30 @@
 
 package controllers
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import models.SubmissionResponse
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.Play
-import play.api.mvc.Request
 import services.{RenewalService, StatusService, SubmissionService}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.Upstream4xxResponse
+import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
 import views.html.duplicate_submission
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SubmissionController extends BaseController {
 
   private[controllers] def subscriptionService: SubmissionService
   private[controllers] def statusService: StatusService
   private[controllers] def renewalService: RenewalService
+
+  private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    renewalService.getRenewal flatMap {
+      case Some(r) =>subscriptionService.renewalAmendment(r)
+      case _ => subscriptionService.variation
+    }
+  }
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
@@ -41,6 +50,7 @@ trait SubmissionController extends BaseController {
           case Some(r) =>subscriptionService.renewal(r)
           case _ => subscriptionService.variation
         }
+        case RenewalSubmitted(_) => handleRenewalAmendment()
         case _ => subscriptionService.subscribe
       }
     }.map {

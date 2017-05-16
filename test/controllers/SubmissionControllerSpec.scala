@@ -17,7 +17,7 @@
 package controllers
 
 import models.renewal.Renewal
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import models.{AmendVariationResponse, SubmissionResponse, SubscriptionResponse}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -34,11 +34,14 @@ import scala.concurrent.Future
 class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new SubmissionController {
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
+
       override protected def authConnector: AuthConnector = self.authConnector
+
       override private[controllers] val statusService: StatusService = mock[StatusService]
       override private[controllers] val renewalService = mock[RenewalService]
     }
@@ -78,12 +81,12 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
         controller.subscriptionService.subscribe(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReady))
+      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
 
     "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
@@ -92,12 +95,12 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
         controller.subscriptionService.update(any(), any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
-      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
 
     "post must return a 'Duplicate Business Partner' error page when 422 is returned from the middle tier" in new Fixture {
@@ -106,7 +109,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
         controller.subscriptionService.subscribe(any(), any(), any())
       } thenReturn Future.failed(Upstream4xxResponse("Error", 422, 500))
 
-      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReady))
+      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.post()(request)
 
@@ -131,17 +134,17 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       }
 
 
-      "Redirect to the correct confirmation page" in new Fixture{
+      "Redirect to the correct confirmation page" in new Fixture {
         when {
           controller.subscriptionService.variation(any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
       }
     }
 
@@ -187,6 +190,28 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
         verify(controller.subscriptionService).variation(any(), any(), any())
         verify(controller.subscriptionService, never()).renewal(any())(any(), any(), any())
+      }
+    }
+
+    "Submission is in renewal amendment status" must {
+      "call the renewal amendment method on the service" in new Fixture {
+
+        when {
+          controller.subscriptionService.renewalAmendment(any())(any(), any(), any())
+        } thenReturn Future.successful(mock[SubmissionResponse])
+
+        when {
+          controller.statusService.getStatus(any(), any(), any())
+        } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
+
+        when {
+          controller.renewalService.getRenewal(any(), any(), any())
+        } thenReturn Future.successful(Some(mock[Renewal]))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
       }
     }
   }
