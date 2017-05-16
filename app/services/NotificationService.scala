@@ -35,7 +35,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
   def getNotifications(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
     amlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegNo) map {
-      case notifications@(s :: sc) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
+      case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
