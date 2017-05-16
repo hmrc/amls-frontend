@@ -70,6 +70,9 @@ object AddBankAccountEvent {
 
       case account: NonUKIBANNumber =>
         BankAccountAuditDetail(ba.accountName, bankDetails.bankAccountType, isUKBankAccount = false, None, None, account.IBANNumber.some)
+
+      case account: NonUKAccountNumber =>
+        BankAccountAuditDetail(ba.accountName, bankDetails.bankAccountType, isUKBankAccount = false, None, account.accountNumber.some, None)
     }
   }
 

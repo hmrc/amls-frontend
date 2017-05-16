@@ -69,6 +69,14 @@ class AddBankAccountEventSpec extends PlaySpec with OneAppPerSuite {
 
         result.detail("accountType") mustBe "other business"
       }
+
+      "bank account uses a non-UK account number" in {
+        val account = BankDetails(Some(PersonalAccount), Some(BankAccount("Test account", NonUKAccountNumber("98374389hjk"))))
+        val result = AddBankAccountEvent(account)
+
+        result.detail("accountNumber") mustBe "98374389hjk"
+      }
+
     }
   }
 }
