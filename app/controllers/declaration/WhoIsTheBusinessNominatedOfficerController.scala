@@ -84,29 +84,28 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
   }
 
   def post = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Form2[BusinessNominatedOfficer](request.body) match {
-          case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-            case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
-            case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
-          }
-          case ValidForm(_, data) => {
-            data.value match {
-              case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, true)))
-              case _ => for {
-                serviceStatus <- statusService.getStatus
-                responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-                rp <- updateNominatedOfficer(responsiblePeople, data)
-                _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
-              } yield serviceStatus match {
-                case SubmissionReady | NotCompleted => Redirect(controllers.routes.FeeGuidanceController.get())
-                case SubmissionReadyForReview => Redirect(routes.WhoIsRegisteringController.get())
-                case _ => Redirect(routes.WhoIsRegisteringController.getWithAmendment())
-              }
+    implicit authContext => implicit request =>
+      Form2[BusinessNominatedOfficer](request.body) match {
+        case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+          case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
+          case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
+        }
+        case ValidForm(_, data) => {
+          data.value match {
+            case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, true)))
+            case _ => for {
+              serviceStatus <- statusService.getStatus
+              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+              rp <- updateNominatedOfficer(responsiblePeople, data)
+              _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
+            } yield serviceStatus match {
+              case SubmissionReady | NotCompleted => Redirect(controllers.routes.FeeGuidanceController.get())
+              case SubmissionReadyForReview => Redirect(routes.WhoIsRegisteringController.get())
+              case _ => Redirect(routes.WhoIsRegisteringController.getWithAmendment())
             }
           }
         }
+      }
   }
 }
 

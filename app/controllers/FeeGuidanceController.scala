@@ -36,15 +36,12 @@ import scala.concurrent.Future
 class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
                                       val dataCacheConnector: DataCacheConnector) extends BaseController with ServicesConfig {
 
-  def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-
-        getBreakdownRows() map { rows =>
-          val total = getTotal(rows)
-          Ok(views.html.fee_guidance(total, rows))
-        }
-
+  def get = Authorised.async {
+    implicit authContext => implicit request =>
+      getBreakdownRows() map { rows =>
+        val total = getTotal(rows)
+        Ok(views.html.fee_guidance(total, rows))
+      }
   }
 
   private def getBreakdownRows()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Seq[BreakdownRow]] = {
