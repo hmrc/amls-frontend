@@ -225,7 +225,6 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         val result = controller.messageDetails("dfgdhsjk",ContactType.MindedToRevoke)(request)
 
         status(result) mustBe 200
-        contentAsString(result) must include(Messages("notifications.mtrv.title"))
         contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(amlsRegNo)
         contentAsString(result) must include(testBusinessName)

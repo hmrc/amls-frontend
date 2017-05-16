@@ -14,7 +14,10 @@
  * limitations under the License.
  *@
 
-@()
+@import include._
+@import include.forms2._
+
+@()(implicit request: Request[_],m:Messages)
 
 <h2 class="heading-medium">Regulations</h2>
 <p>This decision takes into account the following parts of the Money Laundering Regulations 2007</a>:</p>
@@ -30,11 +33,16 @@
 <h2 class="heading-medium">If you disagree with this decision</h2>
 <p>You have 30 days to provide reasons why you disagree with this decision. Write to:</p>
 
-<div class="panel panel-border-wide">
-    Anti-Money Laundering Supervision<br>
-    7th Floor<br>
-    Alexander House<br>
-    21 Victoria Avenue<br>
-    Southend-on-Sea<br>
-    SS99 1AG<br>
-</div>
+@panel(
+    wide = true,
+    jsHidden = false
+) {
+    <div class="panel panel-border-wide">
+        Anti-Money Laundering Supervision<br>
+        7th Floor<br>
+        Alexander House<br>
+        21 Victoria Avenue<br>
+        Southend-on-Sea<br>
+        SS99 1AG<br>
+    </div>
+}

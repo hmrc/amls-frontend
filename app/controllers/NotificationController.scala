@@ -59,7 +59,6 @@ trait NotificationController extends BaseController {
     }
   }
 
-
   def messageDetails(id: String, contactType: ContactType) = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
       implicit authContext =>
