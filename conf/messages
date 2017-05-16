@@ -781,6 +781,7 @@ aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
+aboutthebusiness.lettersaddress.title = Is this the right address to send you letters?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll be asked for things like:
@@ -1292,7 +1293,7 @@ responsiblepeople.confirmaddress.title = Is this the person’s home address?
 responsiblepeople.new.home.date.of.change.heading = When did {0} move?
 responsiblepeople.new.home.date.of.change.title = When did this person move?
 responsiblepeople.new.home.heading = What’s {0}’s new home address?
-responsiblepeople.new.home.title = what is this persons new home address?
+responsiblepeople.new.home.title = What's this persons new home address?
 responsiblepeople.detailed_answer.tell.us.moved = Tell us that {0} has moved
 responsiblepeople.movedaddress.heading = Has {0} moved from this home address?
 responsiblepeople.movedaddress.title = Has this person moved from this home address?
