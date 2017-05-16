@@ -20,6 +20,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.renewal.BusinessTurnover
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
@@ -137,6 +138,17 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
     "throw error for invalid data" in {
       Json.fromJson[ExpectedBusinessTurnover](Json.obj("expectedBusinessTurnover" -> "20")) must
         be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+    }
+
+    "convert ExpectedBusinessTurnover to renewal BusinessTurnover model" in {
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.First) must be(BusinessTurnover.First)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Second) must be(BusinessTurnover.Second)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Third) must be(BusinessTurnover.Third)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fourth) must be(BusinessTurnover.Fourth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fifth) must be(BusinessTurnover.Fifth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Sixth) must be(BusinessTurnover.Sixth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Seventh) must be(BusinessTurnover.Seventh)
+
     }
   }
 }

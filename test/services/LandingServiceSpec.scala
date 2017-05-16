@@ -21,14 +21,15 @@ import models.{Country, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
-import models.businessactivities.BusinessActivities
+import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover, CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.moneyservicebusiness._
+import models.renewal._
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -81,6 +82,23 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   "refreshCache" must {
 
+    val businessActivitiesSection = BusinessActivities(expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
+      involvedInOther = Some(BAInvolvedInOtherYes("test")),
+      customersOutsideUK = Some(BACustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)
+    )
+    val msbSection = MoneyServiceBusiness(
+      throughput = Some(ExpectedThroughput.Second),
+      transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+      sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+      whichCurrencies = Some(WhichCurrencies(Seq("USD", "GBP", "EUR"),None, None, None, None))
+    )
+    val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
+      None,None,None,None,None,None,None,None,false)
+
     val cacheMap = CacheMap("", Map.empty)
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -90,14 +108,15 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
-      businessActivitiesSection = None,
+      businessActivitiesSection = businessActivitiesSection,
       responsiblePeopleSection = None,
       tcspSection = None,
       aspSection = None,
-      msbSection = None,
+      msbSection = Some(msbSection),
       hvdSection = None,
       supervisionSection = None
     )
+    
 
     def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
       when {
@@ -126,6 +145,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, viewResponse.msbSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Renewal.key, renewalModel)
 
       whenReady(TestLandingService.refreshCache("regNo")){
         _ mustEqual cacheMap

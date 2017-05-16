@@ -19,7 +19,8 @@ package models.moneyservicebusiness
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsError, Json, JsPath, JsSuccess}
+import models.renewal.TotalThroughput
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedThroughputSpec extends PlaySpec {
 
@@ -113,7 +114,6 @@ class ExpectedThroughputSpec extends PlaySpec {
       }
 
       "write the correct value" in {
-
         Json.toJson(ExpectedThroughput.First) must
           be(Json.obj("throughput" -> "01"))
 
@@ -140,6 +140,16 @@ class ExpectedThroughputSpec extends PlaySpec {
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
           be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
       }
+    }
+
+    "convert to renewal throughput model" must {
+      ExpectedThroughput.convert(ExpectedThroughput.First) must be(TotalThroughput("01"))
+      ExpectedThroughput.convert(ExpectedThroughput.Second) must be(TotalThroughput("02"))
+      ExpectedThroughput.convert(ExpectedThroughput.Third) must be(TotalThroughput("03"))
+      ExpectedThroughput.convert(ExpectedThroughput.Fourth) must be(TotalThroughput("04"))
+      ExpectedThroughput.convert(ExpectedThroughput.Fifth) must be(TotalThroughput("05"))
+      ExpectedThroughput.convert(ExpectedThroughput.Sixth) must be(TotalThroughput("06"))
+      ExpectedThroughput.convert(ExpectedThroughput.Seventh) must be(TotalThroughput("07"))
     }
    
   }

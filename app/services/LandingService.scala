@@ -21,13 +21,14 @@ import models.{AmendVariationResponse, SubscriptionResponse, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
-import models.businessactivities.BusinessActivities
+import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
+import models.renewal._
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -74,6 +75,34 @@ trait LandingService {
     cacheConnector.remove(BusinessMatching.key)
   }
 
+  def getRenewalData(viewResponse: ViewResponse): Renewal = {
+
+    import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
+    import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
+
+    val data = Renewal(
+      involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i =>BAInvolvedInOther.convert(i)),
+      businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data =>ExpectedBusinessTurnover.convert(data)),
+      turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data =>ExpectedAMLSTurnover.convert(data)),
+      customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
+      percentageOfCashPaymentOver15000 = None,
+      receiveCashPayments = None,
+      totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
+      whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
+      transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
+        (_.transactionsInNext12Months.map(t =>TransactionsInLast12Months(t.txnAmount))),
+      sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
+        (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
+      mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
+        (_.mostTransactions.map(m => MostTransactions(m.countries))),
+      ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
+        (_.ceTransactionsInNext12Months.map(t =>CETransactionsInLast12Months(t.ceTransaction)))
+    )
+
+    println("data==="+ data)
+    data
+  }
+
   def refreshCache(amlsRefNumber: String)
                   (implicit
                    authContext: AuthContext,
@@ -94,7 +123,9 @@ trait LandingService {
                           _ => cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection) flatMap {
                             _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
                               _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
-                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection)
+                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
+                                  _ => cacheConnector.save[Renewal](Renewal.key, getRenewalData(viewResponse))
+                                }
                               }
                             }
                           }
