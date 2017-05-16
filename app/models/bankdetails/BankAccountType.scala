@@ -26,6 +26,7 @@ sealed trait BankAccountType
 case object PersonalAccount extends BankAccountType
 case object BelongsToBusiness extends BankAccountType
 case object BelongsToOtherBusiness extends BankAccountType
+case class SomeOtherAccountType(t: String) extends BankAccountType
 
 object BankAccountType {
 
