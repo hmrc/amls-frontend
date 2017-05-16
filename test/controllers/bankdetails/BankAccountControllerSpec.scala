@@ -16,20 +16,26 @@
 
 package controllers.bankdetails
 
+import audit.AddBankAccountEvent.BankAccountAuditDetail
 import connectors.DataCacheConnector
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.{AuditEvent, DataEvent}
 import utils.AuthorisedFixture
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
@@ -40,6 +46,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override implicit val statusService = mock[StatusService]
+      override val auditConnector = mock[AuditConnector]
     }
   }
 
@@ -146,6 +153,8 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
+
+          verify(controller.auditConnector, never()).sendEvent(any())(any(), any())
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
@@ -156,6 +165,8 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
             "isIBAN" -> "false"
           )
 
+          when(controller.auditConnector.sendEvent(any())(any(), any()))
+            .thenReturn(Future.successful(Success))
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
           when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
@@ -166,6 +177,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
         }
+
         "blahblah given valid data in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -226,6 +238,40 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
 
           status(result) must be(BAD_REQUEST)
         }
+      }
+    }
+
+    "an account is created" must {
+      "send an audit event" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "accountName" -> "test",
+          "isUK" -> "false",
+          "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+          "isIBAN" -> "false"
+        )
+
+        when(controller.auditConnector.sendEvent(any())(any(), any())).
+          thenReturn(Future.successful(Success))
+
+        when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Test account", UKAccount("8934798324", "934947"))))))))
+
+        when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
+
+        val captor = ArgumentCaptor.forClass(classOf[AuditEvent])
+        verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+        captor.getValue match {
+          case DataEvent(_, _, _, _, detail, _) =>
+            detail("accountName") mustBe "Test account"
+        }
+
       }
     }
   }
