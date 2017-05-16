@@ -56,10 +56,9 @@ trait PreviouslyRegisteredController extends BaseController {
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
               } yield {
                 dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                  getUpdatedModel(businessType, aboutTheBusiness, data))
+                  getUpdatedModel(businessType,  cache.getEntry[AboutTheBusiness](AboutTheBusiness.key), data))
                 getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
