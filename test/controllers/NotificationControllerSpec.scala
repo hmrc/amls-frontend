@@ -167,6 +167,10 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     "display the message view given the message id" when {
 
       "contactType is ApplicationAutorejectionForFailureToPay" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("Registration Number")))
 
@@ -180,6 +184,10 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
 
       "contactType is ReminderToPayForVariation" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("Registration Number")))
 

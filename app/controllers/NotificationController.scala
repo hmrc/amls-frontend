@@ -16,9 +16,11 @@
 
 package controllers
 
+import cats.data.OptionT
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
+import models.notifications.ContactType.MindedToRevoke
 import models.notifications._
 import play.api.Play
 import play.api.i18n.Messages
@@ -29,6 +31,7 @@ import utils.FeatureToggle
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import cats.implicits._
 
 trait NotificationController extends BaseController {
 
@@ -44,36 +47,35 @@ trait NotificationController extends BaseController {
         implicit request =>
           authEnrolmentsService.amlsRegistrationNumber flatMap {
             case Some(amlsRegNo) => {
-              dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { businessMatching =>
-                (for {
-                  bm <- businessMatching
-                  rd <- bm.reviewDetails
-                } yield {
-                  amlsNotificationService.getNotifications(amlsRegNo) map { records =>
-                    Ok(views.html.notifications.your_messages(rd.businessName, records))
-                  }
-                }) getOrElse (throw new Exception("Cannot retrieve business name"))
-              }
+              (for {
+                businessName <- OptionT(getBusinessName)
+                records <- OptionT.liftF(amlsNotificationService.getNotifications(amlsRegNo))
+              } yield {
+                Ok(views.html.notifications.your_messages(businessName, records))
+              }) getOrElse (throw new Exception("Cannot retrieve business name"))
             }
             case _ => throw new Exception("amlsRegNo does not exist")
           }
     }
   }
 
-  def messageDetails(id: String, contactType:ContactType) = FeatureToggle(ApplicationConfig.notificationsToggle) {
+
+  def messageDetails(id: String, contactType: ContactType) = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
       implicit authContext =>
         implicit request =>
           authEnrolmentsService.amlsRegistrationNumber flatMap {
-            case Some(regNo) => {
-              amlsNotificationService.getMessageDetails(regNo, id, contactType) map {
-                case Some(msg) => {
-                  contactType match {
-                    case _ => Ok(views.html.notifications.message_details(msg.subject, msg.messageText.getOrElse(Messages(msg.subject))))
-                  }
+            case Some(amlsRegNo) => {
+              (for {
+                businessName <- OptionT(getBusinessName)
+                msg <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
+                msgText <- OptionT.fromOption[Future](msg.messageText)
+              } yield {
+                contactType match {
+                  case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
+                  case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
-                case None => NotFound(notFoundView)
-              }
+              }) getOrElse NotFound(notFoundView)
             }
             case _ => Future.successful(BadRequest)
           }
