@@ -60,7 +60,6 @@ trait NotificationController extends BaseController {
     }
   }
 
-
   def messageDetails(id: String, contactType:ContactType) = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
       implicit authContext =>
@@ -68,7 +67,11 @@ trait NotificationController extends BaseController {
           authEnrolmentsService.amlsRegistrationNumber flatMap {
             case Some(regNo) => {
               amlsNotificationService.getMessageDetails(regNo, id, contactType) map {
-                case Some(msg) => Ok(views.html.notifications.message_details(msg.subject, msg.messageText.getOrElse(Messages(msg.subject))))
+                case Some(msg) => {
+                  contactType match {
+                    case _ => Ok(views.html.notifications.message_details(msg.subject, msg.messageText.getOrElse(Messages(msg.subject))))
+                  }
+                }
                 case None => NotFound(notFoundView)
               }
             }
@@ -76,6 +79,16 @@ trait NotificationController extends BaseController {
           }
     }
   }
+
+  private def getBusinessName(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[String]] = {
+    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map { businessMatching =>
+      for {
+        bm <- businessMatching
+        rd <- bm.reviewDetails
+      } yield rd.businessName
+    }
+  }
+
 }
 
 object NotificationController extends NotificationController {

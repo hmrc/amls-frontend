@@ -109,7 +109,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "respond with OK and show the your_messages page when there is valid data" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessMatching(Some(ReviewDetails("businessName",None,Address("line1","line2",None,None,None,Country("countryName","US")),"safeId"))))))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
 
       when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(Some("")))
@@ -123,6 +123,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "throw an exception" when {
+
       "business name cannot be retrieved" in new Fixture {
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -140,6 +141,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         result.getMessage mustBe "Cannot retrieve business name"
 
       }
+
       "enrolment does not exist" in new Fixture {
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -156,39 +158,74 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         result.getMessage mustBe "amlsRegNo does not exist"
       }
+
     }
   }
 
   "messageDetails" must {
-    "display the message view given the message id for contactType ApplicationAutorejectionForFailureToPay" in new Fixture {
-      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-        .thenReturn(Future.successful(Some("Registration Number")))
 
-      when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(NotificationDetails(Some(ApplicationAutorejectionForFailureToPay), None, Some("Message Text"), false))))
+    "display the message view given the message id" when {
 
-      val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
+      "contactType is ApplicationAutorejectionForFailureToPay" in new Fixture {
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("Registration Number")))
 
-      status(result) mustBe 200
-      contentAsString(result) must include("Message Text")
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(Some(ApplicationAutorejectionForFailureToPay), None, Some("Message Text"), false))))
+
+        val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include("Message Text")
+      }
+
+      "contactType is ReminderToPayForVariation" in new Fixture {
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("Registration Number")))
+
+        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(Some(ReminderToPayForVariation), None, Some(reminderVariationMessage), false))))
+
+        val result = controller.messageDetails("dfgdhsjk",ContactType.ReminderToPayForVariation)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include(
+          reminderVariationMessage
+        )
+      }
+
     }
 
-    "display the message view given the message id for contactType ReminderToPayForVariation" in new Fixture {
-      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-        .thenReturn(Future.successful(Some("Registration Number")))
+    "display minded_to_revoke" when {
 
-      val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+      "contact is MTRV" in new Fixture {
 
-      when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(NotificationDetails(Some(ReminderToPayForVariation), None, Some(reminderVariationMessage), false))))
+        val amlsRegNo = "regNo"
+        val msgTxt = "Considering revokation"
 
-      val result = controller.messageDetails("dfgdhsjk",ContactType.ReminderToPayForVariation)(request)
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
 
-      status(result) mustBe 200
-      contentAsString(result) must include(
-        reminderVariationMessage
-      )
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegNo)))
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(Some(MindedToRevoke), None, Some(msgTxt), false))))
+
+        val result = controller.messageDetails("dfgdhsjk",ContactType.MindedToRevoke)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include(Messages("notifications.mtrv.title"))
+        contentAsString(result) must include(msgTxt)
+        contentAsString(result) must include(amlsRegNo)
+        contentAsString(result) must include(testBusinessName)
+
+      }
+
     }
+
   }
 }
 
