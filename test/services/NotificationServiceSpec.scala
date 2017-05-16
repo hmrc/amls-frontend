@@ -42,6 +42,7 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
   trait Fixture extends AuthorisedFixture {
 
     implicit val authContext = mock[AuthContext]
+
     val amlsNotificationConnector = mock[AmlsNotificationConnector]
 
     val injector = new GuiceInjectorBuilder()
@@ -254,21 +255,6 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
       result.get.messageText.get mustBe Messages("notification.message.with.end.date.RenewalReminder",new LocalDate(2018, 7, 31))
     }
 
-    "return correct message content when contact type is not ReminderToPay or static content" in new Fixture {
-
-      val message = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-
-      when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(
-          NotificationDetails(Some(MindedToReject),
-            None,
-            Some(message),
-            true))))
-
-      val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToReject))
-
-      result.get.messageText.get mustBe message
-    }
 
     "return None" when {
       "getMessageDetails returns None and message is of type with end date only message" in new Fixture {
@@ -302,6 +288,22 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar{
 
         result mustBe None
 
+      }
+
+      "return correct message content message is ETMP markdown" in new Fixture {
+
+        val message = "<P># Test Heading</P><P>* bullet 1</P><P>* bullet 2</P><P>* bullet 3</P>"
+
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(
+            NotificationDetails(Some(MindedToReject),
+              None,
+              Some(message),
+              true))))
+
+        val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToRevoke))
+
+        result.get.messageText.get mustBe CustomAttributeProvider.commonMark(message)
       }
     }
   }
