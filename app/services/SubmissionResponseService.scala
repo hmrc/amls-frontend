@@ -275,11 +275,11 @@ trait SubmissionResponseService extends DataCacheService {
     } else {
       Seq.empty
     }
-
   }
 
 }
 
 object SubmissionResponseService extends SubmissionResponseService {
+  // $COVERAGE-OFF$
   override private[services] val cacheConnector = DataCacheConnector
 }
