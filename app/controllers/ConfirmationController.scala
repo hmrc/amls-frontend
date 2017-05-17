@@ -28,7 +28,7 @@ import models.renewal.Renewal
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
-import services.{StatusService, SubmissionService}
+import services.{SubmissionResponseService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait ConfirmationController extends BaseController {
 
-  private[controllers] def submissionService: SubmissionService
+  private[controllers] def submissionResponseService: SubmissionResponseService
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
@@ -117,7 +117,7 @@ trait ConfirmationController extends BaseController {
         }
       case _ =>
         for {
-          (paymentRef, total, rows) <- OptionT.liftF(submissionService.getSubscription)
+          (paymentRef, total, rows) <- OptionT.liftF(submissionResponseService.getSubscription)
           paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((paymentRef, total, rows, None),
             routes.ConfirmationController.paymentConfirmation(paymentRef).url))
         } yield {
@@ -152,7 +152,7 @@ trait ConfirmationController extends BaseController {
     }
 
   private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionService.getAmendment flatMap {
+    submissionResponseService.getAmendment flatMap {
       case Some((paymentRef, total, rows, difference)) =>
         (difference, paymentRef) match {
           case (Some(currency), Some(payRef)) if currency.value > 0 => Future.successful(Some((payRef, total, rows, difference)))
@@ -163,7 +163,7 @@ trait ConfirmationController extends BaseController {
   }
 
   private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionService.getVariation flatMap {
+    submissionResponseService.getVariation flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
           case Some(payRef) if total.value > 0 =>
@@ -177,7 +177,7 @@ trait ConfirmationController extends BaseController {
   }
 
   private def getRenewalFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionService.getRenewal flatMap {
+    submissionResponseService.getRenewal flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
           case Some(payRef) if total.value > 0 =>
@@ -194,7 +194,7 @@ trait ConfirmationController extends BaseController {
 object ConfirmationController extends ConfirmationController {
   // $COVERAGE-OFF$
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val submissionService = SubmissionService
+  override private[controllers] val submissionResponseService = SubmissionResponseService
   override val statusService: StatusService = StatusService
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
