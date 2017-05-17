@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import audit.AddressConversions._
 import models.Country
-import models.aboutthebusiness.{RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.aboutthebusiness.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 
 class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
@@ -97,6 +97,33 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
           "country" -> "Scotland"
+        )
+
+        event.detail mustBe expected
+      }
+
+      "given a correspondence address in the UK" in {
+        val address = UKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, "NE1 1ET")
+        val event = AddressCreatedEvent(address)
+        val expected = hc.toAuditDetails() ++ Map(
+          "addressLine1" -> "CA Line 1",
+          "addressLine2" -> "CA Line 2",
+          "addressLine3" -> "CA Line 3",
+          "country" -> "GB",
+          "postCode" -> "NE1 1ET"
+        )
+
+        event.detail mustBe expected
+      }
+
+      "given a correspondence address outside the UK" in {
+        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
+        val event = AddressCreatedEvent(address)
+        val expected = hc.toAuditDetails() ++ Map(
+          "addressLine1" -> "CA Line 1",
+          "addressLine2" -> "CA Line 2",
+          "addressLine3" -> "CA Line 3",
+          "country" -> "Finland"
         )
 
         event.detail mustBe expected

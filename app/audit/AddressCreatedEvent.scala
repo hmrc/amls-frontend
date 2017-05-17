@@ -77,4 +77,7 @@ object AddressConversions {
 
   implicit def convert(address: UKCorrespondenceAddress): AuditAddress =
     AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode.some)
+
+  implicit def convert(address: NonUKCorrespondenceAddress): AuditAddress =
+    AuditAddress(address.addressLineNonUK1, address.addressLineNonUK2, address.addressLineNonUK3, address.country.name, None)
 }
