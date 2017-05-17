@@ -16,20 +16,19 @@
 
 @import include._
 
-@(msgContent: String, amlsRegNo: String, businessName: String)(implicit request: Request[_],m:Messages)
+@(msgContent: String, businessName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading(Messages("notifications.mtrv.title"), "summary.status")
+    @heading(Messages("notifications.mtrj.title"), "summary.status")
 }
 
 @main(
-    title = Messages(Messages("notifications.mtrv.title")) + " - " + Messages("summary.status"),
+    title = Messages(Messages("notifications.mtrj.title")) + " - " + Messages("summary.status"),
     heading = header
 )  {
 
-    <p>Your reference: @amlsRegNo</p>
-    <p>We&#8217;re considering revoking your supervision under the Money Laundering Regulations 2007 for @businessName.</p>
-    <p>If we do revoke your application, you&#8217;ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by the Money Laundering Regulations 2007.<p>
+    <p>Your application to register @businessName for supervision under the Money Laundering Regulations 2007 has been considered and we currently believe it should be refused.</p>
+    <p>If we do reject your application, you’ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by the Money Laundering Regulations 2007.<p>
 
     <h2 class="heading-medium">@Messages("notifications.reason.considering.refusal")</h2>
     <p>@Html(msgContent)</p>

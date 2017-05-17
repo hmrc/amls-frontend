@@ -222,11 +222,33 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(Some(MindedToRevoke), None, Some(msgTxt), false))))
 
-        val result = controller.messageDetails("dfgdhsjk",ContactType.MindedToRevoke)(request)
+        val result = controller.messageDetails("id",ContactType.MindedToRevoke)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(amlsRegNo)
+        contentAsString(result) must include(testBusinessName)
+
+      }
+
+      "contact is MTRJ" in new Fixture {
+
+        val amlsRegNo = "regNo"
+        val msgTxt = "Considering revokation"
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegNo)))
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(Some(MindedToReject), None, Some(msgTxt), false))))
+
+        val result = controller.messageDetails("id",ContactType.MindedToReject)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(testBusinessName)
 
       }
