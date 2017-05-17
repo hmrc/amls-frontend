@@ -31,11 +31,11 @@ class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
   }
 
-  "branches_or_agents view" must {
+  "minded_to_reject view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_reject("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", businessName)
 
       doc.title must be(Messages("notifications.mtrj.title") +
         " - " + Messages("status.title") +
@@ -45,7 +45,7 @@ class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_reject("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", businessName)
 
       heading.html must be(Messages("notifications.mtrj.title"))
       subHeading.html must include(Messages("status.title"))

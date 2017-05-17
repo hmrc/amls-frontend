@@ -31,7 +31,7 @@ class minded_to_revokeSpec extends GenericTestHelper with MustMatchers {
 
   }
 
-  "branches_or_agents view" must {
+  "minded_to_revoke view" must {
 
     "have correct title" in new ViewFixture {
 

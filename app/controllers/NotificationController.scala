@@ -20,7 +20,7 @@ import cats.data.OptionT
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import models.notifications.ContactType.MindedToRevoke
+import models.notifications.ContactType.{MindedToReject, MindedToRevoke}
 import models.notifications._
 import play.api.Play
 import play.api.i18n.Messages
@@ -72,6 +72,7 @@ trait NotificationController extends BaseController {
               } yield {
                 contactType match {
                   case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
+                  case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
                   case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
               }) getOrElse NotFound(notFoundView)
