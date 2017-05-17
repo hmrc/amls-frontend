@@ -19,7 +19,7 @@ package controllers.aboutthebusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms._
 import models.aboutthebusiness.{RegisteredOffice, AboutTheBusiness, LettersAddress}
 import views.html.aboutthebusiness._
 
@@ -31,7 +31,20 @@ trait LettersAddressController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      for {
+        aboutTheBusiness <-
+        dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+      } yield aboutTheBusiness match {
+        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), Some(correspondenceAddress), _)) =>
+          Ok(letters_address(Form2[LettersAddress](request.body), registeredOffice, edit))
+        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _)) =>
+          Ok(letters_address(EmptyForm, registeredOffice, edit))
+        case _ =>
+          // TODO: Make sure this redirects to the right place
+          Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+      }
+
+    /*dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
         response =>
           val regOffice: Option[RegisteredOffice] = (for {
             aboutTheBusiness <- response
@@ -41,7 +54,7 @@ trait LettersAddressController extends BaseController {
             case Some(data) => Ok(letters_address(EmptyForm, data, edit))
             case _ => Redirect(routes.CorrespondenceAddressController.get())
           }
-      }
+      }*/
   }
 
   def post(edit: Boolean = false) = Authorised.async {

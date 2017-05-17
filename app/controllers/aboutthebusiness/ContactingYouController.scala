@@ -62,11 +62,13 @@ trait ContactingYouController extends BaseController {
           for {
             aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.contactingYou(data).correspondenceAddress(None)
+              aboutTheBusiness.contactingYou(data)
             )
-            //correspondenceAddress <- aboutTheBusiness.correspondenceAddress
           } yield {
-            Redirect(routes.LettersAddressController.get(edit))
+            (aboutTheBusiness, edit) match {
+              case (Some(AboutTheBusiness(_,_,_,_,_,_,Some(correspondenceAddress),_)), true) => Redirect(routes.SummaryController.get())
+              case _ => Redirect(routes.LettersAddressController.get(edit))
+            }
           }
       }
   }
