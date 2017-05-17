@@ -81,10 +81,10 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(1, true)(postRequest)
+          val result = controller.post(1, false)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, false).url))
 
         }
       }
@@ -110,10 +110,10 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(1, true)(postRequest)
+          val result = controller.post(1, false)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, false).url))
 
         }
       }
@@ -157,6 +157,35 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePeople(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+
+        }
+      }
+      "given valid data for a current address time SixToElevenMonths" must {
+        "redirect to the details page when in edit mode" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),

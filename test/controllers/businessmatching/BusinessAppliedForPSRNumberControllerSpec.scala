@@ -121,7 +121,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with M
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.CannotContinueWithTheApplicationController.get().url))
-        verify(controller.dataCacheConnector, times(1)).remove(any())(any())
+        verify(controller.dataCacheConnector, times(1)).save(any(), any())(any(), any(), any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

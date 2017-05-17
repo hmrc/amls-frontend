@@ -88,7 +88,7 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
 
               doUpdate(index, dateOfChange).map { _ =>
                 timeAtCurrentO match {
-                  case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) =>
+                  case (Some(ZeroToFiveMonths) | Some(SixToElevenMonths)) if !edit =>
                     Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
                   case Some(_) => Redirect(routes.DetailedAnswersController.get(index))
                 }
