@@ -26,7 +26,7 @@ sealed trait PercentageOfCashPaymentOver15000
 
 object PercentageOfCashPaymentOver15000 {
 
-  def convert(model: PercentageOfCashPaymentOver15000): RPercentageOfCashPaymentOver15000 = {
+  implicit def convert(model: PercentageOfCashPaymentOver15000): RPercentageOfCashPaymentOver15000 = {
     model match {
       case First => RPercentageOfCashPaymentOver15000.First
       case Second => RPercentageOfCashPaymentOver15000.Second

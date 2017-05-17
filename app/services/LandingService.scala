@@ -17,7 +17,7 @@
 package services
 
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
-import models.{AmendVariationResponse, SubscriptionResponse, ViewResponse}
+import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -28,12 +28,12 @@ import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
-import models.renewal._
+import models.renewal.{ReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.{Format, Writes}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -47,6 +47,8 @@ trait LandingService {
   private[services] def keyStore: KeystoreConnector
 
   private[services] def desConnector: AmlsConnector
+
+  private[services] def statusService: StatusService
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -75,36 +77,43 @@ trait LandingService {
     cacheConnector.remove(BusinessMatching.key)
   }
 
-  def getRenewalData(viewResponse: ViewResponse): Renewal = {
+  def getRenewalData(viewResponse: ViewResponse)(implicit
+                                                 authContext: AuthContext,
+                                                 hc: HeaderCarrier,
+                                                 ec: ExecutionContext
+  ): Future[Option[Renewal]] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
+    import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000, ReceiveCashPayments => HvdReceiveCashPayments}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
-    import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}
 
-    val data = Renewal(
-      involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i =>BAInvolvedInOther.convert(i)),
-      businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data =>ExpectedBusinessTurnover.convert(data)),
-      turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data =>ExpectedAMLSTurnover.convert(data)),
-      customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
-      percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
-      (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
-      receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
-        (_.receiveCashPayments.map(r => ReceiveCashPayments(r.paymentMethods))),
-      totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
-      whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
-      transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
-        (_.transactionsInNext12Months.map(t =>TransactionsInLast12Months(t.txnAmount))),
-      sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
-        (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
-      mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
-        (_.mostTransactions.map(m => MostTransactions(m.countries))),
-      ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
-        (_.ceTransactionsInNext12Months.map(t =>CETransactionsInLast12Months(t.ceTransaction)))
-    )
-
-    println("data==="+ data)
+    val data = statusService.getStatus map {
+      case RenewalSubmitted(_) => Some(Renewal(
+        involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i =>BAInvolvedInOther.convert(i)),
+        businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data =>ExpectedBusinessTurnover.convert(data)),
+        turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data =>ExpectedAMLSTurnover.convert(data)),
+        customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
+        percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
+          (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
+        receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
+          (_.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(r))),
+        totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
+        whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
+        transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
+          (_.transactionsInNext12Months.map(t =>TransactionsInLast12Months(t.txnAmount))),
+        sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
+          (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
+        mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
+          (_.mostTransactions.map(m => MostTransactions(m.countries))),
+        ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
+          (_.ceTransactionsInNext12Months.map(t =>CETransactionsInLast12Months(t.ceTransaction)))
+      ))
+      case _=> None
+    }
+ println("data==="+ data)
     data
   }
+
 
   def refreshCache(amlsRefNumber: String)
                   (implicit
@@ -127,7 +136,9 @@ trait LandingService {
                             _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
                               _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
                                 _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
-                                  _ => cacheConnector.save[Renewal](Renewal.key, getRenewalData(viewResponse))
+                                  _ => getRenewalData(viewResponse) flatMap {renewal =>
+                                    cacheConnector.save[Renewal](Renewal.key, renewal)
+                                  }
                                 }
                               }
                             }
@@ -187,5 +198,6 @@ object LandingService extends LandingService {
 
   override private[services] def desConnector = AmlsConnector
 
+  override private[services] def statusService = StatusService
   // $COVERAGE-ON$
 }

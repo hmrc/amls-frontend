@@ -127,6 +127,7 @@ trait WhoIsRegisteringController extends BaseController {
           case Some(_) => status(who_is_registering_this_renewal(form, rp))
           case _ => status(who_is_registering_this_update(form, rp))
         }
+      case RenewalSubmitted(_) => Future.successful(status(who_is_registering_this_update(form, rp)))
       case _ => Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
 
