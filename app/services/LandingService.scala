@@ -110,7 +110,10 @@ trait LandingService {
       ))
       case _=> None
     }
- println("data==="+ data)
+    data map {x =>
+      println("data=============================================================="+ x)
+    }
+
     data
   }
 
