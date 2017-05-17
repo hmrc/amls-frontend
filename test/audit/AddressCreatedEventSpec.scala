@@ -24,7 +24,8 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import audit.AddressConversions._
 import models.Country
-import models.tradingpremises.{ Address => TradingPremisesAddress }
+import models.aboutthebusiness.RegisteredOfficeUK
+import models.tradingpremises.{Address => TradingPremisesAddress}
 
 class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
@@ -67,6 +68,20 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
           "addressLine1" -> "TP Line 1",
           "addressLine2" -> "TP Line 2",
           "addressLine3" -> "TP Line 3",
+          "country" -> "GB",
+          "postCode" -> "a post code"
+        )
+
+        event.detail mustBe expected
+      }
+
+      "given the address of a registered office in the UK" in {
+        val address = RegisteredOfficeUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, "a post code")
+        val event = AddressCreatedEvent(address)
+        val expected = hc.toAuditDetails() ++ Map(
+          "addressLine1" -> "RO Line 1",
+          "addressLine2" -> "RO Line 2",
+          "addressLine3" -> "RO Line 3",
           "country" -> "GB",
           "postCode" -> "a post code"
         )
