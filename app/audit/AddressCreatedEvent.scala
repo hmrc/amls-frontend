@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import Utils.toMap
 import play.api.libs.json.Json
 import cats.implicits._
-import models.aboutthebusiness.{RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.aboutthebusiness._
 import models.tradingpremises.{Address => TradingPremisesAddress}
 
 case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
@@ -69,4 +69,12 @@ object AddressConversions {
 
   implicit def convert(address: RegisteredOfficeNonUK): AuditAddress =
     AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, address.country.name, None)
+
+  implicit def convert(address: CorrespondenceAddress): AuditAddress = address match {
+    case a: UKCorrespondenceAddress => convert(a)
+    case a: NonUKCorrespondenceAddress => convert(a)
+  }
+
+  implicit def convert(address: UKCorrespondenceAddress): AuditAddress =
+    AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode.some)
 }
