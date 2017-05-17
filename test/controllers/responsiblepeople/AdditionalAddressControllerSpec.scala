@@ -23,8 +23,10 @@ import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMont
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
+
 import scala.collection.JavaConversions._
 import org.jsoup.select.Elements
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -32,6 +34,9 @@ import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -47,7 +52,12 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
     val additionalAddressController = new AdditionalAddressController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
+      override lazy val auditConnector = mock[AuditConnector]
     }
+
+    when {
+      additionalAddressController.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -175,6 +185,16 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           val result = additionalAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(additionalAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+          }
         }
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
@@ -198,6 +218,16 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           val result = additionalAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(additionalAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("country") mustBe "Spain"
+          }
         }
 
       }
