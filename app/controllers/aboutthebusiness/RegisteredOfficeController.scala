@@ -57,13 +57,11 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        val resultPromise = Promise[Result]
-
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
-            resultPromise success BadRequest(registered_office(f, edit))
+            Future.successful(BadRequest(registered_office(f, edit)))
           case ValidForm(_, data) =>
-            for {
+            (for {
               aboutTheBusiness <-
               dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
               _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
@@ -72,19 +70,17 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
             } yield {
               status match {
                 case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
-                  resultPromise success Redirect(routes.RegisteredOfficeDateOfChangeController.get())
+                  Future.successful(Redirect(routes.RegisteredOfficeDateOfChangeController.get()))
                 case _ => edit match {
-                  case true => resultPromise success Redirect(routes.SummaryController.get())
+                  case true => Future.successful(Redirect(routes.SummaryController.get()))
                   case _ =>
                     auditConnector.sendEvent(AddressCreatedEvent(data)) map { _ =>
-                      resultPromise success Redirect(routes.ContactingYouController.get(edit))
+                      Redirect(routes.ContactingYouController.get(edit))
                     }
                 }
               }
-            }
+            }).flatMap(identity)
         }
-
-        resultPromise.future
   }
 
 }
