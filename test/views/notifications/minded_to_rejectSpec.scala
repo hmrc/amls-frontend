@@ -21,7 +21,7 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class minded_to_revokeSpec extends GenericTestHelper with MustMatchers {
+class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
@@ -35,9 +35,9 @@ class minded_to_revokeSpec extends GenericTestHelper with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", "amlsRegNo", businessName)
 
-      doc.title must be(Messages("notifications.mtrv.title") +
+      doc.title must be(Messages("notifications.mtrj.title") +
         " - " + Messages("status.title") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -45,9 +45,9 @@ class minded_to_revokeSpec extends GenericTestHelper with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", "amlsRegNo", businessName)
 
-      heading.html must be(Messages("notifications.mtrv.title"))
+      heading.html must be(Messages("notifications.mtrj.title"))
       subHeading.html must include(Messages("status.title"))
 
     }
