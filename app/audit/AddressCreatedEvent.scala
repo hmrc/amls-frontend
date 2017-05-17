@@ -38,7 +38,7 @@ object AddressCreatedEvent {
   def apply(address: AuditAddress)(implicit hc: HeaderCarrier) = DataEvent(
     auditSource = AppName.appName,
     auditType = "manualAddressSubmitted",
-    tags = hc.toAuditTags("manualBankAccountSubmitted", "n/a"),
+    tags = hc.toAuditTags("manualAddressSubmitted", "n/a"),
     detail = hc.toAuditDetails() ++ toMap(address)
   )
 
