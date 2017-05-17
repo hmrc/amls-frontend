@@ -1543,6 +1543,11 @@ notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
 
+notifications.reason.considering.refusal = Reason for considering refusal
+
+notifications.mtrv.title = Revocation being considered
+notifications.mtrj.title = Refusal being considered
+
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
 renewal.whatyouneed.line_1 = your net profit

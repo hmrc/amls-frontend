@@ -26,7 +26,6 @@ import models.Country
 import play.api.i18n.Messages
 import views.Fixture
 
-
 class branches_or_agentsSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
