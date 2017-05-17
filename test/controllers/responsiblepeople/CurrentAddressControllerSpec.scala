@@ -16,6 +16,7 @@
 
 package controllers.responsiblepeople
 
+import audit.AddressCreatedEvent
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
@@ -25,6 +26,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -36,13 +38,19 @@ import scala.collection.JavaConversions._
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
+import audit.AddressConversions._
+import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.AuditExtensions._
 
 import scala.concurrent.Future
 
 class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
-
+  implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
@@ -51,10 +59,14 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
     val currentAddressController = new CurrentAddressController {
       override val dataCacheConnector = mockDataCacheConnector
+      override val auditConnector = mock[AuditConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
-
     }
+
+    when {
+      currentAddressController.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
@@ -185,6 +197,15 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(currentAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+          }
         }
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
@@ -212,6 +233,15 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(currentAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("country") mustBe "Spain"
+          }
         }
 
       }

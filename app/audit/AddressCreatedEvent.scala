@@ -17,7 +17,7 @@
 package audit
 
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
+import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -45,6 +45,11 @@ object AddressCreatedEvent {
 }
 
 object AddressConversions {
+  implicit def convert(address: PersonAddress): AuditAddress = address match {
+    case a: PersonAddressUK => convert(a)
+    case a: PersonAddressNonUK => convert(a)
+  }
+
   implicit def convert(address: PersonAddressUK): AuditAddress =
     AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode.some)
 
