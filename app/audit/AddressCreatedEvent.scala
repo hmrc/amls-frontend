@@ -17,14 +17,15 @@
 package audit
 
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import models.responsiblepeople.PersonAddressUK
+import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
 import Utils.toMap
 import play.api.libs.json.Json
+import cats.implicits._
 
-case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: String)
+case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
 
 object AuditAddress {
   implicit val format = Json.format[AuditAddress]
@@ -42,8 +43,9 @@ object AddressCreatedEvent {
 }
 
 object AddressConversions {
-
   implicit def convert(address: PersonAddressUK): AuditAddress =
-    AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode)
+    AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode.some)
 
+  implicit def convert(address: PersonAddressNonUK): AuditAddress =
+    AuditAddress(address.addressLineNonUK1, address.addressLineNonUK2, address.addressLineNonUK3, address.country.name, None)
 }

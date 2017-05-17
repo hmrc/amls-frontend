@@ -16,13 +16,14 @@
 
 package audit
 
-import models.responsiblepeople.PersonAddressUK
+import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import cats.implicits._
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import audit.AddressConversions._
+import models.Country
 
 class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
@@ -44,7 +45,19 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
 
         event.detail mustBe expected
       }
+
+      "given an address of a responsible person outside the UK" in {
+        val address = PersonAddressNonUK("Line 1", "Line 2", "Line 3".some, None, Country("Norway", "NW"))
+        val event = AddressCreatedEvent(address)
+        val expected = hc.toAuditDetails() ++ Map(
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "addressLine3" -> "Line 3",
+          "country" -> "Norway"
+        )
+
+        event.detail mustBe expected
+      }
     }
   }
-
 }
