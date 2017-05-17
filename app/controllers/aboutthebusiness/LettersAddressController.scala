@@ -55,14 +55,14 @@ trait LettersAddressController extends BaseController {
                 registeredOffice <- aboutTheBusiness.registeredOffice
               } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
               regOffice match {
-                case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
-                case _ => Redirect(routes.RegisteredOfficeController.get(edit))
+                case Some(data) => BadRequest(letters_address(f, data))
+                case _ => Redirect(routes.CorrespondenceAddressController.get(edit))
               }
           }
         case ValidForm(_, data) =>
-          data.isRegOfficeOrMainPlaceOfBusiness match {
-            case true => Future.successful(Redirect(routes.ContactingYouController.get(edit)))
-            case false => Future.successful(Redirect(routes.RegisteredOfficeController.get(edit)))
+          data.lettersAddress match {
+            case true => Future.successful(Redirect(routes.SummaryController.get()))
+            case false => Future.successful(Redirect(routes.CorrespondenceAddressController.get(edit)))
           }
       }
   }

@@ -101,7 +101,7 @@ error.required.atb.registered.for.vat = Select yes if your business is registere
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
-error.required.rightaddress = Select yes if this is the right address to send you letters
+error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses

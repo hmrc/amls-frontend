@@ -20,7 +20,7 @@ import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class LettersAddress(isRegOfficeOrMainPlaceOfBusiness: Boolean)
+case class LettersAddress(lettersAddress: Boolean)
 
 object LettersAddress {
 
@@ -30,12 +30,12 @@ object LettersAddress {
   implicit val formRule: Rule[UrlFormEncoded, LettersAddress] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "isRegOfficeOrMainPlaceOfBusiness").read[Boolean].withMessage("error.required.atb.confirm.office") map LettersAddress.apply
+      (__ \ "lettersAddress").read[Boolean].withMessage("error.required.atb.lettersaddress") map LettersAddress.apply
     }
 
   implicit val formWrites: Write[LettersAddress, UrlFormEncoded] =
     Write {
       case LettersAddress(b) =>
-        Map("isRegOfficeOrMainPlaceOfBusiness" -> Seq(b.toString))
+        Map("lettersAddress" -> Seq(b.toString))
     }
 }

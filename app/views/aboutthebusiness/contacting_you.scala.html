@@ -17,10 +17,9 @@
 @import forms.Form2
 @import include._
 @import forms2._
-@import models.aboutthebusiness._
 @import play.api.i18n.Messages
 
-@(f: Form2[_], model: RegisteredOffice, edit: Boolean)(implicit request: Request[_],m:Messages, lang:Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang:Lang)
 
 @header = {
     @errorSummary(f)
@@ -56,33 +55,6 @@
                 attrMaxlength = "24",
                 attrPattern = "[0-9()+\\- ]{1,24}"
             )
-        }
-
-        @registered_office_helper(model)
-
-        @fieldset(
-            f = f("letterToThisAddress-fieldset"),
-            legend = "aboutthebusiness.contactingyou.sendletter.lbl",
-            panel = false
-        ) {
-
-            @errorGroup(
-                field = f("letterToThisAddress")
-            ) {
-
-                @radio(
-                    f = f("letterToThisAddress"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("letterToThisAddress"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
         }
 
         @submit()

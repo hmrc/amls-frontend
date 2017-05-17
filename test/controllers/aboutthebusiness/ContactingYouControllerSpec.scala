@@ -19,7 +19,7 @@ package controllers.aboutthebusiness
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, RegisteredOfficeUK}
+import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -39,8 +39,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou("+44 (0)123 456-7890", "test@test.com"))
-  val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
-  val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
+  val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -59,10 +58,8 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
       "load the page" in new Fixture {
 
-        val aboutTheBusinessWithAddress = AboutTheBusiness(registeredOffice = Some(ukAddress))
-
         when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithAddress)))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -95,9 +92,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val newRequest = request.withFormUrlEncodedBody(
           "phoneNumber" -> "+44 (0)123 456-7890",
-          "email" -> "test@test.com",
-          "website" -> "website",
-          "letterToThisAddress" -> "true"
+          "email" -> "test@test.com"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -108,7 +103,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
       }
 
 
@@ -132,9 +127,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val newRequest = request.withFormUrlEncodedBody(
           "phoneNumber" -> "+44 (0)123 456_7890",
-          "email" -> "test@test.com",
-          "website" -> "website",
-          "letterToThisAddress" -> "true"
+          "email" -> "test@test.com"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -166,26 +159,6 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(routes.ContactingYouController.get().url)
-      }
-
-      "load the page with valid data and letterToThisAddress set to false" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890",
-          "email" -> "test@test.com",
-          "website" -> "website",
-          "letterToThisAddress" -> "false"
-        )
-
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
-
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.CorrespondenceAddressController.get().url)
       }
 
     }
