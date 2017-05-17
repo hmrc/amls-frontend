@@ -251,6 +251,10 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
       override val statusService = mock[StatusService]
       override val auditConnector = mock[AuditConnector]
     }
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
