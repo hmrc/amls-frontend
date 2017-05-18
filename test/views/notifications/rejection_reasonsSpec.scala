@@ -35,7 +35,7 @@ class rejection_reasonsSpec extends GenericTestHelper with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
 
       doc.title must be(Messages("notifications.rejr.title") +
         " - " + Messages("status.title") +
@@ -45,7 +45,7 @@ class rejection_reasonsSpec extends GenericTestHelper with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
 
       heading.html must be(Messages("notifications.rejr.title"))
       subHeading.html must include(Messages("status.title"))

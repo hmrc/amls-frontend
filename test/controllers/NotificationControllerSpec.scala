@@ -186,7 +186,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
+        val result = controller.messageDetails("dfgdhsjk", ContactType.ApplicationAutorejectionForFailureToPay)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include("Message Text")
@@ -194,7 +194,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "contactType is ReminderToPayForVariation" in new Fixture {
 
-        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation", Currency(1234), "ABC1234")
 
         val notificationDetails = NotificationDetails(
           Some(ReminderToPayForVariation),
@@ -213,7 +213,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk",ContactType.ReminderToPayForVariation)(request)
+        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(
@@ -224,7 +224,6 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "display minded_to_revoke" when {
-
       "contact is MTRV" in new Fixture {
 
         val amlsRegNo = "regNo"
@@ -246,7 +245,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id",ContactType.MindedToRevoke)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToRevoke)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -254,7 +253,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(testBusinessName)
 
       }
+    }
 
+    "display minded_to_reject" when {
       "contact is MTRJ" in new Fixture {
 
         val amlsRegNo = "regNo"
@@ -276,14 +277,45 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id",ContactType.MindedToReject)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToReject)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(testBusinessName)
 
       }
+    }
 
+    "display rejection_reasons" when {
+      "contact is REJR" in new Fixture {
+
+        val amlsRegNo = "regNo"
+        val msgTxt = "Rejected"
+        val notificationDetails = NotificationDetails(
+          Some(RejectionReasons),
+          None,
+          Some(msgTxt),
+          false,
+          dateTime
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegNo)))
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(notificationDetails)))
+
+        val result = controller.messageDetails("id", ContactType.RejectionReasons)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include(msgTxt)
+        contentAsString(result) must include(testBusinessName)
+        contentAsString(result) must include(notificationDetails.dateReceived)
+
+      }
     }
 
   }
@@ -331,7 +363,7 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
         status(controller.getMessages()(request)) mustBe 404
       }
       "viewing an individual message" in new Fixture {
-        status(controller.messageDetails("",ContactType.MindedToRevoke)(request)) mustBe 404
+        status(controller.messageDetails("", ContactType.MindedToRevoke)(request)) mustBe 404
       }
     }
   }

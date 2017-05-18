@@ -72,7 +72,7 @@ trait NotificationController extends BaseController {
                 contactType match {
                   case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
                   case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
-                  case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName))
+                  case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
                   case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
               }) getOrElse NotFound(notFoundView)
