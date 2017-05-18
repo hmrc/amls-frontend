@@ -19,17 +19,21 @@ package models.notifications
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 import models.notifications.StatusType.DeRegistered
-import org.joda.time.LocalDate
-import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
-import play.api.libs.json.Json
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
+import play.api.libs.json._
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
                                messageText: Option[String],
-                               variation: Boolean) {
+                               variation: Boolean,
+                               receivedAt: DateTime) {
 
-  def subject = {
-    s"notifications.subject.$getContactType"
+  def subject = s"notifications.subject.$getContactType"
+
+  def dateReceived = {
+    val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
+    receivedAt.toString(fmt)
   }
 
   private def getContactType: ContactType = {
@@ -48,6 +52,7 @@ case class NotificationDetails(contactType: Option[ContactType],
       }
     )
   }
+
 }
 
 object NotificationDetails {
@@ -86,5 +91,12 @@ object NotificationDetails {
 
   private def splitByDash(s: String): String = s.split("-")(1)
 
+  implicit val dateTimeRead: Reads[DateTime] = {
+    (__ \ "$date").read[Long].map { dateTime =>
+      new DateTime(dateTime, DateTimeZone.UTC)
+    }
+  }
+
   implicit val reads = Json.reads[NotificationDetails]
+
 }

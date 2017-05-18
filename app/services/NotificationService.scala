@@ -19,8 +19,8 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
+import cats.implicits._
 import connectors.AmlsNotificationConnector
-import models.notifications.ContactType.{AutoExpiryOfRegistration, RenewalReminder}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -28,7 +28,6 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import cats.implicits._
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
@@ -46,7 +45,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
-           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(contactType)
+           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType)
 
       case ContactType.ReminderToPayForVariation |
            ContactType.ReminderToPayForRenewal |
@@ -68,24 +67,31 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
 
-  private def handleStaticMessage(contactType: ContactType): Future[Some[NotificationDetails]] = {
-    Future.successful(
-      Some(NotificationDetails(
-        Some(contactType),
-        None,
-        Some(messagesApi(s"notification.static.text.$contactType",
-          controllers.routes.StatusController.get())),
-        false
-      ))
-    )
+  private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType)
+                                 (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+
+    amlsNotificationConnector.getMessageDetails(amlsRegNo, id) map {
+      case Some(notificationDetails) => {
+        Some(NotificationDetails(
+          Some(contactType),
+          None,
+          Some(
+            messagesApi(s"notification.static.text.$contactType",
+              controllers.routes.StatusController.get())
+          ),
+          false,
+          notificationDetails.receivedAt
+        ))
+      }
+      case _ => None
+    }
+
   }
 
   private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType)
                                    (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
-    val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
-
-    details.map {
+    amlsNotificationConnector.getMessageDetails(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
@@ -105,9 +111,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
                                   (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
-    val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
-
-    details.map {
+    amlsNotificationConnector.getMessageDetails(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
@@ -126,9 +130,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType)
                                          (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
-    val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
-
-    details.map {
+    amlsNotificationConnector.getMessageDetails(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
