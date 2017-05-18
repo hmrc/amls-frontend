@@ -23,6 +23,7 @@ import org.scalatest.{MustMatchers, WordSpec}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import play.api.libs.json._
+import views.html.include.forms2.date
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
 
@@ -77,8 +78,9 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "given a future date" in {
 
         val data = YourTradingPremises.formW.writes(model.copy( startDate = Some(LocalDate.now().plusDays(1))))
-        YourTradingPremises.formR.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.future.date")))))
+        YourTradingPremises.formR.validate(data) must be(Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA11 1AA",None),Some(true),Some(LocalDate.now().plusDays(1)),None)))
+0
+
       }
     }
 

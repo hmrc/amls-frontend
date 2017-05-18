@@ -141,27 +141,51 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     "redirect to 'Who is registering this business?' page" when {
 
-      "selected option is a valid responsible person in amendment mode" in new Fixture {
+      "making an amendment" when {
 
-        val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+        "selected option is a valid responsible person in amendment mode" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
 
-        val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
-          = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
+            = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.getWithAmendment().url))
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.getWithAmendment().url))
+        }
+
+        "selected option is a valid responsible person" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+
+          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
+            = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(responsiblePeoples)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+        }
+
       }
-
     }
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
@@ -183,8 +207,8 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(responsiblePeoples)))
 
         when(controller.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReady))

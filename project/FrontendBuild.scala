@@ -27,6 +27,8 @@ private object AppDependencies {
 
   private val validationVersion = "2.0.1"
 
+  private val flexmarkVersion = "0.19.1"
+
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
   val compile = Seq(
@@ -45,7 +47,9 @@ private object AppDependencies {
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
-    "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars
+    "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars,
+
+    "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion
 
   )
 

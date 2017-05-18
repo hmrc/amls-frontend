@@ -163,13 +163,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       safeId = ""
     )
 
-    "save BusinessMatching and AboutTheBusiness when both succeed" in {
+    "save BusinessMatching succeed" in {
       when {
         TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
-      when {
-        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
-      } thenReturn Future.successful(cacheMap)
+
       whenReady (TestLandingService.updateReviewDetails(reviewDetails)) {
         _ mustEqual cacheMap
       }
@@ -179,24 +177,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when {
         TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.failed(new Exception(""))
-      when {
-        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
-      } thenReturn Future.successful(cacheMap)
+
       whenReady (TestLandingService.updateReviewDetails(reviewDetails).failed) {
         _ mustBe an[Exception]
       }
     }
 
-    "pass back a failed future when updating AboutTheBusiness fails" in {
-      when {
-        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
-      } thenReturn Future.successful(cacheMap)
-      when {
-        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
-      } thenReturn Future.failed(new Exception)
-      whenReady (TestLandingService.updateReviewDetails(reviewDetails).failed) {
-        _ mustBe an[Exception]
-      }
-    }
   }
 }

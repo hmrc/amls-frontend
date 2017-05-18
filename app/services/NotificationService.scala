@@ -18,8 +18,9 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
 import connectors.AmlsNotificationConnector
-import models.notifications.ContactType.{RenewalReminder, AutoExpiryOfRegistration}
+import models.notifications.ContactType.{AutoExpiryOfRegistration, RenewalReminder}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -27,13 +28,14 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import cats.implicits._
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
 
   def getNotifications(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
     amlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegNo) map {
-      case notifications@(s :: sc) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
+      case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
@@ -57,7 +59,10 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
            ContactType.AutoExpiryOfRegistration |
            ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType)
 
-      case _ => amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
+      case _ => (for {
+        details <- OptionT(amlsNotificationConnector.getMessageDetails(amlsRegNo, id))
+        messageText <- OptionT.fromOption[Future](details.messageText)
+      } yield details.copy(messageText = Some(CustomAttributeProvider.commonMark(messageText)))).value
 
     }
   }
@@ -98,7 +103,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
-                                         (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+                                  (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
@@ -119,7 +124,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType)
-                          (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+                                         (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     val details = amlsNotificationConnector.getMessageDetails(amlsRegNo, id)
 
