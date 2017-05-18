@@ -19,19 +19,18 @@ package services
 import connectors.AmlsNotificationConnector
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationApproval, AutoExpiryOfRegistration, MindedToReject, MindedToRevoke, NoLongerMindedToReject, NoLongerMindedToRevoke, Others, RejectionReasons, ReminderToPayForApplication, ReminderToPayForManualCharges, ReminderToPayForRenewal, ReminderToPayForVariation, RenewalApproval, RenewalReminder, RevocationReasons}
-import models.notifications.{NotificationDetails, ContactType, IDType, NotificationRow}
-import org.joda.time.{LocalDate, DateTime, DateTimeZone}
+import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.{Messages, I18nSupport, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -105,9 +104,21 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is auto-rejected for failure to pay" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.ApplicationAutorejectionForFailureToPay))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.ApplicationAutorejectionForFailureToPay),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.ApplicationAutorejectionForFailureToPay
+        ))
+
         result.get.messageText.get mustBe (
           """<p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 has failed.</p>""" +
             """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
@@ -122,9 +133,21 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is registration variation approval" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.RegistrationVariationApproval))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.RegistrationVariationApproval),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.RegistrationVariationApproval
+        ))
+
         result.get.messageText.get mustBe (
           """<p>The recent changes made to your details have been approved.</p>""" +
             """<p>You can find details of your registration on <a href="""" +
@@ -135,9 +158,21 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.DeRegistrationEffectiveDateChange))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.DeRegistrationEffectiveDateChange),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.DeRegistrationEffectiveDateChange
+        ))
+
         result.get.messageText.get mustBe (
           """<p>The date your anti-money laundering supervision ended has been changed.</p>""" +
             """<p>You can see the new effective date on <a href="""" +
