@@ -35,8 +35,8 @@ trait LettersAddressController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), Some(correspondenceAddress), _)) =>
-          Ok(letters_address(Form2[LettersAddress](request.body), registeredOffice, edit))
+        //case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), Some(correspondenceAddress), _)) =>
+        //  Ok(letters_address(Form2[LettersAddress](request.body), registeredOffice, edit))
         case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _)) =>
           Ok(letters_address(EmptyForm, registeredOffice, edit))
         case _ =>
