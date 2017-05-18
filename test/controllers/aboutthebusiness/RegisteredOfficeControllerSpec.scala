@@ -24,6 +24,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 
 import scala.collection.JavaConversions._
@@ -35,6 +36,9 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -48,7 +52,12 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
+      override val auditConnector = mock[AuditConnector]
     }
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
@@ -118,9 +127,21 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
         "addressLine3"->"",
         "addressLine4"->"",
         "postCode"->"AA1 1AA")
+
       val result = controller.post()(newRequest)
+
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
+
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+      captor.getValue match {
+        case d: DataEvent =>
+          d.detail("addressLine1") mustBe "line1"
+          d.detail("addressLine2") mustBe "line2"
+          d.detail("postCode") mustBe "AA1 1AA"
+      }
     }
 
     "fail submission on invalid address" in new Fixture {
@@ -228,7 +249,12 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
+      override val auditConnector = mock[AuditConnector]
     }
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))

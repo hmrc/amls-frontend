@@ -16,19 +16,24 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import audit.AddressCreatedEvent
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, ValidForm, InvalidForm}
-import models.aboutthebusiness.{UKCorrespondenceAddress, CorrespondenceAddress, AboutTheBusiness}
+import forms.{Form2, InvalidForm, ValidForm}
+import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
+import audit.AddressConversions._
 
 import scala.concurrent.Future
 
 trait CorrespondenceAddressController extends BaseController {
 
   protected def dataConnector: DataCacheConnector
+  protected[controllers] val auditConnector: AuditConnector
+
   private val initialiseWithUK = UKCorrespondenceAddress("","", "", "", None, None, "")
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -49,12 +54,18 @@ trait CorrespondenceAddressController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(correspondence_address(f, edit)))
         case ValidForm(_, data) =>
-          for {
+          (for {
             aboutTheBusiness <- dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataConnector.save[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.correspondenceAddress(data)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield edit match {
+            case true => Future.successful(Redirect(routes.SummaryController.get()))
+            case _ =>
+              auditConnector.sendEvent(AddressCreatedEvent(data)) map { _ =>
+                Redirect(routes.SummaryController.get())
+              }
+          }).flatMap(identity)
       }
     }
   }
@@ -64,4 +75,5 @@ object CorrespondenceAddressController extends CorrespondenceAddressController {
   // $COVERAGE-OFF$
   override protected val dataConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
+  override protected[controllers] lazy val auditConnector = AMLSAuditConnector
 }

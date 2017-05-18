@@ -16,21 +16,25 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePeople, ResponsiblePersonAddress, ResponsiblePersonAddressHistory}
 import play.api.mvc.{AnyContent, Request}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_extra_address
+import audit.AddressConversions._
+import audit.AddressCreatedEvent
 
 import scala.concurrent.Future
 
 trait AdditionalExtraAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
+  val auditConnector: AuditConnector
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
@@ -70,9 +74,8 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     }
   }
 
-  private def updateAndRedirect
-  (data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
-  (implicit authContext: AuthContext, request: Request[AnyContent]) = {
+  private def updateAndRedirect(data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
+                               (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
@@ -80,10 +83,13 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
           case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
         }
       )
-    } map { _ =>
+    } flatMap { _ =>
       data.timeAtAddress match {
-        case Some(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
+        case Some(_) if edit => Future.successful(Redirect(routes.DetailedAnswersController.get(index)))
+        case _ =>
+          auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+            Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
+          }
       }
     }
   }
@@ -93,4 +99,5 @@ object AdditionalExtraAddressController extends AdditionalExtraAddressController
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  override lazy val auditConnector = AMLSAuditConnector
 }

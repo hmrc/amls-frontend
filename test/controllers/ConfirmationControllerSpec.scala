@@ -36,7 +36,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{StatusService, SubmissionService}
+import services.{SubmissionResponseService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -67,7 +67,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
-      override private[controllers] val submissionService = mock[SubmissionService]
+      override private[controllers] val submissionResponseService = mock[SubmissionResponseService]
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -95,7 +95,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     reset(paymentsConnector)
 
-    when(controller.submissionService.getSubscription(any(), any(), any()))
+    when(controller.submissionResponseService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
@@ -144,7 +144,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "query the payments service for the payments url for an amendment" in new Fixture {
 
-      when(controller.submissionService.getAmendment(any(), any(), any()))
+      when(controller.submissionResponseService.getAmendment(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
 
       setupStatus(SubmissionReadyForReview)
@@ -161,7 +161,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "query the payments service for the payments url for a variation" in new Fixture {
 
-      when(controller.submissionService.getVariation(any(), any(), any()))
+      when(controller.submissionResponseService.getVariation(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
       setupStatus(SubmissionDecisionApproved)
@@ -179,7 +179,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     "query the payments service for the payments url for a renewal" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
-      when(controller.submissionService.getRenewal(any(), any(), any()))
+      when(controller.submissionResponseService.getRenewal(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
       setupStatus(ReadyForRenewal(Some(new LocalDate())))
@@ -208,7 +208,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "return the default configured url for payments if none was returned by the payments service" in new Fixture {
-      when(controller.submissionService.getVariation(any(), any(), any()))
+      when(controller.submissionResponseService.getVariation(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
       setupStatus(SubmissionDecisionApproved)
@@ -237,7 +237,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "an amendment has difference(/Some(0))" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        when(controller.submissionService.getAmendment(any(), any(), any()))
+        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
           .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Some(Currency.fromInt(0))))))
 
         val result = controller.get()(request)
@@ -250,7 +250,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "an amendment has no difference(/None)" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        when(controller.submissionService.getAmendment(any(), any(), any()))
+        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
           .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), None))))
 
         val result = controller.get()(request)
@@ -263,7 +263,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "an amendment has no payment reference" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        when(controller.submissionService.getAmendment(any(), any(), any()))
+        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
           .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq(), None))))
 
         val result = controller.get()(request)
@@ -276,7 +276,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "a variation has no payment reference" in new Fixture {
         setupStatus(SubmissionDecisionApproved)
 
-        when(controller.submissionService.getVariation(any(), any(), any()))
+        when(controller.submissionResponseService.getVariation(any(), any(), any()))
           .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq()))))
 
         val result = controller.get()(request)
@@ -289,7 +289,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "a variation without the addition of tp or rp" in new Fixture {
         setupStatus(SubmissionDecisionApproved)
 
-        when(controller.submissionService.getVariation(any(), any(), any()))
+        when(controller.submissionResponseService.getVariation(any(), any(), any()))
           .thenReturn(Future.successful(Some((Some(""), Currency.fromInt(0), Seq()))))
 
         val result = controller.get()(request)
@@ -304,7 +304,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       "a variation when status is ready for renewal and no renewal data in save4later" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
-        when(controller.submissionService.getVariation(any(), any(), any()))
+        when(controller.submissionResponseService.getVariation(any(), any(), any()))
           .thenReturn(Future.successful(Some((Some(""), Currency.fromInt(0), Seq()))))
 
         val result = controller.get()(request)
@@ -323,7 +323,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(Some(Renewal(Some(InvolvedInOtherNo))))
 
-        when(controller.submissionService.getRenewal(any(), any(), any()))
+        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq()))))
 
         val result = controller.get()(request)
@@ -447,7 +447,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
-      override private[controllers] val submissionService = mock[SubmissionService]
+      override private[controllers] val submissionResponseService = mock[SubmissionResponseService]
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -472,7 +472,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
 
     reset(paymentsConnector)
 
-    when(controller.submissionService.getSubscription(any(), any(), any()))
+    when(controller.submissionResponseService.getSubscription(any(), any(), any()))
       .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
 
     when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
@@ -499,7 +499,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
         controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       } thenReturn Future.successful(Some(model))
 
-      when(controller.submissionService.getAmendment(any(), any(), any()))
+      when(controller.submissionResponseService.getAmendment(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
