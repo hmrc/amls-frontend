@@ -79,14 +79,14 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus) = {
-    status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange(tp, ytp) && edit =>
+      if (redirectToDateOfChange(tp, ytp) && edit && isEligibleForDateOfChange(status)) {
         Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
-      case _ => edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
-        case false => Redirect(routes.ActivityStartDateController.get(index, edit))
+      } else {
+        edit match {
+          case true => Redirect(routes.SummaryController.getIndividual(index))
+          case false => Redirect(routes.ActivityStartDateController.get(index, edit))
+        }
       }
-    }
   }
 
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {

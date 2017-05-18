@@ -101,18 +101,18 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                                     tradingPremises: Option[TradingPremises],
                                     data: WhatDoesYourBusinessDo,
                                     edit: Boolean, index: Int) = {
-    status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) if !data.activities.contains(MoneyServiceBusiness)
-        && redirectToDateOfChange(tradingPremises, data) && edit =>
+      if (!data.activities.contains(MoneyServiceBusiness)
+        && redirectToDateOfChange(tradingPremises, data, status) && edit) {
         Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
-      case _ => data.activities.contains(MoneyServiceBusiness) match {
-        case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-        case _ => edit match {
-          case true => Redirect (routes.SummaryController.getIndividual (index) )
-          case false => Redirect (routes.PremisesRegisteredController.get (index) )
+      } else {
+        data.activities.contains(MoneyServiceBusiness) match {
+          case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
+          case _ => edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect(routes.PremisesRegisteredController.get(index))
+          }
         }
       }
-    }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
@@ -185,8 +185,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
   def modelHasChanged(tradingPremises: TradingPremises, model: WhatDoesYourBusinessDo) =
     tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) { _.activities != model.activities }
 
-  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo) =
-    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && modelHasChanged(tradingPremises, model)
+  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo, status: SubmissionStatus) =
+    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
 }

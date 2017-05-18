@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -34,7 +34,7 @@ trait DetailedAnswersController extends BaseController {
 
   private def showHideAddressMove(lineId: Option[Int])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus map {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) if lineId.isDefined => true
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
       case _ => false
     }
   }

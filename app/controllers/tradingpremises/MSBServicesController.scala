@@ -53,11 +53,11 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
                             edit: Boolean,
                             changed:Boolean,
                             index:Int) = {
-    status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) if this.redirectToDateOfChange(tradingPremises, data, changed)
-        && edit && tradingPremises.lineId.isDefined =>
-        Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
-      case _ => edit match {
+    if (this.redirectToDateOfChange(tradingPremises, data, changed, status)
+      && edit && tradingPremises.lineId.isDefined) {
+      Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+    } else {
+      edit match {
         case true => Redirect(routes.SummaryController.getIndividual(index))
         case false => Redirect(routes.PremisesRegisteredController.get(index))
       }
@@ -83,8 +83,8 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       }
   }
 
-  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: MsbServices, force: Boolean = false) =
-    ApplicationConfig.release7 && (!tradingPremises.get.msbServices.contains(msbServices) || force)
+  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: MsbServices, force: Boolean = false, status: SubmissionStatus) =
+    ApplicationConfig.release7 && (!tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force)
 }
 
 object MSBServicesController extends MSBServicesController {
