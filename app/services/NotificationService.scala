@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import cats.implicits._
+import org.joda.time.{DateTime, DateTimeZone}
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
@@ -75,7 +76,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
         None,
         Some(messagesApi(s"notification.static.text.$contactType",
           controllers.routes.StatusController.get())),
-        false
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC)
       ))
     )
   }

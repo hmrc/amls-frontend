@@ -17,13 +17,13 @@
 package controllers
 
 import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AmlsNotificationConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import models.notifications.ContactType.{MindedToReject, MindedToRevoke}
+import models.notifications.ContactType.{MindedToReject, MindedToRevoke, RejectionReasons}
 import models.notifications._
 import play.api.Play
-import play.api.i18n.Messages
 import services.{AuthEnrolmentsService, NotificationService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -31,7 +31,6 @@ import utils.FeatureToggle
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import cats.implicits._
 
 trait NotificationController extends BaseController {
 
@@ -73,6 +72,7 @@ trait NotificationController extends BaseController {
                 contactType match {
                   case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
                   case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
+                  case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName))
                   case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
               }) getOrElse NotFound(notFoundView)

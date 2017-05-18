@@ -43,6 +43,7 @@ import scala.concurrent.Future
 class NotificationControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   val notificationService = mock[NotificationService]
+  val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
@@ -168,6 +169,14 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "contactType is ApplicationAutorejectionForFailureToPay" in new Fixture {
 
+        val notificationDetails = NotificationDetails(
+          Some(ApplicationAutorejectionForFailureToPay),
+          None,
+          Some("Message Text"),
+          false,
+          dateTime
+        )
+
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
 
@@ -175,7 +184,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
           .thenReturn(Future.successful(Some("Registration Number")))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(Some(ApplicationAutorejectionForFailureToPay), None, Some("Message Text"), false))))
+          .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("dfgdhsjk",ContactType.ApplicationAutorejectionForFailureToPay)(request)
 
@@ -185,16 +194,24 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "contactType is ReminderToPayForVariation" in new Fixture {
 
+        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
+
+        val notificationDetails = NotificationDetails(
+          Some(ReminderToPayForVariation),
+          None,
+          Some(reminderVariationMessage),
+          false,
+          dateTime
+        )
+
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
 
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("Registration Number")))
 
-        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation",Currency(1234),"ABC1234")
-
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(Some(ReminderToPayForVariation), None, Some(reminderVariationMessage), false))))
+          .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("dfgdhsjk",ContactType.ReminderToPayForVariation)(request)
 
@@ -212,6 +229,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         val amlsRegNo = "regNo"
         val msgTxt = "Considering revokation"
+        val notificationDetails = NotificationDetails(
+          Some(MindedToRevoke),
+          None,
+          Some(msgTxt),
+          false,
+          dateTime
+        )
 
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -220,7 +244,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(Some(MindedToRevoke), None, Some(msgTxt), false))))
+          .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id",ContactType.MindedToRevoke)(request)
 
@@ -235,6 +259,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         val amlsRegNo = "regNo"
         val msgTxt = "Considering revokation"
+        val notificationDetails = NotificationDetails(
+          Some(MindedToReject),
+          None,
+          Some(msgTxt),
+          false,
+          dateTime
+        )
 
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -243,7 +274,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(Some(MindedToReject), None, Some(msgTxt), false))))
+          .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id",ContactType.MindedToReject)(request)
 
