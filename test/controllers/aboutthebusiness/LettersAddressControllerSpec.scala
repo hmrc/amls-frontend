@@ -55,8 +55,6 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
 
-        //val registeredAddress = LettersAddress(lettersAddress = true)
-
         when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
@@ -116,6 +114,20 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
+
+      }
+
+      "on post with no data" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+        )
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorrespondenceAddressController.get().url))
 
       }
     }

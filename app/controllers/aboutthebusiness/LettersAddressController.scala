@@ -35,26 +35,12 @@ trait LettersAddressController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        //case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), Some(correspondenceAddress), _)) =>
-        //  Ok(letters_address(Form2[LettersAddress](request.body), registeredOffice, edit))
         case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _)) =>
           Ok(letters_address(EmptyForm, registeredOffice, edit))
         case _ =>
-          // TODO: Make sure this redirects to the right place
-          Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+          Redirect(routes.CorrespondenceAddressController.get(edit))
       }
 
-    /*dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        response =>
-          val regOffice: Option[RegisteredOffice] = (for {
-            aboutTheBusiness <- response
-            registeredOffice <- aboutTheBusiness.registeredOffice
-          } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
-          regOffice match {
-            case Some(data) => Ok(letters_address(EmptyForm, data, edit))
-            case _ => Redirect(routes.CorrespondenceAddressController.get())
-          }
-      }*/
   }
 
   def post(edit: Boolean = false) = Authorised.async {
