@@ -18,10 +18,11 @@ package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
 import models.Country
-import models.aboutthebusiness.{NonUKCorrespondenceAddress, AboutTheBusiness, UKCorrespondenceAddress}
+import models.aboutthebusiness.{AboutTheBusiness, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -29,8 +30,12 @@ import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+
 import scala.collection.JavaConversions._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
@@ -44,7 +49,12 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
       override val dataConnector: DataCacheConnector = mock[DataCacheConnector]
 
       override protected def authConnector: AuthConnector = self.authConnector
+      override val auditConnector = mock[AuditConnector]
     }
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   "CorrespondenceAddressController" should {
@@ -118,6 +128,15 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+        captor.getValue match {
+          case d: DataEvent =>
+            d.detail("addressLine1") mustBe "Add Line 1"
+            d.detail("addressLine2") mustBe "Add Line 2"
+            d.detail("postCode") mustBe "AA1 1AA"
+        }
       }
 
       "fail submission on invalid address" in new Fixture {
