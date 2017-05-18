@@ -40,17 +40,18 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
-      implicit authContext => implicit request =>
+      implicit authContext =>
+        implicit request =>
 
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, _,
-          Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _,_, _, _, _, _, _, _, _, _, _))
-          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _,_))
-          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
-          case _
-          => NotFound(notFoundView)
-        }
+          getData[ResponsiblePeople](index) map {
+            case Some(ResponsiblePeople(Some(personName), _, _,
+            Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _))
+            => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
+            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+            => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+            case _
+            => NotFound(notFoundView)
+          }
     }
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
@@ -98,14 +99,13 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
 
-        status match {
-          case SubmissionDecisionApproved | ReadyForRenewal(_)
-            if(redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress)
-              && originalResponsiblePerson.flatMap {
-              orp => orp.lineId
-            }.isDefined && originalAddress.isDefined) =>
-            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-          case _ => Redirect(routes.DetailedAnswersController.get(index, edit))
+        if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+          && originalResponsiblePerson.flatMap {
+          orp => orp.lineId
+        }.isDefined && originalAddress.isDefined) {
+          Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+        } else {
+          Redirect(routes.DetailedAnswersController.get(index, edit))
         }
       } else {
         Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))

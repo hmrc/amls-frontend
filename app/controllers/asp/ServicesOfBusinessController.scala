@@ -52,17 +52,20 @@ trait ServicesOfBusinessController extends BaseController with DateOfChangeHelpe
         case f: InvalidForm =>
           Future.successful(BadRequest(services_of_business(f, edit)))
         case ValidForm(_, data) =>
+
           for {
             businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
             _ <- dataCacheConnector.save[Asp](Asp.key,
               businessServices.services(data))
             status <- statusService.getStatus
-          } yield status match {
-            case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[ServicesOfBusiness](businessServices.services, data) =>
+          } yield {
+            if (redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
               Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
-            case _ => edit match {
-              case true => Redirect(routes.SummaryController.get())
-              case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
+            } else {
+              edit match {
+                case true => Redirect(routes.SummaryController.get())
+                case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
+              }
             }
           }
       }

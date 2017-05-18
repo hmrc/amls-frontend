@@ -17,6 +17,7 @@
 package utils
 
 import models.aboutthebusiness.{RegisteredOffice, RegisteredOfficeUK}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
@@ -45,13 +46,28 @@ class DateOfChangeHelperSpec extends UnitSpec with OneAppPerSuite with MockitoSu
 
     "return false" when {
       "a change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](Some(originalModel), changeModel) should be(false)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(false)
       }
       "no change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](Some(originalModel), originalModel) should be(false)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), originalModel) should be(false)
       }
     }
 
+    "return isEligibleForDateOfChange false when status is Amendment" in {
+      DateOfChangeHelperTest.isEligibleForDateOfChange(SubmissionReadyForReview) should be(false)
+    }
+
+    "return isEligibleForDateOfChange true when status is Variation" in {
+      DateOfChangeHelperTest.isEligibleForDateOfChange(SubmissionDecisionApproved) should be(true)
+    }
+
+    "return isEligibleForDateOfChange true when status is Renewal" in {
+      DateOfChangeHelperTest.isEligibleForDateOfChange(ReadyForRenewal(None)) should be(true)
+    }
+
+    "return isEligibleForDateOfChange true when status is Renewal Submitted" in {
+      DateOfChangeHelperTest.isEligibleForDateOfChange(RenewalSubmitted(None)) should be(true)
+    }
   }
 
 }

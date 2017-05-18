@@ -63,10 +63,10 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
                 aboutTheBusiness.registeredOffice(data))
               status <- statusService.getStatus
             } yield {
-              status match {
-                case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
-                  Redirect(routes.RegisteredOfficeDateOfChangeController.get())
-                case _ => edit match {
+              if(redirectToDateOfChange[RegisteredOffice](status, aboutTheBusiness.registeredOffice, data)) {
+                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
+              } else {
+                 edit match {
                   case true => Redirect(routes.SummaryController.get())
                   case false => Redirect(routes.ContactingYouController.get(edit))
                 }
@@ -75,7 +75,6 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
           }
         }
   }
-
 }
 
 object RegisteredOfficeController extends RegisteredOfficeController {

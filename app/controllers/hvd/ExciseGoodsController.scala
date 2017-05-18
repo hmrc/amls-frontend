@@ -50,7 +50,8 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
 
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext =>
+      implicit request => {
         Form2[ExciseGoods](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(excise_goods(f, edit)))
@@ -61,12 +62,14 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
               _ <- dataCacheConnector.save[Hvd](Hvd.key,
                 hvd.exciseGoods(data)
               )
-            } yield status match {
-              case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[ExciseGoods](hvd.exciseGoods, data) =>
+            } yield {
+              if (redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)) {
                 Redirect(routes.HvdDateOfChangeController.get())
-              case _ => edit match {
-                case true => Redirect(routes.SummaryController.get())
-                case false => Redirect(routes.HowWillYouSellGoodsController.get())
+              } else {
+                edit match {
+                  case true => Redirect(routes.SummaryController.get())
+                  case false => Redirect(routes.HowWillYouSellGoodsController.get())
+                }
               }
             }
         }

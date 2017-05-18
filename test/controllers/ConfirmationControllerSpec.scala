@@ -117,7 +117,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when {
         controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-      } thenReturn Future.successful(None)
+      } thenReturn Future.successful(Some(Renewal()))
     }
 
     def setupStatus(status: SubmissionStatus): Unit = {
@@ -125,7 +125,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
     }
-
   }
 
   "ConfirmationController" must {

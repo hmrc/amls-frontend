@@ -17,6 +17,7 @@
 package utils
 
 import config.ApplicationConfig
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
@@ -25,8 +26,15 @@ import play.api.i18n.Messages.Implicits._
 
 trait DateOfChangeHelper {
 
-  def redirectToDateOfChange[A](a: Option[A], b: A) = {
-    ApplicationConfig.release7 && !a.contains(b)
+  def isEligibleForDateOfChange(status: SubmissionStatus): Boolean = {
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => true
+      case _ => false
+    }
+  }
+
+  def redirectToDateOfChange[A](status: SubmissionStatus,a: Option[A], b: A) = {
+    ApplicationConfig.release7 && !a.contains(b) && isEligibleForDateOfChange(status)
   }
 
   def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate") = {
