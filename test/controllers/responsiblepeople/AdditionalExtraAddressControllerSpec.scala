@@ -24,14 +24,19 @@ import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+
 import scala.collection.JavaConversions._
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -47,8 +52,13 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
 
     val additionalExtraAddressController = new AdditionalExtraAddressController {
       override val dataCacheConnector = mockDataCacheConnector
+      override val auditConnector = mock[AuditConnector]
       override val authConnector = self.authConnector
     }
+
+    when {
+      additionalExtraAddressController.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
@@ -158,6 +168,16 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
           val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(additionalExtraAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+          }
         }
 
         "edit is true and timeAtAddress does not exist" in new Fixture {

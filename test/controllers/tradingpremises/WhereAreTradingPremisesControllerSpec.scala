@@ -36,6 +36,9 @@ import scala.collection.JavaConversions._
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -51,9 +54,14 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
+      override val auditConnector = mock[AuditConnector]
     }
 
     when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(Success)
   }
 
   before {
@@ -147,6 +155,16 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Address 1"
+              d.detail("addressLine2") mustBe "Address 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+          }
         }
         
         "fail submission on invalid uk address" in new Fixture {

@@ -16,22 +16,27 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import audit.AddressCreatedEvent
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
+import play.api.mvc.Result
 import services.StatusService
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
+import audit.AddressConversions._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
+  val auditConnector: AuditConnector
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
 
@@ -55,24 +60,26 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office(f, edit)))
-          case ValidForm(_, data) => {
-            for {
+          case ValidForm(_, data) =>
+            (for {
               aboutTheBusiness <-
               dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
               _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
                 aboutTheBusiness.registeredOffice(data))
               status <- statusService.getStatus
             } yield {
-              if(redirectToDateOfChange[RegisteredOffice](status, aboutTheBusiness.registeredOffice, data)) {
-                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
-              } else {
-                 edit match {
-                  case true => Redirect(routes.SummaryController.get())
-                  case false => Redirect(routes.ContactingYouController.get(edit))
+                if (redirectToDateOfChange[RegisteredOffice](status, aboutTheBusiness.registeredOffice, data)) {
+                  Future.successful(Redirect(routes.RegisteredOfficeDateOfChangeController.get()))
+                } else {
+                  edit match {
+                    case true => Future.successful(Redirect(routes.SummaryController.get()))
+                    case _ =>
+                      auditConnector.sendEvent(AddressCreatedEvent(data)) map { _ =>
+                        Redirect(routes.ContactingYouController.get(edit))
+                      }
+                  }
                 }
-              }
-            }
-          }
+            }).flatMap(identity)
         }
   }
 }
@@ -82,4 +89,5 @@ object RegisteredOfficeController extends RegisteredOfficeController {
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
   override val statusService = StatusService
+  override lazy val auditConnector = AMLSAuditConnector
 }

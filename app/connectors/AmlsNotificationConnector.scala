@@ -51,7 +51,7 @@ trait AmlsNotificationConnector {
   }
 
   def getMessageDetails(amlsRegistrationNumber: String, contactNumber: String)
-                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext) : Future[Option[NotificationDetails]]= {
+                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 

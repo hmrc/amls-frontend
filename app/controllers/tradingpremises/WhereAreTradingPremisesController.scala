@@ -16,7 +16,8 @@
 
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import audit.AddressCreatedEvent
+import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
@@ -25,8 +26,11 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionSta
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
+import audit.AddressConversions._
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -34,6 +38,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
+  val auditConnector: AuditConnector
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -57,7 +62,8 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             tradingPremises <- getData[TradingPremises](index)
             _ <- updateDataStrict[TradingPremises](index)(updateTradingPremises(ytp, _))
             status <- statusService.getStatus
-          } yield redirectTo(index, edit, ytp, tradingPremises, status)
+            result <- redirectTo(index, edit, ytp, tradingPremises, status)
+          } yield result
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
@@ -78,15 +84,19 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   }
 
-  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus) = {
-      if (redirectToDateOfChange(tp, ytp) && edit && isEligibleForDateOfChange(status)) {
-        Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
-      } else {
-        edit match {
-          case true => Redirect(routes.SummaryController.getIndividual(index))
-          case false => Redirect(routes.ActivityStartDateController.get(index, edit))
-        }
+  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus)
+                        (implicit hc: HeaderCarrier) = {
+    if (redirectToDateOfChange(tp, ytp) && edit && isEligibleForDateOfChange(status)) {
+      Future.successful(Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index)))
+    } else {
+      edit match {
+        case true => Future.successful(Redirect(routes.SummaryController.getIndividual(index)))
+        case _ =>
+          auditConnector.sendEvent(AddressCreatedEvent(ytp.tradingPremisesAddress)) map { _ =>
+            Redirect(routes.ActivityStartDateController.get(index, edit))
+          }
       }
+    }
   }
 
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
@@ -136,4 +146,5 @@ object WhereAreTradingPremisesController extends WhereAreTradingPremisesControll
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
   override val statusService = StatusService
+  override lazy val auditConnector = AMLSAuditConnector
 }

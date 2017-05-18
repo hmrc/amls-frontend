@@ -16,7 +16,6 @@
 
 package models.notifications
 
-import jto.validation.ValidationError
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -25,7 +24,8 @@ class NotificationRowSpec extends PlaySpec {
 
   val testNotifications = NotificationRow(
     Some(
-      Status(Some(StatusType.Revoked),
+      Status(
+        Some(StatusType.Revoked),
         Some(RevokedReason.RevokedCeasedTrading))
     ),
     None,
@@ -36,8 +36,8 @@ class NotificationRowSpec extends PlaySpec {
     IDType("1234567")
   )
 
-  "Notification Contact types" must {
-    "read/write Json successfully" in {
+  "NotificationRows " must {
+    "read/write Contact types Json successfully" in {
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RejectionReasons)) must be(JsSuccess(ContactType.RejectionReasons))
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RevocationReasons)) must be(JsSuccess(ContactType.RevocationReasons))
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToReject)) must be(JsSuccess(ContactType.MindedToReject))
@@ -56,14 +56,14 @@ class NotificationRowSpec extends PlaySpec {
     }
 
     "fail with error when status value is passed incorrectly" in {
-      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(play.api.data.validation.ValidationError("error.invalid"))))))
+      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath \ "contact_type", List(play.api.data.validation.ValidationError("error.invalid"))))))
     }
 
     "format the date for the table of messages" in {
       testNotifications.copy(receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)).dateReceived mustBe "1 December 2017"
     }
 
-    "read and write json successfully"  in {
+    "read and write json successfully" in {
       val model = NotificationRow(
         Some(
           Status(
@@ -95,81 +95,85 @@ class NotificationRowSpec extends PlaySpec {
       NotificationRow.format.reads(json) must be(JsSuccess(model))
     }
 
-    "return correct ContactType when contact type is populated" in {
-      val model = NotificationRow(
-        Some(
-          Status(
-            Some(StatusType.Revoked),
-            Some(RevokedReason.RevokedCeasedTrading)
-          )),
-        Some(ContactType.MindedToRevoke),
-        None,
-        false,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
-        false,
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+    "return correct ContactType" when {
 
-      model.getContactType mustBe(ContactType.MindedToRevoke)
-    }
+      "contact type is populated" in {
+        val model = NotificationRow(
+          Some(
+            Status(
+              Some(StatusType.Revoked),
+              Some(RevokedReason.RevokedCeasedTrading)
+            )),
+          Some(ContactType.MindedToRevoke),
+          None,
+          false,
+          new DateTime(1479730062573L, DateTimeZone.UTC),
+          false,
+          new IDType("5832e38e01000001005ca3ff"
+          ))
 
-    "return correct ContactType when auto rejected" in {
-      val model = NotificationRow(
-        Some(
-          Status(
-            Some(StatusType.Rejected),
-            Some(RejectedReason.FailedToPayCharges)
-          )),
-        None,
-        None,
-        false,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
-        false,
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        model.getContactType mustBe (ContactType.MindedToRevoke)
+      }
 
-      model.getContactType mustBe(ContactType.ApplicationAutorejectionForFailureToPay)
-    }
+      "auto rejected" in {
+        val model = NotificationRow(
+          Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.FailedToPayCharges)
+            )),
+          None,
+          None,
+          false,
+          new DateTime(1479730062573L, DateTimeZone.UTC),
+          false,
+          new IDType("5832e38e01000001005ca3ff"
+          ))
 
-    "return correct ContactType when variation approved" in {
-      val model = NotificationRow(
-        Some(
-          Status(
-            Some(StatusType.Approved),None
-          )),
-        None,
-        None,
-        true,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
-        false,
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        model.getContactType mustBe (ContactType.ApplicationAutorejectionForFailureToPay)
+      }
 
-      model.getContactType mustBe(ContactType.RegistrationVariationApproval)
-    }
+      "variation approved" in {
+        val model = NotificationRow(
+          Some(
+            Status(
+              Some(StatusType.Approved), None
+            )),
+          None,
+          None,
+          true,
+          new DateTime(1479730062573L, DateTimeZone.UTC),
+          false,
+          new IDType("5832e38e01000001005ca3ff"
+          ))
 
-    "return correct ContactType when DeRegistrationEffectiveDateChange" in {
-      val model = NotificationRow(
-        Some(
-          Status(
-            Some(StatusType.DeRegistered),None
-          )),
-        None,
-        None,
-        true,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
-        false,
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        model.getContactType mustBe (ContactType.RegistrationVariationApproval)
+      }
 
-      model.getContactType mustBe(ContactType.DeRegistrationEffectiveDateChange)
+      "DeRegistrationEffectiveDateChange" in {
+        val model = NotificationRow(
+          Some(
+            Status(
+              Some(StatusType.DeRegistered), None
+            )),
+          None,
+          None,
+          true,
+          new DateTime(1479730062573L, DateTimeZone.UTC),
+          false,
+          new IDType("5832e38e01000001005ca3ff"
+          ))
+
+        model.getContactType mustBe (ContactType.DeRegistrationEffectiveDateChange)
+      }
+
     }
 
     "throw an error when ContactType not determined" in {
       val model = NotificationRow(
         Some(
           Status(
-            Some(StatusType.Approved),None
+            Some(StatusType.Approved), None
           )),
         None,
         None,

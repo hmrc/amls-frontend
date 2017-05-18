@@ -16,7 +16,8 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import audit.AddressCreatedEvent
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -24,15 +25,18 @@ import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.current_address
+import audit.AddressConversions._
 
 import scala.concurrent.Future
 
 trait CurrentAddressController extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   def dataCacheConnector: DataCacheConnector
+  val auditConnector: AuditConnector
 
   val statusService: StatusService
 
@@ -40,18 +44,17 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
-      implicit authContext =>
-        implicit request =>
+      implicit authContext => implicit request =>
 
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName), _, _,
-            Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _))
-            => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-            => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
-            case _
-            => NotFound(notFoundView)
-          }
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(Some(personName), _, _,
+          Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _,_, _, _, _, _, _, _, _, _, _))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _,_))
+          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          case _
+          => NotFound(notFoundView)
+        }
     }
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
@@ -91,7 +94,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           case Some(a) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
-    } map { _ =>
+    } flatMap { _ =>
       if (edit) {
         val originalAddress = for {
           rp <- originalResponsiblePerson
@@ -99,16 +102,18 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
 
-        if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
-          && originalResponsiblePerson.flatMap {
-          orp => orp.lineId
-        }.isDefined && originalAddress.isDefined) {
-          Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-        } else {
-          Redirect(routes.DetailedAnswersController.get(index, edit))
-        }
+            if(redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+              && originalResponsiblePerson.flatMap {
+              orp => orp.lineId
+            }.isDefined && originalAddress.isDefined) {
+              Future.successful(Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit)))
+            } else {
+              Future.successful(Redirect(routes.DetailedAnswersController.get(index, edit)))
+            }
       } else {
-        Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+        auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+        }
       }
     }
   }
@@ -120,4 +125,5 @@ object CurrentAddressController extends CurrentAddressController {
   val statusService = StatusService
 
   override def dataCacheConnector = DataCacheConnector
+  override lazy val auditConnector = AMLSAuditConnector
 }
