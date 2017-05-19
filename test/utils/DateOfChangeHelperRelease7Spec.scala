@@ -17,6 +17,7 @@
 package utils
 
 import models.aboutthebusiness.{RegisteredOffice, RegisteredOfficeUK}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
@@ -45,14 +46,30 @@ class DateOfChangeHelperRelease7Spec extends UnitSpec with OneAppPerSuite with M
 
     "return true" when {
       "a change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](Some(originalModel), changeModel) should be(true)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(true)
       }
     }
 
     "return false" when {
       "no change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](Some(originalModel), originalModel) should be(false)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), originalModel) should be(false)
       }
+    }
+
+    "return isEligibleForDateOfChange false when status is Amendment" in {
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionReadyForReview, Some(originalModel), changeModel) should be(false)
+    }
+
+    "return isEligibleForDateOfChange true when status is Variation" in {
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(true)
+    }
+
+    "return isEligibleForDateOfChange true when status is Renewal" in {
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](ReadyForRenewal(None), Some(originalModel), changeModel) should be(true)
+    }
+
+    "return isEligibleForDateOfChange true when status is Renewal Submitted" in {
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](RenewalSubmitted(None), Some(originalModel), changeModel) should be(true)
     }
 
   }

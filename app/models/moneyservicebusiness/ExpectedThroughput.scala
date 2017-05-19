@@ -19,11 +19,25 @@ package models.moneyservicebusiness
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.renewal.TotalThroughput
 import play.api.libs.json._
 
 sealed trait ExpectedThroughput
 
 object ExpectedThroughput {
+
+  def convert(expectedThroughput: ExpectedThroughput): TotalThroughput = {
+    expectedThroughput match {
+      case First => TotalThroughput("01")
+      case Second => TotalThroughput("02")
+      case Third => TotalThroughput("03")
+      case Fourth => TotalThroughput( "04")
+      case Fifth => TotalThroughput("05")
+      case Sixth => TotalThroughput("06")
+      case Seventh=> TotalThroughput( "07")
+    }
+  }
+
 
   case object First extends ExpectedThroughput
   case object Second extends ExpectedThroughput

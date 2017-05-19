@@ -142,6 +142,17 @@ trait SubmissionService extends DataCacheService {
     } yield response
   }
 
+  def renewalAmendment(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+    for {
+      cache <- getCache
+      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      response <- amlsConnector.renewalAmendment(
+        createSubscriptionRequest(cache).withRenewalData(renewal),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
+      )
+      _ <- cacheConnector.save[RenewalResponse](RenewalResponse.key, response)
+    } yield response
+  }
 
   private def safeId(cache: CacheMap): Future[String] = {
     (for {

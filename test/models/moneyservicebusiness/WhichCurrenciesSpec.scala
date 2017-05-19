@@ -401,5 +401,19 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       }
 
     }
+
+    "covert Whcih currecncy to renewal which currency" in {
+      import models.renewal.{WhichCurrencies => RWhichCurrencies}
+
+      val wc = WhichCurrencies(
+        Seq("USD", "CHF", "EUR"),
+        usesForeignCurrencies = Some(true),
+        None,
+        Some(WholesalerMoneySource("wholesaler names")),
+        customerMoneySource = Some(true))
+
+      WhichCurrencies.convert(wc) must be(RWhichCurrencies(wc.currencies,  wc.usesForeignCurrencies, wc.bankMoneySource, wc.wholesalerMoneySource, wc.customerMoneySource))
+
+    }
   }
 }

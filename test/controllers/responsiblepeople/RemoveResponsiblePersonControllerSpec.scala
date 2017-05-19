@@ -23,6 +23,7 @@ import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
+import org.jsoup.Jsoup
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -80,6 +81,42 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
 
         }
       }
+
+      "the submission status is Renewal amendment" must {
+        "respond with OK when the index is valid" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(RenewalSubmitted(None)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(OK)
+          val contentString = contentAsString(result)
+          val doc =  Jsoup.parse(contentString)
+          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+
+        }
+      }
+
+      "the submission status is Renewal" must {
+        "respond with OK when the index is valid" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(None)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(OK)
+          val contentString = contentAsString(result)
+          val doc =  Jsoup.parse(contentString)
+          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+
+        }
+      }
       "the submission status is SubmissionDecisionApproved" must {
         "respond with OK when the index is valid" in new Fixture {
 
@@ -91,6 +128,9 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           val result = controller.get(1, false)(request)
 
           status(result) must be(OK)
+          val contentString = contentAsString(result)
+          val doc =  Jsoup.parse(contentString)
+          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
 
         }
         "respond with NOT_FOUND when the index is out of bounds" in new Fixture {

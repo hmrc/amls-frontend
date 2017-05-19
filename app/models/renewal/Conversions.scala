@@ -55,7 +55,6 @@ object Conversions {
       }
       request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)
     }
-
   }
 
   implicit class ConversionSyntax[A](target: Option[A])(implicit fnc: Functor[Option]) {

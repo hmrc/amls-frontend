@@ -19,7 +19,7 @@ package models.hvd
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsPath, Json, JsSuccess}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class ReceiveCashPaymentsSpec extends PlaySpec {
 
@@ -90,5 +90,22 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
         )
       }
     }
+  }
+
+  "convert model to renewal model when payment method has data" in {
+
+    import models.renewal.{ReceiveCashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
+
+    val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+    val data = ReceiveCashPayments(Some(paymentMethods))
+    ReceiveCashPayments.convert(data) must be(RReceiveCashPayments(Some(RPaymentMethods(true,true,Some("foo")))))
+  }
+
+  "convert model to renewal model when payment method is none" in {
+
+    import models.renewal.{ReceiveCashPayments => RReceiveCashPayments}
+
+    val data = ReceiveCashPayments(None)
+    ReceiveCashPayments.convert(data) must be(RReceiveCashPayments(None))
   }
 }

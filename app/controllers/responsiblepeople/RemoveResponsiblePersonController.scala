@@ -35,6 +35,13 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
   private[controllers] def statusService: StatusService
   private[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
+  private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineIdExists => true
+      case _ => false
+    }
+  }
+
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
@@ -42,12 +49,8 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         status <- statusService.getStatus
       } yield rp match {
         case (Some(ResponsiblePeople(Some(personName),_, _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
-          def isDateRequired = status match {
-            case SubmissionDecisionApproved if rp.get.lineId.isDefined => true
-            case _ => false
-          }
           Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, complete, isDateRequired
+            EmptyForm, index, personName.fullName, complete, showRemovalDateField(status, rp.get.lineId.isDefined)
           ))
         case _ => NotFound(notFoundView)
       }

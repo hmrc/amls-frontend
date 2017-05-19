@@ -20,6 +20,7 @@ import jto.validation._
 import jto.validation.forms._
 import play.api.libs.json.{Writes, _}
 import cats.data.Validated.{Invalid, Valid}
+import models.renewal.{ReceiveCashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
@@ -85,7 +86,6 @@ sealed trait ReceiveCashPayments0 {
      case None =>  Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
    }
   }
-
 }
 
 object ReceiveCashPayments {
@@ -96,4 +96,12 @@ object ReceiveCashPayments {
   implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonR
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
+
+
+  def convert(model: ReceiveCashPayments) : RReceiveCashPayments = {
+    model.paymentMethods match {
+      case Some(paymentMtd) => RReceiveCashPayments(Some(RPaymentMethods(paymentMtd.courier, paymentMtd.direct, paymentMtd.other)))
+      case _ => RReceiveCashPayments(None)
+    }
+  }
 }

@@ -101,15 +101,14 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpHistory <- rp.addressHistory
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
-
         auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-          status match {
-            case SubmissionDecisionApproved | ReadyForRenewal(_)
-              if redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress) && originalResponsiblePerson.flatMap {
-                orp => orp.lineId
-              }.isDefined && originalAddress.isDefined =>
-              Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-            case _ => Redirect(routes.DetailedAnswersController.get(index, edit))
+          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+            && originalResponsiblePerson.flatMap {
+            orp => orp.lineId
+          }.isDefined && originalAddress.isDefined) {
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          } else {
+            Redirect(routes.DetailedAnswersController.get(index, edit))
           }
         }
       } else {

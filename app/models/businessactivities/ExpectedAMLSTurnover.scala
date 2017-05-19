@@ -19,6 +19,7 @@ package models.businessactivities
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.renewal.AMLSTurnover
 import play.api.libs.json._
 
 sealed trait ExpectedAMLSTurnover
@@ -85,5 +86,16 @@ object ExpectedAMLSTurnover {
     case Fifth => Json.obj("expectedAMLSTurnover" -> "05")
     case Sixth => Json.obj("expectedAMLSTurnover" -> "06")
     case Seventh => Json.obj("expectedAMLSTurnover" -> "07")
+  }
+
+  implicit def convert(model: ExpectedAMLSTurnover): AMLSTurnover = model match {
+    case ExpectedAMLSTurnover.First => AMLSTurnover.First
+    case ExpectedAMLSTurnover.Second => AMLSTurnover.Second
+    case ExpectedAMLSTurnover.Third => AMLSTurnover.Third
+    case ExpectedAMLSTurnover.Fourth => AMLSTurnover.Fourth
+    case ExpectedAMLSTurnover.Fifth => AMLSTurnover.Fifth
+    case ExpectedAMLSTurnover.Sixth => AMLSTurnover.Sixth
+    case ExpectedAMLSTurnover.Seventh => AMLSTurnover.Seventh
+    case _ => throw new Exception("Invalid AMLS turnover")
   }
 }

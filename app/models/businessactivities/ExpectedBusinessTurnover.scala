@@ -19,7 +19,7 @@ package models.businessactivities
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
+import models.renewal.BusinessTurnover
 import play.api.libs.json._
 
 sealed trait ExpectedBusinessTurnover
@@ -78,7 +78,6 @@ object ExpectedBusinessTurnover {
     }
   }
 
-
   implicit val jsonWrites = Writes[ExpectedBusinessTurnover] {
     case First => Json.obj("expectedBusinessTurnover" -> "01")
     case Second => Json.obj("expectedBusinessTurnover" -> "02")
@@ -88,4 +87,16 @@ object ExpectedBusinessTurnover {
     case Sixth => Json.obj("expectedBusinessTurnover" -> "06")
     case Seventh => Json.obj("expectedBusinessTurnover" -> "07")
   }
+
+  def convert(model: ExpectedBusinessTurnover): BusinessTurnover = model match {
+    case ExpectedBusinessTurnover.First => BusinessTurnover.First
+    case ExpectedBusinessTurnover.Second => BusinessTurnover.Second
+    case ExpectedBusinessTurnover.Third => BusinessTurnover.Third
+    case ExpectedBusinessTurnover.Fourth => BusinessTurnover.Fourth
+    case ExpectedBusinessTurnover.Fifth => BusinessTurnover.Fifth
+    case ExpectedBusinessTurnover.Sixth => BusinessTurnover.Sixth
+    case ExpectedBusinessTurnover.Seventh => BusinessTurnover.Seventh
+    case _ => throw new Exception("Invalid business turnover value")
+  }
+
 }

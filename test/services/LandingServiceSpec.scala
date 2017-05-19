@@ -21,15 +21,19 @@ import models.{Country, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
-import models.businessactivities.BusinessActivities
+import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
+import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions,
+SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
+import models.renewal.{PaymentMethods => RPaymentMethods,
+PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -52,6 +56,8 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     override private[services] val cacheConnector = mock[DataCacheConnector]
     override private[services] val keyStore = mock[KeystoreConnector]
     override private[services] val desConnector = mock[AmlsConnector]
+    override private[services] val statusService = mock[StatusService]
+
   }
 
   implicit val hc = mock[HeaderCarrier]
@@ -81,6 +87,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   "refreshCache" must {
 
+
     val cacheMap = CacheMap("", Map.empty)
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -105,7 +112,10 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       } thenReturn Future.successful(result)
     }
 
+
     "return a cachMap of the saved sections" in {
+      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
@@ -126,6 +136,97 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, viewResponse.msbSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
+
+      whenReady(TestLandingService.refreshCache("regNo")){
+        _ mustEqual cacheMap
+      }
+    }
+
+  }
+
+  "refreshCache when status is renewalSubmitted" must {
+
+
+    val businessActivitiesSection = BusinessActivities(expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
+      involvedInOther = Some(BAInvolvedInOtherYes("test")),
+      customersOutsideUK = Some(BACustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)
+    )
+    val msbSection = MoneyServiceBusiness(
+      throughput = Some(ExpectedThroughput.Second),
+      transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+      sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None, None, None))
+    )
+    val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+    val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
+
+    val hvdSection  = Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+    receiveCashPayments = Some(ReceiveCashPayments(Some(paymentMethods))))
+
+    val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
+      Some(RPercentageOfCashPaymentOver15000.First),Some(RReceiveCashPayments(Some(renewalPaymentMethods))),
+      Some(TotalThroughput("02")),Some(WhichCurrencies(List("USD", "GBP", "EUR"),None,None,None,None)),
+      Some(TransactionsInLast12Months("12345678963")),
+      Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"),None,None)),
+      Some(MostTransactions(List(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("12345678963")),
+      false)
+
+
+    val cacheMap = CacheMap("", Map.empty)
+    val viewResponse = ViewResponse(
+      etmpFormBundleNumber = "FORMBUNDLENUMBER",
+      businessMatchingSection = None,
+      eabSection = None,
+      tradingPremisesSection = None,
+      aboutTheBusinessSection = None,
+      bankDetailsSection = Seq(None),
+      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
+      businessActivitiesSection = businessActivitiesSection,
+      responsiblePeopleSection = None,
+      tcspSection = None,
+      aspSection = None,
+      msbSection = Some(msbSection),
+      hvdSection = Some(hvdSection),
+      supervisionSection = None
+    )
+
+
+    def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
+      when {
+        mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
+      } thenReturn Future.successful(result)
+    }
+
+    "return a cachMap of the saved sections" in {
+
+      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+
+      when {
+        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+      } thenReturn Future.successful(viewResponse)
+      val user = mock[LoggedInUser]
+      when(ac.user).thenReturn(user)
+      when(user.oid).thenReturn("")
+      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(200)))
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AddPerson.key, viewResponse.aboutYouSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Tcsp.key, viewResponse.tcspSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Asp.key, viewResponse.aspSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, viewResponse.msbSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Renewal.key, renewalModel)
 
       whenReady(TestLandingService.refreshCache("regNo")){
         _ mustEqual cacheMap

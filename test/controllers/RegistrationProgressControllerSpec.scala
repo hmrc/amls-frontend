@@ -21,7 +21,7 @@ import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.responsiblepeople._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
@@ -98,6 +98,21 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
           val responseF = controller.get()(request)
           status(responseF) must be(SEE_OTHER)
+          redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
+        }
+      }
+    }
+
+    "redirect to renewal registration progress" when {
+      "status is ready for renewal submitted" must {
+        "renewal data exists in save4later" in new Fixture {
+          when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(RenewalSubmitted(None)))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be(SEE_OTHER)
+          redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
         }
       }
     }
