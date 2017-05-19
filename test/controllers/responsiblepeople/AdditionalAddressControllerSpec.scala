@@ -380,9 +380,9 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "true",
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
+            "addressLine1" -> "New line 1",
+            "addressLine2" -> "New line 2",
+            "postCode" -> "TE1 1ET"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
@@ -394,10 +394,23 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = additionalAddressController.post(RecordId, true)(requestWithParams)
+          val result = additionalAddressController.post(RecordId, edit = true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(additionalAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "New line 1"
+              d.detail("addressLine2") mustBe "New line 2"
+              d.detail("postCode") mustBe "TE1 1ET"
+              d.detail("originalLine1") mustBe "Line 1"
+              d.detail("originalLine2") mustBe "Line 2"
+              d.detail("originalPostCode") mustBe "AA1 1AA"
+          }
         }
       }
 

@@ -16,7 +16,6 @@
 
 package services
 
-import cats.data.OptionT
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness

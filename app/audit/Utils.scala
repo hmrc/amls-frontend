@@ -16,11 +16,20 @@
 
 package audit
 
-import play.api.libs.json.{JsObject, JsString, Json, Writes}
+import play.api.libs.json._
 
 object Utils {
   def toMap[A](model: A)(implicit writes: Writes[A]) = Json.toJson(model).as[JsObject].value.mapValues {
     case JsString(v) => v // for some reason, if you don't do this, it puts two double quotes around the resulting string
     case v => v.toString
+  }
+
+  implicit class JsExtensions(obj: JsObject) {
+    def maybeCombine[A](value: (String, Option[A]))(implicit writes: Writes[A]): JsObject = value match {
+      case (name, Some(v)) => obj ++ Json.obj(name -> Json.toJsFieldJsValueWrapper[A](v))
+      case _ => obj
+    }
+
+    def ++?[A](value: (String, Option[A]))(implicit writes: Writes[A]) = maybeCombine(value)
   }
 }
