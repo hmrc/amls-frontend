@@ -228,18 +228,32 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
             "addressLine2" -> "Address 2",
             "postcode" -> "AA1 1AA"
           )
+
+          val oldAddress = Address("Old address 1", "Old address 2", None, None, "Test")
+
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(YourTradingPremises("Test", oldAddress)))))))
 
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
-
 
           val result = controller.post(RecordId1, true)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
             Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Address 1"
+              d.detail("addressLine2") mustBe "Address 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+              d.detail("originalLine1") mustBe "Old address 1"
+              d.detail("originalLine2") mustBe "Old address 2"
+          }
         }
       }
 
