@@ -21,7 +21,7 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class rejected_reasonsSpec extends GenericTestHelper with MustMatchers {
+class revocation_reasonsSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
@@ -31,13 +31,13 @@ class rejected_reasonsSpec extends GenericTestHelper with MustMatchers {
 
   }
 
-  "rejected_reasons view" must {
+  "revocation_reasons view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.rejected_reasons("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.revocation_reasons("msgContent", "amlsRegNo", businessName, "endDate")
 
-      doc.title must be(Messages("notifications.rejr.title") +
+      doc.title must be(Messages("notifications.revr.title") +
         " - " + Messages("status.title") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -45,9 +45,9 @@ class rejected_reasonsSpec extends GenericTestHelper with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.rejected_reasons("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.revocation_reasons("msgContent", "amlsRegNo", businessName, "endDate")
 
-      heading.html must be(Messages("notifications.rejr.title"))
+      heading.html must be(Messages("notifications.revr.title"))
       subHeading.html must include(Messages("status.title"))
 
     }

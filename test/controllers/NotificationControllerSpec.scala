@@ -318,6 +318,39 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
     }
 
+    "display revocation_reasons" when {
+      "contact is REVR" in new Fixture {
+
+        val amlsRegNo = "regNo"
+        val msgTxt = "Revoked"
+        val notificationDetails = NotificationDetails(
+          Some(RevocationReasons),
+          None,
+          Some(msgTxt),
+          false,
+          dateTime
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegNo)))
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(notificationDetails)))
+
+        val result = controller.messageDetails("id", ContactType.RevocationReasons)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must include(msgTxt)
+        contentAsString(result) must include(testBusinessName)
+        contentAsString(result) must include(notificationDetails.dateReceived)
+        contentAsString(result) must include(amlsRegNo)
+
+      }
+    }
+
   }
 }
 
