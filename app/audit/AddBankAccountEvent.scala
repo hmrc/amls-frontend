@@ -23,6 +23,7 @@ import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
+import Utils._
 
 object AddBankAccountEvent {
 
@@ -56,11 +57,6 @@ object AddBankAccountEvent {
           (__ \ "iban").writeNullable[String]
         ) (unlift(BankAccountAuditDetail.unapply))
     }
-  }
-
-  private def toMap[A](model: A)(implicit writes: Writes[A]) = Json.toJson(model).as[JsObject].value.mapValues {
-    case JsString(v) => v // for some reason, if you don't do this, it puts two double quotes around the resulting string
-    case v => v.toString
   }
 
   implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = bankDetails.bankAccount map { ba =>

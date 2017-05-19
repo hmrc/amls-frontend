@@ -19,23 +19,22 @@ package services
 import connectors.AmlsNotificationConnector
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationApproval, AutoExpiryOfRegistration, MindedToReject, MindedToRevoke, NoLongerMindedToReject, NoLongerMindedToRevoke, Others, RejectionReasons, ReminderToPayForApplication, ReminderToPayForManualCharges, ReminderToPayForRenewal, ReminderToPayForVariation, RenewalApproval, RenewalReminder, RevocationReasons}
-import models.notifications.{NotificationDetails, ContactType, IDType, NotificationRow}
-import org.joda.time.{LocalDate, DateTime, DateTimeZone}
+import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.{Messages, I18nSupport, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
+class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
@@ -60,6 +59,8 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       false,
       IDType("132456")
     )
+
+    val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
     val testList = Seq(
       testNotifications.copy(contactType = Some(ApplicationApproval), receivedAt = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
@@ -103,9 +104,21 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
 
       "contact type is auto-rejected for failure to pay" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.ApplicationAutorejectionForFailureToPay))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.ApplicationAutorejectionForFailureToPay),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.ApplicationAutorejectionForFailureToPay
+        ))
+
         result.get.messageText.get mustBe (
           """<p>Your application to be supervised by HM Revenue and Customs (HMRC) under the Money Laundering regulations 2007 has failed.</p>""" +
             """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
@@ -120,9 +133,21 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
 
       "contact type is registration variation approval" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.RegistrationVariationApproval))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.RegistrationVariationApproval),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.RegistrationVariationApproval
+        ))
+
         result.get.messageText.get mustBe (
           """<p>The recent changes made to your details have been approved.</p>""" +
             """<p>You can find details of your registration on <a href="""" +
@@ -133,9 +158,21 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
 
       "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
 
-        val result = await(service.getMessageDetails("thing", "thing", ContactType.DeRegistrationEffectiveDateChange))
+        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ContactType.DeRegistrationEffectiveDateChange),
+            None,
+            None,
+            true,
+            dateTime
+          ))))
 
-        verifyZeroInteractions(amlsNotificationConnector)
+        val result = await(service.getMessageDetails(
+          "thing",
+          "thing",
+          ContactType.DeRegistrationEffectiveDateChange
+        ))
+
         result.get.messageText.get mustBe (
           """<p>The date your anti-money laundering supervision ended has been changed.</p>""" +
             """<p>You can see the new effective date on <a href="""" +
@@ -151,11 +188,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is ReminderToPayForVariation" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(ReminderToPayForVariation),
-              None,
-              Some(messageWithAmountRefNumberAndStatus),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ReminderToPayForVariation),
+            None,
+            Some(messageWithAmountRefNumberAndStatus),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
 
@@ -165,11 +204,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is ReminderToPayForApplication" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(ReminderToPayForApplication),
-              None,
-              Some(messageWithAmountRefNumberAndStatus),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ReminderToPayForApplication),
+            None,
+            Some(messageWithAmountRefNumberAndStatus),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication))
 
@@ -179,11 +220,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is ReminderToPayForRenewal" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(ReminderToPayForRenewal),
-              None,
-              Some(messageWithAmountRefNumberAndStatus),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ReminderToPayForRenewal),
+            None,
+            Some(messageWithAmountRefNumberAndStatus),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
 
@@ -193,11 +236,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is ReminderToPayForManualCharges" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(ReminderToPayForManualCharges),
-              None,
-              Some(messageWithAmountRefNumberAndStatus),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ReminderToPayForManualCharges),
+            None,
+            Some(messageWithAmountRefNumberAndStatus),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges))
 
@@ -207,11 +252,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is ApplicationApproval" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(ApplicationApproval),
-              None,
-              Some(messageWithDateAndRefNumber),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(ApplicationApproval),
+            None,
+            Some(messageWithDateAndRefNumber),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
 
@@ -221,11 +268,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is RenewalApproval" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(RenewalApproval),
-              None,
-              Some(messageWithDate),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(RenewalApproval),
+            None,
+            Some(messageWithDate),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval))
 
@@ -235,11 +284,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is AutoExpiryOfRegistration" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(AutoExpiryOfRegistration),
-              None,
-              Some(messageWithDate),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(AutoExpiryOfRegistration),
+            None,
+            Some(messageWithDate),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration))
 
@@ -249,11 +300,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
       "contact type is RenewalReminder" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(RenewalReminder),
-              None,
-              Some(messageWithDate),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(RenewalReminder),
+            None,
+            Some(messageWithDate),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
 
@@ -265,11 +318,13 @@ class NotificationServiceSpec  extends GenericTestHelper with MockitoSugar {
         val message = "<P># Test Heading</P><P>* bullet 1</P><P>* bullet 2</P><P>* bullet 3</P>"
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(
-            NotificationDetails(Some(MindedToReject),
-              None,
-              Some(message),
-              true))))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            Some(MindedToReject),
+            None,
+            Some(message),
+            true,
+            dateTime
+          ))))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToRevoke))
 

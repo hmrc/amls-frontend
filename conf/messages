@@ -1546,6 +1546,7 @@ notifications.table.header.date = Date
 
 notifications.reason.considering.refusal = Reason for considering refusal
 
+notifications.rejr.title = Your application has been refused
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
 
