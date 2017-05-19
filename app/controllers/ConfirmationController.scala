@@ -83,7 +83,6 @@ trait ConfirmationController extends BaseController {
   private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     dataCacheConnector.fetch[Renewal](Renewal.key).flatMap { renewal =>
-      println("===================renewal================================="+renewal)
       if (renewal.isDefined) {
         getRenewalFees
       } else {
