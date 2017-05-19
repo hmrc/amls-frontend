@@ -16,16 +16,17 @@
 
 package audit
 
-import uk.gov.hmrc.play.audit.AuditExtensions._
+import audit.Utils._
+import cats.Functor
+import cats.implicits._
+import models.aboutthebusiness._
 import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
+import models.tradingpremises.{Address => TradingPremisesAddress}
+import play.api.libs.json._
+import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
-import Utils.toMap
-import play.api.libs.json.Json
-import cats.implicits._
-import models.aboutthebusiness._
-import models.tradingpremises.{Address => TradingPremisesAddress}
 
 case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
 
@@ -34,17 +35,49 @@ object AuditAddress {
 }
 
 object AddressCreatedEvent {
-
   def apply(address: AuditAddress)(implicit hc: HeaderCarrier) = DataEvent(
     auditSource = AppName.appName,
     auditType = "manualAddressSubmitted",
     tags = hc.toAuditTags("manualAddressSubmitted", "n/a"),
     detail = hc.toAuditDetails() ++ toMap(address)
   )
+}
 
+case class AddressModifiedEvent(currentAddress: AuditAddress, oldAddress: Option[AuditAddress])
+
+object AddressModifiedEvent {
+
+  implicit val writes = Writes[AddressModifiedEvent] { event =>
+    import play.api.libs.json._
+
+    val currentAddressObj = Json.obj(
+      "addressLine1" -> event.currentAddress.addressLine1,
+      "addressLine2" -> event.currentAddress.addressLine2,
+      "country" -> event.currentAddress.country) ++?
+      ("addressLine3" -> event.currentAddress.addressLine3) ++?
+      ("postCode" -> event.currentAddress.postCode)
+
+    event.oldAddress.fold(currentAddressObj){ old =>
+      currentAddressObj ++ Json.obj(
+        "originalLine1" -> old.addressLine1,
+        "originalLine2" -> old.addressLine2,
+        "originalCountry" -> old.country) ++?
+        ("originalLine3" -> old.addressLine3) ++?
+        ("originalPostCode" -> old.postCode)
+    }
+
+  }
 }
 
 object AddressConversions {
+
+  implicit def toDataEvent(event: AddressModifiedEvent)(implicit hc: HeaderCarrier): DataEvent = DataEvent(
+    auditSource = AppName.appName,
+    auditType = "addressModified",
+    tags = hc.toAuditTags("addressModified", "n/a"),
+    detail = hc.toAuditDetails() ++ toMap(event)
+  )
+
   implicit def convert(address: PersonAddress): AuditAddress = address match {
     case a: PersonAddressUK => convert(a)
     case a: PersonAddressNonUK => convert(a)
@@ -80,4 +113,7 @@ object AddressConversions {
 
   implicit def convert(address: NonUKCorrespondenceAddress): AuditAddress =
     AuditAddress(address.addressLineNonUK1, address.addressLineNonUK2, address.addressLineNonUK3, address.country.name, None)
+
+  implicit def convertOptionalAddress[A](address: Option[A])(implicit f: A => AuditAddress): Option[AuditAddress] = Functor[Option].lift(f)(address)
+
 }

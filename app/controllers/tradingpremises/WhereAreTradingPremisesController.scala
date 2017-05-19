@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import audit.AddressCreatedEvent
+import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -26,10 +26,13 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionSta
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
 import audit.AddressConversions._
+import cats.data._
+import cats.implicits._
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -57,17 +60,27 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
-        case ValidForm(_, ytp) => {
-          for {
-            tradingPremises <- getData[TradingPremises](index)
-            _ <- updateDataStrict[TradingPremises](index)(updateTradingPremises(ytp, _))
-            status <- statusService.getStatus
-            result <- redirectTo(index, edit, ytp, tradingPremises, status)
-          } yield result
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
+        case ValidForm(_, ytp) =>
+          val block = for {
+            tradingPremises <- OptionT(getData[TradingPremises](index))
+            _ <- OptionT.liftF(updateDataStrict[TradingPremises](index)(updateTradingPremises(ytp, _)))
+            status <- OptionT.liftF(statusService.getStatus)
+            _ <- OptionT.liftF(
+              sendAudits(ytp.tradingPremisesAddress, tradingPremises.yourTradingPremises.fold[Option[Address]](None)(_.tradingPremisesAddress.some), edit)
+            )
+          } yield redirectTo(index, edit, ytp, tradingPremises, status)
+
+          block getOrElse NotFound(notFoundView)
       }
+  }
+
+  private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)
+                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    if (edit) {
+      auditConnector.sendEvent(AddressModifiedEvent(address, oldAddress))
+    } else {
+      auditConnector.sendEvent(AddressCreatedEvent(address))
+    }
   }
 
   private def updateTradingPremises(ytp: YourTradingPremises, tp: TradingPremises) = {
@@ -84,19 +97,15 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   }
 
-  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: Option[TradingPremises], status: SubmissionStatus)
+  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus)
                         (implicit hc: HeaderCarrier) = status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange(tp, ytp) && edit =>
-        Future.successful(Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index)))
+      case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange(Some(tp), ytp) && edit =>
+        Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
       case _ => edit match {
-        case true => Future.successful(Redirect(routes.SummaryController.getIndividual(index)))
-        case _ =>
-          auditConnector.sendEvent(AddressCreatedEvent(ytp.tradingPremisesAddress)) map { _ =>
-            Redirect(routes.ActivityStartDateController.get(index, edit))
-          }
+        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case _ => Redirect(routes.ActivityStartDateController.get(index, edit))
       }
     }
-
 
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
