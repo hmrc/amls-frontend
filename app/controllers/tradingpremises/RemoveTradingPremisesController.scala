@@ -43,7 +43,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         status <- statusService.getStatus
       } yield (tp, status) match {
 
-        case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_)) =>
+        case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) =>
           Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
             tp.yourTradingPremises.fold("")(_.tradingName), showDateField = tp.lineId.isDefined))
 
