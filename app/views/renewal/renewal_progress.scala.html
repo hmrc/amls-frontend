@@ -17,7 +17,7 @@
 @import include._
 @import models.registrationprogress.Section
 @import models.registrationprogress._
-@import views.html.registrationprogress._
+@import views.html.registrationamendment.section
 @import views.html.registrationamendment.section_list
 @import utils.Strings._
 @import views.html.helper.CSRF
@@ -52,7 +52,7 @@
 
             <div class="grid-layout grid-layout--stacked renewal-progress-section">
                 <ul>
-                    @section(renewalSection.name, renewalSection.status, renewalSection.call)
+                    @section(renewalSection.name, renewalSection.status, renewalSection.hasChanged, renewalSection.call)
                 </ul>
             </div>
 
