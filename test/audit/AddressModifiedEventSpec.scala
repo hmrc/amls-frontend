@@ -47,7 +47,7 @@ class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPer
           "originalPostCode" -> "NE1 1ET"
         )
 
-        val event: DataEvent = AddressModifiedEvent(currentAddress, oldAddress)
+        val event: DataEvent = AddressModifiedEvent(currentAddress, oldAddress.some)
 
         event.detail mustBe expectedResult
       }
@@ -65,7 +65,7 @@ class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPer
           "originalCountry" -> "France"
         )
 
-        val event: DataEvent = AddressModifiedEvent(currentAddress, oldAddress)
+        val event: DataEvent = AddressModifiedEvent(currentAddress, oldAddress.some)
 
         event.detail mustBe expectedResult
       }

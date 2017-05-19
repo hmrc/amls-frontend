@@ -17,6 +17,7 @@
 package audit
 
 import audit.Utils._
+import cats.Functor
 import cats.implicits._
 import models.aboutthebusiness._
 import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
@@ -42,23 +43,29 @@ object AddressCreatedEvent {
   )
 }
 
-case class AddressModifiedEvent(currentAddress: AuditAddress, oldAddress: AuditAddress)
+case class AddressModifiedEvent(currentAddress: AuditAddress, oldAddress: Option[AuditAddress])
 
 object AddressModifiedEvent {
 
   implicit val writes = Writes[AddressModifiedEvent] { event =>
     import play.api.libs.json._
-    Json.obj(
+
+    val currentAddressObj = Json.obj(
       "addressLine1" -> event.currentAddress.addressLine1,
       "addressLine2" -> event.currentAddress.addressLine2,
-      "country" -> event.currentAddress.country,
-      "originalLine1" -> event.oldAddress.addressLine1,
-      "originalLine2" -> event.oldAddress.addressLine2,
-      "originalCountry" -> event.oldAddress.country) ++?
+      "country" -> event.currentAddress.country) ++?
       ("addressLine3" -> event.currentAddress.addressLine3) ++?
-      ("originalLine3" -> event.oldAddress.addressLine3) ++?
-      ("postCode" -> event.currentAddress.postCode) ++?
-      ("originalPostCode" -> event.oldAddress.postCode)
+      ("postCode" -> event.currentAddress.postCode)
+
+    event.oldAddress.fold(currentAddressObj){ old =>
+      currentAddressObj ++ Json.obj(
+        "originalLine1" -> old.addressLine1,
+        "originalLine2" -> old.addressLine2,
+        "originalCountry" -> old.country) ++?
+        ("originalLine3" -> old.addressLine3) ++?
+        ("originalPostCode" -> old.postCode)
+    }
+
   }
 }
 
@@ -106,4 +113,7 @@ object AddressConversions {
 
   implicit def convert(address: NonUKCorrespondenceAddress): AuditAddress =
     AuditAddress(address.addressLineNonUK1, address.addressLineNonUK2, address.addressLineNonUK3, address.country.name, None)
+
+  implicit def convertOptionalAddress[A](address: Option[A])(implicit f: A => AuditAddress): Option[AuditAddress] = Functor[Option].lift(f)(address)
+
 }

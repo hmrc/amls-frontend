@@ -77,7 +77,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)
                         (implicit hc: HeaderCarrier): Future[AuditResult] = {
     if (edit) {
-      auditConnector.sendEvent(AddressModifiedEvent(address, oldAddress.get))
+      auditConnector.sendEvent(AddressModifiedEvent(address, oldAddress))
     } else {
       auditConnector.sendEvent(AddressCreatedEvent(address))
     }
