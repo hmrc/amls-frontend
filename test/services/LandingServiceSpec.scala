@@ -28,8 +28,10 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
-import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
+import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions,
+SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
+import models.renewal.{PaymentMethods => RPaymentMethods,
+PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePeople
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
@@ -56,7 +58,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     override private[services] val desConnector = mock[AmlsConnector]
     override private[services] val statusService = mock[StatusService]
 
-    when(statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
   }
 
   implicit val hc = mock[HeaderCarrier]
@@ -86,7 +87,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   "refreshCache" must {
 
-    when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+
     val cacheMap = CacheMap("", Map.empty)
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -111,7 +112,10 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       } thenReturn Future.successful(result)
     }
 
+
     "return a cachMap of the saved sections" in {
+      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
@@ -132,7 +136,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, viewResponse.msbSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, Renewal.key, Renewal())
 
       whenReady(TestLandingService.refreshCache("regNo")){
         _ mustEqual cacheMap
@@ -143,7 +146,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   "refreshCache when status is renewalSubmitted" must {
 
-    when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
     val businessActivitiesSection = BusinessActivities(expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
       involvedInOther = Some(BAInvolvedInOtherYes("test")),
@@ -201,6 +203,9 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     }
 
     "return a cachMap of the saved sections" in {
+
+      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)

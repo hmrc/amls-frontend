@@ -84,7 +84,7 @@ trait ConfirmationController extends BaseController {
 
     dataCacheConnector.fetch[Renewal](Renewal.key).flatMap { renewal =>
       println("===================renewal================================="+renewal)
-      if (!renewal.contains(Renewal())) {
+      if (renewal.isDefined) {
         getRenewalFees
       } else {
         getVariationFees

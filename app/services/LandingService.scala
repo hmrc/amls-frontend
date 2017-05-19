@@ -77,44 +77,44 @@ trait LandingService {
     cacheConnector.remove(BusinessMatching.key)
   }
 
-  def getRenewalData(viewResponse: ViewResponse)(implicit
+  def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
                                                  authContext: AuthContext,
                                                  hc: HeaderCarrier,
                                                  ec: ExecutionContext
-  ): Future[Option[Renewal]] = {
+  ): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000, ReceiveCashPayments => HvdReceiveCashPayments}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
 
-    val data = statusService.getStatus map {
-      case RenewalSubmitted(_) => Some(Renewal(
-        involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i =>BAInvolvedInOther.convert(i)),
-        businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data =>ExpectedBusinessTurnover.convert(data)),
-        turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data =>ExpectedAMLSTurnover.convert(data)),
-        customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
-        percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
-          (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
-        receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
-          (_.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(r))),
-        totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
-        whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
-        transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
-          (_.transactionsInNext12Months.map(t =>TransactionsInLast12Months(t.txnAmount))),
-        sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
-          (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
-        mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
-          (_.mostTransactions.map(m => MostTransactions(m.countries))),
-        ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
-          (_.ceTransactionsInNext12Months.map(t =>CETransactionsInLast12Months(t.ceTransaction)))
-      ))
-      case _=> None
-    }
-    data map {x =>
-      println("data=============================================================="+ x)
+    statusService.getStatus flatMap {
+      case RenewalSubmitted(_) => {
+        val renewal = Some(Renewal(
+          involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i => BAInvolvedInOther.convert(i)),
+          businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data => ExpectedBusinessTurnover.convert(data)),
+          turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data => ExpectedAMLSTurnover.convert(data)),
+          customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
+          percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
+            (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
+          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
+            (_.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(r))),
+          totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
+          whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
+          transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
+            (_.transactionsInNext12Months.map(t => TransactionsInLast12Months(t.txnAmount))),
+          sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
+            (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
+          mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
+            (_.mostTransactions.map(m => MostTransactions(m.countries))),
+          ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
+            (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
+        ))
+        cacheConnector.save[Renewal](Renewal.key, renewal)
+      }
+      case _=> Future.successful(cacheMap)
+
     }
 
-    data
   }
 
 
@@ -139,9 +139,7 @@ trait LandingService {
                             _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
                               _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
                                 _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
-                                  _ => getRenewalData(viewResponse) flatMap {renewal =>
-                                    cacheConnector.save[Renewal](Renewal.key, renewal)
-                                  }
+                                  cacheMap => saveRenewalData(viewResponse, cacheMap)
                                 }
                               }
                             }

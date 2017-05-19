@@ -125,7 +125,7 @@ trait WhoIsRegisteringController extends BaseController {
     statusService.getStatus flatMap {
       case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) if AmendmentsToggle.feature =>
         renewalService.getRenewal map {
-          case Some(r) if !r.equals(Renewal()) => status(who_is_registering_this_renewal(form, rp))
+          case Some(_) => status(who_is_registering_this_renewal(form, rp))
           case _ => status(who_is_registering_this_update(form, rp))
         }
       case RenewalSubmitted(_) => Future.successful(status(who_is_registering_this_update(form, rp)))
