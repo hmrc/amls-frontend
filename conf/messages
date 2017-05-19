@@ -101,7 +101,7 @@ error.required.atb.registered.for.vat = Select yes if your business is registere
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
-error.required.rightaddress = Select yes if this is the right address to send you letters
+error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
@@ -781,6 +781,7 @@ aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
+aboutthebusiness.lettersaddress.title = Is this the right address to send you letters?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll be asked for things like:
@@ -1525,7 +1526,7 @@ notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
 
-notifications.subject.MindedToReject = Rejection of Application being Considered
+notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
 notifications.subject.NoLongerMindedToReject = Rejection of Application no longer being Considered
 notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
@@ -1544,10 +1545,12 @@ notifications.table.header.type = Type
 notifications.table.header.date = Date
 
 notifications.reason.considering.refusal = Reason for considering refusal
+notifications.reason.revocation = Reason for revocation
 
 notifications.rejr.title = Your application has been refused
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
+notifications.revr.title = Your supervision has been revoked
 
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
