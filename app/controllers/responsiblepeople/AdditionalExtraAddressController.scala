@@ -16,18 +16,22 @@
 
 package controllers.responsiblepeople
 
+import audit.AddressConversions._
+import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data._
+import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{PersonAddressUK, ResponsiblePeople, ResponsiblePersonAddress, ResponsiblePersonAddressHistory}
+import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_extra_address
-import audit.AddressConversions._
-import audit.AddressCreatedEvent
 
 import scala.concurrent.Future
 
@@ -76,21 +80,43 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
   private def updateAndRedirect(data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
                                (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) { res =>
+    val doUpdate = () => updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) => a.additionalExtraAddress(data)
           case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
         }
       )
-    } flatMap { _ =>
+    } map { _ =>
       data.timeAtAddress match {
-        case Some(_) if edit => Future.successful(Redirect(routes.DetailedAnswersController.get(index)))
-        case _ =>
-          auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-            Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
-          }
+        case Some(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
+        case _ => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, fromDeclaration))
+
       }
+    }
+
+    val block = for {
+      rp <- OptionT(getData[ResponsiblePeople](index))
+      result <- OptionT.liftF(doUpdate())
+      _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit))
+    } yield result
+
+    block getOrElse NotFound(notFoundView)
+  }
+
+  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePeople, edit: Boolean)(implicit hc: HeaderCarrier): Future[AuditResult] = {
+    if (edit) {
+      val oldAddress = for {
+        history <- model.addressHistory
+        addr <- history.additionalExtraAddress
+      } yield addr
+
+      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
+        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
+      }
+    }
+    else {
+      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
     }
   }
 }
