@@ -314,6 +314,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(testBusinessName)
         contentAsString(result) must include(notificationDetails.dateReceived)
+        contentAsString(result) must include(amlsRegNo)
 
       }
     }
