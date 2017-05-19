@@ -16,6 +16,7 @@
 
 package services
 
+import cats.data.OptionT
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
@@ -77,7 +78,7 @@ trait LandingService {
     cacheConnector.remove(BusinessMatching.key)
   }
 
-  def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
+  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
                                                  authContext: AuthContext,
                                                  hc: HeaderCarrier,
                                                  ec: ExecutionContext
@@ -94,18 +95,26 @@ trait LandingService {
           businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data => ExpectedBusinessTurnover.convert(data)),
           turnover = viewResponse.businessActivitiesSection.expectedAMLSTurnover.map(data => ExpectedAMLSTurnover.convert(data)),
           customersOutsideUK = viewResponse.businessActivitiesSection.customersOutsideUK.map(c => CustomersOutsideUK(c.countries)),
+
           percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
             (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
+
           receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None)
             (_.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(r))),
+
           totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
+
           whichCurrencies = viewResponse.msbSection.fold[Option[WhichCurrencies]](None)(_.whichCurrencies.map(c => MsbWhichCurrencies.convert(c))),
+
           transactionsInLast12Months = viewResponse.msbSection.fold[Option[TransactionsInLast12Months]](None)
             (_.transactionsInNext12Months.map(t => TransactionsInLast12Months(t.txnAmount))),
+
           sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
             (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
+
           mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
             (_.mostTransactions.map(m => MostTransactions(m.countries))),
+
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
