@@ -105,7 +105,9 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val fetchResult = Future.successful(None)
+        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+
+        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, Some(address))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -136,6 +138,48 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
             d.detail("addressLine1") mustBe "Add Line 1"
             d.detail("addressLine2") mustBe "Add Line 2"
             d.detail("postCode") mustBe "AA1 1AA"
+        }
+      }
+
+      "a valid form request is sent in the body when editing" in new Fixture {
+
+        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+
+        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, Some(address))))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "yourName" -> "Name",
+          "businessName" -> "Business Name",
+          "isUK"         -> "true",
+          "addressLine1" -> "Add Line 1",
+          "addressLine2" -> "Add Line 2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
+          "postCode" -> "AA1 1AA"
+        )
+
+        when(controller.dataConnector.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(fetchResult)
+
+        when(controller.dataConnector.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(edit = true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+        captor.getValue match {
+          case d: DataEvent =>
+            d.detail("addressLine1") mustBe "Add Line 1"
+            d.detail("addressLine2") mustBe "Add Line 2"
+            d.detail("postCode") mustBe "AA1 1AA"
+            d.detail("originalLine1") mustBe "old line 1"
+            d.detail("originalLine2") mustBe "old line 2"
+            d.detail("originalLine3") mustBe "old line 3"
+            d.detail("originalPostCode") mustBe "AA1 1AA"
         }
       }
 
