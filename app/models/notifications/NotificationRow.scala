@@ -16,7 +16,7 @@
 
 package models.notifications
 
-import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
+import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval, RejectionReasons}
 import models.notifications.StatusType.DeRegistered
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -55,7 +55,12 @@ case class NotificationRow(
   }
 
   def subject = {
-    s"notifications.subject.$getContactType"
+    
+    contactType match {
+      case Some(_@RejectionReasons) => "notifications.fail.title"
+      case _ => s"notifications.subject.$getContactType"
+    }
+
   }
 
 }

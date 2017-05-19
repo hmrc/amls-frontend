@@ -1548,6 +1548,7 @@ notifications.reason.revocation = Reason for revocation
 notifications.reason.refusal = Reason for refusal
 
 notifications.rejr.title = Your application has been refused
+notifications.fail.title = Your application has failed
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
 notifications.revr.title = Your supervision has been revoked
