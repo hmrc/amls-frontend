@@ -1544,10 +1544,12 @@ notifications.table.header.type = Type
 notifications.table.header.date = Date
 
 notifications.reason.considering.refusal = Reason for considering refusal
+notifications.reason.revocation = Reason for revocation
 
 notifications.rejr.title = Your application has been refused
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
+notifications.revr.title = Your supervision has been revoked
 
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
