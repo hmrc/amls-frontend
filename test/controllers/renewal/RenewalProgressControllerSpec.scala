@@ -139,6 +139,32 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
+    "load the page when status is renewal submitted and one of the section is modified" in new Fixture {
+
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
+
+      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
+      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(bmWithoutTCSPOrMSB)
+
+      when(controller.progressService.sections(cacheMap))
+        .thenReturn(Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get())
+        ))
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
+      html.select(".progress-step_changed").size() must be(1)
+      html.select("button[name=submit]").hasAttr("disabled") must be(false)
+
+    }
+
     "display all the available sections from a normal variation progress page" in new Fixture {
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))

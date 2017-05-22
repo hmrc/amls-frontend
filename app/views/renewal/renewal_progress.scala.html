@@ -17,7 +17,7 @@
 @import include._
 @import models.registrationprogress.Section
 @import models.registrationprogress._
-@import views.html.registrationprogress._
+@import views.html.registrationamendment.section
 @import views.html.registrationamendment.section_list
 @import utils.Strings._
 @import views.html.helper.CSRF
@@ -49,10 +49,10 @@
                 <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
                 }
             }
-
             <div class="grid-layout grid-layout--stacked renewal-progress-section">
-                <ul>
-                    @section(renewalSection.name, renewalSection.status, renewalSection.call)
+                <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
+                    <li></li>
+                    @section(renewalSection.name, renewalSection.status, renewalSection.hasChanged, renewalSection.call)
                 </ul>
             </div>
 
