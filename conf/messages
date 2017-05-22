@@ -1515,7 +1515,7 @@ notifications.subject.ApplicationApproval = Application Approval
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.RenewalApproval = Renewal Approval
 
-notifications.subject.RejectionReasons = Application Rejection
+notifications.subject.RejectionReasons = Your application has been refused
 notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
@@ -1546,8 +1546,10 @@ notifications.table.header.date = Date
 
 notifications.reason.considering.refusal = Reason for considering refusal
 notifications.reason.revocation = Reason for revocation
+notifications.reason.refusal = Reason for refusal
 
 notifications.rejr.title = Your application has been refused
+notifications.fail.title = Your application has failed
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
 notifications.revr.title = Your supervision has been revoked
