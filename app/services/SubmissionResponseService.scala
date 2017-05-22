@@ -36,7 +36,6 @@ trait SubmissionResponseService extends DataCacheService {
 
   private case class RowEntity(message: String, feePer: BigDecimal)
 
-
   def getSubscription
   (implicit
    ec: ExecutionContext,

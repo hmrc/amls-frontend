@@ -133,6 +133,9 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get(1, false)(request)
+        val contentString = contentAsString(result)
+        val doc =  Jsoup.parse(contentString)
+        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
       }
 
       "application status is ready for renewal" in new Fixture {
@@ -146,7 +149,23 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
         val result = controller.get(1, false)(request)
 
         val contentString = contentAsString(result)
+        val doc =  Jsoup.parse(contentString)
+        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+      }
 
+      "application status is ready for renewal amendment" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(RenewalSubmitted(None)))
+
+        val result = controller.get(1, false)(request)
+
+        val contentString = contentAsString(result)
+        val doc =  Jsoup.parse(contentString)
+        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
       }
 
       "application status is NotCompleted" in new Fixture {
@@ -158,6 +177,9 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1, false)(request)
+        val contentString = contentAsString(result)
+        val doc =  Jsoup.parse(contentString)
+        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(false)
 
       }
     }

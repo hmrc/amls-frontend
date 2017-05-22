@@ -25,7 +25,7 @@ import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.renewal.Renewal
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
+import models.status._
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
 import services.{SubmissionResponseService, StatusService, SubmissionService}
@@ -52,7 +52,8 @@ trait ConfirmationController extends BaseController {
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         for {
           status <- statusService.getStatus
           result <- resultFromStatus(status)
@@ -61,27 +62,28 @@ trait ConfirmationController extends BaseController {
   }
 
   def paymentConfirmation(reference: String) = Authorised.async {
-    implicit authContext => implicit request =>
-      val companyNameT = for {
-        r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-      } yield r.reviewDetails.fold("")(_.businessName)
+    implicit authContext =>
+      implicit request =>
+        val companyNameT = for {
+          r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+        } yield r.reviewDetails.fold("")(_.businessName)
 
-      val result = for {
-        status <- OptionT.liftF(statusService.getStatus)
-        businessName <- companyNameT orElse OptionT.some("")
-      } yield status match {
-        case SubmissionReadyForReview | SubmissionDecisionApproved => Ok(payment_confirmation_amendvariation(businessName, reference))
-        case ReadyForRenewal(_) => Ok(payment_confirmation_renewal(businessName, reference))
-        case _ => Ok(payment_confirmation(businessName, reference))
-      }
+        val result = for {
+          status <- OptionT.liftF(statusService.getStatus)
+          businessName <- companyNameT orElse OptionT.some("")
+        } yield status match {
+          case SubmissionReadyForReview | SubmissionDecisionApproved => Ok(payment_confirmation_amendvariation(businessName, reference))
+          case ReadyForRenewal(_) => Ok(payment_confirmation_renewal(businessName, reference))
+          case _ => Ok(payment_confirmation(businessName, reference))
+        }
 
-      result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
+        result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    dataCacheConnector.fetch[Renewal](Renewal.key).flatMap{ renewal =>
-      if (renewal.isDefined){
+    dataCacheConnector.fetch[Renewal](Renewal.key).flatMap { renewal =>
+      if (renewal.isDefined) {
         getRenewalFees
       } else {
         getVariationFees
@@ -89,32 +91,40 @@ trait ConfirmationController extends BaseController {
     }
   }
 
+  private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    for {
+      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+    } yield {
+      Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+    }
+  }
+
+  private def showVariationConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    for {
+      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+    } yield {
+      Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+    }
+  }
+
+  private def showAmendmentConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
+    for {
+      fees@(payRef, total, rows, difference) <- OptionT(getAmendmentFees)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, returnLocation(payRef)))
+    } yield {
+      Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+    }
+  }
+
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
-
-      val maybeResult = status match {
-      case SubmissionReadyForReview =>
-        for {
-          fees@(payRef, total, rows, difference) <- OptionT(getAmendmentFees)
-          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, returnLocation(payRef)))
-        } yield {
-          Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies:_*)
-        }
-      case SubmissionDecisionApproved =>
-        for {
-            fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-            paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
-          } yield {
-            Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
-          }
-      case ReadyForRenewal(_) =>
-        for {
-          fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
-        } yield {
-          Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
-        }
+    val maybeResult = status match {
+      case SubmissionReadyForReview => showAmendmentConfirmation
+      case SubmissionDecisionApproved | RenewalSubmitted(_) => showVariationConfirmation
+      case ReadyForRenewal(_) => showRenewalConfirmation
       case _ =>
         for {
           (paymentRef, total, rows) <- OptionT.liftF(submissionResponseService.getSubscription)

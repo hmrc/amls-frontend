@@ -114,9 +114,8 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
     "successfully submit form and navigate to target page" in new Fixture {
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(AboutTheBusiness(None,None, None, None, None, Some(ukAddress), None))))
       when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -144,6 +143,43 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
       }
     }
 
+    "successfully submit form and navigate to summary page after edit" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(AboutTheBusiness(None,None, None, None, None, Some(ukAddress), None))))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
+        "addressLine1"->"line1",
+        "addressLine2"->"line2",
+        "addressLine3"->"",
+        "addressLine4"->"",
+        "postCode"->"AA1 1AA")
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+
+      captor.getValue match {
+        case d: DataEvent =>
+          d.detail("addressLine1") mustBe "line1"
+          d.detail("addressLine2") mustBe "line2"
+          d.detail("postCode") mustBe "AA1 1AA"
+          d.detail("originalLine1") mustBe "305"
+          d.detail("originalLine2") mustBe "address line"
+          d.detail("originalLine3") mustBe "address line2"
+          d.detail("originalPostCode") mustBe "AA1 1AA"
+      }
+    }
+
     "fail submission on invalid address" in new Fixture {
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
@@ -160,6 +196,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
         "addressLine3"->"",
         "addressLine4"->"",
         "postCode"->"AA1 1AA")
+
       val result = controller.post()(newRequest)
       val document: Document  = Jsoup.parse(contentAsString(result))
       val errorCount = 2
@@ -208,6 +245,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
           "addressLine3" -> "",
           "addressLine4" -> "",
           "postCode" -> "AA1 1AA")
+
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -230,6 +268,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
           "addressLine3" -> "",
           "addressLine4" -> "",
           "postCode" -> "AA1 1AA")
+
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -290,14 +329,17 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
       }
 
       "the status is ready for renewal and registeredOffice has changed" in new Fixture {
+
+        val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(Some(LocalDate.now()))))
-        val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+
         when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
+
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
-
 
         val newRequest = request.withFormUrlEncodedBody(
           "isUK" -> "true",
@@ -306,6 +348,7 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
           "addressLine3" -> "",
           "addressLine4" -> "",
           "postCode" -> "AA1 1AA")
+
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)

@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
+import models.renewal.Renewal
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
 import models.status._
 import play.api.Play
@@ -127,6 +128,7 @@ trait WhoIsRegisteringController extends BaseController {
           case Some(_) => status(who_is_registering_this_renewal(form, rp))
           case _ => status(who_is_registering_this_update(form, rp))
         }
+      case RenewalSubmitted(_) => Future.successful(status(who_is_registering_this_update(form, rp)))
       case _ => Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
 

@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import audit.AddressCreatedEvent
+import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -101,15 +101,15 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           rpHistory <- rp.addressHistory
           rpCurrAddr <- rpHistory.currentAddress
         } yield rpCurrAddr.personAddress
-
-        status match {
-          case SubmissionDecisionApproved | ReadyForRenewal(_)
-            if(redirectToDateOfChange[PersonAddress](originalAddress, data.personAddress)
-              && originalResponsiblePerson.flatMap {
-              orp => orp.lineId
-            }.isDefined && originalAddress.isDefined) =>
-            Future.successful(Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit)))
-          case _ => Future.successful(Redirect(routes.DetailedAnswersController.get(index, edit)))
+        auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+            && originalResponsiblePerson.flatMap {
+            orp => orp.lineId
+          }.isDefined && originalAddress.isDefined) {
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          } else {
+            Redirect(routes.DetailedAnswersController.get(index, edit))
+          }
         }
       } else {
         auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>

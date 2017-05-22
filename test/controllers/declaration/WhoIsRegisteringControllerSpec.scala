@@ -158,6 +158,32 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           contentAsString(result) must include(Messages("submit.registration"))
         }
 
+
+        "status is renewal amendment" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(RenewalSubmitted(None)))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+
+
         "status is renewal" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]

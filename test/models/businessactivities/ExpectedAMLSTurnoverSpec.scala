@@ -20,6 +20,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.renewal.AMLSTurnover
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
@@ -139,6 +140,17 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
     "throw error for invalid data" in {
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "20")) must
         be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+    }
+
+    "convert ExpectedAMLSTurnover to renewal AMLSTurnover model" in {
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.First) mustBe AMLSTurnover.First
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Second) mustBe AMLSTurnover.Second
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Third) mustBe AMLSTurnover.Third
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Fourth) mustBe AMLSTurnover.Fourth
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Fifth) mustBe AMLSTurnover.Fifth
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Sixth) mustBe AMLSTurnover.Sixth
+      ExpectedAMLSTurnover.convert(ExpectedAMLSTurnover.Seventh) mustBe AMLSTurnover.Seventh
+
     }
   }
 }

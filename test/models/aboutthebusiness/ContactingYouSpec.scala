@@ -26,28 +26,15 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
   "Contacting You Form Details" must {
 
     "successfully validate" when {
-      "given a valid phone number, email and letterToThisAddress 'true' value" in {
+      "given a valid phone number and email " in {
 
         val data = Map(
           "phoneNumber" -> Seq("1234567890"),
-          "email" -> Seq("test@test.com"),
-          "letterToThisAddress" -> Seq("true")
+          "email" -> Seq("test@test.com")
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Valid(ContactingYouForm("1234567890", "test@test.com", true)))
-      }
-
-      "given a valid phone number, email and letterToThisAddress 'false' value" in {
-
-        val data = Map(
-          "phoneNumber" -> Seq("1234567890"),
-          "email" -> Seq("test@test.com"),
-          "letterToThisAddress" -> Seq("false")
-        )
-
-        ContactingYouForm.formRule.validate(data) must
-          be(Valid(ContactingYouForm("1234567890", "test@test.com", false)))
+          be(Valid(ContactingYouForm("1234567890", "test@test.com")))
       }
     }
 
@@ -57,8 +44,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         ContactingYouForm.formRule.validate(Map.empty) must
           be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required")),
-            (Path \ "email") -> Seq(ValidationError("error.required")),
-            (Path \ "letterToThisAddress") -> Seq(ValidationError("error.required.rightaddress"))
+            (Path \ "email") -> Seq(ValidationError("error.required"))
           )))
       }
 
@@ -66,15 +52,13 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "phoneNumber" -> Seq(""),
-          "email" -> Seq(""),
-          "letterToThisAddress" -> Seq("")
+          "email" -> Seq("")
         )
 
         ContactingYouForm.formRule.validate(data) must
           be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number")),
-            (Path \ "email") -> Seq(ValidationError("error.required.rp.email")),
-            (Path \ "letterToThisAddress") -> Seq(ValidationError("error.required.rightaddress"))
+            (Path \ "email") -> Seq(ValidationError("error.required.rp.email"))
           )))
       }
 
@@ -82,8 +66,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "phoneNumber" -> Seq("1" * 31),
-          "email" -> Seq("a" * 101 + "@test.com"),
-          "letterToThisAddress" -> Seq("true")
+          "email" -> Seq("a" * 101 + "@test.com")
         )
 
         ContactingYouForm.formRule.validate(data) must
@@ -97,8 +80,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "phoneNumber" -> Seq("12ab34cd"),
-          "email" -> Seq("test@test.com"),
-          "letterToThisAddress" -> Seq("true")
+          "email" -> Seq("test@test.com")
         )
 
         ContactingYouForm.formRule.validate(data) must
@@ -110,11 +92,10 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
 
     val completeJson = Json.obj(
       "phoneNumber" -> "1234567890",
-      "email" -> "test@test.com",
-      "letterToThisAddress" -> true
+      "email" -> "test@test.com"
     )
 
-    val completeModel = ContactingYouForm("1234567890", "test@test.com", true)
+    val completeModel = ContactingYouForm("1234567890", "test@test.com")
 
     "serialize as expected" in {
       Json.toJson(completeModel) must be(completeJson)

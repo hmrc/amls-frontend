@@ -24,6 +24,7 @@ import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
 import models._
 import play.api.libs.json._
+import models.renewal.{WhichCurrencies => RWhichCurrencies}
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
 
@@ -35,6 +36,9 @@ case class WhichCurrencies(currencies: Seq[String],
 
 
 object WhichCurrencies {
+  def convert(wc: WhichCurrencies): RWhichCurrencies = {
+    RWhichCurrencies(wc.currencies,  wc.usesForeignCurrencies, wc.bankMoneySource, wc.wholesalerMoneySource, wc.customerMoneySource)
+  }
 
   type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
   type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])

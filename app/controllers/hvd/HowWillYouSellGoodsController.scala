@@ -39,7 +39,8 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
 
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         dataCacheConnector.fetch[Hvd](Hvd.key) map {
           response =>
             val form: Form2[HowWillYouSellGoods] = (for {
@@ -51,7 +52,8 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext =>
+      implicit request => {
         Form2[HowWillYouSellGoods](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(how_will_you_sell_goods(f, edit)))
@@ -62,12 +64,14 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
               _ <- dataCacheConnector.save[Hvd](Hvd.key,
                 hvd.howWillYouSellGoods(model)
               )
-            } yield status match {
-              case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[HowWillYouSellGoods](hvd.howWillYouSellGoods, model) =>
+            } yield {
+              if (redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
                 Redirect(routes.HvdDateOfChangeController.get())
-              case _ => edit match {
-                case true => Redirect(routes.SummaryController.get())
-                case false => Redirect(routes.CashPaymentController.get())
+              } else {
+                edit match {
+                  case true => Redirect(routes.SummaryController.get())
+                  case false => Redirect(routes.CashPaymentController.get())
+                }
               }
             }
         }

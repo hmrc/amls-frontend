@@ -16,6 +16,8 @@
 
 package controllers.aboutthebusiness
 
+import java.lang.ProcessBuilder.Redirect
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -33,10 +35,10 @@ trait ContactingYouController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, Some(details), Some(registeredOffice), _, _)) =>
-          Ok(contacting_you(Form2[ContactingYou](details), registeredOffice, edit))
-        case Some(AboutTheBusiness(_,_, _, _, None, Some(registeredOffice), _, _)) =>
-          Ok(contacting_you(EmptyForm, registeredOffice, edit))
+        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _)) =>
+          Ok(contacting_you(Form2[ContactingYou](details), edit))
+        case Some(AboutTheBusiness(_,_, _, _, None, _, _, _)) =>
+          Ok(contacting_you(EmptyForm, edit))
         case _ =>
           // TODO: Make sure this redirects to the right place
           Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
@@ -51,8 +53,8 @@ trait ContactingYouController extends BaseController {
             aboutTheBusiness <-
             dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
           } yield aboutTheBusiness match {
-            case Some(AboutTheBusiness(_, _,_, _, _, Some(registeredOffice), _, _)) =>
-              BadRequest(contacting_you(f, registeredOffice, edit))
+            case Some(AboutTheBusiness(_, _,_, _, _, _, _, _)) =>
+              BadRequest(contacting_you(f, edit))
             case _ =>
               Redirect(routes.ContactingYouController.get(edit))
           }
@@ -60,11 +62,13 @@ trait ContactingYouController extends BaseController {
           for {
             aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.contactingYou(data).correspondenceAddress(None)
+              aboutTheBusiness.contactingYou(data)
             )
-          } yield data.letterToThisAddress match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.CorrespondenceAddressController.get(edit))
+          } yield {
+            (aboutTheBusiness, edit) match {
+              case (Some(AboutTheBusiness(_,_,_,_,_,_,Some(correspondenceAddress),_)), true) => Redirect(routes.SummaryController.get())
+              case _ => Redirect(routes.LettersAddressController.get(edit))
+            }
           }
       }
   }

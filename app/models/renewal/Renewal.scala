@@ -16,7 +16,7 @@
 
 package models.renewal
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
@@ -80,5 +80,6 @@ object Renewal {
 
   implicit def default(renewal: Option[Renewal]): Renewal =
     renewal.getOrElse(Renewal())
+
 
 }

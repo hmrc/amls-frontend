@@ -77,10 +77,12 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
             _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
               updateData(estateAgentBusiness.services(data), data))
             status <- statusService.getStatus
-          } yield status match {
-            case SubmissionDecisionApproved | ReadyForRenewal(_) if redirectToDateOfChange[Services](estateAgentBusiness.services, data) =>
+          } yield {
+            if (redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
               Redirect(routes.ServicesDateOfChangeController.get())
-            case _ => redirectToNextPage(edit, data)
+            } else {
+              redirectToNextPage(edit, data)
+            }
           }
       }
   }

@@ -121,6 +121,17 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
           be(JsError(JsPath , play.api.data.validation.ValidationError("error.invalid")))
       }
     }
+
+    "convert model to renewal model" in {
+      import models.renewal.{PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000}
+
+      PercentageOfCashPaymentOver15000.convert(PercentageOfCashPaymentOver15000.First) must be(RPercentageOfCashPaymentOver15000.First)
+      PercentageOfCashPaymentOver15000.convert(PercentageOfCashPaymentOver15000.Second) must be(RPercentageOfCashPaymentOver15000.Second)
+      PercentageOfCashPaymentOver15000.convert(PercentageOfCashPaymentOver15000.Third) must be(RPercentageOfCashPaymentOver15000.Third)
+      PercentageOfCashPaymentOver15000.convert(PercentageOfCashPaymentOver15000.Fourth) must be(RPercentageOfCashPaymentOver15000.Fourth)
+      PercentageOfCashPaymentOver15000.convert(PercentageOfCashPaymentOver15000.Fifth) must be(RPercentageOfCashPaymentOver15000.Fifth)
+
+    }
    
   }
 }

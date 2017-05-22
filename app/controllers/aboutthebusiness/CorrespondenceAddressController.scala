@@ -16,16 +16,20 @@
 
 package controllers.aboutthebusiness
 
-import audit.AddressCreatedEvent
+import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, RegisteredOffice, UKCorrespondenceAddress}
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 import audit.AddressConversions._
+import cats.data.OptionT
+import cats.implicits._
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -54,19 +58,26 @@ trait CorrespondenceAddressController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(correspondence_address(f, edit)))
         case ValidForm(_, data) =>
-          (for {
-            aboutTheBusiness <- dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.correspondenceAddress(data)
-            )
+          val doUpdate = for {
+            aboutTheBusiness <- OptionT(dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+            _ <- OptionT.liftF(dataConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress(data)))
+            _ <- OptionT.liftF(auditAddressChange(data, aboutTheBusiness.correspondenceAddress, edit)) orElse OptionT.some(Success)
           } yield edit match {
-            case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case _ =>
-              auditConnector.sendEvent(AddressCreatedEvent(data)) map { _ =>
-                Redirect(routes.SummaryController.get())
-              }
-          }).flatMap(identity)
+            case true => Redirect(routes.SummaryController.get())
+            case _ => Redirect(routes.SummaryController.get())
+          }
+
+          doUpdate getOrElse InternalServerError("Could not update correspondence address")
       }
+    }
+  }
+
+  def auditAddressChange(currentAddress: CorrespondenceAddress, oldAddress: Option[CorrespondenceAddress], edit: Boolean)
+                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    if (edit) {
+      auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
+    } else {
+      auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
 }

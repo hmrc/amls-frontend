@@ -47,8 +47,7 @@ object ContactingYou {
 
 case class ContactingYouForm(
                               phoneNumber: String,
-                              email: String,
-                              letterToThisAddress: Boolean
+                              email: String
                             )
 
 object ContactingYouForm {
@@ -62,8 +61,7 @@ object ContactingYouForm {
       import jto.validation.forms.Rules._
       (
         (__ \ "phoneNumber").read(phoneNumberType) ~
-          (__ \ "email").read(emailType) ~
-          (__ \ "letterToThisAddress").read[Boolean].withMessage("error.required.rightaddress")
+          (__ \ "email").read(emailType)
         )(ContactingYouForm.apply _)
     }
 }

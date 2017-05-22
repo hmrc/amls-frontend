@@ -308,5 +308,78 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       submission.hvdSection.get.receiveCashPayments mustBe defined
     }
 
+
+    "submit a renewal amendment" in new Fixture {
+
+      when {
+        cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
+      } thenReturn Some(BusActivities())
+
+      when {
+        cache.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any())
+      } thenReturn Some(MoneyServiceBusiness())
+
+      when {
+        cache.getEntry[Hvd](eqTo(Hvd.key))(any())
+      } thenReturn Some(Hvd())
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+      when {
+        TestSubmissionService.cacheConnector.save[RenewalResponse](eqTo(RenewalResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        TestSubmissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+      } thenReturn Future.successful(mock[RenewalResponse])
+
+      val renewal = Renewal(
+        turnover = Some(AMLSTurnover.First),
+        businessTurnover = Some(BusinessTurnover.Second),
+        totalThroughput = Some(TotalThroughput("02")),
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
+        involvedInOtherActivities = Some(InvolvedInOtherNo),
+        mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
+          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
+        whichCurrencies = Some(WhichCurrencies(
+          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
+        transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
+        percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other")))))
+      )
+
+      val result = await(TestSubmissionService.renewalAmendment(renewal))
+
+      val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
+      verify(TestSubmissionService.amlsConnector).renewalAmendment(captor.capture(), any())(any(), any(), any())
+
+      val submission = captor.getValue
+      // The actual values of these are tested in renewals.models.Conversions
+      submission.businessActivitiesSection mustBe defined
+      submission.businessActivitiesSection.get.expectedAMLSTurnover mustBe defined
+      submission.businessActivitiesSection.get.expectedBusinessTurnover mustBe defined
+      submission.businessActivitiesSection.get.customersOutsideUK mustBe defined
+      submission.businessActivitiesSection.get.involvedInOther mustBe defined
+
+      submission.msbSection mustBe defined
+      submission.msbSection.get.throughput mustBe defined
+      submission.msbSection.get.mostTransactions mustBe defined
+      submission.msbSection.get.sendTheLargestAmountsOfMoney mustBe defined
+      submission.msbSection.get.whichCurrencies mustBe defined
+      submission.msbSection.get.ceTransactionsInNext12Months mustBe defined
+      submission.msbSection.get.transactionsInNext12Months mustBe defined
+
+      submission.hvdSection.get.percentageOfCashPaymentOver15000 mustBe defined
+      submission.hvdSection.get.receiveCashPayments mustBe defined
+    }
+
   }
 }

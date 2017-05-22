@@ -21,6 +21,7 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
+import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes}
 
 sealed trait InvolvedInOther
 
@@ -69,6 +70,11 @@ object InvolvedInOther {
                                           "details" -> details
                                         )
     case involvedInOtherNo => Json.obj("involvedInOther" -> false)
+  }
+
+  implicit def convert(model: InvolvedInOther): models.renewal.InvolvedInOther = model match {
+    case InvolvedInOtherYes(details) => models.renewal.InvolvedInOtherYes(details)
+    case InvolvedInOtherNo => models.renewal.InvolvedInOtherNo
   }
 
 }

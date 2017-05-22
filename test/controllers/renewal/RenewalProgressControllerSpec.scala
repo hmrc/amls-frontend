@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.ReadStatusResponse
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section}
-import models.status.ReadyForRenewal
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -93,15 +93,35 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
-
-    when(statusService.getDetailedStatus(any(), any(), any()))
-      .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
   }
 
   "The Renewal Progress Controller" must {
 
     "load the page" in new Fixture {
+
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
+      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(bmWithoutTCSPOrMSB)
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+
+      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
+
+    }
+
+    "load the page when status is renewal submitted" in new Fixture {
+
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
       val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
@@ -120,6 +140,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     }
 
     "display all the available sections from a normal variation progress page" in new Fixture {
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
       val result = controller.get()(request)
       val html = Jsoup.parse(contentAsString(result))
 
@@ -129,6 +152,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     }
 
     "display the renewal section" in new Fixture {
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
       val result = controller.get()(request)
       val html = Jsoup.parse(contentAsString(result))
 
@@ -136,6 +162,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     }
 
     "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
       when {
         dataCacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(None)
@@ -146,6 +175,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     }
 
     "redirect to the declaration page when the form is posted" in new Fixture {
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
       val result = controller.post()(request)
 
       redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)

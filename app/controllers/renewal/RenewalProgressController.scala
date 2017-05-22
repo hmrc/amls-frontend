@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
-import models.status.ReadyForRenewal
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -61,11 +61,10 @@ class RenewalProgressController @Inject()
 
             statusInfo match {
               case (ReadyForRenewal(renewalDate), _) => Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists, renewalDate))
+              case (RenewalSubmitted(renewalDate), _) => Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists, renewalDate))
               case _ => throw new Exception("Cannot get renewal date")
             }
-
           }
-
           block getOrElse InternalServerError("Cannot get business matching or renewal date")
         }
   }

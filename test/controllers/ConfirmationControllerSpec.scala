@@ -125,7 +125,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
     }
-
   }
 
   "ConfirmationController" must {

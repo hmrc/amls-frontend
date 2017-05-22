@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.responsiblepeople.{BeneficialOwner, PersonName, Positions, ResponsiblePeople}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -72,6 +72,21 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.get(1, true)(request)
+      status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      element.hasAttr("href") must be(true)
+    }
+
+    "load yourAnswers page when the status is renewal submitted" in new Fixture {
+      val personName = PersonName("first name", None, "last name", None, None)
+      val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
+      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       val result = controller.get(1, true)(request)
       status(result) must be(OK)

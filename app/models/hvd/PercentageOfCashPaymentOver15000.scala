@@ -20,10 +20,22 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json._
+import models.renewal.{PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000}
 
 sealed trait PercentageOfCashPaymentOver15000
 
 object PercentageOfCashPaymentOver15000 {
+
+  implicit def convert(model: PercentageOfCashPaymentOver15000): RPercentageOfCashPaymentOver15000 = {
+    model match {
+      case First => RPercentageOfCashPaymentOver15000.First
+      case Second => RPercentageOfCashPaymentOver15000.Second
+      case Third => RPercentageOfCashPaymentOver15000.Third
+      case Fourth => RPercentageOfCashPaymentOver15000.Fourth
+      case Fifth => RPercentageOfCashPaymentOver15000.Fifth
+    }
+  }
+
 
   case object First extends PercentageOfCashPaymentOver15000
   case object Second extends PercentageOfCashPaymentOver15000
