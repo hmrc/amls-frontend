@@ -19,8 +19,11 @@ package connectors
 import config.WSHttp
 import play.api.{Logger, Play}
 import play.api.libs.json.Json
+import play.api.mvc.Request
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,13 +65,13 @@ object BusinessMatchingReviewDetails {
   implicit val formats = Json.format[BusinessMatchingReviewDetails]
 }
 
-trait BusinessMatchingConnector extends ServicesConfig {
+trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPartialsConverter {
 
   val httpGet: HttpGet
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
 
-  def getReviewDetails(implicit hc: HeaderCarrier): Future[Option[BusinessMatchingReviewDetails]] = {
+  def getReviewDetails(implicit request: Request[_]): Future[Option[BusinessMatchingReviewDetails]] = {
 
     val url = s"$businessMatchingUrl/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
@@ -89,4 +92,5 @@ trait BusinessMatchingConnector extends ServicesConfig {
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
   override val httpGet = WSHttp
+  override val crypto = SessionCookieCryptoFilter.encrypt _
 }

@@ -105,7 +105,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
       when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -123,7 +123,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
       when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
