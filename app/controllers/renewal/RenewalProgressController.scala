@@ -49,7 +49,7 @@ class RenewalProgressController @Inject()
       implicit request =>
         renewals.getSection flatMap { renewalSection =>
 
-          val canSubmit = renewalSection.status == Completed
+          val canSubmit = renewalSection.status == Completed && renewalSection.hasChanged
 
           val block = for {
             cache <- OptionT(dataCacheConnector.fetchAll)
