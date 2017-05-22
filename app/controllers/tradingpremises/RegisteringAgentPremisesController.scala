@@ -47,8 +47,10 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
                 }
                 Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
               }
-              case Some(tp) => TPControllerHelper.redirectToNextPage(cache, index, edit)
-              case None => NotFound(notFoundView)
+              case Some(tp) if !edit => {
+                TPControllerHelper.redirectToNextPage(cache, index, edit)
+              }
+              case _ => NotFound(notFoundView)
             }
           } getOrElse NotFound(notFoundView)
       }

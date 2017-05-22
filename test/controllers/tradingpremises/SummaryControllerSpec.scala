@@ -35,6 +35,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
+import org.mockito.Matchers.{eq => meq}
+
 
 import scala.concurrent.Future
 
@@ -93,24 +95,34 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "for an individual display the trading premises summary page for individual" in new Fixture {
 
-      val model = TradingPremises()
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
+        (any())).thenReturn(Some(Seq(TradingPremises())))
+
       val result = summaryController.getIndividual(1)(request)
+
       status(result) must be(OK)
     }
 
 
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
+        (any())).thenReturn(None)
       val result = summaryController.getIndividual(1)(request)
       status(result) must be(NOT_FOUND)
     }
 
     "direct to your answers when the model is present" in new Fixture {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
-        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
       val model = TradingPremises()
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
