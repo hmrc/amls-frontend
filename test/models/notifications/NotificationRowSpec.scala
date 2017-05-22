@@ -18,7 +18,6 @@ package models.notifications
 
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
-import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.GenericTestHelper
 
@@ -193,14 +192,27 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         ).subject must be("notifications.fail.title")
       }
 
-      "status reason is 3" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.FailedToPayCharges)
-            ))
-        ).subject must be("notifications.fail.title")
+      "status reason is 3" when {
+        "contact number & contact type are present" in {
+          notificationRow.copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FailedToPayCharges)
+              ))
+          ).subject must be("notifications.fail.title")
+        }
+
+        "contact number & contact type are absent" in {
+          notificationRow.copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FailedToPayCharges)
+              )),
+            contactType = None
+          ).subject must be("notifications.fail.title")
+        }
       }
 
       "status reason is 98" in {
@@ -212,6 +224,8 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
             ))
         ).subject must be("notifications.fail.title")
       }
+
+
 
       "default" in {
         notificationRow.subject must be("notifications.fail.title")

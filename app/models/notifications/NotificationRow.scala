@@ -66,7 +66,12 @@ case class NotificationRow(
         }
       } yield sr) getOrElse "notifications.fail.title"
     }
-    case _ => s"notifications.subject.$getContactType"
+    case _ => {
+      getContactType match {
+        case ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
+        case _ => s"notifications.subject.$getContactType"
+      }
+    }
   }
 
 }
