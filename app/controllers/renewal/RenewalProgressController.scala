@@ -37,11 +37,11 @@ import scala.concurrent.Future
 class RenewalProgressController @Inject()
 (
   val authConnector: AuthConnector,
-  dataCacheConnector: DataCacheConnector,
-  progressService: ProgressService,
-  messages: MessagesApi,
-  renewals: RenewalService,
-  statusService :StatusService
+  val dataCacheConnector: DataCacheConnector,
+  val progressService: ProgressService,
+  val messages: MessagesApi,
+  val renewals: RenewalService,
+  val statusService :StatusService
 ) extends BaseController {
 
   private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
@@ -67,7 +67,7 @@ class RenewalProgressController @Inject()
             val variationSections = progressService.sections(cache)
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
             val msbOrTcspExists = ControllerHelper.isMSBSelected(businessMatching) || ControllerHelper.isTCSPSelected(businessMatching)
-            val canSubmit = renewalSection.status == Completed && renewalSection.hasChanged && amendmentDeclarationAvailable(variationSections)
+            val canSubmit = (renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections)
 
             statusInfo match {
               case (ReadyForRenewal(renewalDate), _) => Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists, renewalDate))
