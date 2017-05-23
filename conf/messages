@@ -1643,6 +1643,11 @@ notification.static.text.RegistrationVariationApproval = <p>The recent changes m
 notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your anti-money laundering supervision ended has been changed.</p>\
 <p>You can see the new effective date on <a href="{0}">your status page</a>.</p>
 
+notification.static.text.NoLongerMindedToReject = <p>We recently contacted you to tell you we were considering the \
+ refusal of your application for supervision under the Money Laundering Regulations 2007.</p>
+ <p>We're no longer considering \
+ refusal and your application will continue as normal.</p>
+
 notification.reminder.to.pay.ReminderToPayForVariation = <p>You need to pay {0} for the recent changes made to your details.</p>\
 <p>Your payment reference is: {1}.</p>\
 <p>Pay online by credit or debit card.</p>\
