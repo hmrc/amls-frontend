@@ -45,8 +45,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
-           ContactType.DeRegistrationEffectiveDateChange |
-           ContactType.NoLongerMindedToReject => handleStaticMessage(amlsRegNo, id, contactType)
+           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType)
 
       case ContactType.ReminderToPayForVariation |
            ContactType.ReminderToPayForRenewal |
