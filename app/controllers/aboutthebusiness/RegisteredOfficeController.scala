@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.DateOfChangeHelper
@@ -86,14 +86,13 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
   }
 
   def auditAddressChange(currentAddress: RegisteredOffice, oldAddress: Option[RegisteredOffice], edit: Boolean)
-                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
     } else {
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
-
 }
 
 object RegisteredOfficeController extends RegisteredOfficeController {
