@@ -16,33 +16,33 @@
 
 package services
 
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
-import models.{Country, ViewResponse}
+import connectors._
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.declaration.{AddPerson, BeneficialShareholder}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
-import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions,
-SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{PaymentMethods => RPaymentMethods,
-PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
+import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
+import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePeople
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.{Country, ViewResponse}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Writes
+import play.api.mvc.{AnyContent, Request}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -50,14 +50,14 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
 
   object TestLandingService extends LandingService {
     override private[services] val cacheConnector = mock[DataCacheConnector]
     override private[services] val keyStore = mock[KeystoreConnector]
     override private[services] val desConnector = mock[AmlsConnector]
     override private[services] val statusService = mock[StatusService]
-
+    override private[services] val businessMatchingConnector = mock[BusinessMatchingConnector]
   }
 
   implicit val hc = mock[HeaderCarrier]
@@ -236,14 +236,25 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   }
 
   "reviewDetails" must {
+    "contact the business matching service for the business details" in {
+      val model = BusinessMatchingReviewDetails(
+        "Test Business",
+        None,
+        BusinessMatchingAddress("Line 1", "Line 2", None, None, None, "United Kingdom"),
+        "sap number",
+        "safe id",
+        agentReferenceNumber = Some("test")
+      )
 
-    "pass through from the keystore connector" in {
+      implicit val r = FakeRequest()
+
       when {
-        TestLandingService.keyStore.optionalReviewDetails(any(), any())
-      } thenReturn Future.successful(None)
-      whenReady (TestLandingService.reviewDetails) {
-        _ mustEqual None
-      }
+        TestLandingService.businessMatchingConnector.getReviewDetails(any())
+      } thenReturn Future.successful(Some(model))
+
+      await(TestLandingService.reviewDetails)
+
+      verify(TestLandingService.businessMatchingConnector).getReviewDetails(any())
     }
   }
 
