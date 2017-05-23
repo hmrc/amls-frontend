@@ -72,6 +72,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(Some("AMLSREFNO")))
 
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -183,6 +186,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
           val complete = mock[BusinessMatching]
           when(complete.isComplete) thenReturn true
 
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -260,6 +266,40 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
           submitButtons.size() must be (1)
           submitButtons.first().hasAttr("disabled") must be (true)
         }
+      }
+    }
+
+    "exclude business matching from registration page" when {
+      "status is other then NotCompleted and SubmissionReady" in  new Fixture {
+        val complete = mock[BusinessMatching]
+        when(complete.isComplete) thenReturn true
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val sections = Seq(
+          Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
+          Section("TESTSECTION2", Completed, false, mock[Call])
+        )
+
+        when(controller.progressService.sections(mockCacheMap))
+          .thenReturn(sections)
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+        val responseF = controller.get()(request)
+        status(responseF) must be (OK)
+        val doc = Jsoup.parse(contentAsString((responseF)))
+        doc.getElementsMatchingOwnText(Messages("amendment.text.1")).hasText must be(true)
+        val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
+        elements.size() must be(sections.size -1)
+
       }
     }
 

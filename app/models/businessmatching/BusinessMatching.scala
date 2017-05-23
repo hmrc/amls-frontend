@@ -81,8 +81,9 @@ case class BusinessMatching(
 
 object BusinessMatching {
 
+  val messageKey = "businessmatching"
+
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "businessmatching"
     val incomplete = Section(messageKey, NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
