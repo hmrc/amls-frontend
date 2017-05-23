@@ -249,26 +249,6 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
         result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges", Currency(1234), "ABC1234")
       }
 
-      /*"contact type is NoLongerMindedToReject" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ContactType.NoLongerMindedToReject),
-            None,
-            None,
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails(
-          "thing",
-          "thing",
-          ContactType.DeRegistrationEffectiveDateChange
-        ))
-
-        result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges", Currency(1234), "ABC1234")
-      }*/
-
       "contact type is ApplicationApproval" in new Fixture {
 
         when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
