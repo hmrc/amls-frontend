@@ -1529,7 +1529,7 @@ notifications.subject.RenewalReminder = Reminder to Renew
 notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
 notifications.subject.NoLongerMindedToReject = Rejection of Application no longer being Considered
-notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
+notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
 notifications.subject.Others = Generic communication
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
