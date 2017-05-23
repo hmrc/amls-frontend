@@ -75,6 +75,7 @@ trait NotificationController extends BaseController {
                   case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
                   case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
                   case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText))
+                  case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
                   case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
               }) getOrElse NotFound(notFoundView)

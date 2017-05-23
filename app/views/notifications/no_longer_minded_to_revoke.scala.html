@@ -1,0 +1,36 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+
+@(msgContent: String, amlsRegNo: String)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @heading(Messages("notifications.nmrv.title"), "summary.status")
+}
+
+@main(
+    title = Messages(Messages("notifications.nmrv.title")) + " - " + Messages("summary.status"),
+    heading = header
+)  {
+
+    <p>Your reference: @amlsRegNo</p>
+    <p>We recently contacted you to tell you we were considering the revocation of your supervision under the Money Laundering Regulations 2007.<p>
+
+    <p>We're no longer considering revocation and your supervision will continue as normal.</p>
+
+    <a href="@controllers.routes.NotificationController.getMessages().url" class="back-link">@Messages("button.back")</a>
+}
