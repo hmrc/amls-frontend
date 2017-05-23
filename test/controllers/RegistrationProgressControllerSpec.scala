@@ -269,7 +269,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
     }
 
-    "exclude business matching from registration page" when {
+    "exclude business matching section from registration page" when {
       "status is other then NotCompleted and SubmissionReady" in  new Fixture {
         val complete = mock[BusinessMatching]
         when(complete.isComplete) thenReturn true
@@ -303,6 +303,71 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
     }
 
+    "include business matching section in registration page" when {
+      "status is SubmissionReady" in  new Fixture {
+        val complete = mock[BusinessMatching]
+        when(complete.isComplete) thenReturn true
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
+        val sections = Seq(
+          Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
+          Section("TESTSECTION2", Completed, false, mock[Call])
+        )
+
+        when(controller.progressService.sections(mockCacheMap))
+          .thenReturn(sections)
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+        val responseF = controller.get()(request)
+        status(responseF) must be (OK)
+        val doc = Jsoup.parse(contentAsString((responseF)))
+        val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.completed"))
+        elements.size() must be(sections.size)
+
+      }
+    }
+
+    "include business matching section in registration page" when {
+      "status is NotCompleted" in  new Fixture {
+        val complete = mock[BusinessMatching]
+        when(complete.isComplete) thenReturn true
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        val sections = Seq(
+          Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
+          Section("TESTSECTION2", Completed, false, mock[Call])
+        )
+
+        when(controller.progressService.sections(mockCacheMap))
+          .thenReturn(sections)
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+        val responseF = controller.get()(request)
+        status(responseF) must be (OK)
+        val doc = Jsoup.parse(contentAsString((responseF)))
+        val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.completed"))
+        elements.size() must be(sections.size)
+
+      }
+    }
     "the user is not enrolled into the AMLS Account" must {
       "show the registration progress page" in new Fixture {
         val complete = mock[BusinessMatching]
