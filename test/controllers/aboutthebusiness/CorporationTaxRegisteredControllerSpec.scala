@@ -18,8 +18,9 @@ package controllers.aboutthebusiness
 
 import connectors.{BusinessMatchingConnector, BusinessMatchingReviewDetails, DataCacheConnector}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
+import models.businessmatching.BusinessMatching
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -85,8 +86,11 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
       val data = AboutTheBusiness(corporationTaxRegistered = None)
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
 

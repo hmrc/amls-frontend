@@ -23,6 +23,7 @@ import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
+import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.aboutthebusiness.corporation_tax_registered
@@ -41,17 +42,15 @@ trait CorporationTaxRegisteredController extends BaseController {
         case Some(response) if response.corporationTaxRegistered.isDefined =>
           Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
 
-        case _ if ApplicationConfig.businessMatchingDetailsToggle =>
-          businessMatchingConnector.getReviewDetails flatMap {
-            case Some(details) if details.utr.isDefined =>
-              updateCache(CorporationTaxRegisteredYes(details.utr.get)) map { _ =>
-                getRedirectLocation(edit)
-              } getOrElse failedResult
-            case _ => Future.successful(Ok(corporation_tax_registered(EmptyForm, edit)))
-          }
+        case _ =>
+          val updateUtrResult = for {
+            bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+            details <- OptionT.fromOption[Future](bm.reviewDetails)
+            utr <- OptionT.fromOption[Future](details.utr)
+            _ <- updateCache(CorporationTaxRegisteredYes(utr))
+          } yield getRedirectLocation(edit)
 
-        case _ => Future.successful(Ok(corporation_tax_registered(EmptyForm, edit)))
-
+          updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
       }
   }
 
