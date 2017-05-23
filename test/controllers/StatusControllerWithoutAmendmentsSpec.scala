@@ -21,7 +21,7 @@ import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseTy
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status._
-import models.{AmendVariationResponse, Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers

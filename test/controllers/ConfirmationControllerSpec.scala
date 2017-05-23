@@ -18,7 +18,7 @@ package controllers
 
 import cats.implicits._
 import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
-import models.SubscriptionResponse
+import models.{SubscriptionFees, SubscriptionResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
@@ -77,14 +77,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "",
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = paymentRefNo
+      amlsRefNo = "", Some(SubscriptionFees(
+        paymentReference = paymentRefNo,
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0
+      ))
     )
 
     protected val mockCacheMap = mock[CacheMap]
@@ -528,14 +529,15 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "",
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = paymentRefNo
+      amlsRefNo = "", Some(SubscriptionFees(
+        paymentReference = paymentRefNo,
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0
+      ))
     )
 
     protected val mockCacheMap = mock[CacheMap]

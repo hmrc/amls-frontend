@@ -31,7 +31,7 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationResponse, FormTypes, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
@@ -143,7 +143,7 @@ trait LandingController extends BaseController {
         case Some(cacheMap) => {
           //there is data in S4l
           if (dataHasChanged(cacheMap)) {
-            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),cacheMap.getEntry[AmendVariationResponse](AmendVariationResponse.key)) match {
+            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
               case (Some(_),_) => refreshAndRedirect(amlsRegistrationNumber)
               case (_,Some(_)) => refreshAndRedirect(amlsRegistrationNumber)
               case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))
