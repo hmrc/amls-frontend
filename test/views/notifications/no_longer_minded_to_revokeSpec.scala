@@ -35,7 +35,7 @@ class no_longer_minded_to_revokeSpec extends GenericTestHelper with MustMatchers
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
 
       doc.title must be(Messages("notifications.nmrv.title") +
         " - " + Messages("status.title") +
@@ -45,7 +45,7 @@ class no_longer_minded_to_revokeSpec extends GenericTestHelper with MustMatchers
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
 
       heading.html must be(Messages("notifications.nmrv.title"))
       subHeading.html must include(Messages("status.title"))
