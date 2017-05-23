@@ -89,7 +89,7 @@ trait RegistrationProgressController extends BaseController {
 
                 preApplicationComplete(cacheMap) map {
                   case Some(x) => x match {
-                    case true => Ok(registration_amendment(sections.filter(_.name == BusinessMatching.messageKey), amendmentDeclarationAvailable(sections)))
+                    case true => Ok(registration_amendment(sections.filter(_.name != BusinessMatching.messageKey), amendmentDeclarationAvailable(sections)))
                     case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
                   }
                   case None => Redirect(controllers.routes.LandingController.get())
