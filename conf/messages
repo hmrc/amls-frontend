@@ -1553,6 +1553,7 @@ notifications.fail.title = Your application has failed
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
 notifications.revr.title = Your supervision has been revoked
+notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
 ############################### Renewal ###############################
