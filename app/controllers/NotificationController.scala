@@ -21,7 +21,7 @@ import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import models.notifications.ContactType.{MindedToReject, MindedToRevoke, RejectionReasons, RevocationReasons}
+import models.notifications.ContactType._
 import models.notifications._
 import play.api.Play
 import services.{AuthEnrolmentsService, NotificationService}
@@ -74,6 +74,7 @@ trait NotificationController extends BaseController {
                   case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
                   case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
                   case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
+                  case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
                   case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
                 }
               }) getOrElse NotFound(notFoundView)

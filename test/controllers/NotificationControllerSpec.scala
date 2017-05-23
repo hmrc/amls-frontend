@@ -351,6 +351,37 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
     }
 
+    "display no_long_minded_to_revoke" when {
+      "contact is NMRV" in new Fixture {
+
+        val amlsRegNo = "regNo"
+        val msgTxt = "Revoked"
+        val notificationDetails = NotificationDetails(
+          Some(RevocationReasons),
+          None,
+          Some(msgTxt),
+          false,
+          dateTime
+        )
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegNo)))
+
+        when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(notificationDetails)))
+
+        val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke)(request)
+
+        status(result) mustBe 200
+        contentAsString(result) must not include msgTxt
+        contentAsString(result) must include(amlsRegNo)
+
+      }
+    }
+
   }
 }
 
