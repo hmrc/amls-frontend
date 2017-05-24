@@ -25,8 +25,7 @@ import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
-import play.api.i18n.Messages
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -47,6 +46,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
   }
 
   val emptyCache = CacheMap("", Map.empty)
+  val mockCacheMap = mock[CacheMap]
 
   "PersonResidentTypeController" when {
 
@@ -154,8 +154,8 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
     "post" must {
       "submit with a valid form" which {
 
-        "goes to NationalityController" when {
-          "uk residence" in new Fixture {
+        "goes to ContactDetailsController" when {
+          "uk residence" in new Fixture   {
 
             val newRequest = request.withFormUrlEncodedBody(
               "isUKResidence" -> "true",
@@ -174,15 +174,18 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               )
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
           }
         }
 
@@ -190,10 +193,14 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           "non uk residence" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
+              "isUKResidence" -> "false",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
-              "nationality" -> "GB"
+              "nationality" -> "GB",
+              "dateOfBirth.day" -> "24",
+              "dateOfBirth.month" -> "2",
+              "dateOfBirth.year" -> "1990",
+              "passportType" -> "03"
             )
 
             val responsiblePeople = ResponsiblePeople(
@@ -206,8 +213,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               )
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -241,22 +251,25 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
                 )
               )
 
-              when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+                .thenReturn(Some(Seq(responsiblePeople)))
+
+              when(controller.dataCacheConnector.fetchAll(any(), any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
               when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
                 .thenReturn(Future.successful(emptyCache))
 
               val result = controller.post(1, true)(newRequest)
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1).url))
+              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true).url))
             }
           }
         }
 
         "goes to DetailedAnswersController" when {
           "in edit mode" when {
-            "residence type is edited from non uk residence to uk residence" in new Fixture {
+            "uk residence" in new Fixture {
 
               val newRequest = request.withFormUrlEncodedBody(
                 "isUKResidence" -> "true",
@@ -279,8 +292,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
                 )
               )
 
-              when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+                .thenReturn(Some(Seq(responsiblePeople)))
+
+              when(controller.dataCacheConnector.fetchAll(any(), any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
               when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
                 .thenReturn(Future.successful(emptyCache))
@@ -305,8 +321,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -347,8 +366,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -407,8 +429,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
