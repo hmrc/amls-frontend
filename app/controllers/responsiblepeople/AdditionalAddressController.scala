@@ -105,7 +105,8 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     } yield result) getOrElse NotFound(notFoundView)
   }
 
-  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePeople, edit: Boolean)(implicit hc: HeaderCarrier): Future[AuditResult] = {
+  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePeople, edit: Boolean)
+                                (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       val oldAddress = for {
         history <- model.addressHistory
