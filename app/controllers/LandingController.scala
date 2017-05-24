@@ -32,6 +32,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, FormTypes, SubscriptionResponse}
+import play.api.Logger
 import play.api.mvc.{Action, Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}

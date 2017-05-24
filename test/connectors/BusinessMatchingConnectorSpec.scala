@@ -22,6 +22,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Play
 import play.api.libs.json.Json
+import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 import utils.AuthorisedFixture
 
@@ -61,6 +62,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector {
       override val httpGet = mock[HttpGet]
+      override val crypto = SessionCookieCryptoFilter.encrypt _
     }
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")

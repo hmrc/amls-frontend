@@ -64,7 +64,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
 
       val json = Json.obj(
         "businessName" -> "Name",
-        "businessType" -> "corporate body",
+        "businessType" -> "invalid body",
         "businessAddress" -> Json.obj(
           "line_1" -> "1 Test Street",
           "line_2" -> "Test Town",
