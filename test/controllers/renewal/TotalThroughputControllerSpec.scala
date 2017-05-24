@@ -109,7 +109,6 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
       status(result) mustBe OK
 
       val page = Jsoup.parse(contentAsString(result))
-      println(page)
       page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(true)
     }
 
