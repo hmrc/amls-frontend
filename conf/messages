@@ -356,7 +356,7 @@ button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
 button.send.feedback = Send feedback
-button.backtosignin = Back to Sign in
+button.backtosignin = Back to sign in
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
