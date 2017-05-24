@@ -405,6 +405,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val paymentReference = "X00000000000"
         val result = controller.paymentConfirmation(paymentReference)(request)
+
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
@@ -423,6 +424,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
+
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
@@ -436,11 +438,12 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
 
         when {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         }.thenReturn(Future.successful(Some(Renewal())))
+
+        val result = controller.paymentConfirmation(paymentReference)(request)
 
         status(result) mustBe OK
 
