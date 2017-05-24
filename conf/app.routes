@@ -265,7 +265,6 @@ POST        /responsible-people/address/:index                          @control
 GET         /responsible-people/moved-address/:index                    @controllers.responsiblepeople.MovedAddressController.get(index: Int)
 POST        /responsible-people/moved-address/:index                    @controllers.responsiblepeople.MovedAddressController.post(index: Int)
 
-
 GET         /responsible-people/new-address/:index                      controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/new-address/:index                      controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
@@ -277,6 +276,12 @@ POST        /responsible-people/address/:index/date-change              controll
 
 GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
+GET         /responsible-people/passport/:index                         controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/passport/:index                         controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
+GET         /responsible-people/nonuk-passport/:index                   controllers.responsiblepeople.PersonNonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/nonuk-passport/:index                   controllers.responsiblepeople.PersonNonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 
 GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
 POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
