@@ -36,11 +36,11 @@ case class ReviewDetails(
 object ReviewDetails {
 
   private val toBusinessType: PartialFunction[String, BusinessType] = {
-    case "Sole Trader" => SoleProprietor
-    case "Corporate Body" => LimitedCompany
-    case "Partnership" => Partnership
-    case "LLP" => LPrLLP
-    case "Unincorporated Body" => UnincorporatedBody
+    case s if s matches "(?i)Sole Trader" => SoleProprietor
+    case s if s matches "(?i)Corporate Body" => LimitedCompany
+    case s if s matches "(?i)Partnership" => Partnership
+    case s if s matches "(?i)LLP" => LPrLLP
+    case s if s matches "(?i)Unincorporated Body" => UnincorporatedBody
   }
 
   implicit val reads: Reads[ReviewDetails] = {
