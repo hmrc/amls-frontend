@@ -132,8 +132,8 @@ object ResponsiblePeople {
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
-          case _ => {
-            val index = rp.indexWhere {
+          case responsiblePeople => {
+            val index = responsiblePeople.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }
