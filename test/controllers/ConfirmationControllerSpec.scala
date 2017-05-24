@@ -21,7 +21,7 @@ import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
 import models.SubscriptionResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.confirmation.Currency
+import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
@@ -36,7 +36,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{SubmissionResponseService, StatusService, SubmissionService}
+import services.{StatusService, SubmissionResponseService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -332,6 +332,39 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(companyName)
       }
 
+      "a renewal status and has data then load renewal confirmation" in new Fixture {
+        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(Renewal()))
+
+        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10)))))))
+
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
+      }
+
+
+      "a renewal and no data in save4later then load variation confirmation" in new Fixture {
+        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+        } thenReturn Future.successful(None)
+
+        when(controller.submissionResponseService.getVariation(any(), any(), any()))
+          .thenReturn(Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10)))))))
+
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.amendment.header"))
+      }
+
     }
 
     "show the correct payment confirmation page" when {
@@ -413,6 +446,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         status(result) mustBe OK
 
+
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.title must include(Messages("confirmation.payment.renewal.title"))
@@ -422,7 +456,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
-      "the application status is 'ready for renewal' and user hs done only variation" in new Fixture {
+      "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         val paymentReference = "X00000000000"
