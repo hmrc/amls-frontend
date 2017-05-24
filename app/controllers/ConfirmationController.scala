@@ -74,10 +74,12 @@ trait ConfirmationController extends BaseController {
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
         } yield status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(payment_confirmation_amendvariation(businessName, reference))
-          case ReadyForRenewal(_) => if(renewalData.isDefined) {
-            Ok(payment_confirmation_renewal(businessName, reference))
-          } else {
-            Ok(payment_confirmation_amendvariation(businessName, reference))
+          case ReadyForRenewal(_) => {
+            if(renewalData.isDefined) {
+              Ok(payment_confirmation_renewal(businessName, reference))
+            } else {
+              Ok(payment_confirmation_amendvariation(businessName, reference))
+            }
           }
           case _ => Ok(payment_confirmation(businessName, reference))
         }
