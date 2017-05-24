@@ -176,13 +176,9 @@ trait LandingService {
   }
 
   def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] = {
-    if (ApplicationConfig.businessMatchingDetailsToggle) {
-      businessMatchingConnector.getReviewDetails map {
-        case Some(details) => Some(ReviewDetails.convert(details))
-        case _ => None
-      }
-    } else {
-      keyStore.optionalReviewDetails
+    businessMatchingConnector.getReviewDetails map {
+      case Some(details) => Some(ReviewDetails.convert(details))
+      case _ => None
     }
   }
 
