@@ -18,12 +18,14 @@ package audit
 
 import models.bankdetails._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.test.FakeRequest
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 class AddBankAccountEventSpec extends PlaySpec with OneAppPerSuite {
 
   implicit val headerCarrier = HeaderCarrier()
+  implicit val request = FakeRequest("GET", "/test-path")
 
   "The bank account audit event" must {
     "serialize to the correct json" when {
@@ -54,6 +56,7 @@ class AddBankAccountEventSpec extends PlaySpec with OneAppPerSuite {
         )
 
         result.detail mustBe expected
+        result.tags("path") mustBe "/test-path"
       }
 
       "bank account is a business account" in {

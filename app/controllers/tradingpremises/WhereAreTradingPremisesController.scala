@@ -32,6 +32,7 @@ import views.html.tradingpremises._
 import audit.AddressConversions._
 import cats.data._
 import cats.implicits._
+import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -75,7 +76,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)
-                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(address, oldAddress))
     } else {

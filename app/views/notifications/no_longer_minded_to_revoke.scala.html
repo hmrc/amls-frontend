@@ -16,24 +16,21 @@
 
 @import include._
 
-@(msgContent: String, amlsRegNo: String, businessName: String, endDate: String)(implicit request: Request[_],m:Messages)
+@(msgContent: String, amlsRegNo: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading(Messages("notifications.rejr.title"), "summary.status")
+    @heading(Messages("notifications.nmrv.title"), "summary.status")
 }
 
 @main(
-    title = Messages(Messages("notifications.rejr.title")) + " - " + Messages("summary.status"),
+    title = Messages(Messages("notifications.nmrv.title")) + " - " + Messages("summary.status"),
     heading = header
 )  {
 
-    <p>Your application to register @businessName for supervision under the Money Laundering Regulations 2007 was refused on @endDate.</p>
-    <p>This means you’re not supervised and may be subject to penalties and civil proceedings if you trade in activities covered by the Money Laundering Regulations 2007.<p>
+    <p>Your reference: @amlsRegNo</p>
+    <p>We recently contacted you to tell you we were considering the revocation of your supervision under the Money Laundering Regulations 2007.<p>
 
-    <h2 class="heading-medium">@Messages("notifications.reason.refusal")</h2>
-    <p>@Html(msgContent)</p>
-
-    @regulations_info_for_decision()
+    <p>We're no longer considering revocation and your supervision will continue as normal.</p>
 
     <a href="@controllers.routes.NotificationController.getMessages().url" class="back-link">@Messages("button.back")</a>
 }

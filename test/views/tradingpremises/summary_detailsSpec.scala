@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.{DateHelper, GenericTestHelper}
 import views.{Fixture, HtmlAssertions}
 
@@ -89,9 +90,10 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       ("tradingpremises.agentpartnership.title", checkElementTextIncludes(_, "test")),
       ("tradingpremises.agentcompanyname.title", checkElementTextIncludes(_, "test"))
     )
-    "load summary details page" in new ViewFixture {
+    "load summary details page when it is an msb" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises, 1)
+      val isMsb = true
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1)
 
       forAll(sectionChecks) { (key, check) => {
         val hTwos = doc.select("section.check-your-answers h2")
@@ -101,8 +103,15 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
         hTwo must not be (None)
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
-      }
-      }
+      }}
+    }
+
+    "load summary details page when it is not an msb" in new ViewFixture {
+      
+      val isNotMsb = false
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1)
+
+      html mustNot contain(Messages("tradingpremises.summary.who-uses"))
     }
 
   }

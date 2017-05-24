@@ -16,17 +16,16 @@
 
 package controllers.aboutthebusiness
 
-import connectors.{BusinessMatchingConnector, BusinessMatchingReviewDetails, DataCacheConnector}
+import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
+import models.businessmatching.BusinessMatching
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
 import utils.GenericTestHelper
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -45,10 +44,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       override val businessMatchingConnector = mock[BusinessMatchingConnector]
     }
   }
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.business-matching-details-lookup" -> false
-  ))
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -85,8 +80,11 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
       val data = AboutTheBusiness(corporationTaxRegistered = None)
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
 
@@ -105,7 +103,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
       when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -123,7 +121,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       )
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
       when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

@@ -23,6 +23,7 @@ import models.aboutthebusiness._
 import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 import play.api.libs.json._
+import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
@@ -35,10 +36,10 @@ object AuditAddress {
 }
 
 object AddressCreatedEvent {
-  def apply(address: AuditAddress)(implicit hc: HeaderCarrier) = DataEvent(
+  def apply(address: AuditAddress)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
     auditSource = AppName.appName,
     auditType = "manualAddressSubmitted",
-    tags = hc.toAuditTags("manualAddressSubmitted", "n/a"),
+    tags = hc.toAuditTags("manualAddressSubmitted", request.path),
     detail = hc.toAuditDetails() ++ toMap(address)
   )
 }
@@ -71,10 +72,10 @@ object AddressModifiedEvent {
 
 object AddressConversions {
 
-  implicit def toDataEvent(event: AddressModifiedEvent)(implicit hc: HeaderCarrier): DataEvent = DataEvent(
+  implicit def toDataEvent(event: AddressModifiedEvent)(implicit hc: HeaderCarrier, request: Request[_]): DataEvent = DataEvent(
     auditSource = AppName.appName,
     auditType = "addressModified",
-    tags = hc.toAuditTags("addressModified", "n/a"),
+    tags = hc.toAuditTags("addressModified", request.path),
     detail = hc.toAuditDetails() ++ toMap(event)
   )
 

@@ -356,6 +356,7 @@ button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
 button.send.feedback = Send feedback
+button.backtosignin = Back to sign in
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -1515,7 +1516,7 @@ notifications.subject.ApplicationApproval = Application Approval
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.RenewalApproval = Renewal Approval
 
-notifications.subject.RejectionReasons = Application Rejection
+notifications.subject.RejectionReasons = Your application has been refused
 notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
@@ -1528,8 +1529,8 @@ notifications.subject.RenewalReminder = Reminder to Renew
 
 notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
-notifications.subject.NoLongerMindedToReject = Rejection of Application no longer being Considered
-notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
+notifications.subject.NoLongerMindedToReject = No longer considering refusal
+notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
 notifications.subject.Others = Generic communication
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
@@ -1546,11 +1547,15 @@ notifications.table.header.date = Date
 
 notifications.reason.considering.refusal = Reason for considering refusal
 notifications.reason.revocation = Reason for revocation
+notifications.reason.refusal = Reason for refusal
 
 notifications.rejr.title = Your application has been refused
+notifications.fail.title = Your application has failed
 notifications.mtrv.title = Revocation being considered
 notifications.mtrj.title = Refusal being considered
 notifications.revr.title = Your supervision has been revoked
+notifications.nmrj.title = No longer considering refusal
+notifications.nmrv.title = No longer considering revocation
 
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:

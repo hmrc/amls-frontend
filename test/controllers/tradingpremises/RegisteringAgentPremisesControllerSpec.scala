@@ -46,115 +46,141 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
 
   val mockCacheMap = mock[CacheMap]
 
-  "RegisteringAgentPremisesController" must {
+  "RegisteringAgentPremisesController" when {
 
-    "Get Option:" must {
+    "get is called" when {
+      "edit is false" when {
+        "it is not an MSB" must {
+          "redirect to Trading Premises Details form" in new Fixture {
+            val model = TradingPremises(
+              registeringAgentPremises = Some(
+                RegisteringAgentPremises(true)
+              )
+            )
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(model)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-      "load the Register Agent Premises page" in new Fixture {
+            val result = controller.get(1)(request)
+            status(result) must be(SEE_OTHER)
 
-        val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-        val model = TradingPremises()
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(model)))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+            redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
 
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
+          }
+        }
 
+        "it is an MSB" must {
+          "load the Register Agent Premises page" in new Fixture {
+
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+            val model = TradingPremises()
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(model)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+            val result = controller.get(1)(request)
+            status(result) must be(OK)
+
+          }
+
+          "load Yes when save4later returns true" in new Fixture {
+
+            val model = TradingPremises(
+              registeringAgentPremises = Some(
+                RegisteringAgentPremises(true)
+              )
+            )
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(model)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+            val result = controller.get(1)(request)
+            status(result) must be(OK)
+
+            val htmlValue = Jsoup.parse(contentAsString(result))
+            htmlValue.getElementById("agentPremises-true").attr("checked") mustBe "checked"
+
+          }
+          "load No when save4later returns false" in new Fixture {
+
+            val model = TradingPremises(
+              registeringAgentPremises = Some(
+                RegisteringAgentPremises(false)
+              )
+            )
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(model)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+            val result = controller.get(1)(request)
+            status(result) must be(OK)
+
+            val htmlValue = Jsoup.parse(contentAsString(result))
+            htmlValue.getElementById("agentPremises-false").attr("checked") mustBe "checked"
+
+          }
+
+          "respond with NOT_FOUND when there is no data" in new Fixture {
+            val model = TradingPremises(
+              registeringAgentPremises = Some(
+                RegisteringAgentPremises(true)
+              )
+            )
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(None))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(None)
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+            val result = controller.get(1)(request)
+            status(result) must be(NOT_FOUND)
+          }
+
+          "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
+            val model = TradingPremises(
+              registeringAgentPremises = Some(
+                RegisteringAgentPremises(true)
+              )
+            )
+            val businessMatchingActivitiesAll = BusinessMatchingActivities(
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(None))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(model)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+            val result = controller.get(1)(request)
+            status(result) must be(NOT_FOUND)
+          }
+        }
       }
-
-      "load Yes when save4later returns true" in new Fixture {
-
-        val model = TradingPremises(
-          registeringAgentPremises = Some(
-            RegisteringAgentPremises(true)
-          )
-        )
-        val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(model)))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("agentPremises-true").attr("checked") mustBe "checked"
-
-      }
-      "load No when save4later returns false" in new Fixture {
-
-        val model = TradingPremises(
-          registeringAgentPremises = Some(
-            RegisteringAgentPremises(false)
-          )
-        )
-        val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(model)))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("agentPremises-false").attr("checked") mustBe "checked"
-
-      }
-
-      "respond with NOT_FOUND when there is no data" in new Fixture {
-        val model = TradingPremises(
-          registeringAgentPremises = Some(
-            RegisteringAgentPremises(true)
-          )
-        )
-        val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(None))
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(None)
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(NOT_FOUND)
-      }
-
-      "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
-        val model = TradingPremises(
-          registeringAgentPremises = Some(
-            RegisteringAgentPremises(true)
-          )
-        )
-        val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(None))
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(model)))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(NOT_FOUND)
-      }
-
     }
 
-    "Post" must {
+    "post is called" must {
 
       "on post invalid data show error" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
@@ -245,30 +271,6 @@ class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with Mock
           val result = controller.post(10, false)(newRequest)
 
           status(result) must be(NOT_FOUND)
-
-        }
-      }
-
-      "redirect to Trading Premises Details form" when {
-        "MSB is not found in business matching" in new Fixture {
-          val model = TradingPremises(
-            registeringAgentPremises = Some(
-              RegisteringAgentPremises(true)
-            )
-          )
-          val businessMatchingActivitiesAll = BusinessMatchingActivities(
-            Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(model)))
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
-
-          val result = controller.get(1)(request)
-          status(result) must be(SEE_OTHER)
-
-          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
 
         }
       }
