@@ -40,14 +40,6 @@ class company_registration_numberSpec extends GenericTestHelper with MustMatcher
       def view = views.html.businessmatching.company_registration_number(form2, true)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
-
-      def view = views.html.businessmatching.company_registration_number(form2, true)
-
       heading.html must be(Messages("businessmatching.registrationnumber.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 

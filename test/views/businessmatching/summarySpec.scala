@@ -20,16 +20,16 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import org.jsoup.nodes.Element
+import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import utils.GenericTestHelper
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class businessmatchingSpec extends GenericTestHelper
+class summarySpec extends GenericTestHelper
   with MustMatchers
   with TableDrivenPropertyChecks {
 
@@ -43,12 +43,6 @@ class businessmatchingSpec extends GenericTestHelper
       def view = views.html.businessmatching.summary(BusinessMatching())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      def view = views.html.businessmatching.summary(BusinessMatching())
-
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
