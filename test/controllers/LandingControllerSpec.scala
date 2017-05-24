@@ -40,6 +40,7 @@ import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
+import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
@@ -117,7 +118,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
             safeId = ""))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(details))
+          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
@@ -133,7 +134,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
             safeId = ""))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(details))
+          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
@@ -143,7 +144,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
         "the landing service has no valid review details" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -152,7 +153,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
         "the user has an AMLS enrolment" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -283,14 +284,14 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
       "testSafeId")
 
-    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
+    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
       .thenReturn(Future.successful(Some(reviewDetails)))
 
     reviewDetails
   }
 
   def setUpMocksForNoDataInKeyStore(controller : LandingController) = {
-    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
+    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
       .thenReturn(Future.successful(None))
   }
 

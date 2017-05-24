@@ -16,7 +16,8 @@
 
 package services
 
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
+import config.ApplicationConfig
+import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -34,6 +35,7 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -43,12 +45,10 @@ import scala.concurrent.{ExecutionContext, Future}
 trait LandingService {
 
   private[services] def cacheConnector: DataCacheConnector
-
   private[services] def keyStore: KeystoreConnector
-
   private[services] def desConnector: AmlsConnector
-
   private[services] def statusService: StatusService
+  private[services] def businessMatchingConnector: BusinessMatchingConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -175,12 +175,12 @@ trait LandingService {
     }
   }
 
-  def reviewDetails
-  (implicit
-   hc: HeaderCarrier,
-   ec: ExecutionContext
-  ): Future[Option[ReviewDetails]] =
-    keyStore.optionalReviewDetails
+  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] = {
+    businessMatchingConnector.getReviewDetails map {
+      case Some(details) => Some(ReviewDetails.convert(details))
+      case _ => None
+    }
+  }
 
   /* TODO: Consider if there's a good way to stop
    * this from just overwriting whatever is in Business Matching,
@@ -202,11 +202,9 @@ trait LandingService {
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
   override private[services] def cacheConnector = DataCacheConnector
-
   override private[services] def keyStore = KeystoreConnector
-
   override private[services] def desConnector = AmlsConnector
-
   override private[services] def statusService = StatusService
+  override private[services] def businessMatchingConnector = BusinessMatchingConnector
   // $COVERAGE-ON$
 }

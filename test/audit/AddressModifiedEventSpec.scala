@@ -21,12 +21,14 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import cats.implicits._
 import uk.gov.hmrc.play.http.HeaderCarrier
 import audit.AddressConversions._
+import play.api.test.FakeRequest
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 
 class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
   implicit val hc = HeaderCarrier()
+  implicit val request = FakeRequest("GET", "/test-path")
 
   "The AddressModifiedAuditEvent" must {
     "create the proper detail" when {
@@ -50,6 +52,7 @@ class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPer
         val event: DataEvent = AddressModifiedEvent(currentAddress, oldAddress.some)
 
         event.detail mustBe expectedResult
+        event.tags("path") mustBe "/test-path"
       }
 
       "given a current address and an old address without the optional fields" in {
