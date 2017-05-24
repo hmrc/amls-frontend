@@ -16,15 +16,20 @@
 
 package controllers.tradingpremises
 
+import cats.data.OptionT
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.BusinessMatching
 import models.status._
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.tradingpremises._
+
+import scala.concurrent.Future
+import cats.implicits._
 
 trait SummaryController extends RepeatingSection with BaseController {
 
@@ -52,12 +57,14 @@ trait SummaryController extends RepeatingSection with BaseController {
 
   def getIndividual(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
-        case Some(data) =>
-          Ok(summary_details(data, index))
-        case _ =>
-          NotFound(notFoundView)
-      }
+
+      (for {
+        cache <- OptionT(dataCacheConnector.fetchAll)
+        tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
+        bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      } yield {
+        Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index))
+      }).getOrElse(NotFound(notFoundView))
   }
 }
 

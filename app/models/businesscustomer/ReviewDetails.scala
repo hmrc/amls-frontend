@@ -16,25 +16,32 @@
 
 package models.businesscustomer
 
+import cats._
+import cats.implicits._
+import connectors.{BusinessMatchingAddress, BusinessMatchingReviewDetails}
+import models.Country
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
 import play.api.Logger
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads}
 
 case class ReviewDetails(
                           businessName: String,
                           businessType: Option[BusinessType],
                           businessAddress: Address,
-                          //                        sapNumber: String,
-                          safeId: String
-                          //                        isAGroup: Boolean,
-                          //                        directMatch: Boolean,
-                          //                        agentReferenceNumber: Option[String],
-                          //                        firstName: Option[String],
-                          //                        lastName: Option[String]
+                          safeId: String,
+                          utr: Option[String] = None
                         )
 
 object ReviewDetails {
+
+  private val toBusinessType: PartialFunction[String, BusinessType] = {
+    case s if s matches "(?i)Sole Trader" => SoleProprietor
+    case s if s matches "(?i)Corporate Body" => LimitedCompany
+    case s if s matches "(?i)Partnership" => Partnership
+    case s if s matches "(?i)LLP" => LPrLLP
+    case s if s matches "(?i)Unincorporated Body" => UnincorporatedBody
+  }
 
   implicit val reads: Reads[ReviewDetails] = {
     import play.api.libs.functional.syntax._
@@ -43,21 +50,22 @@ object ReviewDetails {
     (
       (__ \ "businessName").read[String] and
         (__ \ "businessType").readNullable[String].map[Option[BusinessType]] {
-          typeOption =>
-            Logger.debug(s"[ReviewDetails - BusinessType: $typeOption}")
-            typeOption match {
-              case Some("Sole Trader") => Some(SoleProprietor)
-              case Some("Corporate Body") => Some(LimitedCompany)
-              case Some("Partnership") => Some(Partnership)
-              case Some("LLP") => Some(LPrLLP)
-              case Some("Unincorporated Body") => Some(UnincorporatedBody)
-              case _ => None
-            }
+          case Some(bt) if toBusinessType.isDefinedAt(bt) => Some(toBusinessType(bt))
+          case _ => None
         } and
         (__ \ "businessAddress").read[Address] and
-        (__ \ "safeId").read[String]
+        (__ \ "safeId").read[String] and
+        (__ \ "utr").readNullable[String]
       ) (ReviewDetails.apply _)
   }
 
   implicit val writes = Json.writes[ReviewDetails]
+
+  implicit def convert(addr: BusinessMatchingAddress): Address =
+    Address(addr.line_1, addr.line_2, addr.line_3, addr.line_4, addr.postcode, Country("", addr.country))
+
+  implicit def convert(details: BusinessMatchingReviewDetails): ReviewDetails = {
+    ReviewDetails(details.businessName, Functor[Option].lift(toBusinessType)(details.businessType), details.businessAddress, details.safeId, details.utr)
+  }
+
 }

@@ -16,11 +16,12 @@
 
 package models.notifications
 
-import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
+import models.notifications.ContactType._
 import models.notifications.StatusType.DeRegistered
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.{JsValue, Writes, _}
+import RejectedReason._
 
 case class NotificationRow(
                             status: Option[Status],
@@ -32,7 +33,7 @@ case class NotificationRow(
                             _id: IDType
                           ) {
 
-  def dateReceived = {
+  def dateReceived: String = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
     receivedAt.toString(fmt)
   }
@@ -46,16 +47,31 @@ case class NotificationRow(
 
     contactType.getOrElse(
       (status, statusReason, variation) match {
-        case (Some(Status(Some(DeRegistered),_)),_,_) => DeRegistrationEffectiveDateChange
-        case (_, Some(_),_) => ApplicationAutorejectionForFailureToPay
-        case (_,_, true) => RegistrationVariationApproval
+        case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
+        case (_, Some(_), _) => ApplicationAutorejectionForFailureToPay
+        case (_, _, true) => RegistrationVariationApproval
         case _ => throw new RuntimeException("No matching ContactType found for id " + _id)
       }
     )
+
   }
 
-  def subject = {
-    s"notifications.subject.$getContactType"
+  def subject: String = contactType match {
+    case Some(RejectionReasons) => {
+      (for {
+        st <- status
+        sr <- st.statusReason match {
+          case Some(NonCompliant) | Some(FitAndProperFailure) | Some(OtherRefused) => Some("notifications.rejr.title")
+          case _ => None
+        }
+      } yield sr) getOrElse "notifications.fail.title"
+    }
+    case _ => {
+      getContactType match {
+        case ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
+        case _ => s"notifications.subject.$getContactType"
+      }
+    }
   }
 
 }

@@ -16,7 +16,6 @@
 
 package models.notifications
 
-import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait StatusType

@@ -26,10 +26,12 @@ import audit.AddressConversions._
 import models.Country
 import models.aboutthebusiness.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
 import models.tradingpremises.{Address => TradingPremisesAddress}
+import play.api.test.FakeRequest
 
 class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
   implicit val hc = HeaderCarrier()
+  implicit val request = FakeRequest("GET", "/test-path")
 
   "The AddressCreatedAuditEvent" must {
     "create the proper detail" when {
@@ -46,6 +48,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
         )
 
         event.detail mustBe expected
+        event.tags("path") mustBe "/test-path"
       }
 
       "given an address of a responsible person outside the UK" in {

@@ -16,11 +16,16 @@
 
 package controllers.aboutthebusiness
 
+import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
+import models.businessmatching.BusinessMatching
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.aboutthebusiness.corporation_tax_registered
 
 import scala.concurrent.Future
@@ -29,24 +34,23 @@ trait CorporationTaxRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
   val businessMatchingConnector: BusinessMatchingConnector
+  val failedResult = InternalServerError("Failed to update the business corporation tax number")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
       dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap {
         case Some(response) if response.corporationTaxRegistered.isDefined =>
-          Future.successful(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get))
+          Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
 
-        case _ if ApplicationConfig.businessMatchingDetailsToggle =>
-          businessMatchingConnector.getReviewDetails map {
-            case Some(details) if details.utr.isDefined => Form2[CorporationTaxRegistered](CorporationTaxRegisteredYes(details.utr.get))
-            case _ => EmptyForm
-          }
+        case _ =>
+          val updateUtrResult = for {
+            bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+            details <- OptionT.fromOption[Future](bm.reviewDetails)
+            utr <- OptionT.fromOption[Future](details.utr)
+            _ <- updateCache(CorporationTaxRegisteredYes(utr))
+          } yield getRedirectLocation(edit)
 
-        case _ => Future.successful(EmptyForm)
-
-      } map { form =>
-        Ok(corporation_tax_registered(form, edit))
+          updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
       }
   }
 
@@ -56,17 +60,22 @@ trait CorporationTaxRegisteredController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(corporation_tax_registered(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.corporationTaxRegistered(data)
-            )
-          } yield edit match {
-            case true =>  Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ConfirmRegisteredOfficeController.get())
-          }
+          updateCache(data) map { _ =>
+            getRedirectLocation(edit)
+          } getOrElse failedResult
       }
     }
+  }
+
+  private def updateCache(data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
+    aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+    cacheMap <- OptionT.liftF(dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.corporationTaxRegistered(data)))
+  } yield cacheMap
+
+  private def getRedirectLocation(edit: Boolean) = if (edit) {
+    Redirect(routes.SummaryController.get())
+  } else {
+    Redirect(routes.ConfirmRegisteredOfficeController.get())
   }
 }
 

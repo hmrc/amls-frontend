@@ -19,9 +19,10 @@ package controllers.businessmatching
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.businessmatching.{BusinessType, BusinessMatching}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType._
+import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
 
@@ -34,9 +35,9 @@ trait BusinessTypeController extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
-        option =>
+        maybeBusinessMatching =>
           val redirect = for {
-            businessMatching <- option
+            businessMatching <- maybeBusinessMatching
             reviewDetails <- businessMatching.reviewDetails
             businessType <- reviewDetails.businessType
           } yield businessType match {

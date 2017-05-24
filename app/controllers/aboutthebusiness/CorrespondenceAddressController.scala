@@ -28,6 +28,7 @@ import views.html.aboutthebusiness._
 import audit.AddressConversions._
 import cats.data.OptionT
 import cats.implicits._
+import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -73,7 +74,7 @@ trait CorrespondenceAddressController extends BaseController {
   }
 
   def auditAddressChange(currentAddress: CorrespondenceAddress, oldAddress: Option[CorrespondenceAddress], edit: Boolean)
-                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
     } else {

@@ -19,8 +19,9 @@ package models.notifications
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
+import utils.GenericTestHelper
 
-class NotificationRowSpec extends PlaySpec {
+class NotificationRowSpec extends PlaySpec with GenericTestHelper {
 
   val testNotifications = NotificationRow(
     Some(
@@ -165,6 +166,113 @@ class NotificationRowSpec extends PlaySpec {
           ))
 
         model.getContactType mustBe (ContactType.DeRegistrationEffectiveDateChange)
+      }
+
+    }
+
+    "return application failure subject line" when {
+
+      val notificationRow = NotificationRow(
+        None,
+        Some(ContactType.RejectionReasons),
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      "status reason is 2" in {
+        notificationRow.copy(
+          status = Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.FailedToRespond)
+            ))
+        ).subject must be("notifications.fail.title")
+      }
+
+      "status reason is 3" when {
+        "contact number & contact type are present" in {
+          notificationRow.copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FailedToPayCharges)
+              ))
+          ).subject must be("notifications.fail.title")
+        }
+
+        "contact number & contact type are absent" in {
+          notificationRow.copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FailedToPayCharges)
+              )),
+            contactType = None
+          ).subject must be("notifications.fail.title")
+        }
+      }
+
+      "status reason is 98" in {
+        notificationRow.copy(
+          status = Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.OtherFailed)
+            ))
+        ).subject must be("notifications.fail.title")
+      }
+
+
+
+      "default" in {
+        notificationRow.subject must be("notifications.fail.title")
+      }
+
+    }
+
+    "return application refusal subject line" when {
+
+      val notificationRow = NotificationRow(
+        None,
+        Some(ContactType.RejectionReasons),
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      "status reason is 1" in {
+        notificationRow.copy(
+          status = Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.NonCompliant)
+            ))
+        ).subject must be("notifications.rejr.title")
+      }
+
+      "status reason is 4" in {
+        notificationRow.copy(
+          status = Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.FitAndProperFailure)
+            ))
+        ).subject must be("notifications.rejr.title")
+      }
+
+      "status reason is 99" in {
+        notificationRow.copy(
+          status = Some(
+            Status(
+              Some(StatusType.Rejected),
+              Some(RejectedReason.OtherRefused)
+            ))
+        ).subject must be("notifications.rejr.title")
       }
 
     }
