@@ -409,7 +409,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
         when {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        }.thenReturn(Future.successful(Some(Renewal())))
+        }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
         status(result) mustBe OK
 
