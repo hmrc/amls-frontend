@@ -44,9 +44,9 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()
 
-    when {
-      renewalService.getRenewal(any(), any(), any())
-    } thenReturn Future.successful(Some(renewal))
+//    when {
+//      renewalService.getRenewal(any(), any(), any())
+//    } thenReturn Future.successful(Some(renewal))
 
     lazy val controller = new TotalThroughputController(
       self.authConnector,
@@ -83,7 +83,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     "return the view with an empty form when no data exists yet" in new Fixture {
       val result = controller.get()(request)
 
-      when((renewalService).getRenewal(any(), any(), any()))
+      when(renewalService.getRenewal(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       status(result) mustBe OK
@@ -101,11 +101,11 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "return the view with prepopulated data" in new Fixture {
-      val result = controller.get()(request)
 
-      when((renewalService).getRenewal(any(), any(), any()))
+      when(renewalService.getRenewal(any(), any(), any()))
         .thenReturn(Future.successful(Some(Renewal(totalThroughput = Some(TotalThroughput("01"))))))
 
+      val result = controller.get()(request)
       status(result) mustBe OK
 
       val page = Jsoup.parse(contentAsString(result))
@@ -121,6 +121,10 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
 
   "A valid form post to the MSB throughput controller" must {
     "redirect to the next page in the flow if edit = false" in new FormSubmissionFixture {
+      when {
+              renewalService.getRenewal(any(), any(), any())
+            } thenReturn Future.successful(Some(Renewal()))
+
       post() { result =>
         result.header.status mustBe SEE_OTHER
         result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
@@ -128,6 +132,10 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "redirect to the summary page if edit = true" in new FormSubmissionFixture {
+      when {
+        renewalService.getRenewal(any(), any(), any())
+      } thenReturn Future.successful(Some(Renewal()))
+
       post(edit = true) { result =>
         result.header.status mustBe SEE_OTHER
         result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get().url)
@@ -135,6 +143,10 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
+      when {
+        renewalService.getRenewal(any(), any(), any())
+      } thenReturn Future.successful(Some(Renewal()))
+
       post() { _ =>
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
