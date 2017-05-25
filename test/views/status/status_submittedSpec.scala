@@ -24,6 +24,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{DateHelper, GenericTestHelper}
 import views.Fixture
+import cats.implicits._
 
 class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
@@ -111,7 +112,6 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
 
-
     "contains expected survey link for supervised status" in new ViewFixture {
       def view =  views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
 
@@ -120,6 +120,11 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+    }
+
+    "shows the 'withdraw application' link" in new ViewFixture {
+      def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, LocalDateTime.now.some, allowWithdrawal = true)
+      doc.select(s"a[href=${controllers.routes.StatusController.withdraw().url}]").text mustBe Messages("status.withdraw.link-text")
     }
   }
 }

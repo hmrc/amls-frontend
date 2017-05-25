@@ -68,6 +68,10 @@ trait StatusController extends BaseController {
         } yield page
   }
 
+  def withdraw = Authorised.async {
+    implicit authContext => implicit request => ???
+  }
+
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                                                        headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
     (mlrRegNumber, submissionStatus) match {

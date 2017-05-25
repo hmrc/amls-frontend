@@ -17,6 +17,7 @@ GET         /application-status                                         controll
 
 GET         /your-registration/your-messages/:id/:contactType           controllers.NotificationController.messageDetails(id : String,contactType:models.notifications.ContactType)
 GET         /your-registration/your-messages                            controllers.NotificationController.getMessages()
+GET         /your-registration/withdraw-application                     controllers.StatusController.withdraw()
 
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()

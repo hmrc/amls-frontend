@@ -20,7 +20,7 @@
 @import org.joda.time.LocalDateTime
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], submittedDate: Option[LocalDateTime])(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], submittedDate: Option[LocalDateTime], allowWithdrawal: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @main2(title = Messages("status.submissionreadyforreview.heading") + " - Your registration") {
 
@@ -39,12 +39,15 @@
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
             <div class="panel-indent panel-indent--gutter panel-border-wide">
-            @businessName.map {bn =>
+            @businessName.map { bn =>
                 <p class="heading-small">@Messages("status.business")</p>
                 <p>@bn</p>
             }
-            @submittedDate.map {date =>
+            @submittedDate.map { date =>
                 <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
+                @if(allowWithdrawal) {
+                    <a href="@routes.StatusController.withdraw()">@Messages("status.withdraw.link-text")</a>
+                }
             }
             </div>
         </div>
