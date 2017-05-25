@@ -28,7 +28,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
-import models.{AmendVariationResponse, Country, SubscriptionRequest, SubscriptionResponse}
+import models._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -72,17 +72,17 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "amlsRef",
-      registrationFee = 0,
+      amlsRefNo = "amlsRef",Some(SubscriptionFees(
+        registrationFee = 0,
       fpFee = None,
       fpFeeRate = None,
       premiseFee = 0,
       premiseFeeRate = None,
       totalFees = 0,
       paymentReference = ""
-    )
+    )))
 
-    val amendmentResponse = AmendVariationResponse(
+    val amendmentResponse = AmendVariationRenewalResponse(
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
@@ -132,7 +132,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       cache.getEntry[Seq[BankDetails]](BankDetails.key)
     } thenReturn Some(mock[Seq[BankDetails]])
     when {
-      cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+      cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
     } thenReturn Some(amendmentResponse)
   }
 
@@ -172,7 +172,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Future.successful(Some(cache))
 
         when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+          TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
         } thenReturn Future.successful(CacheMap("", Map.empty))
 
         when {
@@ -216,7 +216,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Future.successful(Some(cache))
 
         when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+          TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
         } thenReturn Future.successful(CacheMap("", Map.empty))
 
         when {
@@ -258,12 +258,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       when {
-        TestSubmissionService.cacheConnector.save[RenewalResponse](eqTo(RenewalResponse.key), any())(any(), any(), any())
+        TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
         TestSubmissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
-      } thenReturn Future.successful(mock[RenewalResponse])
+      } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),
@@ -332,12 +332,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       when {
-        TestSubmissionService.cacheConnector.save[RenewalResponse](eqTo(RenewalResponse.key), any())(any(), any(), any())
+        TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
         TestSubmissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
-      } thenReturn Future.successful(mock[RenewalResponse])
+      } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),

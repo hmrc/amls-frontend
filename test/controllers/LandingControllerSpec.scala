@@ -31,7 +31,7 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{Country, SubscriptionResponse}
+import models.{Country, SubscriptionFees, SubscriptionResponse}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
@@ -55,10 +55,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
     val controller = new LandingController {
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
@@ -74,7 +75,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
       "the landing service has a saved form and " when {
         "the form has not been submitted" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
           val complete = mock[BusinessMatching]
           val emptyCacheMap = mock[CacheMap]
@@ -97,9 +98,9 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("", "", 1.00,None, None, 1.00, None, 1.00, "")))
+            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, 1.0, None, 1.0)))))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -120,7 +121,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
@@ -136,7 +137,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
@@ -145,7 +146,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
         "the landing service has no valid review details" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
@@ -154,7 +155,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
         "the user has an AMLS enrolment" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsRegNo")))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -173,7 +174,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe  Some(controllers.routes.LandingController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
 
         }
       }
@@ -202,7 +203,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           val complete = mock[BusinessMatching]
 
-          when(httpResponse.status) thenReturn(NO_CONTENT)
+          when(httpResponse.status) thenReturn (NO_CONTENT)
 
           when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
 
@@ -224,7 +225,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           val complete = mock[BusinessMatching]
 
-          when(httpResponse.status) thenReturn(BAD_REQUEST)
+          when(httpResponse.status) thenReturn (BAD_REQUEST)
 
           when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
 
@@ -251,33 +252,34 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
     val controller = new LandingController {
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    when(controller.landingService.refreshCache(any())(any(),any(),any())).thenReturn(Future.successful(mock[CacheMap]))
+    when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
   }
 
 
-  def setUpMocksForNoEnrolment(controller : LandingController) = {
+  def setUpMocksForNoEnrolment(controller: LandingController) = {
     when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(None))
   }
 
-  def setUpMocksForAnEnrolmentExists(controller : LandingController) = {
+  def setUpMocksForAnEnrolmentExists(controller: LandingController) = {
     when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(Some("TESTREGNO")))
   }
 
-  def setUpMocksForNoDataInSaveForLater(controller : LandingController) = {
+  def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
     when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
       .thenReturn(Future.successful(None))
   }
 
-  def setUpMocksForDataExistsInKeystore(controller : LandingController) = {
+  def setUpMocksForDataExistsInKeystore(controller: LandingController) = {
     val reviewDetails = ReviewDetails(
       "Business Name",
       None,
@@ -290,17 +292,17 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     reviewDetails
   }
 
-  def setUpMocksForNoDataInKeyStore(controller : LandingController) = {
+  def setUpMocksForNoDataInKeyStore(controller: LandingController) = {
     when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
       .thenReturn(Future.successful(None))
   }
 
-  def setUpMocksForDataExistsInSaveForLater(controller : LandingController, testData : CacheMap = mock[CacheMap]) = {
+  def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: CacheMap = mock[CacheMap]) = {
     when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
       .thenReturn(Future.successful(Some(testData)))
   }
 
-  def buildTestCacheMap(hasChanged : Boolean, includesResponse : Boolean) : CacheMap = {
+  def buildTestCacheMap(hasChanged: Boolean, includesResponse: Boolean): CacheMap = {
     val result = mock[CacheMap]
     val testASP = Asp(hasChanged = hasChanged)
     val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
@@ -333,14 +335,15 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     if (includesResponse) {
       val testResponse = SubscriptionResponse(
         "TESTFORMBUNDLENUMBER",
-          "TESTAMLSREFNNO",
+        "TESTAMLSREFNNO", Some(SubscriptionFees(
+          "TESTPAYMENTREF",
           100.45,
           None,
           None,
           123.78,
           None,
-          17623.76,
-          "TESTPAYMENTREF"
+          17623.76
+        ))
       )
 
       when(result.getEntry[SubscriptionResponse](SubscriptionResponse.key))
@@ -354,13 +357,13 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
   "show landing page without authorisation" in new Fixture {
 
     val result = controller.start()(FakeRequest().withSession())
-    status(result) must be (OK)
+    status(result) must be(OK)
 
   }
 
   "direct to the service when authorised" in new Fixture {
     val result = controller.start()(request)
-    status(result) must be (SEE_OTHER)
+    status(result) must be(SEE_OTHER)
   }
 
   "Landing Controller" when {
@@ -388,8 +391,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
               val result = controller.get()(request)
 
-              status(result) must be (SEE_OTHER)
-              redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
               verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
           }
@@ -401,14 +404,13 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, true))
 
-              val result = controller.get()(request.withHeaders("test-context" ->"ESCS"))
+              val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
 
-              status(result) must be (SEE_OTHER)
-              redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
               verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
-
 
 
           }
@@ -421,8 +423,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               val result = controller.get()(request)
 
               verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
-              status(result) must be (SEE_OTHER)
-              redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
             }
           }
         }
@@ -434,8 +436,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
             val result = controller.get()(request)
 
-            status(result) must be (SEE_OTHER)
-            redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
             verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
           }
         }
@@ -448,8 +450,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
           val result = controller.get()(request)
 
-          status(result) must be (SEE_OTHER)
-          redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
           verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
         }
       }
@@ -457,7 +459,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
     "an enrolment does not exist" when {
       "there is data in S4L " should {
-        "do not refresh API5 and redirect to status controller" in new Fixture{
+        "do not refresh API5 and redirect to status controller" in new Fixture {
 
           val complete = mock[BusinessMatching]
           val emptyCacheMap = mock[CacheMap]
@@ -472,8 +474,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
           val result = controller.get()(request)
 
           verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
-          status(result) must be (SEE_OTHER)
-          redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
         }
       }
 
@@ -489,8 +491,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
             val result = controller.get()(request)
 
-            status(result) must be (SEE_OTHER)
-            redirectLocation(result) must be (Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
 
             Mockito.verify(controller.landingService, times(1))
               .updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
@@ -504,8 +506,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
             setUpMocksForNoDataInKeyStore(controller)
 
             val result = controller.get()(request)
-            status(result) must be (SEE_OTHER)
-            redirectLocation(result) must be (Some("http://localhost:9923/business-customer/amls"))
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some("http://localhost:9923/business-customer/amls"))
           }
         }
       }

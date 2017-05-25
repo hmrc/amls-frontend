@@ -18,7 +18,7 @@ package controllers
 
 import models.renewal.Renewal
 import models.status._
-import models.{AmendVariationResponse, SubmissionResponse, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -50,17 +50,17 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
   val response = SubscriptionResponse(
     etmpFormBundleNumber = "",
-    amlsRefNo = "",
+    amlsRefNo = "", Some(SubscriptionFees(
     registrationFee = 0,
     fpFee = None,
     fpFeeRate = None,
     premiseFee = 0,
     premiseFeeRate = None,
     totalFees = 0,
-    paymentReference = ""
+    paymentReference = ""))
   )
 
-  val amendmentResponse = AmendVariationResponse(
+  val amendmentResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
@@ -122,7 +122,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       "call the variation method on the service" in new Fixture {
         when {
           controller.subscriptionService.variation(any(), any(), any())
-        } thenReturn Future.successful(mock[AmendVariationResponse])
+        } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
         when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
 
@@ -176,7 +176,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
         when {
           controller.subscriptionService.variation(any(), any(), any())
-        } thenReturn Future.successful(mock[AmendVariationResponse])
+        } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
         when {
           controller.statusService.getStatus(any(), any(), any())

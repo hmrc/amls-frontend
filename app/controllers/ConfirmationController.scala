@@ -71,23 +71,28 @@ trait ConfirmationController extends BaseController {
         val result = for {
           status <- OptionT.liftF(statusService.getStatus)
           businessName <- companyNameT orElse OptionT.some("")
+          renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
         } yield status match {
-          case SubmissionReadyForReview | SubmissionDecisionApproved => Ok(payment_confirmation_amendvariation(businessName, reference))
-          case ReadyForRenewal(_) => Ok(payment_confirmation_renewal(businessName, reference))
+          case SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(payment_confirmation_amendvariation(businessName, reference))
+          case ReadyForRenewal(_) => if(renewalData.isDefined) {
+            Ok(payment_confirmation_renewal(businessName, reference))
+          } else {
+            Ok(payment_confirmation_amendvariation(businessName, reference))
+          }
           case _ => Ok(payment_confirmation(businessName, reference))
         }
 
         result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def isRenewalDefined(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Boolean] = {
+     dataCacheConnector.fetch[Renewal](Renewal.key).map ( _.isDefined)
+  }
 
-    dataCacheConnector.fetch[Renewal](Renewal.key).flatMap { renewal =>
-      if (renewal.isDefined) {
-        getRenewalFees
-      } else {
-        getVariationFees
-      }
+  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    isRenewalDefined flatMap {
+      case true => getRenewalFees
+      case false => getVariationFees
     }
   }
 
@@ -95,8 +100,12 @@ trait ConfirmationController extends BaseController {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
-      Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      renewalDefined match {
+        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+        case false =>Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      }
     }
   }
 

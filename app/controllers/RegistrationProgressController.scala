@@ -89,7 +89,7 @@ trait RegistrationProgressController extends BaseController {
 
                 preApplicationComplete(cacheMap) map {
                   case Some(x) => x match {
-                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+                    case true => Ok(registration_amendment(sections.filter(_.name != BusinessMatching.messageKey), amendmentDeclarationAvailable(sections)))
                     case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
                   }
                   case None => Redirect(controllers.routes.LandingController.get())
@@ -106,9 +106,12 @@ trait RegistrationProgressController extends BaseController {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
     } yield bm.isComplete match {
       case (true) => {
-        enrolmentsService.amlsRegistrationNumber map {
-          case Some(_) => Some(true)
-          case None => Some(false)
+        enrolmentsService.amlsRegistrationNumber flatMap {
+          case Some(_) => statusService.getStatus map {
+            case  NotCompleted | SubmissionReady => Some(false)
+            case _ => Some(true)
+          }
+          case None => Future.successful(Some(false))
         }
       }
       case _ => Future.successful(None)

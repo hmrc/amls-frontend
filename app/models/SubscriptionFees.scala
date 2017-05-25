@@ -16,13 +16,16 @@
 
 package models
 
-trait SubmissionResponse {
-  val etmpFormBundleNumber: String
-  def getRegistrationFee: BigDecimal
-  def getPremiseFeeRate: Option[BigDecimal]
-  def getFpFeeRate: Option[BigDecimal]
-  def getFpFee: Option[BigDecimal]
-  def getPremiseFee: BigDecimal
-  def getPaymentReference: String
-  def getTotalFees: BigDecimal
+import play.api.libs.json.Json
+
+case class SubscriptionFees(paymentReference: String,
+                            registrationFee: BigDecimal,
+                            fpFee: Option[BigDecimal],
+                            fpFeeRate: Option[BigDecimal] = None,
+                            premiseFee: BigDecimal,
+                            premiseFeeRate: Option[BigDecimal] = None,
+                            totalFees: BigDecimal)
+
+object SubscriptionFees {
+  implicit val format = Json.format[SubscriptionFees]
 }

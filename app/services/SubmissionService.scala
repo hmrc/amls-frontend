@@ -29,12 +29,12 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
-import models.renewal.{Renewal, RenewalResponse}
+import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -101,7 +101,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[AmendVariationResponse] = {
+  ): Future[AmendVariationRenewalResponse] = {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
@@ -109,7 +109,7 @@ trait SubmissionService extends DataCacheService {
         createSubscriptionRequest(cache),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
+      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
     } yield amendment
   }
 
@@ -118,7 +118,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[AmendVariationResponse] = {
+  ): Future[AmendVariationRenewalResponse] = {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
@@ -126,7 +126,7 @@ trait SubmissionService extends DataCacheService {
         createSubscriptionRequest(cache),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
+      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
     } yield amendment
   }
 
@@ -138,7 +138,7 @@ trait SubmissionService extends DataCacheService {
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
-      _ <- cacheConnector.save[RenewalResponse](RenewalResponse.key, response)
+      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
     } yield response
   }
 
@@ -150,7 +150,7 @@ trait SubmissionService extends DataCacheService {
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
       )
-      _ <- cacheConnector.save[RenewalResponse](RenewalResponse.key, response)
+      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
     } yield response
   }
 

@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, InternalAccountant}
 import models.status.{NotCompleted, SubmissionReadyForReview}
-import models.{ReadStatusResponse, SubscriptionResponse}
+import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -38,10 +38,11 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
@@ -52,14 +53,15 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
     val mockCacheMap = mock[CacheMap]
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "",
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = ""
+      amlsRefNo = "", Some(SubscriptionFees(
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = "")
+      )
     )
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
@@ -71,7 +73,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
     "use the correct services" in new Fixture {
       DeclarationController.authConnector must be(AMLSAuthConnector)
       DeclarationController.dataCacheConnector must be(DataCacheConnector)
-      DeclarationController.statusService must be (StatusService)
+      DeclarationController.statusService must be(StatusService)
     }
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
@@ -79,7 +81,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -138,7 +140,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
@@ -149,10 +151,11 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
 }
 
 class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> true))
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
@@ -163,14 +166,15 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
     val mockCacheMap = mock[CacheMap]
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "",
+      amlsRefNo = "", Some(SubscriptionFees(
       registrationFee = 0,
       fpFee = None,
       fpFeeRate = None,
       premiseFee = 0,
       premiseFeeRate = None,
       totalFees = 0,
-      paymentReference = ""
+      paymentReference = "")
+      )
     )
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
@@ -182,7 +186,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
     "use the correct services" in new Fixture {
       DeclarationController.authConnector must be(AMLSAuthConnector)
       DeclarationController.dataCacheConnector must be(DataCacheConnector)
-      DeclarationController.statusService must be (StatusService)
+      DeclarationController.statusService must be(StatusService)
     }
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
@@ -190,7 +194,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -249,7 +253,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
@@ -262,7 +266,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)

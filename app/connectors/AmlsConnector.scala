@@ -18,7 +18,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models._
-import models.renewal.RenewalResponse
+import models.AmendVariationRenewalResponse
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
@@ -102,19 +102,19 @@ trait AmlsConnector {
   }
 
   def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                             headerCarrier: HeaderCarrier,
-                                             ec: ExecutionContext,
-                                             reqW: Writes[SubscriptionRequest],
-                                             resW: Writes[AmendVariationResponse],
-                                             ac: AuthContext
-  ): Future[AmendVariationResponse] = {
+                                                                                headerCarrier: HeaderCarrier,
+                                                                                ec: ExecutionContext,
+                                                                                reqW: Writes[SubscriptionRequest],
+                                                                                resW: Writes[AmendVariationRenewalResponse],
+                                                                                ac: AuthContext
+  ): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
+    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -122,19 +122,19 @@ trait AmlsConnector {
   }
 
   def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                                                                headerCarrier: HeaderCarrier,
-                                                                                ec: ExecutionContext,
-                                                                                reqW: Writes[SubscriptionRequest],
-                                                                                resW: Writes[AmendVariationResponse],
-                                                                                ac: AuthContext
-  ): Future[AmendVariationResponse] = {
+                                                                                   headerCarrier: HeaderCarrier,
+                                                                                   ec: ExecutionContext,
+                                                                                   reqW: Writes[SubscriptionRequest],
+                                                                                   resW: Writes[AmendVariationRenewalResponse],
+                                                                                   ac: AuthContext
+  ): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
+    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -145,7 +145,7 @@ trait AmlsConnector {
              (implicit headerCarrier: HeaderCarrier,
              ec: ExecutionContext,
              authContext: AuthContext
-             ): Future[RenewalResponse] = {
+             ): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -154,7 +154,7 @@ trait AmlsConnector {
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, RenewalResponse](postUrl, subscriptionRequest) map { response =>
+    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
@@ -164,7 +164,7 @@ trait AmlsConnector {
              (implicit headerCarrier: HeaderCarrier,
               ec: ExecutionContext,
               authContext: AuthContext
-             ): Future[RenewalResponse] = {
+             ): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -173,7 +173,7 @@ trait AmlsConnector {
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, RenewalResponse](postUrl, subscriptionRequest) map { response =>
+    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
