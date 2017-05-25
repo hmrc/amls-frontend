@@ -17,11 +17,18 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
+import play.api.test.Helpers._
+
+import scala.concurrent.Future
 
 class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -36,12 +43,53 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    val controllers = app.injector.instanceOf[PersonUKPassportController]
+    val controller = app.injector.instanceOf[PersonUKPassportController]
   }
 
   "PersonUKPassportController" when {
 
     "get is called" must {
+
+      val personName = PersonName("firstname", None, "lastname", None, None)
+
+      "return OK" when {
+
+        "data is not present" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople(Some(personName))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[name=ukPassportNumber]").`val` must be("")
+          document.getElementById("hasUKPassport-true").hasAttr("checked") must be(false)
+          document.getElementById("hasUKPassport-false").hasAttr("checked") must be(false)
+
+        }
+
+        "data is present" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName)
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[name=ukPassportNumber]").`val` must be("000000000")
+          document.getElementById("hasUKPassport-true").hasAttr("checked") must be(true)
+
+        }
+
+      }
 
     }
 

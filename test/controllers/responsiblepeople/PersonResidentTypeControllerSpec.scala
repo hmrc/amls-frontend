@@ -79,7 +79,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.select("input[name=dateOfBirth.day]").`val` must be("")
           document.select("input[name=dateOfBirth.month]").`val` must be("")
           document.select("input[name=dateOfBirth.year]").`val` must be("")
-          document.select("input[name=ukPassportNumber]").`val` must be("")
           document.select("input[name=nonUKPassportNumber]").`val` must be("")
 
         }
