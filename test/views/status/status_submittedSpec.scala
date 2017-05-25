@@ -124,7 +124,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "shows the 'withdraw application' link" in new ViewFixture {
       def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, LocalDateTime.now.some, allowWithdrawal = true)
-      doc.select(s"a[href=${controllers.routes.StatusController.withdraw().url}]").text mustBe Messages("status.withdraw.link-text")
+      doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
     }
   }
 }

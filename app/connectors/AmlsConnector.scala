@@ -178,6 +178,9 @@ trait AmlsConnector {
       response
     }
   }
+
+  def withdraw(amlsRegistrationNumber: String)
+              (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext): Future[WithdrawSubscriptionResponse] = ???
 }
 
 object AmlsConnector extends AmlsConnector {
