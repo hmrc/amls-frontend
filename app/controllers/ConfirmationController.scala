@@ -85,14 +85,14 @@ trait ConfirmationController extends BaseController {
         result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def isRenewalDefined(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Boolean] = {
+     dataCacheConnector.fetch[Renewal](Renewal.key).map ( _.isDefined)
+  }
 
-    dataCacheConnector.fetch[Renewal](Renewal.key).flatMap { renewal =>
-      if (renewal.isDefined) {
-        getRenewalFees
-      } else {
-        getVariationFees
-      }
+  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    isRenewalDefined flatMap {
+      case true => getRenewalFees
+      case false => getVariationFees
     }
   }
 
@@ -100,8 +100,12 @@ trait ConfirmationController extends BaseController {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
-      Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      renewalDefined match {
+        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+        case false =>Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      }
     }
   }
 
