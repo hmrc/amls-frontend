@@ -35,6 +35,7 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -45,9 +46,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait LandingService {
 
   private[services] def cacheConnector: DataCacheConnector
+
   private[services] def keyStore: KeystoreConnector
+
   private[services] def desConnector: AmlsConnector
+
   private[services] def statusService: StatusService
+
   private[services] def businessMatchingConnector: BusinessMatchingConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
@@ -78,9 +83,9 @@ trait LandingService {
   }
 
   private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
-                                                 authContext: AuthContext,
-                                                 hc: HeaderCarrier,
-                                                 ec: ExecutionContext
+                                                                              authContext: AuthContext,
+                                                                              hc: HeaderCarrier,
+                                                                              ec: ExecutionContext
   ): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
@@ -119,7 +124,7 @@ trait LandingService {
         ))
         cacheConnector.save[Renewal](Renewal.key, renewal)
       }
-      case _=> Future.successful(cacheMap)
+      case _ => Future.successful(cacheMap)
 
     }
 
@@ -132,37 +137,25 @@ trait LandingService {
                    hc: HeaderCarrier,
                    ec: ExecutionContext
                   ): Future[CacheMap] = {
-    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-      cacheConnector.remove(authContext.user.oid) flatMap {
-        _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
-          _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
-            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
-              _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection) flatMap {
-                _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
-                  _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
-                    _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
-                      _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
-                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection) flatMap {
-                          _ => cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection) flatMap {
-                            _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
-                              _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
-                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
-                                  cacheMap => saveRenewalData(viewResponse, cacheMap)
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+
+    (for {
+      viewResponse <- desConnector.view(amlsRefNumber)
+      _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection)
+      _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection)
+      _ <- cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection)
+      _ <- cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection)
+      _ <- cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
+      _ <- cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection)
+      _ <- cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection)
+      _ <- cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
+      _ <- cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection)
+      _ <- cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection)
+      _ <- cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection)
+      _ <- cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection)
+      cacheMap <- cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection)
+      cacheMap <- saveRenewalData(viewResponse, cacheMap)
+    } yield cacheMap).recoverWith{case ex => Logger.warn("Failed saving cache",ex);Future.failed(ex)}
+
   }
 
   def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
@@ -202,9 +195,14 @@ trait LandingService {
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
   override private[services] def cacheConnector = DataCacheConnector
+
   override private[services] def keyStore = KeystoreConnector
+
   override private[services] def desConnector = AmlsConnector
+
   override private[services] def statusService = StatusService
+
   override private[services] def businessMatchingConnector = BusinessMatchingConnector
+
   // $COVERAGE-ON$
 }
