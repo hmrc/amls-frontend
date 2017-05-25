@@ -75,7 +75,7 @@ a.block-link {
 
 .progress-steps li:first-child,
 .progress-steps__amend li:first-child + li {
-  margin-top: 0;
+  //margin-top: 0;
 }
 
 .renewal-progress-section {
