@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{AccountancyServices, BusinessActivities}
 import models.renewal.AMLSTurnover
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -50,6 +51,15 @@ class amls_turnoverSpec extends GenericTestHelper with MustMatchers  {
       heading.html must be(Messages("renewal.turnover.title"))
       subHeading.html must include( Messages("summary.renewal"))
 
+    }
+
+    "correctly list business activities" in new ViewFixture {
+
+      val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Fifth)
+
+      def view = views.html.renewal.amls_turnover(form2, true, Some(BusinessActivities(Set(AccountancyServices))))
+
+      html must include("Accountancy services")
     }
 
     "show errors in the correct locations" in new ViewFixture {
