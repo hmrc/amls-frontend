@@ -22,7 +22,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import models.renewal._
 import models.status._
-import models.{Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
+import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers
@@ -31,7 +31,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{RenewalService, AuthEnrolmentsService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, LandingService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -171,9 +171,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           private val readStatusResponse = Some(ReadStatusResponse(
             LocalDateTime.now,
             "formBundleStatus",
-            None,None,None,
+            None, None, None,
             Some(LocalDate.now.plusDays(15)),
-            true,None,None,None
+            true, None, None, None
           ))
 
           when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -195,7 +195,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -227,7 +227,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -256,7 +256,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -286,7 +286,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -315,7 +315,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -344,7 +344,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -362,7 +362,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.renewalService.getRenewal(any(),any(),any()))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -381,7 +381,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
@@ -389,7 +389,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
           .thenReturn(Future.successful(false))
 
         val renewalDate = LocalDate.now().plusDays(15)
@@ -402,7 +402,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.renewalService.getRenewal(any(),any(),any()))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(Some(Renewal())))
 
         val result = controller.get()(request)
@@ -427,17 +427,17 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           )))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", 0, None, None, 0, None, 0, "")))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
         val dataCache = mock[DataCacheConnector]
 
-        when(dataCache.fetchAll(any(),any()))
+        when(dataCache.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.renewalService.isRenewalComplete(any())(any(),any(),any()))
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
           .thenReturn(Future.successful(true))
 
         when(authConnector.currentAuthority(any()))
@@ -459,9 +459,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
           Some(TotalThroughput("01")),
-          Some(WhichCurrencies(Seq("EUR"),None,None,None,None)),
+          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
           Some(TransactionsInLast12Months("1500")),
           Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
@@ -469,7 +469,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
           hasChanged = true
         )
 
-        when(controller.renewalService.getRenewal(any(),any(),any()))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         val result = controller.get()(request)

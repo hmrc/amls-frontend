@@ -19,7 +19,7 @@ package connectors
 import models._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, BeneficialShareholder}
-import models.renewal.RenewalResponse
+import models.AmendVariationRenewalResponse
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -82,17 +82,18 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   val subscriptionResponse = SubscriptionResponse(
     etmpFormBundleNumber = "",
-    amlsRefNo = "",
-    registrationFee = 0,
-    fpFee = None,
-    fpFeeRate = None,
-    premiseFee = 0,
-    premiseFeeRate = None,
-    totalFees = 0,
-    paymentReference = ""
+    amlsRefNo = "", Some(SubscriptionFees(
+      paymentReference = "",
+      registrationFee = 0,
+      fpFee = None,
+      fpFeeRate = None,
+      premiseFee = 0,
+      premiseFeeRate = None,
+      totalFees = 0)
+    )
   )
 
-  val amendmentResponse = AmendVariationResponse(
+  val amendmentResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
@@ -104,7 +105,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     paymentReference = Some(""),
     difference = Some(0)
   )
-  val renewalResponse = RenewalResponse(
+  val renewalResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
@@ -116,7 +117,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     paymentReference = Some(""),
     difference = Some(0)
   )
-
 
 
   val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
@@ -129,13 +129,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       None,
       None,
       CredentialStrength.Weak,
-      ConfidenceLevel.L50,""),
+      ConfidenceLevel.L50, ""),
     Principal(
       None,
       Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
     None,
     None,
-    None,None)
+    None, None)
 
   "subscribe" must {
 
@@ -155,10 +155,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "return correct status" in {
       when {
-        AmlsConnector.httpGet.GET[ReadStatusResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/status"))(any(),any())
+        AmlsConnector.httpGet.GET[ReadStatusResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/status"))(any(), any())
       } thenReturn Future.successful(readStatusResponse)
 
-      whenReady(AmlsConnector.status(amlsRegistrationNumber)){
+      whenReady(AmlsConnector.status(amlsRegistrationNumber)) {
         _ mustBe readStatusResponse
       }
     }
@@ -168,10 +168,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "a view response" in {
       when {
-        AmlsConnector.httpGet.GET[ViewResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any())
+        AmlsConnector.httpGet.GET[ViewResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(), any())
       } thenReturn Future.successful(viewResponse)
 
-      whenReady(AmlsConnector.view(amlsRegistrationNumber)){
+      whenReady(AmlsConnector.view(amlsRegistrationNumber)) {
         _ mustBe viewResponse
       }
     }
@@ -181,11 +181,11 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "successfully submit amendment" in {
       when {
-        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/update")
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/update")
           , eqTo(subscriptionRequest), any())(any(), any(), any())
       }.thenReturn(Future.successful(amendmentResponse))
 
-      whenReady(AmlsConnector.update(subscriptionRequest,amlsRegistrationNumber)){
+      whenReady(AmlsConnector.update(subscriptionRequest, amlsRegistrationNumber)) {
         _ mustBe amendmentResponse
       }
     }
@@ -194,7 +194,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   "variation" must {
     "successfully submit variation" in {
       when {
-        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
           , eqTo(subscriptionRequest), any())(any(), any(), any())
       }.thenReturn(Future.successful(amendmentResponse))
 
@@ -206,7 +206,8 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   "renewal" must {
     "successfully submit renewal" in {
-      when { AmlsConnector.httpPost.POST[SubscriptionRequest, RenewalResponse](
+      when {
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](
           eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewal"), eqTo(subscriptionRequest), any())(any(), any(), any())
       } thenReturn Future.successful(renewalResponse)
 
@@ -216,8 +217,9 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     }
 
     "successfully submit renewalAmendment" in {
-      when { AmlsConnector.httpPost.POST[SubscriptionRequest, RenewalResponse](
-        eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewalAmendment"), eqTo(subscriptionRequest), any())(any(), any(), any())
+      when {
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](
+          eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewalAmendment"), eqTo(subscriptionRequest), any())(any(), any(), any())
       } thenReturn Future.successful(renewalResponse)
 
       whenReady(AmlsConnector.renewalAmendment(subscriptionRequest, amlsRegistrationNumber)) {
