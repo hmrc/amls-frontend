@@ -64,7 +64,7 @@ class RenewalProgressController @Inject()
             cache <- OptionT(dataCacheConnector.fetchAll)
             statusInfo <- OptionT.liftF(statusService.getDetailedStatus)
           } yield {
-            val variationSections = progressService.sections(cache)
+            val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
             val msbOrTcspExists = ControllerHelper.isMSBSelected(businessMatching) || ControllerHelper.isTCSPSelected(businessMatching)
             val canSubmit = (renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections)

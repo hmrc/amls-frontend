@@ -25,6 +25,8 @@ import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 import scala.concurrent.Future
 
@@ -57,17 +59,28 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
 
     "get is called" must {
       "load the page" when {
-        "renewal data is found for receiving payments" in new Fixture {
+        "renewal data is found for receiving payments and pre-populate the data" in new Fixture {
 
           when(mockRenewalService.getRenewal(any(),any(),any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)
           status(result) mustEqual OK
+
+          val page = Jsoup.parse(contentAsString(result))
+          page.select("input[type=radio][name=receivePayments][value=true]").hasAttr("checked") must be(true)
+          page.select("input[type=radio][name=receivePayments][value=false]").hasAttr("checked") must be(false)
+
         }
-        "no renewal data is found" in new Fixture {
+
+        "no renewal data is found and show an empty form" in new Fixture {
           val result = controller.get()(request)
           status(result) mustEqual OK
+
+          val page = Jsoup.parse(contentAsString(result))
+          page.select("input[type=radio][name=receivePayments][value=true]").hasAttr("checked") must be(false)
+          page.select("input[type=radio][name=receivePayments][value=false]").hasAttr("checked") must be(false)
+
         }
       }
     }

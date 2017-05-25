@@ -29,6 +29,8 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 import scala.concurrent.Future
 
@@ -78,14 +80,36 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
   }
 
   "The MSB throughput controller" must {
-    "return the view" in new Fixture {
+    "return the view with an empty form when no data exists yet" in new Fixture {
       val result = controller.get()(request)
+
+      when((renewalService).getRenewal(any(), any(), any()))
+        .thenReturn(Future.successful(None))
 
       status(result) mustBe OK
 
-      contentAsString(result) must include(Messages("renewal.msb.throughput.header"))
+      val html = contentAsString(result)
+      html must include(Messages("renewal.msb.throughput.header"))
+      val page = Jsoup.parse(html)
+      page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-02]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-03]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-04]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-05]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-06]").hasAttr("checked") must be(false)
+      page.select("input[type=radio][name=throughput][id=throughput-07]").hasAttr("checked") must be(false)
+    }
 
-      verify(renewalService).getRenewal(any(), any(), any())
+    "return the view with prepopulated data" in new Fixture {
+      val result = controller.get()(request)
+
+      when((renewalService).getRenewal(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Renewal(totalThroughput = Some(TotalThroughput("01"))))))
+
+      status(result) mustBe OK
+
+      val page = Jsoup.parse(contentAsString(result))
+      page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(true)
     }
 
     "return a bad request result when an invalid form is posted" in new Fixture {

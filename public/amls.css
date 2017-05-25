@@ -78,11 +78,6 @@ a.block-link {
   margin-top: 0;
 }
 
-.progress-steps__amend li:first-child {
-  display: none;
-  visibility: hidden;
-}
-
 .renewal-progress-section {
   border-bottom: 10px solid #e2e2e2;
   margin-bottom: 40px!important;

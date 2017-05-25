@@ -150,9 +150,12 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
 
+      val sections = Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
+          Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
+      )
+
       when(controller.progressService.sections(cacheMap))
-        .thenReturn(Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get())
-        ))
+        .thenReturn(sections)
 
       val result = controller.get()(request)
 
@@ -162,6 +165,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select(".page-header").text() must include(Messages("renewal.progress.title"))
       html.select(".progress-step_changed").size() must be(1)
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
+
+      val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
+      elements.size() must be(2)
 
     }
 

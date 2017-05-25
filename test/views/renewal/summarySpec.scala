@@ -67,19 +67,19 @@ class summarySpec extends GenericTestHelper
       "businessmatching.registerservices.servicename.lbl.07"
     )
 
-    val sectionChecks = Table[String, Element=>Boolean](
-      ("title key", "check"),
-      ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text")),
-      ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
-      ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999")),
-      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet)),
-      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom")),
-      ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01")),
-      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1")),
-      ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500")),
-      ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France")),
-      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom")),
-      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"))
+    val sectionChecks = Table[String, Element=>Boolean, String](
+      ("title key", "check", "edit link"),
+      ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+      ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.BusinessTurnoverController.get(true).toString),
+      ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
+      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
+      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
+      ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString),
+      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"), controllers.renewal.routes.TotalThroughputController.get(true).toString),
+      ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500"), controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).toString),
+      ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
+      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
+      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString)
     )
 
     "include the provided data" in new ViewFixture {
@@ -124,13 +124,13 @@ class summarySpec extends GenericTestHelper
         views.html.renewal.summary(renewalModel, Some(businessActivitiesModel), msbServices)
       }
 
-      forAll(sectionChecks) { (key, check) => {
+      forAll(sectionChecks) { (key, check, editLink) => {
         val headers = doc.select("section.check-your-answers h2")
         val header = headers.toList.find(e => e.text() == Messages(key))
-
         header must not be None
         val section = header.get.parents().select("section").first()
         check(section) must be(true)
+        section.select("a[href]").attr("href") must include(editLink)
       }}
     }
   }

@@ -41,14 +41,6 @@ class business_typeSpec extends GenericTestHelper with MustMatchers  {
       def view = views.html.businessmatching.business_type(form2)
 
       doc.title must startWith(Messages("businessmatching.businessType.title") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[BusinessType] = Form2(LimitedCompany)
-
-      def view = views.html.businessmatching.business_type(form2)
-
       heading.html must be(Messages("businessmatching.businessType.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
     }

@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, Reads}
 
-case class AmendVariationResponse (
+case class AmendVariationRenewalResponse(
                                     processingDate: String,
                                     etmpFormBundleNumber: String,
                                     registrationFee: BigDecimal,
@@ -34,32 +34,26 @@ case class AmendVariationResponse (
                                     addedFullYearTradingPremises: Int = 0,
                                     halfYearlyTradingPremises: Int = 0,
                                     zeroRatedTradingPremises: Int = 0
-                                  ) extends SubmissionResponse
+                                  ) extends SubmissionResponse {
 
-object AmendVariationResponse {
+  override def getRegistrationFee: BigDecimal = registrationFee
+
+  override def getPremiseFeeRate: Option[BigDecimal] = premiseFeeRate
+
+  override def getFpFeeRate: Option[BigDecimal] = fpFeeRate
+
+  override def getFpFee: Option[BigDecimal] = fpFee
+
+  override def getPremiseFee: BigDecimal = premiseFee
+
+  override def getPaymentReference: String = paymentReference.getOrElse("")
+
+  override def getTotalFees: BigDecimal = totalFees
+}
+
+object AmendVariationRenewalResponse {
 
   val key = "AmendVariationResponse"
-  implicit val format = Json.format[AmendVariationResponse]
+  implicit val format = Json.format[AmendVariationRenewalResponse]
 
-  implicit val reads: Reads[AmendVariationResponse] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-    (
-      (__ \ "processingDate").read[String] and
-        (__ \ "etmpFormBundleNumber").read[String] and
-        (__ \ "registrationFee").read[BigDecimal] and
-        (__ \ "fpFee").read(Reads.optionWithNull[BigDecimal]).orElse((__ \ "fPFee").read(Reads.optionWithNull[BigDecimal])).orElse(Reads.pure(None)) and
-        (__ \ "fpFeeRate").readNullable[BigDecimal] and
-        (__ \ "premiseFee").read[BigDecimal] and
-        (__ \ "premiseFeeRate").readNullable[BigDecimal] and
-        (__ \ "totalFees").read[BigDecimal] and
-        (__ \ "paymentReference").readNullable[String] and
-        (__ \ "difference").readNullable[BigDecimal] and
-        (__ \ "addedResponsiblePeople").read[Int] and
-        (__ \ "addedResponsiblePeopleFitAndProper").read[Int] and
-        (__ \ "addedFullYearTradingPremises").read[Int] and
-        (__ \ "halfYearlyTradingPremises").read[Int] and
-        (__ \ "zeroRatedTradingPremises").read[Int]
-      ) apply AmendVariationResponse.apply _
-  }
 }

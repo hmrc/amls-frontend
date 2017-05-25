@@ -20,16 +20,16 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import org.jsoup.nodes.Element
+import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import utils.GenericTestHelper
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class businessmatchingSpec extends GenericTestHelper
+class summarySpec extends GenericTestHelper
   with MustMatchers
   with TableDrivenPropertyChecks {
 
@@ -43,12 +43,6 @@ class businessmatchingSpec extends GenericTestHelper
       def view = views.html.businessmatching.summary(BusinessMatching())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      def view = views.html.businessmatching.summary(BusinessMatching())
-
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
@@ -89,10 +83,11 @@ class businessmatchingSpec extends GenericTestHelper
 
       def view = views.html.businessmatching.summary(testBusinessMatching)
 
-      val sectionChecks = Table[String, Element => Boolean](
-        ("title key", "check"),
-        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom")),
-        ("businessmatching.registrationnumber.title", checkElementTextIncludes(_, "12345678")),
+      val sectionChecks = Table[String, Element => Boolean, String](
+        ("title key", "check", "editLink"),
+        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom"), ""),
+        ("businessmatching.registrationnumber.title", checkElementTextIncludes(_, "12345678"),
+          controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString),
         ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
           "businessmatching.registerservices.servicename.lbl.01",
           "businessmatching.registerservices.servicename.lbl.02",
@@ -100,13 +95,16 @@ class businessmatchingSpec extends GenericTestHelper
           "businessmatching.registerservices.servicename.lbl.04",
           "businessmatching.registerservices.servicename.lbl.05",
           "businessmatching.registerservices.servicename.lbl.06",
-          "businessmatching.registerservices.servicename.lbl.07"))),
+          "businessmatching.registerservices.servicename.lbl.07")),
+          controllers.businessmatching.routes.RegisterServicesController.get(true).toString),
         ("businessmatching.services.title", checkListContainsItems(_, Set(
           "businessmatching.services.list.lbl.01",
           "businessmatching.services.list.lbl.02",
           "businessmatching.services.list.lbl.03",
-          "businessmatching.services.list.lbl.04"))),
-        ("businessmatching.psr.number.title", checkElementTextIncludes(_, "123456"))
+          "businessmatching.services.list.lbl.04")),
+          controllers.businessmatching.routes.ServicesController.get(true).toString),
+        ("businessmatching.psr.number.title", checkElementTextIncludes(_, "123456"),
+          controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString)
       )
 
       html must not include Messages("businessmatching.typeofbusiness.title")
@@ -114,15 +112,13 @@ class businessmatchingSpec extends GenericTestHelper
       html must not include Messages("button.logout")
       html must include(Messages("businessmatching.button.confirm.start"))
 
+      val sections = doc.getElementsByTag("section").zipWithIndex
 
-      forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
-
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+      for((section, index) <- sections) {
+        val (key, check, editLink) = sectionChecks(index)
+        section.select("h2").text() must be(Messages(key))
         check(section) must be(true)
-      }
+        section.select("a[href]").attr("href") must be(editLink)
       }
     }
 
@@ -153,17 +149,20 @@ class businessmatchingSpec extends GenericTestHelper
 
       def view = views.html.businessmatching.summary(testBusinessMatching)
 
-      val sectionChecks = Table[String, Element => Boolean](
-        ("title key", "check"),
-        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom")),
-        ("businessmatching.typeofbusiness.title", checkElementTextIncludes(_, "test")),
+      val sectionChecks = Table[String, Element => Boolean, String](
+        ("title key", "check", "editLink"),
+        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom"), ""),
+        ("businessmatching.typeofbusiness.title", checkElementTextIncludes(_, "test"),
+          controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString),
         ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
           "businessmatching.registerservices.servicename.lbl.01",
           "businessmatching.registerservices.servicename.lbl.02",
           "businessmatching.registerservices.servicename.lbl.03",
           "businessmatching.registerservices.servicename.lbl.04",
           "businessmatching.registerservices.servicename.lbl.06",
-          "businessmatching.registerservices.servicename.lbl.07")))
+          "businessmatching.registerservices.servicename.lbl.07")),
+          controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+        )
       )
 
       html must not include Messages("businessmatching.services.title")
@@ -171,16 +170,13 @@ class businessmatchingSpec extends GenericTestHelper
 
       html must include(Messages("button.logout"))
       html must not include Messages("businessmatching.button.confirm.start")
+      val sections = doc.getElementsByTag("section").zipWithIndex
 
-
-      forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
-
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+      for((section, index) <- sections) {
+        val (key, check, editLink) = sectionChecks(index)
+        section.select("h2").text() must be(Messages(key))
         check(section) must be(true)
-      }
+        section.select("a[href]").attr("href") must be(editLink)
       }
     }
   }

@@ -22,7 +22,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMa
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationResponse, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -61,17 +61,17 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "amlsRef",
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = ""
-    )
+      amlsRefNo = "amlsRef", Some(SubscriptionFees(
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = ""
+      )))
 
-    val amendmentResponse = AmendVariationResponse(
+    val amendmentResponse = AmendVariationRenewalResponse(
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
@@ -84,7 +84,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
       difference = Some(0)
     )
 
-    val variationResponse = AmendVariationResponse(
+    val variationResponse = AmendVariationRenewalResponse(
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
@@ -125,7 +125,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
     } thenReturn Some(businessMatching)
 
     when {
-      cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+      cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
     } thenReturn Some(amendmentResponse)
 
     when {
@@ -146,7 +146,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         } thenReturn Some(Seq(ResponsiblePeople()))
 
         when {
-          TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+          TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
         } thenReturn Future.successful(CacheMap("", Map.empty))
 
         val rows = Seq(
@@ -165,7 +165,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
       "submit amendment returning submission data with dynamic fee rate" in new Fixture {
 
-        val amendmentResponseWithRate = AmendVariationResponse(
+        val amendmentResponseWithRate = AmendVariationRenewalResponse(
           processingDate = "",
           etmpFormBundleNumber = "",
           registrationFee = 100,
@@ -179,7 +179,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         )
 
         when {
-          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+          cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
         } thenReturn Some(amendmentResponseWithRate)
 
         when {
@@ -220,7 +220,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         } thenReturn Some(Seq(TradingPremises()))
 
         when {
-          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+          cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
         } thenReturn Some(amendResponseWithRPFees)
 
         when {
@@ -252,7 +252,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         } thenReturn Some(premises)
 
         when {
-          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+          cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
         } thenReturn Some(amendmentResponse)
 
         when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(Seq(ResponsiblePeople()))
@@ -284,7 +284,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(amendResponseWithRPFees)
 
           when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
@@ -300,7 +300,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "there is no fee returned in a amendment response because business type is not msb or tcsp" in new Fixture {
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(amendmentResponse)
 
           when {
@@ -327,7 +327,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "the business type is MSB and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(amendmentResponse)
 
           when {
@@ -356,7 +356,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(amendmentResponse)
 
           when {
@@ -388,11 +388,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
       "retrieve data from variation submission" in new Fixture {
 
         when {
-          TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+          TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
         } thenReturn Future.successful(CacheMap("", Map.empty))
 
         when {
-          cache.getEntry[AmendVariationResponse](any())(any())
+          cache.getEntry[AmendVariationRenewalResponse](any())(any())
         } thenReturn Some(variationResponse.copy(
           paymentReference = Some("12345"),
           addedResponsiblePeople = 1,
@@ -425,7 +425,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "there is no fee returned in a variation response because business type is not msb or tcsp" in new Fixture {
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(fpFee = None))
 
           when {
@@ -451,7 +451,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
         "there is a Responsible Persons fee to pay with dynamic fpFeeRate" in new Fixture {
 
-          val variationResponseWithRate = AmendVariationResponse(
+          val variationResponseWithRate = AmendVariationRenewalResponse(
             processingDate = "",
             etmpFormBundleNumber = "",
             registrationFee = 100,
@@ -469,11 +469,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           )
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponseWithRate)
 
           whenReady(TestSubmissionResponseService.getVariation) {
@@ -495,11 +495,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "a Trading Premises has been added with a full year fee" in new Fixture {
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
@@ -516,11 +516,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "a Trading Premises has been added with a half year fee" in new Fixture {
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
@@ -537,11 +537,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "a Trading Premises has been added with a zero fee" in new Fixture {
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
@@ -558,11 +558,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "there is a Responsible Persons fee to pay" in new Fixture {
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponse.copy(addedResponsiblePeople = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
@@ -580,7 +580,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
         "the business type is MSB and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
 
-          val testVariationResponse = AmendVariationResponse(
+          val testVariationResponse = AmendVariationRenewalResponse(
             processingDate = "",
             etmpFormBundleNumber = "",
             registrationFee = 100,
@@ -599,7 +599,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           )
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(testVariationResponse)
 
           when {
@@ -627,7 +627,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
 
-          val testVariationResponse = AmendVariationResponse(
+          val testVariationResponse = AmendVariationRenewalResponse(
             processingDate = "",
             etmpFormBundleNumber = "",
             registrationFee = 100,
@@ -646,7 +646,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           )
 
           when {
-            cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(testVariationResponse)
 
           when {
@@ -675,11 +675,11 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         "each of the categorised fees are in the response" in new Fixture {
 
           when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](any())(any())
           } thenReturn Some(variationResponse.copy(
             addedResponsiblePeople = 1,
             addedResponsiblePeopleFitAndProper = 1,
@@ -733,7 +733,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
           when {
             cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
-          } thenReturn Some(subscriptionResponse.copy(fpFee = Some(100)))
+          } thenReturn Some(subscriptionResponse.copy(subscriptionFees=Some(subscriptionResponse.subscriptionFees.get.copy(fpFee = Some(100)))))
 
           when {
             cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
@@ -757,7 +757,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
           val subscriptionResponseWithFeeRate = SubscriptionResponse(
             etmpFormBundleNumber = "",
-            amlsRefNo = "amlsRef",
+            amlsRefNo = "amlsRef",Some(SubscriptionFees(
             registrationFee = 100,
             fpFee = Some(125.0),
             fpFeeRate = Some(130.0),
@@ -765,6 +765,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
             premiseFeeRate = Some(125.0),
             totalFees = 0,
             paymentReference = ""
+            ))
           )
 
           when {
