@@ -16,7 +16,6 @@
 
 package views.status
 
-
 import forms.EmptyForm
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType

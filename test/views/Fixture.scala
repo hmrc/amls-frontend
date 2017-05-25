@@ -22,7 +22,6 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 
-
 trait Fixture extends MustMatchers {
   implicit val request = FakeRequest()
 
