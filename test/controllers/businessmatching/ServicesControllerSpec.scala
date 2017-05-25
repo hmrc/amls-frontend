@@ -96,7 +96,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
       document.select("input[type=checkbox]").size mustBe 4
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 1
     }
 
     "return a redirect to the 'How much Throughput' page on valid submission" in new Fixture {

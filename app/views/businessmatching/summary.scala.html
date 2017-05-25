@@ -96,16 +96,16 @@
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
             @model.msbServices.map { services =>
                 @checkYourAnswers(
-                    question = Messages("msb.services.title"),
+                    question = Messages("businessmatching.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
                 ) {
                     <ul class="list list--comma">
                     @services.msbServices.map { svc =>
                         <li>@svc match {
-                            case TransmittingMoney => {@Messages("services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("services.list.lbl.04")}
+                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
                         }</li>
                     }
                     </ul>

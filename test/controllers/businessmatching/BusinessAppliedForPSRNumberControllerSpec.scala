@@ -53,9 +53,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with M
           (any(), any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.psr.number.title"))
       }
-
 
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())

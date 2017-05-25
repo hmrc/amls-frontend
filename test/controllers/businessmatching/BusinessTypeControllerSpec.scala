@@ -55,12 +55,6 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
       val result = controller.get()(request)
       status(result) must be(OK)
 
-      val pageTitle = Messages("businessmatching.businessType.title") + " - " +
-        Messages("summary.businessmatching") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.title() mustBe pageTitle
     }
 
     "display Registration Number page for CORPORATE_BODY" in new Fixture {

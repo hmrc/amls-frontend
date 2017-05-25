@@ -18,6 +18,7 @@ package models.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
 import models.Country
+import models.registrationprogress.{Completed, NotStarted, Started}
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
@@ -239,6 +240,54 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       initial.isComplete must be(false)
     }
 
+  }
+
+  "Amendment and Variation flow" when {
+    "the section is complete with all the Responsible People being removed" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
+            ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true))))
+        val section = ResponsiblePeople.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(NotStarted)
+        section.call must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+      }
+    }
+
+    "the section is complete with all the Responsible People being removed and has one incomplete model" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
+            ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
+            ResponsiblePeople(Some(DefaultValues.personName)))))
+        val section = ResponsiblePeople.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Started)
+        section.call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
+      }
+    }
+
+    "the section is complete with one of the Responsible People object being removed" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
+            completeResponsiblePeople)))
+        val section = ResponsiblePeople.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+      }
+    }
   }
 
   it when {
