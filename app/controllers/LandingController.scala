@@ -141,6 +141,7 @@ trait LandingController extends BaseController {
     enrolmentsService.amlsRegistrationNumber flatMap  {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap { //enrolment exists
         case Some(cacheMap) => {
+          Logger.debug("CACHEMAP"+cacheMap)
           //there is data in S4l
           if (dataHasChanged(cacheMap)) {
             (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
