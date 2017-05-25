@@ -41,14 +41,6 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
       def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
 
       doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
-
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
-
       heading.html must be(Messages("businessmatching.psr.number.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 

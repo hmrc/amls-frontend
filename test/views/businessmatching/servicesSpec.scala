@@ -40,14 +40,6 @@ class servicesSpec extends GenericTestHelper with MustMatchers  {
       def view = views.html.businessmatching.services(form2, true)
 
       doc.title must startWith(Messages("msb.services.title") + " - " + Messages("summary.businessmatching"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
-
-      def view = views.html.businessmatching.services(form2, true)
-
       heading.html must be(Messages("msb.services.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
