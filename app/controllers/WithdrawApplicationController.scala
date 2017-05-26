@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import services.AuthEnrolmentsService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.withdraw_application
 
@@ -30,23 +30,31 @@ import scala.concurrent.Future
 
 class WithdrawApplicationController @Inject()
 (val authConnector: AuthConnector,
- amlsConnector: AmlsConnector,
- authService: AuthEnrolmentsService,
- cacheConnector: DataCacheConnector) extends BaseController {
+ amls: AmlsConnector,
+ enrolments: AuthEnrolmentsService,
+ cache: DataCacheConnector,
+ statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
+
+      val maybeProcessingDate = for {
+        status <- OptionT.liftF(statusService.getDetailedStatus)
+        response <- OptionT.fromOption[Future](status._2)
+      } yield response.processingDate
+
       (for {
-        cache <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+        cache <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
         details <- OptionT.fromOption[Future](cache.reviewDetails)
-      } yield Ok(withdraw_application(details.businessName))) getOrElse InternalServerError("Unable to show the withdrawl page")
+        processingDate <- maybeProcessingDate
+      } yield Ok(withdraw_application(details.businessName, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
       (for {
-        regNumber <- OptionT(authService.amlsRegistrationNumber)
-        _ <- OptionT.liftF(amlsConnector.withdraw(regNumber))
+        regNumber <- OptionT(enrolments.amlsRegistrationNumber)
+        _ <- OptionT.liftF(amls.withdraw(regNumber))
       } yield Redirect(routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
   }
 

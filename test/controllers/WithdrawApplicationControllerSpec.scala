@@ -17,15 +17,17 @@
 package controllers
 
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.WithdrawSubscriptionResponse
+import models.{ReadStatusResponse, WithdrawSubscriptionResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
-import services.AuthEnrolmentsService
-import utils.{AuthorisedFixture, GenericTestHelper}
+import services.{AuthEnrolmentsService, StatusService}
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 import cats.implicits._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import models.status.SubmissionReadyForReview
+import org.joda.time.LocalDateTime
 
 import scala.concurrent.Future
 
@@ -38,13 +40,19 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
     val cacheConnector = mock[DataCacheConnector]
+    val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector)
+    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector, statusService)
 
     val amlsRegistrationNumber = "XA1234567890L"
     val businessName = "Test Business"
     val reviewDetails = mock[ReviewDetails]
-    when(reviewDetails.businessName) thenReturn businessName
+
+    //noinspection ScalaStyle
+    val processingDate = new LocalDateTime(2002, 1, 1, 12, 0, 0)
+    val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
+
+    when(reviewDetails.businessName).thenReturn(businessName)
 
     when {
       authService.amlsRegistrationNumber(any(), any(), any())
@@ -57,6 +65,10 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
     when {
       cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
+
+    when {
+      statusService.getDetailedStatus(any(), any(), any())
+    } thenReturn Future.successful(SubmissionReadyForReview, statusResponse.some)
   }
 
   "The WithdrawApplication controller" when {
@@ -70,6 +82,11 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
         val result = controller.get()(request)
         contentAsString(result) must include(businessName)
       }
+
+      "show the registration date" in new TestFixture {
+        val result = controller.get()(request)
+        contentAsString(result) must include(DateHelper.formatDate(processingDate))
+      }
     }
 
     "call the middle tier to initiate the withdrawal process" when {
@@ -82,7 +99,5 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
         verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber))(any(), any(), any())
       }
     }
-
   }
-
 }
