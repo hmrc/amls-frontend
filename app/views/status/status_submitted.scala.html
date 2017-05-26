@@ -45,9 +45,10 @@
             }
             @submittedDate.map { date =>
                 <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
-                @if(allowWithdrawal) {
-                    <a href="@routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
-                }
+
+            }
+            @if(allowWithdrawal) {
+                <a href="@routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
             }
             </div>
         </div>
