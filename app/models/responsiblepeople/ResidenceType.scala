@@ -27,8 +27,7 @@ sealed trait ResidenceType
 case class UKResidence(nino: String) extends ResidenceType
 
 case class NonUKResidence(
-                           dateOfBirth: LocalDate,
-                           passportType: PassportType
+                           dateOfBirth: LocalDate
                          ) extends ResidenceType
 
 object ResidenceType {
