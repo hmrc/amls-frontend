@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.AmlsConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.WithdrawSubscriptionResponse
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -24,6 +24,8 @@ import play.api.test.Helpers._
 import services.AuthEnrolmentsService
 import utils.{AuthorisedFixture, GenericTestHelper}
 import cats.implicits._
+import models.businesscustomer.ReviewDetails
+import models.businessmatching.BusinessMatching
 
 import scala.concurrent.Future
 
@@ -35,10 +37,14 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
+    val cacheConnector = mock[DataCacheConnector]
 
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService)
+    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector)
 
     val amlsRegistrationNumber = "XA1234567890L"
+    val businessName = "Test Business"
+    val reviewDetails = mock[ReviewDetails]
+    when(reviewDetails.businessName) thenReturn businessName
 
     when {
       authService.amlsRegistrationNumber(any(), any(), any())
@@ -47,13 +53,22 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
     when {
       amlsConnector.withdraw(eqTo(amlsRegistrationNumber))(any(), any(), any())
     } thenReturn Future.successful(WithdrawSubscriptionResponse("processing date"))
+
+    when {
+      cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
   }
 
-  "The WithdrawApplication controller" must {
-    "show the 'withdraw your application' page" when {
-      "the get method is called" in new TestFixture {
+  "The WithdrawApplication controller" when {
+    "the get method is called" must {
+      "show the 'withdraw your application' page" in new TestFixture {
         val result = controller.get()(request)
         status(result) mustBe OK
+      }
+
+      "show the business name" in new TestFixture {
+        val result = controller.get()(request)
+        contentAsString(result) must include(businessName)
       }
     }
 
