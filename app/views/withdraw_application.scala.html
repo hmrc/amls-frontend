@@ -27,8 +27,12 @@
 
 @main(title = messages("status.withdraw.title"), heading = header) {
 
-    @businessName
-    @DateHelper.formatDate(processingDate)
+    <div class="panel-indent panel-indent--gutter panel-border-wide">
+        <p class="heading-small">@Messages("status.business")</p>
+        <p>@businessName</p>
+        <p class="heading-small">@Messages("lbl.registration.status")</p>
+        <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(processingDate))</p>
+    </div>
 
     @Messages("status.withdraw.body-content").paragraphizeH
 
