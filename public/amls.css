@@ -73,11 +73,6 @@ a.block-link {
   margin-top: 12px;
 }
 
-.progress-steps li:first-child,
-.progress-steps__amend li:first-child + li {
-  margin-top: 0;
-}
-
 .renewal-progress-section {
   border-bottom: 10px solid #e2e2e2;
   margin-bottom: 40px!important;
