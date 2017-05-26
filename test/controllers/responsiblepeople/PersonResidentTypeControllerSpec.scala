@@ -57,7 +57,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         val personName = PersonName("firstname", None, "lastname", None, None)
         val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("0000000000"))
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2))
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))

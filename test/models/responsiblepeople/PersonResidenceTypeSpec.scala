@@ -57,7 +57,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Valid(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), NoPassport),
+          be(Valid(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24)),
             Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 
@@ -319,7 +319,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
       "write correct NonUKResidence model" in {
 
-        val data = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
+        val data = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24)),
           Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.formWrites.writes(data) mustBe Map(
@@ -347,8 +347,13 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
       }
 
       "Successfully validate non uk residence type model" in {
-        val nonUKModel = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
-          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
+        val nonUKModel = PersonResidenceType(
+          NonUKResidence(
+            new LocalDate(1990, 2, 24)
+          ),
+          Country("United Kingdom", "GB"),
+          Some(Country("United Kingdom", "GB")
+          ))
 
         PersonResidenceType.jsonRead.reads(
           PersonResidenceType.jsonWrite.writes(nonUKModel)) must

@@ -48,24 +48,22 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
   val emptyCache = CacheMap("", Map.empty)
 
   "NationalityController" must {
-    val pageTitle = Messages("responsiblepeople.nationality.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
     "successfully load nationality page" in new Fixture {
 
       val responsiblePeople = ResponsiblePeople(personName)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
@@ -76,9 +74,11 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
         val responsiblePeople = ResponsiblePeople()
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
         val result = controller.get(3)(request)
+
         status(result) must be(NOT_FOUND)
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
@@ -91,15 +91,15 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
@@ -107,10 +107,15 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
     "successfully pre-populate UI with data from sav4later" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
-        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("00000000000")),
-          Country("United Kingdom", "GB"), Some(Country("France", "FR")))), None)))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
+          personName,
+          Some(PersonResidenceType(NonUKResidence(
+            new LocalDate(1990, 2, 24)),
+            Country("United Kingdom", "GB"),
+            Some(Country("France", "FR")))),
+          None
+        )))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
@@ -123,19 +128,17 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
     "fail submission on error" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-      )
+      val newRequest = request.withFormUrlEncodedBody()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
       document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
     }
 
@@ -147,11 +150,11 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val responsiblePeople = ResponsiblePeople()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -167,11 +170,11 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val responsiblePeople = ResponsiblePeople()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -187,16 +190,17 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val prt = pResidenceType.copy(nationality = Some(Country("Ireland", "IE")))
       val responsiblePeople1 = ResponsiblePeople(None, Some(pResidenceType))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -211,11 +215,11 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val responsiblePeople = ResponsiblePeople()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(10, true)(newRequest)
       status(result) must be(NOT_FOUND)

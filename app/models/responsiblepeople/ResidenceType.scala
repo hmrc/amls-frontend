@@ -17,10 +17,10 @@
 package models.responsiblepeople
 
 import models.FormTypes._
-import org.joda.time.LocalDate
+import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
-import play.api.libs.json.{Writes, Reads}
+import play.api.libs.json.{Reads, Writes}
 
 sealed trait ResidenceType
 
@@ -37,53 +37,31 @@ object ResidenceType {
   implicit val formRule: Rule[UrlFormEncoded, ResidenceType] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
-      case true =>
-        (__ \ "nino").read(ninoType).map(UKResidence.apply)
-      case false =>
-        (
-          (__ \ "dateOfBirth").read(localDateFutureRule) ~
-            __.read[PassportType]
-          ) (NonUKResidence)
+      case true => (__ \ "nino").read(ninoType).map(UKResidence.apply)
+      case false => (__ \ "dateOfBirth").read(localDateFutureRule).map(NonUKResidence.apply)
     }
   }
 
-  implicit def formWrites
-  (implicit
-   w: Write[NonUKResidence, UrlFormEncoded]
-  ) = Write[ResidenceType, UrlFormEncoded] {
-    case f: UKResidence =>
-      Map(
-        "isUKResidence" -> Seq("true"),
-        "nino" -> Seq(f.nino)
-      )
-    case f: NonUKResidence =>
-      Map(
-        "isUKResidence" -> Seq("false")
-      ) ++
-      w.writes(f)
-
+  implicit def formWrites = Write[ResidenceType, UrlFormEncoded] {
+    case f: UKResidence => Map(
+      "isUKResidence" -> Seq("true"),
+      "nino" -> Seq(f.nino)
+    )
+    case f: NonUKResidence => Map(
+      "isUKResidence" -> Seq("false"),
+      "dateOfBirth.day" -> Seq(f.dateOfBirth.get(DateTimeFieldType.dayOfMonth()).toString),
+      "dateOfBirth.month" -> Seq(f.dateOfBirth.get(DateTimeFieldType.monthOfYear()).toString),
+      "dateOfBirth.year" -> Seq(f.dateOfBirth.get(DateTimeFieldType.year()).toString)
+    )
   }
-
-  implicit val formWritesNonUK: Write[NonUKResidence, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import models.FormTypes.localDateWrite
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "dateOfBirth").write(localDateWrite) ~
-        __.write[PassportType]
-      ) (unlift(NonUKResidence.unapply))
-  }
-
 
   implicit val jsonReads: Reads[ResidenceType] = {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-      (__ \ "nino").read[String] map UKResidence.apply map identity[ResidenceType] orElse
-      (
-        (__ \ "dateOfBirth").read[LocalDate] and
-          __.read[PassportType]
-        ) (NonUKResidence.apply _)
+    (__ \ "nino").read[String] map UKResidence.apply map identity[ResidenceType] orElse {
+      (__ \ "dateOfBirth").read[LocalDate] map NonUKResidence.apply map identity[ResidenceType]
+    }
   }
 
   implicit val jsonWrites: Writes[ResidenceType] = {
@@ -95,11 +73,11 @@ object ResidenceType {
         Json.obj(
           "nino" -> a.nino
         )
-      case a: NonUKResidence =>
-        (
-          (__ \ "dateOfBirth").write[LocalDate] and
-            __.write[PassportType]
-          ) (unlift(NonUKResidence.unapply)).writes(a)
+      case a: NonUKResidence => {
+        Json.obj(
+          "dateOfBirth" -> a.dateOfBirth
+        )
+      }
     }
   }
 

@@ -57,7 +57,7 @@ trait NationalityController extends RepeatingSection with BaseController {
               }
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
                   rp.personResidenceType(residenceType)
                 }
