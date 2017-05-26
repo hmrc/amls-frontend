@@ -14,13 +14,49 @@
  * limitations under the License.
  *@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+@import include._
+@import forms2._
 
-</body>
-</html>
+@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("responsiblepeople.sole.proprietor.another.business.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.sole.proprietor.another.business.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+@form(f, controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.post(index, edit, fromDeclaration)) {
+
+    @fieldset(
+        f = f("hasUKPassport-fieldset"),
+        legend = "responsiblepeople.sole.proprietor.another.business.title",
+        legendHidden = true,
+        panel = false
+    ) {
+        @rpErrorGroup(
+            field = f("hasUKPassport"),
+            personName = personName
+        ) {
+            @radio(
+                f = f("hasUKPassport"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("hasUKPassport"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+    }
+
+    @submit()
+
+    }
+}

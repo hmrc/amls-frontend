@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePeople, UKPassport}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -74,7 +74,10 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
         "data is present" in new Fixture {
 
           val responsiblePeople = ResponsiblePeople(
-            personName = Some(personName)
+            personName = Some(personName),
+            passportType = Some(
+              UKPassport("000000000")
+            )
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
