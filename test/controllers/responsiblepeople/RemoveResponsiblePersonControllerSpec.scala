@@ -490,6 +490,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   val CompleteResponsiblePeople1 = ResponsiblePeople(
     Some(personName),
     Some(personResidenceType),
+    None,
     Some(contactDetails),
     Some(addressHistory),
     Some(positions),
@@ -505,6 +506,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   val CompleteResponsiblePeople2 = ResponsiblePeople(
     Some(personName),
     Some(personResidenceType),
+    None,
     Some(contactDetails),
     Some(addressHistory),
     Some(positions),
@@ -520,6 +522,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   val CompleteResponsiblePeople3 = ResponsiblePeople(
     Some(personName),
     Some(personResidenceType),
+    None,
     Some(contactDetails),
     Some(addressHistory),
     Some(positions),
