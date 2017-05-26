@@ -57,7 +57,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         val personName = PersonName("firstname", None, "lastname", None, None)
         val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("0000000000"))
+        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2))
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))
@@ -127,7 +127,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.select("input[name=dateOfBirth.month]").`val` must be("12")
           document.select("input[name=dateOfBirth.year]").`val` must be("1990")
           document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
-          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
 
         }
 
@@ -205,7 +204,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             val responsiblePeople = ResponsiblePeople(
               personResidenceType = Some(
                 PersonResidenceType(
-                  NonUKResidence(new LocalDate(1990,1,21), NonUKPassport("")),
+                  NonUKResidence(new LocalDate(1990,1,21)),
                   Country("UK", "UK"),
                   None
                 )
@@ -284,7 +283,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               val responsiblePeople = ResponsiblePeople(
                 personResidenceType = Some(
                   PersonResidenceType(
-                    NonUKResidence(new LocalDate(1990,1,21), NonUKPassport("")),
+                    NonUKResidence(new LocalDate(1990,1,21)),
                     Country("UK", "UK"),
                     None
                   )

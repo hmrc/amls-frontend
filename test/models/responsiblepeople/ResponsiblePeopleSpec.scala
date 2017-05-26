@@ -533,7 +533,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     private val residenceMonth = 2
     private val residenceDay = 24
     private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
-    private val residence = NonUKResidence(residenceDate, UKPassport("000000000"))
+    private val residence = NonUKResidence(residenceDate)
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
