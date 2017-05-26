@@ -44,11 +44,11 @@
                 <p>@bn</p>
             }
             @submittedDate.map { date =>
-                <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))</p>
-
-            }
-            @if(allowWithdrawal) {
-                <a href="@routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
+                <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(date))<br/>
+                @if(allowWithdrawal) {
+                    <a href="@routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
+                }
+                </p>
             }
             </div>
         </div>

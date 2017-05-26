@@ -486,6 +486,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
 class StatusControllerWithWithdrawalSpec extends GenericTestHelper with OneAppPerSuite {
 
+  import cats.implicits._
+
   val cacheMap = mock[CacheMap]
 
   override lazy val app = GuiceApplicationBuilder()
@@ -509,6 +511,9 @@ class StatusControllerWithWithdrawalSpec extends GenericTestHelper with OneAppPe
     val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
+    val statusResponse = mock[ReadStatusResponse]
+    when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+
     when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
       .thenReturn(
         Some(BusinessMatching(Some(reviewDetails), None)))
@@ -520,7 +525,7 @@ class StatusControllerWithWithdrawalSpec extends GenericTestHelper with OneAppPe
       .thenReturn(Future.successful(None))
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionReadyForReview, None))
+      .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
   }
 
   "The status controller" must {
