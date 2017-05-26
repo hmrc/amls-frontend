@@ -29,6 +29,8 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 import scala.concurrent.Future
 
