@@ -245,7 +245,7 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
 
               }
             }
@@ -402,6 +402,7 @@ class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoS
                 redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
               }
             }
+
             "time at address is more than 1 year" must {
               "redirect to the detailed answers controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(

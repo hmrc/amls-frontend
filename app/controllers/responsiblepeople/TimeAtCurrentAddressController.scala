@@ -94,46 +94,16 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     }
   }
 
-  private def redirectTo(index: Int, data: TimeAtAddress,
+  private def redirectTo(index: Int, timeAtAddress: TimeAtAddress,
                         rp: ResponsiblePeople,
                         status: SubmissionStatus,
                         edit: Boolean,
-                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
-    case SubmissionDecisionApproved => handleApproved(index, edit, rp, data, fromDeclaration)
-    case _ => handleNotYetApproved(index, data, rp, edit, fromDeclaration)
-  }
-
-  private def handleApproved(index: Int,
-                             edit: Boolean,
-                             rp: ResponsiblePeople,
-                             data: TimeAtAddress, fromDeclaration: Boolean = false) = {
-
-    val moreThanOneYear = data == ThreeYearsPlus || data == OneToThreeYears
-
-    if (moreThanOneYear && !edit) {
-      Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
-    } else if (!moreThanOneYear && !additionalAddressHistory(rp)) {
-      Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
-    } else {
-      Redirect(routes.DetailedAnswersController.get(index, edit))
-    }
-  }
-
-  private def handleNotYetApproved(index: Int,
-                                   timeAtAddress: TimeAtAddress,
-                                   rp: ResponsiblePeople,
-                                   edit: Boolean, fromDeclaration: Boolean = false) = {
+                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit))
-      case _ if additionalAddressHistory(rp) => Redirect(routes.DetailedAnswersController.get(index, edit))
       case _ => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
     }
-  }
-
-  private def additionalAddressHistory(rp: ResponsiblePeople) = rp.addressHistory match {
-    case Some(ResponsiblePersonAddressHistory(_,Some(_),_)) => true
-    case _ => false
   }
 
 }
