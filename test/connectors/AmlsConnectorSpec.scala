@@ -16,10 +16,9 @@
 
 package connectors
 
-import models._
+import models.{AmendVariationRenewalResponse, _}
+import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.declaration.{AddPerson, BeneficialShareholder}
-import models.AmendVariationRenewalResponse
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -61,7 +60,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     hvdSection = None,
     supervisionSection = None
   )
-
 
   val viewResponse = ViewResponse(
     etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -227,5 +225,19 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       }
     }
 
+    "withdraw" must {
+      "successfully withdraw the application" in {
+        val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/withdraw"
+        val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
+
+        when {
+          AmlsConnector.httpPost.POSTEmpty[WithdrawSubscriptionResponse](eqTo(postUrl))(any(), any())
+        } thenReturn Future.successful(response)
+
+        whenReady(AmlsConnector.withdraw(amlsRegistrationNumber)) {
+          _ mustBe response
+        }
+      }
+    }
   }
 }

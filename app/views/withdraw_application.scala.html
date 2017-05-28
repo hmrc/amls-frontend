@@ -18,7 +18,9 @@
 @import org.joda.time._
 @import utils.DateHelper
 @import utils.Strings._
+@import forms2._
 
+@import forms.EmptyForm
 @(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_])
 
 @header = {
@@ -35,5 +37,9 @@
     </div>
 
     @Messages("status.withdraw.body-content").paragraphizeH
+
+    @form(EmptyForm, routes.WithdrawApplicationController.post()) {
+        @submit(edit = false, Some(Messages("status.withdraw.button-text")))
+    }
 
 }

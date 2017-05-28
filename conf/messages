@@ -514,7 +514,8 @@ status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
 status.withdraw.link-text = withdraw application
-status.withdraw.title = Withdraw application 
+status.withdraw.title = Withdraw application
+status.withdraw.button-text = Withdraw application
 status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
   I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
 
