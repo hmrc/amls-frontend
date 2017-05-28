@@ -178,8 +178,7 @@ trait AmlsConnector {
   def withdraw(amlsRegistrationNumber: String)
               (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext): Future[WithdrawSubscriptionResponse] = {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdraw"
+    val postUrl = s"$url/$amlsRegistrationNumber/withdrawal"
 
     httpPost.POSTEmpty[WithdrawSubscriptionResponse](postUrl) map { response =>
       response

@@ -227,7 +227,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "withdraw" must {
       "successfully withdraw the application" in {
-        val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/withdraw"
+        val postUrl = s"${AmlsConnector.url}/$amlsRegistrationNumber/withdraw"
         val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
 
         when {
