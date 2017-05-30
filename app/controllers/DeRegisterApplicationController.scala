@@ -20,8 +20,10 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
+import models.deregister.DeRegisterSubscriptionRequest
+import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.deregister_application
@@ -33,7 +35,8 @@ class DeRegisterApplicationController @Inject()
   val authConnector: AuthConnector,
   cache: DataCacheConnector,
   statusService: StatusService,
-  enrolments: AuthEnrolmentsService
+  enrolments: AuthEnrolmentsService,
+  amls: AmlsConnector
 ) extends BaseController {
 
   def get() = Authorised.async {
@@ -53,6 +56,12 @@ class DeRegisterApplicationController @Inject()
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request => ???
+    implicit authContext => implicit request =>
+      val maybeRequest = for {
+        regNumber <- OptionT(enrolments.amlsRegistrationNumber)
+        _ <- OptionT.liftF(amls.deregister(regNumber, DeRegisterSubscriptionRequest("AA", LocalDate.now, "Some reason")))
+      } yield Redirect(routes.StatusController.get())
+
+      maybeRequest getOrElse InternalServerError("Could not de-register the subscription")
   }
 }

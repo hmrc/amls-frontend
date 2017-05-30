@@ -17,10 +17,11 @@
 package controllers
 
 import cats.implicits._
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import models.deregister.DeRegisterSubscriptionResponse
 import models.status.SubmissionDecisionApproved
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -46,8 +47,9 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     val statusService = mock[StatusService]
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
+    val amlsConnector = mock[AmlsConnector]
     val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false)
-    val controller = new DeRegisterApplicationController(self.authConnector, messages, dataCache, statusService, enrolments)
+    val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
 
     when(reviewDetails.businessName).thenReturn(businessName)
 
@@ -62,6 +64,10 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     when {
       enrolments.amlsRegistrationNumber(any(), any(), any())
     } thenReturn Future.successful(applicationReference.some)
+
+    when {
+      amlsConnector.deregister(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
   }
 
   "The DeRegisterApplicationController" when {
@@ -85,6 +91,14 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
       "show the application reference" in new TestFixture {
         val result = controller.get()(request)
         contentAsString(result) must include(applicationReference)
+      }
+    }
+
+    "POST is called" must {
+      "make a request to the middle tier to perform the deregistration" in new TestFixture {
+        val result = controller.post()(request)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe controllers.routes.StatusController.get().url.some
       }
     }
   }
