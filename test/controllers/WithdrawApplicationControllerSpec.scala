@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.{ReadStatusResponse, WithdrawSubscriptionResponse}
+import models.ReadStatusResponse
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
@@ -27,6 +27,7 @@ import cats.implicits._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionReadyForReview
+import models.withdrawal.WithdrawSubscriptionResponse
 import org.joda.time.LocalDateTime
 
 import scala.concurrent.Future
@@ -59,7 +60,7 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
     } thenReturn Future.successful(amlsRegistrationNumber.some)
 
     when {
-      amlsConnector.withdraw(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
     } thenReturn Future.successful(WithdrawSubscriptionResponse("processing date"))
 
     when {
@@ -96,7 +97,7 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe controllers.routes.LandingController.get().url.some
 
-        verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
       }
     }
   }

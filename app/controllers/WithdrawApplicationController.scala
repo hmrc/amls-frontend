@@ -22,6 +22,8 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
+import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.withdraw_application
@@ -52,9 +54,11 @@ class WithdrawApplicationController @Inject()
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
+      val requestData = WithdrawSubscriptionRequest(WithdrawSubscriptionRequest.DefaultAckReference, LocalDate.now(), WithdrawalReason.OutOfScope)
+
       (for {
         regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-        _ <- OptionT.liftF(amls.withdraw(regNumber))
+        _ <- OptionT.liftF(amls.withdraw(regNumber, requestData))
       } yield Redirect(routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
   }
 

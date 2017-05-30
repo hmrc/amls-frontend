@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models
+package models.withdrawal
 
 import play.api.libs.json.Json
 
