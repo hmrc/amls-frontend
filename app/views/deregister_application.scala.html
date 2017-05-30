@@ -16,10 +16,19 @@
 
 @import org.joda.time.LocalDateTime
 @import utils.DateHelper
+@import include._
 
-@(businessName: String, processingDate: LocalDateTime)(implicit request: Request[_], messages: Messages)
+@(businessName: String, processingDate: LocalDateTime, regNumber: String)(implicit request: Request[_], messages: Messages)
 
-<p>@messages("status.deregister.title")</p>
+ @header = {
+  @heading("status.deregister.title", "summary.status")
+ }
 
-    @businessName
-    @DateHelper.formatDate(processingDate)
+ @main(title = messages("status.deregister.title"), heading = header) {
+
+  <p>@messages("status.deregister.title")</p>
+
+  @businessName
+  @DateHelper.formatDate(processingDate)
+  @regNumber
+ }

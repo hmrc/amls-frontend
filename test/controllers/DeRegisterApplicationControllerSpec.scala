@@ -16,22 +16,21 @@
 
 package controllers
 
+import cats.implicits._
 import connectors.DataCacheConnector
+import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import models.status.SubmissionDecisionApproved
+import org.joda.time.LocalDateTime
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito.when
-import cats.implicits._
-import models.ReadStatusResponse
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
-import org.joda.time.{LocalDate, LocalDateTime}
-import play.api.test.FakeRequest
-import services.StatusService
 
 import scala.concurrent.Future
 
@@ -41,12 +40,14 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     val request = addToken(authRequest)
 
     val businessName = "Test Business"
+    val applicationReference = "SUIYD3274890384"
     val registrationDate = LocalDateTime.now()
     val reviewDetails = mock[ReviewDetails]
     val statusService = mock[StatusService]
     val dataCache = mock[DataCacheConnector]
+    val enrolments = mock[AuthEnrolmentsService]
     val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false)
-    val controller = new DeRegisterApplicationController(self.authConnector, messages, dataCache, statusService)
+    val controller = new DeRegisterApplicationController(self.authConnector, messages, dataCache, statusService, enrolments)
 
     when(reviewDetails.businessName).thenReturn(businessName)
 
@@ -57,6 +58,10 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     when {
       statusService.getDetailedStatus(any(), any(), any())
     } thenReturn Future.successful(SubmissionDecisionApproved, statusResponse.some)
+
+    when {
+      enrolments.amlsRegistrationNumber(any(), any(), any())
+    } thenReturn Future.successful(applicationReference.some)
   }
 
   "The DeRegisterApplicationController" when {
@@ -76,7 +81,11 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
         val result = controller.get()(request)
         contentAsString(result) must include(DateHelper.formatDate(registrationDate))
       }
+
+      "show the application reference" in new TestFixture {
+        val result = controller.get()(request)
+        contentAsString(result) must include(applicationReference)
+      }
     }
   }
-
 }

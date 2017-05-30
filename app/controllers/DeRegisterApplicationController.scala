@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.deregister_application
 
@@ -34,7 +34,8 @@ class DeRegisterApplicationController @Inject()
   val authConnector: AuthConnector,
   messages: Messages,
   cache: DataCacheConnector,
-  statusService: StatusService
+  statusService: StatusService,
+  enrolments: AuthEnrolmentsService
 ) extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -48,6 +49,7 @@ class DeRegisterApplicationController @Inject()
         bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
         details <- OptionT.fromOption[Future](bm.reviewDetails)
         processingDate <- maybeProcessingDate
-      } yield Ok(deregister_application(details.businessName, processingDate))) getOrElse InternalServerError("Could not show the de-register page")
+        amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+      } yield Ok(deregister_application(details.businessName, processingDate, amlsRegNumber))) getOrElse InternalServerError("Could not show the de-register page")
   }
 }
