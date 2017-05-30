@@ -25,9 +25,9 @@ import play.api.libs.json._
 
 sealed trait PassportType
 
-case class UKPassport(passportNumberUk: String) extends PassportType
-case class NonUKPassport(passportNumberNonUk: String) extends PassportType
-case object NoPassport extends PassportType
+case class PassportTypeUKPassport(passportNumberUk: String) extends PassportType
+case class PassportTypeNonUKPassport(passportNumberNonUk: String) extends PassportType
+case object PassportTypeNoPassport extends PassportType
 
 object PassportType {
 
@@ -59,25 +59,25 @@ object PassportType {
     import models.FormTypes._
     (__ \ "passportType").read[String].withMessage("error.required.rp.passport.option") flatMap {
       case "01" =>
-        (__ \ "ukPassportNumber").read(ukPassportType) map UKPassport.apply
+        (__ \ "ukPassportNumber").read(ukPassportType) map PassportTypeUKPassport.apply
       case "02" =>
-        (__ \ "nonUKPassportNumber").read(noUKPassportType) map NonUKPassport.apply
-      case "03" => NoPassport
+        (__ \ "nonUKPassportNumber").read(noUKPassportType) map PassportTypeNonUKPassport.apply
+      case "03" => PassportTypeNoPassport
       case _ =>
         (Path \ "passportType") -> Seq(ValidationError("error.invalid"))
     }
   }
 
   implicit val formWrites: Write[PassportType, UrlFormEncoded] = Write {
-    case UKPassport(ukNumber) =>  Map(
+    case PassportTypeUKPassport(ukNumber) =>  Map(
       "passportType" -> "01",
       "ukPassportNumber" -> ukNumber
     )
-    case NonUKPassport(nonUKNumber) =>   Map(
+    case PassportTypeNonUKPassport(nonUKNumber) =>   Map(
       "passportType" -> "02",
       "nonUKPassportNumber" -> nonUKNumber
     )
-    case NoPassport => "passportType" -> "03"
+    case PassportTypeNoPassport => "passportType" -> "03"
   }
 
   implicit val jsonReads : Reads[PassportType] = {
@@ -85,28 +85,28 @@ object PassportType {
       (__ \ "passportType").read[String].flatMap[PassportType] {
         case "01" =>
           (__ \ "ukPassportNumber").read[String] map {
-            UKPassport
+            PassportTypeUKPassport
           }
         case "02" =>
           (__ \ "nonUKPassportNumber").read[String] map {
-            NonUKPassport
+            PassportTypeNonUKPassport
           }
-        case "03" => NoPassport
+        case "03" => PassportTypeNoPassport
         case _ =>
           play.api.data.validation.ValidationError("error.invalid")
       }
   }
 
   implicit val jsonWrites = Writes[PassportType] {
-    case UKPassport(ukNumber) =>  Json.obj(
+    case PassportTypeUKPassport(ukNumber) =>  Json.obj(
       "passportType" -> "01",
       "ukPassportNumber" -> ukNumber
     )
-    case NonUKPassport(nonUKNumber) =>  Json.obj(
+    case PassportTypeNonUKPassport(nonUKNumber) =>  Json.obj(
       "passportType" -> "02",
       "nonUKPassportNumber" -> nonUKNumber
     )
-    case NoPassport => Json.obj("passportType" -> "03")
+    case PassportTypeNoPassport => Json.obj("passportType" -> "03")
   }
 }
 

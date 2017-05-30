@@ -93,7 +93,7 @@ class PassportTypeSpec extends PlaySpec {
 
     "successfully pass validation for NoPassport" in {
       val urlFormEncoded = Map("passportType" -> Seq("03"))
-      PassportType.formRule.validate(urlFormEncoded) must be(Valid(NoPassport))
+      PassportType.formRule.validate(urlFormEncoded) must be(Valid(PassportTypeNoPassport))
     }
 
     "successfully pass validation for uk passport number" in {
@@ -101,7 +101,7 @@ class PassportTypeSpec extends PlaySpec {
         "passportType" -> Seq("01"),
         "ukPassportNumber" -> Seq("000000000")
       )
-      PassportType.formRule.validate(urlFormEncoded) must be(Valid(UKPassport("000000000")))
+      PassportType.formRule.validate(urlFormEncoded) must be(Valid(PassportTypeUKPassport("000000000")))
     }
 
     "successfully pass validation for non uk passport number" in {
@@ -109,7 +109,7 @@ class PassportTypeSpec extends PlaySpec {
         "passportType" -> Seq("02"),
         "nonUKPassportNumber" -> Seq("AA1234567")
       )
-      PassportType.formRule.validate(urlFormEncoded) must be(Valid(NonUKPassport("AA1234567")))
+      PassportType.formRule.validate(urlFormEncoded) must be(Valid(PassportTypeNonUKPassport("AA1234567")))
     }
 
     "fail validation if nonUKPassportNumber is empty" in {
@@ -127,7 +127,7 @@ class PassportTypeSpec extends PlaySpec {
         "passportType" -> Seq("02"),
         "nonUKPassportNumber" -> Seq("AA1234567")
       )
-      PassportType.formWrites.writes(NonUKPassport("AA1234567")) must be(data)
+      PassportType.formWrites.writes(PassportTypeNonUKPassport("AA1234567")) must be(data)
 
     }
 
@@ -135,7 +135,7 @@ class PassportTypeSpec extends PlaySpec {
       val data = Map(
         "passportType" -> Seq("03")
       )
-      PassportType.formWrites.writes(NoPassport) must be(data)
+      PassportType.formWrites.writes(PassportTypeNoPassport) must be(data)
     }
 
     "fail to validate given an invalid value" in {
@@ -152,18 +152,18 @@ class PassportTypeSpec extends PlaySpec {
 
       "Read the json and return the PassportType domain object successfully for the NoPassport" in {
 
-        PassportType.jsonReads.reads(PassportType.jsonWrites.writes(NoPassport)) must
-          be(JsSuccess(NoPassport, JsPath))
+        PassportType.jsonReads.reads(PassportType.jsonWrites.writes(PassportTypeNoPassport)) must
+          be(JsSuccess(PassportTypeNoPassport, JsPath))
       }
 
       "Read the json and return NonUKPassport" in {
-        val model = NonUKPassport("21321313213132132")
+        val model = PassportTypeNonUKPassport("21321313213132132")
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(model)) must
           be(JsSuccess(model, JsPath \ "nonUKPassportNumber"))
       }
 
       "Read the json and return UKPassport" in {
-        val model = UKPassport("AA0000000")
+        val model = PassportTypeUKPassport("AA0000000")
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(model)) must
           be(JsSuccess(model, JsPath \ "ukPassportNumber"))
       }
