@@ -66,7 +66,6 @@ object BusinessMatchingReviewDetails {
 }
 
 trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPartialsConverter {
-
   val httpGet: HttpGet
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
@@ -83,11 +82,10 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
       Some(result)
     } recover {
       case ex =>
-        Logger.error(s"$logPrefix Failed to fetch review details: ${ex.getMessage}")
+        Logger.warn(s"$logPrefix Failed to fetch review details", ex)
         None
     }
   }
-
 }
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
