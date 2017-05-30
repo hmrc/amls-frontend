@@ -18,6 +18,8 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -55,18 +57,24 @@ class PersonUKPassportController @Inject()(
           BadRequest(person_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
         }
         case ValidForm(_, data) => {
-          for {
-            _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+          (for {
+            cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
               rp.ukPassport(data)
-            }
-          } yield edit match {
-            case true => Redirect(routes.DetailedAnswersController.get(index, fromDeclaration))
-            case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
-          }
+            })
+            rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+          } yield {
+            redirectGivenUKPassport(index, edit, fromDeclaration)
+          }) getOrElse NotFound(notFoundView)
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
   }
 
+  private def redirectGivenUKPassport(index: Int, edit: Boolean, fromDeclaration: Boolean) = {
+    edit match {
+      case true => Redirect(routes.DetailedAnswersController.get(index, fromDeclaration))
+      case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
+    }
+  }
 }

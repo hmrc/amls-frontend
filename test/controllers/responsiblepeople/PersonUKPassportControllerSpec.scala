@@ -48,13 +48,13 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
+
+    val personName = PersonName("firstname", None, "lastname", None, None)
   }
 
   "PersonUKPassportController" when {
 
     "get is called" must {
-
-      val personName = PersonName("firstname", None, "lastname", None, None)
 
       "return OK" when {
 
@@ -124,6 +124,9 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
 
             val responsiblePeople = ResponsiblePeople(
             )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
