@@ -44,8 +44,9 @@ import scala.concurrent.Future
 class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.release7" -> true
-  ))
+    "microservice.services.feature-toggle.amendments" -> true,
+    "microservice.services.feature-toggle.release7" -> true)
+  )
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -67,49 +68,51 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
   "AddPersonController" when {
 
-    "newget is called" must {
+    "get is called" must {
       "display the persons page" when {
         "status is pending" in new Fixture {
-          val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-          val businessMatching = BusinessMatching(Some(reviewDtls))
 
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName",
+            "roleWithinBusiness[]" -> "ExternalAccountant"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          val result = addPersonController.get()(request)
-          status(result) must be(OK)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.title() must be(Messages("declaration.addperson.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
-
-          contentAsString(result) must include(Messages("submit.amendment.application"))
+          val result = addPersonController.post()(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
         }
+
         "status is pre-submission" in new Fixture {
 
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName",
+            "roleWithinBusiness[]" -> "ExternalAccountant"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = addPersonController.get()(request)
-          status(result) must be(OK)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.title() must be(Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
-
-          contentAsString(result) must include(Messages("submit.registration"))
+          val result = addPersonController.post()(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
         }
       }
 
       "on get display the persons page with blank fields" in new Fixture {
 
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         when(addPersonController.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
@@ -127,8 +130,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "on getWithAmendment display the persons page with blank fields" in new Fixture {
 
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
         when(addPersonController.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
@@ -144,59 +147,39 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
       }
     }
 
-    "get is called" must {
-      "must pass on post with all the mandatory parameters supplied" when {
-        "status is pending" in new Fixture {
+    "post is called" must {
+      "redirect to a new place" when {
+        "the role type selected is Director" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "BeneficialShareholder"
+            "roleWithinBusiness" -> "Director"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
-        }
-        "status is pre-submission" in new Fixture {
-
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "BeneficialShareholder"
-          )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+          redirectLocation(result) mustBe Some(routes.RegisterResponsiblePersonController.get().url)
         }
       }
-    }
 
-    "post is called" must {
       "redirect to DeclarationController when all the mandatory parameters supplied" when {
         "status is pending" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -211,11 +194,11 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -231,11 +214,11 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val firstNameMissingInRequest = request.withFormUrlEncodedBody(
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -251,11 +234,11 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val lastNameNissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -274,8 +257,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
             "lastName" -> "lastName"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
