@@ -19,7 +19,7 @@ package views
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.{DateHelper, GenericTestHelper}
 
 class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
 
@@ -41,6 +41,8 @@ class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
 
     "show the correct informational content" in new ViewFixture {
       validateParagraphizedContent("status.withdraw.body-content")
+
+      doc.body().html must include(Messages("status.withdraw.registration-date.label", DateHelper.formatDate(date)))
     }
   }
 }
