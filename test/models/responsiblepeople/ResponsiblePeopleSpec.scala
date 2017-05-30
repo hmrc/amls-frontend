@@ -461,6 +461,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "ukPassport value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeResponsiblePeople.ukPassport(UKPassportNo)
+          result must be(completeResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeResponsiblePeople.ukPassport(UKPassportYes("87654321"))
+          result must be(completeResponsiblePeople.copy(ukPassport = Some(UKPassportYes("87654321")), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
     "status value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
@@ -555,7 +572,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
   val completeResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
-    None,
+    Some(UKPassportNo),
     None,
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
@@ -598,6 +615,9 @@ trait ResponsiblePeopleValues extends NinoUtil{
       "nino" -> nino,
       "countryOfBirth" -> "GB",
       "nationality" -> "GB"
+    ),
+    "ukPassport" -> Json.obj(
+      "ukPassport" -> false
     ),
     "contactDetails" -> Json.obj(
       "phoneNumber" -> "07702743555",

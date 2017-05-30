@@ -20,12 +20,14 @@ import javax.inject.Inject
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
-import models.responsiblepeople.{PassportType, ResponsiblePeople}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.{ResponsiblePeople, UKPassport}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_uk_passport
+
+import scala.concurrent.Future
 
 class PersonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -38,21 +40,33 @@ class PersonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,Some(passport_type),_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            {
-              println(">>>>>>>>" + passport_type)
-              Ok(person_uk_passport(Form2[PassportType](passport_type), edit, index, fromDeclaration, personName.titleName))
-            }
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName),_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+            Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }
   }
 
   def post(index:Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        ???
+    implicit authContext => implicit request =>
+      Form2[UKPassport](request.body) match {
+        case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          BadRequest(person_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+        }
+        case ValidForm(_, data) => {
+          for {
+            _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              rp.ukPassport(data)
+            }
+          } yield edit match {
+            case true => Redirect(routes.DetailedAnswersController.get(index, fromDeclaration))
+            case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
+          }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
+      }
   }
 
 }
