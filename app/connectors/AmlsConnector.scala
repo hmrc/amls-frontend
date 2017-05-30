@@ -17,15 +17,12 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models._
-import models.AmendVariationRenewalResponse
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
+import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
-import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
+import play.api.libs.json.{JsObject, Json, Reads, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.http._
+import uk.gov.hmrc.play.http.{HeaderCarrier, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -177,6 +174,15 @@ trait AmlsConnector {
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
+  }
+
+  def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest)
+              (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[WithdrawSubscriptionResponse] = {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
+
+    httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
   }
 }
 

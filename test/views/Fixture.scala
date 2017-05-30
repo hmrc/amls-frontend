@@ -18,10 +18,12 @@ package views
 
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
-import play.api.mvc.Request
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import utils.Strings.TextHelpers
 
+import scala.collection.JavaConverters._
 
 trait Fixture extends MustMatchers {
   implicit val request = FakeRequest()
@@ -33,4 +35,11 @@ trait Fixture extends MustMatchers {
   lazy val heading = doc.getElementsByTag("h1").first()
   lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
   lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
+
+  def validateParagraphizedContent(messageKey: String)(implicit messages: Messages): Unit = {
+    for(p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala) {
+      doc.body().toString must include(p.text())
+    }
+  }
+
 }
