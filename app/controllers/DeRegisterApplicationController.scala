@@ -22,7 +22,6 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import play.api.i18n.Messages
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.deregister_application
@@ -32,11 +31,11 @@ import scala.concurrent.Future
 class DeRegisterApplicationController @Inject()
 (
   val authConnector: AuthConnector,
-  messages: Messages,
   cache: DataCacheConnector,
   statusService: StatusService,
   enrolments: AuthEnrolmentsService
 ) extends BaseController {
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
 
