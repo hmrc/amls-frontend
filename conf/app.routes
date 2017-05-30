@@ -243,7 +243,6 @@ POST        /declaration/add-person                                     controll
 GET         /update-information/add-person                              controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /declaration/register-responsible-person                    @controllers.declaration.RegisterResponsiblePersonController.get()
-POST        /declaration/register-responsible-person                    @controllers.declaration.RegisterResponsiblePersonController.post()
 
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
 GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()

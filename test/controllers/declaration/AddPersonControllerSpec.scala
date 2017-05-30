@@ -383,7 +383,7 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "03"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -402,7 +402,7 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "03"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -422,7 +422,7 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
 
           val firstNameMissingInRequest = request.withFormUrlEncodedBody(
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "03"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -442,7 +442,7 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
 
           val lastNameNissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "03"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -536,6 +536,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
       }
     }
 
+
     "post is called" must {
       "must pass on post with all the mandatory parameters supplied" when {
         "status is pending" in new Fixture {
@@ -543,7 +544,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "01"
+            "roleWithinBusiness" -> "03"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -592,7 +593,7 @@ class AddPersonControllerWithoutAmendmentSpecRelease7 extends GenericTestHelper 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "BeneficialShareholder"
+            "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())

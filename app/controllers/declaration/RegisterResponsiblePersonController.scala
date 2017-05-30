@@ -20,10 +20,8 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.collection.Seq
 import scala.concurrent.Future
 
 
@@ -38,21 +36,5 @@ class RegisterResponsiblePersonController @Inject()(
 
       Future.successful(Ok(views.html.declaration.register_responsible_person()))
     }
-  }
-
-  def post() = Authorised.async {
-    implicit authContext => implicit request =>
-
-      dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key).map { responsiblePeople =>
-
-        val nextResponsiblePersonIndex = responsiblePeople.map { x =>
-          x.indexWhere {
-            case model if !model.isComplete => true
-            case _ => false
-          } + 1
-        }
-
-        Redirect(controllers.responsiblepeople.routes.WhatYouNeedController.get(nextResponsiblePersonIndex.getOrElse(0), true))
-      }
   }
 }
