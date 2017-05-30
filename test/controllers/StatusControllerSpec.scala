@@ -29,7 +29,9 @@ import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -477,6 +479,62 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
         contentAsString(result) must include(Messages("status.renewalnotsubmitted.description"))
 
+      }
+    }
+  }
+}
+
+class StatusControllerWithWithdrawalSpec extends GenericTestHelper with OneAppPerSuite {
+
+  import cats.implicits._
+
+  val cacheMap = mock[CacheMap]
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
+    }
+
+    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+    val statusResponse = mock[ReadStatusResponse]
+    when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+      .thenReturn(
+        Some(BusinessMatching(Some(reviewDetails), None)))
+
+    when(controller.landingService.cacheMap(any(), any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+
+    when(controller.statusService.getDetailedStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+  }
+
+  "The status controller" must {
+    "show the withdrawal link" when {
+      "the 'allow-withdrawal' feature toggle is on" in new Fixture {
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
       }
     }
   }

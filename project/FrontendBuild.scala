@@ -60,7 +60,7 @@ private object AppDependencies {
 
   private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
-  private val jsoupVersion = "1.8.3"
+  private val jsoupVersion = "1.9.2"
   private val hmrctestVersion = "2.3.0"
 
   object Test {

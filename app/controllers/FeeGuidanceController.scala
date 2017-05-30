@@ -79,7 +79,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
         }
         val peopleRow = BreakdownRow(Messages("summary.responsiblepeople"), peopleCount, Currency(peopleFee), Currency(peopleCount * peopleFee))
 
-        val premisesCount = tradingpremises.size
+        val premisesCount = tradingpremises.count(_ != TradingPremises())
         val premisesRow = BreakdownRow(Messages("summary.tradingpremises"), premisesCount, Currency(premisesFee), Currency(premisesCount * premisesFee))
 
         Seq(submissionRow, peopleRow, premisesRow).filter(row =>

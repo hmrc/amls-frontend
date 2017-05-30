@@ -556,6 +556,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
     None,
+    None,
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),
@@ -574,6 +575,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
   val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
+    None,
     None,
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory)
