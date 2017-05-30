@@ -16,7 +16,6 @@
 
 package views.status
 
-
 import forms.EmptyForm
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
@@ -25,6 +24,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{DateHelper, GenericTestHelper}
 import views.Fixture
+import cats.implicits._
 
 class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
@@ -111,7 +111,6 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
       Messages("status.submittedForReview.submitteddate.text", date)
       doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
-
 
     "contains expected survey link for supervised status" in new ViewFixture {
       def view =  views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)
