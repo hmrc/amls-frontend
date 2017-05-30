@@ -29,10 +29,16 @@ import models.businessmatching.BusinessMatching
 import models.status.SubmissionReadyForReview
 import models.withdrawal.WithdrawSubscriptionResponse
 import org.joda.time.LocalDateTime
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
-class WithdrawApplicationControllerSpec extends GenericTestHelper {
+class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPerSuite {
+
+  override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
+    .build()
 
   trait TestFixture extends AuthorisedFixture {
     self =>
@@ -98,6 +104,33 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper {
         redirectLocation(result) mustBe controllers.routes.LandingController.get().url.some
 
         verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+      }
+    }
+  }
+}
+
+class WithdrawApplicationControllerToggleOffSpec extends GenericTestHelper with OneAppPerSuite {
+
+  override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
+    .build()
+
+  trait TestFixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val amlsConnector = mock[AmlsConnector]
+    val authService = mock[AuthEnrolmentsService]
+    val cacheConnector = mock[DataCacheConnector]
+    val statusService = mock[StatusService]
+
+    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+  }
+
+  "The WithdrawApplicationController" when {
+    "the GET method is called" must {
+      "return 404 not found" in new TestFixture {
+        status(controller.get(request)) mustBe NOT_FOUND
       }
     }
   }

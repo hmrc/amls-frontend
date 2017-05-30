@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
@@ -40,16 +41,20 @@ class WithdrawApplicationController @Inject()
   def get = Authorised.async {
     implicit authContext => implicit request =>
 
-      val maybeProcessingDate = for {
-        status <- OptionT.liftF(statusService.getDetailedStatus)
-        response <- OptionT.fromOption[Future](status._2)
-      } yield response.processingDate
+      if(!ApplicationConfig.allowWithdrawalToggle) {
+        Future.successful(NotFound)
+      } else {
+        val maybeProcessingDate = for {
+          status <- OptionT.liftF(statusService.getDetailedStatus)
+          response <- OptionT.fromOption[Future](status._2)
+        } yield response.processingDate
 
-      (for {
-        cache <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-        details <- OptionT.fromOption[Future](cache.reviewDetails)
-        processingDate <- maybeProcessingDate
-      } yield Ok(withdraw_application(details.businessName, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
+        (for {
+          cache <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
+          details <- OptionT.fromOption[Future](cache.reviewDetails)
+          processingDate <- maybeProcessingDate
+        } yield Ok(withdraw_application(details.businessName, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
+      }
   }
 
   def post = Authorised.async {
