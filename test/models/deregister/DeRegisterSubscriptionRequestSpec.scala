@@ -17,14 +17,24 @@
 package models.deregister
 
 import org.joda.time.LocalDate
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-object DeRegisterReason {
-  val OutOfScope = "Out of scope"
-}
+class DeRegisterSubscriptionRequestSpec extends PlaySpec with MustMatchers {
 
-case class DeRegisterSubscriptionRequest(acknowledgementReference: String, deregistrationDate: LocalDate, deregistrationReason: String)
+  "The model" must {
+    "deserialise correctly" in {
+      val reference = "A" * 32
 
-object DeRegisterSubscriptionRequest {
-  implicit val formats = Json.format[DeRegisterSubscriptionRequest]
+      val expectedJson = Json.obj(
+        "acknowledgementReference" -> reference,
+        "deregistrationDate" -> LocalDate.now.toString("yyyy-MM-dd"),
+        "deregistrationReason" -> DeRegisterReason.OutOfScope
+      )
+
+      Json.toJson(DeRegisterSubscriptionRequest(reference, LocalDate.now, DeRegisterReason.OutOfScope)) mustBe expectedJson
+    }
+  }
+
 }
