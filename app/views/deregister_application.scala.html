@@ -17,6 +17,9 @@
 @import org.joda.time.LocalDateTime
 @import utils.DateHelper
 @import include._
+@import utils.Strings._
+@import forms2._
+@import forms.EmptyForm
 
 @(businessName: String, processingDate: LocalDateTime, regNumber: String)(implicit request: Request[_], messages: Messages)
 
@@ -26,9 +29,19 @@
 
  @main(title = messages("status.deregister.title"), heading = header) {
 
-  <p>@messages("status.deregister.title")</p>
+  <div class="panel-indent panel-indent--gutter panel-border-wide">
+   <p class="heading-small">@Messages("status.business")</p>
+   <p>@businessName</p>
+   <p class="heading-small">@Messages("lbl.registration.status")</p>
+   <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(processingDate))</p>
+   <p class="heading-small">@messages("status.registrationno")</p>
+   <p>@regNumber</p>
+  </div>
 
-  @businessName
-  @DateHelper.formatDate(processingDate)
-  @regNumber
- }
+  @messages("status.deregister.body-content").paragraphizeH
+
+  @form(EmptyForm, routes.DeRegisterApplicationController.post()) {
+   @submit(edit = false, Some(Messages("status.deregister.button-text")))
+  }
+
+}

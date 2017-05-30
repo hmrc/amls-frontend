@@ -30,21 +30,23 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
     val businessName = "Test Business"
     val processingDate = LocalDateTime.now()
     val regNumber = "IUYSF894739847"
+
+    def view = views.html.deregister_application(businessName, processingDate, regNumber)
   }
 
   "deregister_application view" must {
-    "have correct title, headings and content" in new ViewFixture {
+    "have correct title and headings" in new ViewFixture {
 
-      val form2 = EmptyForm
+      val title = s"${Messages("status.deregister.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
 
-      def view = views.html.deregister_application(businessName, processingDate, regNumber)
-
-      val title = s"${Messages("status.deregister.title")} - ${Messages("title.gov")} - ${Messages("title.amls")}"
-
-      doc.title must startWith(Messages("status.deregister.title"))
+      doc.title mustBe title
       heading.html must be(Messages("status.deregister.title"))
       subHeading.html must include(Messages("summary.status"))
       //code to check existance of form fields			
+    }
+
+    "have correct body content" in new ViewFixture {
+      validateParagraphizedContent("status.deregister.body-content")
     }
   }
 }

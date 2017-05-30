@@ -52,4 +52,8 @@ class DeRegisterApplicationController @Inject()
         amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
       } yield Ok(deregister_application(details.businessName, processingDate, amlsRegNumber))) getOrElse InternalServerError("Could not show the de-register page")
   }
+
+  def post() = Authorised.async {
+    implicit authContext => implicit request => ???
+  }
 }
