@@ -16,18 +16,47 @@
 
 package controllers
 
+import connectors.DataCacheConnector
+import models.businesscustomer.ReviewDetails
+import models.businessmatching.BusinessMatching
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito.when
+import cats.implicits._
+import models.ReadStatusResponse
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import org.joda.time.{LocalDate, LocalDateTime}
+import play.api.test.FakeRequest
+import services.StatusService
+
+import scala.concurrent.Future
 
 class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
 
-    val controller = new DeRegisterApplicationController(self.authConnector, messages)
+    val businessName = "Test Business"
+    val registrationDate = LocalDateTime.now()
+    val reviewDetails = mock[ReviewDetails]
+    val statusService = mock[StatusService]
+    val dataCache = mock[DataCacheConnector]
+    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false)
+    val controller = new DeRegisterApplicationController(self.authConnector, messages, dataCache, statusService)
+
+    when(reviewDetails.businessName).thenReturn(businessName)
+
+    when {
+      dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
+
+    when {
+      statusService.getDetailedStatus(any(), any(), any())
+    } thenReturn Future.successful(SubmissionDecisionApproved, statusResponse.some)
   }
 
   "The DeRegisterApplicationController" when {
@@ -36,6 +65,16 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
         val result = controller.get()(request)
         status(result) mustBe OK
         contentAsString(result) must include(Messages("status.deregister.title"))
+      }
+
+      "show the name of the business" in new TestFixture {
+        val result = controller.get()(request)
+        contentAsString(result) must include(businessName)
+      }
+
+      "show the processing date" in new TestFixture {
+        val result = controller.get()(request)
+        contentAsString(result) must include(DateHelper.formatDate(registrationDate))
       }
     }
   }

@@ -18,14 +18,36 @@ package controllers
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
+import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.deregister_application
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationController @Inject()(val authConnector: AuthConnector, messages: Messages) extends BaseController {
+class DeRegisterApplicationController @Inject()
+(
+  val authConnector: AuthConnector,
+  messages: Messages,
+  cache: DataCacheConnector,
+  statusService: StatusService
+) extends BaseController {
   def get() = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok(messages("status.deregister.title")))
-  }
+    implicit authContext => implicit request =>
 
+      val maybeProcessingDate = for {
+        status <- OptionT.liftF(statusService.getDetailedStatus)
+        response <- OptionT.fromOption[Future](status._2)
+      } yield response.processingDate
+
+      (for {
+        bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
+        details <- OptionT.fromOption[Future](bm.reviewDetails)
+        processingDate <- maybeProcessingDate
+      } yield Ok(deregister_application(details.businessName, processingDate))) getOrElse InternalServerError("Could not show the de-register page")
+  }
 }
