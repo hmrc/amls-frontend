@@ -514,6 +514,34 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
       }
     }
+
+    "show the deregister link" when {
+      "the status is 'approved'" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(
+            Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+      }
+    }
   }
 }
 
