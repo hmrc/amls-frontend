@@ -478,6 +478,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "nonUKPassport value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeResponsiblePeople.nonUKPassport(NoPassport)
+          result must be(completeResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeResponsiblePeople.nonUKPassport(NonUKPassportYes("87654321"))
+          result must be(completeResponsiblePeople.copy(nonUKPassport = Some(NonUKPassportYes("87654321")), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
     "status value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {

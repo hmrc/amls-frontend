@@ -18,14 +18,18 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{NonUKPassport, ResponsiblePeople}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
+
+import scala.concurrent.Future
 
 class PersonNonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -46,10 +50,27 @@ class PersonNonUKPassportController @Inject()(
         }
   }
 
-  def post(index:Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ???
+        Form2[NonUKPassport](request.body) match {
+          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+            BadRequest(person_non_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+          }
+          case ValidForm(_, data) => {
+            (for {
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+                rp.nonUKPassport(data)
+              })
+              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+            } yield edit match {
+              case true => Redirect(routes.DetailedAnswersController.get(index))
+              case false => Redirect(routes.DateOfBirthController.get(index,edit,fromDeclaration))
+            }) getOrElse NotFound(notFoundView)
+          } recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          }
+        }
   }
 
 }

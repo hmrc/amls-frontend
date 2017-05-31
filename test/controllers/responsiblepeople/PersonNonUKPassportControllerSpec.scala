@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{NonUKPassportYes, PersonName, ResponsiblePeople}
+import models.responsiblepeople.{UKPassportYes, _}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -25,6 +25,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -44,6 +45,9 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
       .build()
 
     val controller = app.injector.instanceOf[PersonNonUKPassportController]
+
+    val emptyCache = CacheMap("", Map.empty)
+    val mockCacheMap = mock[CacheMap]
 
     val personName = PersonName("firstname", None, "lastname", None, None)
 
@@ -110,6 +114,119 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
     }
 
     "post is called" must {
+
+      "edit is false" must {
+        "go to DateOfBirthController" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "nonUKPassport" -> "true",
+              "nonUKPassportNumber" -> passportNumber
+            )
+
+            val responsiblePeople = ResponsiblePeople()
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+
+          }
+      }
+
+      "edit is true" must {
+        "go to DetailedAnswersController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "nonUKPassport" -> "true",
+            "nonUKPassportNumber" -> passportNumber
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+
+        }
+      }
+
+      "given invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "nonUKPassport" -> "true",
+            "nonUKPassportNumber" -> "abc"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "Responsible Person cannot be found with given index" must {
+        "respond with NOT_FOUND" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "nonUKPassport" -> "false"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(10)(newRequest)
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
 
     }
 
