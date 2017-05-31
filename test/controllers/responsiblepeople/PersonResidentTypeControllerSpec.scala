@@ -57,7 +57,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         val personName = PersonName("firstname", None, "lastname", None, None)
         val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2))
+        val residenceTypeNonUK = NonUKResidence
 
         "without pre-populated data" in new Fixture {
           val responsiblePeople = ResponsiblePeople(Some(personName))
@@ -76,9 +76,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.getElementById("passportType-01").hasAttr("checked") must be(false)
           document.getElementById("passportType-02").hasAttr("checked") must be(false)
           document.getElementById("passportType-03").hasAttr("checked") must be(false)
-          document.select("input[name=dateOfBirth.day]").`val` must be("")
-          document.select("input[name=dateOfBirth.month]").`val` must be("")
-          document.select("input[name=dateOfBirth.year]").`val` must be("")
           document.select("input[name=ukPassportNumber]").`val` must be("")
           document.select("input[name=nonUKPassportNumber]").`val` must be("")
 
@@ -124,9 +121,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val document = Jsoup.parse(contentAsString(result))
           document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
-          document.select("input[name=dateOfBirth.day]").`val` must be("2")
-          document.select("input[name=dateOfBirth.month]").`val` must be("12")
-          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
           document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
 
         }

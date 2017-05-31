@@ -110,8 +110,8 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
           personName,
-          Some(PersonResidenceType(NonUKResidence(
-            new LocalDate(1990, 2, 24)),
+          Some(PersonResidenceType(
+            NonUKResidence,
             Country("United Kingdom", "GB"),
             Some(Country("France", "FR")))),
           None
