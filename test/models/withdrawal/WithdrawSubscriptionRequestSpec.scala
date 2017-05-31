@@ -21,7 +21,7 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class WithdrawalSubscriptionRequestSpec extends PlaySpec with MustMatchers {
+class WithdrawSubscriptionRequestSpec extends PlaySpec with MustMatchers {
 
   "The withdrawal subscription request object" when {
     "serialised" must {

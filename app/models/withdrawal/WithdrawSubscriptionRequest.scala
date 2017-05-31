@@ -29,27 +29,8 @@ case class WithdrawSubscriptionRequest (acknowledgementReference: String,
                                        )
 
 object WithdrawSubscriptionRequest {
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   val DefaultAckReference = "A" * 32
-
-  implicit val reads: Reads[WithdrawSubscriptionRequest] = {
-    (
-      (__ \ "acknowledgementReference").read[String] and
-        (__ \ "withdrawalDate").read[String].map[LocalDate](LocalDate.parse) and
-        (__ \ "withdrawalReason").read[String] and
-        (__ \ "withdrawalReasonOthers").readNullable[String]
-    )(WithdrawSubscriptionRequest.apply _)
-  }
-
-  implicit val writes: Writes[WithdrawSubscriptionRequest] = {
-    (
-      (__ \ "acknowledgementReference").write[String] and
-        (__ \ "withdrawalDate").write[String].contramap[LocalDate](_.toString("yyyy-MM-dd")) and
-        (__ \ "withdrawalReason").write[String] and
-        (__ \ "withdrawalReasonOthers").writeNullable[String]
-    )(unlift(WithdrawSubscriptionRequest.unapply))
-  }
-
+  implicit val format = Json.format[WithdrawSubscriptionRequest]
 }
