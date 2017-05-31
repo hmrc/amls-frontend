@@ -29,6 +29,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
                              ukPassport: Option[UKPassport] = None,
                              nonUKPassport: Option[NonUKPassport] = None,
+                             dateOfBirth: Option[DateOfBirth] = None,
                              contactDetails: Option[ContactDetails] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
                              positions: Option[Positions] = None,
@@ -95,9 +96,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
     this match {
-      case ResponsiblePeople(Some(_), Some(_), _, _, Some(_), Some(_), Some(pos),
+      case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos),
       Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP) if pos.startDate.isDefined && checkVatField(otherBusinessSP)=> true
-      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
       case _ => false
     }
   }
@@ -165,6 +166,7 @@ object ResponsiblePeople {
         (__ \ "personResidenceType").readNullable[PersonResidenceType] and
         (__ \ "ukPassport").readNullable[UKPassport] and
         (__ \ "nonUKPassport").readNullable[NonUKPassport] and
+        (__ \ "dateOfBirth").readNullable[DateOfBirth] and
         (__ \ "contactDetails").readNullable[ContactDetails] and
         (__ \ "addressHistory").readNullable[ResponsiblePersonAddressHistory] and
         (__ \ "positions").readNullable[Positions] and

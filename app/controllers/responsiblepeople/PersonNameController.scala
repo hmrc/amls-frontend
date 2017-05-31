@@ -37,9 +37,9 @@ trait PersonNameController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(name), _, _, _,_,_, _, _, _, _, _, _, _, _, _,_, _))
+          case Some(ResponsiblePeople(Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_name(Form2[PersonName](name), edit, index, fromDeclaration))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _,_, _,_, _, _, _, _,_, _, _))
+          case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_name(EmptyForm, edit, index, fromDeclaration))
           case _
           => NotFound(notFoundView)

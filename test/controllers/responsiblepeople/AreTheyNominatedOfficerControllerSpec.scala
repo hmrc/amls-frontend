@@ -53,9 +53,9 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
-    val noNominatedOfficer = ResponsiblePeople(personName, None,None, None,None, None, Some(DefaultValues.noNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(personName, None,None, None,None, None, Some(DefaultValues.hasNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
-    val withPartnerShip = ResponsiblePeople(personName, None,None, None,None, None, Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)), None,None, None,None, Some(true), false, Some(1), Some("test"))
+    val noNominatedOfficer = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.noNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficer = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.hasNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
+    val withPartnerShip = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)), None,None, None,None, Some(true), false, Some(1), Some("test"))
   }
 
   val emptyCache = CacheMap("", Map.empty)

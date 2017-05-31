@@ -38,9 +38,9 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }
