@@ -26,5 +26,7 @@ object DeRegisterReason {
 case class DeRegisterSubscriptionRequest(acknowledgementReference: String, deregistrationDate: LocalDate, deregistrationReason: String)
 
 object DeRegisterSubscriptionRequest {
+  val DefaultAckReference = "A" * 32
+
   implicit val formats = Json.format[DeRegisterSubscriptionRequest]
 }

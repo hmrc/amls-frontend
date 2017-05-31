@@ -23,7 +23,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import models.deregister.DeRegisterSubscriptionRequest
+import models.deregister.{DeRegisterReason, DeRegisterSubscriptionRequest}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -66,7 +66,7 @@ class DeRegisterApplicationController @Inject()
     implicit authContext => implicit request =>
       val maybeRequest = for {
         regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-        _ <- OptionT.liftF(amls.deregister(regNumber, DeRegisterSubscriptionRequest("AA", LocalDate.now, "Some reason")))
+        _ <- OptionT.liftF(amls.deregister(regNumber, DeRegisterSubscriptionRequest("A" * 32, LocalDate.now, DeRegisterReason.OutOfScope)))
       } yield Redirect(routes.StatusController.get())
 
       maybeRequest getOrElse InternalServerError("Could not de-register the subscription")
