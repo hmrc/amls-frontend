@@ -177,8 +177,7 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "nonUKPassport" -> "true",
-            "nonUKPassportNumber" -> "abc"
+            "nonUKPassport" -> "true"
           )
 
           val responsiblePeople = ResponsiblePeople()

@@ -33,13 +33,6 @@ object NonUKPassport {
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
-  private val passportRegex = "^[0-9]{9}$".r
-  private val passportRequired = required("error.required.uk.passport")
-  private val passportInputLength = 9
-  private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
-  private val passportLengthRule = maxLength(passportInputLength).withMessage("error.required.uk.passport") andThen
-    minLength(passportInputLength).withMessage("error.required.uk.passport")
-
   private val nonUKPassportRequired = required("error.required.non.uk.passport")
   private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
 
