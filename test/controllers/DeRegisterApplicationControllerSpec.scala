@@ -27,8 +27,9 @@ import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
@@ -36,6 +37,10 @@ import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 import scala.concurrent.Future
 
 class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
+
+  implicit override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
+    .build()
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
@@ -102,4 +107,30 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
       }
     }
   }
+}
+
+class DeRegisterApplicationControllerNoToggleSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
+
+  implicit override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-deregister" -> false)
+    .build()
+
+  trait TestFixture extends AuthorisedFixture { self =>
+    val request = addToken(authRequest)
+    val statusService = mock[StatusService]
+    val dataCache = mock[DataCacheConnector]
+    val enrolments = mock[AuthEnrolmentsService]
+    val amlsConnector = mock[AmlsConnector]
+    val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
+  }
+
+  "The DeRegisterApplicationController" when {
+    "the de-register feature toggle is off" must {
+      "return a 404 when GET is called" in new TestFixture {
+        val result = controller.get()(request)
+        status(result) mustBe NOT_FOUND
+      }
+    }
+  }
+
 }

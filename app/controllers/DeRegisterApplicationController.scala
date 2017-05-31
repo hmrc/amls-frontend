@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.deregister.DeRegisterSubscriptionRequest
@@ -42,17 +43,23 @@ class DeRegisterApplicationController @Inject()
   def get() = Authorised.async {
     implicit authContext => implicit request =>
 
-      val maybeProcessingDate = for {
-        status <- OptionT.liftF(statusService.getDetailedStatus)
-        response <- OptionT.fromOption[Future](status._2)
-      } yield response.processingDate
+      if(!ApplicationConfig.allowDeRegisterToggle) {
+        Future.successful(NotFound)
+      } else {
+        val maybeProcessingDate = for {
+          status <- OptionT.liftF(statusService.getDetailedStatus)
+          response <- OptionT.fromOption[Future](status._2)
+        } yield response.processingDate
 
-      (for {
-        bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-        details <- OptionT.fromOption[Future](bm.reviewDetails)
-        processingDate <- maybeProcessingDate
-        amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
-      } yield Ok(deregister_application(details.businessName, processingDate, amlsRegNumber))) getOrElse InternalServerError("Could not show the de-register page")
+        (for {
+          bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
+          details <- OptionT.fromOption[Future](bm.reviewDetails)
+          processingDate <- maybeProcessingDate
+          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+        } yield {
+          Ok(deregister_application(details.businessName, processingDate, amlsRegNumber))
+        }) getOrElse InternalServerError("Could not show the de-register page")
+      }
   }
 
   def post() = Authorised.async {
