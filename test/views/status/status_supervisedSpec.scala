@@ -36,7 +36,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, true)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -45,7 +45,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false)
+      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, true)
 
       doc.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
@@ -65,7 +65,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true)
+      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, true)
 
       val renewalDate = LocalDate.now().plusDays(15)
 
@@ -77,7 +77,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contains expected survey link for supervised status" in new ViewFixture {
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false)
+      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, true)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
         be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))

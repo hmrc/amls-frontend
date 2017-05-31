@@ -124,10 +124,13 @@ trait StatusController extends BaseController {
                               businessNameOption: Option[String])(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) =>
-        Ok(status_supervised(mlrRegNumber.getOrElse(""),
-          businessNameOption,
-          statusDtls.fold[Option[LocalDate]](None)(x =>x.currentRegYearEndDate), false)
-        )
+        val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
+
+        Ok {
+          //noinspection ScalaStyle
+          status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, endDate, renewalFlow = false, allowDeRegister = ApplicationConfig.allowDeRegisterToggle)
+        }
+
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
@@ -153,7 +156,7 @@ trait StatusController extends BaseController {
                 Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""),businessNameOption,renewalDate)))
               }
             }
-          case _ => Future.successful(Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true)))
+          case _ => Future.successful(Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true, ApplicationConfig.allowDeRegisterToggle)))
         }
       }
     }
