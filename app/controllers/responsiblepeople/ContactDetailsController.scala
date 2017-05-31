@@ -34,9 +34,9 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _,_,_, Some(name), _, _, _, _, _, _, _, _, _, _, _,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(Form2[ContactDetails](name), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _,_,_, _, _, _, _, _, _, _, _, _, _, _,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }

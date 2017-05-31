@@ -416,8 +416,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
@@ -437,8 +437,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None,None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None,None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None,None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None,None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
@@ -454,8 +454,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer and status is variation" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
@@ -469,8 +469,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "at least one of the person in responsible people is nominated officer and status is renewal" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
@@ -496,8 +496,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     "redirect to 'Who is the business’s nominated officer?'" when {
       "no one is nominated officer in responsible people" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))
@@ -512,8 +512,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "no one is nominated officer in responsible people and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.statusService.getStatus(any(),any(),any()))

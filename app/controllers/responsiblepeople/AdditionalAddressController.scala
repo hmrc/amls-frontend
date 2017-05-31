@@ -47,9 +47,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, _, _,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)), _, _, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _,_, _, _, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(additional_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }

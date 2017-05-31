@@ -35,9 +35,9 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, _, _,_, _,_, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
           => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _,_, _,_, _, _, _, _, _, _, _, _, _))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(sole_proprietor(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }

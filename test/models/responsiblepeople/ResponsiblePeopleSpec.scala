@@ -559,6 +559,9 @@ trait ResponsiblePeopleValues extends NinoUtil{
     val training = TrainingYes("test")
     val experienceTraining = ExperienceTrainingYes("Some training")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
+    val ukPassport = UKPassportNo
+    val nonUKPassport = NoPassport
+    val dateOfBirth = DateOfBirth(new LocalDate(1990,10,2))
   }
 
   object NewValues {
@@ -567,7 +570,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     private val residenceMonth = 2
     private val residenceDay = 24
     private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
-    private val residence = NonUKResidence(residenceDate)
+    private val residence = NonUKResidence
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
@@ -589,8 +592,9 @@ trait ResponsiblePeopleValues extends NinoUtil{
   val completeResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
-    Some(UKPassportNo),
-    Some(NoPassport),
+    Some(DefaultValues.ukPassport),
+    Some(DefaultValues.nonUKPassport),
+    Some(DefaultValues.dateOfBirth),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),
@@ -609,6 +613,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
   val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
+    None,
     None,
     None,
     Some(DefaultValues.contactDetails),

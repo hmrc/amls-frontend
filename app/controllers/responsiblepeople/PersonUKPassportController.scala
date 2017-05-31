@@ -42,9 +42,9 @@ class PersonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, Some(ukPassport), _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(person_uk_passport(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }

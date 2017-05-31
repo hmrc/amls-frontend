@@ -38,9 +38,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName), Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, fromDeclaration, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -90,7 +90,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
       case false => {
         data.isUKResidence match {
           case UKResidence(_) => Redirect(routes.ContactDetailsController.get(index, edit, fromDeclaration))
-          case NonUKResidence(_) => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
+          case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
         }
       }
     }

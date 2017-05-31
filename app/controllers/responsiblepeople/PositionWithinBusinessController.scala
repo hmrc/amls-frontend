@@ -40,9 +40,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               .getOrElse(BusinessType.SoleProprietor)
 
             getData[ResponsiblePeople](cache, index) match {
-              case Some(ResponsiblePeople(Some(personName), _, _,_,_, _, Some(positions), _, _, _, _, _, _, _, _,_, _))
+              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,Some(positions),_,_,_,_,_,_,_,_,_,_))
               => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, fromDeclaration, personName.titleName))
-              case Some(ResponsiblePeople(Some(personName), _, _,_, _,_, _, _, _, _, _, _, _, _, _,_, _))
+              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
               => Ok(position_within_business(EmptyForm, edit, index, bt, fromDeclaration, personName.titleName))
               case _
               => NotFound(notFoundView)

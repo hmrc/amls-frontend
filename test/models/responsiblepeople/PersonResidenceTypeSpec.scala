@@ -59,8 +59,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         PersonResidenceType.formRule.validate(ukModel) must
           be(Valid(
             PersonResidenceType(
-              NonUKResidence(
-                new LocalDate(1990, 2, 24)),
+              NonUKResidence,
               Country("United Kingdom", "GB"),
               Some(Country("United Kingdom", "GB"))
             )))
@@ -151,24 +150,6 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         "non UK" when {
 
           "missing" when {
-            "dateOfBirth" in {
-              val ukModel = Map(
-                "isUKResidence" -> Seq("false"),
-                "dateOfBirth.day" -> Seq(""),
-                "dateOfBirth.month" -> Seq(""),
-                "dateOfBirth.year" -> Seq(""),
-                "passportType" -> Seq("01"),
-                "ukPassportNumber" -> Seq("000000000"),
-                "countryOfBirth" -> Seq("GB"),
-                "nationality" -> Seq("GB")
-              )
-
-              PersonResidenceType.formRule.validate(ukModel) must
-                be(Invalid(Seq(
-                  Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-                )))
-            }
-
             "countryOfBirth" in {
               val ukModel = Map(
                 "isUKResidence" -> Seq("false"),
@@ -186,11 +167,9 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
                   Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country"))
                 )))
             }
-
           }
 
           "invalid" when {
-
             "countryOfBirth" in {
               val ukModel = Map(
                 "isUKResidence" -> Seq("false"),
@@ -208,25 +187,6 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
                   Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country"))
                 )))
             }
-
-            "dateOfBirth" in {
-              val ukModel = Map(
-                "isUKResidence" -> Seq("false"),
-                "dateOfBirth.day" -> Seq("c"),
-                "dateOfBirth.month" -> Seq("b"),
-                "dateOfBirth.year" -> Seq("a"),
-                "passportType" -> Seq("01"),
-                "ukPassportNumber" -> Seq("000000000"),
-                "countryOfBirth" -> Seq("GB"),
-                "nationality" -> Seq("GB")
-              )
-
-              PersonResidenceType.formRule.validate(ukModel) must
-                be(Invalid(Seq(
-                  Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-                )))
-            }
-
           }
 
         }
@@ -260,18 +220,14 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
       "write correct NonUKResidence model" in {
 
-        val data = PersonResidenceType(NonUKResidence(
-          new LocalDate(1990, 2, 24)
-        ),
+        val data = PersonResidenceType(
+          NonUKResidence,
           Country("United Kingdom", "GB"),
           Some(Country("United Kingdom", "GB"))
         )
 
         PersonResidenceType.formWrites.writes(data) mustBe Map(
           "isUKResidence" -> Seq("false"),
-          "dateOfBirth.day" -> Seq("24"),
-          "dateOfBirth.month" -> Seq("2"),
-          "dateOfBirth.year" -> Seq("1990"),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("GB")
         )
@@ -291,9 +247,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
       "validate non uk residence type model" in {
         val nonUKModel = PersonResidenceType(
-          NonUKResidence(
-            new LocalDate(1990, 2, 24)
-          ),
+          NonUKResidence,
           Country("United Kingdom", "GB"),
           Some(Country("United Kingdom", "GB")
           ))

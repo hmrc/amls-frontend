@@ -54,9 +54,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
 
-    val noNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
+    val noNominatedOfficer = ResponsiblePeople(None, None, None,None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficer = ResponsiblePeople(None, None, None,None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None,None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
   }
 
   val emptyCache = CacheMap("", Map.empty)

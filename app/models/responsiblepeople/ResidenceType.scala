@@ -16,6 +16,7 @@
 
 package models.responsiblepeople
 
+import cats.data.Validated.Valid
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.forms.UrlFormEncoded
@@ -26,9 +27,7 @@ sealed trait ResidenceType
 
 case class UKResidence(nino: String) extends ResidenceType
 
-case class NonUKResidence(
-                           dateOfBirth: LocalDate
-                         ) extends ResidenceType
+case object NonUKResidence extends ResidenceType
 
 object ResidenceType {
 
@@ -38,20 +37,17 @@ object ResidenceType {
     import jto.validation.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
       case true => (__ \ "nino").read(ninoType).map(UKResidence.apply)
-      case false => (__ \ "dateOfBirth").read(localDateFutureRule).map(NonUKResidence.apply)
+      case false => Rule.fromMapping { _ => Valid(NonUKResidence) }
     }
   }
 
-  implicit def formWrites = Write[ResidenceType, UrlFormEncoded] {
-    case f: UKResidence => Map(
+  implicit def formWrites: Write[ResidenceType, UrlFormEncoded] = Write {
+    case UKResidence(nino) => Map(
       "isUKResidence" -> Seq("true"),
-      "nino" -> Seq(f.nino)
+      "nino" -> Seq(nino)
     )
-    case f: NonUKResidence => Map(
-      "isUKResidence" -> Seq("false"),
-      "dateOfBirth.day" -> Seq(f.dateOfBirth.get(DateTimeFieldType.dayOfMonth()).toString),
-      "dateOfBirth.month" -> Seq(f.dateOfBirth.get(DateTimeFieldType.monthOfYear()).toString),
-      "dateOfBirth.year" -> Seq(f.dateOfBirth.get(DateTimeFieldType.year()).toString)
+    case NonUKResidence => Map(
+      "isUKResidence" -> Seq("false")
     )
   }
 
@@ -59,9 +55,7 @@ object ResidenceType {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-    (__ \ "nino").read[String] map UKResidence.apply map identity[ResidenceType] orElse {
-      (__ \ "dateOfBirth").read[LocalDate] map NonUKResidence.apply map identity[ResidenceType]
-    }
+    (__ \ "nino").read[String] map UKResidence.apply map identity[ResidenceType] orElse Reads(_ => JsSuccess(NonUKResidence))
   }
 
   implicit val jsonWrites: Writes[ResidenceType] = {
@@ -69,13 +63,13 @@ object ResidenceType {
     import play.api.libs.json.Writes._
     import play.api.libs.json._
     Writes[ResidenceType] {
-      case a: UKResidence =>
+      case UKResidence(nino) =>
         Json.obj(
-          "nino" -> a.nino
+          "nino" -> nino
         )
-      case a: NonUKResidence => {
+      case NonUKResidence => {
         Json.obj(
-          "dateOfBirth" -> a.dateOfBirth
+          "isUKResidence" -> "false"
         )
       }
     }
