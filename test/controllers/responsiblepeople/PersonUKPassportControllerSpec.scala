@@ -17,10 +17,10 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, ResponsiblePeople, UKPassport, UKPassportYes}
+import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -50,6 +50,8 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
     val mockCacheMap = mock[CacheMap]
 
     val personName = PersonName("firstname", None, "lastname", None, None)
+
+    val ukPassportNumber = "000000000"
   }
 
   "PersonUKPassportController" when {
@@ -119,11 +121,10 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
 
             val newRequest = request.withFormUrlEncodedBody(
               "ukPassport" -> "true",
-              "ukPassportNumber" -> "87654321"
+              "ukPassportNumber" -> ukPassportNumber
             )
 
-            val responsiblePeople = ResponsiblePeople(
-            )
+            val responsiblePeople = ResponsiblePeople()
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
@@ -140,33 +141,222 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+
           }
         }
         "go to PersonNonUKPassportController" when {
           "no uk passport" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "false"
+            )
+
+            val responsiblePeople = ResponsiblePeople()
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1).url))
 
           }
         }
       }
 
       "edit is true" must {
-        "go to ContactDetailsController" when {
-          "changed from no uk passport to uk passport" in new Fixture {
+        "go to PersonNonUKPassportController" when {
+          "data is changed from uk passport to non uk passport" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "false"
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              ukPassport = Some(UKPassportYes(ukPassportNumber))
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true).url))
 
           }
         }
-        "go to SummaryController" when {
-          "uk passport number already existed" in new Fixture {
+        "go to DetailedAnswersController" when {
+          "uk passport" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "true",
+              "ukPassportNumber" -> ukPassportNumber
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              ukPassport = Some(UKPassportNo)
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
 
           }
-          "no uk passport" in new Fixture {
+
+          "non uk passport has not been changed" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "false"
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              ukPassport = Some(UKPassportNo)
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
 
           }
         }
       }
 
+      "given invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "ukPassport" -> "true",
+            "ukPassportNumber" -> "abc"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "Responsible Person cannot be found with given index" must {
+        "respond with NOT_FOUND" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "ukPassport" -> "false"
+          )
+
+          val responsiblePeople = ResponsiblePeople()
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(10)(newRequest)
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+
     }
 
+  }
+
+  it must {
+    "remove non uk passport data" when {
+      "data is changed to uk passport" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "ukPassport" -> "true",
+          "ukPassportNumber" -> ukPassportNumber
+        )
+
+        val responsiblePeople = ResponsiblePeople(
+          ukPassport = Some(UKPassportNo),
+          nonUKPassport = Some(NoPassport)
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(responsiblePeople)))
+
+        when(controller.dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        controller.post(1, true)(newRequest)
+        verify(controller.dataCacheConnector)
+          .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
+          ukPassport = Some(UKPassportYes(ukPassportNumber)),
+          nonUKPassport = None
+        ))))(any(), any(), any())
+
+      }
+    }
   }
 
 }
