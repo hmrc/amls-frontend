@@ -34,7 +34,7 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
 
   "experience_training view" must {
 
-    "have correct title and not contain any raw message keys" in new ViewFixture {
+    "have correct title" in new ViewFixture {
 
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
