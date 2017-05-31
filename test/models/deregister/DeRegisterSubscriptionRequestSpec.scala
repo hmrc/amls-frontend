@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package models.withdrawal
+package models.deregister
 
-import org.joda.time.{LocalDate, LocalDateTime}
+import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class WithdrawalSubscriptionRequestSpec extends PlaySpec with MustMatchers {
+class DeRegisterSubscriptionRequestSpec extends PlaySpec with MustMatchers {
 
-  "The withdrawal subscription request object" when {
-    "serialised" must {
-      "produce the correct JSON" in {
-        val date = LocalDate.now()
-        val expectedJson = Json.obj(
-          "acknowledgementReference" -> "SomeRef",
-          "withdrawalDate" -> date.toString("yyyy-MM-dd"),
-          "withdrawalReason" -> WithdrawalReason.OutOfScope
-        )
+  "The model" must {
+    "deserialise correctly" in {
+      val reference = "A" * 32
 
-        Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.OutOfScope, None)) mustBe expectedJson
-      }
+      val expectedJson = Json.obj(
+        "acknowledgementReference" -> reference,
+        "deregistrationDate" -> LocalDate.now.toString("yyyy-MM-dd"),
+        "deregistrationReason" -> DeRegisterReason.OutOfScope
+      )
+
+      Json.toJson(DeRegisterSubscriptionRequest(reference, LocalDate.now, DeRegisterReason.OutOfScope)) mustBe expectedJson
     }
   }
 

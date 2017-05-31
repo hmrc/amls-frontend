@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package models.withdrawal
+package models.deregister
 
 import org.joda.time.LocalDate
+import play.api.libs.json.Json
 
-object WithdrawalReason {
+object DeRegisterReason {
   val OutOfScope = "Out of scope"
 }
 
-case class WithdrawSubscriptionRequest (acknowledgementReference: String,
-                                        withdrawalDate: LocalDate,
-                                        withdrawalReason: String,
-                                        withdrawalReasonOthers: Option[String] = None
-                                       )
+case class DeRegisterSubscriptionRequest(acknowledgementReference: String, deregistrationDate: LocalDate, deregistrationReason: String)
 
-object WithdrawSubscriptionRequest {
-  import play.api.libs.json._
-
+object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
-  implicit val format = Json.format[WithdrawSubscriptionRequest]
+
+  implicit val formats = Json.format[DeRegisterSubscriptionRequest]
 }

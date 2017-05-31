@@ -21,6 +21,9 @@ GET         /your-registration/your-messages                            controll
 GET         /your-registration/withdraw-application                     @controllers.WithdrawApplicationController.get()
 POST        /your-registration/withdraw-application                     @controllers.WithdrawApplicationController.post()
 
+GET         /your-registration/de-register-application                  @controllers.DeRegisterApplicationController.get()
+POST        /your-registration/de-register-application                  @controllers.DeRegisterApplicationController.post()
+
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
 
