@@ -20,9 +20,12 @@ import javax.inject.Inject
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2}
+import models.responsiblepeople.{NonUKPassport, ResponsiblePeople}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import views.html.responsiblepeople.person_non_uk_passport
 
 class PersonNonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -34,7 +37,13 @@ class PersonNonUKPassportController @Inject()(
   def get(index:Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ???
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(Some(personName), _, _, Some(nonUKPassport), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+            Ok(person_non_uk_passport(Form2[NonUKPassport](nonUKPassport), edit, index, fromDeclaration, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+            Ok(person_non_uk_passport(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+          case _ => NotFound(notFoundView)
+        }
   }
 
   def post(index:Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {

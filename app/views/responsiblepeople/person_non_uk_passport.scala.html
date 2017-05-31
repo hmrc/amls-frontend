@@ -14,13 +14,66 @@
  * limitations under the License.
  *@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+@import include._
+@import forms2._
 
-</body>
-</html>
+@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("nonUKPassportNumber").id}-fieldset"""
+}
+
+@header = {
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.PersonNonUKPassportController.post(index, edit, fromDeclaration)) {
+
+        @fieldset(
+            f = f("nonUKPassport-fieldset"),
+            legend = "",
+            legendHidden = true,
+            panel = false
+        ) {
+            @rpErrorGroup(
+                field = f("nonUKPassport"),
+                personName = personName
+            ) {
+                @radio(
+                    f = f("nonUKPassport"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s"#$target"
+                )
+                @radio(
+                    f = f("nonUKPassport"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f(s"$target"))
+        ) {
+            @input(
+                field = f("nonUKPassportNumber"),
+                labelText = "",
+                bold = false,
+                hintText = ""
+            )
+        }
+
+        @submit()
+
+    }
+
+}

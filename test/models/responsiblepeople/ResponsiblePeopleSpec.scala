@@ -573,7 +573,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
     Some(UKPassportNo),
-    None,
+    Some(NoPassport),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),

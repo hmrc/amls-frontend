@@ -17,11 +17,18 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import models.responsiblepeople.{NonUKPassportYes, PersonName, ResponsiblePeople}
+import org.jsoup.Jsoup
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
+
+import scala.concurrent.Future
 
 class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -36,12 +43,69 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    val controllers = app.injector.instanceOf[PersonNonUKPassportController]
+    val controller = app.injector.instanceOf[PersonNonUKPassportController]
+
+    val personName = PersonName("firstname", None, "lastname", None, None)
+
+    val passportNumber = "000000000"
   }
 
   "PersonNonUKPassportController" when {
 
     "get is called" must {
+
+      "return OK" when {
+
+        "data is not present" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople(Some(personName))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[name=nonUKPassportNumber]").`val` must be("")
+          document.getElementById("nonUKPassport-true").hasAttr("checked") must be(false)
+          document.getElementById("nonUKPassport-false").hasAttr("checked") must be(false)
+
+        }
+
+        "data is present" in new Fixture {
+
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName),
+            nonUKPassport = Some(
+              NonUKPassportYes(passportNumber)
+            )
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[name=nonUKPassportNumber]").`val` must be(passportNumber)
+          document.getElementById("nonUKPassport-true").hasAttr("checked") must be(true)
+
+        }
+
+      }
+
+      "display Not Found" when {
+        "a populated ResponsiblePeople model cannot be found" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(NOT_FOUND)
+        }
+      }
 
     }
 

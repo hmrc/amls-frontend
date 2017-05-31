@@ -352,10 +352,12 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
         verify(controller.dataCacheConnector)
           .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
           ukPassport = Some(UKPassportYes(ukPassportNumber)),
-          nonUKPassport = None
+          nonUKPassport = None,
+          hasChanged = true
         ))))(any(), any(), any())
 
       }
+
     }
   }
 
