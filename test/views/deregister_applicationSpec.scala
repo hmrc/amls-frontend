@@ -16,33 +16,37 @@
 
 package views
 
+import forms.EmptyForm
 import org.joda.time.LocalDateTime
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{DateHelper, GenericTestHelper}
+import utils.GenericTestHelper
 
-class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
+class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    //noinspection ScalaStyle
-    val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)
+    val businessName = "Test Business"
+    val processingDate = LocalDateTime.now()
+    val regNumber = "IUYSF894739847"
 
-    def view = views.html.withdraw_application("The Business", date)
+    def view = views.html.deregister_application(businessName, processingDate, regNumber)
   }
 
-  "The withdraw application view" must {
-    "show the correct titles and headings" in new ViewFixture {
-      doc.title must be(s"${Messages("status.withdraw.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
-      heading.html must be(Messages("status.withdraw.title"))
+  "deregister_application view" must {
+    "have correct title and headings" in new ViewFixture {
+
+      val title = s"${Messages("status.deregister.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+      doc.title mustBe title
+      heading.html must be(Messages("status.deregister.title"))
       subHeading.html must include(Messages("summary.status"))
+      //code to check existance of form fields			
     }
 
-    "show the correct informational content" in new ViewFixture {
-      validateParagraphizedContent("status.withdraw.body-content")
-
-      doc.body().html must include(Messages("status.withdraw.registration-date.label", DateHelper.formatDate(date)))
+    "have correct body content" in new ViewFixture {
+      validateParagraphizedContent("status.deregister.body-content")
     }
   }
 }

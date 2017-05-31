@@ -20,7 +20,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean)(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, allowDeRegister: Boolean)(implicit request: Request[_],m:Messages)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration") {
 
@@ -41,8 +41,13 @@
             @businessName.map {bn =>
                 <div class="panel-indent panel-indent--gutter panel-border-wide">
                     <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
-                    @endDate.map {date =>
-                       <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))</p>
+                    @endDate.map { date =>
+                        <p class="heading-small">@Messages("lbl.registration.status")</p>
+                        <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
+                            @if(allowDeRegister) {
+                                <a href="@routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                            }
+                        </p>
                     }
                     <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
                 </div>

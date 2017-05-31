@@ -515,9 +515,17 @@ status.renewalnotsubmitted.description2 = You’ve completed all sections of the
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
 status.withdraw.link-text = withdraw application
 status.withdraw.title = Withdraw application
+status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
 status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
   I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
+
+status.deregister.title = De-register business
+status.deregister.link-text = de-register business
+status.deregister.button-text = De-register
+status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
+  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
+  If you de-register, your business must not carry out activities which are cover by Money Laundering Regulations.
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
