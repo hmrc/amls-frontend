@@ -46,7 +46,7 @@ trait StatusController extends BaseController {
 
   private[controllers] def renewalService: RenewalService
 
-  def get() = Authorised.async {
+  def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
 
         val businessName = landingService.cacheMap map {

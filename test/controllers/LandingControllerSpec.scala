@@ -440,8 +440,20 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
             verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
           }
+
+          "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
+            setUpMocksForAnEnrolmentExists(controller)
+            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(false, false))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
+            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          }
         }
       }
+
 
       "there is no data in S4L" should {
         "refresh from API5 and redirect to status controller" in new Fixture {
