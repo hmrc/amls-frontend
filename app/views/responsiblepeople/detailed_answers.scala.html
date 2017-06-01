@@ -129,28 +129,10 @@
         ) { prt =>
             @prt.isUKResidence match {
                 case UKResidence(nino) => {
-                <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
+                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
                 }
-                case NonUKResidence(dob, UKPassport(number)) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number</li>
-                </ul>
-                }
-                case NonUKResidence(dob, NonUKPassport(number)) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number</li>
-                </ul>
-                }
-                case NonUKResidence(dob, NoPassport) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.no_passport")</li>
-                </ul>
+                case NonUKResidence => {
+                    <p>@Messages("lbl.no")</p>
                 }
             }
         }
