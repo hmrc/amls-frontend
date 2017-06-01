@@ -644,6 +644,9 @@ trait ResponsiblePeopleValues extends NinoUtil{
     "nonUKPassport" -> Json.obj(
       "nonUKPassport" -> false
     ),
+    "dateOfBirth" -> Json.obj(
+      "dateOfBirth" -> "1990-10-02"
+    ),
     "contactDetails" -> Json.obj(
       "phoneNumber" -> "07702743555",
       "emailAddress" -> "test@test.com"
