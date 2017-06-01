@@ -25,11 +25,11 @@
 
 @header = {
     @rpErrorSummary(f, personName)
-    @headingWithPlaceholder(("", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.uk.passport.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.uk.passport.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -66,9 +66,9 @@
     ) {
         @input(
             field = f("ukPassportNumber"),
-            labelText = "",
+            labelText = "responsiblepeople.detailed_answers.uk_resident.passport_number",
             bold = false,
-            hintText = ""
+            hintText = "hint.9.digits"
         )
     }
 
