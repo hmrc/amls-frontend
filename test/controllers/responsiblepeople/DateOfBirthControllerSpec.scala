@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.{UKPassportYes, _}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -31,7 +32,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar {
+class DateOfBirthControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -44,24 +45,20 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    val controller = app.injector.instanceOf[PersonNonUKPassportController]
+    val controller = app.injector.instanceOf[DateOfBirthController]
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
 
     val personName = PersonName("firstname", None, "lastname", None, None)
 
-    val passportNumber = "000000000"
   }
 
-  "PersonNonUKPassportController" when {
-
+  "DateOfBirthController" when {
     "get is called" must {
-
       "return OK" when {
 
         "data is not present" in new Fixture {
-
           val responsiblePeople = ResponsiblePeople(Some(personName))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -71,19 +68,15 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=nonUKPassportNumber]").`val` must be("")
-          document.getElementById("nonUKPassport-true").hasAttr("checked") must be(false)
-          document.getElementById("nonUKPassport-false").hasAttr("checked") must be(false)
-
+          document.select("input[name=dateOfBirth.day]").`val` must be("")
+          document.select("input[name=dateOfBirth.month]").`val` must be("")
+          document.select("input[name=dateOfBirth.year]").`val` must be("")
         }
 
         "data is present" in new Fixture {
-
           val responsiblePeople = ResponsiblePeople(
             personName = Some(personName),
-            nonUKPassport = Some(
-              NonUKPassportYes(passportNumber)
-            )
+            dateOfBirth = Some(DateOfBirth(new LocalDate(2001,12,2)))
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -93,11 +86,10 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=nonUKPassportNumber]").`val` must be(passportNumber)
-          document.getElementById("nonUKPassport-true").hasAttr("checked") must be(true)
-
+          document.select("input[name=dateOfBirth.day]").`val` must be("2")
+          document.select("input[name=dateOfBirth.month]").`val` must be("12")
+          document.select("input[name=dateOfBirth.year]").`val` must be("2001")
         }
-
       }
 
       "display Not Found" when {
@@ -116,34 +108,36 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
     "post is called" must {
 
       "edit is false" must {
-        "go to DateOfBirthController" in new Fixture {
+        "go to ContactDetailsController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
-              "nonUKPassport" -> "true",
-              "nonUKPassportNumber" -> passportNumber
-            )
+          val newRequest = request.withFormUrlEncodedBody(
+            "dateOfBirth.day" -> "1",
+            "dateOfBirth.month" -> "12",
+            "dateOfBirth.year" -> "1990"
+          )
 
-            val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePeople()
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-            val result = controller.post(1)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
 
-          }
+        }
       }
 
       "edit is true" must {
         "go to DetailedAnswersController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "nonUKPassport" -> "true",
-            "nonUKPassportNumber" -> passportNumber
+            "dateOfBirth.day" -> "1",
+            "dateOfBirth.month" -> "12",
+            "dateOfBirth.year" -> "1990"
           )
 
           val responsiblePeople = ResponsiblePeople()
@@ -173,6 +167,12 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
 
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
@@ -186,7 +186,9 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
         "respond with NOT_FOUND" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "nonUKPassport" -> "false"
+            "dateOfBirth.day" -> "1",
+            "dateOfBirth.month" -> "12",
+            "dateOfBirth.year" -> "1990"
           )
 
           val responsiblePeople = ResponsiblePeople()
@@ -206,5 +208,4 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
     }
 
   }
-
 }

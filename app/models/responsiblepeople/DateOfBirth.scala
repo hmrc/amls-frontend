@@ -16,17 +16,15 @@
 
 package models.responsiblepeople
 
-import jto.validation.{From, Rule, Write}
 import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.Json
 
 case class DateOfBirth(dateOfBirth: LocalDate)
 
 object DateOfBirth {
-
-  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, DateOfBirth] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

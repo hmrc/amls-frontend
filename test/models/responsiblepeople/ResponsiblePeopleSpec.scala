@@ -495,6 +495,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "dateOfBirth value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeResponsiblePeople.dateOfBirth(DateOfBirth(new LocalDate(1990,10,2)))
+          result must be(completeResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeResponsiblePeople.dateOfBirth(DateOfBirth(new LocalDate(1990,12,12)))
+          result must be(completeResponsiblePeople.copy(dateOfBirth = Some(DateOfBirth(new LocalDate(1990,12,12))), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
     "status value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {

@@ -58,15 +58,15 @@ class PersonNonUKPassportController @Inject()(
             BadRequest(person_non_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
-            (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
-                rp.nonUKPassport(data)
-              })
-              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+            for {
+              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                rp.copy(nonUKPassport = Some(data))
+              }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.DateOfBirthController.get(index,edit,fromDeclaration))
-            }) getOrElse NotFound(notFoundView)
+              case false => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
+            }
+
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }

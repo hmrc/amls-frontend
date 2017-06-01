@@ -87,6 +87,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def nonUKPassport(p: NonUKPassport): ResponsiblePeople =
     this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p))
 
+  def dateOfBirth(p: DateOfBirth): ResponsiblePeople =
+    this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p))
+
   def status(p: String): ResponsiblePeople =
     this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
 
