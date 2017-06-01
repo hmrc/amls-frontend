@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                           val authConnector: AuthConnector) extends RepeatingSection with BaseController {
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
@@ -50,7 +50,7 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
     }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[SoleProprietorOfAnotherBusiness](request.body) match {
         case f: InvalidForm => getData[ResponsiblePeople](index) flatMap { rp =>

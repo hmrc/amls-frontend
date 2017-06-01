@@ -31,7 +31,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration:Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetchAll map { optionalCache =>
@@ -51,7 +51,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>

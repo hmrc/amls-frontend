@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@(index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
+@(index: Int, fromDeclaration: Option[String] = None)(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.responsiblepeople")

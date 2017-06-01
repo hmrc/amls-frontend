@@ -39,7 +39,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -50,7 +50,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
       }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
@@ -98,7 +98,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                         rp: ResponsiblePeople,
                         status: SubmissionStatus,
                         edit: Boolean,
-                        fromDeclaration: Boolean)(implicit request:Request[AnyContent]) = status match {
+                        fromDeclaration: Option[String])(implicit request:Request[AnyContent]) = status match {
     case SubmissionDecisionApproved => handleApproved(index, edit, rp, data, fromDeclaration)
     case _ => handleNotYetApproved(index, data, rp, edit, fromDeclaration)
   }
@@ -106,7 +106,8 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
   private def handleApproved(index: Int,
                              edit: Boolean,
                              rp: ResponsiblePeople,
-                             data: TimeAtAddress, fromDeclaration: Boolean = false) = {
+                             data: TimeAtAddress,
+                             fromDeclaration: Option[String]) = {
 
     val moreThanOneYear = data == ThreeYearsPlus || data == OneToThreeYears
 
@@ -122,7 +123,8 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
   private def handleNotYetApproved(index: Int,
                                    timeAtAddress: TimeAtAddress,
                                    rp: ResponsiblePeople,
-                                   edit: Boolean, fromDeclaration: Boolean = false) = {
+                                   edit: Boolean,
+                                   fromDeclaration: Option[String]) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit))

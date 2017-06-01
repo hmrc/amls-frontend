@@ -30,7 +30,7 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, Some(vat), _, _, _, _, _, _, _, _)) =>
@@ -41,7 +41,7 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
         Form2[VATRegistered](request.body) match {
           case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>

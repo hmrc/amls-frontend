@@ -51,7 +51,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {rp =>
@@ -60,7 +60,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
     }
 
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
@@ -92,7 +92,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
     }
 
   private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePeople]],
-                                      fromDeclaration: Boolean = false)(implicit request: Request[AnyContent]) = {
+                                      fromDeclaration: Option[String] = None)(implicit request: Request[AnyContent]) = {
     rpSeqOption match {
       case Some(rpSeq) => edit match {
         case true => Redirect(routes.DetailedAnswersController.get(index))

@@ -30,7 +30,7 @@ trait PersonRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, fromDeclaration: Boolean = false) =
+  def get(index: Int, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
@@ -44,7 +44,7 @@ trait PersonRegisteredController extends BaseController {
         }
   }
 
-  def post(index: Int, fromDeclaration: Boolean = false) =
+  def post(index: Int, fromDeclaration: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
           Form2[PersonRegistered](request.body) match {
