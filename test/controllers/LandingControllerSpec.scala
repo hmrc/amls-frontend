@@ -331,6 +331,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
     when(result.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
     when(result.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
+    when(result.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
 
     if (includesResponse) {
       val testResponse = SubscriptionResponse(
@@ -387,6 +388,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               when(emptyCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(None)
               when(emptyCacheMap.getEntry[Hvd](Hvd.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[Renewal](Renewal.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
+
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
               val result = controller.get()(request)
@@ -417,8 +420,11 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
           "there is no subscription response" should {
             "redirect to status controller without refreshing API5" in new Fixture {
+              val testCacheMap = buildTestCacheMap(true, false)
+              when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
+
               setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, false))
+              setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
               val result = controller.get()(request)
 
@@ -443,7 +449,9 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
-            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(false, false))
+            val testCacheMap = buildTestCacheMap(false, false)
+            setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+            when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None, Some(true))))
 
             val result = controller.get()(request)
 

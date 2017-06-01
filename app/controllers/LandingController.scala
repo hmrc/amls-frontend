@@ -120,9 +120,7 @@ trait LandingController extends BaseController {
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
         val fromDuplicate = cacheMap match {
-          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
-            _.previouslySubmitted == Some(true)
-          }
+          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {_.previouslySubmitted.contains(true)}
           case _ => false
         }
 
