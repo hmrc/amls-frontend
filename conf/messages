@@ -1294,7 +1294,6 @@ responsiblepeople.nationality.heading = What’s the nationality of {0}?
 responsiblepeople.nationality.title = What’s the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
-responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.summary.responsible.people = People you have registered
