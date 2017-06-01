@@ -237,106 +237,111 @@ class detailed_answersSpec extends GenericTestHelper
         }
       }
 
-//      "a non-uk resident, non-uk passport" in new ViewFixture {
-//
-//        val nonUKPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
-//          personResidenceType = Some(PersonResidenceType(
-//            NonUKResidence(new LocalDate(1990, 2, 25), NonUKPassport("0000000000")),
-//            Country("Uganda", "UG"),
-//            Some(Country("Italy", "ITA"))
-//          ))
-//        )
-//
-//        val sectionChecks = Table[String, Element => Boolean](
-//          ("title key", "check"),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000"))
-//        )
-//
-//        def view = {
-//          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true)
-//        }
-//
-//        forAll(sectionChecks) { (key, check) => {
-//          val headers = doc.select("section.check-your-answers h2")
-//          val header = headers.toList.find(e => e.text() == key)
-//
-//          header must not be None
-//          val section = header.get.parents().select("section").first()
-//          check(section) must be(true)
-//
-//        }
-//        }
-//
-//      }
-//
-//      "a non-uk resident, uk passport" in new ViewFixture {
-//
-//        val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
-//          personResidenceType = Some(PersonResidenceType(
-//            NonUKResidence(new LocalDate(1990, 2, 25), UKPassport("0000000000")),
-//            Country("Uganda", "UG"),
-//            Some(Country("Italy", "ITA"))
-//          ))
-//        )
-//
-//        val sectionChecks = Table[String, Element => Boolean](
-//          ("title key", "check"),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000")))
-//
-//        def view = {
-//          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
-//        }
-//
-//        forAll(sectionChecks) { (key, check) => {
-//          val headers = doc.select("section.check-your-answers h2")
-//          val header = headers.toList.find(e => e.text() == key)
-//
-//          header must not be None
-//          val section = header.get.parents().select("section").first()
-//          check(section) must be(true)
-//
-//        }
-//        }
-//
-//      }
-//
-//      "a non-uk resident, no passport" in new ViewFixture {
-//
-//        val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
-//          personResidenceType = Some(PersonResidenceType(
-//            NonUKResidence(new LocalDate(1990, 2, 25), NoPassport),
-//            Country("Uganda", "UG"),
-//            Some(Country("Italy", "ITA"))
-//          ))
-//        )
-//
-//        val sectionChecks = Table[String, Element => Boolean](
-//          ("title key", "check"),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-//          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No passport"))
-//        )
-//
-//        def view = {
-//          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
-//        }
-//
-//        forAll(sectionChecks) { (key, check) => {
-//          val headers = doc.select("section.check-your-answers h2")
-//          val header = headers.toList.find(e => e.text() == key)
-//
-//          header must not be None
-//          val section = header.get.parents().select("section").first()
-//          check(section) must be(true)
-//
-//        }
-//        }
-//
-//      }
+      "a non-uk resident, non-uk passport" in new ViewFixture {
+
+        val nonUKPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+          personResidenceType = Some(PersonResidenceType(
+            NonUKResidence,
+            Some(Country("Uganda", "UG")),
+            Some(Country("Italy", "ITA"))
+          )),
+          ukPassport = Some(UKPassportNo),
+          nonUKPassport = Some(NonUKPassportYes("0000000000"))
+        )
+
+        val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000"))
+        )
+
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+
+        }
+        }
+
+      }
+
+      "a non-uk resident, uk passport" in new ViewFixture {
+
+        val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+          personResidenceType = Some(PersonResidenceType(
+            NonUKResidence,
+            Some(Country("Uganda", "UG")),
+            Some(Country("Italy", "ITA"))
+          )),
+          ukPassport = Some(UKPassportYes("0000000000"))
+        )
+
+        val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000")))
+
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+
+        }
+        }
+
+      }
+
+      "a non-uk resident, no passport" in new ViewFixture {
+
+        val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
+          personResidenceType = Some(PersonResidenceType(
+            NonUKResidence,
+            Some(Country("Uganda", "UG")),
+            Some(Country("Italy", "ITA"))
+          )),
+          ukPassport = Some(UKPassportNo),
+          nonUKPassport = Some(NoPassport)
+        )
+
+        val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No passport"))
+        )
+
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+
+        }
+        }
+
+      }
 
     }
 
