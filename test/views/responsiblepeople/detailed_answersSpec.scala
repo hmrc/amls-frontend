@@ -102,7 +102,7 @@ class detailed_answersSpec extends GenericTestHelper
 
     val residenceType = PersonResidenceType(
       UKResidence(nino),
-      Country("Uganda", "UG"),
+      Some(Country("Uganda", "UG")),
       Some(Country("United Kingdom", "GB"))
     )
 

@@ -42,37 +42,20 @@ class person_residence_typeSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUKResidence") must not be empty
-      doc.getElementsByAttributeValue("name", "countryOfBirth") must not be empty
       doc.getElementsByAttributeValue("name", "nino") must not be empty
-      doc.getElementsByAttributeValue("name", "passportType") must not be empty
-      doc.getElementsByAttributeValue("name", "ukPassportNumber") must not be empty
-      doc.getElementsByAttributeValue("name", "nonUKPassportNumber") must not be empty
-      doc.getElementsByAttributeValue("name", "dateOfBirth.day") must not be empty
-      doc.getElementsByAttributeValue("name", "dateOfBirth.month") must not be empty
-      doc.getElementsByAttributeValue("name", "dateOfBirth.year") must not be empty
 
     }
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "isUKResidence") -> Seq(ValidationError("not a message Key")),
-          (Path \ "nino") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "countryOfBirth") -> Seq(ValidationError("third not a message Key")),
-          (Path \ "ukPassportNumber") -> Seq(ValidationError("fourth not a message Key")),
-          (Path \ "passportType") -> Seq(ValidationError("fifth not a message Key")),
-          (Path \ "nonUKPassportNumber") -> Seq(ValidationError("sixth not a message Key")),
-          (Path \ "dateOfBirth") -> Seq(ValidationError("seventh not a message Key"))
+          (Path \ "nino") -> Seq(ValidationError("second not a message Key"))
         ))
 
       def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, true, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
-      errorSummary.html() must include("fourth not a message Key")
-      errorSummary.html() must include("fifth not a message Key")
-      errorSummary.html() must include("sixth not a message Key")
-      errorSummary.html() must include("seventh not a message Key")
     }
   }
 }

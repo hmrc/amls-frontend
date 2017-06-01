@@ -87,7 +87,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
     "successfully load nationality page when nationality is none" in new Fixture {
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -110,7 +110,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
           personName,
           Some(PersonResidenceType(
             NonUKResidence,
-            Country("United Kingdom", "GB"),
+            Some(Country("United Kingdom", "GB")),
             Some(Country("France", "FR")))),
           None
         )))))
@@ -184,7 +184,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
         "otherCountry" -> "GB"
       )
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
