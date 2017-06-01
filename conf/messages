@@ -522,10 +522,11 @@ status.withdraw.body-content = I want to withdraw my application for anti-money 
 
 status.deregister.title = De-register business
 status.deregister.link-text = de-register business
+status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
 status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
   De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
-  If you de-register, your business must not carry out activities which are cover by Money Laundering Regulations.
+  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
@@ -1293,7 +1294,6 @@ responsiblepeople.nationality.heading = What’s the nationality of {0}?
 responsiblepeople.nationality.title = What’s the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
-responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.summary.responsible.people = People you have registered

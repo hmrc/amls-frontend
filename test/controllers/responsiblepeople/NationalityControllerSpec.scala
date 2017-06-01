@@ -66,7 +66,6 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
     }
 
     "successfully load Not found page" when {
@@ -102,7 +101,6 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(false)
     }
 
     "successfully pre-populate UI with data from sav4later" in new Fixture {
@@ -122,8 +120,6 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=03]").hasAttr("checked") must be(true)
     }
 
     "fail submission on error" in new Fixture {
@@ -164,7 +160,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
     "successfully submit with valid nationality data (with other country)" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "nationality" -> "03",
+        "nationality" -> "02",
         "otherCountry" -> "GB"
       )
 
@@ -184,7 +180,8 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
     "submit with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "nationality" -> "02"
+        "nationality" -> "02",
+        "otherCountry" -> "GB"
       )
 
       val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
@@ -193,7 +190,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val prt = pResidenceType.copy(nationality = Some(Country("Ireland", "IE")))
+      val prt = pResidenceType.copy(nationality = Some(Country("France", "FR")))
       val responsiblePeople1 = ResponsiblePeople(None, Some(pResidenceType))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))(any(), any(), any()))
@@ -210,7 +207,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
     "load NotFound page on exception" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "nationality" -> "02"
+        "nationality" -> "01"
       )
 
       val responsiblePeople = ResponsiblePeople()
