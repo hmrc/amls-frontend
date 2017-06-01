@@ -14,40 +14,32 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include.{main, heading}
-@import include.forms2._
+@import include._
+@import forms2._
 
 @(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @errorSummary(f)
-    @heading("", "summary.responsiblepeople")
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("responsiblepeople.date.of.birth.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.date.of.birth.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
     @form(f, controllers.responsiblepeople.routes.DateOfBirthController.post(index, edit, fromDeclaration)) {
 
-        @panel(
-            jsHidden = false,
-            wide = true
-        ) {
-            <p>@Messages("", personName)</p>
-        }
-
         @date(
             f = f,
             p = "dateOfBirth",
-            labelText = "",
+            labelText = "responsiblepeople.date.of.birth.title",
             hintText = "",
             true
         )
 
-        @submit(false, Some(Messages("")))
+        @submit()
 
         }
 }
