@@ -42,6 +42,7 @@ trait StatusService {
   val Rejected = "Rejected"
   val Revoked = "Revoked"
   val Expired = "Expired"
+  val Withdrawal = "Withdrawal"
 
   private def getApprovedStatus(response: ReadStatusResponse) = {
     (response.currentRegYearEndDate, response.renewalConFlag) match {
@@ -59,6 +60,7 @@ trait StatusService {
       case `Rejected` => SubmissionDecisionRejected
       case `Revoked` => SubmissionDecisionRevoked
       case `Expired` => SubmissionDecisionExpired
+      case `Withdrawal` => SubmissionWithdrawn
       case _ => throw new RuntimeException("ETMP returned status is inconsistent")
     }
   }
