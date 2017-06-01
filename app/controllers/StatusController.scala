@@ -99,7 +99,8 @@ trait StatusController extends BaseController {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
         Future.successful(getInitialSubmissionPage(mlrRegNumber,statusInfo, businessNameOption, feeResponse))
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
-           (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) =>
+           (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
+            (SubmissionWithdrawn, _) =>
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
@@ -134,6 +135,7 @@ trait StatusController extends BaseController {
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionWithdrawn, _) => Ok(status_withdrawn(businessNameOption))
     }
   }
 

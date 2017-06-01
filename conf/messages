@@ -500,6 +500,10 @@ status.submissiondecisionrevoked.description2 = Your business is not registered 
 status.submissiondecisionexpired.title = Application expired
 status.submissiondecisionexpired.description = Your supervision has expired.
 status.submissiondecisionexpired.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionwithdrawn.title = Application withdrawn
+status.submissiondecisionwithdrawn.description = Your application has been withdrawn.
+status.submissiondecisionwithdrawn.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionwithdrawn.button-text = Submit new application
 
 status.renewalsubmitted.text = Currently supervised, renewal under review
 status.renewalsubmitted.description = Renewal under review

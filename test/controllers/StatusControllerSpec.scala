@@ -313,6 +313,35 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
       }
 
+      "application status is SubmissionWithdrawn" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionWithdrawn, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+      }
+
       "application status is RenewalSubmitted" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
