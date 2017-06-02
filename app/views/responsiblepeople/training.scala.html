@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("information").id}-fieldset"""
@@ -36,7 +36,7 @@
 
     <p>@Messages("responsiblepeople.training.hinttext")</p>
 
-    @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit, flow)) {
 
         @fieldset(
             f = f("training-fieldset"),
