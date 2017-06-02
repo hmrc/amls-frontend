@@ -32,26 +32,26 @@ trait FitAndProperController extends RepeatingSection with BaseController {
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _,_,_, _))
-              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, fromDeclaration, personName.titleName))
+              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName))
             case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _,_, _,_))
-              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
             case _
               => NotFound(notFoundView)
           }
       }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request => {
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map {rp =>
-                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) =>{
               for {
@@ -60,7 +60,7 @@ trait FitAndProperController extends RepeatingSection with BaseController {
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.PersonRegisteredController.get(index, fromDeclaration))
+                case false => Redirect(routes.PersonRegisteredController.get(index, flow))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

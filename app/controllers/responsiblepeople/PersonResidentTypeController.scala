@@ -31,26 +31,26 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), Some(residencyType), _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, fromDeclaration, personName.titleName))
+          => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, flow, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-          => Ok(person_residence_type(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+          => Ok(person_residence_type(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
 
         Form2[PersonResidenceType](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map {rp =>
-              BadRequest(person_residence_type(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              BadRequest(person_residence_type(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
@@ -61,7 +61,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.NationalityController.get(index, edit, fromDeclaration))
+              case false => Redirect(routes.NationalityController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

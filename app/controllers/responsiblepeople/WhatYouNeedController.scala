@@ -24,10 +24,10 @@ import scala.concurrent.Future
 
 trait WhatYouNeedController extends BaseController {
 
-  def get(index: Int, fromDeclaration: Option[String] = None) =
+  def get(index: Int, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
-        Future.successful(Ok(what_you_need(index, fromDeclaration)))
+        Future.successful(Ok(what_you_need(index, flow)))
     }
 }
 

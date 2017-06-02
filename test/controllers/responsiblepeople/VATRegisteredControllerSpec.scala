@@ -152,6 +152,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
+
           val newRequest = request.withFormUrlEncodedBody(
             "registeredForVAT" -> "true",
             "vrnNumber" -> "123456789",
