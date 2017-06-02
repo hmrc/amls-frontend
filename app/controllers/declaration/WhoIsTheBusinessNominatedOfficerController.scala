@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.StatusConstants
 import views.html.declaration.select_business_nominated_officer
+import ResponsiblePeople.nominatedOfficerFlow
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -92,7 +93,8 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
         }
         case ValidForm(_, data) => {
           data.value match {
-            case BusinessNominatedOfficer.someoneElse => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("nominatedofficer"))))
+            case BusinessNominatedOfficer.someoneElse =>
+              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(nominatedOfficerFlow))))
             case _ => for {
               serviceStatus <- statusService.getStatus
               responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)

@@ -32,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, StatusConstants}
+import ResponsiblePeople.nominatedOfficerFlow
 
 import scala.concurrent.Future
 
@@ -200,7 +201,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("nominatedofficer")).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(nominatedOfficerFlow)).url))
       }
     }
 
