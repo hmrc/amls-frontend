@@ -42,8 +42,7 @@ object PersonName {
 
   import play.api.libs.json._
 
-  implicit val formRule: Rule[UrlFormEncoded, PersonName] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 
       val otherNamesLength = 140
       val otherNamesType = notEmptyStrip andThen

@@ -58,8 +58,7 @@ case class PersonAddressNonUK(
                          country: Country) extends PersonAddress
 
 object PersonAddress {
-  implicit val formRule: Rule[UrlFormEncoded, PersonAddress] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._

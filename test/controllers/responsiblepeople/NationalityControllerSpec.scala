@@ -51,7 +51,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
     val personName = Some(PersonName("firstname", None, "lastname", None, None))
 
-    "successfully load nationality page" in new Fixture {
+    "load nationality page" in new Fixture {
 
       val responsiblePeople = ResponsiblePeople(personName)
 
@@ -68,7 +68,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
     }
 
-    "successfully load Not found page" when {
+    "load Not found page" when {
       "get throws not found exception" in new Fixture {
 
         val responsiblePeople = ResponsiblePeople()
@@ -85,9 +85,9 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       }
     }
 
-    "successfully load nationality page when nationality is none" in new Fixture {
+    "load nationality page when nationality is none" in new Fixture {
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -103,14 +103,14 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
     }
 
-    "successfully pre-populate UI with data from sav4later" in new Fixture {
+    "pre-populate UI with data from sav4later" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
           personName,
           Some(PersonResidenceType(
             NonUKResidence,
-            Some(Country("United Kingdom", "GB")),
+            Country("United Kingdom", "GB"),
             Some(Country("France", "FR")))),
           None
         )))))
@@ -138,7 +138,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
     }
 
-    "successfully submit with valid nationality data" in new Fixture {
+    "submit with valid nationality data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "nationality" -> "01"
@@ -154,10 +154,10 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonResidentTypeController.get(1).url))
     }
 
-    "successfully submit with valid nationality data (with other country)" in new Fixture {
+    "submit with valid nationality data (with other country)" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "nationality" -> "02",
@@ -174,7 +174,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonResidentTypeController.get(1).url))
     }
 
     "submit with valid data in edit mode" in new Fixture {
@@ -184,7 +184,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
         "otherCountry" -> "GB"
       )
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Country("United Kingdom", "GB"), None)
       val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
