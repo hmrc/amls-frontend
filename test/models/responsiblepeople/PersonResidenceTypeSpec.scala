@@ -124,7 +124,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         }
 
         "non UK" when {
-          
+
           "invalid" when {
             "countryOfBirth" in {
               val ukModel = Map(
