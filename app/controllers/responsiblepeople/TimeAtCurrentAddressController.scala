@@ -42,7 +42,8 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
   def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePeople(Some(personName),_,_,
+          Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, fromDeclaration, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
@@ -70,7 +71,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                 for {
                   status <- statusService.getStatus
                 } yield {
-                  redirectTo(index,data,rp,status, edit, fromDeclaration)
+                  redirectDependingOnStatus(index,data,rp,status, edit, fromDeclaration)
                 }
               }
             }) getOrElse Future.successful(NotFound(notFoundView))
@@ -94,7 +95,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
     }
   }
 
-  private def redirectTo(index: Int, data: TimeAtAddress,
+  private def redirectDependingOnStatus(index: Int, data: TimeAtAddress,
                         rp: ResponsiblePeople,
                         status: SubmissionStatus,
                         edit: Boolean,

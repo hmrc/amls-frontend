@@ -28,6 +28,8 @@ object BusinessNominatedOfficer {
 
   val key = "business-nominated-officer"
 
+  val someoneElse = "-1"
+
   implicit val formRule: Rule[UrlFormEncoded, BusinessNominatedOfficer] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
