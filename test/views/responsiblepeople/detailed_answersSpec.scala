@@ -102,7 +102,7 @@ class detailed_answersSpec extends GenericTestHelper
 
     val residenceType = PersonResidenceType(
       UKResidence(nino),
-      Country("Uganda", "UG"),
+      Some(Country("Uganda", "UG")),
       Some(Country("United Kingdom", "GB"))
     )
 
@@ -242,7 +242,7 @@ class detailed_answersSpec extends GenericTestHelper
         val nonUKPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
           personResidenceType = Some(PersonResidenceType(
             NonUKResidence,
-            Country("Uganda", "UG"),
+            Some(Country("Uganda", "UG")),
             Some(Country("Italy", "ITA"))
           )),
           ukPassport = Some(UKPassportNo),
@@ -278,7 +278,7 @@ class detailed_answersSpec extends GenericTestHelper
         val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
           personResidenceType = Some(PersonResidenceType(
             NonUKResidence,
-            Country("Uganda", "UG"),
+            Some(Country("Uganda", "UG")),
             Some(Country("Italy", "ITA"))
           )),
           ukPassport = Some(UKPassportYes("0000000000"))
@@ -312,7 +312,7 @@ class detailed_answersSpec extends GenericTestHelper
         val ukPassportResponsiblePeopleModel = responsiblePeopleModel.copy(
           personResidenceType = Some(PersonResidenceType(
             NonUKResidence,
-            Country("Uganda", "UG"),
+            Some(Country("Uganda", "UG")),
             Some(Country("Italy", "ITA"))
           )),
           ukPassport = Some(UKPassportNo),
