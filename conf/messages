@@ -539,6 +539,8 @@ status.submittedForReview.submitteddate.text = Application submitted {0}
 
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
+fee.details.dup.heading = If you haven’t paid, you'll need to make a payment. You’ll see a breakdown of your fees before you make the payment.
+fee.details.dup_nofees.heading = If you haven’t paid, you'll need to make a payment. Please give us some details of your situation and an adviser will contact you to take payment.
 fee.details.registration.fee.lbl = Your registration fee
 fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.

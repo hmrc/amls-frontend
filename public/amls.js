@@ -203,4 +203,15 @@ $(function () {
     duplicateErrorWrapper.find('.report-error__toggle').remove();
   }
 
+  var dupFeeNotFoundDiv = $('.dup_feenotfound');
+  if(dupFeeNotFoundDiv != null){
+    $('#get-help-action').remove();
+    $('.report-error__content').find('h2').remove();
+    $('.report-error__content').find('p').remove();
+    $($('#error-feedback-form').find('.form-group-compound')[2]).css('visibility','hidden');
+     $($('#error-feedback-form').find('.form-group-compound')[3]).css('visibility','hidden');
+    $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
+
+  }
+
 });

@@ -18,18 +18,24 @@
 @import include._
 @import forms2._
 @import models.FeeResponse
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
 @(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@getHelpForm = {
+@config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+}
 
 <h2>@Messages("status.submissionreadyforreview.duplicate.title")</h2>
 <p>@Messages("status.submissionreadyforreview.duplicate.description")</p>
 <p>@Messages("status.submissionreadyforreview.duplicate.description2")</p>
 
-@feeResponse.map {fee =>
-    @detailsSummary(
-        summary = Messages("status.submissionreadyforreview.duplicate.link")
-    ) {
-       @include.status.fee_details(fee)
-    }
-
+@detailsSummary(summary = Messages("status.submissionreadyforreview.duplicate.link")){
+@feeResponse match {
+        case Some(fee) => {@include.status.fee_details_dup(fee)}
+        case None => {
+<p>@Messages("fee.details.dup_nofees.heading")</p>
+<div class="dup_feenotfound"><div class="get-help-form">
+    @getHelpForm
+</div></div>}
+}
 }
