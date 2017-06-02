@@ -17,7 +17,7 @@
 package models.responsiblepeople
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule}
+import jto.validation.{From, Rule, Write}
 import models.Country
 import play.api.libs.json.Json
 
@@ -37,5 +37,16 @@ object CountryOfBirth {
         case false => CountryOfBirth(false, None)
       }
     }
+
+  implicit val formWrites: Write[CountryOfBirth, UrlFormEncoded] = Write {x =>
+    x.country match {
+      case Some(country) =>  Map(
+        "countryOfBirth" -> Seq("true"),
+        "country" -> Seq(country.code)
+      )
+      case None =>  Map("countryOfBirth" -> Seq("false"))
+    }
+
+  }
 
 }

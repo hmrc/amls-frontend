@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.Country
@@ -34,12 +33,19 @@ import scala.concurrent.Future
 class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
+  def getCountryOfBirth(countryOfBirth: Option[Country]): CountryOfBirth = {
+    countryOfBirth match {
+      case Some(data) => CountryOfBirth(true, Some(data))
+      case None => CountryOfBirth(false, None)
+    }
+  }
+
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), Some(personResidenceType), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-            Ok(country_of_birth(Form2[PersonResidenceType](personResidenceType), edit, index, fromDeclaration, personName.titleName))
+            Ok(country_of_birth(Form2[CountryOfBirth](getCountryOfBirth(personResidenceType.countryOfBirth)), edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
             Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
@@ -70,7 +76,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, fromDeclaration))
-              case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, fromDeclaration))
+              case false => Redirect(routes.NationalityController.get(index, edit, fromDeclaration))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
