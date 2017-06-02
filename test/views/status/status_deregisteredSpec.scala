@@ -45,10 +45,12 @@ class status_deregisteredSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture {
-      doc.getElementsMatchingOwnText(Messages("status.submissionderegistered.description", DateHelper.formatDate(deregistrationDate))).text must be(
-        Messages("status.submissionderegistered.description", DateHelper.formatDate(deregistrationDate)))
-      doc.getElementsMatchingOwnText(Messages("status.submissionderegistered.description2")).text must be(
-        Messages("status.submissionderegistered.description2"))
+
+      Seq(
+        Messages("status.submissionderegistered.status", DateHelper.formatDate(deregistrationDate)),
+        Messages("status.submissionderegistered.description"),
+        Messages("status.submissionderegistered.description2")
+      ) foreach { msg => doc.getElementsMatchingOwnText(msg).text mustBe msg }
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
