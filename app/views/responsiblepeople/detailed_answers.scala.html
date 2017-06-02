@@ -68,20 +68,15 @@
 
     @model.map { person =>
 
-
-            @showHide match {
-                case true => {
-                    <div class="panel-indent panel-indent--gutter panel-border-wide info">
-                        <p>
-                            <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
-                                 @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
-                            </a>
-                        </p>
-                    </div>
-                        }
-                case false => {}
-            }
-
+        @if(showHide){
+            <div class="panel-indent panel-indent--gutter panel-border-wide info">
+                <p>
+                    <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                        @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
+                    </a>
+                </p>
+            </div>
+        }
 
         <h2 class="heading-large">
             @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):

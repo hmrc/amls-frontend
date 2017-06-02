@@ -58,12 +58,27 @@ class detailed_answersSpec extends GenericTestHelper
       subHeading.html must include(Messages("summary.responsiblepeople"))
     }
 
+    val previousName = PreviousName(
+      Some("firstName"),
+      Some("middleName"),
+      Some("lastName"),
+      new LocalDate(1990, 2, 24)
+    )
+
+    val personName = PersonName(
+      "firstName",
+      Some("middleName"),
+      "lastName",
+      Some(previousName),
+      Some("otherName")
+    )
+
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
       (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "firstName middleName lastName")),
       (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "24 February 1990")),
       (Messages("responsiblepeople.detailed_answers.other_names"), checkElementTextIncludes(_, "otherName")),
-      (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, nino)),
+      (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, nino)),
       (Messages("responsiblepeople.detailed_answers.country_of_birth"), checkElementTextIncludes(_, "Uganda")),
       (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
       (Messages("responsiblepeople.detailed_answers.phone_number"), checkElementTextIncludes(_, "098765")),
@@ -81,21 +96,6 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.previous_experience"), checkElementTextIncludes(_, "experience")),
       (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), checkElementTextIncludes(_, "training")),
       (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
-    )
-
-    val previousName = PreviousName(
-      Some("firstName"),
-      Some("middleName"),
-      Some("lastName"),
-      new LocalDate(1990, 2, 24)
-    )
-
-    val personName = PersonName(
-      "firstName",
-      Some("middleName"),
-      "lastName",
-      Some(previousName),
-      Some("otherName")
     )
 
     val residenceType = PersonResidenceType(
@@ -171,7 +171,7 @@ class detailed_answersSpec extends GenericTestHelper
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true, personName.fullName)
         }
 
         val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
@@ -214,14 +214,17 @@ class detailed_answersSpec extends GenericTestHelper
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, true, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
           val header = headers.toList.find(e => e.text() == key)
 
-          if (key.equals(Messages("responsiblepeople.detailed_answers.address")) || key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))) {
+          if (key.equals(
+            Messages("responsiblepeople.detailed_answers.address")) ||
+            key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", personName.fullName))
+          ) {
             header must not be None
             val section = header.get.parents().select("section").first()
             check(section) must be(true)
@@ -247,12 +250,12 @@ class detailed_answersSpec extends GenericTestHelper
 
         val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.person.a.resident.heading", personName), checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.non.uk.passport.heading", personName), checkElementTextIncludes(_, "Yes"))
+          (Messages("responsiblepeople.person.a.resident.heading", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.non.uk.passport.heading", personName.fullName), checkElementTextIncludes(_, "0000000000"))
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -281,12 +284,11 @@ class detailed_answersSpec extends GenericTestHelper
 
         val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "Passport Number: 0000000000")))
+          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "Passport Number: 0000000000")))
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -316,13 +318,12 @@ class detailed_answersSpec extends GenericTestHelper
 
         val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "25 February 1990")),
-          (Messages("responsiblepeople.detailed_answers.uk_resident"), checkElementTextIncludes(_, "No passport"))
+          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.non.uk.passport", personName.fullName), checkElementTextIncludes(_, "No"))
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true)
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -373,8 +374,11 @@ class detailed_answersSpec extends GenericTestHelper
     }
 
     "display timeAtAddress for corresponding addresses" in new Fixture {
+
+      val responsiblePeople = ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))
+
       def view = {
-        views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))), 1, true)
+        views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, true, false, personName.fullName)
       }
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
