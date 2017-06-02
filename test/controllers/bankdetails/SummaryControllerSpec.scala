@@ -122,7 +122,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       contentString must include("Account number: 12341234")
       contentString must include("Sort code: 00-00-00")
       contentString must include("UK Bank Account")
-      contentString must include("Personal")
+      contentString must include("A personal bank account")
     }
 
     "show no bank account text" when {
