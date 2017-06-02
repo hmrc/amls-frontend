@@ -35,7 +35,7 @@ class additional_addressSpec extends GenericTestHelper with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.additional_address(form2, true, 1, true, name)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name)
 
       doc.title must be(Messages("responsiblepeople.additional_address.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -74,7 +74,7 @@ class additional_addressSpec extends GenericTestHelper with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.additional_address(form2, true, 1, true, name)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")

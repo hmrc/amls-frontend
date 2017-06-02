@@ -39,7 +39,7 @@ trait DetailedAnswersController extends BaseController {
     }
   }
 
-  def get(index: Int, fromYourAnswers: Boolean) =
+  def get(index: Int, fromYourAnswers: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {

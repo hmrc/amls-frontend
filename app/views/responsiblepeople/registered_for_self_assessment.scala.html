@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, fromYourAnswers: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
 @target = @{
 s"""${f("utrNumber").id}-fieldset"""
@@ -33,7 +33,7 @@ s"""${f("utrNumber").id}-fieldset"""
     heading = header
 )  {
 
-    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit, fromYourAnswers)) {
+    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit, fromDeclaration)) {
         @fieldset(
             f = f("saRegistered-fieldset"),
             legend = "responsiblepeople.registeredforselfassessment.title",

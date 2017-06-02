@@ -34,7 +34,7 @@ class nationalitySpec extends GenericTestHelper with MustMatchers {
   "nationality view" must {
       "have correct title, headings and form fields" in new ViewFixture {
         val form2 = EmptyForm
-        def view = views.html.responsiblepeople.nationality(form2, true, 1, false, "firstName lastName")
+        def view = views.html.responsiblepeople.nationality(form2, true, 1, None, "firstName lastName")
 
         doc.title must be(Messages("responsiblepeople.nationality.title") +
           " - " + Messages("summary.responsiblepeople") +
@@ -52,7 +52,7 @@ class nationalitySpec extends GenericTestHelper with MustMatchers {
           )
         )
 
-        def view = views.html.responsiblepeople.nationality(form2, true, 1, false, "firstName lastName")
+        def view = views.html.responsiblepeople.nationality(form2, true, 1, None, "firstName lastName")
         errorSummary.html () must include ("not a message Key")
         errorSummary.html () must include ("second not a message Key")
       }

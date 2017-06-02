@@ -44,7 +44,7 @@ trait SummaryController extends BaseController {
   def post(fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       fromDeclaration match {
-        case Some("nominatedofficer") => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         case _ => {
           for {
             status <- statusService.getStatus

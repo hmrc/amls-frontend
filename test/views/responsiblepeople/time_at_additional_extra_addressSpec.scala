@@ -39,7 +39,7 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, name)
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
 
       doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -51,7 +51,7 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false, name)
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
 
       heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", name))
     }
@@ -67,7 +67,7 @@ class time_at_additional_extra_addressSpec extends GenericTestHelper with MustMa
         Seq((Path \ timeAtAddress, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, false,name)
+      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None,name)
 
       errorSummary.html() must include(messageKey1)
     }

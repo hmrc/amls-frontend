@@ -30,7 +30,7 @@ class who_must_registerSpec extends GenericTestHelper with MustMatchers {
 
   "who_must_register View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.who_must_register(1, false)
+      def view = views.html.responsiblepeople.who_must_register(1, None)
 
       doc.title must be(Messages("responsiblepeople.whomustregister.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -39,14 +39,14 @@ class who_must_registerSpec extends GenericTestHelper with MustMatchers {
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.responsiblepeople.who_must_register(1, false)
+      def view = views.html.responsiblepeople.who_must_register(1, None)
 
       heading.html must be (Messages("responsiblepeople.whomustregister.title"))
       subHeading.html must include (Messages("summary.responsiblepeople"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.responsiblepeople.who_must_register(1, false)
+      def view = views.html.responsiblepeople.who_must_register(1, None)
 
 
       html must include(Messages("responsiblepeople.whomustregister.line_1"))
