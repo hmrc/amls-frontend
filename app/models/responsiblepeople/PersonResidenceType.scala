@@ -23,7 +23,7 @@ import play.api.libs.json.{Reads, Writes}
 
 case class PersonResidenceType (
                                isUKResidence : ResidenceType,
-                               countryOfBirth: Country,
+                               countryOfBirth: Option[Country],
                                nationality: Option[Country]
                               )
 
@@ -35,7 +35,7 @@ object PersonResidenceType {
     import jto.validation.forms.Rules._
     (
       __.read[ResidenceType] ~
-      (__ \ "countryOfBirth").read[Country].withMessage("error.required.rp.birth.country") ~
+      (__ \ "countryOfBirth").read[Option[Country]].withMessage("error.required.rp.birth.country") ~
       (__ \ "nationality").read[Option[Country]].withMessage("error.required.nationality")
       )(PersonResidenceType.apply)
   }
@@ -45,7 +45,7 @@ object PersonResidenceType {
     import play.api.libs.functional.syntax.unlift
     (
       __.write[ResidenceType] ~
-        (__ \ "countryOfBirth").write[Country] ~
+        (__ \ "countryOfBirth").write[Option[Country]] ~
         (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))
   }
@@ -55,7 +55,7 @@ object PersonResidenceType {
     import play.api.libs.json._
     (
       __.read[ResidenceType] and
-        (__ \ "countryOfBirth").read[Country] and
+        (__ \ "countryOfBirth").readNullable[Country] and
         (__ \ "nationality").readNullable[Country]
       ) (PersonResidenceType.apply _)
   }
@@ -65,7 +65,7 @@ object PersonResidenceType {
     import play.api.libs.json._
     (
       __.write[ResidenceType] and
-        (__ \ "countryOfBirth").write[Country] and
+        (__ \ "countryOfBirth").write[Option[Country]] and
         (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))
   }

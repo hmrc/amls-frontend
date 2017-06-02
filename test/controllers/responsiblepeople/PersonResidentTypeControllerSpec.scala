@@ -89,7 +89,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             personName = Some(personName),
             personResidenceType = Some(PersonResidenceType(
               isUKResidence = residenceTypeUK,
-              countryOfBirth = Country("United Kingdom", "GB"),
+              countryOfBirth = Some(Country("United Kingdom", "GB")),
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
@@ -111,7 +111,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             personName = Some(personName),
             personResidenceType = Some(PersonResidenceType(
               isUKResidence = residenceTypeNonUK,
-              countryOfBirth = Country("United Kingdom", "GB"),
+              countryOfBirth = Some(Country("United Kingdom", "GB")),
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
