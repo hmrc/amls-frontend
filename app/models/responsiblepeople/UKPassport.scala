@@ -47,7 +47,7 @@ object UKPassport {
 
   implicit val formRule: Rule[UrlFormEncoded, UKPassport] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "ukPassport").read[Boolean].withMessage("error.invalid") flatMap {
+    (__ \ "ukPassport").read[Boolean].withMessage("error.required.uk.passport") flatMap {
       case true =>
         (__ \ "ukPassportNumber").read(ukPassportType) map (UKPassportYes apply _)
       case false => Rule.fromMapping { _ => Valid(UKPassportNo) }

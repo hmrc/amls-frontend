@@ -220,6 +220,8 @@ error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of 
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
+error.required.uk.passport = Select yes if this person has a UK passport
+error.required.non.uk.passport = Select yes if this person has a passport from another country
 
 
 ############################### Trust and company service providers ###############################

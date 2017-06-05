@@ -92,7 +92,7 @@ class UKPassportSpec extends PlaySpec {
 
       UKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "ukPassport") -> Seq(ValidationError("error.invalid"))
+          (Path \ "ukPassport") -> Seq(ValidationError("error.required.uk.passport"))
         )))
     }
 
