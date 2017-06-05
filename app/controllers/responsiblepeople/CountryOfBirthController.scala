@@ -25,7 +25,7 @@ import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople._
+import views.html.responsiblepeople.country_of_birth
 
 import scala.concurrent.Future
 
@@ -33,10 +33,14 @@ import scala.concurrent.Future
 class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
-  def getCountryOfBirth(countryOfBirth: Option[Country]): CountryOfBirth = {
+  private def getCountryOfBirth(countryOfBirth: Option[Country]): CountryOfBirth = {
     countryOfBirth match {
-      case Some(data) => CountryOfBirth(true, Some(data))
-      case None => CountryOfBirth(false, None)
+      case Some(country) => if(country.code != "GB") {
+        CountryOfBirth(false, Some(country))
+      } else {
+        CountryOfBirth(true, None)
+      }
+      case _ => CountryOfBirth(true, None)
     }
   }
 
@@ -45,7 +49,8 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), Some(personResidenceType), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-            Ok(country_of_birth(Form2[CountryOfBirth](getCountryOfBirth(personResidenceType.countryOfBirth)), edit, index, fromDeclaration, personName.titleName))
+            Ok(country_of_birth(Form2[CountryOfBirth](getCountryOfBirth(personResidenceType.countryOfBirth)),
+              edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
             Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)
@@ -59,7 +64,6 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       data.country
     }
     personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
-
   }
 
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
@@ -67,7 +71,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
           case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(vat_registered(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(country_of_birth(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {

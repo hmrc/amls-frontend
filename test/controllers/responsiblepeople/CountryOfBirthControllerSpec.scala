@@ -18,8 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople._
-import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
+import models.Country
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -56,7 +55,8 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
   val personName = Some(PersonName("firstname", None, "lastname", None, None))
   val nino = nextNino
   val personResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("Spain", "ES")), Some(Country("Spain", "ES")))
-  val updtdPersonResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
+  val updtdPersonResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("France", "FR")), Some(Country("Spain", "ES")))
+  val updtdPersonResidenceTypeYes = PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
   val responsiblePeople = ResponsiblePeople(personName, Some(personResidenceType))
 
   "CountryOfBirthController" when {
@@ -93,6 +93,18 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("countryOfBirth-false").hasAttr("checked") must be(true)
+        document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
+      }
+
+      "display the country of birth page successfully with data from save4later for the option 'Yes'" in new Fixture {
+
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))
+
+        val result = controllers.get(RecordId)(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
         document.getElementById("countryOfBirth-true").hasAttr("checked") must be(true)
       }
     }
@@ -100,10 +112,10 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
     "post is called" must {
       "redirect to Nationality Controller" when {
 
-        "all the mandatory UK parameters are supplied" in new Fixture {
+        "all the mandatory inoput parameters are supplied" in new Fixture {
           val requestWithParams = request.withFormUrlEncodedBody(
-            "countryOfBirth" -> "true",
-            "country" -> "GB"
+            "countryOfBirth" -> "false",
+            "country" -> "FR"
           )
          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -117,6 +129,27 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
           redirectLocation(result) must be(Some(routes.NationalityController.get(RecordId).url))
           verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
             meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true))))(any(), any(), any())
+        }
+      }
+
+      "redirect to Detailed Answer Controller" when {
+
+        "all the mandatory input parameters are supplied and in edit mode" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "countryOfBirth" -> "true"
+          )
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controllers.post(RecordId, edit = true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any(), any())
         }
       }
 

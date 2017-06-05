@@ -102,7 +102,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val document = Jsoup.parse(contentAsString(result))
           document.select("input[name=isUKResidence]").`val` must be("true")
           document.select("input[name=nino]").`val` must be(nino)
-          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
 
         }
 
@@ -127,7 +126,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.select("input[name=dateOfBirth.day]").`val` must be("2")
           document.select("input[name=dateOfBirth.month]").`val` must be("12")
           document.select("input[name=dateOfBirth.year]").`val` must be("1990")
-          document.select("select[name=countryOfBirth] > option[value=GB]").hasAttr("selected") must be(true)
+
           document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
 
         }

@@ -21,7 +21,6 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.JsSuccess
 
 class CountryOfBirthSpec extends PlaySpec {
 
@@ -30,17 +29,17 @@ class CountryOfBirthSpec extends PlaySpec {
     "Form" must {
       "read successfully for valid input type 'Yes'" in {
         val urlFormEncoded = Map(
-          "countryOfBirth" -> Seq("true"),
+          "countryOfBirth" -> Seq("false"),
           "country" -> Seq("GB")
         )
-        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(true, Some(Country("United Kingdom", "GB")))))
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(Country("United Kingdom", "GB")))))
       }
 
       "read successfully for valid input type 'No'" in {
         val urlFormEncoded = Map(
-          "countryOfBirth" -> Seq("false")
+          "countryOfBirth" -> Seq("true")
         )
-        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, None)))
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(true, None)))
       }
 
       "throw validation error when mandatory field not selected" in {
@@ -53,7 +52,7 @@ class CountryOfBirthSpec extends PlaySpec {
 
       "throw validation error when mandatory field country od birth is selected as 'yes' and not selected country" in {
         val urlFormEncoded = Map(
-          "countryOfBirth" -> Seq("true"),
+          "countryOfBirth" -> Seq("false"),
           "country" -> Seq("")
         )
 
@@ -62,13 +61,6 @@ class CountryOfBirthSpec extends PlaySpec {
       }
     }
 
-    "Json" must {
-      "read write json successfully" in {
-        val input = CountryOfBirth(true, Some(Country("United Kingdom", "GB")))
-        CountryOfBirth.format.reads(CountryOfBirth.format.writes(input)) mustEqual JsSuccess(input)
-      }
-
-    }
   }
 
 }

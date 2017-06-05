@@ -19,13 +19,10 @@ package models.responsiblepeople
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
 import models.Country
-import play.api.libs.json.Json
 
 case class CountryOfBirth (countryOfBirth: Boolean, country: Option[Country])
 
 object CountryOfBirth {
-
-  implicit val format = Json.format[CountryOfBirth]
 
   import utils.MappingUtils.Implicits._
 
@@ -33,20 +30,19 @@ object CountryOfBirth {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       (__ \ "countryOfBirth").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case true => (__ \ "country").read[Country] map {c =>CountryOfBirth(true, Some(c))}
-        case false => CountryOfBirth(false, None)
+        case false => (__ \ "country").read[Country] map {c =>CountryOfBirth(false, Some(c))}
+        case true => CountryOfBirth(true, None)
       }
     }
 
   implicit val formWrites: Write[CountryOfBirth, UrlFormEncoded] = Write {x =>
     x.country match {
       case Some(country) =>  Map(
-        "countryOfBirth" -> Seq("true"),
+        "countryOfBirth" -> Seq("false"),
         "country" -> Seq(country.code)
       )
-      case None =>  Map("countryOfBirth" -> Seq("false"))
+      case None =>  Map("countryOfBirth" -> Seq("true"))
     }
-
   }
 
 }

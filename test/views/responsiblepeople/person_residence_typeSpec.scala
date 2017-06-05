@@ -42,7 +42,6 @@ class person_residence_typeSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUKResidence") must not be empty
-      doc.getElementsByAttributeValue("name", "countryOfBirth") must not be empty
       doc.getElementsByAttributeValue("name", "nino") must not be empty
       doc.getElementsByAttributeValue("name", "passportType") must not be empty
       doc.getElementsByAttributeValue("name", "ukPassportNumber") must not be empty
