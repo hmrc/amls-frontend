@@ -508,7 +508,7 @@ status.submissiondecisionwithdrawn.button-text = Submit new application
 status.submissionderegistered.title = Application de-registered
 status.submissionderegistered.status = De-registered on {0}
 status.submissionderegistered.description = Your business is now de-registered.
-status.submissionderegistered.description2 = This business is no longer registered for anti-money laundering supervision with HM Revenue and Customs.
+status.submissionderegistered.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.submissionderegistered.button-text = Submit new application
 
 status.renewalsubmitted.text = Currently supervised, renewal under review
