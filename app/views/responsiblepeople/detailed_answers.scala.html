@@ -146,44 +146,56 @@
             }
         }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
-            editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true).toString(),
-            dataItem = person.ukPassport
-        ) { pp =>
-            @pp match {
-                case UKPassportYes(ukPassportNumber) => {
-                    <p>@Messages("lbl.yes")</p>
-                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @ukPassportNumber</p>
-                }
-                case UKPassportNo => {
-                    <p>@Messages("lbl.no")</p>
+        @person.ukPassport.map { ukPassport =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
+                editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true).toString(),
+                dataItem = Some(ukPassport)
+            ) { pp =>
+                @pp match {
+                    case UKPassportYes(ukPassportNumber) => {
+                        <p>@Messages("lbl.yes")</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @ukPassportNumber</p>
+                    }
+                    case UKPassportNo => {
+                        <p>@Messages("lbl.no")</p>
+                    }
                 }
             }
+
         }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
-            editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true).toString(),
-            dataItem = person.nonUKPassport
-        ) { pp =>
-            @pp match {
-                case NonUKPassportYes(nonUKPassportNumber) => {
-                    <p>@Messages("lbl.yes")</p>
-                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @nonUKPassportNumber</p>
-                }
-                case NoPassport => {
-                    <p>@Messages("lbl.no")</p>
+        @person.nonUKPassport.map { nonUKPassport =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
+                editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true).toString(),
+                dataItem = Some(nonUKPassport)
+            ) { pp =>
+                @pp match {
+                    case NonUKPassportYes(nonUKPassportNumber) => {
+                        <p>@Messages("lbl.yes")</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @nonUKPassportNumber</p>
+                    }
+                    case NoPassport => {
+                        <p>@Messages("lbl.no")</p>
+                    }
                 }
             }
+
         }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.dob", personName),
-            editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true).toString(),
-            dataItem = person.dateOfBirth
-        ) { dob =>
-            <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
+        @person.dateOfBirth.map { dateOfBirth =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.dob", personName),
+                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true).toString(),
+                dataItem = Some(dateOfBirth)
+            ) { dob =>
+                <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
+            }
+
         }
 
         @detailedAnswers(
