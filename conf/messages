@@ -220,6 +220,7 @@ error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of 
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
+error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 
 
 ############################### Trust and company service providers ###############################
@@ -1328,7 +1329,9 @@ responsiblepeople.new.home.title = What’s this person’s new home address?
 responsiblepeople.detailed_answer.tell.us.moved = Tell us that {0} has moved
 responsiblepeople.movedaddress.heading = Has {0} moved from this home address?
 responsiblepeople.movedaddress.title = Has this person moved from this home address?
-
+responsiblepeople.country.of.birth.title = Was this person born in the UK?
+responsiblepeople.country.of.birth.heading = Was {0} born in the UK?
+responsiblepeople.country.of.birth.txt.lbl = What country was {0} born in?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
