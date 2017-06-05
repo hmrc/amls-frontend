@@ -24,7 +24,8 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.Country
 import models.responsiblepeople.{NonUKResidence, PersonResidenceType, ResponsiblePeople, UKResidence}
-import play.api.mvc.Result
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
@@ -59,7 +60,10 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
                 val updatedData = data.copy(nationality = nationality)
-                rp.personResidenceType(updatedData)
+                data.isUKResidence match {
+                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
+                  case NonUKResidence => rp.personResidenceType(updatedData)
+                }
               })
               rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             } yield {
@@ -77,7 +81,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                                       index: Int,
                                       edit: Boolean = false,
                                       fromDeclaration: Boolean = false
-                                    ): Result = {
+                                    ) = {
     edit match {
       case true => {
         rp(index - 1).personResidenceType map { residenceType =>

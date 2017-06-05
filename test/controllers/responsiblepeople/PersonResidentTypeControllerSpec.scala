@@ -19,13 +19,12 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -160,11 +159,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               "isUKResidence" -> "false",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
-              "nationality" -> "GB",
-              "dateOfBirth.day" -> "24",
-              "dateOfBirth.month" -> "2",
-              "dateOfBirth.year" -> "1990",
-              "passportType" -> "03"
+              "nationality" -> "GB"
             )
 
             val responsiblePeople = ResponsiblePeople(
@@ -196,10 +191,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
               val newRequest = request.withFormUrlEncodedBody(
                 "isUKResidence" -> "false",
-                "dateOfBirth.day" -> "24",
-                "dateOfBirth.month" -> "2",
-                "dateOfBirth.year" -> "1990",
-                "passportType" -> "03",
                 "nino" -> nextNino,
                 "countryOfBirth" -> "GB",
                 "nationality" -> "GB"
@@ -237,10 +228,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
               val newRequest = request.withFormUrlEncodedBody(
                 "isUKResidence" -> "true",
-                "dateOfBirth.day" -> "24",
-                "dateOfBirth.month" -> "2",
-                "dateOfBirth.year" -> "1990",
-                "passportType" -> "03",
                 "nino" -> nextNino,
                 "countryOfBirth" -> "GB",
                 "nationality" -> "GB"
@@ -358,6 +345,63 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             _ mustBe testNino
           }
 
+        }
+
+        "removes data from uk passport and no uk passport" when {
+          "data is changed from no to yes in edit" in new Fixture {
+
+            val nino = nextNino
+
+            val countryCode = "GB"
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "isUKResidence" -> "true",
+              "nino" -> nino,
+              "countryOfBirth" -> countryCode,
+              "nationality" -> countryCode
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              personResidenceType = Some(
+                PersonResidenceType(
+                  UKResidence(nino),
+                  Some(Country(countryCode, countryCode)),
+                  None
+                )
+              ),
+              ukPassport = Some(UKPassportNo),
+              nonUKPassport = Some(NonUKPassportYes("22654321"))
+            )
+
+            val personName = PersonName("firstname", None, "lastname", None, None)
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+
+            verify(controller.dataCacheConnector)
+              .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
+              personResidenceType = Some(PersonResidenceType(
+                UKResidence(nino),
+                Some(Country(countryCode, countryCode)),
+                Some(Country(countryCode, countryCode))
+              )),
+              ukPassport = None,
+              nonUKPassport = None,
+              hasChanged = true
+            ))))(any(), any(), any())
+
+          }
         }
       }
 
