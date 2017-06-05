@@ -204,12 +204,31 @@ $(function () {
   }
 
   var dupFeeNotFoundDiv = $('.dup_feenotfound');
-  if(dupFeeNotFoundDiv != null){
+  if(dupFeeNotFoundDiv.length) {
+
     $('#get-help-action').remove();
-    $('.report-error__content').find('h2').remove();
-    $('.report-error__content').find('p').remove();
-    $($('#error-feedback-form').find('.form-group-compound')[2]).css('visibility','hidden');
-     $($('#error-feedback-form').find('.form-group-compound')[3]).css('visibility','hidden');
+    var container = $('.report-error__content');
+    container.find('h2').remove();
+    container.find('p').remove();
+
+    var reportActionField = $('#report-action');
+    var reportErrorField = $('#report-error');
+
+    var css = {
+        visibility: 'hidden',
+        height: 0
+    };
+
+    reportActionField
+        .val('Submit my application')
+        .closest('.form-group-compound')
+        .css(css);
+
+    reportErrorField
+        .val('Paying for my application')
+        .closest('.form-group-compound')
+        .css(css);
+
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
 
   }

@@ -20,22 +20,28 @@
 @import models.FeeResponse
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_], m: Messages, lang: Lang)
+
 @getHelpForm = {
-@config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
 }
 
 <h2>@Messages("status.submissionreadyforreview.duplicate.title")</h2>
 <p>@Messages("status.submissionreadyforreview.duplicate.description")</p>
 <p>@Messages("status.submissionreadyforreview.duplicate.description2")</p>
 
-@detailsSummary(summary = Messages("status.submissionreadyforreview.duplicate.link")){
-@feeResponse match {
-        case Some(fee) => {@include.status.fee_details_dup(fee)}
+@detailsSummary(summary = Messages("status.submissionreadyforreview.duplicate.link")) {
+    @feeResponse match {
+        case Some(fee) => {
+            @include.status.fee_details_dup(fee)
+        }
         case None => {
-<p>@Messages("fee.details.dup_nofees.heading")</p>
-<div class="dup_feenotfound"><div class="get-help-form">
-    @getHelpForm
-</div></div>}
-}
+            <p>@Messages("fee.details.dup_nofees.heading")</p>
+            <div class="dup_feenotfound">
+                <div class="get-help-form">
+                    @getHelpForm
+                </div>
+            </div>
+        }
+    }
 }
