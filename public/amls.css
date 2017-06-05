@@ -1227,3 +1227,7 @@ details {
 .duplicate-submission-page .report-error__content > p {
     display: none
 }
+
+.dup_feenotfound .report-error {
+  margin: 0;
+}

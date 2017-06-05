@@ -17,7 +17,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import models.SubmissionResponse
+import models.{SubmissionResponse, SubscriptionResponse}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.Play
 import services.{RenewalService, StatusService, SubmissionService}
@@ -31,39 +31,44 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait SubmissionController extends BaseController {
 
   private[controllers] def subscriptionService: SubmissionService
+
   private[controllers] def statusService: StatusService
+
   private[controllers] def renewalService: RenewalService
 
   private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     renewalService.getRenewal flatMap {
-      case Some(r) =>subscriptionService.renewalAmendment(r)
+      case Some(r) => subscriptionService.renewalAmendment(r)
       case _ => subscriptionService.variation
     }
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request => {
-      statusService.getStatus.flatMap[SubmissionResponse] {
-        case SubmissionReadyForReview => subscriptionService.update
-        case SubmissionDecisionApproved => subscriptionService.variation
-        case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
-          case Some(r) =>subscriptionService.renewal(r)
-          case _ => subscriptionService.variation
+    implicit authContext =>
+      implicit request => {
+        statusService.getStatus.flatMap[SubmissionResponse] {
+          case SubmissionReadyForReview => subscriptionService.update
+          case SubmissionDecisionApproved => subscriptionService.variation
+          case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
+            case Some(r) => subscriptionService.renewal(r)
+            case _ => subscriptionService.variation
+          }
+          case RenewalSubmitted(_) => handleRenewalAmendment()
+          case _ => subscriptionService.subscribe
         }
-        case RenewalSubmitted(_) => handleRenewalAmendment()
-        case _ => subscriptionService.subscribe
+      }.map {
+        case SubscriptionResponse(_, _, _, Some(true)) => Redirect(controllers.routes.LandingController.get())
+        case _ => Redirect(controllers.routes.ConfirmationController.get())
+      } recover {
+        case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
       }
-    }.map {
-      _ => Redirect(controllers.routes.ConfirmationController.get())
-    } recover {
-      case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
-    }
   }
 }
 
 object SubmissionController extends SubmissionController {
   // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
+
   override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val subscriptionService: SubmissionService = SubmissionService
   override private[controllers] val statusService: StatusService = StatusService

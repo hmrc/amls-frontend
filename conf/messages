@@ -485,6 +485,10 @@ status.submissionready.buttontext = Submit application
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = Your application will be reviewed by HM Revenue and Customs.
 status.submissionreadyforreview.description2 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
+status.submissionreadyforreview.duplicate.title = Something went wrong with your submission
+status.submissionreadyforreview.duplicate.description = We’ve definitely received your application, but we can’t tell if you paid your application fee.
+status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there’s nothing to worry about. When HMRC deals with your application they'll be able to match your payment to your submission.
+status.submissionreadyforreview.duplicate.link = If you haven't paid the fee
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
 status.submissiondecisionsupervised.renewal.btn = Renew supervision
@@ -549,6 +553,8 @@ status.submittedForReview.submitteddate.text = Application submitted {0}
 
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
+fee.details.dup.heading = If you haven’t paid, you'll need to make a payment. You’ll see a breakdown of your fees before you make the payment.
+fee.details.dup_nofees.heading = If you haven’t paid, you'll need to make a payment. Please give us some details of your situation and an adviser will contact you to take payment.
 fee.details.registration.fee.lbl = Your registration fee
 fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.

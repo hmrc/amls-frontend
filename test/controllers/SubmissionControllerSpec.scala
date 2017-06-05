@@ -73,20 +73,36 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
     difference = Some(0)
   )
 
-  "SubmissionController" must {
+  "SubmissionController" when {
 
-    "post must return the response from the service correctly when Submission Ready" in new Fixture {
+    "subscribing" must {
 
-      when {
-        controller.subscriptionService.subscribe(any(), any(), any())
-      } thenReturn Future.successful(response)
+      "return to the confirmation page on first submission" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+        when {
+          controller.subscriptionService.subscribe(any(), any(), any())
+        } thenReturn Future.successful(response)
 
-      val result = controller.post()(request)
+        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+      }
+
+      "return to the landing controller when recovers from duplicate response" in new Fixture {
+        when {
+          controller.subscriptionService.subscribe(any(), any(), any())
+        } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
+
+        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+      }
     }
 
     "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
