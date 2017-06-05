@@ -63,11 +63,12 @@ object UKPassport {
     case UKPassportNo => Map("ukPassport" -> Seq("false"))
   }
 
-  implicit val jsonReads: Reads[UKPassport] =
+  implicit val jsonReads: Reads[UKPassport] = {
     (__ \ "ukPassport").read[Boolean] flatMap {
       case true => (__ \ "ukPassportNumber").read[String] map (UKPassportYes apply _)
       case false => Reads(_ => JsSuccess(UKPassportNo))
     }
+  }
 
   implicit val jsonWrites = Writes[UKPassport] {
     case UKPassportYes(value) => Json.obj(
