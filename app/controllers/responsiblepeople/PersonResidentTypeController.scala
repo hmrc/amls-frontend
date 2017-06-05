@@ -59,7 +59,8 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
-                val updatedData = data.copy(nationality = nationality)
+                val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
+                val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
                 data.isUKResidence match {
                   case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
                   case NonUKResidence => rp.personResidenceType(updatedData)

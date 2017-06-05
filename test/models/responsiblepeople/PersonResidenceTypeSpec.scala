@@ -85,6 +85,19 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
             )))
         }
 
+        "country has is missing" in {
+          val nino = nextNino
+          val ukModel = Map(
+            "isUKResidence" -> Seq("true"),
+            "nino" -> Seq(nino),
+            "countryOfBirth" -> Seq(""),
+            "nationality" -> Seq("GB")
+          )
+
+          PersonResidenceType.formRule.validate(ukModel) must
+            be(Valid(PersonResidenceType(UKResidence(nino), None, Some(Country("United Kingdom", "GB")))))
+        }
+
         "UK" when {
           "nino is missing" in {
             val ukModel = Map(

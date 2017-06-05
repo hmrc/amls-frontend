@@ -350,6 +350,9 @@ POST        /responsible-people/responsible-person-registered/:index    controll
 GET         /responsible-people/remove/:index                           controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
 POST        /responsible-people/remove/:index                           controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String)
 
+GET         /responsible-people/country-of-birth/:index                 @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+POST        /responsible-people/country-of-birth/:index                 @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+
 GET         /responsible-people/your-answers                            controllers.responsiblepeople.YourAnswersController.get()
 
 GET         /accountancy-service-provider/what-you-need                 controllers.asp.WhatYouNeedController.get()

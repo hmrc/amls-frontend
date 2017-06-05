@@ -95,6 +95,32 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         }
 
+        "with pre-populated data (non uk)" in new Fixture {
+          val responsiblePeople = ResponsiblePeople(
+            personName = Some(personName),
+            personResidenceType = Some(PersonResidenceType(
+              isUKResidence = residenceTypeNonUK,
+              countryOfBirth = Some(Country("United Kingdom", "GB")),
+              nationality = Some(Country("United Kingdom", "GB"))))
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
+          document.select("input[name=dateOfBirth.day]").`val` must be("2")
+          document.select("input[name=dateOfBirth.month]").`val` must be("12")
+          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
+
+          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
+
+        }
+
       }
 
       "return NOT_FOUND" when {
