@@ -38,12 +38,16 @@
 
  <div class="grid-layout grid-layout--stacked">
   <div class="grid-layout__column grid-layout__column--2-3">
-  @businessName.map {bn =>
    <div class="panel-indent panel-indent--gutter panel-border-wide">
-    <p class="heading-small">@Messages("status.business")</p>
-    <p>@bn</p>
+    @businessName.map { bn =>
+      <p class="heading-small">@Messages("status.business")</p>
+      <p>@bn</p>
+    }
+    @deregistrationDate.map { date =>
+     <p class="heading-small">@Messages("lbl.registration.status")</p>
+     <p>@Messages("status.submissionderegistered.status", DateHelper.formatDate(date))</p>
+    }
    </div>
-  }
   </div>
   <div class="grid-layout__column grid-layout__column--1-3">
   @if(ApplicationConfig.notificationsToggle) {
