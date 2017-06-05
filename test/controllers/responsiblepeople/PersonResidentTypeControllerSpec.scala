@@ -298,9 +298,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           when(controller.dataCacheConnector.fetchAll(any(), any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
 

@@ -154,7 +154,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
     "submit with valid nationality data (with other country)" in new Fixture {
@@ -174,7 +174,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
     "submit with valid data in edit mode" in new Fixture {
