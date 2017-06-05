@@ -21,5 +21,3 @@
 
 @deregistrationDate.map { date => <p>@messages("status.submissionderegistered.description", DateHelper.formatDate(date))</p> }
 <p>@messages("status.submissionderegistered.description2")</p>
-
-<p><a class="button" href="@routes.LandingController.get().url">@messages("status.submissionderegistered.button-text")</a></p>
