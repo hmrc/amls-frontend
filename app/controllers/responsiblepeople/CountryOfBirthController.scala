@@ -33,15 +33,12 @@ import scala.concurrent.Future
 class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
-  private def getCountryOfBirth(countryOfBirth: Option[Country]): CountryOfBirth = {
-    countryOfBirth match {
-      case Some(country) => if(country.code != "GB") {
-        CountryOfBirth(false, Some(country))
+  private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
+     if(countryOfBirth.code != "GB") {
+        CountryOfBirth(false, Some(countryOfBirth))
       } else {
         CountryOfBirth(true, None)
       }
-      case _ => CountryOfBirth(true, None)
-    }
   }
 
   def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
@@ -49,8 +46,11 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), Some(personResidenceType), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-            Ok(country_of_birth(Form2[CountryOfBirth](getCountryOfBirth(personResidenceType.countryOfBirth)),
-              edit, index, fromDeclaration, personName.titleName))
+            personResidenceType.countryOfBirth match {
+              case Some(country) => Ok (country_of_birth (Form2[CountryOfBirth] (getCountryOfBirth(country)),
+                edit, index, fromDeclaration, personName.titleName))
+              case _ => Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+            }
           case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
             Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _ => NotFound(notFoundView)

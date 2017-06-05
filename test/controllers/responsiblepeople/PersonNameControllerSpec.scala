@@ -165,7 +165,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
             val result = personNameController.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.CountryOfBirthController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.PersonResidentTypeController.get(RecordId).url))
           }
         }
         "go to DetailedAnswersController" when {
