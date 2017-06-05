@@ -94,7 +94,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
       }
       case false => {
         data.isUKResidence match {
-          case UKResidence(_) => Redirect(routes.ContactDetailsController.get(index, edit, fromDeclaration))
+          case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
           case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
         }
       }

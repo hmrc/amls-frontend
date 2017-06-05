@@ -62,7 +62,7 @@ class DateOfBirthController @Inject()(
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.ContactDetailsController.get(index, edit, fromDeclaration))
+              case false => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
             }
 
           }.recoverWith {

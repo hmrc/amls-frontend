@@ -113,12 +113,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val document = Jsoup.parse(contentAsString(result))
           document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
-          document.select("input[name=dateOfBirth.day]").`val` must be("2")
-          document.select("input[name=dateOfBirth.month]").`val` must be("12")
-          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
-
-          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
-
         }
 
       }
@@ -143,7 +137,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
     "post" must {
       "submit with a valid form" which {
 
-        "goes to ContactDetailsController" when {
+        "goes to CountryOfBirthController" when {
           "uk residence" in new Fixture   {
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -174,7 +168,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
           }
         }
 

@@ -108,7 +108,7 @@ class DateOfBirthControllerSpec extends GenericTestHelper with MockitoSugar {
     "post is called" must {
 
       "edit is false" must {
-        "go to ContactDetailsController" in new Fixture {
+        "go to CountryOfBirthController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "dateOfBirth.day" -> "1",
@@ -126,7 +126,7 @@ class DateOfBirthControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
 
         }
       }
