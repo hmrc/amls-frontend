@@ -62,7 +62,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
                 data.isUKResidence match {
-                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
+                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None, dateOfBirth = None)
                   case NonUKResidence => rp.personResidenceType(updatedData)
                 }
               })

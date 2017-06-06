@@ -25,6 +25,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{NonUKPassport, ResponsiblePeople}
 import play.api.i18n.MessagesApi
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
@@ -58,14 +59,15 @@ class PersonNonUKPassportController @Inject()(
             BadRequest(person_non_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
-            for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                rp.copy(nonUKPassport = Some(data))
-              }
+            (for {
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+                rp.nonUKPassport(data)
+              })
+              rp <- OptionT.fromOption[Future](getData[ResponsiblePeople](cache, index))
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
-            }
+              case true if rp.dateOfBirth.isDefined => Redirect(routes.DetailedAnswersController.get(index))
+              case false => Redirect(routes.DateOfBirthController.get(index,edit,fromDeclaration))
+            }) getOrElse NotFound(notFoundView)
 
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

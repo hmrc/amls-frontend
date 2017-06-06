@@ -660,7 +660,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "nonUKPassportNumber" -> "87654321",
       "countryOfBirth" -> "GB",
       "nationality" -> "GB"
-    ),abo
+    ),
     "contactDetails" -> Json.obj(
       "phoneNumber" -> "07702743555",
       "emailAddress" -> "test@test.com"
