@@ -92,7 +92,7 @@ class summarySpec extends GenericTestHelper
 
     "include the provided data for a UKAccount" in new ViewFixture {
 
-      private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
+      private val title = "Account Name"
 
       private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.sortcode") + ": 00-00-00",
@@ -130,7 +130,7 @@ class summarySpec extends GenericTestHelper
 
     "include the provided data for a NonUKAccountNumber" in new ViewFixture {
 
-      private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
+      private val title = "Account Name"
 
       private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.accountnumber") + ": 56789",
@@ -166,7 +166,7 @@ class summarySpec extends GenericTestHelper
 
     "include the provided data for a NonUKIBANNumber" in new ViewFixture {
 
-      private val title = Messages("bankdetails.bankaccount.accountname") + ": " + "Account Name"
+      private val title = "Account Name"
 
       private val bankDetailsSet = List(
         Messages("bankdetails.bankaccount.iban") + ": 000000000",
