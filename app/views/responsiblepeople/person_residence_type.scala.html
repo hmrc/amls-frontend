@@ -38,8 +38,9 @@
                 legendHidden = true,
                 panel = false
             ) {
-                @errorGroup(
-                    field = f("isUKResidence")
+                @rpErrorGroup(
+                    field = f("isUKResidence"),
+                    personName = personName
                 ) {
                     @radio(
                         f = f("isUKResidence"),

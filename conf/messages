@@ -188,7 +188,7 @@ error.required.eab.info.about.penalty = Give a brief description of what the pen
 error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
-error.required.rp.is.uk.resident = Select yes if this person is a UK resident
+error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
 error.required.rp.birth.country = Enter an official country name: for example, Holland is Netherlands
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
@@ -222,8 +222,8 @@ error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
-error.required.uk.passport = Select yes if {0} has a UK passport
-error.required.non.uk.passport = Select yes if {0} has a passport from another country
+error.required.select.uk.passport = Select yes if {0} has a UK passport
+error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 
 
 ############################### Trust and company service providers ###############################

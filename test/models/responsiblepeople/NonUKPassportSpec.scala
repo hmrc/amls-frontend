@@ -53,6 +53,7 @@ class NonUKPassportSpec extends PlaySpec {
     }
   }
 
+
   "NonUKPassport" must {
 
     "pass validation for NoPassport" in {
@@ -100,7 +101,7 @@ class NonUKPassportSpec extends PlaySpec {
 
       NonUKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "nonUKPassport") -> Seq(ValidationError("error.required.non.uk.passport"))
+          (Path \ "nonUKPassport") -> Seq(ValidationError("error.required.select.non.uk.passport"))
         )))
     }
 
