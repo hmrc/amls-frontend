@@ -56,12 +56,13 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
-                val updatedData = data.copy(nationality = nationality)
+                val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
+                val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
                 rp.personResidenceType(updatedData)
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.NationalityController.get(index, edit, fromDeclaration))
+              case false => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

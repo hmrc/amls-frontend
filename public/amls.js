@@ -203,4 +203,34 @@ $(function () {
     duplicateErrorWrapper.find('.report-error__toggle').remove();
   }
 
+  var dupFeeNotFoundDiv = $('.dup_feenotfound');
+  if(dupFeeNotFoundDiv.length) {
+
+    $('#get-help-action').remove();
+    var container = $('.report-error__content');
+    container.find('h2').remove();
+    container.find('p').remove();
+
+    var reportActionField = $('#report-action');
+    var reportErrorField = $('#report-error');
+
+    var css = {
+        visibility: 'hidden',
+        height: 0
+    };
+
+    reportActionField
+        .val('Submit my application')
+        .closest('.form-group-compound')
+        .css(css);
+
+    reportErrorField
+        .val('Paying for my application')
+        .closest('.form-group-compound')
+        .css(css);
+
+    $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
+
+  }
+
 });

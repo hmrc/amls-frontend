@@ -20,9 +20,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, InternalAccountant}
-import models.status.{NotCompleted, SubmissionReadyForReview}
+import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.LocalDateTime
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -94,6 +94,8 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+
       val result = declarationController.get()(request)
       status(result) must be(OK)
 
@@ -106,6 +108,8 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
     "report error if retrieval of amlsRegNo fails" in new Fixture {
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -207,6 +211,8 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+
       val result = declarationController.get()(request)
       status(result) must be(OK)
 
@@ -216,9 +222,43 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
       contentAsString(result) must include(Messages("submit.registration"))
     }
 
+    "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
+
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
+
+      val result = declarationController.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must include(addPerson.firstName)
+      contentAsString(result) must include(addPerson.middleName mkString)
+      contentAsString(result) must include(addPerson.lastName)
+      contentAsString(result) must include(Messages("submit.renewal.application"))
+    }
+
+    "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
+
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+
+      val result = declarationController.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must include(addPerson.firstName)
+      contentAsString(result) must include(addPerson.middleName mkString)
+      contentAsString(result) must include(addPerson.lastName)
+      contentAsString(result) must include(Messages("submit.amendment.application"))
+    }
+
     "report error if retrieval of amlsRegNo fails" in new Fixture {
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
