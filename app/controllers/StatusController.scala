@@ -117,7 +117,7 @@ trait StatusController extends BaseController {
       case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
-        businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x => Some(x.processingDate)), ApplicationConfig.allowWithdrawalToggle,
+        businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
         fromDuplicateSubmission))
     }
   }
