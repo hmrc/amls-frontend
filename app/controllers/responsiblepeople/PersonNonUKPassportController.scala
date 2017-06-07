@@ -18,14 +18,14 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{NonUKPassport, ResponsiblePeople}
 import play.api.i18n.MessagesApi
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
@@ -51,6 +51,18 @@ class PersonNonUKPassportController @Inject()(
         }
   }
 
+  private def redirectToNextPage(result: Option[CacheMap], index: Int,
+                         edit: Boolean, fromDeclaration: Boolean )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
+    (for {
+      cache <- result
+      rp <- getData[ResponsiblePeople](cache, index)
+    } yield rp.dateOfBirth.isDefined && edit match {
+      case true => Redirect(routes.DetailedAnswersController.get(index))
+      case false => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
+    }).getOrElse(NotFound(notFoundView))
+  }
+
+
   def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -59,15 +71,11 @@ class PersonNonUKPassportController @Inject()(
             BadRequest(person_non_uk_passport(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
-            (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
-                rp.nonUKPassport(data)
-              })
-              rp <- OptionT.fromOption[Future](getData[ResponsiblePeople](cache, index))
-            } yield edit match {
-              case true if rp.dateOfBirth.isDefined => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.DateOfBirthController.get(index,edit,fromDeclaration))
-            }) getOrElse NotFound(notFoundView)
+            for {
+              result <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+                rp.copy(nonUKPassport = Some(data))
+              }
+            } yield redirectToNextPage(result, index, edit, fromDeclaration)
 
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

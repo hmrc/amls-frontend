@@ -17,7 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{UKPassportYes, _}
+import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePeople}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -26,7 +27,9 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -118,24 +121,24 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
       "edit is false" must {
         "go to DateOfBirthController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
-              "nonUKPassport" -> "true",
-              "nonUKPassportNumber" -> passportNumber
-            )
+          val newRequest = request.withFormUrlEncodedBody(
+            "nonUKPassport" -> "true",
+            "nonUKPassportNumber" -> passportNumber
+          )
 
-            val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePeople()
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName)))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            val result = controller.post(1)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
 
-          }
+        }
       }
 
       "edit is true" must {
@@ -148,11 +151,12 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName),
+              dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 1,22)))))))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -173,9 +177,6 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -191,11 +192,11 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName)))))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(10)(newRequest)
           status(result) must be(NOT_FOUND)
