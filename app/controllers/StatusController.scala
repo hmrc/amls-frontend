@@ -98,7 +98,7 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        Future.successful(getInitialSubmissionPage(mlrRegNumber, statusInfo, businessNameOption, feeResponse, fromDuplicateSubmission))
+        Future.successful(getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission))
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
             (SubmissionWithdrawn, _) | (DeRegistered, _) =>
@@ -110,14 +110,14 @@ trait StatusController extends BaseController {
   }
 
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
-                                       statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
+                                       status: SubmissionStatus,
                                        businessNameOption: Option[String],
                                        feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent]) = {
-    statusInfo match {
-      case (NotCompleted, _) => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionReady, _) => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionReadyForReview, statusDtls) => Ok(status_submitted(mlrRegNumber.getOrElse(""),
-        businessNameOption, feeResponse, statusDtls.fold[Option[LocalDateTime]](None)(x => Some(x.processingDate)), ApplicationConfig.allowWithdrawalToggle,
+    status match {
+      case NotCompleted => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
+      case SubmissionReady => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
+      case _ => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+        businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
         fromDuplicateSubmission))
     }
   }
