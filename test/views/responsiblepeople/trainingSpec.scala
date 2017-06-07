@@ -36,7 +36,7 @@ class trainingSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
 
       doc.title must be(Messages("responsiblepeople.training.title") + " - " +
         Messages("summary.responsiblepeople")+
@@ -49,7 +49,7 @@ class trainingSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.training.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -60,7 +60,7 @@ class trainingSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
 
       noException must be thrownBy doc.getElementById("training-true")
       noException must be thrownBy doc.getElementById("training-false")
@@ -76,7 +76,7 @@ class trainingSpec extends GenericTestHelper with MustMatchers {
           (Path \ "information") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = views.html.responsiblepeople.training(form2, false, 0, false, "Person Name")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

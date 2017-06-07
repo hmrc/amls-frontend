@@ -35,7 +35,7 @@ class are_they_nominated_officerSpec extends GenericTestHelper with MustMatchers
 
       val name = "firstName lastName"
 
-      def view = views.html.responsiblepeople.are_they_nominated_officer(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.are_they_nominated_officer(form2, true, 1, true, name)
 
       doc.title must be(Messages("responsiblepeople.aretheynominatedofficer.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -54,7 +54,7 @@ class are_they_nominated_officerSpec extends GenericTestHelper with MustMatchers
           (Path \ "isNominatedOfficer") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.are_they_nominated_officer(form2, true, 1, None, "firstName lastName")
+      def view = views.html.responsiblepeople.are_they_nominated_officer(form2, true, 1, true, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
     }

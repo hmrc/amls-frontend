@@ -16,7 +16,6 @@
 
 @import include._
 @import models.responsiblepeople._
-@import models.declaration.BusinessNominatedOfficer
 @import forms2._
 
 @(subtitle: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
@@ -52,7 +51,7 @@
                 }
             }
             <p class="form-block">@Messages("lbl.or")</p>
-            @radio(f("value"), Messages("lbl.register.some.one.else"), BusinessNominatedOfficer.someoneElse)
+            @radio(f("value"), Messages("lbl.register.some.one.else"), "-1")
         }
         @submit()
     }

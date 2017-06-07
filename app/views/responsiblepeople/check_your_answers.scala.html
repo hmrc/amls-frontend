@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import utils.StatusConstants
 
-@(model: Seq[ResponsiblePeople], flow: Option[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Seq[ResponsiblePeople], fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("responsiblepeople.summary.responsible.people", "summary.responsiblepeople")
@@ -55,7 +55,7 @@
         </ul>
     }
 
-    <form method="post" action="@controllers.responsiblepeople.routes.SummaryController.post(flow).url">
+    <form method="post" action="@controllers.responsiblepeople.routes.SummaryController.post(fromDeclaration).url">
         @CSRF.formField
         <button type="submit" name="submit" class="button">
             @Messages("button.checkyouranswers.acceptandcomplete")

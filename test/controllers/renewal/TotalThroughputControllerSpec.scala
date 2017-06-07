@@ -77,11 +77,10 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
 
   "The MSB throughput controller" must {
     "return the view with an empty form when no data exists yet" in new Fixture {
+      val result = controller.get()(request)
 
       when(renewalService.getRenewal(any(), any(), any()))
         .thenReturn(Future.successful(None))
-
-      val result = controller.get()(request)
 
       status(result) mustBe OK
 

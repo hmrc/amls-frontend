@@ -39,7 +39,7 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
       doc.title must be(Messages("responsiblepeople.registeredforselfassessment.title") + " - " +
         Messages("summary.responsiblepeople") +
@@ -51,7 +51,7 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
       heading.html must be(Messages("responsiblepeople.registeredforselfassessment.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -62,7 +62,7 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, false, 0, false, name)
 
       doc.getElementsByAttributeValue("name", "saRegistered") must not be empty
       doc.getElementsByAttributeValue("name", "utrNumber") must not be empty
@@ -77,7 +77,7 @@ class registered_for_self_assessmentSpec extends GenericTestHelper with MustMatc
           (Path \ "utrNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, false, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

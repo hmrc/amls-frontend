@@ -33,25 +33,25 @@ trait PersonNameController extends RepeatingSection with BaseController {
   val dataCacheConnector: DataCacheConnector
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _, _, _, _,_, _))
-          => Ok(person_name(Form2[PersonName](name), edit, index, flow))
+          => Ok(person_name(Form2[PersonName](name), edit, index, fromDeclaration))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_, _, _))
-          => Ok(person_name(EmptyForm, edit, index, flow))
+          => Ok(person_name(EmptyForm, edit, index, fromDeclaration))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
         Form2[PersonName](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index, flow)))
+            Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index, fromDeclaration)))
           case ValidForm(_, data) => {
             for {
               result <- updateDataStrict[ResponsiblePeople](index) { rp =>
@@ -59,7 +59,7 @@ trait PersonNameController extends RepeatingSection with BaseController {
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
+              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, fromDeclaration))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

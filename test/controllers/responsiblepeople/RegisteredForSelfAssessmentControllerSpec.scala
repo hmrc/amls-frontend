@@ -56,7 +56,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
-        val result = controller.get(recordId, false, None)(request)
+        val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
@@ -71,7 +71,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, saRegistered = Some(SaRegisteredYes(utr)))))))
 
-        val result = controller.get(recordId, false, None)(request)
+        val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
@@ -84,7 +84,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get(recordId, false, None)(request)
+        val result = controller.get(recordId)(request)
         status(result) must be(NOT_FOUND)
       }
     }
@@ -98,7 +98,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
 
-        val result = controller.post(recordId, false, None)(newRequest)
+        val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)
 
       }
@@ -112,7 +112,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-        val result = controller.post(99, false, None)(newRequest)
+        val result = controller.post(99)(newRequest)
         status(result) must be(NOT_FOUND)
       }
 
@@ -128,7 +128,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
           when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(recordId, false, None)(newRequest)
+          val result = controller.post(recordId, edit = false)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ExperienceTrainingController.get(recordId).url))
         }
@@ -145,7 +145,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
           when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(recordId, true, None)(newRequest)
+          val result = controller.post(recordId, true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
         }

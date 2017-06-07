@@ -40,7 +40,7 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, None, "FirstName LastName")
+        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
       doc.title must be(Messages("responsiblepeople.experiencetraining.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -54,7 +54,7 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, None, "FirstName LastName")
+        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
       heading.html() must be(Messages("responsiblepeople.experiencetraining.heading", "FirstName LastName"))
     }
@@ -69,7 +69,7 @@ class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "experienceInformation", Seq(ValidationError(messageKey2)))))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, None, "FirstName LastName")
+        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, false, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
       errorSummary.html() must include(messageKey2)

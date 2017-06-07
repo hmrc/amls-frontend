@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -33,7 +33,7 @@
 
     <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
 
-    @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
+    @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, fromDeclaration)) {
 
         <div class="form-group">
         @fieldset(

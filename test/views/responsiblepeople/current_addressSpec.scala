@@ -36,7 +36,7 @@ class current_addressSpec extends GenericTestHelper with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.current_address(form2, true, 1, true, name)
 
       doc.title must be(Messages("responsiblepeople.wherepersonlives.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -75,7 +75,7 @@ class current_addressSpec extends GenericTestHelper with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.current_address(form2, true, 1, true, name)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")

@@ -36,7 +36,7 @@ class person_registeredSpec extends GenericTestHelper with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.person_registered(form2, 1, None)
+      def view = views.html.responsiblepeople.person_registered(form2, 1, true)
 
       doc.title must be(Messages("responsiblepeople.person.registered.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -56,7 +56,7 @@ class person_registeredSpec extends GenericTestHelper with MustMatchers {
           (Path \ "registerAnotherPerson") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.person_registered(form2, 1, None)
+      def view = views.html.responsiblepeople.person_registered(form2, 1, true)
 
       errorSummary.html() must include("not a message Key")
     }

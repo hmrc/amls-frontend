@@ -20,8 +20,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.{BaseController, declaration}
 import models.responsiblepeople.ResponsiblePeople
-import models.status._
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import utils.ControllerHelper
 import views.html.responsiblepeople._
@@ -33,49 +34,45 @@ trait SummaryController extends BaseController {
   val dataCacheConnector: DataCacheConnector
   val statusService : StatusService
 
-  def get(flow: Option[String] = None) = Authorised.async {
+  def get(fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-        case Some(data) => Ok(check_your_answers(data, flow))
+        case Some(data) => Ok(check_your_answers(data, fromDeclaration))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
 
-  def post(flow: Option[String] = None) = Authorised.async {
+  def post(fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      flow match {
-        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case _ => {
+      fromDeclaration match {
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        case true => {
           for {
             status <- statusService.getStatus
             hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-          } yield redirectDependingOnStatus(status, hasNominatedOfficer)
+          } yield status match {
+            case SubmissionReady | NotCompleted => {
+              hasNominatedOfficer match {
+                case true => Redirect(controllers.routes.FeeGuidanceController.get())
+                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+              }
+            }
+            case SubmissionReadyForReview => {
+              hasNominatedOfficer match {
+                case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
+                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+              }
+            }
+            case _ => {
+              hasNominatedOfficer match {
+                case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
+                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
+              }
+            }
+          }
         }
       }
     }
-
-  private def redirectDependingOnStatus(status: SubmissionStatus, hasNominatedOfficer: Boolean) = {
-    status match {
-      case SubmissionReady | NotCompleted => {
-        hasNominatedOfficer match {
-          case true => Redirect(controllers.routes.FeeGuidanceController.get())
-          case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-        }
-      }
-      case SubmissionReadyForReview => {
-        hasNominatedOfficer match {
-          case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
-          case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-        }
-      }
-      case _ => {
-        hasNominatedOfficer match {
-          case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
-          case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
-        }
-      }
-    }
-  }
 }
 
 object SummaryController extends SummaryController {

@@ -182,6 +182,4 @@ object ResponsiblePeople {
   def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())
 
-  val nominatedOfficerFlow = "nominatedofficer"
-
 }

@@ -36,7 +36,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
       doc.title must be(Messages("responsiblepeople.sole.proprietor.another.business.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -50,7 +50,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.sole.proprietor.another.business.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -64,7 +64,7 @@ class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
           (Path \ "soleProprietorOfAnotherBusiness") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, true, "Person Name")
 
       errorSummary.html() must include("not a message Key")
 
