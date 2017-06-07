@@ -20,7 +20,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.declaration.AddPerson
-import models.status.SubmissionReadyForReview
+import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, Result}
 import services.StatusService
@@ -36,7 +36,26 @@ trait DeclarationController extends BaseController {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 
-  def get(): Action[AnyContent] = defaultView
+  def get() = Authorised.async {
+    implicit authContext => implicit request => {
+      dataCacheConnector.fetch[AddPerson](AddPerson.key) flatMap {
+        case Some(addPerson) => {
+          val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
+          for{
+            status <- statusService.getStatus
+          } yield status match {
+            case ReadyForRenewal(_) => Ok(
+              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
+            case SubmissionReadyForReview if AmendmentsToggle.feature => Ok(
+              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
+            case _ => Ok(
+              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
+          }
+        }
+        case _ => redirectToAddPersonPage
+      }
+    }
+  }
 
   def getWithAmendment = AmendmentsToggle.feature match {
     case b@true => declarationView("declaration.declaration.amendment.title", "submit.amendment.application", b)

@@ -16,7 +16,6 @@
 
 package views.status
 
-
 import forms.EmptyForm
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
@@ -25,6 +24,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{DateHelper, GenericTestHelper}
 import views.Fixture
+import cats.implicits._
 
 class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
@@ -75,6 +75,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
 
+
     }
 
     "contains 'update/amend information' content and link" in new ViewFixture {
@@ -112,6 +113,24 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
     }
 
+    "show specific content when view input has feeData and submitted date and is duplicate" in new ViewFixture {
+
+      val feeResponse = FeeResponse(SubscriptionResponseType, "XAML00000000000"
+        , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
+        new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+
+
+      def view = views.html.status.status_submitted("XAML0000000000", Some("business name"), Some(feeResponse), Some(LocalDateTime.now()), false, true)
+
+      val date = DateHelper.formatDate(LocalDate.now())
+      doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must be
+      Messages("status.submittedForReview.submitteddate.text", date)
+      doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.submissionreadyforreview.duplicate.link"))
+      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.duplicate.description")).text() must be(
+        Messages("status.submissionreadyforreview.duplicate.description"))
+      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.duplicate.description2")).text() must be(
+        Messages("status.submissionreadyforreview.duplicate.description2"))
+    }
 
     "contains expected survey link for supervised status" in new ViewFixture {
       def view =  views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, None)

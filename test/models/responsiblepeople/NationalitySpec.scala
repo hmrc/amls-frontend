@@ -33,14 +33,10 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
       Nationality.formRule.validate(urlFormEncoded) must be(Valid(British))
     }
 
-    "successfully pass validation for Irish" in {
-      val urlFormEncoded = Map("nationality" -> Seq("02"))
-      Nationality.formRule.validate(urlFormEncoded) must be(Valid(Irish))
-    }
 
     "successfully pass validation for otherCountry" in {
       val urlFormEncoded = Map(
-        "nationality" -> Seq("03"),
+        "nationality" -> Seq("02"),
         "otherCountry" -> Seq("GB")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Valid(OtherCountry(Country("United Kingdom", "GB"))))
@@ -48,7 +44,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "fail validation if not Other value" in {
       val urlFormEncoded = Map(
-        "nationality" -> Seq("03"),
+        "nationality" -> Seq("02"),
         "otherCountry" -> Seq("")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
@@ -58,7 +54,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "fail validation if invalid Other value" in {
       val urlFormEncoded = Map(
-        "nationality" -> Seq("03"),
+        "nationality" -> Seq("02"),
         "otherCountry" -> Seq("invalid")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
@@ -88,13 +84,9 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
         Nationality.formWrite.writes(British) must be(Map("nationality" -> Seq("01")))
       }
 
-      "load the correct value in the form for Irish" in {
-        Nationality.formWrite.writes(Irish) must be(Map("nationality" -> Seq("02")))
-      }
-
       "load the correct value in the form for Other value" in {
         Nationality.formWrite.writes(OtherCountry(Country("United Kingdom", "GB"))) must be(Map(
-          "nationality" -> Seq("03"),
+          "nationality" -> Seq("02"),
           "otherCountry" -> Seq("GB")
         ))
       }
@@ -106,11 +98,6 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
     "Read json and write the option British successfully" in {
 
       Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath))
-    }
-
-    "Read json and write the option Irish successfully" in {
-
-      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath))
     }
 
     "Read read and write the option `other country` successfully" in {

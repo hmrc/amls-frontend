@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.implicits._
 import connectors.{DataCacheConnector, FeeConnector}
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
@@ -29,7 +30,9 @@ import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,9 +40,13 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
+class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite {
 
   val cacheMap = mock[CacheMap]
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
+    .build()
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -306,6 +313,64 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
       }
 
+      "application status is SubmissionWithdrawn" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionWithdrawn, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+      }
+
+      "application status is DeRegistered" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((DeRegistered, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+      }
+
       "application status is RenewalSubmitted" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
@@ -478,6 +543,164 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
         contentAsString(result) must include(Messages("status.renewalnotsubmitted.description"))
 
       }
+    }
+
+    "show the withdrawal link" when {
+      "the status is 'ready for review'" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(
+            Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
+      }
+    }
+
+    "show the deregister link" when {
+      "the status is 'approved'" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(
+            Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+      }
+    }
+  }
+}
+
+class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAppPerSuite {
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val cacheMap = mock[CacheMap]
+
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
+    }
+
+    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+    val statusResponse = mock[ReadStatusResponse]
+    when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+      .thenReturn(
+        Some(BusinessMatching(Some(reviewDetails), None)))
+
+    when(controller.landingService.cacheMap(any(), any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+
+    when(controller.statusService.getDetailedStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+  }
+
+  "The status controller" must {
+    "not show the withdrawal link" in new Fixture {
+      val result = controller.get()(request)
+      val doc = Jsoup.parse(contentAsString(result))
+
+      Option(doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
+    }
+  }
+}
+
+class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAppPerSuite {
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-deregister" -> false)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val cacheMap = mock[CacheMap]
+
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
+    }
+
+    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+    val statusResponse = mock[ReadStatusResponse]
+    when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+      .thenReturn(
+        Some(BusinessMatching(Some(reviewDetails), None)))
+
+    when(controller.landingService.cacheMap(any(), any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+
+    when(controller.statusService.getDetailedStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+  }
+
+  "The status controller" must {
+    "not show the deregister link" in new Fixture {
+      val result = controller.get()(request)
+      val doc = Jsoup.parse(contentAsString(result))
+
+      Option(doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
     }
   }
 }

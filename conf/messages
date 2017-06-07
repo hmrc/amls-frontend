@@ -220,6 +220,7 @@ error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of 
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
+error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 
 
 ############################### Trust and company service providers ###############################
@@ -482,6 +483,10 @@ status.submissionready.buttontext = Submit application
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = Your application will be reviewed by HM Revenue and Customs.
 status.submissionreadyforreview.description2 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
+status.submissionreadyforreview.duplicate.title = Something went wrong with your submission
+status.submissionreadyforreview.duplicate.description = We’ve definitely received your application, but we can’t tell if you paid your application fee.
+status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there’s nothing to worry about. When HMRC deals with your application they'll be able to match your payment to your submission.
+status.submissionreadyforreview.duplicate.link = If you haven't paid the fee
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
 status.submissiondecisionsupervised.renewal.btn = Renew supervision
@@ -500,6 +505,16 @@ status.submissiondecisionrevoked.description2 = Your business is not registered 
 status.submissiondecisionexpired.title = Application expired
 status.submissiondecisionexpired.description = Your supervision has expired.
 status.submissiondecisionexpired.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionwithdrawn.title = Application withdrawn
+status.submissiondecisionwithdrawn.status = Withdrawn
+status.submissiondecisionwithdrawn.description = Your application has been withdrawn.
+status.submissiondecisionwithdrawn.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionwithdrawn.button-text = Submit new application
+status.submissionderegistered.title = Application de-registered
+status.submissionderegistered.status = De-registered on {0}
+status.submissionderegistered.description = Your business is now de-registered.
+status.submissionderegistered.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissionderegistered.button-text = Submit new application
 
 status.renewalsubmitted.text = Currently supervised, renewal under review
 status.renewalsubmitted.description = Renewal under review
@@ -513,7 +528,20 @@ status.renewalincomplete.description2 = You’ve started the renewal application
 status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
+status.withdraw.link-text = withdraw application
+status.withdraw.title = Withdraw application
+status.withdraw.registration-date.label = Registration submitted {0}
+status.withdraw.button-text = Withdraw application
+status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
+  I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
 
+status.deregister.title = De-register business
+status.deregister.link-text = de-register business
+status.deregister.end-date.text = Currently registered to {0}
+status.deregister.button-text = De-register
+status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
+  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
+  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
@@ -521,7 +549,10 @@ status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
 
+
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
+fee.details.dup.heading = If you haven’t paid, you'll need to make a payment. You’ll see a breakdown of your fees before you make the payment.
+fee.details.dup_nofees.heading = If you haven’t paid, you'll need to make a payment. Please give us some details of your situation and an adviser will contact you to take payment.
 fee.details.registration.fee.lbl = Your registration fee
 fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.
@@ -984,9 +1015,9 @@ bankdetails.accountdetails.title = Account details
 bankdetails.summary.bankaccount = Bank Account
 bankdetails.summary.check.info = Please check all the information you have provided.
 bankdetails.summary.add.account = Add another bank account
-bankdetails.summary.accounttype.lbl.01 = Personal
-bankdetails.summary.accounttype.lbl.02 = My business’s account
-bankdetails.summary.accounttype.lbl.03 = Another business’s account
+bankdetails.summary.accounttype.lbl.01 = A personal bank account
+bankdetails.summary.accounttype.lbl.02 = A business account belonging to this business
+bankdetails.summary.accounttype.lbl.03 = A business account belonging to another business
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
 bankdetails.bank.account.registered.title = Bank account registered
@@ -1072,6 +1103,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 
 submit.registration = Submit registration
 submit.amendment.application = Update information
+submit.renewal.application = Submit Renewal
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1283,7 +1315,6 @@ responsiblepeople.nationality.heading = What’s the nationality of {0}?
 responsiblepeople.nationality.title = What’s the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
-responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.summary.responsible.people = People you have registered
@@ -1301,7 +1332,9 @@ responsiblepeople.new.home.title = What’s this person’s new home address?
 responsiblepeople.detailed_answer.tell.us.moved = Tell us that {0} has moved
 responsiblepeople.movedaddress.heading = Has {0} moved from this home address?
 responsiblepeople.movedaddress.title = Has this person moved from this home address?
-
+responsiblepeople.country.of.birth.title = Was this person born in the UK?
+responsiblepeople.country.of.birth.heading = Was {0} born in the UK?
+responsiblepeople.country.of.birth.txt.lbl = What country was {0} born in?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:

@@ -21,7 +21,7 @@ import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, Previo
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{AgentCompanyDetails, TradingPremises}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.PrivateMethodTester
@@ -60,6 +60,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .build()
+
+    val nonEmptyTradingPremises = TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))
 
     val submissionFee = getInt(s"$rootServices.amounts.registration")
     val premisesFee = getInt(s"$rootServices.amounts.premises")
@@ -108,8 +110,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             )
 
             val tradingpremises = Seq(
-              TradingPremises(),
-              TradingPremises()
+              nonEmptyTradingPremises,
+              nonEmptyTradingPremises
             )
 
             val responsiblepeople = Seq(
@@ -159,8 +161,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             )
 
             val tradingpremises = Seq(
-              TradingPremises(),
-              TradingPremises()
+              nonEmptyTradingPremises,
+              nonEmptyTradingPremises
             )
 
             val responsiblepeople = Seq(
@@ -214,8 +216,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
           )
 
           val tradingpremises = Seq(
-            TradingPremises(),
-            TradingPremises()
+            nonEmptyTradingPremises,
+            nonEmptyTradingPremises
           )
 
           val responsiblepeople = Seq(
@@ -268,8 +270,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
           )
 
           val tradingpremises = Seq(
-            TradingPremises(),
-            TradingPremises()
+            nonEmptyTradingPremises,
+            nonEmptyTradingPremises
           )
 
           val responsiblepeople = Seq(
@@ -321,8 +323,8 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
           )
 
           val tradingpremises = Seq(
-            TradingPremises(),
-            TradingPremises()
+            nonEmptyTradingPremises,
+            nonEmptyTradingPremises
           )
 
           val responsiblepeople = Seq(

@@ -173,15 +173,31 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     }
 
     "return RenewalSubmitted" in {
-
       when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
       whenReady(TestStatusService.getStatus) {
         _ mustEqual RenewalSubmitted(None)
       }
-
     }
-  }
 
+    "return SubmissionWithdrawn" in {
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Withdrawal")))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual SubmissionWithdrawn
+      }
+    }
+
+    "return DeRegistered" in {
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "De-Registered")))
+      whenReady(TestStatusService.getStatus) {
+        _ mustEqual DeRegistered
+      }
+    }
+
+  }
 }

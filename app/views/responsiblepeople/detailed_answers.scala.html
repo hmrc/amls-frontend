@@ -157,7 +157,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
-            editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             <p>@prt.countryOfBirth</p>

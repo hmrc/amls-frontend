@@ -517,7 +517,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     //scalastyle:off magic.number
     val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), new LocalDate(1990, 2, 24))
     val personName = PersonName("first", Some("middle"), "last", Some(previousName), Some("name"))
-    val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
+    val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
     val saRegistered = SaRegisteredYes("0123456789")
     val contactDetails = ContactDetails("07702743555", "test@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
@@ -544,7 +544,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     val personName = PersonName("first", Some("middle"), "last", None, None)
     val contactDetails = ContactDetails("07000000000", "new@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
-    val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
+    val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
     val saRegistered = SaRegisteredNo
     val vatRegistered = VATRegisteredYes("12345678")
     val positions = Positions(Set(Director, SoleProprietor), startDate)

@@ -26,8 +26,6 @@ sealed trait Nationality
 
 case object British extends Nationality
 
-case object Irish extends Nationality
-
 case class OtherCountry(name: Country) extends Nationality
 
 object Nationality {
@@ -39,8 +37,7 @@ object Nationality {
       import jto.validation.forms.Rules._
       (readerURLFormEncoded \ "nationality").read[String].withMessage("error.required.nationality") flatMap {
         case "01" => British
-        case "02" => Irish
-        case "03" =>
+        case "02" =>
           (readerURLFormEncoded \ "otherCountry").read[Country] map OtherCountry.apply
         case _ =>
           (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
@@ -49,8 +46,7 @@ object Nationality {
 
   implicit val formWrite: Write[Nationality, UrlFormEncoded] = Write {
     case British => "nationality" -> "01"
-    case Irish => "nationality" -> "02"
-    case OtherCountry(value) => Map("nationality" -> "03",
+    case OtherCountry(value) => Map("nationality" -> "02",
       "otherCountry" -> value.code)
   }
 
@@ -59,17 +55,15 @@ object Nationality {
 
     (__ \ "nationality").read[String].flatMap[Nationality] {
       case "01" => British
-      case "02" => Irish
-      case "03" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
+      case "02" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
       case _ => play.api.data.validation.ValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites = Writes[Nationality] {
     case British => Json.obj("nationality" -> "01")
-    case Irish => Json.obj("nationality" -> "02")
     case OtherCountry(value) => Json.obj(
-      "nationality" -> "03",
+      "nationality" -> "02",
       "otherCountry" -> value
     )
   }
@@ -84,7 +78,6 @@ object Nationality {
   implicit def getNationality(country: Country): Nationality = {
     country match {
       case Country("United Kingdom", "GB") => British
-      case Country("Ireland", "IE") => Irish
       case someCountry => OtherCountry(someCountry)
     }
   }
@@ -92,7 +85,6 @@ object Nationality {
   implicit def getCountry(nationality: Nationality): Country = {
     nationality match {
       case British =>Country("United Kingdom", "GB")
-      case Irish => Country("Ireland", "IE")
       case OtherCountry(someCountry) => someCountry
     }
   }
