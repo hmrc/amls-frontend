@@ -16,14 +16,14 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@(subtitle: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading("declaration.register.responsible.person.title", "submit.registration")
+    @heading("declaration.register.responsible.person.title", subtitle)
 }
 
 @whatyouneed(
-    title = Messages("declaration.register.responsible.person.title") + " - " + Messages("submit.registration"),
+    title = Messages("declaration.register.responsible.person.title") + " - " + Messages(subtitle),
     heading = header,
     sidebar = sidebar
 ) {

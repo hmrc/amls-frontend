@@ -20,6 +20,8 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.status.{SubmissionReadyForReview, ReadyForRenewal}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -28,13 +30,18 @@ import scala.concurrent.Future
 @Singleton
 class RegisterResponsiblePersonController @Inject()(
                                                      val dataCacheConnector: DataCacheConnector,
-                                                     val authConnector: AuthConnector
+                                                     val authConnector: AuthConnector,
+                                                     val statusService: StatusService
                                                    ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request => {
 
-      Future.successful(Ok(views.html.declaration.register_responsible_person()))
+      statusService.getStatus map {
+        case ReadyForRenewal(_) => Ok(views.html.declaration.register_responsible_person("submit.renewal.application"))
+        case SubmissionReadyForReview if AmendmentsToggle.feature => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
+        case _ => Ok(views.html.declaration.register_responsible_person("submit.registration"))
+      }
     }
   }
 }

@@ -87,19 +87,6 @@ trait AddPersonController extends BaseController {
         }
       }
     }
-
-  def registerResponsiblePerson() = Authorised.async {
-    implicit authContext => implicit request => {
-
-      // need to be able to pass the next index through to the page after this.  probably do need a post?
-//      val index = responsiblePeople.indexWhere {
-//        case model if !model.isComplete => true
-//        case _ => false
-//      }
-      Future.successful(Ok(views.html.declaration.register_responsible_person()))
-    }
-  }
-
 }
 
 object AddPersonController extends AddPersonController {

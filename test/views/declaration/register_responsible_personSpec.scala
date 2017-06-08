@@ -29,23 +29,25 @@ class register_responsible_personSpec extends GenericTestHelper with MustMatcher
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.declaration.register_responsible_person()
+      def view = views.html.declaration.register_responsible_person("subheading")
 
       doc.title must startWith(Messages("declaration.register.responsible.person.title"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.declaration.register_responsible_person()
+      def view = views.html.declaration.register_responsible_person("subheading")
 
       heading.html must be (Messages("declaration.register.responsible.person.title"))
-      subHeading.html must include (Messages("submit.registration"))
+      subHeading.html must include (Messages("subheading"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.declaration.register_responsible_person()
+      def view = views.html.declaration.register_responsible_person("subheading")
 
       html must include(Messages("declaration.register.responsible.person.description"))
       html must include(Messages("responsiblepeople.whomustregister.title"))
+
+      html must include(Messages("subheading"))
 
       html must include(Messages("responsiblepeople.whomustregister.line_1"))
       html must include(Messages("responsiblepeople.whomustregister.line_2"))
