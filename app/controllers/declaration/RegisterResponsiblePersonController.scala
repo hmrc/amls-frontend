@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.status.{SubmissionReadyForReview, ReadyForRenewal}
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, ReadyForRenewal}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -38,8 +38,9 @@ class RegisterResponsiblePersonController @Inject()(
     implicit authContext => implicit request => {
 
       statusService.getStatus map {
-        case ReadyForRenewal(_) => Ok(views.html.declaration.register_responsible_person("submit.renewal.application"))
-        case SubmissionReadyForReview if AmendmentsToggle.feature => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
+        case ReadyForRenewal(_) => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
+        case SubmissionDecisionApproved => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
+        case SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
         case _ => Ok(views.html.declaration.register_responsible_person("submit.registration"))
       }
     }
