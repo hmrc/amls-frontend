@@ -38,9 +38,9 @@ class RegisterResponsiblePersonController @Inject()(
     implicit authContext => implicit request => {
 
       statusService.getStatus map {
-        case ReadyForRenewal(_) => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
-        case SubmissionDecisionApproved => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
-        case SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
+        case ReadyForRenewal(_) |
+             SubmissionDecisionApproved |
+             SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
         case _ => Ok(views.html.declaration.register_responsible_person("submit.registration"))
       }
     }
