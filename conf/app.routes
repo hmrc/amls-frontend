@@ -30,6 +30,10 @@ POST        /satisfaction-survey                                        controll
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
+GET         /about-the-business/contacting-you-phone                    controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
+POST        /about-the-business/contacting-you-phone                    controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
+
+
 GET         /about-the-business/previously-registered                   controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/previously-registered                   controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 

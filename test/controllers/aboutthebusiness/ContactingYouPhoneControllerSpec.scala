@@ -20,22 +20,19 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class ContactingYouPhoneControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
@@ -44,7 +41,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ContactingYouController {
+    val controller = new ContactingYouPhoneController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -52,7 +49,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "BusinessHasEmailController" must {
+  "ContactingYouPhoneController" must {
 
     "Get" must {
 
@@ -63,7 +60,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.phone.title"))
       }
 
       "load the page with the pre populated data" in new Fixture {
@@ -73,15 +70,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
-      }
-
-      "load the page with no data" in new Fixture {
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-        val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.ConfirmRegisteredOfficeController.get().url)
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.phone.title"))
       }
 
     }
@@ -91,8 +80,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
       "on post of valid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "confirmEmail" -> "test@test.com",
-          "email" -> "test@test.com"
+          "phoneNumber" -> "+44 (0)123 456-7890"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -103,14 +91,14 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.ContactingYouPhoneController.get().url))
+        redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
       }
 
 
       "on post of incomplete data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "email" -> "test@test.com"
+          "phoneNumber" -> ""
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -122,28 +110,6 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
-
-      "on post of different email addresses" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "confirmEmail" -> "test@test.com",
-          "email" -> "test1@test.com"
-        )
-
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
-
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-      }
-
-
-
-
-
 
     }
   }

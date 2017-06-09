@@ -22,12 +22,19 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness._
 import views.html.aboutthebusiness._
+
+import scala.concurrent.Future
 
 trait ContactingYouController extends BaseController {
 
   val dataCache: DataCacheConnector
+
+  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): Option[ContactingYou] = {
+    contactingYou.fold[Option[ContactingYou]](Some(ContactingYou()))(x => Some(x.copy(email = Some(data.email))))
+  }
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -47,27 +54,25 @@ trait ContactingYouController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[ContactingYouForm](request.body) match {
+      Form2[ContactingYouEmail](request.body) match {
         case f: InvalidForm =>
-          for {
-            aboutTheBusiness <-
-            dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-          } yield aboutTheBusiness match {
-            case Some(AboutTheBusiness(_, _,_, _, _, _, _, _)) =>
-              BadRequest(contacting_you(f, edit))
-            case _ =>
-              Redirect(routes.ContactingYouController.get(edit))
-          }
+              Future.successful(BadRequest(contacting_you(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.contactingYou(data)
-            )
-          } yield {
-            (aboutTheBusiness, edit) match {
-              case (Some(AboutTheBusiness(_,_,_,_,_,_,Some(correspondenceAddress),_)), true) => Redirect(routes.SummaryController.get())
-              case _ => Redirect(routes.LettersAddressController.get(edit))
+          if (!data.email.equals(data.confirmEmail)) {
+            val in = InvalidForm(Map("email" -> Seq(data.email), "confirmEmail" -> Seq(data.confirmEmail)),
+              List(( Path \ "",List(ValidationError(List("error.mismatch.atb.email"))))))
+            Future.successful(BadRequest(contacting_you(in, edit)))
+          }else{
+            for {
+              aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+              _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
+                aboutTheBusiness.copy(contactingYou = updateData(aboutTheBusiness.contactingYou, data))
+              )
+            } yield {
+              edit match {
+                case true => Redirect(routes.SummaryController.get())
+                case _ => Redirect(routes.ContactingYouPhoneController.get(edit))
+              }
             }
           }
       }
