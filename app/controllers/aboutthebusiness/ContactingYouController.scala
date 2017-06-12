@@ -32,8 +32,8 @@ trait ContactingYouController extends BaseController {
 
   val dataCache: DataCacheConnector
 
-  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): Option[ContactingYou] = {
-    contactingYou.fold[Option[ContactingYou]](Some(ContactingYou()))(x => Some(x.copy(email = Some(data.email))))
+  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
+    contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(email = Some(data.email)))
   }
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -66,7 +66,7 @@ trait ContactingYouController extends BaseController {
             for {
               aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
               _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
-                aboutTheBusiness.copy(contactingYou = updateData(aboutTheBusiness.contactingYou, data))
+                aboutTheBusiness.contactingYou(updateData(aboutTheBusiness.contactingYou, data))
               )
             } yield {
               edit match {

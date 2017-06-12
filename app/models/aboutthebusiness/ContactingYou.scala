@@ -27,12 +27,6 @@ case class ContactingYou(
 
 object ContactingYou {
 
-  /*implicit def convert(c: ContactingYouForm): ContactingYou =
-    ContactingYou(
-      phoneNumber = c.phoneNumber,
-      email = c.email
-    )*/
-
   implicit val formats = Json.format[ContactingYou]
 
   implicit val formWrites: Write[ContactingYou, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -44,24 +38,3 @@ object ContactingYou {
       ) (unlift(ContactingYou.unapply _))
   }
 }
-
-/*case class ContactingYouForm(
-                              phoneNumber: Option[String],
-                              email: Option[String]
-                            )
-
-object ContactingYouForm {
-
-  implicit val formats = Json.format[ContactingYouForm]
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYouForm] =
-    From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import jto.validation.forms.Rules._
-      (
-        (__ \ "phoneNumber").read(optionR(phoneNumberType)) ~
-          (__ \ "email").read(optionR(emailType))
-        )(ContactingYouForm.apply _)
-    }
-}*/
