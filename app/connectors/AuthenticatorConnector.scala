@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
-
+import play.api.http.Status._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -38,7 +38,7 @@ class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
           Logger.info("[AuthenticatorConnector] Current user profile was refreshed")
           response
         }
-      case _ => Future.successful(HttpResponse(200))
+      case _ => Future.successful(HttpResponse(OK))
     }
 
   }

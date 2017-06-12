@@ -17,8 +17,9 @@
 package controllers
 
 import config.AMLSAuthConnector
+import connectors.AuthenticatorConnector
 import models.{SubmissionResponse, SubscriptionResponse}
-import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status._
 import play.api.Play
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -27,6 +28,7 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
 import views.html.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait SubmissionController extends BaseController {
 
@@ -35,6 +37,8 @@ trait SubmissionController extends BaseController {
   private[controllers] def statusService: StatusService
 
   private[controllers] def renewalService: RenewalService
+
+  private[controllers] def authenticator: AuthenticatorConnector
 
   private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     renewalService.getRenewal flatMap {
@@ -46,22 +50,27 @@ trait SubmissionController extends BaseController {
   def post() = Authorised.async {
     implicit authContext =>
       implicit request => {
-        statusService.getStatus.flatMap[SubmissionResponse] {
-          case SubmissionReadyForReview => subscriptionService.update
-          case SubmissionDecisionApproved => subscriptionService.variation
-          case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
-            case Some(r) => subscriptionService.renewal(r)
-            case _ => subscriptionService.variation
+        statusService.getStatus.flatMap[SubmissionResponse](subscribeBasedOnStatus)
+      }.flatMap {
+        case SubscriptionResponse(_, _, _, Some(true)) =>
+          authenticator.refreshProfile map { _ =>
+            Redirect(controllers.routes.LandingController.get())
           }
-          case RenewalSubmitted(_) => handleRenewalAmendment()
-          case _ => subscriptionService.subscribe
-        }
-      }.map {
-        case SubscriptionResponse(_, _, _, Some(true)) => Redirect(controllers.routes.LandingController.get())
-        case _ => Redirect(controllers.routes.ConfirmationController.get())
+        case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
       } recover {
         case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
       }
+  }
+
+  private def subscribeBasedOnStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = status match {
+    case SubmissionReadyForReview => subscriptionService.update
+    case SubmissionDecisionApproved => subscriptionService.variation
+    case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
+      case Some(r) => subscriptionService.renewal(r)
+      case _ => subscriptionService.variation
+    }
+    case RenewalSubmitted(_) => handleRenewalAmendment()
+    case _ => subscriptionService.subscribe
   }
 }
 
@@ -72,4 +81,5 @@ object SubmissionController extends SubmissionController {
   override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val subscriptionService: SubmissionService = SubmissionService
   override private[controllers] val statusService: StatusService = StatusService
+  override private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
 }

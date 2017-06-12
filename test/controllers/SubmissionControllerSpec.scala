@@ -16,6 +16,7 @@
 
 package controllers
 
+import connectors.AuthenticatorConnector
 import models.renewal.Renewal
 import models.status._
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
@@ -26,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.Upstream4xxResponse
+import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -44,6 +45,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
       override private[controllers] val statusService: StatusService = mock[StatusService]
       override private[controllers] val renewalService = mock[RenewalService]
+      override private[controllers] val authenticator = mock[AuthenticatorConnector]
     }
 
   }
@@ -96,12 +98,17 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
           controller.subscriptionService.subscribe(any(), any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
 
+        when {
+          controller.authenticator.refreshProfile(any(), any())
+        } thenReturn Future.successful(HttpResponse(OK))
+
         when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+        verify(controller.authenticator).refreshProfile(any(), any())
       }
     }
 
