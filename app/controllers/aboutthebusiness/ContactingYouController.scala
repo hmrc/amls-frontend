@@ -33,7 +33,7 @@ trait ContactingYouController extends BaseController {
   val dataCache: DataCacheConnector
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
-    contactingYou.fold[ContactingYou](ContactingYou(Some(data.email)))(x => x.copy(email = Some(data.email)))
+    contactingYou.fold[ContactingYou](ContactingYou(email = Some(data.email)))(x => x.copy(email = Some(data.email)))
   }
 
   def get(edit: Boolean = false) = Authorised.async {
