@@ -33,7 +33,7 @@ trait ContactingYouController extends BaseController {
   val dataCache: DataCacheConnector
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
-    contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(email = Some(data.email)))
+    contactingYou.fold[ContactingYou](ContactingYou(Some(data.email)))(x => x.copy(email = Some(data.email)))
   }
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -42,13 +42,10 @@ trait ContactingYouController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _)) =>
-          Ok(contacting_you(Form2[ContactingYou](details), edit))
-        case Some(AboutTheBusiness(_,_, _, _, None, _, _, _)) =>
-          Ok(contacting_you(EmptyForm, edit))
+        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _)) if details.email.isDefined =>
+          Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(Some(details.email.getOrElse("")),"")), edit))
         case _ =>
-          // TODO: Make sure this redirects to the right place
-          Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+          Ok(contacting_you(EmptyForm, edit))
       }
   }
 
