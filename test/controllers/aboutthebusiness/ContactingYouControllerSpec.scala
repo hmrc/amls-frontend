@@ -80,8 +80,8 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
         when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.ConfirmRegisteredOfficeController.get().url)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
       }
 
     }

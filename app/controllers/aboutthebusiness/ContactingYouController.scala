@@ -55,11 +55,6 @@ trait ContactingYouController extends BaseController {
         case f: InvalidForm =>
               Future.successful(BadRequest(contacting_you(f, edit)))
         case ValidForm(_, data) =>
-          if (!data.email.equals(data.confirmEmail)) {
-            val in = InvalidForm(Map("email" -> Seq(data.email), "confirmEmail" -> Seq(data.confirmEmail)),
-              List(( Path \ "",List(ValidationError(List("error.mismatch.atb.email"))))))
-            Future.successful(BadRequest(contacting_you(in, edit)))
-          }else{
             for {
               aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
               _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
@@ -72,7 +67,6 @@ trait ContactingYouController extends BaseController {
               }
             }
           }
-      }
   }
 }
 

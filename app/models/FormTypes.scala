@@ -194,10 +194,22 @@ object FormTypes {
       ValidationError("error.expected.dateofchange.date.after.activitystartdate", activityStartDate.toString("dd-MM-yyyy"))))
   }
 
+  val confirmEmailMatchRuleMapping = Rule.fromMapping[(String, String), (String,String)] {
+    case email@(s1, s2) if s1.equals(s2) => Valid(email)
+    case _ => Invalid(Seq(
+      ValidationError(List("error.mismatch.atb.email"))))
+  }
+
   val dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
       (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
+
+  val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "email").read(emailType) ~
+      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping).repath(_ => Path \ "email")
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {

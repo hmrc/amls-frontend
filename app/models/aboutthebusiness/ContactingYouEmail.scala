@@ -30,10 +30,8 @@ object ContactingYouEmail {
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
       import jto.validation.forms.Rules._
-      (
-        (__ \ "email").read(emailType) ~
-          (__ \ "confirmEmail").read(emailType)
-        )(ContactingYouEmail.apply _)
+
+      __.read(confirmEmailMatchRule).map (x => ContactingYouEmail(x._1, x._2))
     }
 
   implicit val formWrites: Write[ContactingYouEmail, UrlFormEncoded] =
