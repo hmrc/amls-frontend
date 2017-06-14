@@ -196,8 +196,7 @@ object FormTypes {
 
   val confirmEmailMatchRuleMapping = Rule.fromMapping[(String, String), (String,String)] {
     case email@(s1, s2) if s1.equals(s2) => Valid(email)
-    case _ => Invalid(Seq(
-      ValidationError(List("error.mismatch.atb.email"))))
+    case _ => Invalid(Seq(ValidationError(List("error.mismatch.atb.email"))))
   }
 
   val dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
