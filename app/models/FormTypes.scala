@@ -209,7 +209,7 @@ object FormTypes {
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "email").read(emailType) ~
-      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping).repath(_ => Path \ "email")
+      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping)
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
