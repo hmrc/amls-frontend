@@ -104,7 +104,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is auto-rejected for failure to pay" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ContactType.ApplicationAutorejectionForFailureToPay),
             None,
@@ -133,7 +133,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is registration variation approval" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ContactType.RegistrationVariationApproval),
             None,
@@ -158,7 +158,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ContactType.DeRegistrationEffectiveDateChange),
             None,
@@ -187,7 +187,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is ReminderToPayForVariation" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ReminderToPayForVariation),
             None,
@@ -203,7 +203,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is ReminderToPayForApplication" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ReminderToPayForApplication),
             None,
@@ -219,7 +219,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is ReminderToPayForRenewal" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ReminderToPayForRenewal),
             None,
@@ -235,7 +235,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is ReminderToPayForManualCharges" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ReminderToPayForManualCharges),
             None,
@@ -251,7 +251,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is ApplicationApproval" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(ApplicationApproval),
             None,
@@ -267,7 +267,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is RenewalApproval" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(RenewalApproval),
             None,
@@ -283,7 +283,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is AutoExpiryOfRegistration" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(AutoExpiryOfRegistration),
             None,
@@ -299,7 +299,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "contact type is RenewalReminder" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(RenewalReminder),
             None,
@@ -317,7 +317,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val message = "<P># Test Heading</P><P>* bullet 1</P><P>* bullet 2</P><P>* bullet 3</P>"
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             Some(MindedToReject),
             None,
@@ -336,7 +336,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
     "return None" when {
       "getMessageDetails returns None and message is of type with end date only message" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
@@ -347,7 +347,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "getMessageDetails returns None and message is of type with end date and ref number message" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
@@ -358,7 +358,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
       "getMessageDetails returns None and message is of type with ref number, amount and status message" in new Fixture {
 
-        when(amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsBySafeId(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))

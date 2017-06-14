@@ -50,12 +50,43 @@ trait AmlsNotificationConnector {
     }
   }
 
-  def getMessageDetails(amlsRegistrationNumber: String, contactNumber: String)
+  def fetchAllBySafeId(safeId: String)(implicit
+                                        headerCarrier: HeaderCarrier,
+                                        reqW: Writes[Seq[NotificationRow]],
+                                        ac: AuthContext
+  ): Future[Seq[NotificationRow]] = {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
+    val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
+    Logger.debug(s"$prefix - Request : $safeId")
+    httpGet.GET[Seq[NotificationRow]](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: $response")
+        response
+    }
+  }
+
+  def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String)
                        (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
+    httpGet.GET[NotificationDetails](url)
+      .map {Some(_)}
+      .recover {
+        case _:NotFoundException => None
+      }
+  }
+
+  def getMessageDetailsBySafeId(safeId: String, contactNumber: String)
+                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val url = s"$baseUrl/$accountType/$accountId/safeId/$safeId/$contactNumber"
     httpGet.GET[NotificationDetails](url)
       .map {Some(_)}
       .recover {
