@@ -345,7 +345,9 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
         when(controller.dataCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        controller.post(1, true)(newRequest)
+        val result = controller.post(1, true)(newRequest)
+        status(result) must be(SEE_OTHER)
+
         verify(controller.dataCacheConnector)
           .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
           ukPassport = Some(UKPassportYes(ukPassportNumber)),
@@ -354,8 +356,6 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
         ))))(any(), any(), any())
 
       }
-
     }
   }
-
 }

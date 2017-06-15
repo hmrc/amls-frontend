@@ -59,6 +59,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         val residenceTypeNonUK = NonUKResidence
 
         "without pre-populated data" in new Fixture {
+
           val responsiblePeople = ResponsiblePeople(Some(personName))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -405,19 +406,19 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
 
             verify(controller.dataCacheConnector)
               .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
               personResidenceType = Some(PersonResidenceType(
                 UKResidence(nino),
                 Some(Country(countryCode, countryCode)),
-                Some(Country(countryCode, countryCode))
+                None
               )),
               ukPassport = None,
               nonUKPassport = None,
               hasChanged = true
             ))))(any(), any(), any())
-
           }
         }
       }

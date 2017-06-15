@@ -84,11 +84,20 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def ukPassport(p: UKPassport): ResponsiblePeople =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p))
 
+  def ukPassport(p: Option[UKPassport]): ResponsiblePeople =
+    this.copy(ukPassport = p, hasChanged = hasChanged || this.personResidenceType != p)
+
   def nonUKPassport(p: NonUKPassport): ResponsiblePeople =
     this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p))
 
+  def nonUKPassport(p: Option[NonUKPassport]): ResponsiblePeople =
+    this.copy(nonUKPassport = p, hasChanged = hasChanged || !this.nonUKPassport.contains(p))
+
   def dateOfBirth(p: DateOfBirth): ResponsiblePeople =
     this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p))
+
+  def dateOfBirth(p: Option[DateOfBirth]): ResponsiblePeople =
+    this.copy(dateOfBirth = p, hasChanged = hasChanged || !this.dateOfBirth.contains(p))
 
   def status(p: String): ResponsiblePeople =
     this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
@@ -158,6 +167,8 @@ object ResponsiblePeople {
   }
 
   import play.api.libs.json._
+  import play.api.libs.functional.syntax._
+  import play.api.libs.json._
 
   val key = "responsible-people"
 
@@ -165,16 +176,44 @@ object ResponsiblePeople {
     override def apply(): String = key
   }
 
+  def constant[A](x: A): Reads[A] = new Reads[A] {
+    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+  }
+
   implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
 
+  val oldNonUkPassportReader: Reads[Option[NonUKPassport]] = {
+      (__ \ "personResidenceType" \ "nonUKPassportNumber").readNullable[String] map {
+        case Some(p) => Some(NonUKPassportYes(p))
+        case _ => Some(NoPassport)
+      }
+  }
+  val nonUkPassportReader: Reads[Option[NonUKPassport]] = {
+    (__ \ "nonUKPassport").readNullable[NonUKPassport] flatMap {
+      case None => oldNonUkPassportReader
+      case p => constant(p)
+    }
+  }
+
+  val oldUkPassportReader: Reads[Option[UKPassport]] = {
+    (__ \ "personResidenceType" \ "UKPassportNumber").readNullable[String] map {
+      case Some(p) => Some(UKPassportYes(p))
+      case _ => Some(UKPassportNo)
+    }
+  }
+  val UkPassportReader: Reads[Option[UKPassport]] = {
+    (__ \ "UKPassport").readNullable[UKPassport] flatMap {
+      case None => oldUkPassportReader
+      case p => constant(p)
+    }
+  }
+
   implicit val reads: Reads[ResponsiblePeople] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
     (
       (__ \ "personName").readNullable[PersonName] and
         (__ \ "personResidenceType").readNullable[PersonResidenceType] and
-        (__ \ "ukPassport").readNullable[UKPassport] and
-        (__ \ "nonUKPassport").readNullable[NonUKPassport] and
+        __.read(UkPassportReader) and
+        __.read(nonUkPassportReader) and
         (__ \ "dateOfBirth").readNullable[DateOfBirth] and
         (__ \ "contactDetails").readNullable[ContactDetails] and
         (__ \ "addressHistory").readNullable[ResponsiblePersonAddressHistory] and

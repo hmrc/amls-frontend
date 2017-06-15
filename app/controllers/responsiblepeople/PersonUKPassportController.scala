@@ -92,6 +92,5 @@ class PersonUKPassportController @Inject()(
         case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, fromDeclaration))
       }
     }
-
   }
 }
