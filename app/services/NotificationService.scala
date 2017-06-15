@@ -33,7 +33,7 @@ import scala.concurrent.Future
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
 
   def getNotifications(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
-    amlsNotificationConnector.fetchAllByAmlsRegNo(safeId) map {
+    amlsNotificationConnector.fetchAllBySafeId(safeId) map {
       case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }

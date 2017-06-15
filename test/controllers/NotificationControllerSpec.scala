@@ -35,7 +35,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{AuthEnrolmentsService, NotificationService}
+import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -89,6 +89,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService = mock[StatusService]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -113,6 +114,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         .thenReturn(Future.successful(Some(testBusinessMatch)))
 
       when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
+
+      when(controller.statusService.getReadStatus(any(), any(), any()))
         .thenReturn(Future.successful(Some("")))
 
       when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
@@ -436,6 +440,7 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService = mock[StatusService]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]

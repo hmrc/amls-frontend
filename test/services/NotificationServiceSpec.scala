@@ -93,7 +93,7 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
     "get all notifications in order" in new Fixture {
 
-      when(amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(), any(), any()))
+      when(amlsNotificationConnector.fetchAllBySafeId(any())(any(), any(), any()))
         .thenReturn(Future.successful(testList))
 
       val result = await(service.getNotifications("testNo"))
