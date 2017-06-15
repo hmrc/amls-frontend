@@ -196,8 +196,7 @@ object FormTypes {
 
   val confirmEmailMatchRuleMapping = Rule.fromMapping[(String, String), (String,String)] {
     case email@(s1, s2) if s1.equals(s2) => Valid(email)
-    case _ => Invalid(Seq(
-      ValidationError(List("error.mismatch.atb.email"))))
+    case _ => Invalid(Seq(ValidationError(List("error.mismatch.atb.email"))))
   }
 
   val dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
@@ -209,7 +208,7 @@ object FormTypes {
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "email").read(emailType) ~
-      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping).repath(_ => Path \ "email")
+      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping)
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {

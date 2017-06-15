@@ -24,7 +24,11 @@
         <ul>
             @form.errors.map { case (path, errors) =>
                 <li>
-                    <a href="#@form(path).id">@errors.toMessage</a>
+                    @if(path.path.nonEmpty) {
+                        <a href="#@form(path).id">@errors.toMessage</a>
+                    } else {
+                        <a href="#">@errors.toMessage</a>
+                    }
                 </li>
             }
         </ul>
