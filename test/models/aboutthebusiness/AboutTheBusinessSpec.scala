@@ -34,7 +34,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
   val regForCorpTax = CorporationTaxRegisteredYes("1234567890")
 
-  val contactingYou = ContactingYou("1234567890", "test@test.com")
+  val contactingYou = ContactingYou(Some("1234567890"), Some("test@test.com"))
 
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
@@ -254,9 +254,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
       "is different" must {
         "set the hasChanged & contactingYou Properties" in {
-          val res = completeModel.contactingYou(ContactingYou("0000000000", "new@testvalue.com"))
+          val res = completeModel.contactingYou(ContactingYou(Some("0000000000"), Some("new@testvalue.com")))
           res.hasChanged must be (true)
-          res.contactingYou must be (Some(ContactingYou("0000000000", "new@testvalue.com")))
+          res.contactingYou must be (Some(ContactingYou(Some("0000000000"), Some("new@testvalue.com"))))
         }
       }
     }

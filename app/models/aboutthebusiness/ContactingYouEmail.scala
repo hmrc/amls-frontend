@@ -16,23 +16,27 @@
 
 package models.aboutthebusiness
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-class ContactingYouSpec extends PlaySpec with MockitoSugar {
-  "Contacting You Form Details" must {
+case class ContactingYouEmail(email: String, confirmEmail: String)
 
-    "write correct data" in {
-      val model = ContactingYou(Some("1234567890"), Some("test@test.com"))
-      ContactingYou.formWrites.writes(model) must
-        be(Map(
-          "phoneNumber" -> Seq("1234567890"),
-          "email" -> Seq("test@test.com")
-        ))
+object ContactingYouEmail {
+
+  implicit val formats = Json.format[ContactingYouEmail]
+
+  implicit val formRule: Rule[UrlFormEncoded, ContactingYouEmail] =
+    From[UrlFormEncoded] { __ =>
+      import models.FormTypes._
+      import jto.validation.forms.Rules._
+
+      __.read(confirmEmailMatchRule).map (x => ContactingYouEmail(x._1, x._2))
     }
 
-  }
+  implicit val formWrites: Write[ContactingYouEmail, UrlFormEncoded] =
+    Write {
+      case ContactingYouEmail(b,_) =>
+        Map("email" -> Seq(b.toString))
+    }
 }

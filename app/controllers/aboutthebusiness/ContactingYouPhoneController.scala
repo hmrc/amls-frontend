@@ -22,18 +22,17 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness._
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait ContactingYouController extends BaseController {
+trait ContactingYouPhoneController extends BaseController {
 
   val dataCache: DataCacheConnector
 
-  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
-    contactingYou.fold[ContactingYou](ContactingYou(email = Some(data.email)))(x => x.copy(email = Some(data.email)))
+  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
+    contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))
   }
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -42,35 +41,34 @@ trait ContactingYouController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _)) if details.email.isDefined =>
-          Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(Some(details.email.getOrElse("")),"")), edit))
-        case _ =>
-          Ok(contacting_you(EmptyForm, edit))
+        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _)) if details.phoneNumber.isDefined =>
+          Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone (details.phoneNumber.getOrElse(""))), edit))
+        case _ => Ok(contacting_you_phone(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[ContactingYouEmail](request.body) match {
+      Form2[ContactingYouPhone](request.body) match {
         case f: InvalidForm =>
-              Future.successful(BadRequest(contacting_you(f, edit)))
+          Future.successful(BadRequest(contacting_you_phone(f, edit)))
         case ValidForm(_, data) =>
-            for {
-              aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-              _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
+          for {
+            aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
                 aboutTheBusiness.contactingYou(updateData(aboutTheBusiness.contactingYou, data))
-              )
-            } yield {
-              edit match {
-                case true => Redirect(routes.SummaryController.get())
-                case _ => Redirect(routes.ContactingYouPhoneController.get(edit))
-              }
+            )
+          } yield {
+            edit match {
+              case true => Redirect(routes.SummaryController.get())
+              case _ => Redirect(routes.LettersAddressController.get(edit))
             }
           }
+      }
   }
 }
 
-object ContactingYouController extends ContactingYouController {
+object ContactingYouPhoneController extends ContactingYouPhoneController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCache = DataCacheConnector

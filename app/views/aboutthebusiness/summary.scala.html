@@ -88,15 +88,25 @@
     }
 
     @model.contactingYou.map { c =>
+
         @checkYourAnswers(
-            question = Messages("aboutthebusiness.contactingyou.title"),
+            question = Messages("aboutthebusiness.contactingyou.email.title"),
             editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
-                <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
                 <li>@Messages("aboutthebusiness.contactingyou.email.lbl"): @c.email</li>
             </ul>
         }
+
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.contactingyou.phone.title"),
+            editUrl = controllers.aboutthebusiness.routes.ContactingYouPhoneController.get(true).toString
+        ) {
+            <ul class="list">
+                <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
+            </ul>
+        }
+
     @model.correspondenceAddress.map { ca =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
