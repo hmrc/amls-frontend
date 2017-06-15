@@ -65,7 +65,8 @@ class summarySpec extends GenericTestHelper
       ("aboutthebusiness.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
       ("aboutthebusiness.registeredforcorporationtax.title",checkElementTextIncludes(_, "aboutthebusiness.registeredforcorporationtax.taxReference", "3456")),
       ("aboutthebusiness.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
-      ("aboutthebusiness.contactingyou.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl", "01234567890","aboutthebusiness.contactingyou.email.lbl", "test@test.com")),
+      ("aboutthebusiness.contactingyou.email.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.email.lbl", "test@test.com")),
+      ("aboutthebusiness.contactingyou.phone.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl", "01234567890")),
       ("aboutthebusiness.correspondenceaddress.postal.address",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
@@ -78,7 +79,7 @@ class summarySpec extends GenericTestHelper
           Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),
-          Some(ContactingYou("01234567890", "test@test.com")),
+          Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           false

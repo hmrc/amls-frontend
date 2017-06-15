@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
+import models.declaration.release7._
 import models.status.SubmissionReadyForReview
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
@@ -51,12 +52,27 @@ trait AddPersonController extends BaseController {
         case ValidForm(_, data) =>
           dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
             statusService.getStatus map {
+              case _ if isResponsiblePerson(data) => {
+                Redirect(routes.RegisterResponsiblePersonController.get())
+              }
               case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
               case _ => Redirect(routes.DeclarationController.get())
             }
           }
       }
     }
+  }
+
+  private def isResponsiblePerson(data: AddPerson): Boolean = {
+
+    val roleList = data.roleWithinBusiness.items
+
+    roleList.contains(BeneficialShareholder) ||
+    roleList.contains(Director) ||
+    roleList.contains(Partner) ||
+    roleList.contains(SoleProprietor) ||
+    roleList.contains(DesignatedMember) ||
+    roleList.contains(NominatedOfficer)
   }
 
   private def addPersonView(status: Status, form: Form2[AddPerson])

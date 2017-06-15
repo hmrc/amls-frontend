@@ -17,16 +17,15 @@
 package views.aboutthebusiness
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{ContactingYou, ContactingYouEmail}
+import jto.validation.{Path, ValidationError}
+import models.aboutthebusiness.ContactingYouPhone
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.i18n.Messages
+import utils.GenericTestHelper
 import views.Fixture
 
 
-class contacting_youSpec extends GenericTestHelper with MustMatchers  {
+class contacting_you_phoneSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -35,21 +34,20 @@ class contacting_youSpec extends GenericTestHelper with MustMatchers  {
   "contacting_you view" must {
     "have correct title, headings and form fields" in new ViewFixture {
 
-      val form2: ValidForm[ContactingYouEmail] = Form2(ContactingYouEmail("123456789789","test@test.com"))
+      val form2: ValidForm[ContactingYouPhone] = Form2(ContactingYouPhone("123456789789"))
 
       def view = {
-        views.html.aboutthebusiness.contacting_you(form2, true)
+        views.html.aboutthebusiness.contacting_you_phone(form2, true)
       }
 
-      doc.title must be(Messages("aboutthebusiness.contactingyou.email.title") +
+      doc.title must be(Messages("aboutthebusiness.contactingyou.phone.title") +
         " - " + Messages("summary.aboutbusiness") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("aboutthebusiness.contactingyou.email.title"))
+      heading.html must be(Messages("aboutthebusiness.contactingyou.phone.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
-      doc.getElementsByAttributeValue("name", "email") must not be empty
-      doc.getElementsByAttributeValue("name", "confirmEmail") must not be empty
+      doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty
 
     }
 
@@ -61,7 +59,7 @@ class contacting_youSpec extends GenericTestHelper with MustMatchers  {
         ))
 
       def view = {
-        views.html.aboutthebusiness.contacting_you(form2, true)
+        views.html.aboutthebusiness.contacting_you_phone(form2, true)
       }
 
       errorSummary.html() must include("not a message Key")

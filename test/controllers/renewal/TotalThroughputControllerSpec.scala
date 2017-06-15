@@ -43,6 +43,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     val renewalService = mock[RenewalService]
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()
+
     lazy val controller = new TotalThroughputController(
       self.authConnector,
       renewalService,
