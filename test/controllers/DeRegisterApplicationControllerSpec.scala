@@ -53,7 +53,7 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false)
+    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = "ABCDE1234567890")
     val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
 
     when(reviewDetails.businessName).thenReturn(businessName)

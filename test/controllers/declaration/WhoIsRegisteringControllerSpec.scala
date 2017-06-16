@@ -51,8 +51,10 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
       override private[controllers] val renewalService = mock[RenewalService]
     }
 
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
+      None, false, safeId = "ABCDE1234567890")
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
+      None, false, safeId = "ABCDE1234567890")
     when {
       controller.renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(None)
@@ -374,8 +376,10 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
       override private[controllers] val renewalService = mock[RenewalService]
     }
 
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
+      None, false, safeId = "ABCDE1234567890")
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
+      None, false, safeId = "ABCDE1234567890")
     val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(

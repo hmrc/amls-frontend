@@ -91,7 +91,8 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     val renewalDate = LocalDate.now().plusDays(15)
 
-    val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+    val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+      Some(renewalDate), false, safeId = "ABCDE1234567890")
 
   }
 
