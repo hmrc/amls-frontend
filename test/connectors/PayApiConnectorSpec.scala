@@ -16,23 +16,21 @@
 
 package connectors
 
-import models.payments.{CreatePaymentResponse, CreatePaymentRequest}
+import config.ApplicationConfig
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
-import org.scalatestplus.play.PlaySpec
-import play.api.inject.guice.GuiceInjectorBuilder
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
-import play.api.http.Status._
-import cats.implicits._
-import config.ApplicationConfig
+import play.api.inject.guice.GuiceInjectorBuilder
 import uk.gov.hmrc.play.config.inject.ServicesConfig
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
 
@@ -53,12 +51,17 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     val validResponse = CreatePaymentResponse(paymentId)
     val paymentsToggleValue = true
     val httpPost = mock[HttpPost]
+    val payApiUrl = "http://localhost:9021/pay-api"
 
     val config = new ServicesConfig {
       override protected def environment = mock[play.api.Environment]
       override def getConfBool(confKey: String, defBool: => Boolean) = confKey match {
         case ApplicationConfig.paymentsUrlLookupToggleName => paymentsToggleValue
         case _ => super.getConfBool(confKey, defBool)
+      }
+
+      override def baseUrl(serviceName: String) = serviceName match {
+        case "pay-api" => payApiUrl
       }
     }
 
@@ -75,7 +78,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](any(), any(), any())(any(), any(), any())
+            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](eqTo(s"$payApiUrl/payment"), any(), any())(any(), any(), any())
           } thenReturn Future.successful(validResponse)
 
           whenReady(connector.createPayment(validRequest)) {
@@ -86,10 +89,13 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
       "the payments feature is toggled off" must {
         "return no result" in new TestFixture {
-
           override val paymentsToggleValue = false
 
-          whenReady(connector.createPayment(validRequest)) { _ must not be defined }
+          whenReady(connector.createPayment(validRequest)) { r =>
+            r must not be defined
+
+            verify(httpPost, never)
+          }
         }
       }
     }

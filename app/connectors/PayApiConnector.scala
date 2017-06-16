@@ -26,10 +26,12 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(httpPost: HttpPost, config: ServicesConfig) {
+
+  lazy val baseUrl = config.baseUrl("pay-api")
   
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
     if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, false)) {
-      httpPost.POST[CreatePaymentRequest, CreatePaymentResponse]("some url", request) map { r => Some(r) }
+      httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](s"$baseUrl/payment", request) map { r => Some(r) }
     } else {
       Future.successful(None)
     }
