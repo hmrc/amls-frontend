@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.payments.{CreatePaymentResponse, PayApiRequest}
+import models.payments.{CreatePaymentResponse, CreatePaymentRequest}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
 import org.scalatestplus.play.PlaySpec
@@ -43,7 +43,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
     val paymentId = "763843249809843"
 
-    val validRequest = PayApiRequest(
+    val validRequest = CreatePaymentRequest(
       "other",
       "X12345678901234",
       "An example payment",
@@ -75,7 +75,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[PayApiRequest, CreatePaymentResponse](any(), any(), any())(any(), any(), any())
+            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(validResponse)
 
           whenReady(connector.createPayment(validRequest)) {
@@ -89,9 +89,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
           override val paymentsToggleValue = false
 
-          whenReady(connector.createPayment(validRequest)) { r =>
-            r must not be defined
-          }
+          whenReady(connector.createPayment(validRequest)) { _ must not be defined }
         }
       }
     }

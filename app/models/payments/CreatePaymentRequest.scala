@@ -18,8 +18,8 @@ package models.payments
 
 import play.api.libs.json.Json
 
-case class PayApiRequest(taxType: String, reference: String, description: String, amountInPence: Int, returnUrl: String)
+case class CreatePaymentRequest(taxType: String, reference: String, description: String, amountInPence: Int, returnUrl: String)
 
-object PayApiRequest {
-  implicit val format = Json.format[PayApiRequest]
+object CreatePaymentRequest {
+  implicit val format = Json.format[CreatePaymentRequest]
 }
