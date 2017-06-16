@@ -18,15 +18,21 @@ package connectors
 
 import javax.inject.Inject
 
+import config.ApplicationConfig
 import models.payments.{CreatePaymentResponse, PayApiRequest}
+import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class PayApiConnector @Inject()(httpPost: HttpPost) {
+class PayApiConnector @Inject()(httpPost: HttpPost, config: ServicesConfig) {
   
-  def createPayment(request: PayApiRequest)(implicit hc: HeaderCarrier): Future[CreatePaymentResponse] = {
-    httpPost.POST[PayApiRequest, CreatePaymentResponse]("some url", request)
+  def createPayment(request: PayApiRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+    if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, false)) {
+      httpPost.POST[PayApiRequest, CreatePaymentResponse]("some url", request) map { r => Some(r) }
+    } else {
+      Future.successful(None)
+    }
   }
 
 }

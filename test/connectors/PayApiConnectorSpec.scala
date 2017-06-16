@@ -27,8 +27,12 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.http.Status._
+import cats.implicits._
+import config.ApplicationConfig
+import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
 
@@ -47,31 +51,49 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "http://localhost:9222/anti-money-laundering")
 
     val validResponse = CreatePaymentResponse(paymentId)
-
+    val paymentsToggleValue = true
     val httpPost = mock[HttpPost]
+
+    val config = new ServicesConfig {
+      override protected def environment = mock[play.api.Environment]
+      override def getConfBool(confKey: String, defBool: => Boolean) = confKey match {
+        case ApplicationConfig.paymentsUrlLookupToggleName => paymentsToggleValue
+        case _ => super.getConfBool(confKey, defBool)
+      }
+    }
 
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[HttpPost].to(httpPost))
+      .bindings(bind[ServicesConfig].to(config))
       .build()
 
     lazy val connector = injector.instanceOf[PayApiConnector]
   }
 
   "The Pay-API connector" when {
-    "the 'createPayment' method is called" must {
-      "make a request to the payments API" in new TestFixture {
+    "the 'createPayment' method is called" when {
+      "the payments feature is toggled on" must {
+        "make a request to the payments API" in new TestFixture {
+          when {
+            httpPost.POST[PayApiRequest, CreatePaymentResponse](any(), any(), any())(any(), any(), any())
+          } thenReturn Future.successful(validResponse)
 
-        when {
-          httpPost.POST[PayApiRequest, CreatePaymentResponse](any(), any(), any())(any(), any(), any())
-        } thenReturn Future.successful(validResponse)
+          whenReady(connector.createPayment(validRequest)) {
+            case Some(response) => response.id mustBe paymentId
+          }
+        }
+      }
 
-        whenReady(connector.createPayment(validRequest)) { r =>
+      "the payments feature is toggled off" must {
+        "return no result" in new TestFixture {
 
-          r.id mustBe paymentId
+          override val paymentsToggleValue = false
 
+          whenReady(connector.createPayment(validRequest)) { r =>
+            r must not be defined
+          }
         }
       }
     }
   }
-
 }
