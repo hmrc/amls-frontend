@@ -47,14 +47,15 @@ trait NotificationController extends BaseController {
       implicit authContext =>
         implicit request =>
           statusService.getReadStatus flatMap {
-            case readStatus  => {
+            case readStatus if readStatus.safeId.isDefined => {
               (for {
                 businessName <- OptionT(getBusinessName)
-                records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId))
+                records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
               } yield {
                 Ok(views.html.notifications.your_messages(businessName, records))
               }) getOrElse (throw new Exception("Cannot retrieve business name"))
             }
+            case _ => throw new Exception("Unable to retrieve SafeID")
           }
     }
   }
@@ -64,11 +65,11 @@ trait NotificationController extends BaseController {
       implicit authContext =>
         implicit request =>
           statusService.getReadStatus flatMap {
-            case readStatus => {
+            case readStatus if readStatus.safeId.isDefined => {
               (for {
                 amlsRegNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
                 businessName <- OptionT(getBusinessName)
-                msg <- OptionT(amlsNotificationService.getMessageDetails(readStatus.safeId, id, contactType))
+                msg <- OptionT(amlsNotificationService.getMessageDetails(readStatus.safeId.get, id, contactType))
                 msgText <- OptionT.fromOption[Future](msg.messageText)
               } yield {
                 contactType match {
@@ -82,6 +83,7 @@ trait NotificationController extends BaseController {
                 }
               }) getOrElse NotFound(notFoundView)
             }
+            case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
             case _ => Future.successful(BadRequest)
           }
     }

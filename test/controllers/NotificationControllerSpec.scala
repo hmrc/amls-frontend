@@ -56,7 +56,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     val request = authRequest
 
     val registrationDate = LocalDateTime.now()
-    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = "ABCDE1234567890")
+    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
 
     val testNotifications = NotificationRow(
       status = None,

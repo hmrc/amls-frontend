@@ -52,9 +52,9 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
-      None, false, safeId = "ABCDE1234567890")
+      None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
-      None, false, safeId = "ABCDE1234567890")
+      None, false)
     when {
       controller.renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(None)
@@ -377,9 +377,9 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
-      None, false, safeId = "ABCDE1234567890")
+      None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
-      None, false, safeId = "ABCDE1234567890")
+      None, false)
     val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(
