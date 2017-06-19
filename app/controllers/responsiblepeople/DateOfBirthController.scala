@@ -58,7 +58,7 @@ class DateOfBirthController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                rp.copy(dateOfBirth = Some(data))
+                rp.dateOfBirth(data)
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))

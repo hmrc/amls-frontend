@@ -264,11 +264,6 @@ object ResponsiblePeople {
       ).tupled.map { t =>
         val r = (ResponsiblePeople.apply _).tupled(t)
 
-//        val newrp = r.ukPassport match {
-//          case Some(UKPassportYes(_)) => r.copy(nonUKPassport = None)
-//          case _ => r
-//         }
-
         if (hasUkPassportNumber(r)) {
           r.copy(nonUKPassport = None)
         } else if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasdateOfBirth(r)) {

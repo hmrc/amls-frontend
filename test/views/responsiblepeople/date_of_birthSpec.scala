@@ -52,7 +52,7 @@ class date_of_birthSpec extends GenericTestHelper with MustMatchers  {
       heading.html() must be(Messages("responsiblepeople.date.of.birth.heading", "first last"))
     }
 
-    "show errors in correct places when validation fails" in new ViewFixture {
+    "show errors in correct places when validation fails and have the correct fields" in new ViewFixture {
 
       val messageKey1 = "definitely not a message key"
       val dateField = "dateOfBirth"
@@ -67,6 +67,10 @@ class date_of_birthSpec extends GenericTestHelper with MustMatchers  {
       errorSummary.html() must include(messageKey1)
 
       doc.getElementById(dateField).html() must include(messageKey1)
+
+      doc.getElementsByAttributeValue("name", "dateOfBirth.day") must not be empty
+      doc.getElementsByAttributeValue("name", "dateOfBirth.month") must not be empty
+      doc.getElementsByAttributeValue("name", "dateOfBirth.year") must not be empty
     }
   }
 }

@@ -73,7 +73,7 @@ class PersonNonUKPassportController @Inject()(
           case ValidForm(_, data) => {
             for {
               result <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
-                rp.copy(nonUKPassport = Some(data))
+                rp.nonUKPassport(data)
               }
             } yield redirectToNextPage(result, index, edit, fromDeclaration)
 
