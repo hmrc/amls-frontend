@@ -18,7 +18,13 @@ package models.payments
 
 import play.api.libs.json.Json
 
-case class CreatePaymentResponse(id: String)
+case class PayApiLinks(nextUrl: String)
+
+object PayApiLinks {
+  implicit val format = Json.format[PayApiLinks]
+}
+
+case class CreatePaymentResponse(links: PayApiLinks)
 
 object CreatePaymentResponse {
   implicit val format = Json.format[CreatePaymentResponse]

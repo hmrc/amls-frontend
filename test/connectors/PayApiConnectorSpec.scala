@@ -17,7 +17,7 @@
 package connectors
 
 import config.ApplicationConfig
-import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -39,7 +39,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
   trait TestFixture {
     val paymentAmount = 100
 
-    val paymentId = "763843249809843"
+    val paymentUrl = "http://pay-api/payment"
 
     val validRequest = CreatePaymentRequest(
       "other",
@@ -48,7 +48,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       paymentAmount,
       "http://localhost:9222/anti-money-laundering")
 
-    val validResponse = CreatePaymentResponse(paymentId)
+    val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
     val httpPost = mock[HttpPost]
     val payApiUrl = "http://localhost:9021/pay-api"
@@ -82,7 +82,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           } thenReturn Future.successful(validResponse)
 
           whenReady(connector.createPayment(validRequest)) {
-            case Some(response) => response.id mustBe paymentId
+            case Some(response) => response.links.nextUrl mustBe paymentUrl
           }
         }
       }
