@@ -57,7 +57,7 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
 
     //noinspection ScalaStyle
     val processingDate = new LocalDateTime(2002, 1, 1, 12, 0, 0)
-    val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false, safeId = "ABCDE1234567890")
+    val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
 
     when(reviewDetails.businessName).thenReturn(businessName)
 
