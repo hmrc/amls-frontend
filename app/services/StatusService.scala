@@ -45,6 +45,7 @@ trait StatusService {
   val Withdrawal = "Withdrawal"
   val DeRegistered = "De-Registered"
 
+
   private def getApprovedStatus(response: ReadStatusResponse) = {
     (response.currentRegYearEndDate, response.renewalConFlag) match {
       case (Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)) =>
@@ -96,6 +97,14 @@ trait StatusService {
     }
   }
 
+  def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
+    enrolmentsService.amlsRegistrationNumber flatMap {
+      case Some(mlrRegNumber) =>
+        etmpReadStatus(mlrRegNumber)(hc, authContext, ec)
+      case _ => throw new RuntimeException("ETMP returned no read status")
+    }
+  }
+
   private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = {
 
     def isComplete(seq: Seq[Section]): Boolean =
@@ -119,6 +128,12 @@ trait StatusService {
         response =>
           getETMPStatus(response)
       }
+    }
+  }
+
+  private def etmpReadStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
+    {
+      amlsConnector.status(amlsRefNumber)
     }
   }
 }

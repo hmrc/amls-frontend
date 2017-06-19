@@ -119,7 +119,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   )
 
 
-  val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
+  val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false, safeId = "ABCDE1234567890")
 
   implicit val hc = HeaderCarrier()
   implicit val ac = AuthContext(
