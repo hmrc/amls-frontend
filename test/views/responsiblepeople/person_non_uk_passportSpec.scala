@@ -56,6 +56,10 @@ class person_non_uk_passportSpec extends GenericTestHelper with MustMatchers {
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
+
+      doc.getElementsByAttributeValue("name", "nonUKPassport") must not be empty
+      doc.getElementsByAttributeValue("name", "nonUKPassportNumber") must not be empty
+
     }
   }
 
