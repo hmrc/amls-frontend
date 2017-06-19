@@ -205,25 +205,6 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
     "validating JSON" must {
 
-      "read uk residence type in old format" in {
-        val json = Json.obj(
-          "personResidenceType" -> Json.obj(
-            "nino" -> "AA111111A",
-            "countryOfBirth" -> "GB",
-            "nationality" -> "GB"
-          )
-        )
-
-          //is this what it is supposed to be?
-        json.as[PersonResidenceType] must be(
-          PersonResidenceType(
-            UKResidence("AA111111A"),
-            Some(Country("United Kingdom", "GB")),
-            Some(Country("United Kingdom", "GB"))
-          )
-        )
-      }
-
       "read non-uk residence type in old format" in {
         val json = Json.obj(
           "isUKResidence" -> false,

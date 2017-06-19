@@ -81,8 +81,8 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
 
     "serialize without including empty responsible people" in {
 
-      val emptyRp = ResponsiblePeople()
       val nonEmptyRp = ResponsiblePeople(personName = Some(PersonName("Smith", None, "Jones", None, None)))
+      val emptyRp = ResponsiblePeople()
       val sequenceOfRps = Seq(nonEmptyRp, emptyRp)
 
       val testRequest = SubscriptionRequest(None, None, None, None, None, None, None, Some(sequenceOfRps), None, None, None, None, None)

@@ -16,6 +16,7 @@
 
 package models.responsiblepeople
 
+import org.joda.time.LocalDate
 import play.Logger
 import play.api.libs.json.Reads
 import typeclasses.MongoKey
@@ -180,14 +181,24 @@ object ResponsiblePeople {
     override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
+  def ifPersonResidenceType[A](oldreader: Reads[Option[A]]) = {
+    (__ \ "personResidenceType").readNullable[JsObject] flatMap {
+      case Some(obj) => oldreader
+      case _ => constant[Option[A]](None)
+    }
+  }
+
   implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
 
-  val oldNonUkPassportReader: Reads[Option[NonUKPassport]] = {
-      (__ \ "personResidenceType" \ "nonUKPassportNumber").readNullable[String] map {
-        case Some(p) => Some(NonUKPassportYes(p))
-        case _ => Some(NoPassport)
-      }
+  def oldNonUkPassportReader: Reads[Option[NonUKPassport]] = {
+    val ppReader: Reads[Option[NonUKPassport]] = (__ \ "personResidenceType" \ "nonUKPassportNumber").readNullable[String] map {
+      case Some(p) => Some(NonUKPassportYes(p))
+      case _ => Some(NoPassport)
+    }
+
+    ifPersonResidenceType(ppReader)
   }
+
   val nonUkPassportReader: Reads[Option[NonUKPassport]] = {
     (__ \ "nonUKPassport").readNullable[NonUKPassport] flatMap {
       case None => oldNonUkPassportReader
@@ -195,15 +206,35 @@ object ResponsiblePeople {
     }
   }
 
-  val oldUkPassportReader: Reads[Option[UKPassport]] = {
-    (__ \ "personResidenceType" \ "UKPassportNumber").readNullable[String] map {
+
+  def oldUkPassportReader: Reads[Option[UKPassport]] = {
+    val oppReader: Reads[Option[UKPassport]] = (__ \ "personResidenceType" \ "ukPassportNumber").readNullable[String] map {
       case Some(p) => Some(UKPassportYes(p))
       case _ => Some(UKPassportNo)
     }
+
+    ifPersonResidenceType(oppReader)
   }
+
   val UkPassportReader: Reads[Option[UKPassport]] = {
-    (__ \ "UKPassport").readNullable[UKPassport] flatMap {
+    (__ \ "ukPassport").readNullable[UKPassport] flatMap {
       case None => oldUkPassportReader
+      case p => constant(p)
+    }
+  }
+
+  def oldDateOfBirthReader: Reads[Option[DateOfBirth]] = {
+    val dobReader = (__ \ "personResidenceType" \ "dateOfBirth").readNullable[LocalDate] map {
+      case Some(p) => Some(DateOfBirth(p))
+      case _ => None
+    }
+
+    ifPersonResidenceType(dobReader)
+  }
+
+  val UkDateOfBirthReader: Reads[Option[DateOfBirth]] = {
+    (__ \ "dateOfBirth").readNullable[DateOfBirth] flatMap {
+      case None => oldDateOfBirthReader
       case p => constant(p)
     }
   }
@@ -214,7 +245,7 @@ object ResponsiblePeople {
         (__ \ "personResidenceType").readNullable[PersonResidenceType] and
         __.read(UkPassportReader) and
         __.read(nonUkPassportReader) and
-        (__ \ "dateOfBirth").readNullable[DateOfBirth] and
+        __.read(UkDateOfBirthReader) and
         (__ \ "contactDetails").readNullable[ContactDetails] and
         (__ \ "addressHistory").readNullable[ResponsiblePersonAddressHistory] and
         (__ \ "positions").readNullable[Positions] and
@@ -230,8 +261,31 @@ object ResponsiblePeople {
         (__ \ "status").readNullable[String] and
         (__ \ "endDate").readNullable[ResponsiblePersonEndDate] and
         (__ \ "soleProprietorOfAnotherBusiness").readNullable[SoleProprietorOfAnotherBusiness]
-      ) apply ResponsiblePeople.apply _
+      ).tupled.map { t =>
+        val r = (ResponsiblePeople.apply _).tupled(t)
+
+//        val newrp = r.ukPassport match {
+//          case Some(UKPassportYes(_)) => r.copy(nonUKPassport = None)
+//          case _ => r
+//         }
+
+        if (hasUkPassportNumber(r)) {
+          r.copy(nonUKPassport = None)
+        } else if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasdateOfBirth(r)) {
+          r.copy(ukPassport = None, nonUKPassport = None)
+        } else r
+      }
   }
+
+  private def hasUkPassportNumber(rp: ResponsiblePeople): Boolean = rp.ukPassport match {
+    case Some(UKPassportYes(_)) => true
+    case _ => false
+  }
+  private def hasNonUkPassportNumber(rp: ResponsiblePeople): Boolean = rp.nonUKPassport match {
+    case Some(NonUKPassportYes(_)) => true
+    case _ => false
+  }
+  private def hasdateOfBirth(rp: ResponsiblePeople): Boolean = !rp.dateOfBirth.isEmpty
 
   def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())
