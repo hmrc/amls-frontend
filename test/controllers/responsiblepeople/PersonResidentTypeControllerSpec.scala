@@ -366,11 +366,23 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         }
 
         "removes data from uk passport and no uk passport" when {
-          "data is changed from no to yes in edit" in new Fixture {
+          "data is changed from not uk resident to uk resident when edit is true" in new Fixture {
 
             val nino = nextNino
 
             val countryCode = "GB"
+
+            val responsiblePeople = ResponsiblePeople(
+              personResidenceType = Some(
+                PersonResidenceType(
+                  NonUKResidence,
+                  Some(Country(countryCode, countryCode)),
+                  Some(Country(countryCode, countryCode))
+                )
+              ),
+              ukPassport = Some(UKPassportNo),
+              nonUKPassport = Some(NonUKPassportYes("22654321"))
+            )
 
             val newRequest = request.withFormUrlEncodedBody(
               "isUKResidence" -> "true",
@@ -379,17 +391,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               "nationality" -> countryCode
             )
 
-            val responsiblePeople = ResponsiblePeople(
-              personResidenceType = Some(
-                PersonResidenceType(
-                  UKResidence(nino),
-                  Some(Country(countryCode, countryCode)),
-                  None
-                )
-              ),
-              ukPassport = Some(UKPassportNo),
-              nonUKPassport = Some(NonUKPassportYes("22654321"))
-            )
 
             val personName = PersonName("firstname", None, "lastname", None, None)
 
@@ -413,7 +414,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               personResidenceType = Some(PersonResidenceType(
                 UKResidence(nino),
                 Some(Country(countryCode, countryCode)),
-                None
+                Some(Country(countryCode, countryCode))
               )),
               ukPassport = None,
               nonUKPassport = None,

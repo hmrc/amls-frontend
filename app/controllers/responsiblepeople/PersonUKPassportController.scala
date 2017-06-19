@@ -61,7 +61,7 @@ class PersonUKPassportController @Inject()(
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
                 data match {
-                  case UKPassportYes(_) if rp.ukPassport.contains(UKPassportNo) => rp.ukPassport(data).nonUKPassport(None)
+                  case UKPassportYes(_) if rp.ukPassport.contains(UKPassportNo) => rp.ukPassport(data).copy(nonUKPassport = None)
                   case _ => rp.ukPassport(data)
                 }
               })
