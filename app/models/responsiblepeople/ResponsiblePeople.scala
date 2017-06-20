@@ -158,7 +158,6 @@ object ResponsiblePeople {
 
   }
 
-  import play.api.libs.json._
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
@@ -172,9 +171,9 @@ object ResponsiblePeople {
     override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
-  def ifPersonResidenceType[A](oldreader: Reads[Option[A]]) = {
+  def ifPersonResidenceType[A](oldreader: Reads[Option[A]]): Reads[Option[A]] = {
     (__ \ "personResidenceType").readNullable[JsObject] flatMap {
-      case Some(obj) => oldreader
+      case Some(_) => oldreader
       case _ => constant[Option[A]](None)
     }
   }
@@ -196,7 +195,6 @@ object ResponsiblePeople {
       case p => constant(p)
     }
   }
-
 
   def oldUkPassportReader: Reads[Option[UKPassport]] = {
     val oppReader: Reads[Option[UKPassport]] = (__ \ "personResidenceType" \ "ukPassportNumber").readNullable[String] map {
@@ -257,7 +255,7 @@ object ResponsiblePeople {
 
         if (hasUkPassportNumber(r)) {
           r.copy(nonUKPassport = None)
-        } else if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasdateOfBirth(r)) {
+        } else if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasDateOfBirth(r)) {
           r.copy(ukPassport = None, nonUKPassport = None)
         } else r
       }
@@ -271,7 +269,7 @@ object ResponsiblePeople {
     case Some(NonUKPassportYes(_)) => true
     case _ => false
   }
-  private def hasdateOfBirth(rp: ResponsiblePeople): Boolean = !rp.dateOfBirth.isEmpty
+  private def hasDateOfBirth(rp: ResponsiblePeople): Boolean = rp.dateOfBirth.isDefined
 
   def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())

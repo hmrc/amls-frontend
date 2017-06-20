@@ -115,22 +115,6 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
-            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true).toString(),
-            dataItem = person.personResidenceType
-        ) { prt =>
-            <p>@prt.countryOfBirth</p>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.nationality"),
-            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true).toString(),
-            dataItem = person.personResidenceType
-        ) { prt =>
-            <p>@prt.nationality</p>
-        }
-
-        @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
             editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true).toString(),
             dataItem = person.personResidenceType
@@ -196,6 +180,22 @@
                 <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
             }
 
+        }
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
+            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true).toString(),
+            dataItem = person.personResidenceType
+        ) { prt =>
+            <p>@prt.countryOfBirth</p>
+        }
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.detailed_answers.nationality"),
+            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true).toString(),
+            dataItem = person.personResidenceType
+        ) { prt =>
+            <p>@prt.nationality</p>
         }
 
         @detailedAnswers(
