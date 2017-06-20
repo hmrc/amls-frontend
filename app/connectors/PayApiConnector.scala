@@ -30,7 +30,7 @@ class PayApiConnector @Inject()(httpPost: HttpPost, config: ServicesConfig) {
   lazy val baseUrl = config.baseUrl("pay-api")
   
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
-    if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, false)) {
+    if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {
       httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](s"$baseUrl/payment", request) map { r => Some(r) }
     } else {
       Future.successful(None)

@@ -17,7 +17,7 @@
 package connectors
 
 import config.ApplicationConfig
-import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks, ReturnLocation}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -26,6 +26,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
+import play.api.test.FakeRequest
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
@@ -35,6 +36,7 @@ import scala.concurrent.Future
 class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
 
   implicit val headerCarrier = HeaderCarrier()
+  implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
 
   trait TestFixture {
     val paymentAmount = 100
@@ -46,7 +48,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "X12345678901234",
       "An example payment",
       paymentAmount,
-      "http://localhost:9222/anti-money-laundering")
+      ReturnLocation("/confirmation"))
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
@@ -94,7 +96,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           whenReady(connector.createPayment(validRequest)) { r =>
             r must not be defined
 
-            verify(httpPost, never)
+            verify(httpPost, never).POST(any(), any(), any())(any(), any(), any())
           }
         }
       }

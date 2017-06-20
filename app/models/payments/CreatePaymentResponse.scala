@@ -16,6 +16,7 @@
 
 package models.payments
 
+import config.ApplicationConfig
 import play.api.libs.json.Json
 
 case class PayApiLinks(nextUrl: String)
@@ -27,5 +28,8 @@ object PayApiLinks {
 case class CreatePaymentResponse(links: PayApiLinks)
 
 object CreatePaymentResponse {
+
+  def default = CreatePaymentResponse(PayApiLinks(ApplicationConfig.paymentsUrl))
+
   implicit val format = Json.format[CreatePaymentResponse]
 }
