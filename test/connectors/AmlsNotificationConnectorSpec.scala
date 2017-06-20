@@ -69,7 +69,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given amlsRegNo" in new Fixture {
         val amlsRegistrationNumber = "XAML00000000000"
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, IDType(""))
+          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", IDType(""))
         )
         val url = s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber"
 
@@ -85,7 +85,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given safeId" in new Fixture {
         val safeId = "AA1234567891234"
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, IDType(""))
+          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", IDType(""))
         )
         val url = s"${connector.baseUrl}/org/TestOrgRef/safeId/$safeId"
 
@@ -127,55 +127,14 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       }
     }
 
-    "the call to notification service is successful (using safeId)" must {
-      "return the response" in new Fixture {
-
-        val url = s"${connector.baseUrl}/org/TestOrgRef/safeId/$safeId/NOTIFICATIONID"
-
-        when(connector.httpGet.GET[NotificationDetails](eqTo(url))(any(), any()))
-          .thenReturn(Future.successful(NotificationDetails(
-            Some(ContactType.MindedToReject),
-            Some(Status(Some(StatusType.Approved),
-              Some(RejectedReason.FailedToPayCharges))),
-            Some("Text of the message"),
-            false,
-            dateTime
-          )))
-
-        whenReady(connector.getMessageDetailsBySafeId(safeId, "NOTIFICATIONID")) { result =>
-          result must be (Some(NotificationDetails(
-            Some(ContactType.MindedToReject),
-            Some(Status(Some(StatusType.Approved),
-              Some(RejectedReason.FailedToPayCharges))),
-            Some("Text of the message"),
-            false,
-            dateTime
-          )))
-        }
-      }
-    }
-
     "the call to notification service returns a Bad Request" must {
       "Fail the future with an upstream 5xx exception (using amls reg no)" in new Fixture {
-
         val url = s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/NOTIFICATIONID"
 
         when(connector.httpGet.GET[NotificationDetails](eqTo(url))(any(), any()))
           .thenReturn(Future.failed(new BadRequestException("GET of blah returned status 400.")))
 
         whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber, "NOTIFICATIONID").failed) { exception =>
-          exception mustBe a[BadRequestException]
-        }
-      }
-
-      "Fail the future with an upstream 5xx exception (using safeId" in new Fixture {
-
-        val url = s"${connector.baseUrl}/org/TestOrgRef/safeId/$safeId/NOTIFICATIONID"
-
-        when(connector.httpGet.GET[NotificationDetails](eqTo(url))(any(), any()))
-          .thenReturn(Future.failed(new BadRequestException("GET of blah returned status 400.")))
-
-        whenReady(connector.getMessageDetailsBySafeId(safeId, "NOTIFICATIONID").failed) { exception =>
           exception mustBe a[BadRequestException]
         }
       }
@@ -191,20 +150,6 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
 
         whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber, "NOTIFICATIONID")) { result =>
           result must be (None)
-        }
-      }
-    }
-
-    "the call to notification service returns Not Found (when using safeId)" must {
-      "return a None" in new Fixture {
-
-        val url = s"${connector.baseUrl}/org/TestOrgRef/safeId/$safeId/NOTIFICATIONID"
-
-        when(connector.httpGet.GET[NotificationDetails](eqTo(url))(any(), any()))
-          .thenReturn(Future.failed(new NotFoundException("GET of blah returned status 404.")))
-
-        whenReady(connector.getMessageDetailsBySafeId(safeId, "NOTIFICATIONID")) { result =>
-          result must be(None)
         }
       }
     }
