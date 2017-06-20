@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.{verify, when}
@@ -203,6 +204,33 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
 
           }
         }
+        "goes to DateOfBirthController" when {
+          "uk passport and DateOfBirth data does not exist" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "true",
+              "ukPassportNumber" -> ukPassportNumber
+            )
+
+            val responsiblePeople = ResponsiblePeople()
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1, true).url))
+
+          }
+        }
         "go to DetailedAnswersController" when {
           "uk passport" in new Fixture {
 
@@ -212,7 +240,8 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
             )
 
             val responsiblePeople = ResponsiblePeople(
-              ukPassport = Some(UKPassportNo)
+              ukPassport = Some(UKPassportNo),
+              dateOfBirth = Some(DateOfBirth(new LocalDate(2001,12,1)))
             )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

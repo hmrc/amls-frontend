@@ -67,7 +67,7 @@ class PersonUKPassportController @Inject()(
               })
               rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             } yield {
-              redirectGivenUKPassport(rp, data, index, edit, fromDeclaration)
+              redirectTo(rp, data, index, edit, fromDeclaration)
             }) getOrElse NotFound(notFoundView)
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -75,22 +75,14 @@ class PersonUKPassportController @Inject()(
         }
   }
 
-  private def redirectGivenUKPassport(rp: Seq[ResponsiblePeople], data: UKPassport, index: Int, edit: Boolean, fromDeclaration: Boolean) = {
-
-    edit match {
-      case true => data match {
-        case UKPassportYes(_) => Redirect(routes.DetailedAnswersController.get(index))
-        case UKPassportNo => {
-          rp(index - 1).ukPassport match {
-            case Some(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index))
-            case _ => Redirect(routes.PersonNonUKPassportController.get(index, edit, fromDeclaration))
-          }
-        }
-      }
-      case false => data match {
-        case UKPassportYes(_) => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
-        case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, fromDeclaration))
-      }
+  private def redirectTo(rp: Seq[ResponsiblePeople], data: UKPassport, index: Int, edit: Boolean, fromDeclaration: Boolean) = {
+    val responsiblePerson = rp(index - 1)
+    data match {
+      case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
+      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case UKPassportYes(_) => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))
+      case UKPassportNo if responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index))
+      case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, fromDeclaration))
     }
   }
 }
