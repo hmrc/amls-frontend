@@ -34,6 +34,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
     false,
     DateTime.now(),
     false,
+    "XJML00000200000",
     IDType("1234567")
   )
 
@@ -76,8 +77,8 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        "XJML00000200000",
+        new IDType("5832e38e01000001005ca3ff"))
 
       val json = Json.parse(
         """
@@ -88,6 +89,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
           | "contactType":"MTRV",
           | "variation":false,
           | "receivedAt":{"$date":1479730062573},
+          | "amlsRegistrationNumber":"XJML00000200000",
           | "isRead":false,
           | "_id":{"$oid":"5832e38e01000001005ca3ff"}}
           |
@@ -110,6 +112,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
           false,
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
+          "XJML00000200000",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -128,6 +131,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
           false,
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
+          "XJML00000200000",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -145,6 +149,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
           true,
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
+          "XJML00000200000",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -162,6 +167,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
           true,
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
+          "XJML00000200000",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -179,6 +185,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
+        "XJML00000200000",
         new IDType("5832e38e01000001005ca3ff"
         ))
 
@@ -242,6 +249,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
+        "XJML00000200000",
         new IDType("5832e38e01000001005ca3ff"
         ))
 
@@ -288,6 +296,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
+        "XJML00000200000",
         new IDType("5832e38e01000001005ca3ff"
         ))
 

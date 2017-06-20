@@ -30,6 +30,7 @@ case class NotificationRow(
                             variation: Boolean,
                             receivedAt: DateTime,
                             isRead: Boolean,
+                            amlsRegistrationNumber: String,
                             _id: IDType
                           ) {
 
