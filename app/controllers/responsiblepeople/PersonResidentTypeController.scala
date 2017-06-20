@@ -83,9 +83,13 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                                       fromDeclaration: Boolean = false
                                     ) = {
 
+    val existingPassport = rp(index - 1).ukPassport
+
     isUKResidence match {
       case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
       case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
+      case NonUKResidence if existingPassport.isEmpty => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
+      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index))
       case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
     }
 
