@@ -19,15 +19,30 @@ package models.payments
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 
 class CreatePaymentRequestSpec extends PlaySpec with MustMatchers {
 
+  implicit val request = FakeRequest("GET", "http://localhost:9222")
+
   "The CreatePaymentRequest model" must {
     "round-trip through JSON serialization correctly" in {
-      //noinspection ScalaStyle
-      val model = CreatePaymentRequest("other", "Some Reference", "A description", 100, "http://return.url")
 
-      Json.toJson(model).as[CreatePaymentRequest] mustBe model
+      val expectedJson =
+        """
+          | {
+          |   "taxType":"other",
+          |   "reference":"XA2345678901232",
+          |   "description":"A description",
+          |   "amountInPence":100,
+          |   "returnUrl":"//localhost:9222/confirmation"
+          | }
+        """.stripMargin
+
+      //noinspection ScalaStyle
+      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation"))
+
+      Json.toJson(model) mustBe Json.parse(expectedJson)
     }
   }
 
