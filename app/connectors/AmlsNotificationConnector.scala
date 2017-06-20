@@ -80,19 +80,6 @@ trait AmlsNotificationConnector {
         case _:NotFoundException => None
       }
   }
-
-  def getMessageDetailsBySafeId(safeId: String, contactNumber: String)
-                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val url = s"$baseUrl/$accountType/$accountId/safeId/$safeId/$contactNumber"
-    httpGet.GET[NotificationDetails](url)
-      .map {Some(_)}
-      .recover {
-        case _:NotFoundException => None
-      }
-  }
 }
 
 object AmlsNotificationConnector extends AmlsNotificationConnector {
