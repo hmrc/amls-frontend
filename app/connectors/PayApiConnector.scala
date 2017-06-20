@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(httpPost: HttpPost, config: ServicesConfig) {
 
-  lazy val baseUrl = config.baseUrl("pay-api")
+  lazy val baseUrl = s"${config.baseUrl("pay-api")}/pay-api"
   
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
     if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {

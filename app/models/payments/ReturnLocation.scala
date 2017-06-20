@@ -28,9 +28,11 @@ object ReturnLocation {
   def apply(call: Call)(implicit request: Request[_]) =
     new ReturnLocation(call.url, buildRedirectUrl(call.url))
 
+  private def scheme(request: Request[_]) = if (request.secure) "https" else "http"
+
   private def buildRedirectUrl(url: String)(implicit request: Request[_]): String = {
     "^localhost".r.findFirstIn(request.host) match {
-      case Some(_) => s"//${request.host}$url"
+      case Some(_) => s"${scheme(request)}://${request.host}$url"
       case _ => url
     }
   }

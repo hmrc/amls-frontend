@@ -53,7 +53,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
     val httpPost = mock[HttpPost]
-    val payApiUrl = "http://localhost:9021/pay-api"
+    val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
       override protected def environment = mock[play.api.Environment]
@@ -80,7 +80,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](eqTo(s"$payApiUrl/payment"), any(), any())(any(), any(), any())
+            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any())
           } thenReturn Future.successful(validResponse)
 
           whenReady(connector.createPayment(validRequest)) {

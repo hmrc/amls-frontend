@@ -35,7 +35,7 @@ class CreatePaymentRequestSpec extends PlaySpec with MustMatchers {
           |   "reference":"XA2345678901232",
           |   "description":"A description",
           |   "amountInPence":100,
-          |   "returnUrl":"//localhost:9222/confirmation"
+          |   "returnUrl":"http://localhost:9222/confirmation"
           | }
         """.stripMargin
 
