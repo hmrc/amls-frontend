@@ -20,7 +20,7 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("summary.detailedanswers.title", "summary.tradingpremises")
@@ -65,7 +65,7 @@
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.services"),
-                editUrl = controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString
+                editUrl = if(hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
                 <ul class="list list--comma">
                 @ba.activities.map { a =>

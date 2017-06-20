@@ -82,7 +82,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       ("tradingpremises.summary.address", checkElementTextIncludes(_, "Address Answer: 1 2 asdfasdf")),
       ("tradingpremises.summary.tradingstartdate", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.summary.residential", checkElementTextIncludes(_, "lbl.yes")),
-      ("tradingpremises.summary.services", checkElementTextIncludes(_, "Bill payment services", "Estate agency services", "Money Service Business activities")),
+      ("tradingpremises.summary.services", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money Service Business activities")),
       ("tradingpremises.msb.services.title", checkElementTextIncludes(_, "Transmitting money","Currency exchange")),
       ("tradingpremises.summary.who-uses", checkElementTextIncludes(_, "tradingpremises.summary.agents")),
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),
@@ -93,7 +93,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
     "load summary details page when it is an msb" in new ViewFixture {
 
       val isMsb = true
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false)
 
       forAll(sectionChecks) { (key, check) => {
         val hTwos = doc.select("section.check-your-answers h2")
@@ -109,11 +109,38 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
     "load summary details page when it is not an msb" in new ViewFixture {
       
       val isNotMsb = false
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1, false)
 
-      html mustNot contain(Messages("tradingpremises.summary.who-uses"))
+      html mustNot include(Messages("tradingpremises.summary.who-uses"))
     }
 
+    "show the edit link for business services if the business sector has multiple business services" in new ViewFixture {
+
+      val isMsb = true
+      val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
+
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, true)
+
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
+      val servicesSection = hTwo.get.parent.toString
+
+      servicesSection must include("Edit")
+
+    }
+
+    "not show the edit link for business services if the business sector has only one business service" in new ViewFixture {
+
+      val isMsb = true
+      val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
+
+      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, false)
+
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
+      val servicesSection = hTwo.get.parent.toString
+
+      println(servicesSection)
+      servicesSection mustNot include("Edit")
+    }
   }
 }
 
