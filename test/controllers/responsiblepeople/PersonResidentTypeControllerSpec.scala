@@ -208,13 +208,10 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           }
 
           "in edit mode" when {
-            "residence type is edited from uk residence to non uk residence" in new Fixture {
+            "residence type is changed from uk residence to non uk residence" in new Fixture {
 
               val newRequest = request.withFormUrlEncodedBody(
-                "isUKResidence" -> "false",
-                "nino" -> nextNino,
-                "countryOfBirth" -> "GB",
-                "nationality" -> "GB"
+                "isUKResidence" -> "false"
               )
 
               val responsiblePeople = ResponsiblePeople(
