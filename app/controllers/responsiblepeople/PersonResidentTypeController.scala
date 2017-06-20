@@ -23,9 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.Country
-import models.responsiblepeople.{NonUKResidence, PersonResidenceType, ResponsiblePeople, UKResidence}
-import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.responsiblepeople._
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
@@ -56,19 +54,20 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               BadRequest(person_residence_type(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
+            val residency = data.isUKResidence
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
-                data.isUKResidence match {
+                residency match {
                   case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None, dateOfBirth = None)
                   case NonUKResidence => rp.personResidenceType(updatedData)
                 }
               })
               rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             } yield {
-              redirectGivenResidency(data, rp, index, edit, fromDeclaration)
+              redirectGivenResidency(residency, rp, index, edit, fromDeclaration)
             }) getOrElse NotFound(notFoundView)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -77,28 +76,19 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
   }
 
   private def redirectGivenResidency(
-                                      data: PersonResidenceType,
+                                      isUKResidence: Residency,
                                       rp: Seq[ResponsiblePeople],
                                       index: Int,
                                       edit: Boolean = false,
                                       fromDeclaration: Boolean = false
                                     ) = {
-    edit match {
-      case true => {
-        rp(index - 1).personResidenceType map { residenceType =>
-          residenceType.isUKResidence
-        } match {
-          case Some(UKResidence(_)) => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
-          case _ => Redirect(routes.DetailedAnswersController.get(index))
-        }
-      }
-      case false => {
-        data.isUKResidence match {
-          case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
-          case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
-        }
-      }
+
+    isUKResidence match {
+      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, fromDeclaration))
+      case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, fromDeclaration))
     }
+
   }
 }
 
