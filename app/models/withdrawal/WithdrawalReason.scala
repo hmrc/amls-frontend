@@ -16,8 +16,10 @@
 
 package models.withdrawal
 
+import jto.validation.forms.Rules.{maxLength, notEmpty}
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 
 sealed trait WithdrawalReason
 
@@ -31,15 +33,21 @@ object WithdrawalReason {
 
   import utils.MappingUtils.Implicits._
 
+  private val maxTextLength = 255
+  private val specifyOtherReasonType = notEmptyStrip andThen
+    notEmpty andThen
+    maxLength(maxTextLength) andThen
+    basicPunctuationPattern()
+
   implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     import models.FormTypes._
-    (__ \ "withdrawalReason").read[String].withMessage("") flatMap {
+    (__ \ "withdrawalReason").read[String].withMessage("error.required.withdrawal.reason") flatMap {
       case "01" => OutOfScope
       case "02" => NotTradingInOwnRight
       case "03" => UnderAnotherSupervisor
       case "04" => JoinedAWRSGroup
-      case "05" => (__ \ "specifyOtherReason").read[String] map Other.apply
+      case "05" => (__ \ "specifyOtherReason").read(specifyOtherReasonType) map Other.apply
       case _ =>
         (Path \ "withdrawalReason") -> Seq(ValidationError("error.invalid"))
     }

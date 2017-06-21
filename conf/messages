@@ -322,6 +322,8 @@ error.required.renewal.ba.select.country = Select yes if you had customers in th
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
 
+error.required.withdrawal.reason = You must select a reason for withdrawing your application
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business

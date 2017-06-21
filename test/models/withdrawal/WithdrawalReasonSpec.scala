@@ -16,7 +16,7 @@
 
 package models.withdrawal
 
-import jto.validation.Valid
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -74,9 +74,27 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
       }
     }
 
-    "throw error on invalid data" in {}
+    "throw error" when {
+      "invalid enum value" in {
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("20"))) must
+          be(Invalid(Seq((Path \ "withdrawalReason", Seq(ValidationError("error.invalid"))))))
+      }
+      "invalid characters other reason value" in {
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("{}"))) must
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("err.text.validation"))))))
+      }
+      "other reason value has too many characters" in {
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("a" * 256))) must
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 255))))))
+      }
 
-    "throw error on empty data" in {}
+    }
+
+    "throw error on empty data" in {
+      WithdrawalReason.formRule.validate(Map.empty) must
+        be(Invalid(Seq((Path \ "withdrawalReason", Seq(ValidationError("error.required.withdrawal.reason"))))))
+
+    }
 
   }
 
