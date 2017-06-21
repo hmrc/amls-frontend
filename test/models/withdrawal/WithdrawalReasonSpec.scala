@@ -52,7 +52,27 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
     }
 
 
-    "write correct data from enum value" in {}
+    "write correct data" when {
+      "from enum value" in {
+
+        WithdrawalReason.formWrites.writes(WithdrawalReason.OutOfScope) must
+          be(Map("withdrawalReason" -> Seq("01")))
+
+        WithdrawalReason.formWrites.writes(WithdrawalReason.NotTradingInOwnRight) must
+          be(Map("withdrawalReason" -> Seq("02")))
+
+        WithdrawalReason.formWrites.writes(WithdrawalReason.UnderAnotherSupervisor) must
+          be(Map("withdrawalReason" -> Seq("03")))
+
+        WithdrawalReason.formWrites.writes(WithdrawalReason.JoinedAWRSGroup) must
+          be(Map("withdrawalReason" -> Seq("04")))
+
+      }
+      "from enum value of Other and string of reason" in {
+        WithdrawalReason.formWrites.writes(WithdrawalReason.Other("reason")) must
+          be(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("reason")))
+      }
+    }
 
     "throw error on invalid data" in {}
 

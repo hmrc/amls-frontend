@@ -16,7 +16,7 @@
 
 package models.withdrawal
 
-import jto.validation.{From, Path, Rule, ValidationError}
+import jto.validation.{From, Path, Rule, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
 
 sealed trait WithdrawalReason
@@ -43,6 +43,14 @@ object WithdrawalReason {
       case _ =>
         (Path \ "withdrawalReason") -> Seq(ValidationError("error.invalid"))
     }
+  }
+
+  implicit val formWrites: Write[WithdrawalReason, UrlFormEncoded] = Write {
+    case OutOfScope => Map("withdrawalReason" -> "01")
+    case NotTradingInOwnRight => Map("withdrawalReason" -> "02")
+    case UnderAnotherSupervisor => Map("withdrawalReason" -> "03")
+    case JoinedAWRSGroup => Map("withdrawalReason" -> "04")
+    case Other(reason) => Map("withdrawalReason" -> "05", "specifyOtherReason" -> reason)
   }
 
 }
