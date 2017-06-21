@@ -16,15 +16,30 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
-
-import controllers.BaseController
+import play.api.inject.bind
+import play.api.inject.guice.GuiceInjectorBuilder
+import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.Future
+class RoleInBusinessControllerSpec extends GenericTestHelper {
 
-class StillEmployedController @Inject()(val authConnector: AuthConnector) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+  trait TestFixture extends AuthorisedFixture { self =>
+    val request = addToken(self.authRequest)
+
+    val injector = new GuiceInjectorBuilder()
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    lazy val controller = injector.instanceOf[RoleInBusinessController]
   }
+
+  "The StillEmployedController" must {
+    "get the view" in new TestFixture {
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+    }
+  }
+
 }

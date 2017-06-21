@@ -254,6 +254,8 @@ GET         /update-information/add-person                                      
 
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 
+GET         /update-information/role-in-business                                      @controllers.changeofficer.RoleInBusinessController.get()
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
