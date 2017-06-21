@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
-  val serviceUrl = config.baseUrl("authenticator")
+  val serviceUrl = config.baseUrl("government-gateway-authentication")
 
   def refreshProfile(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
 
