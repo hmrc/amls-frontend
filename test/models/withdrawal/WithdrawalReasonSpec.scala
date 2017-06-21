@@ -16,6 +16,7 @@
 
 package models.withdrawal
 
+import jto.validation.Valid
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -24,7 +25,32 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
 
   "Form Validation" must {
 
-    "validate given an enum value" in {}
+    "validate" when {
+      "given an enum value" in {
+
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("01"))) must
+          be(Valid(WithdrawalReason.OutOfScope))
+
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("02"))) must
+          be(Valid(WithdrawalReason.NotTradingInOwnRight))
+
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("03"))) must
+          be(Valid(WithdrawalReason.UnderAnotherSupervisor))
+
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"))) must
+          be(Valid(WithdrawalReason.JoinedAWRSGroup))
+
+      }
+
+      "given enum value for other and string for reason" in {
+
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("other"))) must
+          be(Valid(WithdrawalReason.Other("other")))
+
+      }
+
+    }
+
 
     "write correct data from enum value" in {}
 

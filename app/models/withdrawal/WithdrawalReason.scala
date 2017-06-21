@@ -16,14 +16,33 @@
 
 package models.withdrawal
 
+import jto.validation.{From, Path, Rule, ValidationError}
+import jto.validation.forms.UrlFormEncoded
+
 sealed trait WithdrawalReason
 
 object WithdrawalReason {
 
-  case object OutOfScope
-  case object NotTradingInOwnRight
-  case object UnderAnotherSupervisor
-  case object JoinedAWRSGroup
-  case class Other(otherReason: String)
+  case object OutOfScope extends WithdrawalReason
+  case object NotTradingInOwnRight extends WithdrawalReason
+  case object UnderAnotherSupervisor extends WithdrawalReason
+  case object JoinedAWRSGroup extends WithdrawalReason
+  case class Other(otherReason: String) extends WithdrawalReason
+
+  import utils.MappingUtils.Implicits._
+
+  implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    import models.FormTypes._
+    (__ \ "withdrawalReason").read[String].withMessage("") flatMap {
+      case "01" => OutOfScope
+      case "02" => NotTradingInOwnRight
+      case "03" => UnderAnotherSupervisor
+      case "04" => JoinedAWRSGroup
+      case "05" => (__ \ "specifyOtherReason").read[String] map Other.apply
+      case _ =>
+        (Path \ "withdrawalReason") -> Seq(ValidationError("error.invalid"))
+    }
+  }
 
 }
