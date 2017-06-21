@@ -108,7 +108,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
-  override def paymentsUrlLookupToggle = getConfBool("feature-toggle.payments-url-lookup", false)
+  val paymentsUrlLookupToggleName = "feature-toggle.payments-url-lookup"
+  override def paymentsUrlLookupToggle = getConfBool(paymentsUrlLookupToggleName, false)
 
   override def allowWithdrawalToggle = getConfBool("feature-toggle.allow-withdrawal", false)
 

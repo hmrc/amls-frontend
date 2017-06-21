@@ -32,7 +32,7 @@ class ReturnLocationSpec extends GenericTestHelper {
         implicit val request = FakeRequest(GET, "http://localhost:9222/anti-money-laundering/confirmation")
         val model = ReturnLocation(call)
 
-        model.returnUrl mustBe s"//localhost:9222${call.url}"
+        model.returnUrl mustBe s"http://localhost:9222${call.url}"
 
       }
 

@@ -16,31 +16,18 @@
 
 package models.payments
 
+import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
 
-class PaymentRedirectRequestSpec extends PlaySpec {
+class CreatePaymentResponseSpec extends PlaySpec with MustMatchers {
 
-  "The PaymentRedirectRequest type" must {
+  "The CreatePaymentResponse model" must {
+    "round-trip through JSON serialization correctly" in {
+      val model = CreatePaymentResponse(PayApiLinks("http://next.url"))
 
-    "serialize to the correct JSON format" in {
-
-      implicit val request = FakeRequest(GET, "http://localhost:9222/anti-money-laundering")
-
-      val expectedJson = Json.obj(
-        "reference" -> "some_reference",
-        "amount" -> "100.0",
-        "url" -> "http://localhost:9222/anti-money-laundering/start"
-      )
-
-      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start"))
-
-      Json.toJson(model) mustBe expectedJson
-
+      Json.toJson(model).as[CreatePaymentResponse] mustBe model
     }
-
   }
 
 }
