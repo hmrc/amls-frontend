@@ -22,7 +22,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-class RoleInBusinessControllerSpec extends GenericTestHelper {
+class NewOfficerControllerSpec extends GenericTestHelper {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -31,10 +31,10 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    lazy val controller = injector.instanceOf[RoleInBusinessController]
+    lazy val controller = injector.instanceOf[NewOfficerController]
   }
 
-  "The RoleInBusinessController" must {
+  "The NewOfficerController" must {
     "get the view" in new TestFixture {
       val result = controller.get()(request)
 
