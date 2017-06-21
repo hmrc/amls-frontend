@@ -16,21 +16,14 @@
 
 package models.withdrawal
 
-import org.joda.time.LocalDate
+sealed trait WithdrawalReason
 
-object StaticWithdrawalReason {
-  val OutOfScope = "Out of scope"
-}
+object WithdrawalReason {
 
-case class WithdrawSubscriptionRequest (acknowledgementReference: String,
-                                        withdrawalDate: LocalDate,
-                                        withdrawalReason: String,
-                                        withdrawalReasonOthers: Option[String] = None
-                                       )
+  case object OutOfScope
+  case object NotTradingInOwnRight
+  case object UnderAnotherSupervisor
+  case object JoinedAWRSGroup
+  case class Other(otherReason: String)
 
-object WithdrawSubscriptionRequest {
-  import play.api.libs.json._
-
-  val DefaultAckReference = "A" * 32
-  implicit val format = Json.format[WithdrawSubscriptionRequest]
 }

@@ -16,21 +16,32 @@
 
 package models.withdrawal
 
-import org.joda.time.LocalDate
+import org.scalatest.MustMatchers
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 
-object StaticWithdrawalReason {
-  val OutOfScope = "Out of scope"
-}
+class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
 
-case class WithdrawSubscriptionRequest (acknowledgementReference: String,
-                                        withdrawalDate: LocalDate,
-                                        withdrawalReason: String,
-                                        withdrawalReasonOthers: Option[String] = None
-                                       )
+  "Form Validation" must {
 
-object WithdrawSubscriptionRequest {
-  import play.api.libs.json._
+    "validate given an enum value" in {}
 
-  val DefaultAckReference = "A" * 32
-  implicit val format = Json.format[WithdrawSubscriptionRequest]
+    "write correct data from enum value" in {}
+
+    "throw error on invalid data" in {}
+
+    "throw error on empty data" in {}
+
+  }
+
+  "JSON validation" must {
+
+    "validate given an enum value" in {}
+
+    "write the correct value" in {}
+
+    "throw error for invalid data" in {}
+
+  }
+
 }
