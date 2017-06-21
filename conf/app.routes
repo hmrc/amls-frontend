@@ -252,6 +252,8 @@ POST        /declaration/add-person                                             
 
 GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
 
+GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
