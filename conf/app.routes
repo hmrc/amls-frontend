@@ -260,6 +260,8 @@ GET         /update-information/new-nominated-officer                           
 
 GET         /update-information/further-updates                                       @controllers.changeofficer.FurtherUpdatesController.get()
 
+GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
