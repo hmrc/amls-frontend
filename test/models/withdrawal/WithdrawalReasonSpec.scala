@@ -90,10 +90,15 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
 
     }
 
-    "throw error on empty data" in {
-      WithdrawalReason.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "withdrawalReason", Seq(ValidationError("error.required.withdrawal.reason"))))))
-
+    "throw error on empty" when {
+      "non-selection of enum" in {
+        WithdrawalReason.formRule.validate(Map.empty) must
+          be(Invalid(Seq((Path \ "withdrawalReason", Seq(ValidationError("error.required.withdrawal.reason"))))))
+      }
+      "no other reason given" in {
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq.empty)) must
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+      }
     }
 
   }

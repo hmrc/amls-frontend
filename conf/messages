@@ -323,6 +323,7 @@ error.required.renewal.ba.involved.in.other = Select yes if your business was in
 error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
+error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
