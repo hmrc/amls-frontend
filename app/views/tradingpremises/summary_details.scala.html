@@ -65,7 +65,7 @@
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.services"),
-                editUrl = if(hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
+                editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
                 <ul class="list list--comma">
                 @ba.activities.map { a =>

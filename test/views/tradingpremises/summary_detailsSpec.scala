@@ -119,7 +119,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, true)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false)
 
       val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
       val servicesSection = hTwo.get.parent.toString
@@ -133,7 +133,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, false)
+      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true)
 
       val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
       val servicesSection = hTwo.get.parent.toString
