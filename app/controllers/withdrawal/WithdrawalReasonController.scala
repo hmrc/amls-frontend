@@ -32,7 +32,7 @@ class WithdrawalReasonController @Inject()
 (val authConnector: AuthConnector,
  amls: AmlsConnector,
  enrolments: AuthEnrolmentsService,
- cache: DataCacheConnector,
+ dataCacheConnector: DataCacheConnector,
  statusService: StatusService) extends BaseController {
 
   def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle) {

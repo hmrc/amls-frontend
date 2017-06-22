@@ -22,8 +22,9 @@ import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionReadyForReview
-import models.withdrawal.WithdrawSubscriptionResponse
+import models.withdrawal.{WithdrawSubscriptionResponse, WithdrawalReason}
 import org.joda.time.LocalDateTime
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
@@ -59,14 +60,26 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
     "get is called" must {
 
-      "display withdrawal_reasons view" in new TestFixture {
+      "display withdrawal_reasons view without data" in new TestFixture{
+
+        when(controller.dataCacheConnector.fetch[WithdrawalReason](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("withdrawal.reason.title"))
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("withdrawalReason-01").hasAttr("checked") must be(false)
+        document.getElementById("withdrawalReason-02").hasAttr("checked") must be(false)
+        document.getElementById("withdrawalReason-03").hasAttr("checked") must be(false)
+        document.getElementById("withdrawalReason-04").hasAttr("checked") must be(false)
+        document.getElementById("specifyOtherReason").`val`() is empty
       }
 
-      "display the page without pre-populated data" in new TestFixture{
-
+      "display the page with pre-populated data" in new TestFixture{
+        val result = controller.get()(request)
+        status(result) must be(OK)
       }
     }
 
