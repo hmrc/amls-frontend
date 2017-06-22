@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.withdrawal
 
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
-import cats.implicits._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionReadyForReview
 import models.withdrawal.WithdrawSubscriptionResponse
 import org.joda.time.LocalDateTime
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, StatusService}
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 
 import scala.concurrent.Future
 

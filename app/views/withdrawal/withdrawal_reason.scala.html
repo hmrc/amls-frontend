@@ -28,7 +28,7 @@
     title = Messages("withdrawal.reason.title") + " - " + Messages("title.yapp"),
     heading = header
 ) {
-    @form(f, controllers.routes.WithdrawalReasonController.post) {
+    @form(f, controllers.withdrawal.routes.WithdrawalReasonController.post) {
 
         @fieldset(
             f = f("withdrawalReason-fieldset"),

@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.withdrawal
 
 import javax.inject.Inject
 
-import cats.data.OptionT
-import cats.implicits._
-import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.businessmatching.BusinessMatching
-import models.withdrawal.{StaticWithdrawalReason, StaticWithdrawalReason$, WithdrawSubscriptionRequest}
-import org.joda.time.LocalDate
+import controllers.BaseController
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.withdraw_application
-
-import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()
 (val authConnector: AuthConnector,

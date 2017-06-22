@@ -18,11 +18,11 @@ GET         /application-status                                                 
 GET         /your-registration/your-messages/:id/:contactType/:amlsRegNo              controllers.NotificationController.messageDetails(id : String, contactType:models.notifications.ContactType, amlsRegNo: String)
 GET         /your-registration/your-messages                                          controllers.NotificationController.getMessages()
 
-GET         /your-registration/withdraw-application                                   @controllers.WithdrawApplicationController.get()
-POST        /your-registration/withdraw-application                                   @controllers.WithdrawApplicationController.post()
+GET         /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.get()
+POST        /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.post()
 
-GET         /your-registration/withdraw-application-reason                            @controllers.WithdrawalReasonController.get()
-POST        /your-registration/withdraw-application-reason                            @controllers.WithdrawalReasonController.post()
+GET         /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.get()
+POST        /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.post()
 
 GET         /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.get()
 POST        /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.post()
