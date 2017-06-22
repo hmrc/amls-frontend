@@ -18,7 +18,7 @@ package models.withdrawal
 
 import org.joda.time.LocalDate
 
-object WithdrawalReason {
+object StaticWithdrawalReason {
   val OutOfScope = "Out of scope"
 }
 

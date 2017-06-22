@@ -30,10 +30,10 @@ class WithdrawSubscriptionRequestSpec extends PlaySpec with MustMatchers {
         val expectedJson = Json.obj(
           "acknowledgementReference" -> "SomeRef",
           "withdrawalDate" -> date.toString("yyyy-MM-dd"),
-          "withdrawalReason" -> WithdrawalReason.OutOfScope
+          "withdrawalReason" -> StaticWithdrawalReason.OutOfScope
         )
 
-        Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.OutOfScope, None)) mustBe expectedJson
+        Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, StaticWithdrawalReason.OutOfScope, None)) mustBe expectedJson
       }
     }
   }
