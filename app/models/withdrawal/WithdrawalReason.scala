@@ -32,8 +32,6 @@ object WithdrawalReason {
 
   case object UnderAnotherSupervisor extends WithdrawalReason
 
-  case object JoinedAWRSGroup extends WithdrawalReason
-
   case class Other(otherReason: String) extends WithdrawalReason
 
   import utils.MappingUtils.Implicits._
@@ -51,8 +49,7 @@ object WithdrawalReason {
       case "01" => OutOfScope
       case "02" => NotTradingInOwnRight
       case "03" => UnderAnotherSupervisor
-      case "04" => JoinedAWRSGroup
-      case "05" => (__ \ "specifyOtherReason").read(specifyOtherReasonType) map Other.apply
+      case "04" => (__ \ "specifyOtherReason").read(specifyOtherReasonType) map Other.apply
       case _ =>
         (Path \ "withdrawalReason") -> Seq(ValidationError("error.invalid"))
     }
@@ -62,8 +59,7 @@ object WithdrawalReason {
     case OutOfScope => Map("withdrawalReason" -> "01")
     case NotTradingInOwnRight => Map("withdrawalReason" -> "02")
     case UnderAnotherSupervisor => Map("withdrawalReason" -> "03")
-    case JoinedAWRSGroup => Map("withdrawalReason" -> "04")
-    case Other(reason) => Map("withdrawalReason" -> "05", "specifyOtherReason" -> reason)
+    case Other(reason) => Map("withdrawalReason" -> "04", "specifyOtherReason" -> reason)
   }
 
   implicit val jsonReads: Reads[WithdrawalReason] = {
@@ -72,8 +68,7 @@ object WithdrawalReason {
       case "01" => OutOfScope
       case "02" => NotTradingInOwnRight
       case "03" => UnderAnotherSupervisor
-      case "04" => JoinedAWRSGroup
-      case "05" =>
+      case "04" =>
         (JsPath \ "specifyOtherReason").read[String] map {
           Other
         }
@@ -86,10 +81,9 @@ object WithdrawalReason {
     case OutOfScope => Json.obj("withdrawalReason" -> "01")
     case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "02")
     case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "03")
-    case JoinedAWRSGroup => Json.obj("withdrawalReason" -> "04")
     case Other(reason) =>
       Json.obj(
-        "withdrawalReason" -> "05",
+        "withdrawalReason" -> "04",
         "specifyOtherReason" -> reason
       )
   }
