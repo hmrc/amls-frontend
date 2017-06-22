@@ -26,6 +26,7 @@ import models.withdrawal.WithdrawalReason
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
+import views.html.withdrawal.withdrawal_reason
 
 import scala.concurrent.Future
 
@@ -40,8 +41,8 @@ class WithdrawalReasonController @Inject()(
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[WithdrawalReason](WithdrawalReason.key) map {
-          case Some(withdrawal) => Ok(views.html.withdrawal.withdrawal_reason(Form2[WithdrawalReason](withdrawal)))
-          case _ => Ok(views.html.withdrawal.withdrawal_reason(EmptyForm))
+          case Some(reason) => Ok(withdrawal_reason(Form2[WithdrawalReason](reason)))
+          case _ => Ok(withdrawal_reason(EmptyForm))
         }
     }
   }
