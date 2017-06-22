@@ -18,10 +18,12 @@ package controllers.withdrawal
 
 import javax.inject.Inject
 
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.FeatureToggle
 
 class WithdrawalReasonController @Inject()
 (val authConnector: AuthConnector,
@@ -30,9 +32,11 @@ class WithdrawalReasonController @Inject()
  cache: DataCacheConnector,
  statusService: StatusService) extends BaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      ???
+  def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle) {
+    Authorised.async {
+      implicit authContext => implicit request =>
+        ???
+    }
   }
 
   def post = Authorised.async {
