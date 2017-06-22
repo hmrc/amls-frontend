@@ -20,7 +20,7 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
 
@@ -152,7 +152,20 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
       }
     }
 
-    "throw error for invalid data" in {}
+    "throw error" when {
+      "enum value is invalid" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "10")) must
+          be(JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid")))
+      }
+      "enum is missing" in {
+        Json.fromJson[WithdrawalReason](Json.obj()) must
+          be(JsError(JsPath \ "withdrawalReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+      }
+      "other reason is missing" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "05")) must
+          be(JsError(JsPath \ "specifyOtherReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+      }
+    }
 
   }
 
