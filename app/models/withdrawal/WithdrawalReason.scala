@@ -36,6 +36,8 @@ object WithdrawalReason {
 
   import utils.MappingUtils.Implicits._
 
+  val key = "withdrawal-reason"
+
   private val maxTextLength = 255
   private val specifyOtherReasonType = notEmptyStrip.withMessage("error.required.withdrawal.reason.other") andThen
     notEmpty.withMessage("error.required.withdrawal.reason.other") andThen

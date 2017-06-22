@@ -38,7 +38,7 @@
 
     @Messages("status.withdraw.body-content").paragraphizeH
 
-    @form(EmptyForm, routes.WithdrawApplicationController.post()) {
+    @form(EmptyForm, controllers.withdrawal.routes.WithdrawApplicationController.post()) {
         @submit(edit = false, Some(Messages("status.withdraw.button-text")))
     }
 

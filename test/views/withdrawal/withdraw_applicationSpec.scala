@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package views
+package views.withdrawal
 
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import utils.{DateHelper, GenericTestHelper}
+import views.Fixture
 
 class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
 
@@ -29,7 +30,7 @@ class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
     //noinspection ScalaStyle
     val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)
 
-    def view = views.html.withdraw_application("The Business", date)
+    def view = views.html.withdrawal.withdraw_application("The Business", date)
   }
 
   "The withdraw application view" must {
