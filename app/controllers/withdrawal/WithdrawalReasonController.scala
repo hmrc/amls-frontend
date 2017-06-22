@@ -21,9 +21,12 @@ import javax.inject.Inject
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
+import forms.EmptyForm
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
+
+import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()
 (val authConnector: AuthConnector,
@@ -35,7 +38,7 @@ class WithdrawalReasonController @Inject()
   def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle) {
     Authorised.async {
       implicit authContext => implicit request =>
-        ???
+        Future.successful(Ok(views.html.withdrawal.withdrawal_reason(EmptyForm)))
     }
   }
 

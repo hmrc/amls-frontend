@@ -16,15 +16,61 @@
 
 package controllers.withdrawal
 
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import org.mockito.Matchers.{eq => eqTo}
+import models.ReadStatusResponse
+import models.businesscustomer.ReviewDetails
+import models.businessmatching.BusinessMatching
+import models.status.SubmissionReadyForReview
+import models.withdrawal.WithdrawSubscriptionResponse
+import org.joda.time.LocalDateTime
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 
-class WithdrawalReasonControllerSpec {
+import scala.concurrent.Future
+
+class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite{
+
+  override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
+    .build()
+
+  trait TestFixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val amlsConnector = mock[AmlsConnector]
+    val authService = mock[AuthEnrolmentsService]
+    val cacheConnector = mock[DataCacheConnector]
+    val statusService = mock[StatusService]
+
+    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+
+  }
+
+
+  "WithdrawalReasonController" when {
+
+    "get is called" must {
+
+      "display withdrawal_reasons view" in new TestFixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("withdrawal.reason.title"))
+      }
+
+      "display the page without pre-populated data" in new TestFixture{
+
+      }
+    }
+
+  }
 
 }
 
