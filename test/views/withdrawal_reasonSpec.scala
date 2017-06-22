@@ -16,14 +16,11 @@
 
 package views
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
+import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
-import jto.validation.Path
-import jto.validation.ValidationError
-import models.withdrawal.WithdrawalReason
 import play.api.i18n.Messages
-import views.Fixture
+import utils.GenericTestHelper
 
 class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
 
@@ -49,6 +46,17 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
       heading.html must be(Messages("withdrawal.reason.heading"))
       subHeading.html must include(Messages("summary.status"))
 
+    }
+
+    "have the correct fields" in new TestFixture {
+
+      override def view = views.html.withdrawal_reason(EmptyForm)
+
+      doc.getElementsByAttributeValue("for", "withdrawalReason-01") must not be empty
+      doc.getElementsByAttributeValue("for", "withdrawalReason-02") must not be empty
+      doc.getElementsByAttributeValue("for", "withdrawalReason-03") must not be empty
+      doc.getElementsByAttributeValue("for", "withdrawalReason-04") must not be empty
+      doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
     }
 
     "show errors in the correct locations" in new TestFixture {
