@@ -20,8 +20,9 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
+class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
 
   "Form Validation" must {
 
@@ -42,13 +43,10 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
 
       }
       "given enum value for other and string for reason" in {
-
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("other"))) must
           be(Valid(WithdrawalReason.Other("other")))
-
       }
     }
-
 
     "write correct data" when {
       "from enum value" in {
@@ -85,7 +83,6 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("a" * 256))) must
           be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 255))))))
       }
-
     }
 
     "throw error on empty" when {
@@ -107,16 +104,53 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
             be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required"))))))
         }
       }
-
     }
 
   }
 
   "JSON validation" must {
 
-    "validate given an enum value" in {}
+    "validate given an enum value" when {
+      "OutOfScope" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "01")) must
+          be(JsSuccess(WithdrawalReason.OutOfScope, JsPath))
+      }
+      "NotTradingInOwnRight" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "02")) must
+          be(JsSuccess(WithdrawalReason.NotTradingInOwnRight, JsPath))
+      }
+      "UnderAnotherSupervisor" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "03")) must
+          be(JsSuccess(WithdrawalReason.UnderAnotherSupervisor, JsPath))
+      }
+      "JoinedAWRSGroup" in {
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "04")) must
+          be(JsSuccess(WithdrawalReason.JoinedAWRSGroup, JsPath))
+      }
+    }
 
-    "write the correct value" in {}
+    "validate given an enum value and string" in {
+      Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "05", "specifyOtherReason" -> "reason")) must
+        be(JsSuccess(WithdrawalReason.Other("reason"), JsPath \ "specifyOtherReason"))
+    }
+
+    "write the correct value" when {
+      "OutOfScope" in {
+        Json.toJson(WithdrawalReason.OutOfScope) must be(Json.obj("withdrawalReason" -> "01"))
+      }
+      "NotTradingInOwnRight" in {
+        Json.toJson(WithdrawalReason.NotTradingInOwnRight) must be(Json.obj("withdrawalReason" -> "02"))
+      }
+      "UnderAnotherSupervisor" in {
+        Json.toJson(WithdrawalReason.UnderAnotherSupervisor) must be(Json.obj("withdrawalReason" -> "03"))
+      }
+      "JoinedAWRSGroup" in {
+        Json.toJson(WithdrawalReason.JoinedAWRSGroup) must be(Json.obj("withdrawalReason" -> "04"))
+      }
+      "Other" in {
+        Json.toJson(WithdrawalReason.Other("reason")) must be(Json.obj("withdrawalReason" -> "05", "specifyOtherReason" -> "reason"))
+      }
+    }
 
     "throw error for invalid data" in {}
 

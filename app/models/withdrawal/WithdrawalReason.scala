@@ -20,15 +20,20 @@ import jto.validation.forms.Rules.{maxLength, notEmpty}
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+import play.api.libs.json._
 
 sealed trait WithdrawalReason
 
 object WithdrawalReason {
 
   case object OutOfScope extends WithdrawalReason
+
   case object NotTradingInOwnRight extends WithdrawalReason
+
   case object UnderAnotherSupervisor extends WithdrawalReason
+
   case object JoinedAWRSGroup extends WithdrawalReason
+
   case class Other(otherReason: String) extends WithdrawalReason
 
   import utils.MappingUtils.Implicits._
@@ -61,4 +66,31 @@ object WithdrawalReason {
     case Other(reason) => Map("withdrawalReason" -> "05", "specifyOtherReason" -> reason)
   }
 
+  implicit val jsonReads: Reads[WithdrawalReason] = {
+    import play.api.libs.json.Reads.StringReads
+    (__ \ "withdrawalReason").read[String].flatMap[WithdrawalReason] {
+      case "01" => OutOfScope
+      case "02" => NotTradingInOwnRight
+      case "03" => UnderAnotherSupervisor
+      case "04" => JoinedAWRSGroup
+      case "05" =>
+        (JsPath \ "specifyOtherReason").read[String] map {
+          Other
+        }
+      case _ =>
+        play.api.data.validation.ValidationError("error.invalid")
+    }
+  }
+
+  implicit val jsonRedressWrites = Writes[WithdrawalReason] {
+    case OutOfScope => Json.obj("withdrawalReason" -> "01")
+    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "02")
+    case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "03")
+    case JoinedAWRSGroup => Json.obj("withdrawalReason" -> "04")
+    case Other(reason) =>
+      Json.obj(
+        "withdrawalReason" -> "05",
+        "specifyOtherReason" -> reason
+      )
+  }
 }
