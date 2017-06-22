@@ -41,14 +41,12 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
           be(Valid(WithdrawalReason.JoinedAWRSGroup))
 
       }
-
       "given enum value for other and string for reason" in {
 
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("other"))) must
           be(Valid(WithdrawalReason.Other("other")))
 
       }
-
     }
 
 
@@ -95,10 +93,21 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar{
         WithdrawalReason.formRule.validate(Map.empty) must
           be(Invalid(Seq((Path \ "withdrawalReason", Seq(ValidationError("error.required.withdrawal.reason"))))))
       }
-      "no other reason given" in {
-        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq.empty)) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+      "no other reason" which {
+        "is an empty string" in {
+          WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq(""))) must
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+        }
+        "a string of whitespace" in {
+          WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq("   \t"))) must
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+        }
+        "a missing value" in {
+          WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("05"), "specifyOtherReason" -> Seq.empty)) must
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required"))))))
+        }
       }
+
     }
 
   }
