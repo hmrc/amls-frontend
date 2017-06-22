@@ -442,6 +442,9 @@ lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers 
 
 lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
+link.return.registration.progress = Return to application progress
+link.return.renewal.progress = Return to renewal progress
+
 ############################### Login Page ###############################
 amls.Login.title = AMLS
 unauthorised.title = You can’t access this service with this account
