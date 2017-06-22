@@ -16,14 +16,8 @@
 
 package controllers.withdrawal
 
-import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.ReadStatusResponse
-import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessMatching
-import models.status.SubmissionReadyForReview
-import models.withdrawal.{WithdrawSubscriptionResponse, WithdrawalReason}
-import org.joda.time.LocalDateTime
+import models.withdrawal.WithdrawalReason
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -32,11 +26,11 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite{
+class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite {
 
   override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
@@ -48,10 +42,10 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
-    val cacheConnector = mock[DataCacheConnector]
+    val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+    lazy val controller = new WithdrawalReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
 
   }
 
@@ -60,7 +54,7 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
     "get is called" must {
 
-      "display withdrawal_reasons view without data" in new TestFixture{
+      "display withdrawal_reasons view without data" in new TestFixture {
 
         when(controller.dataCacheConnector.fetch[WithdrawalReason](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -74,12 +68,55 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
         document.getElementById("withdrawalReason-02").hasAttr("checked") must be(false)
         document.getElementById("withdrawalReason-03").hasAttr("checked") must be(false)
         document.getElementById("withdrawalReason-04").hasAttr("checked") must be(false)
-        document.getElementById("specifyOtherReason").`val`() is empty
+        document.getElementById("specifyOtherReason").`val`() must be("")
       }
 
-      "display the page with pre-populated data" in new TestFixture{
-        val result = controller.get()(request)
-        status(result) must be(OK)
+      "display the page with pre-populated data" when {
+
+        val outOfScopeId = "withdrawalReason-01"
+        val notTradingInOwnRightId = "withdrawalReason-02"
+        val underAnotherSupervisorId = "withdrawalReason-03"
+        val otherId = "withdrawalReason-04"
+
+        val withdrawalReason = Map(
+          outOfScopeId -> WithdrawalReason.OutOfScope,
+          notTradingInOwnRightId -> WithdrawalReason.NotTradingInOwnRight,
+          underAnotherSupervisorId -> WithdrawalReason.UnderAnotherSupervisor,
+          otherId -> WithdrawalReason.Other("reason")
+        )
+
+        withdrawalReason.foreach {
+          case (id, model) =>
+            model.toString in new TestFixture {
+
+              when(controller.dataCacheConnector.fetch[WithdrawalReason](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(model)))
+
+              val result = controller.get()(request)
+              status(result) must be(OK)
+
+              val document = Jsoup.parse(contentAsString(result))
+
+              document.getElementById(outOfScopeId).hasAttr("checked") must be(outOfScopeId.equals(id))
+              document.getElementById(notTradingInOwnRightId).hasAttr("checked") must be(notTradingInOwnRightId.equals(id))
+              document.getElementById(underAnotherSupervisorId).hasAttr("checked") must be(underAnotherSupervisorId.equals(id))
+              document.getElementById(otherId).hasAttr("checked") must be(otherId.equals(id))
+            }
+        }
+
+        "given a reason with other" in new TestFixture {
+
+          when(controller.dataCacheConnector.fetch[WithdrawalReason](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(WithdrawalReason.Other("reason"))))
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.getElementById("specifyOtherReason").`val`() must be("reason")
+
+        }
+
       }
     }
 
@@ -102,7 +139,7 @@ class WithdrawalReasonControllerToggleOffSpec extends GenericTestHelper with One
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+    lazy val controller = new WithdrawalReasonController(authConnector, cacheConnector, amlsConnector, authService, statusService)
   }
 
   "The WithdrawalReasonController" when {
