@@ -755,6 +755,9 @@ summary.linetext = Please check all the information you have provided.
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
+withdrawal.reason.title = Withdraw Application
+withdrawal.reason.heading = Why are you withdrawing your application?
+
 
 main.sidebar.title = Automatic saving
 main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
