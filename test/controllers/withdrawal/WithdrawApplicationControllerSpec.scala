@@ -101,7 +101,7 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.routes.LandingController.get().url.some
+        redirectLocation(result) mustBe routes.WithdrawalReasonController.get().url.some
 
         verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
       }
