@@ -38,8 +38,9 @@ trait ApplicationConfig {
   def allowWithdrawalToggle: Boolean
 
   def allowDeRegisterToggle: Boolean
-}
 
+  def frontendBaseUrl: String
+}
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
@@ -114,4 +115,12 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def allowWithdrawalToggle = getConfBool("feature-toggle.allow-withdrawal", false)
 
   override def allowDeRegisterToggle = getConfBool("feature-toggle.allow-deregister", false)
+
+  override def frontendBaseUrl = {
+    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
+    val scheme = if (secure) "https" else "http"
+    val host = getConfString("amls-frontend.public.host", "")
+
+    s"$scheme://$host"
+  }
 }
