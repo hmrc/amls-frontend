@@ -20,16 +20,13 @@
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
 
-@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "")(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
     editUrl: String = "",
     dataItem: Option[T]
 )(content: T => Html)(implicit lang: Lang) = {
-
-
-
 <section class="check-your-answers">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
     <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
@@ -54,11 +51,11 @@
         }</p>
 }
 
-@personName(person: ResponsiblePeople) = @{person.personName.map ( name =>
-    name.fullName
-).getOrElse(
+@personName = @{if(rpName.equals("")){
     Messages("missing.personName")
-)}
+} else {
+    rpName
+}}
 
 @header = {
     @heading("responsiblepeople.detailed_answers.title", "summary.responsiblepeople")
@@ -71,20 +68,15 @@
 
     @model.map { person =>
 
-            @person.personName.map { pName =>
-                @showHide match {
-                    case true => {
-                        <div class="panel-indent panel-indent--gutter panel-border-wide info">
-                            <p>
-                                <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
-                                     @Messages("responsiblepeople.detailed_answer.tell.us.moved", pName.fullName)
-                                </a>
-                            </p>
-                        </div>
-                            }
-                    case false => {}
-                }
-            }
+        @if(showHide){
+            <div class="panel-indent panel-indent--gutter panel-border-wide info">
+                <p>
+                    <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                        @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
+                    </a>
+                </p>
+            </div>
+        }
 
         <h2 class="heading-large">
             @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):
@@ -123,36 +115,71 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.uk_resident"),
+            question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
             editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             @prt.isUKResidence match {
                 case UKResidence(nino) => {
-                <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
+                    <p>@Messages("lbl.yes")</p>
+                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
                 }
-                case NonUKResidence(dob, UKPassport(number)) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number</li>
-                </ul>
-                }
-                case NonUKResidence(dob, NonUKPassport(number)) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number</li>
-                </ul>
-                }
-                case NonUKResidence(dob, NoPassport) => {
-                <ul class="list">
-                    <li>@Messages("lbl.no")</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.uk_resident.no_passport")</li>
-                </ul>
+                case NonUKResidence => {
+                    <p>@Messages("lbl.no")</p>
                 }
             }
+        }
+
+        @person.ukPassport.map { ukPassport =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
+                editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true).toString(),
+                dataItem = Some(ukPassport)
+            ) { pp =>
+                @pp match {
+                    case UKPassportYes(ukPassportNumber) => {
+                        <p>@Messages("lbl.yes")</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @ukPassportNumber</p>
+                    }
+                    case UKPassportNo => {
+                        <p>@Messages("lbl.no")</p>
+                    }
+                }
+            }
+
+        }
+
+        @person.nonUKPassport.map { nonUKPassport =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
+                editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true).toString(),
+                dataItem = Some(nonUKPassport)
+            ) { pp =>
+                @pp match {
+                    case NonUKPassportYes(nonUKPassportNumber) => {
+                        <p>@Messages("lbl.yes")</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @nonUKPassportNumber</p>
+                    }
+                    case NoPassport => {
+                        <p>@Messages("lbl.no")</p>
+                    }
+                }
+            }
+
+        }
+
+        @person.dateOfBirth.map { dateOfBirth =>
+
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.dob", personName),
+                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true).toString(),
+                dataItem = Some(dateOfBirth)
+            ) { dob =>
+                <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
+            }
+
         }
 
         @detailedAnswers(
@@ -208,7 +235,7 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
+            question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
             editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true).toString,
             dataItem = person.addressHistory.flatMap(_.currentAddress)
         ){ a =>
@@ -227,7 +254,7 @@
             }
 
             @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
+                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>
@@ -248,7 +275,7 @@
             }
 
             @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName(person)),
+                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
                 editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true).toString,
                 dataItem = Some(pa)
             ){ a =>

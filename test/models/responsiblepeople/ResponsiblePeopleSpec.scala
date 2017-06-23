@@ -32,27 +32,67 @@ import utils.StatusConstants
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
 
   "ResponsiblePeople" must {
-
-    "validate complete json" when {
-
-      "Serialising" in {
-        Json.toJson(completeResponsiblePeople) must be(CompleteJson)
-      }
-
-      "Deserialising" in {
-        CompleteJson.as[ResponsiblePeople] must be(completeResponsiblePeople)
+    "serialise correctly" when {
+      "residence and passport type is in current format" in {
+        Json.toJson(completeModelNonUkResidentNonUkPassport) must be(completeJsonPresentNonUkResidentNonUkPassport)
       }
     }
 
-    "implicitly return an existing Model if one present" in {
-      val responsiblePeople = ResponsiblePeople.default(Some(completeResponsiblePeople))
-      responsiblePeople must be(completeResponsiblePeople)
+    "deserialise old format json successfully" when {
+      "given complete json" when {
+        "residence and passport type is in old format for a UK responsible person" in {
+          CompleteJsonPastUk.as[ResponsiblePeople] must be(completeModelUkResident)
+        }
+        "residence and passport type is in old format for a non-uk responsible person" in {
+          CompleteJsonPastNonUk.as[ResponsiblePeople] must be(completeModelNonUkResidentNonUkPassport)
+        }
+      }
+      "given incomplete json" when {
+        incompleteJsonPastUk.as[ResponsiblePeople] must be(
+          ResponsiblePeople(Some(DefaultValues.personName))
+        )
+      }
     }
+    "deserialise current format json successfully" when {
+      "json is complete" when {
+        "uk resident = yes" in {
+          completeJsonPresentUkResident.as[ResponsiblePeople] must be(completeModelUkResident)
+        }
+        "uk resident = no, uk passport = yes" in {
+          completeJsonPresentNonUkResidentUkPassport.as[ResponsiblePeople] must be(completeModelNonUkResidentUkPassport)
+        }
+        "uk resident = no, uk passport = no, non-uk passport = yes" in {
+          completeJsonPresentNonUkResidentNonUkPassport.as[ResponsiblePeople] must be(completeModelNonUkResidentNonUkPassport)
+        }
+        "uk resident = no, uk passport = no, non-uk passport = no" in {
+          completeJsonPresentNonUkResidentNoPassport.as[ResponsiblePeople] must be(completeModelNonUkResidentNoPassport)
+        }
+      }
+      "given partially complete json in current format" when {
+        "response to Uk resident is no, and no further responses have been given" in {
+          incompleteJsonCurrentUpToUkResident.as[ResponsiblePeople] must be(incompleteResponsiblePeopleUpToUkResident)
+        }
+        "response to Uk resident is no, and a uk passport number has been provided" in {
+          incompleteJsonCurrentUpToUkPassportNumber.as[ResponsiblePeople] must be(incompleteResponsiblePeopleUpToUkPassportNumber)
+        }
+        "response to Uk resident is no, and a non-uk passport number has been provided" in {
+          incompleteJsonCurrentUpToNonUkPassportNumber.as[ResponsiblePeople] must be(incompleteResponsiblePeopleUpToNonUkPassportNumber)
+        }
+        "response to Uk resident is no, non-uk passport is no and a date of birth has been given" in {
+          incompleteJsonCurrentUpToNoNonUkPassportDateOfBirth.as[ResponsiblePeople] must be(incompleteResponsiblePeopleUpToNoNonUkPassportDateOfBirth)
+        }
+      }
+    }
+  }
 
-    "implicitly return an empty Model if not present" in {
-      val responsiblePeople = ResponsiblePeople.default(None)
-      responsiblePeople must be(ResponsiblePeople())
-    }
+  "implicitly return an existing Model if one present" in {
+    val responsiblePeople = ResponsiblePeople.default(Some(completeModelNonUkResidentNonUkPassport))
+    responsiblePeople must be(completeModelNonUkResidentNonUkPassport)
+  }
+
+  "implicitly return an empty Model if not present" in {
+    val responsiblePeople = ResponsiblePeople.default(None)
+    responsiblePeople must be(ResponsiblePeople())
   }
 
   "the section" when {
@@ -72,7 +112,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(completeResponsiblePeople)))
+          .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport)))
 
         ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
       }
@@ -83,7 +123,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(completeResponsiblePeople, completeResponsiblePeople, incompleteResponsiblePeople)))
+          .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport, completeModelNonUkResidentNonUkPassport, incompleteResponsiblePeople)))
 
         ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
 
@@ -117,7 +157,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(completeResponsiblePeople, ResponsiblePeople())))
+          .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport, ResponsiblePeople())))
 
         ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
@@ -128,7 +168,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-          .thenReturn(Some(Seq(completeResponsiblePeople, ResponsiblePeople(), incompleteResponsiblePeople)))
+          .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport, ResponsiblePeople(), incompleteResponsiblePeople)))
 
         ResponsiblePeople.section(mockCacheMap).call.url must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3).url)
       }
@@ -214,19 +254,19 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   "Successfully validate if the model is complete" when {
 
     "the model is fully complete" in {
-      completeResponsiblePeople.isComplete must be(true)
+      completeModelNonUkResidentNonUkPassport.isComplete must be(true)
     }
 
     "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
-      completeResponsiblePeople.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
+      completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None).isComplete must be(true)
     }
 
     "the model partially complete with vat registration model is empty" in {
-      completeResponsiblePeople.copy(vatRegistered = None).isComplete must be(false)
+      completeModelNonUkResidentNonUkPassport.copy(vatRegistered = None).isComplete must be(false)
     }
 
     "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
-      completeResponsiblePeople.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+      completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
         vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
     }
 
@@ -280,7 +320,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
-            completeResponsiblePeople)))
+            completeModelNonUkResidentNonUkPassport)))
         val section = ResponsiblePeople.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -294,16 +334,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "personName value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.personName(DefaultValues.personName)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.personName(DefaultValues.personName)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.personName(NewValues.personName)
-          result must be(completeResponsiblePeople.copy(personName = Some(NewValues.personName), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.personName(NewValues.personName)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(personName = Some(NewValues.personName), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -311,16 +351,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "personResidenceType value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.personResidenceType(DefaultValues.personResidenceType)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.personResidenceType(DefaultValues.personResidenceTypeNonUk)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.personResidenceType(NewValues.personResidenceType)
-          result must be(completeResponsiblePeople.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.personResidenceType(NewValues.personResidenceType)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -328,16 +368,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "contactDetails value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.contactDetails(DefaultValues.contactDetails)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.contactDetails(DefaultValues.contactDetails)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.contactDetails(NewValues.contactDetails)
-          result must be(completeResponsiblePeople.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.contactDetails(NewValues.contactDetails)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -345,16 +385,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "addressHistory value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.addressHistory(DefaultValues.addressHistory)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.addressHistory(DefaultValues.addressHistory)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.addressHistory(NewValues.addressHistory)
-          result must be(completeResponsiblePeople.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.addressHistory(NewValues.addressHistory)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -362,16 +402,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "positions value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.positions(DefaultValues.positions)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.positions(DefaultValues.positions)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.positions(NewValues.positions)
-          result must be(completeResponsiblePeople.copy(positions = Some(NewValues.positions), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.positions(NewValues.positions)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(positions = Some(NewValues.positions), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -379,16 +419,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "saRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.saRegistered(DefaultValues.saRegistered)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.saRegistered(DefaultValues.saRegistered)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.saRegistered(NewValues.saRegistered)
-          result must be(completeResponsiblePeople.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.saRegistered(NewValues.saRegistered)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -396,16 +436,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "vatRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.vatRegistered(DefaultValues.vatRegistered)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.vatRegistered(DefaultValues.vatRegistered)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.vatRegistered(NewValues.vatRegistered)
-          result must be(completeResponsiblePeople.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.vatRegistered(NewValues.vatRegistered)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -413,16 +453,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "experienceTraining value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.experienceTraining(DefaultValues.experienceTraining)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.experienceTraining(DefaultValues.experienceTraining)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.experienceTraining(NewValues.experienceTraining)
-          result must be(completeResponsiblePeople.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.experienceTraining(NewValues.experienceTraining)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -430,16 +470,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "training value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.training(DefaultValues.training)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.training(DefaultValues.training)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.training(NewValues.training)
-          result must be(completeResponsiblePeople.copy(training = Some(NewValues.training), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.training(NewValues.training)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(training = Some(NewValues.training), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -447,16 +487,67 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "hasAlreadyPassedFitAndProper value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.hasAlreadyPassedFitAndProper(true)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(true)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.hasAlreadyPassedFitAndProper(false)
-          result must be(completeResponsiblePeople.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(false)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
+    "ukPassport value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeModelNonUkResidentNonUkPassport.ukPassport(UKPassportNo)
+          result must be(completeModelNonUkResidentNonUkPassport)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeModelNonUkResidentNonUkPassport.ukPassport(UKPassportYes("87654321"))
+          result must be(completeModelNonUkResidentNonUkPassport.copy(ukPassport = Some(UKPassportYes("87654321")), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
+    "nonUKPassport value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeModelNonUkResidentNonUkPassport.nonUKPassport(NonUKPassportYes("87654321"))
+          result must be(completeModelNonUkResidentNonUkPassport)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeModelNonUkResidentNonUkPassport.nonUKPassport(NoPassport)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(nonUKPassport = Some(NoPassport), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
+    "dateOfBirth value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = completeModelNonUkResidentNonUkPassport.dateOfBirth(DateOfBirth(new LocalDate(1990, 10, 2)))
+          result must be(completeModelNonUkResidentNonUkPassport)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = completeModelNonUkResidentNonUkPassport.dateOfBirth(DateOfBirth(new LocalDate(1990, 12, 12)))
+          result must be(completeModelNonUkResidentNonUkPassport.copy(dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 12, 12))), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -464,16 +555,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "status value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeResponsiblePeople.status(StatusConstants.Unchanged)
-          result must be(completeResponsiblePeople)
+          val result = completeModelNonUkResidentNonUkPassport.status(StatusConstants.Unchanged)
+          result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeResponsiblePeople.status(StatusConstants.Deleted)
-          result must be(completeResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.status(StatusConstants.Deleted)
+          result must be(completeModelNonUkResidentNonUkPassport.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -481,8 +572,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   }
 
   "anyChanged" must {
-    val originalResponsiblePeople = Seq(completeResponsiblePeople)
-    val responsiblePeopleChanged = Seq(completeResponsiblePeople.copy(hasChanged=true))
+    val originalResponsiblePeople = Seq(completeModelNonUkResidentNonUkPassport)
+    val responsiblePeopleChanged = Seq(completeModelNonUkResidentNonUkPassport.copy(hasChanged = true))
 
     "return false" when {
       "no ResponsiblePeople within the sequence have changed" in {
@@ -499,14 +590,15 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
   }
 }
 
-trait ResponsiblePeopleValues extends NinoUtil{
+trait ResponsiblePeopleValues extends NinoUtil {
 
   private val startDate = Some(new LocalDate())
   private val nino = nextNino
 
   object DefaultValues {
 
-    private val residence = UKResidence(nino)
+    private val residenceNonUk = NonUKResidence
+    private val residenceUk = UKResidence("AA111111A")
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
@@ -517,7 +609,8 @@ trait ResponsiblePeopleValues extends NinoUtil{
     //scalastyle:off magic.number
     val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), new LocalDate(1990, 2, 24))
     val personName = PersonName("first", Some("middle"), "last", Some(previousName), Some("name"))
-    val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
+    val personResidenceTypeNonUk = PersonResidenceType(residenceNonUk, Some(residenceCountry), Some(residenceNationality))
+    val personResidenceTypeUk = PersonResidenceType(residenceUk, Some(residenceCountry), Some(residenceNationality))
     val saRegistered = SaRegisteredYes("0123456789")
     val contactDetails = ContactDetails("07702743555", "test@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
@@ -525,6 +618,11 @@ trait ResponsiblePeopleValues extends NinoUtil{
     val training = TrainingYes("test")
     val experienceTraining = ExperienceTrainingYes("Some training")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
+    val ukPassportYes = UKPassportYes("000000000")
+    val ukPassportNo = UKPassportNo
+    val nonUKPassportYes = NonUKPassportYes("87654321")
+    val nonUKPassportNo = NoPassport
+    val dateOfBirth = DateOfBirth(new LocalDate(1990, 10, 2))
   }
 
   object NewValues {
@@ -533,7 +631,7 @@ trait ResponsiblePeopleValues extends NinoUtil{
     private val residenceMonth = 2
     private val residenceDay = 24
     private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
-    private val residence = NonUKResidence(residenceDate, UKPassport("000000000"))
+    private val residence = UKResidence(nino)
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
@@ -552,9 +650,12 @@ trait ResponsiblePeopleValues extends NinoUtil{
     val training = TrainingNo
   }
 
-  val completeResponsiblePeople = ResponsiblePeople(
+  val completeModelUkResident = ResponsiblePeople(
     Some(DefaultValues.personName),
-    Some(DefaultValues.personResidenceType),
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    None,
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),
@@ -570,14 +671,107 @@ trait ResponsiblePeopleValues extends NinoUtil{
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
+  val completeModelNonUkResidentNonUkPassport = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportNo),
+    Some(DefaultValues.nonUKPassportYes),
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelNonUkResidentNoPassport = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportNo),
+    Some(DefaultValues.nonUKPassportNo),
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelNonUkResidentUkPassport = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportYes),
+    None,
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+
   val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
-    Some(DefaultValues.personResidenceType),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    None,
+    None,
+    None,
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory)
   )
 
-  val CompleteJson = Json.obj(
+  val incompleteResponsiblePeopleUpToUkResident = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk)
+  )
+
+  val incompleteResponsiblePeopleUpToUkPassportNumber = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportYes)
+  )
+
+  val incompleteResponsiblePeopleUpToNonUkPassportNumber = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportNo),
+    Some(DefaultValues.nonUKPassportYes)
+  )
+
+  val incompleteResponsiblePeopleUpToNoNonUkPassportDateOfBirth = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportNo),
+    Some(DefaultValues.nonUKPassportNo),
+    Some(DefaultValues.dateOfBirth)
+  )
+
+  val incompleteJsonCurrent = Json.obj(
     "personName" -> Json.obj(
       "firstName" -> "first",
       "middleName" -> "middle",
@@ -591,7 +785,552 @@ trait ResponsiblePeopleValues extends NinoUtil{
       "otherNames" -> "name"
     ),
     "personResidenceType" -> Json.obj(
-      "nino" -> nino,
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    )
+  )
+
+  val incompleteJsonCurrentUpToUkResident = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    )
+  )
+
+  val incompleteJsonCurrentUpToUkPassportNumber = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "ukPassport" -> Json.obj(
+      "ukPassport" -> true,
+      "ukPassportNumber" -> "000000000"
+    )
+  )
+
+  val incompleteJsonCurrentUpToNonUkPassportNumber = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "nonUKPassport" -> Json.obj(
+      "nonUKPassport" -> true,
+      "nonUKPassportNumber" -> "87654321"
+    )
+  )
+
+  val incompleteJsonCurrentUpToNoNonUkPassportDateOfBirth = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "nonUKPassport" -> Json.obj(
+      "nonUKPassport" -> false
+    ),
+    "dateOfBirth" -> Json.obj(
+      "dateOfBirth" -> "1990-10-02"
+    )
+  )
+
+  val CompleteJsonPastNonUk = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> false,
+      "dateOfBirth" -> "1990-10-02",
+      "nonUKPassportNumber" -> "87654321",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val incompleteJsonPastUk = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    )
+  )
+
+  val CompleteJsonPastUk = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "nino" -> "AA111111A",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentNonUkResidentUkPassport = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "ukPassport" -> Json.obj(
+      "ukPassport" -> true,
+      "ukPassportNumber" -> "000000000"
+    ),
+    "dateOfBirth" -> Json.obj(
+      "dateOfBirth" -> "1990-10-02"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentNonUkResidentNonUkPassport = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "ukPassport" -> Json.obj(
+      "ukPassport" -> false
+    ),
+    "nonUKPassport" -> Json.obj(
+      "nonUKPassport" -> true,
+      "nonUKPassportNumber" -> "87654321"
+    ),
+    "dateOfBirth" -> Json.obj(
+      "dateOfBirth" -> "1990-10-02"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentNonUkResidentNoPassport = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "false",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "ukPassport" -> Json.obj(
+      "ukPassport" -> false
+    ),
+    "nonUKPassport" -> Json.obj(
+      "nonUKPassport" -> false
+    ),
+    "dateOfBirth" -> Json.obj(
+      "dateOfBirth" -> "1990-10-02"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+
+  val completeJsonPresentUkResident = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last",
+      "previousName" -> Json.obj(
+        "firstName" -> "oldFirst",
+        "middleName" -> "oldMiddle",
+        "lastName" -> "oldLast",
+        "date" -> "1990-02-24"
+      ),
+      "otherNames" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "true",
+      "nino" -> "AA111111A",
       "countryOfBirth" -> "GB",
       "nationality" -> "GB"
     ),
@@ -650,6 +1389,6 @@ trait ResponsiblePeopleValues extends NinoUtil{
   )
 
   /** Make sure Responsible People model is complete */
-  assert(completeResponsiblePeople.isComplete)
+  assert(completeModelNonUkResidentNonUkPassport.isComplete)
 
 }
