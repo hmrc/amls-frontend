@@ -29,15 +29,5 @@ object WithdrawSubscriptionRequest {
 
   val DefaultAckReference = "A" * 32
 
-  implicit val reads = Json.reads[WithdrawSubscriptionRequest]
-  implicit val writes: Writes[WithdrawSubscriptionRequest] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-    (
-        (__ \ "acknowledgementReference").write[String] and
-        (__ \ "withdrawalDate").write[LocalDate] and
-        (__ \ "withdrawalReason").write[WithdrawalReason] and
-        (__ \ "withdrawalReasonOthers").writeNullable[String]
-      ) (unlift(WithdrawSubscriptionRequest.unapply))
-  }
+  implicit val format = Json.format[WithdrawSubscriptionRequest]
 }
