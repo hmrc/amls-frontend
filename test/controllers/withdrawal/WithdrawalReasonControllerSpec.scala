@@ -24,6 +24,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -118,6 +119,33 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
         }
 
       }
+
+    }
+
+    "post is called" when {
+
+      "given valid data" must {
+
+        "go to landing controller" in new TestFixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "withdrawalReason" -> "01"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+
+        }
+
+        "send a withdrawal to amls" in new TestFixture {}
+
+      }
+
+      "given invalid data" must {
+        "return with BAD_REQUEST" in new TestFixture {}
+      }
+
     }
 
   }

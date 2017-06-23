@@ -49,7 +49,7 @@ class WithdrawalReasonController @Inject()(
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+      Future.successful(Redirect(controllers.routes.LandingController.get()))
   }
 
 }
