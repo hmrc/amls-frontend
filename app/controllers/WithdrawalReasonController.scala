@@ -31,7 +31,7 @@ import views.html.withdraw_application
 
 import scala.concurrent.Future
 
-class WithdrawApplicationController @Inject()
+class WithdrawalReasonController @Inject()
 (val authConnector: AuthConnector,
  amls: AmlsConnector,
  enrolments: AuthEnrolmentsService,
@@ -40,31 +40,12 @@ class WithdrawApplicationController @Inject()
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-
-      if(!ApplicationConfig.allowWithdrawalToggle) {
-        Future.successful(NotFound)
-      } else {
-        val maybeProcessingDate = for {
-          status <- OptionT.liftF(statusService.getDetailedStatus)
-          response <- OptionT.fromOption[Future](status._2)
-        } yield response.processingDate
-
-        (for {
-          cache <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-          details <- OptionT.fromOption[Future](cache.reviewDetails)
-          processingDate <- maybeProcessingDate
-        } yield Ok(withdraw_application(details.businessName, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
-      }
+      ???
   }
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      val requestData = WithdrawSubscriptionRequest(WithdrawSubscriptionRequest.DefaultAckReference, LocalDate.now(), StaticWithdrawalReason.OutOfScope)
-
-      (for {
-        regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-        _ <- OptionT.liftF(amls.withdraw(regNumber, requestData))
-      } yield Redirect(routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
+      ???
   }
 
 }

@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package models.withdrawal
+package models.payments
 
-import org.joda.time.{LocalDate, LocalDateTime}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class WithdrawSubscriptionRequestSpec extends PlaySpec with MustMatchers {
+class CreatePaymentResponseSpec extends PlaySpec with MustMatchers {
 
-  "The withdrawal subscription request object" when {
-    "serialised" must {
-      "produce the correct JSON" in {
-        val date = LocalDate.now()
-        val expectedJson = Json.obj(
-          "acknowledgementReference" -> "SomeRef",
-          "withdrawalDate" -> date.toString("yyyy-MM-dd"),
-          "withdrawalReason" -> StaticWithdrawalReason.OutOfScope
-        )
+  "The CreatePaymentResponse model" must {
+    "round-trip through JSON serialization correctly" in {
+      val model = CreatePaymentResponse(PayApiLinks("http://next.url"))
 
-        Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, StaticWithdrawalReason.OutOfScope, None)) mustBe expectedJson
-      }
+      Json.toJson(model).as[CreatePaymentResponse] mustBe model
     }
   }
 

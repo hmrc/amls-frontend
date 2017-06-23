@@ -1,0 +1,79 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("withdrawal.reason.heading", "summary.status")
+}
+
+@main(
+    title = Messages("withdrawal.reason.title") + " - " + Messages("title.yapp"),
+    heading = header
+) {
+    @form(f, controllers.routes.WithdrawalReasonController.post) {
+
+        @fieldset(
+            f = f("withdrawalReason-fieldset"),
+            legend = "withdrawal.reason.heading",
+            classes = Seq("withdrawalReason-fieldset")
+        ) {
+            @errorGroup(
+                field = f("withdrawalReason")
+            ) {
+                @radio(
+                    f = f("withdrawalReason"),
+                    labelText = "withdrawal.reason.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("withdrawalReason"),
+                    labelText = "withdrawal.reason.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("withdrawalReason"),
+                    labelText = "withdrawal.reason.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("withdrawalReason"),
+                    labelText = "withdrawal.reason.lbl.04",
+                    value = "04",
+                    target = s".other-fieldset"
+                )
+            }
+        }
+
+        @fieldset(
+            legend = "withdrawal.reason.lbl.04",
+            legendHidden = true,
+            classes = Seq("specifyOtherReason-fieldset"),
+            f = f("specifyOtherReason-fieldset")
+        ) {
+            @input(
+                field = f("specifyOtherReason"),
+                labelText = "withdrawal.reason.lbl.specify.other.reason"
+            )
+        }
+
+        @submit(false, Some(Messages("button.continue")))
+    }
+}

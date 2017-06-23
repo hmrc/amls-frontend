@@ -50,7 +50,7 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
     lazy val config = app.injector.instanceOf(classOf[ServicesConfig])
 
-    lazy val configKey = config.baseUrl("authenticator")
+    lazy val configKey = config.baseUrl("government-gateway-authentication")
   }
 
   "The Authenticator connector" must {

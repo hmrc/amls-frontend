@@ -36,7 +36,8 @@ class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, config
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")
 
-  def requestPaymentRedirectUrl(redirectRequest: PaymentRedirectRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, httpRequest: Request[_]): Future[Option[PaymentServiceRedirect]] = {
+  def requestPaymentRedirectUrl(redirectRequest: PaymentRedirectRequest)
+                               (implicit hc: HeaderCarrier, ec: ExecutionContext, httpRequest: Request[_]): Future[Option[PaymentServiceRedirect]] = {
 
     if (config.getConfBool("feature-toggle.payments-url-lookup", defBool = false)) {
 

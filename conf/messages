@@ -325,6 +325,9 @@ error.required.renewal.ba.select.country = Select yes if you had customers in th
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
 
+error.required.withdrawal.reason = You must select a reason for withdrawing your application
+error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -441,6 +444,9 @@ hint.255.chars = Enter 255 characters or less.
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
 lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
+
+link.return.registration.progress = Return to application progress
+link.return.renewal.progress = Return to renewal progress
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -754,6 +760,15 @@ summary.linetext = Please check all the information you have provided.
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
+
+withdrawal.reason.title = Withdraw Application
+withdrawal.reason.heading = Why are you withdrawing your application?
+
+withdrawal.reason.lbl.01 = Out of scope
+withdrawal.reason.lbl.02 = Not trading in own right
+withdrawal.reason.lbl.03 = I‘m supervised by another body
+withdrawal.reason.lbl.04 = Other
+withdrawal.reason.lbl.specify.other.reason = Please specify
 
 
 main.sidebar.title = Automatic saving

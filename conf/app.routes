@@ -21,6 +21,9 @@ GET         /your-registration/your-messages                                    
 GET         /your-registration/withdraw-application                                   @controllers.WithdrawApplicationController.get()
 POST        /your-registration/withdraw-application                                   @controllers.WithdrawApplicationController.post()
 
+GET         /your-registration/withdraw-application-reason                            @controllers.WithdrawalReasonController.get()
+POST        /your-registration/withdraw-application-reason                            @controllers.WithdrawalReasonController.post()
+
 GET         /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.get()
 POST        /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.post()
 
@@ -251,6 +254,16 @@ GET         /declaration/add-person                                             
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
 
 GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
+
+GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
+
+GET         /update-information/role-in-business                                      @controllers.changeofficer.RoleInBusinessController.get()
+
+GET         /update-information/new-nominated-officer                                 @controllers.changeofficer.NewOfficerController.get()
+
+GET         /update-information/further-updates                                       @controllers.changeofficer.FurtherUpdatesController.get()
+
+GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 

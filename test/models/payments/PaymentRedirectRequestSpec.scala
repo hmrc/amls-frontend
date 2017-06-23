@@ -32,7 +32,7 @@ class PaymentRedirectRequestSpec extends PlaySpec {
       val expectedJson = Json.obj(
         "reference" -> "some_reference",
         "amount" -> "100.0",
-        "url" -> "//localhost:9222/anti-money-laundering/start"
+        "url" -> "http://localhost:9222/anti-money-laundering/start"
       )
 
       val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start"))
