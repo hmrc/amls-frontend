@@ -33,7 +33,9 @@
         @fieldset(
             f = f("withdrawalReason-fieldset"),
             legend = "withdrawal.reason.heading",
-            classes = Seq("withdrawalReason-fieldset")
+            legendHidden = true,
+            classes = Seq("withdrawalReason-fieldset"),
+            panel = false
         ) {
             @errorGroup(
                 field = f("withdrawalReason")
