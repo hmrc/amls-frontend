@@ -19,14 +19,12 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
-import play.api.i18n.Messages
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -47,6 +45,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
   }
 
   val emptyCache = CacheMap("", Map.empty)
+  val mockCacheMap = mock[CacheMap]
 
   "PersonResidentTypeController" when {
 
@@ -57,9 +56,10 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
         val personName = PersonName("firstname", None, "lastname", None, None)
         val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
-        val residenceTypeNonUK = NonUKResidence(new LocalDate(1990, 12, 2), NonUKPassport("0000000000"))
+        val residenceTypeNonUK = NonUKResidence
 
         "without pre-populated data" in new Fixture {
+
           val responsiblePeople = ResponsiblePeople(Some(personName))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -72,15 +72,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(false)
           document.select("input[name=nino]").`val` must be("")
-          document.select("input[name=countryOfBirth]").`val` must be("")
-          document.getElementById("passportType-01").hasAttr("checked") must be(false)
-          document.getElementById("passportType-02").hasAttr("checked") must be(false)
-          document.getElementById("passportType-03").hasAttr("checked") must be(false)
-          document.select("input[name=dateOfBirth.day]").`val` must be("")
-          document.select("input[name=dateOfBirth.month]").`val` must be("")
-          document.select("input[name=dateOfBirth.year]").`val` must be("")
-          document.select("input[name=ukPassportNumber]").`val` must be("")
-          document.select("input[name=nonUKPassportNumber]").`val` must be("")
 
         }
 
@@ -123,12 +114,6 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val document = Jsoup.parse(contentAsString(result))
           document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
-          document.select("input[name=dateOfBirth.day]").`val` must be("2")
-          document.select("input[name=dateOfBirth.month]").`val` must be("12")
-          document.select("input[name=dateOfBirth.year]").`val` must be("1990")
-
-          document.select("input[name=nonUKPassportNumber]").`val` must be("0000000000")
-
         }
 
       }
@@ -152,52 +137,143 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
     "post" must {
       "submit with a valid form" which {
-        "goes to NationalityController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "isUKResidence" -> "true",
-            "nino" -> nextNino,
-            "countryOfBirth" -> "GB",
-            "nationality" -> "GB"
-          )
-
-          val responsiblePeople = ResponsiblePeople()
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
-        }
-        "goes to DetailedAnswersController" when {
-          "in edit mode" in new Fixture {
+        "goes to CountryOfBirthController" when {
+          "uk residence" in new Fixture   {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "isUKResidence" -> "false",
-              "dateOfBirth.day" -> "24",
-              "dateOfBirth.month" -> "2",
-              "dateOfBirth.year" -> "1990",
-              "passportType" -> "03",
+              "isUKResidence" -> "true",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
               "nationality" -> "GB"
             )
 
-            val responsiblePeople = ResponsiblePeople()
+            val responsiblePeople = ResponsiblePeople(
+              personResidenceType = Some(
+                PersonResidenceType(
+                  UKResidence(nextNino),
+                  Some(Country("UK", "UK")),
+                  None
+                )
+              )
+            )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val result = controller.post(1, true)(newRequest)
+            val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
+          }
+        }
+
+        "goes to PersonUKPassportController" when {
+          "non uk residence" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "isUKResidence" -> "false",
+              "nino" -> nextNino,
+              "countryOfBirth" -> "GB",
+              "nationality" -> "GB"
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              personResidenceType = Some(
+                PersonResidenceType(
+                  NonUKResidence,
+                  Some(Country("UK", "UK")),
+                  None
+                )
+              )
+            )
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1).url))
+          }
+
+          "in edit mode" when {
+            "residence type is changed from uk residence to non uk residence" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "isUKResidence" -> "false"
+              )
+
+              val responsiblePeople = ResponsiblePeople(
+                personResidenceType = Some(
+                  PersonResidenceType(
+                    UKResidence(nextNino),
+                    Some(Country("UK", "UK")),
+                    None
+                  )
+                )
+              )
+
+              when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+                .thenReturn(Some(Seq(responsiblePeople)))
+
+              when(controller.dataCacheConnector.fetchAll(any(), any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+
+              val result = controller.post(1, true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true).url))
+            }
+          }
+        }
+
+        "goes to DetailedAnswersController" when {
+          "in edit mode" when {
+            "uk residence" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "isUKResidence" -> "true",
+                "nino" -> nextNino,
+                "countryOfBirth" -> "GB",
+                "nationality" -> "GB"
+              )
+
+              val responsiblePeople = ResponsiblePeople(
+                personResidenceType = Some(
+                  PersonResidenceType(
+                    NonUKResidence,
+                    Some(Country("UK", "UK")),
+                    None
+                  )
+                )
+              )
+
+              when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+                .thenReturn(Some(Seq(responsiblePeople)))
+
+              when(controller.dataCacheConnector.fetchAll(any(), any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+
+              val result = controller.post(1, true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+            }
           }
         }
 
@@ -214,11 +290,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -256,8 +332,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -281,6 +360,64 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             _ mustBe testNino
           }
 
+        }
+
+        "removes data from uk passport and no uk passport" when {
+          "data is changed from not uk resident to uk resident when edit is true" in new Fixture {
+
+            val nino = nextNino
+
+            val countryCode = "GB"
+
+            val responsiblePeople = ResponsiblePeople(
+              personResidenceType = Some(
+                PersonResidenceType(
+                  NonUKResidence,
+                  Some(Country(countryCode, countryCode)),
+                  Some(Country(countryCode, countryCode))
+                )
+              ),
+              ukPassport = Some(UKPassportNo),
+              nonUKPassport = Some(NonUKPassportYes("22654321"))
+            )
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "isUKResidence" -> "true",
+              "nino" -> nino,
+              "countryOfBirth" -> countryCode,
+              "nationality" -> countryCode
+            )
+
+
+            val personName = PersonName("firstname", None, "lastname", None, None)
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, true)(newRequest)
+            status(result) must be(SEE_OTHER)
+
+            verify(controller.dataCacheConnector)
+              .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
+              personResidenceType = Some(PersonResidenceType(
+                UKResidence(nino),
+                Some(Country(countryCode, countryCode)),
+                Some(Country(countryCode, countryCode))
+              )),
+              ukPassport = None,
+              nonUKPassport = None,
+              hasChanged = true
+            ))))(any(), any(), any())
+          }
         }
       }
 
@@ -316,8 +453,11 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
           val responsiblePeople = ResponsiblePeople()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
+
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))

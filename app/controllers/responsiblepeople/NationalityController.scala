@@ -34,12 +34,12 @@ trait NationalityController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName), Some(residencyType), _, _, _, _, _, _, _, _, _, _,_, _,_))
+            case Some(ResponsiblePeople(Some(personName),Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => residencyType.nationality match {
                 case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration, personName.titleName))
                 case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
               }
-            case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _,_, _, _, _, _, _,_, _))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
             case _
             => NotFound(notFoundView)
@@ -57,7 +57,7 @@ trait NationalityController extends RepeatingSection with BaseController {
               }
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
                   rp.personResidenceType(residenceType)
                 }

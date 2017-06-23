@@ -24,6 +24,7 @@ import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionAppro
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 
@@ -46,7 +47,7 @@ trait DetailedAnswersController extends BaseController {
           case Some(data) => {
             data.lift(index - 1) match {
               case Some(x) => showHideAddressMove(x.lineId) map {showHide =>
-                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide))
+                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide, ControllerHelper.rpTitleName(Some(x))))
               }
               case _ => Future.successful(NotFound(notFoundView))
             }

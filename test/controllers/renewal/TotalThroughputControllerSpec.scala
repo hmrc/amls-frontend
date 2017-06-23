@@ -90,6 +90,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
       html must include(Messages("renewal.msb.throughput.header"))
 
       val page = Jsoup.parse(html)
+
       page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(false)
       page.select("input[type=radio][name=throughput][id=throughput-02]").hasAttr("checked") must be(false)
       page.select("input[type=radio][name=throughput][id=throughput-03]").hasAttr("checked") must be(false)
@@ -149,7 +150,8 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         renewalService.getRenewal(any(), any(), any())
       } thenReturn Future.successful(Some(Renewal()))
 
-      post() { _ =>
+      post() { result =>
+        result.header.status mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
