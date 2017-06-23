@@ -23,7 +23,7 @@ import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
@@ -53,6 +53,7 @@ class WithdrawalReasonController @Inject()(
   def post = Authorised.async {
     implicit authContext => implicit request =>
       Form2[WithdrawalReason](request.body) match {
+        case f:InvalidForm => Future.successful(BadRequest(withdrawal_reason(f)))
         case ValidForm(_, data) => {
           val withdrawal = WithdrawSubscriptionRequest(
             WithdrawSubscriptionRequest.DefaultAckReference,

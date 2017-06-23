@@ -163,7 +163,16 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
       }
 
       "given invalid data" must {
-        "return with BAD_REQUEST" in new TestFixture {}
+        "return with BAD_REQUEST" in new TestFixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "withdrawalReason" -> "20"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
       }
 
     }
