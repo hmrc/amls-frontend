@@ -18,13 +18,9 @@ package models.withdrawal
 
 import org.joda.time.LocalDate
 
-object StaticWithdrawalReason {
-  val OutOfScope = "Out of scope"
-}
-
 case class WithdrawSubscriptionRequest (acknowledgementReference: String,
                                         withdrawalDate: LocalDate,
-                                        withdrawalReason: String,
+                                        withdrawalReason: WithdrawalReason,
                                         withdrawalReasonOthers: Option[String] = None
                                        )
 

@@ -20,7 +20,7 @@ import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
-import models.withdrawal.{StaticWithdrawalReason, StaticWithdrawalReason$, WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
+import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -230,7 +230,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "withdraw" must {
       "successfully withdraw the application" in {
         val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/withdrawal"
-        val request = WithdrawSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), StaticWithdrawalReason.OutOfScope)
+        val request = WithdrawSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), WithdrawalReason.OutOfScope)
         val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
 
         when {

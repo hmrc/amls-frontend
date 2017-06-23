@@ -24,8 +24,6 @@ import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
-import models.withdrawal.{StaticWithdrawalReason, WithdrawSubscriptionRequest}
-import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
@@ -33,12 +31,11 @@ import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future
 
-class WithdrawApplicationController @Inject()
-(val authConnector: AuthConnector,
- amls: AmlsConnector,
- enrolments: AuthEnrolmentsService,
- cache: DataCacheConnector,
- statusService: StatusService) extends BaseController {
+class WithdrawApplicationController @Inject()(
+                                               val authConnector: AuthConnector,
+                                               amls: AmlsConnector,
+                                               cache: DataCacheConnector,
+                                               statusService: StatusService) extends BaseController {
 
   def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle){
     Authorised.async {
@@ -58,12 +55,7 @@ class WithdrawApplicationController @Inject()
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      val requestData = WithdrawSubscriptionRequest(WithdrawSubscriptionRequest.DefaultAckReference, LocalDate.now(), StaticWithdrawalReason.OutOfScope)
-
-      (for {
-        regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-        _ <- OptionT.liftF(amls.withdraw(regNumber, requestData))
-      } yield Redirect(routes.WithdrawalReasonController.get())) getOrElse InternalServerError("Unable to withdraw the application")
+      Future.successful(Redirect(routes.WithdrawalReasonController.get()))
   }
 
 }

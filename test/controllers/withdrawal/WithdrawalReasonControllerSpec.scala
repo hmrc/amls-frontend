@@ -16,15 +16,16 @@
 
 package controllers.withdrawal
 
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.withdrawal.WithdrawalReason
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -47,6 +48,16 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
     val statusService = mock[StatusService]
 
     lazy val controller = new WithdrawalReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
+
+    val amlsRegistrationNumber = "XA1234567890L"
+
+    when {
+      authService.amlsRegistrationNumber(any(), any(), any())
+    } thenReturn Future.successful(amlsRegistrationNumber.some)
+
+    when {
+      amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+    } thenReturn Future.successful(mock[WithdrawSubscriptionResponse])
 
   }
 
@@ -126,19 +137,28 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
       "given valid data" must {
 
-        "go to landing controller" in new TestFixture {
+        "go to landing controller" which {
+          "follows sending a withdrawal to amls" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "withdrawalReason" -> "01"
-          )
+            val newRequest = request.withFormUrlEncodedBody(
+              "withdrawalReason" -> "01"
+            )
 
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+            val withdrawal = WithdrawSubscriptionRequest(
+              WithdrawSubscriptionRequest.DefaultAckReference,
+              LocalDate.now(),
+              WithdrawalReason.OutOfScope
+            )
 
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+
+            verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+
+            redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+
+          }
         }
-
-        "send a withdrawal to amls" in new TestFixture {}
 
       }
 
