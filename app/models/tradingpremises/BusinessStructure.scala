@@ -48,7 +48,6 @@ case object Partnership extends BusinessStructure
 case object IncorporatedBody extends BusinessStructure
 case object UnincorporatedBody extends BusinessStructure
 
-
 object BusinessStructure {
 
   import utils.MappingUtils.Implicits._

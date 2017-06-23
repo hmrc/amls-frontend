@@ -425,10 +425,10 @@ lbl.currency.line1 = Currency 1
 lbl.currency.line2 = Currency 2 (if applicable)
 lbl.currency.line3 = Currency 3 (if applicable)
 
-businessType.lbl.02 = Limited company
 businessType.lbl.01 = Sole proprietor
+businessType.lbl.02 = Limited partnership or limited liability partnership
 businessType.lbl.03 = Partnership
-businessType.lbl.04 = Limited partnership or limited liability partnership
+businessType.lbl.04 = Limited company
 businessType.lbl.05 = Unincorporated association or trust
 
 services.list.lbl.01 = Transmitting money
