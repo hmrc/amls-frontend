@@ -23,6 +23,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalacheck.Prop.Exception
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -171,6 +172,23 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "unable to withdraw" must {
+        "return InternalServerError" in new TestFixture {
+
+          when {
+            authService.amlsRegistrationNumber(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "withdrawalReason" -> "01"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(INTERNAL_SERVER_ERROR)
 
         }
       }
