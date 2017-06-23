@@ -67,10 +67,10 @@ object WithdrawalReason {
   implicit val jsonReads: Reads[WithdrawalReason] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "withdrawalReason").read[String].flatMap[WithdrawalReason] {
-      case "01" => OutOfScope
-      case "02" => NotTradingInOwnRight
-      case "03" => UnderAnotherSupervisor
-      case "04" =>
+      case "Out of scope" => OutOfScope
+      case "Not trading in own right" => NotTradingInOwnRight
+      case "Under another supervisor" => UnderAnotherSupervisor
+      case "Other, please specify" =>
         (JsPath \ "specifyOtherReason").read[String] map {
           Other
         }
@@ -80,12 +80,12 @@ object WithdrawalReason {
   }
 
   implicit val jsonRedressWrites = Writes[WithdrawalReason] {
-    case OutOfScope => Json.obj("withdrawalReason" -> "01")
-    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "02")
-    case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "03")
+    case OutOfScope => Json.obj("withdrawalReason" -> "Out of scope")
+    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "Not trading in own right")
+    case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "Under another supervisor")
     case Other(reason) =>
       Json.obj(
-        "withdrawalReason" -> "04",
+        "withdrawalReason" -> "Other, please specify",
         "specifyOtherReason" -> reason
       )
   }
