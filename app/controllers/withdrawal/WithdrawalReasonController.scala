@@ -55,10 +55,15 @@ class WithdrawalReasonController @Inject()(
       Form2[WithdrawalReason](request.body) match {
         case f:InvalidForm => Future.successful(BadRequest(withdrawal_reason(f)))
         case ValidForm(_, data) => {
+          val withdrawalReasonOthers = data match {
+            case WithdrawalReason.Other(reason) => reason.some
+            case _ => None
+          }
           val withdrawal = WithdrawSubscriptionRequest(
             WithdrawSubscriptionRequest.DefaultAckReference,
             LocalDate.now(),
-            data
+            data,
+            withdrawalReasonOthers
           )
           (for {
             regNumber <- OptionT(enrolments.amlsRegistrationNumber)

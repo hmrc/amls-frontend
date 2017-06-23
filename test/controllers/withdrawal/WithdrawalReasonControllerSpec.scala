@@ -139,25 +139,49 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
       "given valid data" must {
 
         "go to landing controller" which {
-          "follows sending a withdrawal to amls" in new TestFixture {
+          "follows sending a withdrawal to amls" when {
+            "withdrawalReason is selection without other reason" in new TestFixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
-              "withdrawalReason" -> "01"
-            )
+              val newRequest = request.withFormUrlEncodedBody(
+                "withdrawalReason" -> "01"
+              )
 
-            val withdrawal = WithdrawSubscriptionRequest(
-              WithdrawSubscriptionRequest.DefaultAckReference,
-              LocalDate.now(),
-              WithdrawalReason.OutOfScope
-            )
+              val withdrawal = WithdrawSubscriptionRequest(
+                WithdrawSubscriptionRequest.DefaultAckReference,
+                LocalDate.now(),
+                WithdrawalReason.OutOfScope
+              )
 
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
 
-            verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), eqTo(withdrawal))(any(), any(), any())
 
-            redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
 
+            }
+            "withdrawalReason is selection with other reason" in new TestFixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "withdrawalReason" -> "04",
+                "specifyOtherReason" -> "reason"
+              )
+
+              val withdrawal = WithdrawSubscriptionRequest(
+                WithdrawSubscriptionRequest.DefaultAckReference,
+                LocalDate.now(),
+                WithdrawalReason.Other("reason"),
+                "reason".some
+              )
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), eqTo(withdrawal))(any(), any(), any())
+
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+
+            }
           }
         }
 

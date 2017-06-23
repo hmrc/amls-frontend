@@ -32,7 +32,7 @@ class WithdrawSubscriptionRequestSpec extends PlaySpec with MustMatchers {
           "withdrawalDate" -> date.toString("yyyy-MM-dd"),
           "withdrawalReason" -> "01"
         )
-        
+
         Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.OutOfScope, None)) mustBe expectedJson
       }
     }
