@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import utils.StatusConstants
 
-@(model: Seq[ResponsiblePeople], fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Seq[ResponsiblePeople], fromDeclaration: Boolean = false, hasNonUKResident: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("responsiblepeople.summary.responsible.people", "summary.responsiblepeople")
@@ -40,6 +40,17 @@
             <p><a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
         }
     } else {
+
+        @if(hasNonUKResident) {
+        @panel(
+            jsHidden = false,
+            wide = true
+        ) {
+            <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.1")</p>
+            <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.2")</p>
+          }
+        }
+
         <ul class="list">
             @model.zipWithIndex.map { case (responsiblePerson, idx) =>
                 @if(!responsiblePerson.status.contains(StatusConstants.Deleted)) {
