@@ -37,7 +37,9 @@ trait SummaryController extends BaseController {
   def get(fromDeclaration: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-        case Some(data) => Ok(check_your_answers(data, fromDeclaration))
+        case Some(data) =>
+          val hasNonUKResident = ControllerHelper.hasNonUkResident(Some(data))
+          Ok(check_your_answers(data, fromDeclaration, hasNonUKResident))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
