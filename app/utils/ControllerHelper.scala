@@ -18,7 +18,7 @@ package utils
 
 import controllers.tradingpremises.routes
 import models.businessmatching._
-import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
+import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople, UKResidence}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
 import play.api.Play.current
@@ -98,6 +98,16 @@ object ControllerHelper {
       case _ =>  false
     }
   }
+  def hasNonUkResident(rp: Option[Seq[ResponsiblePeople]]): Boolean = {
+    rp match {
+      case Some(rps) => rps.exists(_.personResidenceType.fold(false)(_.isUKResidence match {
+        case _: NonUKResidence => true
+        case _ => false
+      }))
+      case _ =>  false
+    }
+  }
+
 
   def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 

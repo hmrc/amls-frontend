@@ -18,12 +18,14 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.Country
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.StatusService
@@ -69,6 +71,22 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get()(request)
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
+    }
+
+    "show extra content if any of the responsible people are non UK resident" in new Fixture {
+
+      val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
+        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("00000000000")),
+          Some(Country("United Kingdom", "GB")), Some(Country("France", "FR")))), None)))))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must include(Messages("responsiblepeople.check_your_answers.hasNonUKresident.1"))
+      contentAsString(result) must include(Messages("responsiblepeople.check_your_answers.hasNonUKresident.2"))
     }
   }
 
