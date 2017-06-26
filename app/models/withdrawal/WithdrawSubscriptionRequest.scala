@@ -18,16 +18,31 @@ package models.withdrawal
 
 import org.joda.time.LocalDate
 
-case class WithdrawSubscriptionRequest (acknowledgementReference: String,
-                                        withdrawalDate: LocalDate,
-                                        withdrawalReason: WithdrawalReason,
-                                        withdrawalReasonOthers: Option[String] = None
-                                       )
+case class WithdrawSubscriptionRequest(acknowledgementReference: String,
+                                       withdrawalDate: LocalDate,
+                                       withdrawalReason: WithdrawalReason,
+                                       withdrawalReasonOthers: Option[String] = None
+                                      )
 
 object WithdrawSubscriptionRequest {
+
   import play.api.libs.json._
 
   val DefaultAckReference = "A" * 32
 
-  implicit val format = Json.format[WithdrawSubscriptionRequest]
+  implicit val format = Json.reads[WithdrawSubscriptionRequest]
+
+  implicit val jsonWrites: Writes[WithdrawSubscriptionRequest] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Writes._
+    import play.api.libs.json._
+    Writes[WithdrawSubscriptionRequest] { ep =>
+      (
+        (__ \ "acknowledgementReference").write[String] and
+          (__ \ "withdrawalDate").write[LocalDate] and
+          __.write[WithdrawalReason] and
+          (__ \ "withdrawalReasonOthers").writeNullable[String]
+        ) (unlift(WithdrawSubscriptionRequest.unapply)).writes(ep)
+    }
+  }
 }

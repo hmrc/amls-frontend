@@ -35,7 +35,6 @@ import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()(
                                             val authConnector: AuthConnector,
-                                            val dataCacheConnector: DataCacheConnector,
                                             val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService) extends BaseController {
@@ -43,10 +42,7 @@ class WithdrawalReasonController @Inject()(
   def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle) {
     Authorised.async {
       implicit authContext => implicit request =>
-        dataCacheConnector.fetch[WithdrawalReason](WithdrawalReason.key) map {
-          case Some(reason) => Ok(withdrawal_reason(Form2[WithdrawalReason](reason)))
-          case _ => Ok(withdrawal_reason(EmptyForm))
-        }
+        Future.successful(Ok(withdrawal_reason(EmptyForm)))
     }
   }
 
