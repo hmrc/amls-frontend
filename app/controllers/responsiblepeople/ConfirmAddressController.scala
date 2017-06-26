@@ -107,7 +107,11 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                 rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
               } map ( _ => Redirect(routes.TimeAtCurrentAddressController.get(index)))
             }
-            case false => Future.successful(Redirect(routes.CurrentAddressController.get(index)))
+            case false => {
+              fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
+                rp.copy(addressHistory = None)
+              } map ( _ => Redirect(routes.CurrentAddressController.get(index)))
+            }
           }
       }
   }
