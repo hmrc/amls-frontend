@@ -27,4 +27,8 @@ class StillEmployedController @Inject()(val authConnector: AuthConnector) extend
   def get = Authorised.async {
     implicit authContext => implicit request => Future.successful(Ok)
   }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request => Future.successful(Redirect(routes.RoleInBusinessController.get()))
+  }
 }

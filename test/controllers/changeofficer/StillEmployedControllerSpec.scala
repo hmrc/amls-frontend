@@ -34,12 +34,23 @@ class StillEmployedControllerSpec extends GenericTestHelper {
     lazy val controller = injector.instanceOf[StillEmployedController]
   }
 
-  "The StillEmployedController" must {
-    "get the view" in new TestFixture {
-      val result = controller.get()(request)
+  "The StillEmployedController" when {
+    "get is called" must {
 
-      status(result) mustBe OK
+      "respond with OK" in new TestFixture {
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+      }
+    }
+
+    "post is called" must {
+      "respond with SEE_OTHER" in new TestFixture {
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.RoleInBusinessController.get().url)
+      }
     }
   }
-
 }
