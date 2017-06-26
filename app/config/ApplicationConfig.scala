@@ -38,6 +38,8 @@ trait ApplicationConfig {
   def allowWithdrawalToggle: Boolean
 
   def allowDeRegisterToggle: Boolean
+
+  def returnLinkToggle: Boolean
 }
 
 
@@ -114,4 +116,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def allowWithdrawalToggle = getConfBool("feature-toggle.allow-withdrawal", false)
 
   override def allowDeRegisterToggle = getConfBool("feature-toggle.allow-deregister", false)
+
+  override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 }
