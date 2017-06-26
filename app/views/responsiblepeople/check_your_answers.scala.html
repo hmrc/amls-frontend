@@ -42,13 +42,14 @@
     } else {
 
         @if(hasNonUKResident) {
-        @panel(
-            jsHidden = false,
-            wide = true
-        ) {
-            <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.1")</p>
-            <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.2")</p>
-          }
+            @panel(
+                jsHidden = false,
+                wide = true,
+                gutter = true
+            ) {
+                <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.1")</p>
+                <p>@Messages("responsiblepeople.check_your_answers.hasNonUKresident.2")</p>
+              }
         }
 
         <ul class="list">
