@@ -23,7 +23,7 @@ case class CreatePaymentRequest(taxType: String, reference: String, description:
 object CreatePaymentRequest {
 
   implicit val locationWrites = new Writes[ReturnLocation] {
-    override def writes(o: ReturnLocation) = JsString(o.returnUrl)
+    override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
   }
 
   implicit val format = Json.writes[CreatePaymentRequest]
