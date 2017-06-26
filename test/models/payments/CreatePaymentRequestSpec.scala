@@ -17,11 +17,11 @@
 package models.payments
 
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 
-class CreatePaymentRequestSpec extends PlaySpec with MustMatchers {
+class CreatePaymentRequestSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
   implicit val request = FakeRequest("GET", "http://localhost:9222")
 
