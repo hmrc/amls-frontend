@@ -79,8 +79,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
-        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("00000000000")),
-          Some(Country("United Kingdom", "GB")), Some(Country("France", "FR")))), None)))))
+        Some(PersonResidenceType(NonUKResidence,
+          Some(Country("United Kingdom", "GB")),
+          Some(Country("France", "FR")))), None)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
