@@ -18,6 +18,8 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
@@ -30,17 +32,17 @@ class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCa
   def get = Authorised.async {
     implicit authContext => implicit request =>
 
-      dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-        case Some(data) => {
-
-          val nominatedOfficer = data.filter(_.positions.fold(false) (p => p.positions.contains(NominatedOfficer))).head
-
-          val name = nominatedOfficer.personName map (n => n.fullName)
-          Ok(views.html.changeofficer.still_employed(EmptyForm, name.getOrElse("")))
-        }
-        case _ => InternalServerError("No responsible people found")
+      def getOfficer(people: Seq[ResponsiblePeople]) = {
+        people.find(_.positions.fold(false)(p => p.positions.contains(NominatedOfficer)))
       }
 
+      (for {
+        people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+        nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
+        name <- OptionT.fromOption[Future](nominatedOfficer.personName)
+      } yield {
+        Ok(views.html.changeofficer.still_employed(EmptyForm, name.fullName))
+      }) getOrElse InternalServerError("No responsible people found")
   }
 
   def post = Authorised.async {
