@@ -61,7 +61,6 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
 
   }
 
-
   "DeregistrationReasonController" when {
 
     "get is called" must {

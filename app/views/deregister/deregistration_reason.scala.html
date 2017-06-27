@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], hvdRequired: Boolean = false)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -59,11 +59,13 @@
                     labelText = "deregistration.reason.lbl.04",
                     value = "04"
                 )
-                @radio(
-                    f = f("deregistrationReason"),
-                    labelText = "deregistration.reason.lbl.05",
-                    value = "05"
-                )
+                @if(hvdRequired){
+                    @radio(
+                        f = f("deregistrationReason"),
+                        labelText = "deregistration.reason.lbl.05",
+                        value = "05"
+                    )
+                }
                 @radio(
                     f = f("deregistrationReason"),
                     labelText = "deregistration.reason.lbl.06",
