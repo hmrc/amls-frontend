@@ -52,26 +52,21 @@ class still_employedSpec extends GenericTestHelper with MustMatchers  {
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
-//
-//    "show errors in the correct locations" in new ViewFixture {
-//
-//      val form2: InvalidForm = InvalidForm(Map.empty,
-//        Seq(
-//          (Path \ "registeredForVAT") -> Seq(ValidationError("not a message Key")),
-//          (Path \ "vrnNumber-panel") -> Seq(ValidationError("second not a message Key"))
-//        ))
-//
-//      def view = views.html.aboutthebusiness.vat_registered(form2, true)
-//
-//      errorSummary.html() must include("not a message Key")
-//      errorSummary.html() must include("second not a message Key")
-//
-//      doc.getElementById("registeredForVAT")
-//        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-//
-//      doc.getElementById("vrnNumber-panel")
-//        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-//
-//    }
+
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2 = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "stillEmployed") -> Seq(ValidationError("not a message Key"))
+        ))
+
+      def view = views.html.changeofficer.still_employed(form2, "testName")
+
+      errorSummary.html() must include("not a message Key")
+
+      doc.getElementById("stillEmployed")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
   }
 }
