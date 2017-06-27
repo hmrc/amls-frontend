@@ -18,19 +18,29 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
+import forms.EmptyForm
+import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 class RoleInBusinessController @Inject()
 (val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       val result = for {
+        businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+        reviewDetails <- OptionT.fromOption[Future](businessMatching.reviewDetails)
+        businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
         name <- getNominatedOfficerName()
-      } yield Ok(name)
+      } yield {
+        Ok(views.html.changeofficer.role_in_business(EmptyForm, businessType, name))
+      }
 
       result getOrElse InternalServerError("Unable to get nominated officer")
   }

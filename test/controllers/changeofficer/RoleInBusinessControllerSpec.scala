@@ -17,9 +17,14 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
+import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.SoleProprietor
 import models.responsiblepeople._
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
@@ -52,17 +57,31 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       positions = Some(Positions(Set(Director),None))
     )
 
-    when(cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+    when(cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
   }
 
   "The RoleInBusinessController" must {
     "get the view" in new TestFixture {
 
+      val details = ReviewDetails(
+        "Some business",
+        Some(SoleProprietor),
+        Address("Line 1", "Line 2", None, None, None, Country("UK", "UK")),
+        "XA123456789",
+        None)
+
+      when {
+        cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
+
       val result = controller.get()(request)
 
       status(result) mustBe OK
       contentAsString(result) must include("firstName lastName")
+
+      contentAsString(result) must include(Messages("responsiblepeople.position_within_business.lbl.06"))
+      
     }
   }
 
