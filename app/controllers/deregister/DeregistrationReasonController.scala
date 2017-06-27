@@ -34,9 +34,9 @@ import views.html.deregister.deregistration_reason
 import scala.concurrent.Future
 
 class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
+                                               val dataCacheConnector: DataCacheConnector,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               cache: DataCacheConnector,
                                                statusService: StatusService) extends BaseController {
 
   def get = FeatureToggle(ApplicationConfig.allowDeRegisterToggle) {

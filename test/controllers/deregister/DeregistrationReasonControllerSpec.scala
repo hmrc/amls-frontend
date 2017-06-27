@@ -18,6 +18,7 @@ package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -47,7 +48,7 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new DeregistrationReasonController(authConnector, amlsConnector, authService, dataCacheConnector, statusService)
+    lazy val controller = new DeregistrationReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -68,6 +69,13 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
         "shows hvd option" when {
           "hvd is present in business activities" in new TestFixture {
 
+            val businessMatching = BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing)))
+            )
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(),any(),any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
+
             val result = controller.get()(request)
             status(result) must be(OK)
             contentAsString(result) must include(Messages("deregistration.reason.title"))
@@ -85,6 +93,13 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
         }
         "hides hvd option" when {
           "hvd is not present in business activities" in new TestFixture {
+
+            val businessMatching = BusinessMatching(
+              activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+            )
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(),any(),any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
 
             val result = controller.get()(request)
             status(result) must be(OK)
@@ -208,7 +223,7 @@ class DeregistrationReasonControllerToggleOffSpec extends GenericTestHelper with
     val authService = mock[AuthEnrolmentsService]
     val statusService = mock[StatusService]
 
-    lazy val controller = new DeregistrationReasonController(authConnector, amlsConnector, authService, dataCacheConnector, statusService)
+    lazy val controller = new DeregistrationReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
   }
 
   "The DeregistrationReasonController" when {
