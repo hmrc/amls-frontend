@@ -24,7 +24,8 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.{AddPerson, Director}
-import models.status.{SubmissionReady, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -70,25 +71,6 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "get is called" must {
       "display the persons page" when {
-        "status is pending" in new Fixture {
-
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "ExternalAccountant"
-          )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
-        }
-
         "status is pre-submission" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -103,10 +85,51 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+          val result = addPersonController.get()(requestWithParams)
+          status(result) must be(OK)
+          contentAsString(result) must include(Messages("submit.registration"))
+
         }
+
+        "status is pending" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName",
+            "roleWithinBusiness[]" -> "ExternalAccountant"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(addPersonController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = addPersonController.get()(requestWithParams)
+          status(result) must be(OK)
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+
+        "status is ready for renewal" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName",
+            "roleWithinBusiness[]" -> "ExternalAccountant"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(addPersonController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate))))
+
+          val result = addPersonController.get()(requestWithParams)
+          status(result) must be(OK)
+          contentAsString(result) must include(Messages("submit.renewal.application"))
+        }
+
+
       }
 
       "on get display the persons page with blank fields" in new Fixture {
@@ -531,7 +554,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
           val document = Jsoup.parse(contentAsString(result))
           document.title() must be(Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
-          contentAsString(result) must include(Messages("submit.registration"))
+          contentAsString(result) must include(Messages("submit.amendment.application"))
         }
       }
     }
