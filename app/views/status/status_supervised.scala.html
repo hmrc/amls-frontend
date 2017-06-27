@@ -45,7 +45,7 @@
                         <p class="heading-small">@Messages("lbl.registration.status")</p>
                         <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
                             @if(allowDeRegister) {
-                                <a href="@routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                                <a href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
                             }
                         </p>
                     }

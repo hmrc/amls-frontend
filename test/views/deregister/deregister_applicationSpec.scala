@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package views
+package views.deregister
 
-import forms.EmptyForm
 import org.joda.time.LocalDateTime
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
+import views.Fixture
 
 class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
 
@@ -31,7 +31,7 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
     val processingDate = LocalDateTime.now()
     val regNumber = "IUYSF894739847"
 
-    def view = views.html.deregister_application(businessName, processingDate, regNumber)
+    def view = views.html.deregister.deregister_application(businessName, processingDate, regNumber)
   }
 
   "deregister_application view" must {
