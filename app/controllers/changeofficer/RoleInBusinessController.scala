@@ -18,13 +18,20 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.changeofficer.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
-
-class RoleInBusinessController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class RoleInBusinessController @Inject()
+(val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext => implicit request =>
+      val result = for {
+        name <- getNominatedOfficerName()
+      } yield Ok(name)
+
+      result getOrElse InternalServerError("Unable to get nominated officer")
   }
 }
