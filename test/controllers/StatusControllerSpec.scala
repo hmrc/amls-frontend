@@ -601,7 +601,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
       }
     }
   }
