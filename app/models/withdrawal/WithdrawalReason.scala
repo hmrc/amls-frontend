@@ -44,7 +44,6 @@ object WithdrawalReason {
 
   implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
     (__ \ "withdrawalReason").read[String].withMessage("error.required.withdrawal.reason") flatMap {
       case "01" => OutOfScope
       case "02" => NotTradingInOwnRight

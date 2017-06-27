@@ -328,6 +328,9 @@ error.required.renewal.ba.involved.in.other.text = Give details of the other act
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
 error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application
 
+error.required.deregistration.reason = You must select a reason for de-registering the business
+error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
