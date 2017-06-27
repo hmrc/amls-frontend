@@ -16,19 +16,28 @@
 
 package models.changeofficer
 
-import jto.validation.Rule
-import jto.validation.forms.UrlFormEncoded
+import cats.data.Validated.Valid
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 
-sealed trait StillEmployed
-case object StillEmployedYes extends StillEmployed
+class StillEmployedSpec extends PlaySpec with MustMatchers {
 
-object StillEmployed {
-  import jto.validation._
+  "The StillEmployed model" when {
+    "given a valid form" when {
+      "'yes' is selected" must {
+        "return a valid form model" in {
 
-  val formReads: Rule[UrlFormEncoded, StillEmployed] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "stillEmployed").read[Boolean] map {
-      case true => StillEmployedYes
+          val formData = Map(
+            "stillEmployed" -> Seq("true")
+          )
+
+          val result = StillEmployed.formReads.validate(formData)
+
+          result mustBe Valid(StillEmployedYes)
+
+        }
+      }
     }
   }
+
 }
