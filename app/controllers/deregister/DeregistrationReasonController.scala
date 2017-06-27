@@ -24,6 +24,7 @@ import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
@@ -43,7 +44,14 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          Future.successful(Ok(deregistration_reason(EmptyForm)))
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map { businessMatching =>
+            (for {
+              bm <- businessMatching
+              at <- bm.activities
+            } yield {
+              Ok(deregistration_reason(EmptyForm, at.businessActivities.contains(HighValueDealing)))
+            }) getOrElse Ok(deregistration_reason(EmptyForm))
+          }
     }
   }
 
