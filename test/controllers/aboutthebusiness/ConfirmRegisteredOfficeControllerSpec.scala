@@ -21,6 +21,7 @@ import models.Country
 import models.aboutthebusiness._
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.declaration.AddPerson
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -50,6 +51,8 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val bm = BusinessMatching(Some(reviewDtls))
+  val emptyCache = CacheMap("", Map.empty)
+
 
   "ConfirmRegisteredOfficeController" must {
 
@@ -88,6 +91,8 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
         when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
           .thenReturn(Some(aboutTheBusiness))
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -96,7 +101,10 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ContactingYouController.get().url))
-        verify(controller.dataCache).save[AboutTheBusiness](any(), meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any())
+        verify(
+          controller.dataCache).save[AboutTheBusiness](any(),
+          meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any()
+        )
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
@@ -105,9 +113,24 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(aboutTheBusiness))
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
+        verify(
+          controller.dataCache).save[AboutTheBusiness](any(),
+          meq(aboutTheBusiness.copy(registeredOffice = None)))(any(), any(), any()
+        )
+
       }
 
       "on post invalid data" in new Fixture {

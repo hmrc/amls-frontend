@@ -16,6 +16,7 @@
 
 package controllers.aboutthebusiness
 
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -25,8 +26,9 @@ import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import views.html.aboutthebusiness._
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import cats.implicits._
 
 trait ConfirmRegisteredOfficeController extends BaseController {
 
@@ -68,22 +70,33 @@ trait ConfirmRegisteredOfficeController extends BaseController {
               case _ => Redirect(routes.RegisteredOfficeController.get(edit))
             }
           case ValidForm(_, data) =>
-            data.isRegOfficeOrMainPlaceOfBusiness match {
-              case true => {
-                dataCache.fetchAll map {
-                  optionalCache =>
-                    (for {
-                      cache <- optionalCache
-                      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-                      aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-                    } yield {
-                      dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.copy(registeredOffice = updateBMAddress(bm)))
-                      Redirect(routes.ContactingYouController.get(edit))
-                    }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
+
+            def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
+                                                  aboutTheBusiness: AboutTheBusiness) = {
+
+              val address = if (data.isRegOfficeOrMainPlaceOfBusiness) {
+                updateBMAddress(bm)
+              } else {
+                None
+              }
+
+              dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.copy(registeredOffice = address)) map { _ =>
+                if (data.isRegOfficeOrMainPlaceOfBusiness) {
+                  Redirect(routes.ContactingYouController.get(edit))
+                } else {
+                  Redirect(routes.RegisteredOfficeController.get(edit))
                 }
               }
-              case false => Future.successful(Redirect(routes.RegisteredOfficeController.get(edit)))
             }
+
+            (for {
+              cache <- OptionT(dataCache.fetchAll)
+              bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+              aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+              result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, aboutTheBusiness))
+            } yield {
+              result
+            }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
         }
   }
 }
