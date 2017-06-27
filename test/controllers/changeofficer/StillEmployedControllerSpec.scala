@@ -86,6 +86,14 @@ class StillEmployedControllerSpec extends GenericTestHelper {
         val result = controller.post()(request)
         status(result) mustBe BAD_REQUEST
       }
+
+      "respond with SEE_OTHER" when {
+        "response is 'yes', and redirect to RoleInBusinessController" in new TestFixture {
+          val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
+        }
+      }
     }
   }
 }

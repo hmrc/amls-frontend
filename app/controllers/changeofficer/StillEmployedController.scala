@@ -49,6 +49,7 @@ class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCa
           (getNominatedOfficerName map (name =>
             BadRequest(views.html.changeofficer.still_employed(x, name))
             )) getOrElse InternalServerError("No responsible people found")
+        case _ => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
       }
   }
 
