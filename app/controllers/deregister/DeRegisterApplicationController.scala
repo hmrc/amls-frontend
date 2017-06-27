@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.deregister
 
 import javax.inject.Inject
 
@@ -22,12 +22,13 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterReason, DeRegisterSubscriptionRequest}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.deregister_application
+import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
@@ -67,7 +68,7 @@ class DeRegisterApplicationController @Inject()
       val maybeRequest = for {
         regNumber <- OptionT(enrolments.amlsRegistrationNumber)
         _ <- OptionT.liftF(amls.deregister(regNumber, DeRegisterSubscriptionRequest("A" * 32, LocalDate.now, DeRegisterReason.OutOfScope)))
-      } yield Redirect(routes.StatusController.get())
+      } yield Redirect(controllers.routes.StatusController.get())
 
       maybeRequest getOrElse InternalServerError("Could not de-register the subscription")
   }

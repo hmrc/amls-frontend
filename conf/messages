@@ -746,6 +746,7 @@ summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
 summary.submit.renewal = Submit renewal
+summary.updateinformation = Update information
 
 summary.checkyouranswers.title = Check your answers
 summary.youranswers.title = Your answers
@@ -764,6 +765,17 @@ summary.linetext = Please check all the information you have provided.
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
+deregistration.reason.title = De-Register
+deregistration.reason.heading = Why are you de-registering the business?
+
+deregistration.reason.lbl.01 = Out of scope
+deregistration.reason.lbl.02 = Not trading in own right
+deregistration.reason.lbl.03 = Under another supervisor
+deregistration.reason.lbl.04 = Change of Legal Entity
+deregistration.reason.lbl.05 = HVD - policy of not accepting high value cash payments
+deregistration.reason.lbl.06 = Other
+deregistration.reason.lbl.specify.other.reason = Please specify
+
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
 
@@ -772,7 +784,6 @@ withdrawal.reason.lbl.02 = Not trading in own right
 withdrawal.reason.lbl.03 = I‘m supervised by another body
 withdrawal.reason.lbl.04 = Other
 withdrawal.reason.lbl.specify.other.reason = Please specify
-
 
 main.sidebar.title = Automatic saving
 main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
@@ -1127,7 +1138,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 
 submit.registration = Submit registration
 submit.amendment.application = Update information
-submit.renewal.application = Submit Renewal
+submit.renewal.application = Submit renewal
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1582,6 +1593,10 @@ hvd.percentage.lbl.02 = 21% to 40%
 hvd.percentage.lbl.03 = 41% to 60%
 hvd.percentage.lbl.04 = 61% to 80%
 hvd.percentage.lbl.05 = 81% to 100%
+
+changeofficer.personstillemployed.title = Does this person still work for your business?
+changeofficer.stillemployed.title = Does {0} still work for your business?
+changeofficer.stillemployed.validationerror = You must select yes or no. Select yes, if they are still working for your business
 
 ###############################  Notifications ###############################
 

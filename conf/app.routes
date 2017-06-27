@@ -24,8 +24,11 @@ POST        /your-registration/withdraw-application                             
 GET         /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.get()
 POST        /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.post()
 
-GET         /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.get()
-POST        /your-registration/de-register-application                                @controllers.DeRegisterApplicationController.post()
+GET         /your-registration/de-register-application                                @controllers.deregister.DeRegisterApplicationController.get()
+POST        /your-registration/de-register-application                                @controllers.deregister.DeRegisterApplicationController.post()
+
+GET         /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.get()
+POST        /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.post()
 
 GET         /satisfaction-survey                                                      controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                                      controllers.SatisfactionSurveyController.post()
@@ -256,6 +259,7 @@ POST        /declaration/add-person                                             
 GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
+POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
 
 GET         /update-information/role-in-business                                      @controllers.changeofficer.RoleInBusinessController.get()
 

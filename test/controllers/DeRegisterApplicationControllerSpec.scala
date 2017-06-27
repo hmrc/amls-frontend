@@ -18,6 +18,7 @@ package controllers
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.deregister.DeRegisterApplicationController
 import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
