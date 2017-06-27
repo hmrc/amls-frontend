@@ -64,22 +64,45 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
   "DeregistrationReasonController" when {
 
     "get is called" must {
-      "display deregistration_reasons view without data" in new TestFixture {
+      "display deregistration_reasons view without data" which {
+        "shows hvd option" when {
+          "hvd is present in business activities" in new TestFixture {
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include(Messages("deregistration.reason.title"))
+            val result = controller.get()(request)
+            status(result) must be(OK)
+            contentAsString(result) must include(Messages("deregistration.reason.title"))
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("deregistrationReason-01").hasAttr("checked") must be(false)
-        document.getElementById("deregistrationReason-02").hasAttr("checked") must be(false)
-        document.getElementById("deregistrationReason-03").hasAttr("checked") must be(false)
-        document.getElementById("deregistrationReason-04").hasAttr("checked") must be(false)
-        document.getElementById("deregistrationReason-05").hasAttr("checked") must be(false)
-        document.getElementById("deregistrationReason-06").hasAttr("checked") must be(false)
-        document.getElementById("specifyOtherReason").`val`() must be("")
+            val document = Jsoup.parse(contentAsString(result))
+            document.getElementById("deregistrationReason-01").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-02").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-03").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-04").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-05").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-06").hasAttr("checked") must be(false)
+            document.getElementById("specifyOtherReason").`val`() must be("")
 
+          }
+        }
+        "hides hvd option" when {
+          "hvd is not present in business activities" in new TestFixture {
+
+            val result = controller.get()(request)
+            status(result) must be(OK)
+            contentAsString(result) must include(Messages("deregistration.reason.title"))
+
+            val document = Jsoup.parse(contentAsString(result))
+            document.getElementById("deregistrationReason-01").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-02").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-03").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-04").hasAttr("checked") must be(false)
+            document.getElementById("deregistrationReason-05") must be(null)
+            document.getElementById("deregistrationReason-06").hasAttr("checked") must be(false)
+            document.getElementById("specifyOtherReason").`val`() must be("")
+
+          }
+        }
       }
+
     }
 
     "post is called" when {
