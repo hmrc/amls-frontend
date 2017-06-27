@@ -103,7 +103,7 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
       "make a request to the middle tier to perform the deregistration" in new TestFixture {
         val result = controller.post()(request)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.routes.StatusController.get().url.some
+        redirectLocation(result) mustBe routes.DeregistrationReasonController.get().url.some
       }
     }
   }
