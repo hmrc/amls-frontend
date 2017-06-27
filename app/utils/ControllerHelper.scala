@@ -101,7 +101,7 @@ object ControllerHelper {
   def hasNonUkResident(rp: Option[Seq[ResponsiblePeople]]): Boolean = {
     rp match {
       case Some(rps) => rps.exists(_.personResidenceType.fold(false)(_.isUKResidence match {
-        case _: NonUKResidence => true
+        case NonUKResidence => true
         case _ => false
       }))
       case _ =>  false

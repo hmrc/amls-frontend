@@ -105,7 +105,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"))))
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))(request)
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
     def setupBusinessMatching(companyName: String) = {
       val model = BusinessMatching(
@@ -163,6 +163,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "query the payments service for the payments url for a variation" in new Fixture {
 
+      //noinspection ScalaStyle
       when(controller.submissionResponseService.getVariation(any(), any(), any()))
         .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq()))))
 
@@ -563,9 +564,9 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
 
     when {
       paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"))))
+    } thenReturn Future.successful(None)
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request)
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))
 
   }
 
@@ -600,7 +601,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
           paymentRefNo,
           "AMLS Payment",
           10000,
-          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))(request))
+          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo)))
       })(any(), any())
 
       Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true

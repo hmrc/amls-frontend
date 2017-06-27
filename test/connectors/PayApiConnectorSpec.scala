@@ -48,7 +48,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "X12345678901234",
       "An example payment",
       paymentAmount,
-      ReturnLocation("/confirmation"))
+      ReturnLocation("/confirmation", "http://localhost:9222"))
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
@@ -57,9 +57,14 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
     val config = new ServicesConfig {
       override protected def environment = mock[play.api.Environment]
+
       override def getConfBool(confKey: String, defBool: => Boolean) = confKey match {
         case ApplicationConfig.paymentsUrlLookupToggleName => paymentsToggleValue
         case _ => super.getConfBool(confKey, defBool)
+      }
+
+      override def getConfString(confKey: String, defString: => String) = confKey match {
+        case _ => super.getConfString(confKey, defString)
       }
 
       override def baseUrl(serviceName: String) = serviceName match {

@@ -126,13 +126,28 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "false"
           )
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-            .thenReturn(Future.successful(Some(bm)))
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))))
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(bm))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
+
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+            any(),
+            meq(Seq(TradingPremises(yourTradingPremises = None))))(any(), any(), any())
+
         }
+
       }
 
       "throw error message on not selecting the option" in new Fixture {
