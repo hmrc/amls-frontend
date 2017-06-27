@@ -329,7 +329,7 @@ error.required.withdrawal.reason = You must select a reason for withdrawing your
 error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application. Enter your reason for withdrawing
 
 error.required.deregistration.reason = You must select a reason for de-registering the business
-error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business
+error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
