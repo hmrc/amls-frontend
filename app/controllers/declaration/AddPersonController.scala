@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7._
-import models.status.SubmissionReadyForReview
+import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -83,6 +83,7 @@ trait AddPersonController extends BaseController {
         statusService.getStatus map {
           case SubmissionReadyForReview if AmendmentsToggle.feature =>
             status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
           case _ => status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
         }
       }
