@@ -18,13 +18,11 @@ package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.deregister.DeRegisterSubscriptionResponse
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
+import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Prop.Exception
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -67,7 +65,6 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
   "DeregistrationReasonController" when {
 
     "get is called" must {
-
       "display deregistration_reasons view without data" in new TestFixture {
 
         val result = controller.get()(request)
@@ -85,6 +82,92 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
 
       }
     }
+
+    "post is called" when {
+
+      "given valid data" must {
+
+        "go to landing controller" which {
+          "follows sending a withdrawal to amls" when {
+            "withdrawalReason is selection without other reason" in new TestFixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "withdrawalReason" -> "01"
+              )
+
+              val deregistration = DeRegisterSubscriptionRequest(
+                DeRegisterSubscriptionRequest.DefaultAckReference,
+                LocalDate.now(),
+                DeregistrationReason.OutOfScope
+              )
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), eqTo(deregistration))(any(), any(), any())
+
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+
+            }
+            "DeregistrationReason is selection with other reason" in new TestFixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "deregistrationReason" -> "04",
+                "specifyOtherReason" -> "reason"
+              )
+
+              val deregistration = DeRegisterSubscriptionRequest(
+                DeRegisterSubscriptionRequest.DefaultAckReference,
+                LocalDate.now(),
+                DeregistrationReason.Other("reason"),
+                "reason".some
+              )
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), eqTo(deregistration))(any(), any(), any())
+
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+
+            }
+          }
+        }
+
+      }
+
+      "given invalid data" must {
+        "return with BAD_REQUEST" in new TestFixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "deregistrationReason" -> "20"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "unable to withdraw" must {
+        "return InternalServerError" in new TestFixture {
+
+          when {
+            authService.amlsRegistrationNumber(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "deregistrationReason" -> "01"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(INTERNAL_SERVER_ERROR)
+
+        }
+      }
+
+    }
+
   }
 }
 

@@ -19,7 +19,7 @@ package connectors
 import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
+import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import models.withdrawal.{StaticWithdrawalReason, StaticWithdrawalReason$, WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -246,7 +246,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "deregister" must {
       "successfully deregister the application" in {
         val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/deregistration"
-        val request = DeRegisterSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), "")
+        val request = DeRegisterSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), DeregistrationReason.OutOfScope)
         val response = DeRegisterSubscriptionResponse("some date")
 
         when {

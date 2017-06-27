@@ -19,11 +19,10 @@ package models.deregister
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
-object DeRegisterReason {
-  val OutOfScope = "Out of scope"
-}
-
-case class DeRegisterSubscriptionRequest(acknowledgementReference: String, deregistrationDate: LocalDate, deregistrationReason: String)
+case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
+                                         deregistrationDate: LocalDate,
+                                         deregistrationReason: DeregistrationReason,
+                                         deregistrationReasonOther: Option[String] = None)
 
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
