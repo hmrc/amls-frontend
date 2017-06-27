@@ -746,6 +746,7 @@ summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
 summary.submit.renewal = Submit renewal
+summary.updateinformation = Update information
 
 summary.checkyouranswers.title = Check your answers
 summary.youranswers.title = Your answers
@@ -1582,6 +1583,10 @@ hvd.percentage.lbl.02 = 21% to 40%
 hvd.percentage.lbl.03 = 41% to 60%
 hvd.percentage.lbl.04 = 61% to 80%
 hvd.percentage.lbl.05 = 81% to 100%
+
+changeofficer.personstillemployed.title = Does this person still work for your business?
+changeofficer.stillemployed.title = Does {0} still work for your business?
+changeofficer.stillemployed.validationerror = You must select yes or no. Select yes, if they are still working for your business
 
 ###############################  Notifications ###############################
 
