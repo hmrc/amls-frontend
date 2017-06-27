@@ -47,6 +47,16 @@ class StillEmployedSpec extends PlaySpec with MustMatchers {
         }
       }
     }
-  }
 
+    "given a valid model" must {
+      "return the form values" when {
+        "StillEmployed is 'yes'" in {
+          val model = StillEmployedYes
+          val result = StillEmployed.formWrites.writes(model)
+
+          result mustBe Map("stillEmployed" -> Seq("true"))
+        }
+      }
+    }
+  }
 }

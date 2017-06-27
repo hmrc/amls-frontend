@@ -82,11 +82,9 @@ class StillEmployedControllerSpec extends GenericTestHelper {
     }
 
     "post is called" must {
-      "respond with SEE_OTHER" in new TestFixture {
+      "respond with BAD_REQUEST" in new TestFixture {
         val result = controller.post()(request)
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.RoleInBusinessController.get().url)
+        status(result) mustBe BAD_REQUEST
       }
     }
   }

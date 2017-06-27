@@ -22,7 +22,8 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm}
+import models.changeofficer.StillEmployed
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -47,6 +48,9 @@ class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCa
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Redirect(routes.RoleInBusinessController.get()))
+      Form2[StillEmployed](request.body) match {
+        case x: InvalidForm =>
+          Future.successful(BadRequest(views.html.changeofficer.still_employed(x, "testName")))
+      }
   }
 }
