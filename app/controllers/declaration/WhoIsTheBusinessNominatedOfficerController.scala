@@ -46,7 +46,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
     statusService.getStatus map {
       case SubmissionReady => status(select_business_nominated_officer("submit.registration", form, rp))
       case SubmissionReadyForReview | SubmissionDecisionApproved => status(select_business_nominated_officer("submit.amendment.application", form, rp))
-      case ReadyForRenewal(_) => status(select_business_nominated_officer("submit.renewal.application", form, rp))
+      case ReadyForRenewal(_) |  RenewalSubmitted (_) => status(select_business_nominated_officer("submit.renewal.application", form, rp))
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
