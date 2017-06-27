@@ -30,7 +30,8 @@ case class ReadStatusResponse(
                                renewalConFlag: Boolean,
                                renewalSubmissionFlag: Option[Boolean] = None,
                                currentAMLSOutstandingBalance: Option[String] = None,
-                               businessContactNumber: Option[String] = None
+                               businessContactNumber: Option[String] = None,
+                               safeId: Option[String] = None
                              )
 
 object ReadStatusResponse {

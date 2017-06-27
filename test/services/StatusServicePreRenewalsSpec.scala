@@ -48,7 +48,8 @@ class StatusServicePreRenewalsSpec extends PlaySpec with MockitoSugar with Scala
   implicit val ac = mock[AuthContext]
   implicit val ec = mock[ExecutionContext]
 
-  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None, None, false)
+  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,
+    None, false)
 
   "Status Service Pre Renewals" must {
 

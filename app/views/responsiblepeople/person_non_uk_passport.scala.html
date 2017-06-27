@@ -1,0 +1,79 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("nonUKPassportNumber").id}-fieldset"""
+}
+
+@header = {
+    @rpErrorSummary(f, personName)
+    @headingWithPlaceholder(("responsiblepeople.non.uk.passport.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.non.uk.passport.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.PersonNonUKPassportController.post(index, edit, fromDeclaration)) {
+
+        @fieldset(
+            f = f("nonUKPassport-fieldset"),
+            legend = "",
+            legendHidden = true,
+            panel = false
+        ) {
+            @rpErrorGroup(
+                field = f("nonUKPassport"),
+                personName = personName
+            ) {
+                @radio(
+                    f = f("nonUKPassport"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s"#$target"
+                )
+                @radio(
+                    f = f("nonUKPassport"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f(s"$target"))
+        ) {
+            @input(
+                field = f("nonUKPassportNumber"),
+                labelText = "lbl.passport.number",
+                bold = false,
+                hintText = "hint.9.digits"
+            )
+        }
+
+        @submit()
+
+    }
+
+}

@@ -83,7 +83,13 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                     }
                   } yield Redirect(routes.ActivityStartDateController.get(index))
               }
-              case false => Future.successful(Redirect(routes.WhereAreTradingPremisesController.get(index)))
+              case false => {
+                for {
+                  _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
+                    tp.copy(yourTradingPremises = None)
+                  }
+                } yield Redirect(routes.WhereAreTradingPremisesController.get(index))
+              }
             }
         }
   }

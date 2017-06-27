@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
-  val contactingYou = Some(ContactingYou("+44 (0)123 456-7890", "test@test.com"))
+  val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
   val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
 
   trait Fixture extends AuthorisedFixture {
@@ -63,7 +63,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.title"))
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
       }
 
       "load the page with the pre populated data" in new Fixture {
@@ -73,15 +73,15 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.title"))
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
       }
 
       "load the page with no data" in new Fixture {
         when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.ConfirmRegisteredOfficeController.get().url)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.email.title"))
       }
 
     }
@@ -91,7 +91,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
       "on post of valid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890",
+          "confirmEmail" -> "test@test.com",
           "email" -> "test@test.com"
         )
 
@@ -103,30 +103,13 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
+        redirectLocation(result) must be(Some(routes.ContactingYouPhoneController.get().url))
       }
 
 
       "on post of incomplete data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890"
-        )
-
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
-
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-      }
-
-      "fail validation on invalid phone number" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456_7890",
           "email" -> "test@test.com"
         )
 
@@ -138,28 +121,29 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-
-        val document: Document  = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("error-notification").html() must include(Messages("err.invalid.phone.number"))
       }
 
-
-      "on post of incomplete data with no response from data cache" in new Fixture {
+      "on post of different email addresses" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890"
+          "confirmEmail" -> "test@test.com",
+          "email" -> "test1@test.com"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         when(controller.dataCache.save[AboutTheBusiness](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.ContactingYouController.get().url)
+        status(result) must be(BAD_REQUEST)
       }
+
+
+
+
+
 
     }
   }

@@ -102,6 +102,7 @@ error.required.atb.corporation.tax = Select yes if your business is registered f
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
+error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
@@ -188,7 +189,7 @@ error.required.eab.info.about.penalty = Give a brief description of what the pen
 error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
 
 ############################### Responsible People ###############################
-error.required.rp.is.uk.resident = Select yes if this person is a UK resident
+error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
 error.required.rp.birth.country = Enter an official country name: for example, Holland is Netherlands
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
@@ -221,6 +222,9 @@ error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
+error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
+error.required.select.uk.passport = Select yes if {0} has a UK passport
+error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 
 
 ############################### Trust and company service providers ###############################
@@ -321,6 +325,12 @@ error.required.renewal.ba.select.country = Select yes if you had customers in th
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
 
+error.required.withdrawal.reason = You must select a reason for withdrawing your application
+error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application
+
+error.required.deregistration.reason = You must select a reason for de-registering the business
+error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -418,10 +428,10 @@ lbl.currency.line1 = Currency 1
 lbl.currency.line2 = Currency 2 (if applicable)
 lbl.currency.line3 = Currency 3 (if applicable)
 
-businessType.lbl.02 = Limited company
 businessType.lbl.01 = Sole proprietor
+businessType.lbl.02 = Limited partnership or limited liability partnership
 businessType.lbl.03 = Partnership
-businessType.lbl.04 = Limited partnership or limited liability partnership
+businessType.lbl.04 = Limited company
 businessType.lbl.05 = Unincorporated association or trust
 
 services.list.lbl.01 = Transmitting money
@@ -437,6 +447,9 @@ hint.255.chars = Enter 255 characters or less.
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
 lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
+
+link.return.registration.progress = Return to application progress
+link.return.renewal.progress = Return to renewal progress
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -552,7 +565,7 @@ status.submittedForReview.submitteddate.text = Application submitted {0}
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.dup.heading = If you haven’t paid, you’ll need to make a payment. You’ll see a breakdown of your fees before you make the payment.
-fee.details.dup_nofees.heading = If you haven’t paid, you’ll need to make a payment. Please give us some details of your situation and an adviser will contact you to take payment.
+fee.details.dup_nofees.heading = If you haven’t paid, you’ll need to make a payment. Please give us some contact details and an adviser will contact you to take payment.
 fee.details.registration.fee.lbl = Your registration fee
 fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.
@@ -733,6 +746,7 @@ summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
 summary.submit.renewal = Submit renewal
+summary.updateinformation = Update information
 
 summary.checkyouranswers.title = Check your answers
 summary.youranswers.title = Your answers
@@ -751,6 +765,25 @@ summary.linetext = Please check all the information you have provided.
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
+deregistration.reason.title = De-Register
+deregistration.reason.heading = Why are you de-registering the business?
+
+deregistration.reason.lbl.01 = Out of scope
+deregistration.reason.lbl.02 = Not trading in own right
+deregistration.reason.lbl.03 = Under another supervisor
+deregistration.reason.lbl.04 = Change of Legal Entity
+deregistration.reason.lbl.05 = HVD - policy of not accepting high value cash payments
+deregistration.reason.lbl.06 = Other
+deregistration.reason.lbl.specify.other.reason = Please specify
+
+withdrawal.reason.title = Withdraw Application
+withdrawal.reason.heading = Why are you withdrawing your application?
+
+withdrawal.reason.lbl.01 = Out of scope
+withdrawal.reason.lbl.02 = Not trading in own right
+withdrawal.reason.lbl.03 = I‘m supervised by another body
+withdrawal.reason.lbl.04 = Other
+withdrawal.reason.lbl.specify.other.reason = Please specify
 
 main.sidebar.title = Automatic saving
 main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
@@ -778,9 +811,11 @@ aboutthebusiness.registeredforvat.lbl.vatNumber.hint = It’s 9 numbers with no 
 aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
 aboutthebusiness.registeredforcorporationtax.taxReference = Corporation Tax reference number
 aboutthebusiness.registeredforcorporationtax.taxReferenceHint = It’s 10 numbers with no letters, punctuation or other characters.
-aboutthebusiness.contactingyou.title = Your contact details
+aboutthebusiness.contactingyou.email.title = What’s your business’s email address?
+aboutthebusiness.contactingyou.phone.title = What’s your business’s phone number?
 aboutthebusiness.contactingyou.lbl = We’ll email you when there’s an update about your application for anti-money laundering supervision.
 aboutthebusiness.contactingyou.email.lbl = Email address
+aboutthebusiness.contactingyou.confirm.email.lbl = Confirm email address
 aboutthebusiness.contactingyou.email.hint = For example, myname@example.com.
 aboutthebusiness.contactingyou.phone.lbl = Phone number
 aboutthebusiness.contactingyou.phone.hint = You can only use numbers, spaces, brackets, plus (+) and dash (-).
@@ -881,7 +916,7 @@ tradingpremises.agentpartnership.title = Who are your agent’s partners?
 tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
 tradingpremises.premises.registered.title = Do you want to register another trading premises?
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
-tradingpremises.have.registered.premises.text2 = You need register every premises where you trade in activities that are supervised under the Money Laundering Regulations.
+tradingpremises.have.registered.premises.text2 = You need to register every premises where you trade in activities that are supervised under the Money Laundering Regulations.
 tradingpremises.have.registered.premises.text3 = You’ll need to pay £115 for each trading premises you register.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
 tradingpremises.remove.trading.premises.title = Remove trading premises
@@ -1103,7 +1138,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 
 submit.registration = Submit registration
 submit.amendment.application = Update information
-submit.renewal.application = Submit Renewal
+submit.renewal.application = Submit renewal
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1245,6 +1280,12 @@ responsiblepeople.passporttype.lbl = What type of passport does this person have
 responsiblepeople.uk.passport.lbl = UK passport
 responsiblepeople.non.uk.passport.lbl = Non-UK passport
 responsiblepeople.no.passport.lbl = This person doesn’t have a passport
+responsiblepeople.uk.passport.title = Does this person have a UK passport?
+responsiblepeople.uk.passport.heading = Does {0} have a UK passport?
+responsiblepeople.non.uk.passport.title = Does this person have a passport from another country?
+responsiblepeople.non.uk.passport.heading = Does {0} have a passport from another country?
+responsiblepeople.date.of.birth.title = What’s this person’s date of birth?
+responsiblepeople.date.of.birth.heading = What’s {0}’s date of birth?
 responsiblepeople.country.of.birth.lbl = Country of birth
 responsiblepeople.country.of.birth.hint = If you were born in England, Scotland, Wales, or Northern Ireland, select ‘United Kingdom’.
 responsiblepeople.or.lbl = or
@@ -1279,6 +1320,10 @@ responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
 responsiblepeople.check_your_answers.visuallyhidden.from.your = from your responsible people
+
+responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.
+responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘About the Business’ section and let you know what they need.
+
 responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
@@ -1289,9 +1334,12 @@ responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
 responsiblepeople.detailed_answers.previous_names.since = Since
 responsiblepeople.detailed_answers.other_names = Other names
-responsiblepeople.detailed_answers.uk_resident = UK resident
+responsiblepeople.detailed_answers.uk_resident = Is {0} a UK resident?
 responsiblepeople.detailed_answers.uk_resident.nino = National Insurance Number
 responsiblepeople.detailed_answers.uk_resident.dob = D.O.B
+responsiblepeople.detailed_answers.uk.passport = Does {0} have a UK passport?
+responsiblepeople.detailed_answers.non.uk.passport = Does {0} have a passport from another country?
+responsiblepeople.detailed_answers.dob = What’s {0}’s date of birth?
 responsiblepeople.detailed_answers.uk_resident.passport_number = Passport Number
 responsiblepeople.detailed_answers.uk_resident.no_passport = No passport
 responsiblepeople.detailed_answers.country_of_birth = Country of birth
@@ -1545,6 +1593,10 @@ hvd.percentage.lbl.02 = 21% to 40%
 hvd.percentage.lbl.03 = 41% to 60%
 hvd.percentage.lbl.04 = 61% to 80%
 hvd.percentage.lbl.05 = 81% to 100%
+
+changeofficer.personstillemployed.title = Does this person still work for your business?
+changeofficer.stillemployed.title = Does {0} still work for your business?
+changeofficer.stillemployed.validationerror = You must select yes or no. Select yes, if they are still working for your business
 
 ###############################  Notifications ###############################
 

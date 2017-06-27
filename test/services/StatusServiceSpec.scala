@@ -47,7 +47,8 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   implicit val ac = mock[AuthContext]
   implicit val ec = mock[ExecutionContext]
 
-  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None, None, false)
+  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,
+    None, false)
 
   "Status Service" must {
     "return NotCompleted" in {

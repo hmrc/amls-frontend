@@ -23,21 +23,29 @@
 
 @header = {
     @errorSummary(f)
-    @heading("aboutthebusiness.contactingyou.title", "summary.aboutbusiness")
+    @heading("aboutthebusiness.contactingyou.email.title", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("aboutthebusiness.contactingyou.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("aboutthebusiness.contactingyou.email.title") + " - " + Messages("summary.aboutbusiness"),
     heading = header
 ) {
 
-    <p>@Messages("aboutthebusiness.contactingyou.lbl")</p>
+    @panel(
+        wide = true,
+        gutter = true,
+        jsHidden = false
+    ) {
+        <p>@Messages("aboutthebusiness.contactingyou.lbl")</p>
+    }
+
+
 
     @form(f, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) {
 
         @fieldset(
             f = f("contactingyou-fieldset"),
-            legend = "aboutthebusiness.contactingyou.title",
+            legend = "aboutthebusiness.contactingyou.email.title",
             legendHidden = true,
             panel = false
         ) {
@@ -49,11 +57,9 @@
             )
 
             @input(
-                field = f("phoneNumber"),
-                labelText = "aboutthebusiness.contactingyou.phone.lbl",
-                hintText = "aboutthebusiness.contactingyou.phone.hint",
-                attrMaxlength = "24",
-                attrPattern = "[0-9()+\\- ]{1,24}"
+                field = f("confirmEmail"),
+                labelText = "aboutthebusiness.contactingyou.confirm.email.lbl",
+                attrType = "email"
             )
         }
 

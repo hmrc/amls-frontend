@@ -159,12 +159,26 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "false"
           )
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-            .thenReturn(Future.successful(Some(bm)))
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople(addressHistory = Some(mock[ResponsiblePersonAddressHistory])))))
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(bm))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](
+            any(),
+            meq(Seq(ResponsiblePeople(addressHistory = None)))
+          )(any(), any(), any())
         }
       }
 

@@ -210,7 +210,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(LocalDate.now.plusDays(30)), false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(LocalDate.now.plusDays(30)), false)
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
@@ -419,7 +420,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -459,7 +461,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -510,7 +513,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -597,7 +601,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
       }
     }
   }

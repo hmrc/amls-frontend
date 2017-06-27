@@ -22,9 +22,9 @@ import jto.validation.forms._
 import play.api.libs.json.{Reads, Writes}
 
 case class PersonResidenceType (
-                               isUKResidence : ResidenceType,
-                               countryOfBirth: Option[Country],
-                               nationality: Option[Country]
+                                 isUKResidence : Residency,
+                                 countryOfBirth: Option[Country],
+                                 nationality: Option[Country]
                               )
 
 object PersonResidenceType {
@@ -34,7 +34,7 @@ object PersonResidenceType {
   implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (
-      __.read[ResidenceType] ~
+      __.read[Residency] ~
       (__ \ "countryOfBirth").read[Option[Country]].withMessage("error.required.rp.birth.country") ~
       (__ \ "nationality").read[Option[Country]].withMessage("error.required.nationality")
       )(PersonResidenceType.apply)
@@ -44,7 +44,7 @@ object PersonResidenceType {
     import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-      __.write[ResidenceType] ~
+      __.write[Residency] ~
         (__ \ "countryOfBirth").write[Option[Country]] ~
         (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))
@@ -54,7 +54,7 @@ object PersonResidenceType {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-      __.read[ResidenceType] and
+      __.read[Residency] and
         (__ \ "countryOfBirth").readNullable[Country] and
         (__ \ "nationality").readNullable[Country]
       ) (PersonResidenceType.apply _)
@@ -64,7 +64,7 @@ object PersonResidenceType {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-      __.write[ResidenceType] and
+      __.write[Residency] and
         (__ \ "countryOfBirth").write[Option[Country]] and
         (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))

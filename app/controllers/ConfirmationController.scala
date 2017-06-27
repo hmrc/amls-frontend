@@ -19,16 +19,16 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{DataCacheConnector, KeystoreConnector, PaymentsConnector}
+import connectors.{DataCacheConnector, KeystoreConnector, PayApiConnector, PaymentsConnector}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
+import models.payments._
 import models.renewal.Renewal
 import models.status._
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
-import services.{SubmissionResponseService, StatusService, SubmissionService}
+import services.{StatusService, SubmissionResponseService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -45,7 +45,7 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val dataCacheConnector: DataCacheConnector
 
-  private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PaymentsConnector]
+  private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
 
   val statusService: StatusService
 
@@ -103,8 +103,8 @@ trait ConfirmationController extends BaseController {
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
-        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
-        case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
+        case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
       }
     }
   }
@@ -114,7 +114,7 @@ trait ConfirmationController extends BaseController {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
-      Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
     }
   }
 
@@ -124,7 +124,7 @@ trait ConfirmationController extends BaseController {
       fees@(payRef, total, rows, difference) <- OptionT(getAmendmentFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, returnLocation(payRef)))
     } yield {
-      Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+      Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.links.nextUrl))
     }
   }
 
@@ -141,7 +141,7 @@ trait ConfirmationController extends BaseController {
             routes.ConfirmationController.paymentConfirmation(paymentRef).url))
         } yield {
           ApplicationConfig.paymentsUrlLookupToggle match {
-            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.url)).withCookies(paymentsRedirect.responseCookies: _*)
+            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.links.nextUrl))
             case _ => Ok(confirmation(paymentRef, total, rows))
           }
         }
@@ -155,20 +155,24 @@ trait ConfirmationController extends BaseController {
   }
 
   private def requestPaymentsUrl(data: ViewData, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
-  : Future[PaymentServiceRedirect] = data match {
+  : Future[CreatePaymentResponse] = data match {
     case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
     case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl)
-    case _ => Future.successful(PaymentServiceRedirect(ApplicationConfig.paymentsUrl))
+    case _ => Future.successful(CreatePaymentResponse.default)
   }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
-  : Future[PaymentServiceRedirect] =
-    paymentsConnector.requestPaymentRedirectUrl(PaymentRedirectRequest(ref, amount, ReturnLocation(returnUrl))) map {
+  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[CreatePaymentResponse] = {
+
+    val amountInPence = (amount * 100).toInt
+
+    paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) map {
       case Some(redirect) => redirect
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
-        PaymentServiceRedirect(ApplicationConfig.paymentsUrl)
+        CreatePaymentResponse.default
     }
+  }
 
   private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getAmendment flatMap {

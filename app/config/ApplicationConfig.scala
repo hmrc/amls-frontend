@@ -38,8 +38,11 @@ trait ApplicationConfig {
   def allowWithdrawalToggle: Boolean
 
   def allowDeRegisterToggle: Boolean
-}
 
+  def returnLinkToggle: Boolean
+
+  def frontendBaseUrl: String
+}
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
@@ -108,9 +111,20 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
-  override def paymentsUrlLookupToggle = getConfBool("feature-toggle.payments-url-lookup", false)
+  val paymentsUrlLookupToggleName = "feature-toggle.payments-url-lookup"
+  override def paymentsUrlLookupToggle = getConfBool(paymentsUrlLookupToggleName, false)
 
   override def allowWithdrawalToggle = getConfBool("feature-toggle.allow-withdrawal", false)
 
   override def allowDeRegisterToggle = getConfBool("feature-toggle.allow-deregister", false)
+
+  override def frontendBaseUrl = {
+    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
+    val scheme = if (secure) "https" else "http"
+    val host = getConfString("amls-frontend.public.host", "")
+
+    s"$scheme://$host"
+  }
+
+  override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 }

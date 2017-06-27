@@ -23,7 +23,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
+import models.withdrawal.{StaticWithdrawalReason, StaticWithdrawalReason$, WithdrawSubscriptionRequest}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -59,7 +59,7 @@ class WithdrawApplicationController @Inject()
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      val requestData = WithdrawSubscriptionRequest(WithdrawSubscriptionRequest.DefaultAckReference, LocalDate.now(), WithdrawalReason.OutOfScope)
+      val requestData = WithdrawSubscriptionRequest(WithdrawSubscriptionRequest.DefaultAckReference, LocalDate.now(), StaticWithdrawalReason.OutOfScope)
 
       (for {
         regNumber <- OptionT(enrolments.amlsRegistrationNumber)

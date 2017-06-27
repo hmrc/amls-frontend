@@ -18,12 +18,14 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.Country
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.StatusService
@@ -70,6 +72,23 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
     }
+
+    "show extra content if any of the responsible people are non UK resident" in new Fixture {
+
+      val personName = Some(PersonName("firstname", None, "lastname", None, None))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName,
+        Some(PersonResidenceType(NonUKResidence,
+          Some(Country("United Kingdom", "GB")),
+          Some(Country("France", "FR")))), None)))))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must include(Messages("responsiblepeople.check_your_answers.hasNonUKresident.1"))
+      contentAsString(result) must include(Messages("responsiblepeople.check_your_answers.hasNonUKresident.2"))
+    }
   }
 
   "Post" must {
@@ -85,8 +104,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Who is the business’s nominated officer?'" when {
       "'fromDeclaration flat set to true and status is pending'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -104,8 +123,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Who is the business’s nominated officer?'" when {
       "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None,None,None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -124,8 +143,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Fee Guidance'" when {
       "'fromDeclaration flag is true and status is pre amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -144,8 +163,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Who is registering this business?'" when {
       "'fromDeclaration flat set to true and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -160,8 +179,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       }
       "'fromDeclaration is true and status is amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None,None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

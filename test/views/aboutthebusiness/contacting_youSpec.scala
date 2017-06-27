@@ -16,10 +16,10 @@
 
 package views.aboutthebusiness
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.aboutthebusiness.{ContactingYou, ContactingYouForm}
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import forms.{Form2, InvalidForm, ValidForm}
+import models.aboutthebusiness.{ContactingYou, ContactingYouEmail}
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -35,21 +35,21 @@ class contacting_youSpec extends GenericTestHelper with MustMatchers  {
   "contacting_you view" must {
     "have correct title, headings and form fields" in new ViewFixture {
 
-      val form2: ValidForm[ContactingYou] = Form2(ContactingYouForm("123456789789","test@test.com"))
+      val form2: ValidForm[ContactingYouEmail] = Form2(ContactingYouEmail("123456789789","test@test.com"))
 
       def view = {
         views.html.aboutthebusiness.contacting_you(form2, true)
       }
 
-      doc.title must be(Messages("aboutthebusiness.contactingyou.title") +
+      doc.title must be(Messages("aboutthebusiness.contactingyou.email.title") +
         " - " + Messages("summary.aboutbusiness") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("aboutthebusiness.contactingyou.title"))
+      heading.html must be(Messages("aboutthebusiness.contactingyou.email.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
       doc.getElementsByAttributeValue("name", "email") must not be empty
-      doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty
+      doc.getElementsByAttributeValue("name", "confirmEmail") must not be empty
 
     }
 

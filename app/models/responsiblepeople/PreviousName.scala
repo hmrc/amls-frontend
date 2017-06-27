@@ -48,8 +48,7 @@ object PreviousName {
 
   import models.FormTypes._
 
-  implicit val formR: Rule[UrlFormEncoded, PreviousName] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formR: Rule[UrlFormEncoded, PreviousName] = From[UrlFormEncoded] { __ =>
 
       import jto.validation.forms.Rules._
 
@@ -77,8 +76,7 @@ object PreviousName {
       ).tupled andThen iR) ~ (__ \ "date").read(localDateFutureRule))(builder)
     }
 
-  implicit val formW: Write[PreviousName, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
+  implicit val formW: Write[PreviousName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
       import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax._

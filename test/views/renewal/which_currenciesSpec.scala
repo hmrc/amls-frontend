@@ -42,7 +42,7 @@ class which_currenciesSpec extends GenericTestHelper with MustMatchers {
 
       def view = which_currencies(formData, true)
 
-      doc.title must startWith(Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.msb"))
+      doc.title must startWith(Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -52,7 +52,7 @@ class which_currenciesSpec extends GenericTestHelper with MustMatchers {
       def view = which_currencies(formData, true)
 
       heading.html must be(Messages("renewal.msb.whichcurrencies.header"))
-      subHeading.html must include(Messages("summary.msb"))
+      subHeading.html must include(Messages("summary.renewal"))
 
     }
 

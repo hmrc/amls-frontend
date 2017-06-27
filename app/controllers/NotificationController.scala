@@ -24,7 +24,8 @@ import models.businessmatching.BusinessMatching
 import models.notifications.ContactType._
 import models.notifications._
 import play.api.Play
-import services.{AuthEnrolmentsService, NotificationService}
+import play.api.mvc.Request
+import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.FeatureToggle
@@ -38,50 +39,56 @@ trait NotificationController extends BaseController {
 
   protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
+  protected[controllers] def statusService: StatusService
+
   protected[controllers] lazy val amlsNotificationService: NotificationService = Play.current.injector.instanceOf[NotificationService]
 
-  def getMessages() = FeatureToggle(ApplicationConfig.notificationsToggle) {
+  def getMessages = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          authEnrolmentsService.amlsRegistrationNumber flatMap {
-            case Some(amlsRegNo) => {
+          statusService.getReadStatus flatMap {
+            case readStatus if readStatus.safeId.isDefined => {
               (for {
                 businessName <- OptionT(getBusinessName)
-                records <- OptionT.liftF(amlsNotificationService.getNotifications(amlsRegNo))
+                records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
               } yield {
                 Ok(views.html.notifications.your_messages(businessName, records))
               }) getOrElse (throw new Exception("Cannot retrieve business name"))
             }
-            case _ => throw new Exception("amlsRegNo does not exist")
+            case _ => throw new Exception("Unable to retrieve SafeID")
           }
     }
   }
 
-  def messageDetails(id: String, contactType: ContactType) = FeatureToggle(ApplicationConfig.notificationsToggle) {
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          authEnrolmentsService.amlsRegistrationNumber flatMap {
-            case Some(amlsRegNo) => {
+          statusService.getReadStatus flatMap {
+            case readStatus if readStatus.safeId.isDefined =>
               (for {
                 businessName <- OptionT(getBusinessName)
-                msg <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
-                msgText <- OptionT.fromOption[Future](msg.messageText)
-              } yield {
-                contactType match {
-                  case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
-                  case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
-                  case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
-                  case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, msg.dateReceived))
-                  case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText))
-                  case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
-                  case _ => Ok(views.html.notifications.message_details(msg.subject, msgText))
-                }
-              }) getOrElse NotFound(notFoundView)
-            }
+                details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
+              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details)) getOrElse NotFound(notFoundView)
+            case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
             case _ => Future.successful(BadRequest)
           }
+    }
+  }
+
+  private def contactTypeToResponse(contactType: ContactType, amlsRegNo: String, businessName: String, details: NotificationDetails)
+                                   (implicit request: Request[_]) = {
+    val msgText = details.messageText.getOrElse("")
+
+    contactType match {
+      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
+      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
+      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
+      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
+      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText))
+      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
+      case _ => Ok(views.html.notifications.message_details(details.subject, msgText))
     }
   }
 
@@ -100,5 +107,6 @@ object NotificationController extends NotificationController {
   // $COVERAGE-OFF$
   override protected[controllers] val dataCacheConnector = DataCacheConnector
   override protected[controllers] val authEnrolmentsService = AuthEnrolmentsService
+  override protected[controllers] val statusService = StatusService
   override protected val authConnector = AMLSAuthConnector
 }

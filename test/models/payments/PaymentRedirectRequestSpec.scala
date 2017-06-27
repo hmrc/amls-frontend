@@ -16,12 +16,12 @@
 
 package models.payments
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class PaymentRedirectRequestSpec extends PlaySpec {
+class PaymentRedirectRequestSpec extends PlaySpec with OneAppPerSuite {
 
   "The PaymentRedirectRequest type" must {
 
@@ -32,9 +32,10 @@ class PaymentRedirectRequestSpec extends PlaySpec {
       val expectedJson = Json.obj(
         "reference" -> "some_reference",
         "amount" -> "100.0",
-        "url" -> "//localhost:9222/anti-money-laundering/start"
+        "url" -> "http://localhost:9222/anti-money-laundering/start"
       )
 
+      //noinspection ScalaStyle
       val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start"))
 
       Json.toJson(model) mustBe expectedJson

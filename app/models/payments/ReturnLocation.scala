@@ -16,22 +16,18 @@
 
 package models.payments
 
-import play.api.mvc.{Call, Request}
+import config.ApplicationConfig
+import play.api.mvc.Call
 
-case class ReturnLocation(url: String, returnUrl: String)
+case class ReturnLocation(url: String, absoluteUrl: String)
 
 object ReturnLocation {
 
-  def apply(url: String)(implicit request: Request[_]) =
-    new ReturnLocation(url, buildRedirectUrl(url))
+  def apply(url: String) =
+    new ReturnLocation(url, publicRedirectUrl(url))
 
-  def apply(call: Call)(implicit request: Request[_]) =
-    new ReturnLocation(call.url, buildRedirectUrl(call.url))
+  def apply(call: Call) =
+    new ReturnLocation(call.url, publicRedirectUrl(call.url))
 
-  private def buildRedirectUrl(url: String)(implicit request: Request[_]): String = {
-    "^localhost".r.findFirstIn(request.host) match {
-      case Some(_) => s"//${request.host}$url"
-      case _ => url
-    }
-  }
+  private def publicRedirectUrl(url: String) = s"${ApplicationConfig.frontendBaseUrl}$url"
 }

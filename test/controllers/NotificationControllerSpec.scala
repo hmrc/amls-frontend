@@ -17,13 +17,13 @@
 package controllers
 
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
-import models.Country
+import models.{Country, ReadStatusResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -35,7 +35,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{AuthEnrolmentsService, NotificationService}
+import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -55,6 +55,10 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     self =>
     val request = authRequest
 
+    val amlsRegNumber = "XJML00000200000"
+    val registrationDate = LocalDateTime.now()
+    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
+
     val testNotifications = NotificationRow(
       status = None,
       contactType = None,
@@ -62,6 +66,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       variation = true,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       false,
+      amlsRegNumber,
       IDType("132456")
     )
 
@@ -89,6 +94,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService = mock[StatusService]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -109,6 +115,10 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
   "getMessages" must {
 
     "respond with OK and show the your_messages page when there is valid data" in new Fixture {
+
+      when(controller.statusService.getReadStatus(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponse))
+
       when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(testBusinessMatch)))
 
@@ -132,6 +142,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("")))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
           .thenReturn(Future.successful(testList))
 
@@ -141,23 +154,6 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         result.getMessage mustBe "Cannot retrieve business name"
 
-      }
-
-      "enrolment does not exist" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(testBusinessMatch)))
-
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
-          .thenReturn(Future.successful(testList))
-
-        val result = intercept[Exception] {
-          await(controller.getMessages()(request))
-        }
-
-        result.getMessage mustBe "amlsRegNo does not exist"
       }
 
     }
@@ -177,6 +173,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
           dateTime
         )
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
 
@@ -186,7 +185,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk", ContactType.ApplicationAutorejectionForFailureToPay)(request)
+        val result = controller.messageDetails("dfgdhsjk", ContactType.ApplicationAutorejectionForFailureToPay, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include("Message Text")
@@ -210,10 +209,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("Registration Number")))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation)(request)
+        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(
@@ -242,14 +244,17 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToRevoke)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
-        contentAsString(result) must include(amlsRegNo)
+        contentAsString(result) must include(amlsRegNumber)
         contentAsString(result) must include(testBusinessName)
 
       }
@@ -274,10 +279,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToReject)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToReject, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -305,10 +313,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.RejectionReasons)(request)
+        val result = controller.messageDetails("id", ContactType.RejectionReasons, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -337,10 +348,13 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.NoLongerMindedToReject)(request)
+        val result = controller.messageDetails("id", ContactType.NoLongerMindedToReject, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must not include msgTxt
@@ -372,13 +386,16 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.RevocationReasons)(request)
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
+        val result = controller.messageDetails("id", ContactType.RevocationReasons, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
         contentAsString(result) must include(testBusinessName)
         contentAsString(result) must include(notificationDetails.dateReceived)
-        contentAsString(result) must include(amlsRegNo)
+        contentAsString(result) must include(amlsRegNumber)
 
       }
     }
@@ -402,14 +419,17 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegNo)))
 
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke)(request)
+        val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke, amlsRegNumber)(request)
 
         status(result) mustBe 200
         contentAsString(result) must not include msgTxt
-        contentAsString(result) must include(amlsRegNo)
+        contentAsString(result) must include(amlsRegNumber)
 
       }
     }
@@ -430,12 +450,15 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
 
   trait Fixture extends AuthorisedFixture {
     self =>
+
     val request = addToken(authRequest)
+    val amlsRegNumber = "XJML00000200000"
 
     val controller = new NotificationController {
       override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService = mock[StatusService]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -459,7 +482,7 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
         status(controller.getMessages()(request)) mustBe 404
       }
       "viewing an individual message" in new Fixture {
-        status(controller.messageDetails("", ContactType.MindedToRevoke)(request)) mustBe 404
+        status(controller.messageDetails("", ContactType.MindedToRevoke, amlsRegNumber)(request)) mustBe 404
       }
     }
   }
