@@ -85,11 +85,10 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
-
+          val result = addPersonController.get()(requestWithParams)
+          status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.registration"))
+
         }
 
         "status is pending" in new Fixture {
@@ -106,14 +105,12 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
-
+          val result = addPersonController.get()(requestWithParams)
+          status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
 
-        "status is pending" in new Fixture {
+        "status is ready for renewal" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -127,9 +124,8 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate))))
 
-          val result = addPersonController.post()(requestWithParams)
+          val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
-
           contentAsString(result) must include(Messages("submit.renewal.application"))
         }
 
