@@ -18,14 +18,29 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
+import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext => implicit request =>
+
+      dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+        case Some(data) => {
+
+          val nominatedOfficer = data.filter(_.positions.fold(false) (p => p.positions.contains(NominatedOfficer))).head
+
+          val name = nominatedOfficer.personName map (n => n.fullName)
+          Ok(views.html.changeofficer.still_employed(EmptyForm, name.getOrElse("")))
+        }
+        case _ => InternalServerError("No responsible people found")
+      }
+
   }
 
   def post = Authorised.async {
