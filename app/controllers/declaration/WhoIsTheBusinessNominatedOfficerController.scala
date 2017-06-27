@@ -22,7 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
-import models.status.{NotCompleted, ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -44,9 +44,10 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
   def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     statusService.getStatus map {
-      case SubmissionReadyForReview => status(select_business_nominated_officer("submit.amendment.application", form, rp))
+      case SubmissionReady => status(select_business_nominated_officer("submit.registration", form, rp))
+      case SubmissionReadyForReview | SubmissionDecisionApproved => status(select_business_nominated_officer("submit.amendment.application", form, rp))
       case ReadyForRenewal(_) => status(select_business_nominated_officer("submit.renewal.application", form, rp))
-      case _ => status(select_business_nominated_officer("submit.registration", form, rp))
+      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
 
