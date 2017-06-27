@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.changeofficer
+package models.changeofficer
 
-import javax.inject.Inject
 
-import controllers.BaseController
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
-
-class StillEmployedController @Inject()(val authConnector: AuthConnector) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
-  }
-
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Redirect(routes.RoleInBusinessController.get()))
-  }
-}
+sealed trait StillEmployed
