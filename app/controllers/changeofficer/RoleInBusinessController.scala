@@ -34,4 +34,9 @@ class RoleInBusinessController @Inject()
 
       result getOrElse InternalServerError("Unable to get nominated officer")
   }
+
+  def post() = Authorised.async {
+    implicit authContext => implicit request =>
+      ???
+  }
 }
