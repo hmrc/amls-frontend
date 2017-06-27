@@ -18,10 +18,14 @@ package controllers.deregister
 
 import javax.inject.Inject
 
+import cats.implicits._
+import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
+import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
@@ -45,7 +49,25 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+      Form2[DeregistrationReason](request.body) match {
+        case f:InvalidForm => Future.successful(BadRequest(deregistration_reason(f)))
+        case ValidForm(_, data) => {
+          val deregistrationReasonOthers = data match {
+            case DeregistrationReason.Other(reason) => reason.some
+            case _ => None
+          }
+          val deregistration = DeRegisterSubscriptionRequest(
+            DeRegisterSubscriptionRequest.DefaultAckReference,
+            LocalDate.now(),
+            data,
+            deregistrationReasonOthers
+          )
+          (for {
+            regNumber <- OptionT(enrolments.amlsRegistrationNumber)
+            _ <- OptionT.liftF(amls.deregister(regNumber, deregistration))
+          } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
+        }
+      }
   }
 
 }

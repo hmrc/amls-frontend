@@ -88,11 +88,11 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
       "given valid data" must {
 
         "go to landing controller" which {
-          "follows sending a withdrawal to amls" when {
-            "withdrawalReason is selection without other reason" in new TestFixture {
+          "follows sending a deregistration to amls" when {
+            "deregistrationReason is selection without other reason" in new TestFixture {
 
               val newRequest = request.withFormUrlEncodedBody(
-                "withdrawalReason" -> "01"
+                "deregistrationReason" -> "01"
               )
 
               val deregistration = DeRegisterSubscriptionRequest(
@@ -112,7 +112,7 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
             "DeregistrationReason is selection with other reason" in new TestFixture {
 
               val newRequest = request.withFormUrlEncodedBody(
-                "deregistrationReason" -> "04",
+                "deregistrationReason" -> "06",
                 "specifyOtherReason" -> "reason"
               )
 
