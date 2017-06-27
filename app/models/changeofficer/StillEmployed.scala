@@ -24,10 +24,11 @@ case object StillEmployedYes extends StillEmployed
 
 object StillEmployed {
   import jto.validation._
+  import utils.MappingUtils.Implicits._
 
   val formReads: Rule[UrlFormEncoded, StillEmployed] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "stillEmployed").read[Boolean] map {
+    (__ \ "stillEmployed").read[Boolean].withMessage("changeofficer.stillemployed.validationerror") map {
       case true => StillEmployedYes
     }
   }

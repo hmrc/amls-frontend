@@ -16,7 +16,8 @@
 
 package models.changeofficer
 
-import cats.data.Validated.Valid
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
@@ -26,7 +27,6 @@ class StillEmployedSpec extends PlaySpec with MustMatchers {
     "given a valid form" when {
       "'yes' is selected" must {
         "return a valid form model" in {
-
           val formData = Map(
             "stillEmployed" -> Seq("true")
           )
@@ -34,7 +34,16 @@ class StillEmployedSpec extends PlaySpec with MustMatchers {
           val result = StillEmployed.formReads.validate(formData)
 
           result mustBe Valid(StillEmployedYes)
+        }
+      }
 
+      "nothing is selected" must {
+        "return the validation errors" in {
+          val formData = Map.empty[String, Seq[String]]
+
+          val result = StillEmployed.formReads.validate(formData)
+
+          result mustBe Invalid(Seq(Path \ "stillEmployed" -> Seq(ValidationError("changeofficer.stillemployed.validationerror"))))
         }
       }
     }
