@@ -18,10 +18,12 @@ package controllers.deregister
 
 import javax.inject.Inject
 
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.FeatureToggle
 
 class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
                                                amls: AmlsConnector,
@@ -29,9 +31,12 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
                                                cache: DataCacheConnector,
                                                statusService: StatusService) extends BaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      ???
+  def get = FeatureToggle(ApplicationConfig.allowDeRegisterToggle) {
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          ???
+    }
   }
 
   def post = Authorised.async {
