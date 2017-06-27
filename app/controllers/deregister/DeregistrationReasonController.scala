@@ -21,9 +21,13 @@ import javax.inject.Inject
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
+import forms.EmptyForm
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
+import views.html.deregister.deregistration_reason
+
+import scala.concurrent.Future
 
 class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
                                                amls: AmlsConnector,
@@ -35,7 +39,7 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          ???
+          Future.successful(Ok(deregistration_reason(EmptyForm)))
     }
   }
 
