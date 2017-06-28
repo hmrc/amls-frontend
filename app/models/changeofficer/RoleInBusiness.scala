@@ -67,6 +67,13 @@ object RoleInBusiness {
     override def writes(o: RoleInBusiness) = Json.obj("positions" -> JsArray(o.roles.map(r => JsString(roleToString(r))).toSeq))
   }
 
+  implicit val jsonReads: Reads[RoleInBusiness] = {
+    import play.api.libs.json._
+    import play.api.libs.json.Reads._
+
+    (__ \ "positions").read[Seq[String]].map(x => x.map(stringToRole)).map(y => RoleInBusiness(y.toSet))
+  }
+
   implicit val roleReads = Rule[String, Role] { r =>
     if (stringToRole.isDefinedAt(r)) {
       Valid(stringToRole(r))

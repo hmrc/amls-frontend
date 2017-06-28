@@ -55,5 +55,19 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
       Json.toJson(model) mustBe json
     }
+
+    "convert from Json" in {
+
+      val jsonString =
+        """
+          |{"positions": [
+          | "soleprop", "partner"]
+          |}
+        """.stripMargin
+
+      val model = RoleInBusiness(Set(SoleProprietor, Partner))
+
+      Json.parse(jsonString).as[RoleInBusiness] mustBe model
+    }
   }
 }
