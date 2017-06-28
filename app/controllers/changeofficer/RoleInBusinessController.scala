@@ -47,6 +47,6 @@ class RoleInBusinessController @Inject()
 
   def post() = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+      Future.successful(BadRequest)
   }
 }
