@@ -17,17 +17,16 @@
 package connectors
 
 import config.WSHttp
-import play.api.{Logger, Play}
-import play.api.libs.json.{Json, Reads}
+import play.api.Logger
+import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.http.{HttpGet, NotFoundException}
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import scala.concurrent.Future
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -80,10 +79,11 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
     httpGet.GET[BusinessMatchingReviewDetails](url) map { result =>
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       Some(result)
-    } recover {
+    } recoverWith {
+      case _: NotFoundException => Future.successful(None)
       case ex =>
         Logger.warn(s"$logPrefix Failed to fetch review details", ex)
-        None
+        Future.failed(ex)
     }
   }
 }
