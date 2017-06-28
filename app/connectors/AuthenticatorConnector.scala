@@ -34,7 +34,7 @@ class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
     //noinspection SimplifyBooleanMatch
     config.getConfBool("feature-toggle.refresh-profile", defBool = false) match {
       case true =>
-        http.POSTEmpty(s"$serviceUrl/authenticator/refresh-profile") map { response =>
+        http.POSTEmpty(s"$serviceUrl/government-gateway-authentication/refresh-profile") map { response =>
           Logger.info("[AuthenticatorConnector] Current user profile was refreshed")
           response
         }

@@ -65,7 +65,7 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       result.status must be(200)
 
-      verify(http).POSTEmpty(eqTo(s"$configKey/authenticator/refresh-profile"))(any(), any())
+      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any())
 
     }
 
