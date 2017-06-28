@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, Writes}
 case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
                                          deregistrationDate: LocalDate,
                                          deregistrationReason: DeregistrationReason,
-                                         deregistrationReasonOther: Option[String] = None)
+                                         deregReasonOther: Option[String] = None)
 
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
@@ -38,7 +38,7 @@ object DeRegisterSubscriptionRequest {
         (__ \ "acknowledgementReference").write[String] and
           (__ \ "deregistrationDate").write[LocalDate] and
           __.write[DeregistrationReason] and
-          (__ \ "deregistrationReasonOther").writeNullable[String]
+          (__ \ "deregReasonOther").writeNullable[String]
         ) (unlift(DeRegisterSubscriptionRequest.unapply)).writes(ep)
     }
   }
