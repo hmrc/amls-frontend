@@ -16,20 +16,24 @@
 
 package models.changeofficer
 
+import cats.data.Validated.Valid
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
-
 
 class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
   "RoleInBusiness" must {
+
+    "validate a role" in {
+      RoleInBusiness.roleReads.validate("soleprop") mustBe Valid(SoleProprietor)
+    }
+
     "convert valid form into the model" in {
-      val formData = Map("positions" -> Seq("06"))
+      val formData = Map("positions" -> Seq("soleprop"))
 
       val result = RoleInBusiness.formReads.validate(formData)
 
-      result mustBe RoleInBusiness(Set(SoleProprietor))
-
+      result mustBe Valid(RoleInBusiness(Set(SoleProprietor)))
     }
   }
 

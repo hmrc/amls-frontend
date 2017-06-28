@@ -16,22 +16,31 @@
 
 package models.changeofficer
 
-import jto.validation.{From, Rule}
+import cats.data.Validated.Valid
 import jto.validation.forms.UrlFormEncoded
-import play.api.libs.json.Reads
-
+import jto.validation.{From, Rule}
+import utils.TraversableValidators._
 
 case class RoleInBusiness(roles: Set[Role])
 
 sealed trait Role
 
+object Role {
+
+}
+
 case object SoleProprietor extends Role
 case object InternalAccountant extends Role
 
 object RoleInBusiness {
-  implicit def formReads:Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] {
-    __ => (__ \ "positions").read[String] map {
-      case "06" => SoleProprietor
-    }
+
+  implicit val roleReads = Rule[String, Role] {
+    case "soleprop" => Valid(SoleProprietor)
+  }
+
+  implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] {
+    import jto.validation.forms.Rules._
+
+    __ => (__ \ "positions").read(minLengthR[Set[Role]](1)) map { s => RoleInBusiness(s) }
   }
 }
