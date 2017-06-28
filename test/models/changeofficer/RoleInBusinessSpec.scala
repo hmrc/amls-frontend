@@ -47,7 +47,6 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
         (Path \ "positions[0]") -> Seq(ValidationError("error.invalid"))
       ))
 
-//      result.
     }
   }
 
