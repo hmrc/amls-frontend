@@ -52,7 +52,6 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
-
     }
 
     "write correct data from enum value" in {

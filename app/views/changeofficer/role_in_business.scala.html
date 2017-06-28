@@ -1,0 +1,98 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import config.ApplicationConfig
+@import models.businessmatching.{BusinessType, BusinessMatching}
+
+@(f: forms.Form2[_], businessType: BusinessType, personName: String)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder(("changeofficer.roleinbusiness.heading", personName), "summary.updateinformation")
+}
+
+@main(
+    title = Messages("changeofficer.roleinbusiness.title") + " - " + Messages("summary.updateinformation"),
+    heading = header
+) {
+
+
+
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.changeofficer.routes.RoleInBusinessController.post()) {
+
+        <div class="form-group">
+            @fieldset(
+                f = f("positions"),
+                legend = "responsiblepeople.position_within_business.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @businessType match {
+                    case BusinessType.SoleProprietor => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.06",
+                            value = "soleprop"
+                        )
+                    }
+                    case BusinessType.Partnership => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.05",
+                            value = "partner"
+                        )
+                    }
+                    case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.01",
+                            value = "bensharehold"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.02",
+                            value = "director"
+                        )
+                        @if(businessType == BusinessType.LPrLLP) {
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.07",
+                                value = "desigmemb"
+                            )
+                        }
+                    }
+                }
+
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "responsiblepeople.position_within_business.lbl.03",
+                    value = "intAccountant"
+                )
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "responsiblepeople.position_within_business.lbl.08",
+                    value = "extAccountant"
+                )
+            }
+        </div>
+
+        @submit()
+    }
+}
