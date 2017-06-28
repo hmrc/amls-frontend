@@ -25,7 +25,7 @@
 }
 
 @main(
-    title = Messages("deregistration.reason.title") + " - " + Messages("title.yapp"),
+    title = Messages("deregistration.reason.heading") + " - " + Messages("title.yapp"),
     heading = header
 ) {
 
@@ -70,7 +70,7 @@
                     f = f("deregistrationReason"),
                     labelText = "deregistration.reason.lbl.06",
                     value = "06",
-                    target = s".other-fieldset"
+                    target = s".specifyOtherReason-fieldset"
                 )
             }
         }
@@ -87,6 +87,6 @@
             )
         }
     
-        @submit(false, Some(Messages("button.continue")))
+        @submit(false, Some(Messages("status.deregister.button-text")), returnLink = false)
     }
 }

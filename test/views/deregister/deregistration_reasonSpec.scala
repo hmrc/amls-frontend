@@ -35,7 +35,7 @@ class deregistration_reasonSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.deregister.deregistration_reason(EmptyForm)
 
-      doc.title must be(Messages("deregistration.reason.title") +
+      doc.title must be(Messages("deregistration.reason.heading") +
         " - " + Messages("title.yapp") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
