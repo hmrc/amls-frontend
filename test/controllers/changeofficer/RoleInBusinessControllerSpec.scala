@@ -95,7 +95,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
 
-        verify(cache).save(eqTo("changeofficer.roleinbusiness"), eqTo(RoleInBusiness(Set(models.changeofficer.SoleProprietor))))(any(),any(),any())
+        verify(cache).save(eqTo(RoleInBusiness.key), eqTo(RoleInBusiness(Set(models.changeofficer.SoleProprietor))))(any(),any(),any())
       }
 
       "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {

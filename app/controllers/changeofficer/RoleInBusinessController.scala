@@ -48,7 +48,7 @@ class RoleInBusinessController @Inject()
     implicit authContext => implicit request =>
       Form2[RoleInBusiness](request.body) match {
         case ValidForm(_, data) =>
-          dataCacheConnector.save("changeofficer.roleinbusiness", data) map { _ =>
+          dataCacheConnector.save(RoleInBusiness.key, data) map { _ =>
             Redirect(controllers.changeofficer.routes.NewOfficerController.get())
           }
         case f: InvalidForm =>

@@ -41,6 +41,8 @@ case object DesignatedMember extends Role
 case class Other(text: String) extends Role
 
 object RoleInBusiness {
+  val key = "changeofficer.roleinbusiness"
+
   import utils.MappingUtils.Implicits._
 
   val stringToRole = PartialFunction[String, Role] {
