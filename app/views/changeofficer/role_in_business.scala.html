@@ -49,32 +49,32 @@
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.06",
-                            value = "06"
+                            value = "soleprop"
                         )
                     }
                     case BusinessType.Partnership => {
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.05",
-                            value = "05"
+                            value = "partner"
                         )
                     }
                     case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.01",
-                            value = "01"
+                            value = "bensharehold"
                         )
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.02",
-                            value = "02"
+                            value = "director"
                         )
                         @if(businessType == BusinessType.LPrLLP) {
                             @checkbox(
                                 f = f("positions[]"),
                                 labelText = "responsiblepeople.position_within_business.lbl.07",
-                                value = "07"
+                                value = "desigmemb"
                             )
                         }
                     }
@@ -83,12 +83,12 @@
                 @checkbox(
                     f = f("positions[]"),
                     labelText = "responsiblepeople.position_within_business.lbl.03",
-                    value = "03"
+                    value = "intAccountant"
                 )
                 @checkbox(
                     f = f("positions[]"),
                     labelText = "responsiblepeople.position_within_business.lbl.08",
-                    value = "08"
+                    value = "extAccountant"
                 )
             }
         </div>

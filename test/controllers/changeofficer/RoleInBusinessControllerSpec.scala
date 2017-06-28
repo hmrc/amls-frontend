@@ -86,15 +86,17 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
 
     "when post is called" must {
       "respond with SEE_OTHER when yes is selected" in new TestFixture {
-        val result = controller.post()(request.withFormUrlEncodedBody("positions" -> "06"))
+        val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "soleprop"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
       }
 
-      "respond with BAD_REQUEST when no options selected" in new TestFixture {
+      "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {
         val result = controller.post()(request)
         status(result) mustBe BAD_REQUEST
+        contentAsString(result) must include(Messages("error"))
+        contentAsString(result) must include(Messages("firstName lastName"))
       }
     }
   }

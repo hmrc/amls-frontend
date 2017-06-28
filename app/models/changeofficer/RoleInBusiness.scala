@@ -31,11 +31,22 @@ object Role {
 
 case object SoleProprietor extends Role
 case object InternalAccountant extends Role
+case object BeneficialShareholder extends Role
+case object Director extends Role
+case object ExternalAccountant extends Role
+case object Partner extends Role
+case object DesignatedMember extends Role
 
 object RoleInBusiness {
 
   implicit val roleReads = Rule[String, Role] {
     case "soleprop" => Valid(SoleProprietor)
+    case "bensharehold" => Valid(BeneficialShareholder)
+    case "director" => Valid(Director)
+    case "extAccountant" => Valid(ExternalAccountant)
+    case "intAccountant" => Valid(InternalAccountant)
+    case "partner" => Valid(Partner)
+    case "desigmemb" => Valid(DesignatedMember)
     case _ => Invalid(Seq((Path) -> Seq(ValidationError("error.invalid"))))
   }
 

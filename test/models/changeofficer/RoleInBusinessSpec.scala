@@ -26,6 +26,12 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "validate a role" in {
       RoleInBusiness.roleReads.validate("soleprop") mustBe Valid(SoleProprietor)
+      RoleInBusiness.roleReads.validate("bensharehold") mustBe Valid(BeneficialShareholder)
+      RoleInBusiness.roleReads.validate("director") mustBe Valid(Director)
+      RoleInBusiness.roleReads.validate("extAccountant") mustBe Valid(ExternalAccountant)
+      RoleInBusiness.roleReads.validate("intAccountant") mustBe Valid(InternalAccountant)
+      RoleInBusiness.roleReads.validate("partner") mustBe Valid(Partner)
+      RoleInBusiness.roleReads.validate("desigmemb") mustBe Valid(DesignatedMember)
     }
 
     "convert valid form into the model" in {
@@ -36,18 +42,6 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       result mustBe Valid(RoleInBusiness(Set(SoleProprietor)))
     }
 
-    "fail validation when an invalid enum is given" in {
-      val formData = Map("positions" -> Seq("invalid"))
-
-      val result = RoleInBusiness.formReads.validate(formData)
-
-      println("*****" + result)
-
-      result mustBe Invalid(Seq(
-        (Path \ "positions[0]") -> Seq(ValidationError("error.invalid"))
-      ))
-
-    }
   }
 
 }
