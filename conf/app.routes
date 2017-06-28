@@ -262,6 +262,7 @@ GET         /update-information/still-work                                      
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
 
 GET         /update-information/role-in-business                                      @controllers.changeofficer.RoleInBusinessController.get()
+POST        /update-information/role-in-business                                      @controllers.changeofficer.RoleInBusinessController.post()
 
 GET         /update-information/new-nominated-officer                                 @controllers.changeofficer.NewOfficerController.get()
 

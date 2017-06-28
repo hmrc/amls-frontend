@@ -18,21 +18,18 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
-import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm}
 import models.changeofficer.StillEmployed
-import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
-import play.api.mvc.Result
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCacheConnector: DataCacheConnector) extends BaseController {
+class StillEmployedController @Inject()
+(val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -52,20 +49,4 @@ class StillEmployedController @Inject()(val authConnector: AuthConnector, dataCa
         case _ => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
       }
   }
-
-  private def getNominatedOfficerName()(implicit authContext: AuthContext,
-                                               headerCarrier: HeaderCarrier) = {
-    for {
-      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
-      name <- OptionT.fromOption[Future](nominatedOfficer.personName)
-    } yield {
-      name.fullName
-    }
-  }
-
-  private def getOfficer(people: Seq[ResponsiblePeople]) = {
-    people.find(_.positions.fold(false)(p => p.positions.contains(NominatedOfficer)))
-  }
-
 }
