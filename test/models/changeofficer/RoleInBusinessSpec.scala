@@ -16,7 +16,7 @@
 
 package models.changeofficer
 
-import cats.data.Validated.Valid
+import jto.validation.{Invalid, Valid, ValidationError, Path}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
@@ -34,6 +34,20 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       val result = RoleInBusiness.formReads.validate(formData)
 
       result mustBe Valid(RoleInBusiness(Set(SoleProprietor)))
+    }
+
+    "fail validation when an invalid enum is given" in {
+      val formData = Map("positions" -> Seq("invalid"))
+
+      val result = RoleInBusiness.formReads.validate(formData)
+
+      println("*****" + result)
+
+      result mustBe Invalid(Seq(
+        (Path \ "positions[0]") -> Seq(ValidationError("error.invalid"))
+      ))
+
+//      result.
     }
   }
 

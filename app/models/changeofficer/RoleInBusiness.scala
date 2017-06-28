@@ -16,9 +16,9 @@
 
 package models.changeofficer
 
-import cats.data.Validated.Valid
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule}
+import jto.validation.{Path, ValidationError, From, Rule}
 import utils.TraversableValidators._
 
 case class RoleInBusiness(roles: Set[Role])
@@ -36,6 +36,7 @@ object RoleInBusiness {
 
   implicit val roleReads = Rule[String, Role] {
     case "soleprop" => Valid(SoleProprietor)
+    case _ => Invalid(Seq((Path) -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] {
