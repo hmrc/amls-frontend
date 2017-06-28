@@ -37,8 +37,13 @@ case object ExternalAccountant extends Role
 case object Partner extends Role
 case object DesignatedMember extends Role
 
+case class Other(text: String) extends Role
+
 object RoleInBusiness {
   import utils.MappingUtils.Implicits._
+
+
+
 
   implicit val roleReads = Rule[String, Role] {
     case "soleprop" => Valid(SoleProprietor)

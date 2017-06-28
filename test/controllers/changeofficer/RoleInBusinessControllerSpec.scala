@@ -20,7 +20,8 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.SoleProprietor
+import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor, _}
+import models.changeofficer.RoleInBusiness
 import models.responsiblepeople._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -59,7 +60,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
 
     val details = ReviewDetails(
       "Some business",
-      Some(SoleProprietor),
+      Some(BmSoleProprietor),
       Address("Line 1", "Line 2", None, None, None, Country("UK", "UK")),
       "XA123456789",
       None)
@@ -88,6 +89,8 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
+
+//        verify(cache).save(eqTo("changeofficer.roleinbusiness"), eqTo(RoleInBusiness(Set(models.changeofficer.SoleProprietor))))(any(),any(),any())
       }
 
       "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {

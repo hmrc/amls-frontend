@@ -19,6 +19,7 @@ package models.changeofficer
 import jto.validation.{Invalid, Valid, ValidationError, Path}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.{JsArray, Json}
 
 class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
@@ -40,6 +41,18 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       val result = RoleInBusiness.formReads.validate(formData)
 
       result mustBe Valid(RoleInBusiness(Set(SoleProprietor)))
+    }
+
+    "convert to Json" in {
+      val json = Json.obj(
+        "positions" -> Seq(
+          "soleprop"
+        )
+      )
+
+      val model = RoleInBusiness(Set(SoleProprietor))
+
+      Json.toJson(model) mustBe(json)
     }
 
   }
