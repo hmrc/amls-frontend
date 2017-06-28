@@ -48,7 +48,9 @@ class RoleInBusinessController @Inject()
     implicit authContext => implicit request =>
       Form2[RoleInBusiness](request.body) match {
         case ValidForm(_, data) =>
-          Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
+          dataCacheConnector.save(RoleInBusiness.key, data) map { _ =>
+            Redirect(controllers.changeofficer.routes.NewOfficerController.get())
+          }
         case f: InvalidForm =>
           val result = getBusinessNameAndName map {
             case (businessType, name) => BadRequest(views.html.changeofficer.role_in_business(f, businessType, name))
