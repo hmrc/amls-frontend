@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.withdrawal
 
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
-import cats.implicits._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionReadyForReview
 import models.withdrawal.WithdrawSubscriptionResponse
 import org.joda.time.LocalDateTime
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, StatusService}
+import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -45,11 +45,10 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
 
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
-    val authService = mock[AuthEnrolmentsService]
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, cacheConnector, statusService)
 
     val amlsRegistrationNumber = "XA1234567890L"
     val businessName = "Test Business"
@@ -60,14 +59,6 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
     val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
 
     when(reviewDetails.businessName).thenReturn(businessName)
-
-    when {
-      authService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn Future.successful(amlsRegistrationNumber.some)
-
-    when {
-      amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
-    } thenReturn Future.successful(WithdrawSubscriptionResponse("processing date"))
 
     when {
       cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
@@ -96,14 +87,13 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
       }
     }
 
-    "call the middle tier to initiate the withdrawal process" when {
+    "go to WithdrawalReasonController" when {
       "the post method is called" in new TestFixture {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.routes.LandingController.get().url.some
+        redirectLocation(result) mustBe routes.WithdrawalReasonController.get().url.some
 
-        verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
       }
     }
   }
@@ -120,11 +110,10 @@ class WithdrawApplicationControllerToggleOffSpec extends GenericTestHelper with 
 
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
-    val authService = mock[AuthEnrolmentsService]
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, authService, cacheConnector, statusService)
+    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, cacheConnector, statusService)
   }
 
   "The WithdrawApplicationController" when {

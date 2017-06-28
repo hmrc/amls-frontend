@@ -28,12 +28,14 @@
     title = Messages("withdrawal.reason.title") + " - " + Messages("title.yapp"),
     heading = header
 ) {
-    @form(f, controllers.routes.WithdrawalReasonController.post) {
+    @form(f, controllers.withdrawal.routes.WithdrawalReasonController.post) {
 
         @fieldset(
             f = f("withdrawalReason-fieldset"),
             legend = "withdrawal.reason.heading",
-            classes = Seq("withdrawalReason-fieldset")
+            legendHidden = true,
+            classes = Seq("withdrawalReason-fieldset"),
+            panel = false
         ) {
             @errorGroup(
                 field = f("withdrawalReason")
@@ -57,7 +59,7 @@
                     f = f("withdrawalReason"),
                     labelText = "withdrawal.reason.lbl.04",
                     value = "04",
-                    target = s".other-fieldset"
+                    target = s".specifyOtherReason-fieldset"
                 )
             }
         }
@@ -66,7 +68,8 @@
             legend = "withdrawal.reason.lbl.04",
             legendHidden = true,
             classes = Seq("specifyOtherReason-fieldset"),
-            f = f("specifyOtherReason-fieldset")
+            f = f("specifyOtherReason-fieldset"),
+            jsHidden = true
         ) {
             @input(
                 field = f("specifyOtherReason"),
@@ -74,6 +77,6 @@
             )
         }
 
-        @submit(false, Some(Messages("button.continue")))
+        @submit(false, Some(Messages("button.continue")), returnLink = false)
     }
 }
