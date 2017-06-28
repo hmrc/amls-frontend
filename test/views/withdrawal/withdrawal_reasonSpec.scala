@@ -34,7 +34,7 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
 
-      doc.title must be(Messages("withdrawal.reason.title") +
+      doc.title must be(Messages("withdrawal.reason.heading") +
         " - " + Messages("title.yapp") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
