@@ -26,13 +26,13 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
   "RoleInBusiness" must {
 
     "validate a role" in {
-      RoleInBusiness.roleReads.validate("soleprop") mustBe Valid(SoleProprietor)
-      RoleInBusiness.roleReads.validate("bensharehold") mustBe Valid(BeneficialShareholder)
-      RoleInBusiness.roleReads.validate("director") mustBe Valid(Director)
-      RoleInBusiness.roleReads.validate("extAccountant") mustBe Valid(ExternalAccountant)
-      RoleInBusiness.roleReads.validate("intAccountant") mustBe Valid(InternalAccountant)
-      RoleInBusiness.roleReads.validate("partner") mustBe Valid(Partner)
-      RoleInBusiness.roleReads.validate("desigmemb") mustBe Valid(DesignatedMember)
+      RoleInBusiness.roleFormReads.validate(Seq("soleprop")) mustBe Valid(Set(SoleProprietor))
+      RoleInBusiness.roleFormReads.validate(Seq("bensharehold")) mustBe Valid(Set(BeneficialShareholder))
+      RoleInBusiness.roleFormReads.validate(Seq("director")) mustBe Valid(Set(Director))
+      RoleInBusiness.roleFormReads.validate(Seq("extAccountant")) mustBe Valid(Set(ExternalAccountant))
+      RoleInBusiness.roleFormReads.validate(Seq("intAccountant")) mustBe Valid(Set(InternalAccountant))
+      RoleInBusiness.roleFormReads.validate(Seq("partner")) mustBe Valid(Set(Partner))
+      RoleInBusiness.roleFormReads.validate(Seq("desigmemb")) mustBe Valid(Set(DesignatedMember))
     }
 
     "convert valid form into the model" in {
@@ -41,6 +41,16 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       val result = RoleInBusiness.formReads.validate(formData)
 
       result mustBe Valid(RoleInBusiness(Set(SoleProprietor)))
+    }
+
+    "convert invalid form into a set of validation errors" in {
+      val formData = Map(
+        "positions" -> Seq("some value")
+      )
+
+      val result = RoleInBusiness.formReads.validate(formData)
+
+      result mustBe Invalid(Seq(Path \ "positions" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror"))))
     }
 
     "convert to Json" in {
@@ -68,6 +78,20 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       val model = RoleInBusiness(Set(SoleProprietor, Partner))
 
       Json.parse(jsonString).as[RoleInBusiness] mustBe model
+    }
+
+    "convert from invalid json" in {
+      val jsonString =
+        """
+          | {
+          |   "positions": [
+          |     "some value"
+          |   ]
+          | }
+        """.stripMargin
+
+      Json.parse(jsonString).validate[RoleInBusiness] mustBe
+        JsError(Seq(JsPath \ "positions" -> Seq(play.api.data.validation.ValidationError("changeofficer.roleinbusiness.validationerror"))))
     }
   }
 }
