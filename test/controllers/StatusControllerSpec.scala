@@ -573,7 +573,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
       }
     }
 
@@ -653,7 +653,7 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
       val result = controller.get()(request)
       val doc = Jsoup.parse(contentAsString(result))
 
-      Option(doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
+      Option(doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
     }
   }
 }
@@ -704,7 +704,7 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
       val result = controller.get()(request)
       val doc = Jsoup.parse(contentAsString(result))
 
-      Option(doc.select(s"a[href=${controllers.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
+      Option(doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
     }
   }
 }

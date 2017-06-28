@@ -20,7 +20,7 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsString, _}
 
 class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
 
@@ -75,7 +75,7 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
       }
       "other reason value has too many characters" in {
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("a" * 256))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 255))))))
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 40))))))
       }
     }
 
@@ -106,36 +106,36 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
 
     "validate given an enum value" when {
       "OutOfScope" in {
-        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "01")) must
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Out of scope")) must
           be(JsSuccess(WithdrawalReason.OutOfScope, JsPath))
       }
       "NotTradingInOwnRight" in {
-        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "02")) must
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Not trading in own right")) must
           be(JsSuccess(WithdrawalReason.NotTradingInOwnRight, JsPath))
       }
       "UnderAnotherSupervisor" in {
-        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "03")) must
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Under another supervisor")) must
           be(JsSuccess(WithdrawalReason.UnderAnotherSupervisor, JsPath))
       }
     }
 
     "validate given an enum value and string" in {
-      Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "04", "specifyOtherReason" -> "reason")) must
+      Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason")) must
         be(JsSuccess(WithdrawalReason.Other("reason"), JsPath \ "specifyOtherReason"))
     }
 
     "write the correct value" when {
       "OutOfScope" in {
-        Json.toJson(WithdrawalReason.OutOfScope) must be(Json.obj("withdrawalReason" -> "01"))
+        Json.toJson(WithdrawalReason.OutOfScope) must be(Json.obj("withdrawalReason" -> "Out of scope"))
       }
       "NotTradingInOwnRight" in {
-        Json.toJson(WithdrawalReason.NotTradingInOwnRight) must be(Json.obj("withdrawalReason" -> "02"))
+        Json.toJson(WithdrawalReason.NotTradingInOwnRight) must be(Json.obj("withdrawalReason" -> "Not trading in own right"))
       }
       "UnderAnotherSupervisor" in {
-        Json.toJson(WithdrawalReason.UnderAnotherSupervisor) must be(Json.obj("withdrawalReason" -> "03"))
+        Json.toJson(WithdrawalReason.UnderAnotherSupervisor) must be(Json.obj("withdrawalReason" -> "Under another supervisor"))
       }
       "Other" in {
-        Json.toJson(WithdrawalReason.Other("reason")) must be(Json.obj("withdrawalReason" -> "04", "specifyOtherReason" -> "reason"))
+        Json.toJson(WithdrawalReason.Other("reason")) must be(Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
       }
     }
 
@@ -149,7 +149,7 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
           be(JsError(JsPath \ "withdrawalReason" -> play.api.data.validation.ValidationError("error.path.missing")))
       }
       "other reason is missing" in {
-        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "04")) must
+        Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify")) must
           be(JsError(JsPath \ "specifyOtherReason" -> play.api.data.validation.ValidationError("error.path.missing")))
       }
     }
