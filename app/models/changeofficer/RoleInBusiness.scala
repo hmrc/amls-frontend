@@ -38,6 +38,7 @@ case object Partner extends Role
 case object DesignatedMember extends Role
 
 object RoleInBusiness {
+  import utils.MappingUtils.Implicits._
 
   implicit val roleReads = Rule[String, Role] {
     case "soleprop" => Valid(SoleProprietor)
@@ -47,12 +48,12 @@ object RoleInBusiness {
     case "intAccountant" => Valid(InternalAccountant)
     case "partner" => Valid(Partner)
     case "desigmemb" => Valid(DesignatedMember)
-    case _ => Invalid(Seq((Path) -> Seq(ValidationError("error.invalid"))))
+    case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] {
     import jto.validation.forms.Rules._
 
-    __ => (__ \ "positions").read(minLengthR[Set[Role]](1)) map { s => RoleInBusiness(s) }
+    __ => (__ \ "positions").read(minLengthR[Set[Role]](1)).withMessage("changeofficer.roleinbusiness.validationerror") map { s => RoleInBusiness(s) }
   }
 }

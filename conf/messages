@@ -1586,6 +1586,7 @@ changeofficer.stillemployed.title = Does {0} still work for your business?
 changeofficer.stillemployed.validationerror = You must select yes or no. Select yes, if they are still working for your business
 changeofficer.roleinbusiness.heading = What’s {0}’s role in the business now?
 changeofficer.roleinbusiness.title = What’s this person’s role in the business now?
+changeofficer.roleinbusiness.validationerror = You must select a business role. Select one of the following roles
 
 ###############################  Notifications ###############################
 

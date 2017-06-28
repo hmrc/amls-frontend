@@ -57,31 +57,29 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       positions = Some(Positions(Set(Director),None))
     )
 
+    val details = ReviewDetails(
+      "Some business",
+      Some(SoleProprietor),
+      Address("Line 1", "Line 2", None, None, None, Country("UK", "UK")),
+      "XA123456789",
+      None)
+
     when(cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
+
+    when {
+      cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
   }
 
   "The RoleInBusinessController" must {
     "get the view" in new TestFixture {
-
-      val details = ReviewDetails(
-        "Some business",
-        Some(SoleProprietor),
-        Address("Line 1", "Line 2", None, None, None, Country("UK", "UK")),
-        "XA123456789",
-        None)
-
-      when {
-        cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
-
       val result = controller.get()(request)
 
       status(result) mustBe OK
       contentAsString(result) must include("firstName lastName")
 
       contentAsString(result) must include(Messages("responsiblepeople.position_within_business.lbl.06"))
-      
     }
 
     "when post is called" must {
@@ -95,7 +93,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {
         val result = controller.post()(request)
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) must include(Messages("error"))
+        contentAsString(result) must include(Messages("changeofficer.roleinbusiness.validationerror"))
         contentAsString(result) must include(Messages("firstName lastName"))
       }
     }

@@ -37,8 +37,8 @@ class RoleInBusinessController @Inject()
   def get = Authorised.async {
     implicit authContext => implicit request =>
 
-      val result = getBusinessNameAndName map { t =>
-        Ok(views.html.changeofficer.role_in_business(EmptyForm, t._1, t._2))
+      val result = getBusinessNameAndName map {
+        case (businessType, name) => Ok(views.html.changeofficer.role_in_business(EmptyForm, businessType, name))
       }
 
       result getOrElse InternalServerError("Unable to get nominated officer")
@@ -46,18 +46,15 @@ class RoleInBusinessController @Inject()
 
   def post() = Authorised.async {
     implicit authContext => implicit request =>
-      import jto.validation.forms.Rules._
-
       Form2[RoleInBusiness](request.body) match {
         case ValidForm(_, data) =>
           Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
-        case f: InvalidForm => {
-          val result = getBusinessNameAndName map { t =>
-            BadRequest(views.html.changeofficer.role_in_business(f, t._1, t._2))
+        case f: InvalidForm =>
+          val result = getBusinessNameAndName map {
+            case (businessType, name) => BadRequest(views.html.changeofficer.role_in_business(f, businessType, name))
           }
 
           result getOrElse InternalServerError("Unable to get nominated officer")
-        }
       }
   }
 
