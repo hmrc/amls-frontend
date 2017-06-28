@@ -20,10 +20,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Play
 import play.api.libs.json.Json
+import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, NotFoundException}
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -98,13 +98,25 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
     }
 
-    "return None when no details were found, or the http stack throws an exception" in new Fixture {
+    "return None when business matching returns 404" in new Fixture {
       when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any()))
-        .thenReturn(Future.failed(new Exception("Could not find any details")))
+        .thenReturn(Future.failed(new NotFoundException("The review details were not found")))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe None
       }
+    }
+
+    "bubble the exception when any other exception is thrown" in new Fixture {
+      val ex = new Exception("Some other exception")
+
+      when {
+        TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any())
+      } thenReturn Future.failed(ex)
+
+      intercept[Exception] {
+        await(TestBusinessMatchingConnector.getReviewDetails)
+      } mustBe ex
     }
 
   }

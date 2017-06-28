@@ -16,8 +16,6 @@
 
 package connectors
 
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
 import models.status.ConfirmationStatus
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -26,7 +24,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
-import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -36,68 +34,14 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
   val emptyCache = CacheMap("", Map.empty)
 
   object KeystoreConnector extends KeystoreConnector {
-    override private[connectors] val businessCustomerDataCache: SessionCache = mock[SessionCache]
     override private[connectors] val amlsDataCache: SessionCache = mock[SessionCache]
   }
 
   before {
     reset(KeystoreConnector.amlsDataCache)
-    reset(KeystoreConnector.businessCustomerDataCache)
   }
 
   implicit val hc = mock[HeaderCarrier]
-  val mongoKey = "BC_Business_Details"
-
-  "optionReviewDetails" must {
-
-    "return a `Future[Option[ReviewDetails]`" in {
-      when {
-        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
-      } thenReturn Future.successful(None)
-      whenReady (KeystoreConnector.optionalReviewDetails) {
-        result =>
-          result mustBe None
-      }
-    }
-  }
-
-  "reviewDetails" must {
-
-    "return a successful future when review details are found" in {
-
-      val model = ReviewDetails(
-        businessName = "",
-        businessType = None,
-        businessAddress = Address(
-          line_1 = "",
-          line_2 = "",
-          line_3 = None,
-          line_4 = None,
-          postcode = None,
-          country = Country("United Kingdom", "GB")
-        ),
-        safeId = ""
-      )
-
-      when {
-        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
-      } thenReturn Future.successful(Some(model))
-      whenReady (KeystoreConnector.reviewDetails) {
-        result =>
-          result mustEqual model
-      }
-    }
-
-    "return a failed future when review details return `None`" in {
-      when {
-        KeystoreConnector.businessCustomerDataCache.fetchAndGetEntry[ReviewDetails](eqTo(mongoKey))(any(), any())
-      } thenReturn Future.successful(None)
-      whenReady (KeystoreConnector.reviewDetails.failed) {
-        result =>
-          result mustBe a[NotFoundException]
-      }
-    }
-  }
 
   "confirmationIndicator" must {
 
