@@ -16,24 +16,17 @@
 
 package models.changeofficer
 
-import cats.{Applicative, Functor}
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError}
-import play.api.libs.json._
-import utils.TraversableValidators._
 import play.api.libs.functional.syntax._
-import play.api.libs.json._
 import play.api.libs.json.Reads._
+import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 
 case class RoleInBusiness(roles: Set[Role])
 
 sealed trait Role
-
-object Role {
-
-}
 
 case object SoleProprietor extends Role
 case object InternalAccountant extends Role
@@ -50,46 +43,47 @@ object RoleInBusiness {
   private val validationErrorKey = "changeofficer.roleinbusiness.validationerror"
 
   //noinspection ScalaStyle
-  def stringToRole(role: String, other: Option[String]): Option[Role] = role match {
-    case "soleprop" => Some(SoleProprietor)
-    case "director" => Some(Director)
-    case "bensharehold" => Some(BeneficialShareholder)
-    case "extAccountant" => Some(ExternalAccountant)
-    case "intAccountant" => Some(InternalAccountant)
-    case "partner" => Some(Partner)
-    case "desigmemb" => Some(DesignatedMember)
-    case "other" if other.isDefined => Some(Other(other.get))
-    case _ => None
+  def stringToRole(role: String, other: Option[String]): Role = role match {
+    case "soleprop" => SoleProprietor
+    case "director" => Director
+    case "bensharehold" => BeneficialShareholder
+    case "extAccountant" => ExternalAccountant
+    case "intAccountant" => InternalAccountant
+    case "partner" => Partner
+    case "desigmemb" => DesignatedMember
+    case "other" if other.isDefined => Other(other.get)
   }
 
   def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
-      case BeneficialShareholder => "bensharehold"
       case Director => "director"
+      case BeneficialShareholder => "bensharehold"
       case ExternalAccountant => "extAccountant"
       case InternalAccountant => "intAccountant"
       case Partner => "partner"
       case DesignatedMember => "desigmemb"
+      case Other(_) => "other"
     }
 
-  private val strToRoleWithOther = (other: Option[String]) => Function.unlift[String, Role]((stringToRole _)(_: String, other))
-
   implicit val jsonWrites: Writes[RoleInBusiness] = {
-    (__ \ "positions").write[Seq[String]].contramap(_.roles.toSeq.map(roleToString))
+    ((__ \ "positions").write[Seq[String]] ~
+      (__ \ "otherPosition").writeNullable[String]) { r =>
+        val roleSet = r.roles.map(roleToString).toSeq
+        val other = r.roles.collect { case Other(o) => o }.headOption
+        (roleSet, other)
+      }
   }
 
   implicit val jsonReads: Reads[RoleInBusiness] = {
     ((__ \ "positions").read[Seq[String]] and
       (__ \ "otherPosition").readNullable[String]).tupled.flatMap {
-        case (values, other) if values.nonEmpty && values.forall(strToRoleWithOther(other).isDefinedAt) =>
-          RoleInBusiness(values.map(v => stringToRole(v, other).get).toSet)
+        case (roles, other) => RoleInBusiness(roles.map(v => stringToRole(v, other)).toSet)
         case _ => Reads { _ => JsError(JsPath \ "positions", validationErrorKey) }
     }
   }
 
   val roleFormReads = Rule.fromMapping[(Seq[String], Option[String]), Set[Role]] {
-    case (values, other) if values.nonEmpty && values.forall(strToRoleWithOther(other).isDefinedAt) =>
-      Valid(values.map(v => stringToRole(v, other).get).toSet)
+    case (roles, other) if roles.nonEmpty => Valid(roles.map(v => stringToRole(v, other)).toSet)
     case _ => Invalid(ValidationError(validationErrorKey))
   }
 
