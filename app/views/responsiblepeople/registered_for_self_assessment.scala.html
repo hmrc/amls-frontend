@@ -33,7 +33,7 @@ s"""${f("utrNumber").id}-fieldset"""
     heading = header
 )  {
 
-    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit, fromYourAnswers)) {
+    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit, fromDeclaration)) {
         @fieldset(
             f = f("saRegistered-fieldset"),
             legend = "responsiblepeople.registeredforselfassessment.title",

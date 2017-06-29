@@ -275,16 +275,16 @@ GET         /update-information/declaration                                     
 GET         /confirmation                                                             controllers.ConfirmationController.get()
 GET         /confirmation/payment-complete                                            controllers.ConfirmationController.paymentConfirmation(reference: String)
 
-GET         /responsible-people/add                                                   controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/add                                                   controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/who-must-register/:index                              controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, fromDeclaration:Boolean ?= false)
-GET         /responsible-people/what-you-need/:index                                  controllers.responsiblepeople.WhatYouNeedController.get(index:Int, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/who-must-register/:index                              controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, fromDeclaration: Option[String] ?= None)
+GET         /responsible-people/what-you-need/:index                                  controllers.responsiblepeople.WhatYouNeedController.get(index:Int, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/your-name/:index                                      controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/your-name/:index                                      controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/your-name/:index                                      controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/your-name/:index                                      controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
 GET         /responsible-people/address/:index                                        @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
 POST        /responsible-people/address/:index                                        @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
@@ -293,36 +293,36 @@ GET         /responsible-people/moved-address/:index                            
 POST        /responsible-people/moved-address/:index                                  @controllers.responsiblepeople.MovedAddressController.post(index: Int)
 
 
-GET         /responsible-people/new-address/:index                                    controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/new-address/:index                                    controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/new-address/:index                                    controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/new-address/:index                                    controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/time-at-address/:index                                controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/time-at-address/:index                                controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/time-at-address/:index                                controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/time-at-address/:index                                controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
 GET         /responsible-people/address/:index/date-change                            controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index/date-change                            controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(fromDeclaration:Boolean ?= false)
-POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(fromDeclaration:Boolean ?= false)
+GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(fromDeclaration: Option[String] ?= None)
 GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false)
 
-GET         /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
 GET         /responsible-people/address-new/:index                                    @controllers.responsiblepeople.NewHomeAddressController.get(index:Int)
 POST        /responsible-people/address-new/:index                                    @controllers.responsiblepeople.NewHomeAddressController.post(index:Int)
@@ -330,50 +330,50 @@ POST        /responsible-people/address-new/:index                              
 GET         /responsible-people/date-change-moved/:index                              @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.get(index:Int)
 POST        /responsible-people/date-change-moved/:index                              @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.post(index:Int)
 
-GET         /responsible-people/time-at-additional-address/:index                     controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/time-at-additional-address/:index                     controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/time-at-additional-address/:index                     controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/time-at-additional-address/:index                     controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/position/:index                                       controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/position/:index                                       controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/position/:index                                       controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/position/:index                                       controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/nominatedofficer/:index                               controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/nominatedofficer/:index                               controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/nominatedofficer/:index                               controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/nominatedofficer/:index                               controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/sole-proprietor/:index                                @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/sole-proprietor/:index                                @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/sole-proprietor/:index                                @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/sole-proprietor/:index                                @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/time-at-additional-extra-address/:index               controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/time-at-additional-extra-address/:index               controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/time-at-additional-extra-address/:index               controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/time-at-additional-extra-address/:index               controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/additional-extra-address/:index                       controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/vat/:index                                            controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/vat/:index                                            controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/vat/:index                                            controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/vat/:index                                            controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/experience-training/:index                            controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/experience-training/:index                            controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/experience-training/:index                            controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/experience-training/:index                            controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
-GET         /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.get(index:Int, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.get(index:Int, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, fromDeclaration: Option[String] ?= None)
 
 GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
 POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String)
 
-GET         /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
-POST        /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, fromDeclaration:Boolean ?= false)
+GET         /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
+POST        /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, fromDeclaration: Option[String] ?= None)
 
 GET         /responsible-people/your-answers                                          controllers.responsiblepeople.YourAnswersController.get()
 
