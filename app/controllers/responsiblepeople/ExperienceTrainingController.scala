@@ -50,23 +50,23 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
     }
   }
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         businessActivitiesData flatMap {
           activities =>
             getData[ResponsiblePeople](index) map {
               case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, fromDeclaration, personName.titleName))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, flow, personName.titleName))
               case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(experience_training(EmptyForm, activities, edit, index, fromDeclaration, personName.titleName))
+              => Ok(experience_training(EmptyForm, activities, edit, index, flow, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request => {
         businessActivitiesData flatMap {
@@ -74,7 +74,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
                 getData[ResponsiblePeople](index) map {rp =>
-                  BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                  BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, flow, ControllerHelper.rpTitleName(rp)))
                 }
               case ValidForm(_, data) => {
                 for {
@@ -83,7 +83,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                   }
                 } yield edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index))
-                  case false => Redirect(routes.TrainingController.get(index, edit, fromDeclaration))
+                  case false => Redirect(routes.TrainingController.get(index, edit, flow))
                 }
               }.recoverWith {
                 case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

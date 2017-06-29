@@ -39,22 +39,22 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(time_at_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(time_at_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) => {
           getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
@@ -70,7 +70,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                 for {
                   status <- statusService.getStatus
                 } yield {
-                  redirectTo(index,data,rp,status, edit, fromDeclaration)
+                  redirectTo(index,data,rp,status, edit, flow)
                 }
               }
             }) getOrElse Future.successful(NotFound(notFoundView))
@@ -98,11 +98,11 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                         rp: ResponsiblePeople,
                         status: SubmissionStatus,
                         edit: Boolean,
-                        fromDeclaration: Option[String])(implicit request:Request[AnyContent]) = {
+                        flow: Option[String])(implicit request:Request[AnyContent]) = {
     timeAtAddress match {
-      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit))
-      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, fromDeclaration))
+      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
     }
   }
 

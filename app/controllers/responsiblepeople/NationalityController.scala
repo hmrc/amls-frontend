@@ -30,30 +30,30 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(Some(personName),Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => residencyType.nationality match {
-                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, fromDeclaration, personName.titleName))
-                case _ => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName))
+                case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
               }
             case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(nationality(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+            => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
             case _
             => NotFound(notFoundView)
           }
       }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
 
           Form2[Nationality](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map {rp =>
-                BadRequest(nationality(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                BadRequest(nationality(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
               for {
@@ -63,7 +63,7 @@ trait NationalityController extends RepeatingSection with BaseController {
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit, fromDeclaration))
+                case false => Redirect(routes.ContactDetailsController.get(index, edit, flow))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

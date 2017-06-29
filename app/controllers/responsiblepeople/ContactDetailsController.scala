@@ -30,26 +30,26 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(contact_details(Form2[ContactDetails](name), edit, index, fromDeclaration, personName.titleName))
+          => Ok(contact_details(Form2[ContactDetails](name), edit, index, flow, personName.titleName))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(contact_details(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+          => Ok(contact_details(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request => {
 
         Form2[ContactDetails](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map { rp =>
-              BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
@@ -58,7 +58,7 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, fromDeclaration))
+              case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, flow))
               case false if index == 1 => Redirect(routes.ConfirmAddressController.get(index))
             }
           }.recoverWith {

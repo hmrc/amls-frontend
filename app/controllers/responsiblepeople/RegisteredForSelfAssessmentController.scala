@@ -30,26 +30,26 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromDeclaration, personName.titleName))
+          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, flow, personName.titleName))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+          => Ok(registered_for_self_assessment(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map {rp =>
-              BadRequest(registered_for_self_assessment(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              BadRequest(registered_for_self_assessment(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
@@ -58,7 +58,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               }
             } yield {
               edit match {
-                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, fromDeclaration))
+                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
                 case true => Redirect(routes.DetailedAnswersController.get(index))
               }
             }

@@ -24,10 +24,10 @@ import scala.concurrent.Future
 
 trait WhoMustRegisterController extends BaseController {
 
-  def get(index : Int, fromDeclaration: Option[String] = None) =
+  def get(index : Int, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
-          Future.successful(Ok(who_must_register(index, fromDeclaration)))
+          Future.successful(Ok(who_must_register(index, flow)))
       }
 }
 

@@ -41,18 +41,18 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName), Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             personResidenceType.countryOfBirth match {
               case Some(country) => Ok (country_of_birth (Form2[CountryOfBirth] (getCountryOfBirth(country)),
-                edit, index, fromDeclaration, personName.titleName))
-              case _ => Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+                edit, index, flow, personName.titleName))
+              case _ => Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
             }
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, _)) =>
-            Ok(country_of_birth(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
   }
@@ -66,12 +66,12 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
           case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(country_of_birth(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
@@ -80,7 +80,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.NationalityController.get(index, edit, fromDeclaration))
+              case false => Redirect(routes.NationalityController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
