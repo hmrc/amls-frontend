@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("country").id}-fieldset"""
@@ -33,7 +33,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.CountryOfBirthController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.CountryOfBirthController.post(index, edit, flow)) {
 
         @fieldset(
             f = f("countryOfBirth-fieldset"),

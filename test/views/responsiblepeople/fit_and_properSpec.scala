@@ -36,7 +36,7 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, false, "PersonName")
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
 
       doc.title must be(
         Messages("responsiblepeople.fit_and_proper.title", "PersonName")
@@ -50,7 +50,7 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, false, "PersonName")
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
 
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -64,7 +64,7 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
           (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, false, "PersonName")
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
 
       errorSummary.html() must include("not a message Key")
 

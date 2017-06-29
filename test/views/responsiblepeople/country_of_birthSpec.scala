@@ -35,7 +35,7 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
 
       val form2 =  EmptyForm
 
-      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, true, "Person Name")
+      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, None, "Person Name")
 
       doc.title must startWith(Messages("responsiblepeople.country.of.birth.title"))
       heading.html must be(Messages("responsiblepeople.country.of.birth.heading", "Person Name"))
@@ -51,7 +51,7 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, true, "Person Name")
+      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, None, "Person Name")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

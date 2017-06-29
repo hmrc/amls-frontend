@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.responsiblepeople.Positions
 
-@(f: Form2[_], edit: Boolean = false, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean = false, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -40,7 +40,7 @@
     }
 
 
-    @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index, edit, flow)) {
 
         <div class="form-field">
             @fieldset(

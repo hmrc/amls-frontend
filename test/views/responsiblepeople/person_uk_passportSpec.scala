@@ -35,7 +35,7 @@ class person_uk_passportSpec extends GenericTestHelper with MustMatchers {
 
       val name = "firstName lastName"
 
-      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, true, name)
+      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.uk.passport.title"))
       heading.html must be(Messages("responsiblepeople.uk.passport.heading", name))
@@ -45,6 +45,7 @@ class person_uk_passportSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByAttributeValue("name", "ukPassportNumber") must not be empty
 
     }
+
     "show errors in the correct locations and have the correct fields" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
@@ -52,7 +53,7 @@ class person_uk_passportSpec extends GenericTestHelper with MustMatchers {
           (Path \ "ukPassportNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, true, "firstName lastName")
+      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, None, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

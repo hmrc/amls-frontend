@@ -35,7 +35,7 @@ class person_residence_typeSpec extends GenericTestHelper with MustMatchers {
 
       val name = "firstName lastName"
 
-      def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, true, name)
+      def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.person.a.resident.title"))
       heading.html must be(Messages("responsiblepeople.person.a.resident.heading", name))
@@ -52,7 +52,7 @@ class person_residence_typeSpec extends GenericTestHelper with MustMatchers {
           (Path \ "nino") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, true, "firstName lastName")
+      def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, None, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

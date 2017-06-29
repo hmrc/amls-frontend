@@ -32,33 +32,33 @@ trait TrainingController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_))
-          => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, fromDeclaration, personName.titleName))
+          => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, fromDeclaration, personName.titleName))
+          => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request => {
         Form2[Training](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map {rp =>
-              BadRequest(views.html.responsiblepeople.training(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+              BadRequest(views.html.responsiblepeople.training(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
                 rp.training(data)
               }
-            } yield identifyRoutingTarget(index, edit, cacheMap, fromDeclaration)
+            } yield identifyRoutingTarget(index, edit, cacheMap, flow)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
@@ -66,18 +66,18 @@ trait TrainingController extends RepeatingSection with BaseController {
       }
     }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], fromDeclaration: Boolean): Result = {
+  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], flow: Option[String]): Result = {
     cacheMapOpt match {
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
           case (true, _) => Redirect(routes.DetailedAnswersController.get(index))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts)),_,_,_,_, _)))
             if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
-          => Redirect(routes.FitAndProperController.get(index, false, fromDeclaration))
-          case (false, _) => Redirect(routes.PersonRegisteredController.get(index, fromDeclaration))
+          => Redirect(routes.FitAndProperController.get(index, false, flow))
+          case (false, _) => Redirect(routes.PersonRegisteredController.get(index, flow))
         }
       }
-      case _ => Redirect(routes.PersonRegisteredController.get(index, fromDeclaration))
+      case _ => Redirect(routes.PersonRegisteredController.get(index, flow))
     }
   }
 }

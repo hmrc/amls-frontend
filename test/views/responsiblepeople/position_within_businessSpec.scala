@@ -36,7 +36,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, true, name)
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
 
       doc.title must be(Messages("responsiblepeople.position_within_business.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -55,7 +55,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
           (Path \ "positions") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, true, name)
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
 
       errorSummary.html() must include("not a message Key")
     }

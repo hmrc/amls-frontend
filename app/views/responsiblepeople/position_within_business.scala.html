@@ -19,7 +19,7 @@
 @import config.ApplicationConfig
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, fromDeclaration: Boolean = false, personName: String)(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, flow: Option[String], personName: String)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -35,7 +35,7 @@
 
     <p>@Messages("lbl.select.all")</p>
 
-    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, flow)) {
 
         <div class="form-group">
             @fieldset(

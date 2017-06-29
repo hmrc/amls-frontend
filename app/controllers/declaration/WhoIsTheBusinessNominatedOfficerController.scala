@@ -94,7 +94,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
         }
         case ValidForm(_, data) => {
           data.value match {
-            case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, true)))
+            case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("fromDeclaration"))))
             case _ => for {
               serviceStatus <- statusService.getStatus
               responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)

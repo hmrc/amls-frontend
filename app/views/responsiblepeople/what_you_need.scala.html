@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@(index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
+@(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.responsiblepeople")
@@ -40,7 +40,7 @@
     </ul>
 
     @anchor(
-        attrHref = controllers.responsiblepeople.routes.PersonNameController.get(index, false, fromDeclaration).toString,
+        attrHref = controllers.responsiblepeople.routes.PersonNameController.get(index, false, flow).toString,
         attrRole = true,
         linkText = Messages("button.continue"),
         visuallyhidden = Messages("summary.responsiblepeople")

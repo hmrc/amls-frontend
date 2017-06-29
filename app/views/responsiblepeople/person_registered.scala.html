@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], index: Int, fromDeclaration: Boolean = false)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], index: Int, flow: Option[String])(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -48,7 +48,7 @@
             <li>@Messages("responsiblepeople.have.registered.people.line4")</li>
         </ul>
 
-    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index, flow)) {
 
 
 

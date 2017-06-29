@@ -16,11 +16,16 @@
 
 package models.changeofficer
 
+import cats.Functor
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError}
 import play.api.libs.json._
 import utils.TraversableValidators._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import utils.MappingUtils.Implicits._
 
 case class RoleInBusiness(roles: Set[Role])
 
@@ -43,9 +48,7 @@ case class Other(text: String) extends Role
 object RoleInBusiness {
   val key = "changeofficer.roleinbusiness"
 
-  import utils.MappingUtils.Implicits._
-
-  val stringToRole = PartialFunction[String, Role] {
+  val stringToRole: PartialFunction[String, Role] = {
     case "soleprop" => SoleProprietor
     case "bensharehold" => BeneficialShareholder
     case "director" => Director
@@ -65,28 +68,28 @@ object RoleInBusiness {
       case DesignatedMember => "desigmemb"
     }
 
-  implicit val jsonWrites = new Writes[RoleInBusiness] {
-    override def writes(o: RoleInBusiness) = Json.obj("positions" -> JsArray(o.roles.map(r => JsString(roleToString(r))).toSeq))
+  implicit val jsonWrites: Writes[RoleInBusiness] = {
+    (__ \ "positions").write[Seq[String]].contramap(_.roles.toSeq.map(roleToString))
   }
 
-  implicit val jsonReads: Reads[RoleInBusiness] = {
-    import play.api.libs.json._
-    import play.api.libs.json.Reads._
-
-    (__ \ "positions").read[Seq[String]].map(x => x.map(stringToRole)).map(y => RoleInBusiness(y.toSet))
-  }
-
-  implicit val roleReads = Rule[String, Role] { r =>
-    if (stringToRole.isDefinedAt(r)) {
-      Valid(stringToRole(r))
-    } else {
-      Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
+  val roleJsonReads = new Reads[Set[Role]] {
+    override def reads(json: JsValue) = json.as[Seq[String]] match {
+      case strings if strings.forall(stringToRole.isDefinedAt) => JsSuccess((strings map stringToRole).toSet)
+      case _ => JsError("changeofficer.roleinbusiness.validationerror")
     }
   }
 
-  implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] {
-    import jto.validation.forms.Rules._
+  implicit val jsonReads: Reads[RoleInBusiness] = {
+    (__ \ "positions").read(roleJsonReads).map(r => RoleInBusiness(r))
+  }
 
-    __ => (__ \ "positions").read(minLengthR[Set[Role]](1)).withMessage("changeofficer.roleinbusiness.validationerror") map { s => RoleInBusiness(s) }
+  val roleFormReads = Rule.fromMapping[Seq[String], Set[Role]] {
+    case x if x.nonEmpty && x.forall(stringToRole.isDefinedAt) => Valid(x.map(stringToRole).toSet)
+    case _ => Invalid(ValidationError("changeofficer.roleinbusiness.validationerror"))
+  }
+
+  implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "positions").read[Seq[String]] andThen roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
   }
 }

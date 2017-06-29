@@ -37,7 +37,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredNo)
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
+      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
 
       doc.title must startWith(Messages("responsiblepeople.registeredforvat.title"))
     }
@@ -46,7 +46,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
+      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.registeredforvat.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -61,7 +61,7 @@ class vat_registeredSpec extends GenericTestHelper with MustMatchers {
           (Path \ "vrnNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, true, "Person Name")
+      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
