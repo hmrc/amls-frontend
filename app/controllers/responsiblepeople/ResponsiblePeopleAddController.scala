@@ -26,7 +26,7 @@ import utils.RepeatingSection
 import scala.concurrent.Future
 
 trait ResponsiblePeopleAddController extends BaseController with RepeatingSection {
-  def get(displayGuidance: Boolean = true, fromDeclaration: Option[String]) = Authorised.async {
+  def get(displayGuidance: Boolean = true, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request => {
       addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
         Redirect {

@@ -34,7 +34,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -45,7 +45,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
       }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request => {
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>

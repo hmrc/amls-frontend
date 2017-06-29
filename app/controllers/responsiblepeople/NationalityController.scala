@@ -30,7 +30,7 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
@@ -46,7 +46,7 @@ trait NationalityController extends RepeatingSection with BaseController {
           }
       }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
 

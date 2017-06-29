@@ -38,7 +38,7 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName")
 
       doc.title must startWith (Messages("responsiblepeople.additional_extra_address.title", "firstName lastName"))
     }
@@ -47,7 +47,7 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName")
 
       heading.html must be(Messages("responsiblepeople.additional_extra_address.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -67,7 +67,7 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
             (Path \ "postCode") -> Seq(ValidationError("sixth not a message Key"))
           ))
 
-        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName")
 
         errorSummary.html() must include("not a message Key")
         errorSummary.html() must include("second not a message Key")
@@ -108,7 +108,7 @@ class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
             (Path \ "country") -> Seq(ValidationError("sixth not a message Key"))
           ))
 
-        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, false, "firstName lastName")
+        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName")
 
         errorSummary.html() must include("not a message Key")
         errorSummary.html() must include("second not a message Key")

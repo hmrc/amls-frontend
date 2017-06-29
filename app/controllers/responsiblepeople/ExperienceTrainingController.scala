@@ -50,7 +50,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
     }
   }
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         businessActivitiesData flatMap {
@@ -66,7 +66,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request => {
         businessActivitiesData flatMap {

@@ -36,7 +36,7 @@ class contact_detailsSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, false, "firstName lastName")
+      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
 
       doc.title must startWith(Messages("responsiblepeople.contact_details.title"))
     }
@@ -45,7 +45,7 @@ class contact_detailsSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, false, "firstName lastName")
+      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
 
       heading.html must be(Messages("responsiblepeople.contact_details.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -60,7 +60,7 @@ class contact_detailsSpec extends GenericTestHelper with MustMatchers {
           (Path \ "emailAddress") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, false, "firstName lastName")
+      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

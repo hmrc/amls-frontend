@@ -39,7 +39,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -50,7 +50,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
       }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>

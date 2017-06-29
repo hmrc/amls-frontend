@@ -36,7 +36,7 @@ class DateOfBirthController @Inject()(
                                        val authConnector: AuthConnector
                                      ) extends RepeatingSection with BaseController {
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -48,7 +48,7 @@ class DateOfBirthController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[DateOfBirth](request.body) match {

@@ -42,7 +42,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
 
@@ -57,7 +57,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String] = None) =
     Authorised.async {
       implicit authContext =>
         implicit request =>
