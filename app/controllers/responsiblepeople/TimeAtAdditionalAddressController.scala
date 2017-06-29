@@ -35,7 +35,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_, _)) =>
@@ -46,7 +46,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
         }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext => implicit request => {
         (Form2[TimeAtAddress](request.body) match {
           case f: InvalidForm =>
@@ -75,7 +75,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
       }
   }
 
-  private def redirectTo(index: Int, edit: Boolean, fromDeclaration: Boolean, data: TimeAtAddress) = {
+  private def redirectTo(index: Int, edit: Boolean, fromDeclaration: Option[String], data: TimeAtAddress) = {
     data match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index))

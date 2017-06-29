@@ -34,7 +34,7 @@ trait SummaryController extends BaseController {
   val dataCacheConnector: DataCacheConnector
   val statusService : StatusService
 
-  def get(fromDeclaration: Boolean = false) = Authorised.async {
+  def get(fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
         case Some(data) =>
@@ -44,7 +44,7 @@ trait SummaryController extends BaseController {
       }
     }
 
-  def post(fromDeclaration: Boolean = false) = Authorised.async {
+  def post(fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext => implicit request =>
       fromDeclaration match {
         case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))

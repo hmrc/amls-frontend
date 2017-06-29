@@ -30,7 +30,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromYourAnswers: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -43,7 +43,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromYourAnswers: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
     Authorised.async {
       implicit authContext => implicit request =>
         Form2[SaRegistered](request.body) match {

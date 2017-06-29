@@ -38,7 +38,7 @@ class PersonUKPassportController @Inject()(
                                           ) extends RepeatingSection with BaseController {
 
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -50,7 +50,7 @@ class PersonUKPassportController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[UKPassport](request.body) match {
@@ -75,7 +75,7 @@ class PersonUKPassportController @Inject()(
         }
   }
 
-  private def redirectTo(rp: Seq[ResponsiblePeople], data: UKPassport, index: Int, edit: Boolean, fromDeclaration: Boolean) = {
+  private def redirectTo(rp: Seq[ResponsiblePeople], data: UKPassport, index: Int, edit: Boolean, fromDeclaration: Option[String]) = {
     val responsiblePerson = rp(index - 1)
     data match {
       case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, fromDeclaration))

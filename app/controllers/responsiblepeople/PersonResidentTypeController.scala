@@ -33,7 +33,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -45,7 +45,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
         }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[PersonResidenceType](request.body) match {
@@ -80,7 +80,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                                       rp: Seq[ResponsiblePeople],
                                       index: Int,
                                       edit: Boolean = false,
-                                      fromDeclaration: Boolean = false
+                                      fromDeclaration: Option[String]
                                     ) = {
 
     val existingPassport = rp(index - 1).ukPassport

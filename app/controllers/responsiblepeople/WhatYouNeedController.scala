@@ -24,7 +24,7 @@ import scala.concurrent.Future
 
 trait WhatYouNeedController extends BaseController {
 
-  def get(index: Int, fromDeclaration: Boolean = false) =
+  def get(index: Int, fromDeclaration: Option[String]) =
     Authorised.async {
       implicit authContext => implicit request =>
         Future.successful(Ok(what_you_need(index, fromDeclaration)))

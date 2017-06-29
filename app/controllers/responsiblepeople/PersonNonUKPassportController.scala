@@ -39,7 +39,7 @@ class PersonNonUKPassportController @Inject()(
                                           ) extends RepeatingSection with BaseController {
 
 
-  def get(index:Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index:Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -52,7 +52,7 @@ class PersonNonUKPassportController @Inject()(
   }
 
   private def redirectToNextPage(result: Option[CacheMap], index: Int,
-                         edit: Boolean, fromDeclaration: Boolean )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
+                         edit: Boolean, fromDeclaration: Option[String] )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
     (for {
       cache <- result
       rp <- getData[ResponsiblePeople](cache, index)
@@ -63,7 +63,7 @@ class PersonNonUKPassportController @Inject()(
   }
 
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[NonUKPassport](request.body) match {

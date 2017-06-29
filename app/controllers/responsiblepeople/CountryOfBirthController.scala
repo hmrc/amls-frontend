@@ -41,7 +41,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -66,7 +66,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[CountryOfBirth](request.body) match {

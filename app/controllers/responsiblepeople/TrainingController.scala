@@ -32,7 +32,7 @@ trait TrainingController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
@@ -45,7 +45,7 @@ trait TrainingController extends RepeatingSection with BaseController {
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, fromDeclaration: Option[String]) =
     Authorised.async {
       implicit authContext => implicit request => {
         Form2[Training](request.body) match {
@@ -66,7 +66,7 @@ trait TrainingController extends RepeatingSection with BaseController {
       }
     }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], fromDeclaration: Boolean): Result = {
+  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], fromDeclaration: Option[String]): Result = {
     cacheMapOpt match {
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
