@@ -47,8 +47,8 @@ trait SummaryController extends BaseController {
   def post(fromDeclaration: Option[String]) = Authorised.async {
     implicit authContext => implicit request =>
       fromDeclaration match {
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case true => {
+        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        case Some("fromDeclaration") => {
           for {
             status <- statusService.getStatus
             hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))

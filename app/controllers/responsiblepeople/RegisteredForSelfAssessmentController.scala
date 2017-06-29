@@ -35,9 +35,9 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromYourAnswers, personName.titleName))
+          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, fromDeclaration, personName.titleName))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromYourAnswers, personName.titleName))
+          => Ok(registered_for_self_assessment(EmptyForm, edit, index, fromDeclaration, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -49,7 +49,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map {rp =>
-              BadRequest(registered_for_self_assessment(f, edit, index, fromYourAnswers, ControllerHelper.rpTitleName(rp)))
+              BadRequest(registered_for_self_assessment(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
@@ -58,7 +58,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               }
             } yield {
               edit match {
-                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, fromYourAnswers))
+                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, fromDeclaration))
                 case true => Redirect(routes.DetailedAnswersController.get(index))
               }
             }
