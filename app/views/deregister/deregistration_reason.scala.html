@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], hvdRequired: Boolean = false)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -25,7 +25,7 @@
 }
 
 @main(
-    title = Messages("deregistration.reason.title") + " - " + Messages("title.yapp"),
+    title = Messages("deregistration.reason.heading") + " - " + Messages("title.yapp"),
     heading = header
 ) {
 
@@ -34,6 +34,7 @@
         @fieldset(
             f = f("deregistrationReason-fieldset"),
             legend = "deregistration.reason.heading",
+            legendHidden = true,
             classes = Seq("deregistrationReason-fieldset")
         ) {
             @errorGroup(
@@ -59,16 +60,18 @@
                     labelText = "deregistration.reason.lbl.04",
                     value = "04"
                 )
-                @radio(
-                    f = f("deregistrationReason"),
-                    labelText = "deregistration.reason.lbl.05",
-                    value = "05"
-                )
+                @if(hvdRequired){
+                    @radio(
+                        f = f("deregistrationReason"),
+                        labelText = "deregistration.reason.lbl.05",
+                        value = "05"
+                    )
+                }
                 @radio(
                     f = f("deregistrationReason"),
                     labelText = "deregistration.reason.lbl.06",
                     value = "06",
-                    target = s".other-fieldset"
+                    target = s".specifyOtherReason-fieldset"
                 )
             }
         }
@@ -85,6 +88,6 @@
             )
         }
     
-        @submit(false, Some(Messages("button.continue")))
+        @submit(false, Some(Messages("status.deregister.button-text")), returnLink = false)
     }
 }

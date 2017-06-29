@@ -22,6 +22,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import models.businessmatching.{BusinessActivities, EstateAgentBusinessService, HighValueDealing}
 
 class deregistration_reasonSpec extends GenericTestHelper with MustMatchers  {
 
@@ -34,7 +35,7 @@ class deregistration_reasonSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.deregister.deregistration_reason(EmptyForm)
 
-      doc.title must be(Messages("deregistration.reason.title") +
+      doc.title must be(Messages("deregistration.reason.heading") +
         " - " + Messages("title.yapp") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -49,17 +50,32 @@ class deregistration_reasonSpec extends GenericTestHelper with MustMatchers  {
 
     }
 
-    "have the correct fields" in new TestFixture {
+    "have the correct fields" when {
+      "HVD is required" in new TestFixture {
 
-      override def view = views.html.deregister.deregistration_reason(EmptyForm)
+        override def view = views.html.deregister.deregistration_reason(EmptyForm, true)
 
-      doc.getElementsByAttributeValue("for", "deregistrationReason-01") must not be empty
-      doc.getElementsByAttributeValue("for", "deregistrationReason-02") must not be empty
-      doc.getElementsByAttributeValue("for", "deregistrationReason-03") must not be empty
-      doc.getElementsByAttributeValue("for", "deregistrationReason-04") must not be empty
-      doc.getElementsByAttributeValue("for", "deregistrationReason-05") must not be empty
-      doc.getElementsByAttributeValue("for", "deregistrationReason-06") must not be empty
-      doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-01") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-02") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-03") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-04") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-05") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-06") must not be empty
+        doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
+      }
+      "HVD is not required" in new TestFixture {
+
+        override def view = views.html.deregister.deregistration_reason(EmptyForm)
+
+        doc.getElementsByAttributeValue("for", "deregistrationReason-01") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-02") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-03") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-04") must not be empty
+        doc.getElementsByAttributeValue("for", "deregistrationReason-05") must be(empty)
+        doc.getElementsByAttributeValue("for", "deregistrationReason-06") must not be empty
+        doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
+      }
+
     }
 
     "show errors in the correct locations" in new TestFixture {

@@ -17,16 +17,29 @@
 package models.deregister
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 
-object DeRegisterReason {
-  val OutOfScope = "Out of scope"
-}
-
-case class DeRegisterSubscriptionRequest(acknowledgementReference: String, deregistrationDate: LocalDate, deregistrationReason: String)
+case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
+                                         deregistrationDate: LocalDate,
+                                         deregistrationReason: DeregistrationReason,
+                                         deregReasonOther: Option[String] = None)
 
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
 
-  implicit val formats = Json.format[DeRegisterSubscriptionRequest]
+  implicit val reads = Json.reads[DeRegisterSubscriptionRequest]
+
+  implicit val writes: Writes[DeRegisterSubscriptionRequest] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Writes._
+    import play.api.libs.json._
+    Writes[DeRegisterSubscriptionRequest] { ep =>
+      (
+        (__ \ "acknowledgementReference").write[String] and
+          (__ \ "deregistrationDate").write[LocalDate] and
+          __.write[DeregistrationReason] and
+          (__ \ "deregReasonOther").writeNullable[String]
+        ) (unlift(DeRegisterSubscriptionRequest.unapply)).writes(ep)
+    }
+  }
 }

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.deregister.DeRegisterApplicationController
 import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
@@ -28,7 +27,7 @@ import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
@@ -104,7 +103,7 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
       "make a request to the middle tier to perform the deregistration" in new TestFixture {
         val result = controller.post()(request)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.routes.StatusController.get().url.some
+        redirectLocation(result) mustBe routes.DeregistrationReasonController.get().url.some
       }
     }
   }
