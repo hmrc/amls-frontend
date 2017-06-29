@@ -200,7 +200,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, true).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("fromDeclaration")).url))
       }
     }
 
