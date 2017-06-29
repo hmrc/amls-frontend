@@ -90,6 +90,6 @@ object RoleInBusiness {
 
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "positions").read[Seq[String]] andThen roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
+    (__ \ "positions").read(roleFormReads) map { r => RoleInBusiness(r) }
   }
 }
