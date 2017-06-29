@@ -23,7 +23,9 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.renewal.TotalThroughput
+import models.businessmatching._
+import models.renewal.{Renewal, TotalThroughput}
+import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.total_throughput
@@ -31,8 +33,8 @@ import views.html.renewal.total_throughput
 import scala.concurrent.Future
 
 class TotalThroughputController @Inject()(val authConnector: AuthConnector,
-                                           renewals: RenewalService,
-                                           dataCacheConnector: DataCacheConnector) extends BaseController {
+                                          renewals: RenewalService,
+                                          dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -53,22 +55,38 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
         Form2[TotalThroughput](request.body) match {
           case form: InvalidForm => Future.successful(BadRequest(total_throughput(form, edit)))
           case ValidForm(_, model) =>
-            val maybeResult = for {
-              renewal <- OptionT(renewals.getRenewal)
-              _ <- OptionT.liftF(renewals.updateRenewal(renewal.totalThroughput(model)))
-            } yield {
-              Redirect(getNextPage(edit))
+            dataCacheConnector.fetchAll flatMap {
+              optMap =>
+                val result = for {
+                  cacheMap <- optMap
+                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  services <- bm.msbServices
+                  activities <- bm.activities
+                } yield {
+                  dataCacheConnector.save[Renewal](Renewal.key,
+                    renewal.totalThroughput(model)
+                  ) map { _ =>
+                    standardRouting(services.msbServices, activities.businessActivities, edit)
+                  }
+                }
+                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
-
-            maybeResult.getOrElse(Redirect(routes.SummaryController.get()))
         }
   }
 
-  private def getNextPage(edit: Boolean) =
-    if (edit) {
-      routes.SummaryController.get()
-    } else {
-      routes.TransactionsInLast12MonthsController.get()
+  private def standardRouting(services: Set[MsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
+    if ((services contains TransmittingMoney) && !edit ) {
+      Redirect(routes.TransactionsInLast12MonthsController.get(edit))
+    }
+    else if ((services contains CurrencyExchange) && !edit ) {
+      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
+    }
+    else if ((businessActivities contains HighValueDealing) && !edit ) {
+      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+    }
+    else {
+      Redirect(routes.SummaryController.get())
     }
 
 }
