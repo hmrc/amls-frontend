@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.aboutthebusiness._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromYourAnswers: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang:Lang)
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang:Lang)
 
 @header = {
     @errorSummary(f)

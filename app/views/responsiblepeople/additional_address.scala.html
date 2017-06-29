@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)

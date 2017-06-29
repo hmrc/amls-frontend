@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import utils.StatusConstants
 
-@(model: Seq[ResponsiblePeople], fromDeclaration: Boolean = false, hasNonUKResident: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Seq[ResponsiblePeople], fromDeclaration: Option[String], hasNonUKResident: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("responsiblepeople.summary.responsible.people", "summary.responsiblepeople")
