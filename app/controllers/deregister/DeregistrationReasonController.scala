@@ -73,7 +73,7 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
           (for {
             regNumber <- OptionT(enrolments.amlsRegistrationNumber)
             _ <- OptionT.liftF(amls.deregister(regNumber, deregistration))
-          } yield Redirect(controllers.routes.StatusController.get())) getOrElse InternalServerError("Unable to deregister the application")
+          } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to deregister the application")
         }
       }
   }
