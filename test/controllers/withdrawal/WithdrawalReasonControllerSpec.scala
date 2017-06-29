@@ -71,7 +71,7 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("withdrawal.reason.title"))
+        contentAsString(result) must include(Messages("withdrawal.reason.heading"))
 
         val document = Jsoup.parse(contentAsString(result))
         document.getElementById("withdrawalReason-01").hasAttr("checked") must be(false)
