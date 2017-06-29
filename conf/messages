@@ -1270,6 +1270,7 @@ responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member
+responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
