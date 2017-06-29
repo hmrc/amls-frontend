@@ -326,7 +326,10 @@ error.required.renewal.ba.involved.in.other = Select yes if your business was in
 error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
-error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application
+error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application. Enter your reason for withdrawing
+
+error.required.deregistration.reason = You must select a reason for de-registering the business
+error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -762,6 +765,17 @@ summary.linetext = Please check all the information you have provided.
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
+deregistration.reason.title = De-Register
+deregistration.reason.heading = Why are you de-registering the business?
+
+deregistration.reason.lbl.01 = Out of scope
+deregistration.reason.lbl.02 = Not trading in own right
+deregistration.reason.lbl.03 = Under another supervisor
+deregistration.reason.lbl.04 = Change of Legal Entity
+deregistration.reason.lbl.05 = HVD - policy of not accepting high value cash payments
+deregistration.reason.lbl.06 = Other
+deregistration.reason.lbl.specify.other.reason = Please specify
+
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
 
@@ -770,7 +784,6 @@ withdrawal.reason.lbl.02 = Not trading in own right
 withdrawal.reason.lbl.03 = I‘m supervised by another body
 withdrawal.reason.lbl.04 = Other
 withdrawal.reason.lbl.specify.other.reason = Please specify
-
 
 main.sidebar.title = Automatic saving
 main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
@@ -1125,7 +1138,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 
 submit.registration = Submit registration
 submit.amendment.application = Update information
-submit.renewal.application = Submit Renewal
+submit.renewal.application = Submit renewal
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name

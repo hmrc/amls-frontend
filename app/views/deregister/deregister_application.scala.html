@@ -40,8 +40,8 @@
 
   @messages("status.deregister.body-content").paragraphizeH
 
-  @form(EmptyForm, routes.DeRegisterApplicationController.post()) {
-   @submit(edit = false, Some(Messages("status.deregister.button-text")))
+  @form(EmptyForm, controllers.deregister.routes.DeRegisterApplicationController.post()) {
+   @submit(edit = false, Some(Messages("button.continue")), returnLink = false)
   }
 
 }

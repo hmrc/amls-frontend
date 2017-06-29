@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package views
+package views.withdrawal
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
+import views.Fixture
 
 class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
 
@@ -31,9 +32,9 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
   "withdrawal_reasons view" must {
     "have correct title" in new TestFixture {
 
-      def view = views.html.withdrawal_reason(EmptyForm)
+      def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
 
-      doc.title must be(Messages("withdrawal.reason.title") +
+      doc.title must be(Messages("withdrawal.reason.heading") +
         " - " + Messages("title.yapp") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -41,7 +42,7 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
 
     "have correct headings" in new TestFixture {
 
-      def view = views.html.withdrawal_reason(EmptyForm)
+      def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
 
       heading.html must be(Messages("withdrawal.reason.heading"))
       subHeading.html must include(Messages("summary.status"))
@@ -50,7 +51,7 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
 
     "have the correct fields" in new TestFixture {
 
-      override def view = views.html.withdrawal_reason(EmptyForm)
+      override def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
 
       doc.getElementsByAttributeValue("for", "withdrawalReason-01") must not be empty
       doc.getElementsByAttributeValue("for", "withdrawalReason-02") must not be empty
@@ -67,7 +68,7 @@ class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "specifyOtherReason") -> Seq(ValidationError("not yet another message key"))
         ))
 
-      def view = views.html.withdrawal_reason(form2)
+      def view = views.html.withdrawal.withdrawal_reason(form2)
 
       errorSummary.html() must include("not another message key")
       errorSummary.html() must include("not yet another message key")

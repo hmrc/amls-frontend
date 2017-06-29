@@ -36,7 +36,7 @@ object WithdrawalReason {
 
   import utils.MappingUtils.Implicits._
 
-  private val maxTextLength = 255
+  private val maxTextLength = 40
   private val specifyOtherReasonType = notEmptyStrip.withMessage("error.required.withdrawal.reason.other") andThen
     notEmpty.withMessage("error.required.withdrawal.reason.other") andThen
     maxLength(maxTextLength) andThen
@@ -44,7 +44,6 @@ object WithdrawalReason {
 
   implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
     (__ \ "withdrawalReason").read[String].withMessage("error.required.withdrawal.reason") flatMap {
       case "01" => OutOfScope
       case "02" => NotTradingInOwnRight
@@ -65,10 +64,10 @@ object WithdrawalReason {
   implicit val jsonReads: Reads[WithdrawalReason] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "withdrawalReason").read[String].flatMap[WithdrawalReason] {
-      case "01" => OutOfScope
-      case "02" => NotTradingInOwnRight
-      case "03" => UnderAnotherSupervisor
-      case "04" =>
+      case "Out of scope" => OutOfScope
+      case "Not trading in own right" => NotTradingInOwnRight
+      case "Under another supervisor" => UnderAnotherSupervisor
+      case "Other, please specify" =>
         (JsPath \ "specifyOtherReason").read[String] map {
           Other
         }
@@ -78,12 +77,12 @@ object WithdrawalReason {
   }
 
   implicit val jsonRedressWrites = Writes[WithdrawalReason] {
-    case OutOfScope => Json.obj("withdrawalReason" -> "01")
-    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "02")
-    case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "03")
+    case OutOfScope => Json.obj("withdrawalReason" -> "Out of scope")
+    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "Not trading in own right")
+    case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "Under another supervisor")
     case Other(reason) =>
       Json.obj(
-        "withdrawalReason" -> "04",
+        "withdrawalReason" -> "Other, please specify",
         "specifyOtherReason" -> reason
       )
   }

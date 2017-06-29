@@ -19,7 +19,7 @@ package controllers.declaration
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople._
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -73,6 +73,27 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     val mockCacheMap = mock[CacheMap]
       "load 'Who is the business’s nominated officer?' page successfully" when {
+
+        "status is pre-submission" in new Fixture {
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          contentAsString(result) must include(Messages("submit.registration"))
+        }
+
         "status is pending" in new Fixture {
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -93,13 +114,13 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
 
-        "status is pre-submission" in new Fixture {
+        "status is approved" in new Fixture {
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(Some(responsiblePeoples))
@@ -110,7 +131,27 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("submit.registration"))
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+
+        "status is ready for renewal" in new Fixture {
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(responsiblePeoples))
+
+          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          contentAsString(result) must include(Messages("submit.renewal.application"))
         }
     }
 
