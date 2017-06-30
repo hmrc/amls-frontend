@@ -16,15 +16,17 @@
 
 package controllers.renewal
 
+import cats.implicits._
 import connectors.DataCacheConnector
 import models.Country
-import models.renewal.{SendTheLargestAmountsOfMoney, Renewal}
+import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -51,6 +53,20 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
       authConnector = self.authConnector,
       renewalService = mockRenewalService
     )
+  }
+
+  trait FormSubmissionFixture extends Fixture {
+    def formData(valid: Boolean) = if (valid) "country_1" -> "GB" else "country_1" -> ""
+    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+
+    when(mockRenewalService.getRenewal(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+
+    when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+      .thenReturn(Future.successful(emptyCache))
+
+    def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
+      block(await(controller.post(edit)(formRequest(valid))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -88,44 +104,24 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
     "post is called" when {
       "edit is false" must {
-        "redirect to the MostTransactionsController with valid data" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "country_1" -> "GS"
-          )
-
-          when(mockRenewalService.getRenewal(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
+        "redirect to the MostTransactionsController with valid data" in new FormSubmissionFixture {
+          post(){ result =>
+            result.header.status must be (SEE_OTHER)
+            result.header.headers.get("Location")  must be(routes.MostTransactionsController.get().url.some)
+          }
         }
       }
 
       "edit is true" must {
-        "redirect to the SummaryController" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "country_1" -> "GB"
-          )
-
-          when(mockRenewalService.getRenewal(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        "redirect to the SummaryController" in new FormSubmissionFixture {
+          post(edit = true){ result =>
+            result.header.status must be (SEE_OTHER)
+            result.header.headers.get("Location")  must be(routes.SummaryController.get().url.some)
+          }
         }
       }
 
-      "given invalid data, must respond with BAD_REQUEST" in new Fixture {
+      "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "country_1" -> ""
