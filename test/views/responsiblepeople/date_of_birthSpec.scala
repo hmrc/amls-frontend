@@ -37,7 +37,7 @@ class date_of_birthSpec extends GenericTestHelper with MustMatchers  {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, false, "Gary")
+      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "Gary")
 
       doc.title() must startWith(Messages("responsiblepeople.date.of.birth.title") + " - " + Messages("summary.responsiblepeople"))
 
@@ -47,7 +47,7 @@ class date_of_birthSpec extends GenericTestHelper with MustMatchers  {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, false, "first last")
+      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "first last")
 
       heading.html() must be(Messages("responsiblepeople.date.of.birth.heading", "first last"))
     }
@@ -62,7 +62,7 @@ class date_of_birthSpec extends GenericTestHelper with MustMatchers  {
         Seq((Path \ dateField, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, false, "first last")
+      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "first last")
 
       errorSummary.html() must include(messageKey1)
 

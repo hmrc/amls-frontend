@@ -34,23 +34,23 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_additional_extra_address(Form2[TimeAtAddress](additionalExtraAddress), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_additional_extra_address(Form2[TimeAtAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_additional_extra_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          Ok(time_at_additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request => {
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
           getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(time_at_additional_extra_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+            BadRequest(time_at_additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) =>
           getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
@@ -62,7 +62,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
               val additionalExtraAddressWithTime = additionalExtraAddress.copy(
                 timeAtAddress = Some(data)
               )
-              updateAndRedirect(additionalExtraAddressWithTime, index, edit, fromDeclaration)
+              updateAndRedirect(additionalExtraAddressWithTime, index, edit, flow)
             }) getOrElse Future.successful(NotFound(notFoundView))
           }
       }).recoverWith {
@@ -72,7 +72,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
   }
 
   private def updateAndRedirect
-  (data: ResponsiblePersonAddress, index: Int, edit: Boolean, fromDeclaration: Boolean)
+  (data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
@@ -84,7 +84,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
     } map { _ =>
       edit match {
         case true => Redirect(routes.DetailedAnswersController.get(index))
-        case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, fromDeclaration))
+        case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       }
     }
   }

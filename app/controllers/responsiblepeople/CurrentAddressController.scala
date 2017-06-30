@@ -42,29 +42,29 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
 
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,
           Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_, _))
-          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, fromDeclaration, personName.titleName))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, fromDeclaration, personName.titleName))
+          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, fromDeclaration: Boolean = false) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext =>
         implicit request =>
           (Form2[ResponsiblePersonCurrentAddress](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map { rp =>
-                BadRequest(current_address(f, edit, index, fromDeclaration, ControllerHelper.rpTitleName(rp)))
+                BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
               getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
@@ -75,7 +75,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                 } yield data.copy(timeAtAddress = currentAddress.timeAtAddress)).getOrElse(data)
 
                 statusService.getStatus flatMap {
-                  status => updateAndRedirect(currentAddressWithTime, index, edit, fromDeclaration, responsiblePerson, status)
+                  status => updateAndRedirect(currentAddressWithTime, index, edit, flow, responsiblePerson, status)
                 }
               }
             }
@@ -85,7 +85,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
     }
 
   private def updateAndRedirect
-  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, fromDeclaration: Boolean, originalResponsiblePerson: Option[ResponsiblePeople],
+  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, flow: Option[String], originalResponsiblePerson: Option[ResponsiblePeople],
    status: SubmissionStatus)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
@@ -113,7 +113,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
       } else {
         auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, fromDeclaration))
+          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
         }
       }
     }

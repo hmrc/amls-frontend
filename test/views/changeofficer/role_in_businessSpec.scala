@@ -55,7 +55,7 @@ class role_in_businessSpec extends GenericTestHelper with MustMatchers {
           (Path \ "positions") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, true, name)
+      def view = views.html.changeofficer.role_in_business(form2, BusinessType.SoleProprietor, name)
 
       errorSummary.html() must include("not a message Key")
     }

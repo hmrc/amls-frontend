@@ -20,7 +20,7 @@
 @import models.businessmatching._
 
 
-@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -39,7 +39,7 @@
         }
     </ul>
 
-    @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, flow)) {
 
         @fieldset(
             f = f("experienceTraining-fieldset"),

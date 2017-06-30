@@ -34,21 +34,21 @@ trait SummaryController extends BaseController {
   val dataCacheConnector: DataCacheConnector
   val statusService : StatusService
 
-  def get(fromDeclaration: Boolean = false) = Authorised.async {
+  def get(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
         case Some(data) =>
           val hasNonUKResident = ControllerHelper.hasNonUkResident(Some(data))
-          Ok(check_your_answers(data, fromDeclaration, hasNonUKResident))
+          Ok(check_your_answers(data, flow, hasNonUKResident))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
 
-  def post(fromDeclaration: Boolean = false) = Authorised.async {
+  def post(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-      fromDeclaration match {
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case true => {
+      flow match {
+        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        case Some("fromDeclaration") => {
           for {
             status <- statusService.getStatus
             hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))

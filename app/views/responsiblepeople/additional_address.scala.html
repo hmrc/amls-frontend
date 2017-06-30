@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String] = None, personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit, fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit, flow)) {
 
         <div class="form-group">
             @fieldset(

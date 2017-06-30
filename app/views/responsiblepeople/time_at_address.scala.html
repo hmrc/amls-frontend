@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, fromDeclaration: Boolean = false, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.TimeAtCurrentAddressController.post(index,edit,fromDeclaration)) {
+    @form(f, controllers.responsiblepeople.routes.TimeAtCurrentAddressController.post(index,edit,flow)) {
 
         @fieldset(
             f = f("timeAtAddress-fieldset"),
