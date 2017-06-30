@@ -40,7 +40,7 @@ case object DesignatedMember extends Role
 case class Other(text: String) extends Role
 
 object RoleInBusiness {
-  val key = "changeofficer.roleinbusiness"
+  val key = "changeofficerRoleinbusiness"
   private val validationErrorKey = "changeofficer.roleinbusiness.validationerror"
 
   //noinspection ScalaStyle
