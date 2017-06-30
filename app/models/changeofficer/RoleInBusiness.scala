@@ -16,24 +16,18 @@
 
 package models.changeofficer
 
-import cats.Functor
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError}
-import play.api.libs.json._
-import utils.TraversableValidators._
+import models.ValidationRule
 import play.api.libs.functional.syntax._
-import play.api.libs.json._
 import play.api.libs.json.Reads._
+import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 
 case class RoleInBusiness(roles: Set[Role])
 
 sealed trait Role
-
-object Role {
-
-}
 
 case object SoleProprietor extends Role
 case object InternalAccountant extends Role
@@ -47,49 +41,65 @@ case class Other(text: String) extends Role
 
 object RoleInBusiness {
   val key = "changeofficer.roleinbusiness"
+  private val validationErrorKey = "changeofficer.roleinbusiness.validationerror"
 
-  val stringToRole: PartialFunction[String, Role] = {
+  //noinspection ScalaStyle
+  def stringToRole(role: String, other: Option[String]): Role = role match {
     case "soleprop" => SoleProprietor
-    case "bensharehold" => BeneficialShareholder
     case "director" => Director
+    case "bensharehold" => BeneficialShareholder
     case "extAccountant" => ExternalAccountant
     case "intAccountant" => InternalAccountant
     case "partner" => Partner
     case "desigmemb" => DesignatedMember
+    case "other" if other.isDefined => Other(other.get)
   }
 
   def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
-      case BeneficialShareholder => "bensharehold"
       case Director => "director"
+      case BeneficialShareholder => "bensharehold"
       case ExternalAccountant => "extAccountant"
       case InternalAccountant => "intAccountant"
       case Partner => "partner"
       case DesignatedMember => "desigmemb"
+      case Other(_) => "other"
     }
 
   implicit val jsonWrites: Writes[RoleInBusiness] = {
-    (__ \ "positions").write[Seq[String]].contramap(_.roles.toSeq.map(roleToString))
-  }
-
-  val roleJsonReads = new Reads[Set[Role]] {
-    override def reads(json: JsValue) = json.as[Seq[String]] match {
-      case strings if strings.forall(stringToRole.isDefinedAt) => JsSuccess((strings map stringToRole).toSet)
-      case _ => JsError("changeofficer.roleinbusiness.validationerror")
-    }
+    ((__ \ "positions").write[Seq[String]] ~
+      (__ \ "otherPosition").writeNullable[String]) { r =>
+        val roleSet = r.roles.map(roleToString).toSeq
+        val other = r.roles.collect { case Other(o) => o }.headOption
+        (roleSet, other)
+      }
   }
 
   implicit val jsonReads: Reads[RoleInBusiness] = {
-    (__ \ "positions").read(roleJsonReads).map(r => RoleInBusiness(r))
+    ((__ \ "positions").read[Seq[String]] and
+      (__ \ "otherPosition").readNullable[String]).tupled.flatMap {
+        case (roles, other) => RoleInBusiness(roles.map(v => stringToRole(v, other)).toSet)
+        case _ => Reads { _ => JsError(JsPath \ "positions", validationErrorKey) }
+    }
   }
 
-  val roleFormReads = Rule.fromMapping[Seq[String], Set[Role]] {
-    case x if x.nonEmpty && x.forall(stringToRole.isDefinedAt) => Valid(x.map(stringToRole).toSet)
-    case _ => Invalid(ValidationError("changeofficer.roleinbusiness.validationerror"))
+  val roleFormReads = Rule.fromMapping[(Seq[String], Option[String]), Set[Role]] {
+    case (roles, other) if roles.nonEmpty => Valid(roles.map(v => stringToRole(v, other)).toSet)
+    case _ => Invalid(ValidationError(validationErrorKey))
+  }
+
+  val otherValidationRule: ValidationRule[(Seq[String], Option[String])] = Rule[(Seq[String], Option[String]), (Seq[String], Option[String])] {
+    case (roles, None) if roles.contains("other") =>
+      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
+    case x => Valid(x)
   }
 
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "positions").read[Seq[String]] andThen roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
+    ((__ \ "positions").read[Seq[String]] ~
+      (__ \ "otherPosition").read[Option[String]])
+        .tupled
+        .andThen(otherValidationRule)
+        .andThen(roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
   }
 }
