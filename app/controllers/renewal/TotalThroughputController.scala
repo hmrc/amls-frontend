@@ -64,9 +64,7 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
                   services <- bm.msbServices
                   activities <- bm.activities
                 } yield {
-                  dataCacheConnector.save[Renewal](Renewal.key,
-                    renewal.totalThroughput(model)
-                  ) map { _ =>
+                  renewals.updateRenewal(renewal.totalThroughput(model)) map { _ =>
                     standardRouting(services.msbServices, activities.businessActivities, edit)
                   }
                 }
