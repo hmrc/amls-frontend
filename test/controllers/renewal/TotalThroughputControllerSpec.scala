@@ -18,8 +18,11 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
+import models.aboutthebusiness.AboutTheBusiness
+import models.aboutthebusiness._
 import models.businessmatching.{BusinessActivities, _}
-import models.renewal.{MostTransactions, Renewal, TotalThroughput}
+import models.moneyservicebusiness.ExpectedThroughput
+import models.renewal._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -148,7 +151,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
           ), hasChanged = true
         )
         val newRequest = request.withFormUrlEncodedBody(
-          "totalThroughput[]" -> "01"
+          "throughput" -> "01"
         )
 
         when(dataCacheConnector.fetchAll(any(), any()))
@@ -193,7 +196,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
           ), hasChanged = true
         )
         val newRequest = request.withFormUrlEncodedBody(
-          "totalThroughput[]" -> "01"
+          "throughput" -> "01"
         )
 
         when(dataCacheConnector.fetchAll(any(), any()))
@@ -238,7 +241,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
           ), hasChanged = true
         )
         val newRequest = request.withFormUrlEncodedBody(
-          "totalThroughput[]" -> "01"
+          "throughput" -> "01"
         )
 
         when(dataCacheConnector.fetchAll(any(), any()))
@@ -286,7 +289,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
           ), hasChanged = true
         )
         val newRequest = request.withFormUrlEncodedBody(
-          "totalThroughput[]" -> "01"
+          "throughput" -> "01"
         )
 
         when(dataCacheConnector.fetchAll(any(), any()))
@@ -310,7 +313,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
 
 
 
-    /*"save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
+    "save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
 
       val incomingModel = Renewal()
 
@@ -335,7 +338,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         ), hasChanged = true
       )
       val newRequest = request.withFormUrlEncodedBody(
-        "totalThroughput[]" -> "01"
+        "throughput" -> "01"
       )
 
       when(dataCacheConnector.fetchAll(any(), any()))
@@ -350,12 +353,18 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
       when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      post() { result =>
+      val result = controller.post()(newRequest)
+      //status(result) must be(SEE_OTHER)
+      val captor = ArgumentCaptor.forClass(classOf[Renewal])
+      verify(dataCacheConnector).save[Renewal](eqTo(Renewal.key), captor.capture())(any(), any(), any())
+
+
+      /*post() { result =>
         result.header.status mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
+        //verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
-      }
-    }*/
+      }*/
+    }
   }
 }
