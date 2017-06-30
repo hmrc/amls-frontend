@@ -1271,6 +1271,7 @@ responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member
 responsiblepeople.position_within_business.lbl.08 = External accountant
+responsiblepeople.position_within_business.lbl.09 = Other
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
@@ -1601,6 +1602,8 @@ changeofficer.stillemployed.validationerror = You must select yes or no. Select 
 changeofficer.roleinbusiness.heading = What’s {0}’s role in the business now?
 changeofficer.roleinbusiness.title = What’s this person’s role in the business now?
 changeofficer.roleinbusiness.validationerror = You must select a business role. Select one of the following roles
+changeofficer.roleinbusiness.other.lbl = Please specify
+changeofficer.roleinbusiness.validationerror.othermissing = You haven’t specified their role in the business. Enter their role in the business
 
 ###############################  Notifications ###############################
 

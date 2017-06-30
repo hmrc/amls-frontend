@@ -90,6 +90,27 @@
                     labelText = "responsiblepeople.position_within_business.lbl.08",
                     value = "extAccountant"
                 )
+
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "responsiblepeople.position_within_business.lbl.09",
+                    value = "other",
+                    target = "#otherPosition-fieldset"
+                )
+
+                @fieldset(
+                    f = f("otherPosition-fieldset"),
+                    legend = "changeofficer.roleinbusiness.other.lbl",
+                    jsHidden = false
+                ) {
+                    @textarea(
+                        field = f("otherPosition"),
+                        bold = false,
+                        largeWidth = true,
+                        cols = "30",
+                        rows ="1"
+                    )
+                }
             }
         </div>
 
