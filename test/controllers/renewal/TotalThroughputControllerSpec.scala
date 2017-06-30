@@ -354,17 +354,10 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post()(newRequest)
-      //status(result) must be(SEE_OTHER)
+
       val captor = ArgumentCaptor.forClass(classOf[Renewal])
       verify(dataCacheConnector).save[Renewal](eqTo(Renewal.key), captor.capture())(any(), any(), any())
 
-
-      /*post() { result =>
-        result.header.status mustBe SEE_OTHER
-        val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        //verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
-        captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
-      }*/
     }
   }
 }
