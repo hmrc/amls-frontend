@@ -23,5 +23,5 @@ case class ChangeOfficer(roleInBusiness: RoleInBusiness)
 
 object ChangeOfficer {
   implicit val format = Json.format[ChangeOfficer]
-
+  val key = "changeofficer"
 }

@@ -25,7 +25,7 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{InvalidForm, Form2, ValidForm, EmptyForm}
 import models.businessmatching.BusinessMatching
-import models.changeofficer.RoleInBusiness
+import models.changeofficer.{ChangeOfficer, RoleInBusiness}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -47,16 +47,17 @@ class RoleInBusinessController @Inject()
   def post() = Authorised.async {
     implicit authContext => implicit request =>
       Form2[RoleInBusiness](request.body) match {
-        case ValidForm(_, data) =>
-          dataCacheConnector.save(RoleInBusiness.key, data) map { _ =>
-            Redirect(controllers.changeofficer.routes.NewOfficerController.get())
-          }
         case f: InvalidForm =>
           val result = getBusinessNameAndName map {
             case (businessType, name) => BadRequest(views.html.changeofficer.role_in_business(f, businessType, name))
           }
 
           result getOrElse InternalServerError("Unable to get nominated officer")
+
+        case ValidForm(_, data) =>
+          dataCacheConnector.save(ChangeOfficer.key, ChangeOfficer(data)) map { _ =>
+            Redirect(controllers.changeofficer.routes.NewOfficerController.get())
+          }
       }
   }
 
