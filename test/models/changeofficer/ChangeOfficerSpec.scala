@@ -29,6 +29,7 @@ class ChangeOfficerSpec extends PlaySpec with MustMatchers {
 
       Json.toJson(model).as[ChangeOfficer] mustBe model
     }
+
   }
 
 }

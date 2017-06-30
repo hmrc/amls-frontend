@@ -25,7 +25,7 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{InvalidForm, Form2, ValidForm, EmptyForm}
 import models.businessmatching.BusinessMatching
-import models.changeofficer.{ChangeOfficer, RoleInBusiness}
+import models.changeofficer.{Role, ChangeOfficer, RoleInBusiness}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -37,8 +37,11 @@ class RoleInBusinessController @Inject()
   def get = Authorised.async {
     implicit authContext => implicit request =>
 
-      val result = getBusinessNameAndName map {
-        case (businessType, name) => Ok(views.html.changeofficer.role_in_business(EmptyForm, businessType, name))
+      val result = for {
+        co <- OptionT(dataCacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.some(ChangeOfficer(RoleInBusiness(Set.empty[Role])))
+        (businessType, name) <- getBusinessNameAndName
+      } yield {
+        Ok(views.html.changeofficer.role_in_business(Form2[RoleInBusiness](co.roleInBusiness), businessType, name))
       }
 
       result getOrElse InternalServerError("Unable to get nominated officer")

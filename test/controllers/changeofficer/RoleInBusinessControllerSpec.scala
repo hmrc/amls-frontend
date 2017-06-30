@@ -23,6 +23,7 @@ import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor, _}
 import models.changeofficer.{ChangeOfficer, RoleInBusiness}
 import models.responsiblepeople._
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -72,6 +73,10 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
     when {
       cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
+
+    when {
+      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))
   }
 
   "The RoleInBusinessController" must {
@@ -82,6 +87,20 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       contentAsString(result) must include("firstName lastName")
 
       contentAsString(result) must include(Messages("responsiblepeople.position_within_business.lbl.06"))
+    }
+
+    "propulate the view" in new TestFixture {
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+
+      import utils.Strings._
+      println(html.toString in Console.YELLOW)
+
+      html.select("input[type=checkbox][value=soleprop]").hasAttr("checked") mustBe true
     }
 
     "when post is called" must {
