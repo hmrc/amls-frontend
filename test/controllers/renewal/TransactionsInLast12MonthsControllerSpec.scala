@@ -17,13 +17,14 @@
 package controllers.renewal
 
 import cats.implicits._
-import models.renewal.{TransactionsInLast12Months, Renewal}
+import models.renewal.{Renewal, TransactionsInLast12Months}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -46,12 +47,15 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormData = "txnAmount" -> "1500"
-    val validFormRequest = request.withFormUrlEncodedBody(validFormData)
+    def formData(valid: Boolean) = if (valid) {"txnAmount" -> "1500"} else {"txnAmount" -> "abc"}
+    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
 
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
     } thenReturn Future.successful(mock[CacheMap])
+
+    def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
+      block(await(controller.post(edit)(formRequest(valid))))
   }
 
   "Calling the GET action" must {
@@ -92,36 +96,37 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
   "Calling the POST action" when {
     "posting valid data" must {
-      "redirect to the next page in the flow" in new FormSubmissionFixture {
-        val result = controller.post()(validFormRequest)
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
+      "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
+        }
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
-        val result = controller.post(edit = true)(validFormRequest)
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+        post(edit = true) { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
+        }
       }
 
       "return a bad request" when {
         "the form fails validation" in new FormSubmissionFixture {
-          val result = controller.post()(request)
-
-          status(result) mustBe BAD_REQUEST
-          verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
+          post(valid = false) { result =>
+            result.header.status mustBe BAD_REQUEST
+            verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
+          }
         }
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
-        val result = await(controller.post()(validFormRequest))
-        val captor = ArgumentCaptor.forClass(classOf[Renewal])
+        post() { _ =>
+          val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-        verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
+          verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
-        captor.getValue.transactionsInLast12Months mustBe TransactionsInLast12Months("1500").some
+          captor.getValue.transactionsInLast12Months mustBe TransactionsInLast12Months("1500").some
+        }
       }
     }
   }
