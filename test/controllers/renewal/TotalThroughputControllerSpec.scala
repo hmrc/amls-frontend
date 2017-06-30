@@ -121,187 +121,194 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
     }
   }
 
-  "A valid form post to the MSB throughput controller" must {
-    "redirect to the next page in the flow if edit = false and is MSB MT" in new FormSubmissionFixture {
-      val incomingModel = Renewal()
+  "A valid form post to the MSB throughput controller" when {
 
-      val msbServices = Some(
-        MsbServices(
-          Set(
-            TransmittingMoney
+    "edit is false" must {
+      "redirect to TransactionsInLast12MonthsController if MSB MT" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney
+            )
           )
         )
-      )
 
-      val businessActivities = Some(
-        BusinessActivities(Set(HighValueDealing))
-      )
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
 
 
-      val outgoingModel = incomingModel.copy(
-        totalThroughput = Some(
-          TotalThroughput(
-            "01"
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "totalThroughput[]" -> "01"
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
+        }
+      }
+
+      "redirect to CETransactionsInLast12MonthsController if MSB CE" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              CurrencyExchange
+            )
           )
-        ), hasChanged = true
-      )
-      val newRequest = request.withFormUrlEncodedBody(
-        "totalThroughput[]" -> "01"
-      )
+        )
 
-      when(dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
 
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "totalThroughput[]" -> "01"
+        )
 
-      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-      post() { result =>
-        result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
+        }
+      }
+
+      "redirect to PercentageOfCashPaymentOver15000Controller if HVD" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              ChequeCashingScrapMetal
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
+
+
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "totalThroughput[]" -> "01"
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
+        }
       }
     }
 
-    "redirect to the next page in the flow if edit = false and is MSB CE" in new FormSubmissionFixture {
-      val incomingModel = Renewal()
+    "edit is true" must {
+      "redirect to the summary page" in new FormSubmissionFixture {
 
-      val msbServices = Some(
-        MsbServices(
-          Set(
-            CurrencyExchange
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              ChequeCashingScrapMetal
+            )
           )
         )
-      )
 
-      val businessActivities = Some(
-        BusinessActivities(Set(HighValueDealing))
-      )
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
 
 
-      val outgoingModel = incomingModel.copy(
-        totalThroughput = Some(
-          TotalThroughput(
-            "01"
-          )
-        ), hasChanged = true
-      )
-      val newRequest = request.withFormUrlEncodedBody(
-        "totalThroughput[]" -> "01"
-      )
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "totalThroughput[]" -> "01"
+        )
 
-      when(dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(incomingModel))
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
 
-      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      post() { result =>
-        result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
+        post(edit = true) { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get().url)
+        }
       }
     }
 
-    "redirect to the next page in the flow if edit = false and is HVD" in new FormSubmissionFixture {
-      val incomingModel = Renewal()
 
-      val msbServices = Some(
-        MsbServices(
-          Set(
-            ChequeCashingScrapMetal
-          )
-        )
-      )
-
-      val businessActivities = Some(
-        BusinessActivities(Set(HighValueDealing))
-      )
-
-
-      val outgoingModel = incomingModel.copy(
-        totalThroughput = Some(
-          TotalThroughput(
-            "01"
-          )
-        ), hasChanged = true
-      )
-      val newRequest = request.withFormUrlEncodedBody(
-        "totalThroughput[]" -> "01"
-      )
-
-      when(dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      post() { result =>
-        result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
-      }
-    }
-
-    "redirect to the summary page if edit = true" in new FormSubmissionFixture {
-
-      val incomingModel = Renewal()
-
-      val msbServices = Some(
-        MsbServices(
-          Set(
-            ChequeCashingScrapMetal
-          )
-        )
-      )
-
-      val businessActivities = Some(
-        BusinessActivities(Set(HighValueDealing))
-      )
-
-
-      val outgoingModel = incomingModel.copy(
-        totalThroughput = Some(
-          TotalThroughput(
-            "01"
-          )
-        ), hasChanged = true
-      )
-      val newRequest = request.withFormUrlEncodedBody(
-        "totalThroughput[]" -> "01"
-      )
-
-      when(dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      post(edit = true) { result =>
-        result.header.status mustBe SEE_OTHER
-        result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get().url)
-      }
-    }
 
     /*"save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
 
