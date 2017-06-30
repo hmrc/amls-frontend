@@ -19,6 +19,7 @@ package models.changeofficer
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError}
+import models.ValidationRule
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
@@ -87,12 +88,18 @@ object RoleInBusiness {
     case _ => Invalid(ValidationError(validationErrorKey))
   }
 
+  val otherValidationRule: ValidationRule[(Seq[String], Option[String])] = Rule[(Seq[String], Option[String]), (Seq[String], Option[String])] {
+    case (roles, None) if roles.contains("other") =>
+      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
+    case x => Valid(x)
+  }
+
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "positions").read[Seq[String]] ~
       (__ \ "otherPosition").read[Option[String]])
         .tupled
-        .andThen(roleFormReads)
-        .repath(_ => Path \ "positions") map { r => RoleInBusiness(r) }
+        .andThen(otherValidationRule)
+        .andThen(roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
   }
 }

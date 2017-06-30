@@ -65,6 +65,16 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       result mustBe Valid(RoleInBusiness(Set(Other("Some other role"))))
     }
 
+    "fail validation when 'other' is specified but no other role is given" in {
+      val formData = Map(
+        "positions" -> Seq("other")
+      )
+
+      val result = RoleInBusiness.formReads.validate(formData)
+
+      result mustBe Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
+    }
+
     "convert to Json" in {
       val json = Json.obj(
         "positions" -> Seq(
@@ -72,8 +82,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
           "partner",
           "other"
         ),
-        "otherPosition" +
-          "" -> "Another role"
+        "otherPosition" -> "Another role"
       )
 
       val model = RoleInBusiness(Set(SoleProprietor, Partner, Other("Another role")))
