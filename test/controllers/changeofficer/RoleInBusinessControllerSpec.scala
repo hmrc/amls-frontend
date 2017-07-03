@@ -21,8 +21,9 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor, _}
-import models.changeofficer.RoleInBusiness
+import models.changeofficer.{ChangeOfficer, RoleInBusiness}
 import models.responsiblepeople._
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -72,6 +73,10 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
     when {
       cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
+
+    when {
+      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))
   }
 
   "The RoleInBusinessController" must {
@@ -82,6 +87,19 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       contentAsString(result) must include("firstName lastName")
 
       contentAsString(result) must include(Messages("responsiblepeople.position_within_business.lbl.06"))
+    }
+
+    "populate the view" in new TestFixture {
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+
+      import utils.Strings._
+
+      html.select("input[type=checkbox][value=soleprop]").hasAttr("checked") mustBe true
     }
 
     "when post is called" must {
@@ -95,7 +113,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
 
-        verify(cache).save(eqTo(RoleInBusiness.key), eqTo(RoleInBusiness(Set(models.changeofficer.SoleProprietor))))(any(),any(),any())
+        verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))(any(),any(),any())
       }
 
       "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {

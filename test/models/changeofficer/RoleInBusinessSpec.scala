@@ -75,6 +75,17 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       result mustBe Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
     }
 
+    "successfully write the model to the form" in {
+      val formData = Map(
+        "positions[]" -> Seq("other"),
+        "otherPosition" -> Seq("Some other role")
+      )
+
+      val model = RoleInBusiness(Set(Other("Some other role")))
+
+      RoleInBusiness.formWrites.writes(model) mustBe formData
+    }
+
     "convert to Json" in {
       val json = Json.obj(
         "positions" -> Seq(

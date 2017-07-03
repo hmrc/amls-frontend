@@ -18,7 +18,7 @@ package models.changeofficer
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError}
+import jto.validation._
 import models.ValidationRule
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
@@ -101,5 +101,16 @@ object RoleInBusiness {
         .tupled
         .andThen(otherValidationRule)
         .andThen(roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
+  }
+
+  implicit def formWrites: Write[RoleInBusiness, UrlFormEncoded] = Write[RoleInBusiness, UrlFormEncoded] { data =>
+        val roleSet = data.roles.map(roleToString).toSeq
+        val otherRole = data.roles.collect {
+          case Other(o) => o
+        }.toSeq
+        Map(
+          "positions[]" -> roleSet,
+          "otherPosition" -> otherRole
+        )
   }
 }
