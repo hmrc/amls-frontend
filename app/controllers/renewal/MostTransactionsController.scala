@@ -24,13 +24,15 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
+import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 @Singleton
 class MostTransactionsController @Inject()(val authConnector: AuthConnector,
-                                           val cache: DataCacheConnector) extends BaseController {
+                                           val cache: DataCacheConnector,
+                                           val renewalService: RenewalService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -67,12 +69,8 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
-                } yield {
-                  cache.save[Renewal](Renewal.key,
-                    renewal.mostTransactions(data)
-                  ) map { _ =>
-                      standardRouting(services.msbServices, edit)
-                   }
+                } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
+                  standardRouting(services.msbServices, edit)
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
