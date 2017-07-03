@@ -74,7 +74,7 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
           be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("err.text.validation"))))))
       }
       "other reason value has too many characters" in {
-        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("a" * 256))) must
+        WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("a" * 41))) must
           be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 40))))))
       }
     }
