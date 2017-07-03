@@ -21,7 +21,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, EmptyForm}
+import forms.{ValidForm, Form2, EmptyForm}
 import models.changeofficer.{NewOfficer, ChangeOfficer}
 import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -43,6 +43,23 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
 
       result getOrElse {
         InternalServerError("Could not get the list of responsible people")
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[NewOfficer](request.body) match {
+        case ValidForm(_, data) =>
+
+          val result = for {
+            changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+            _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
+          } yield {
+            Redirect(controllers.changeofficer.routes.FurtherUpdatesController.get())
+          }
+
+          result getOrElse InternalServerError("No ChangeOfficer Role found")
+
       }
   }
 }

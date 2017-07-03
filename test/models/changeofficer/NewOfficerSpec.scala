@@ -16,6 +16,7 @@
 
 package models.changeofficer
 
+import cats.data.Validated.Valid
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
@@ -40,6 +41,16 @@ class NewOfficerSpec extends PlaySpec with MustMatchers {
       )
 
       NewOfficer.formWrites.writes(model) mustBe form
+    }
+
+    "successfully read the form" in {
+      val form = Map(
+        "person" -> Seq("testName")
+      )
+
+      val model = NewOfficer("testName")
+
+      NewOfficer.formReads.validate(form) mustBe Valid(model)
     }
   }
 }

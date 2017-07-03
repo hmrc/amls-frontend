@@ -25,6 +25,7 @@ import org.scalacheck.Gen
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -101,6 +102,32 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
         html.select("input[type=radio][value=TestPerson]").hasAttr("checked") mustBe true
       }
 
+    }
+
+    "post is called" must {
+      "respond with SEE_OTHER and redirect to the FurtherUpdatesController" in new TestFixture {
+
+        when {
+          cache.fetch[ChangeOfficer](any())(any(),any(), any())
+        } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
+
+        when {
+          cache.save[ChangeOfficer](any(),any())(any(),any(),any())
+        } thenReturn Future.successful(mock[CacheMap])
+
+        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "testName"))
+        status(result) mustBe(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.FurtherUpdatesController.get().url)
+
+        verify(cache).save(
+          eqTo(ChangeOfficer.key),
+          eqTo(ChangeOfficer(
+            RoleInBusiness(Set(models.changeofficer.SoleProprietor)),
+            Some(NewOfficer("testName"))
+          )))(any(),any(),any())
+
+      }
     }
   }
 
