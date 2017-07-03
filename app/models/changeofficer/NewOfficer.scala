@@ -17,11 +17,25 @@
 package models.changeofficer
 
 import play.api.libs.json.Json
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import utils.MappingUtils.Implicits._
 
 
-case class ChangeOfficer(roleInBusiness: RoleInBusiness, newOfficer: Option[NewOfficer] = None)
+case class NewOfficer(name: String)
 
-object ChangeOfficer {
-  implicit val format = Json.format[ChangeOfficer]
-  val key = "changeofficer"
+object NewOfficer {
+  implicit val formats = Json.format[NewOfficer]
+
+  implicit val formWrites = Write[NewOfficer, UrlFormEncoded] { data =>
+    Map(
+      "person" -> Seq(data.name)
+    )
+  }
+
+  implicit val formReads: Rule[UrlFormEncoded, NewOfficer] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    (__ \ "person").read[String] map { p => NewOfficer(p) }
+  }
+
 }

@@ -18,13 +18,65 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{InvalidForm, ValidForm, Form2, EmptyForm}
+import models.changeofficer.{NewOfficer, ChangeOfficer}
+import models.responsiblepeople.ResponsiblePeople
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import cats.implicits._
 
-class NewOfficerController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext => implicit request =>
+
+      val result = getPeopleAndSelectedOfficer() map { t =>
+        Ok(views.html.changeofficer.new_nominated_officer(Form2[NewOfficer](t._1), t._2))
+      }
+
+      result getOrElse {
+        InternalServerError("Could not get the list of responsible people")
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[NewOfficer](request.body) match {
+        case f: InvalidForm =>
+          val result = getPeopleAndSelectedOfficer() map { t =>
+            BadRequest(views.html.changeofficer.new_nominated_officer(f, t._2))
+          }
+
+          result getOrElse {
+            InternalServerError("Could not get the list of responsible people")
+          }
+
+        case ValidForm(_, data) =>
+
+          val result = for {
+            changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+            _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
+          } yield {
+            Redirect(controllers.changeofficer.routes.FurtherUpdatesController.get())
+          }
+
+          result getOrElse InternalServerError("No ChangeOfficer Role found")
+
+      }
+  }
+
+  private def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
+    for {
+      people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+      selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
+    } yield {
+      (selectedOfficer, people)
+    }
   }
 }
