@@ -17,11 +17,13 @@
 package controllers.renewal
 
 import cats.implicits._
+import connectors.DataCacheConnector
+import models.businessmatching._
 import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
-import models.renewal.{WhichCurrencies, Renewal}
+import models.renewal.{Renewal, WhichCurrencies}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -38,8 +40,10 @@ class WhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar 
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
+    val dataCacheConnector = mock[DataCacheConnector]
+    val cacheMap = mock[CacheMap]
 
-    lazy val controller = new WhichCurrenciesController(self.authConnector, renewalService)
+    lazy val controller = new WhichCurrenciesController(self.authConnector, renewalService, dataCacheConnector)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -102,7 +106,45 @@ class WhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar 
 
   "Calling the POST action" when {
     "posting valid data" must {
-      "redirect to the next page in the flow" in new FormSubmissionFixture {
+      "redirect to the percentage of cash payments over 15000 page if business is HVD" in new FormSubmissionFixture {
+
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
+
+        val currentModel = WhichCurrencies(
+          Seq("USD"),
+          usesForeignCurrencies = Some(true),
+          None,
+          None,
+          Some(true))
+
+
+        val outgoingModel = incomingModel.copy(
+          whichCurrencies = Some(currentModel), hasChanged = true
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
         val result = controller.post()(validFormRequest)
 
         status(result) mustBe SEE_OTHER
@@ -110,6 +152,45 @@ class WhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar 
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
+
+        val currentModel = WhichCurrencies(
+          Seq("USD"),
+          usesForeignCurrencies = Some(true),
+          None,
+          None,
+          Some(true))
+
+
+        val outgoingModel = incomingModel.copy(
+          whichCurrencies = Some(currentModel), hasChanged = true
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+
         val result = controller.post(edit = true)(validFormRequest)
 
         status(result) mustBe SEE_OTHER
@@ -117,6 +198,42 @@ class WhichCurrenciesControllerSpec extends GenericTestHelper with MockitoSugar 
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          MsbServices(
+            Set(
+              TransmittingMoney
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
+
+        val currentModel = WhichCurrencies(
+          Seq("USD", "GBP", "BOB"),
+          Some(true),
+          Some(BankMoneySource("Bank names")),
+          Some(WholesalerMoneySource("wholesaler names")),
+          Some(true))
+
+
+        val outgoingModel = incomingModel.copy(
+          whichCurrencies = Some(currentModel), hasChanged = true
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
