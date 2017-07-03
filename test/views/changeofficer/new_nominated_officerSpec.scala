@@ -41,21 +41,17 @@ class new_nominated_officerSpec extends GenericTestHelper with MustMatchers with
 
       def view = views.html.changeofficer.new_nominated_officer(EmptyForm, responsiblePeople)
 
+      doc.title must be(Messages("changeofficer.newnominatedofficer.title") +
+        " - " + Messages("summary.updateinformation") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
 
+      heading.html must be(Messages("changeofficer.newnominatedofficer.heading"))
+      subHeading.html must include(Messages("summary.updateinformation"))
 
     }
-//
-//    "have correct headings" in new ViewFixture {
-//
-//      val form2 = EmptyForm
-//
-//      def view = views.html.changeofficer.new_nominated_officer(form2, true)
-//
-//      heading.html must be(Messages("expectedHeadingText"))
-//      subHeading.html must include(Messages("ExpectedSubHeading"))
-//
-//    }
-//
+
+
 //    "have correct form fields" in new ViewFixture {
 //
 //      val form2 = EmptyForm

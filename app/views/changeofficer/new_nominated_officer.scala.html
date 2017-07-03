@@ -21,24 +21,21 @@
 @(f: forms.Form2[_], responsiblePeople: Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
-@errorSummary(f)
-@heading("test heading")
+    @errorSummary(f)
+    @heading("changeofficer.newnominatedofficer.heading", "summary.updateinformation")
 }
 
 @main(
-title = Messages("changeofficer.roleinbusiness.title") + " - " + Messages("summary.updateinformation"),
+title = Messages("changeofficer.newnominatedofficer.title") + " - " + Messages("summary.updateinformation"),
 heading = header
 ) {
 
-
-
-<p>@Messages("lbl.select.all")</p>
 
     @form(f, controllers.changeofficer.routes.RoleInBusinessController.post()) {
 
         <div class="form-group">
             @responsiblePeople.map { person =>
-                @radio(f("person"), person.personName.get.fullNameWithoutSpace, person.personName.get.fullNameWithoutSpace)
+                @radio(f("person"), person.personName.get.fullName, person.personName.get.fullNameWithoutSpace)
             }
         </div>
 
