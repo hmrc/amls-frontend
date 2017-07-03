@@ -86,8 +86,8 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
           be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("err.text.validation"))))))
       }
       "other reason value has too many characters" in {
-        DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq("a" * 256))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 255))))))
+        DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq("a" * 41))) must
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 40))))))
       }
     }
 
