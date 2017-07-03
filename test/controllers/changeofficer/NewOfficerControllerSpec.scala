@@ -19,6 +19,7 @@ package controllers.changeofficer
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import org.jsoup.Jsoup
 import org.scalacheck.Gen
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -63,6 +64,12 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
         status(result) mustBe OK
 
         verify(cache).fetch(eqTo(ResponsiblePeople.key))(any(), any(), any())
+
+        val html = Jsoup.parse(contentAsString(result))
+
+        responsiblePeople.foreach { person =>
+          html.select(s"input[type=radio][value=${person.personName.get.fullNameWithoutSpace}]").size() mustBe 1
+        }
       }
     }
   }

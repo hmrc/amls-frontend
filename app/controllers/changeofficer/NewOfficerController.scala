@@ -21,6 +21,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -33,7 +34,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       val result = for {
         people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
       } yield {
-        Ok("")
+        Ok(views.html.changeofficer.new_nominated_officer(EmptyForm, people))
       }
 
       result getOrElse InternalServerError("Could not get the list of responsible people")
