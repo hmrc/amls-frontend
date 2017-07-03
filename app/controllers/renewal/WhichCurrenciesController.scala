@@ -20,9 +20,12 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.renewal.WhichCurrencies
+import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing, MsbService}
+import models.renewal.{Renewal, WhichCurrencies}
+import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.which_currencies
@@ -30,7 +33,8 @@ import views.html.renewal.which_currencies
 import scala.concurrent.Future
 
 class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
-                                          renewalService: RenewalService) extends BaseController {
+                                          renewalService: RenewalService,
+                                          dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -50,16 +54,30 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
       Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
         case ValidForm(_, model) =>
-          val maybeResponse = for {
-            renewal <- OptionT(renewalService.getRenewal)
-            _ <- OptionT.liftF(renewalService.updateRenewal(renewal.whichCurrencies(model)))
-          }yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-          }
+          dataCacheConnector.fetchAll flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                activities <- bm.activities
+              } yield {
+                renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
+                  standardRouting(activities.businessActivities, edit)
+                }
 
-          maybeResponse getOrElse Redirect(routes.SummaryController.get())
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
       }
   }
+
+  private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
+    if ((businessActivities contains HighValueDealing) && !edit ) {
+      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+    }
+    else {
+      Redirect(routes.SummaryController.get())
+    }
 
 }
