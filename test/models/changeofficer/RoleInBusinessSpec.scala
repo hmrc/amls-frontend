@@ -77,7 +77,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "successfully write the model to the form" in {
       val formData = Map(
-        "positions[0]" -> Seq("other"),
+        "positions[]" -> Seq("other"),
         "otherPosition" -> Seq("Some other role")
       )
 

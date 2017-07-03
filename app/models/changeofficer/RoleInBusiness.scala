@@ -103,17 +103,14 @@ object RoleInBusiness {
         .andThen(roleFormReads.repath(_ => Path \ "positions")) map { r => RoleInBusiness(r) }
   }
 
-  implicit val formWrites: Write[RoleInBusiness, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    (
-      (__ \ "positions").write[Seq[String]] ~
-        (__ \ "otherPosition").write[Option[String]]
-      ) { j =>
-        val roleSet = j.roles.map(roleToString).toSeq
-        val otherRole = j.roles.collect {
+  implicit def formWrites: Write[RoleInBusiness, UrlFormEncoded] = Write[RoleInBusiness, UrlFormEncoded] { data =>
+        val roleSet = data.roles.map(roleToString).toSeq
+        val otherRole = data.roles.collect {
           case Other(o) => o
-        }.headOption
-        (roleSet, otherRole)
-      }
+        }.toSeq
+        Map(
+          "positions[]" -> roleSet,
+          "otherPosition" -> otherRole
+        )
   }
 }

@@ -89,7 +89,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       contentAsString(result) must include(Messages("responsiblepeople.position_within_business.lbl.06"))
     }
 
-    "propulate the view" in new TestFixture {
+    "populate the view" in new TestFixture {
 
       val result = controller.get()(request)
 
@@ -98,7 +98,6 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
       val html = Jsoup.parse(contentAsString(result))
 
       import utils.Strings._
-      println(html.toString in Console.YELLOW)
 
       html.select("input[type=checkbox][value=soleprop]").hasAttr("checked") mustBe true
     }
