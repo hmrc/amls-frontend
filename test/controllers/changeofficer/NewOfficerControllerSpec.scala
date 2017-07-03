@@ -16,29 +16,54 @@
 
 package controllers.changeofficer
 
+import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import org.scalacheck.Gen
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 
-class NewOfficerControllerSpec extends GenericTestHelper {
+import scala.concurrent.Future
+
+
+class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonGenerator {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
+    val cache = mock[DataCacheConnector]
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(cache))
       .build()
 
     lazy val controller = injector.instanceOf[NewOfficerController]
+
+
   }
 
-  "The NewOfficerController" must {
-    "get the view" in new TestFixture {
-      val result = controller.get()(request)
+  "The NewOfficerController" when {
+    "get is called" must {
+      "get the view and show all the responsible people" in new TestFixture {
 
-      status(result) mustBe OK
+        val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
+
+        when {
+          cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+        } thenReturn Future.successful(Some(responsiblePeople))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(cache).fetch(eqTo(ResponsiblePeople.key))(any(), any(), any())
+      }
     }
   }
 

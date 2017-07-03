@@ -18,13 +18,24 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import connectors.DataCacheConnector
 import controllers.BaseController
+import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
+import cats.implicits._
 
-class NewOfficerController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext => implicit request =>
+      val result = for {
+        people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      } yield {
+        Ok("")
+      }
+
+      result getOrElse InternalServerError("Could not get the list of responsible people")
   }
 }
