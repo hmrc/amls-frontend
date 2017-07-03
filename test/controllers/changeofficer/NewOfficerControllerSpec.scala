@@ -48,23 +48,20 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
     lazy val controller = injector.instanceOf[NewOfficerController]
 
+    val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
 
+    when {
+      cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(responsiblePeople))
+
+    when {
+      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))))
   }
 
   "The NewOfficerController" when {
     "get is called" must {
       "get the view and show all the responsible people" in new TestFixture {
-
-        val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
-
-        when {
-          cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
-        } thenReturn Future.successful(Some(responsiblePeople))
-
-        when {
-          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))))
-
         val result = controller.get()(request)
 
         status(result) mustBe OK
@@ -80,7 +77,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
       "prepopulate the view with the selected person" in new TestFixture {
 
-        val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
+        override val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
           ResponsiblePeople(Some(PersonName("Test", None, "Person", None, None)))
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
@@ -128,6 +125,20 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
           )))(any(),any(),any())
 
       }
+
+      "respond with BAD_REQUEST when invalid data is posted" in new TestFixture {
+
+        val result = controller.post()(request)
+
+        status(result) mustBe BAD_REQUEST
+
+        val html = Jsoup.parse(contentAsString(result))
+
+        responsiblePeople foreach { p =>
+          contentAsString(result) must include(p.personName.get.fullName)
+        }
+      }
+
     }
   }
 
