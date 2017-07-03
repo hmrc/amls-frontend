@@ -16,12 +16,30 @@
 
 package models.changeofficer
 
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
 
-case class ChangeOfficer(roleInBusiness: RoleInBusiness, newOfficer: Option[NewOfficer] = None)
+class NewOfficerSpec extends PlaySpec with MustMatchers {
 
-object ChangeOfficer {
-  implicit val format = Json.format[ChangeOfficer]
-  val key = "changeofficer"
+  "NewOfficer model" must {
+    "successfully convert json in a round trip" in {
+
+      val model = NewOfficer("testName")
+
+      Json.toJson(model).as[NewOfficer] mustBe model
+
+    }
+
+    "successfully write the form" in {
+      val model = NewOfficer("testName")
+
+      val form = Map(
+        "person" -> Seq("testName")
+      )
+
+      NewOfficer.formWrites.writes(model) mustBe form
+    }
+  }
 }

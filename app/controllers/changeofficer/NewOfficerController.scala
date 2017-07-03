@@ -21,7 +21,8 @@ import javax.inject.Inject
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{Form2, EmptyForm}
+import models.changeofficer.{NewOfficer, ChangeOfficer}
 import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -31,12 +32,17 @@ import cats.implicits._
 class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
+
       val result = for {
         people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+        changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+        selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
       } yield {
-        Ok(views.html.changeofficer.new_nominated_officer(EmptyForm, people))
+        Ok(views.html.changeofficer.new_nominated_officer(Form2[NewOfficer](selectedOfficer), people))
       }
 
-      result getOrElse InternalServerError("Could not get the list of responsible people")
+      result getOrElse {
+        InternalServerError("Could not get the list of responsible people")
+      }
   }
 }

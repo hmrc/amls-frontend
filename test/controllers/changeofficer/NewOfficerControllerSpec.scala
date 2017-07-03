@@ -18,6 +18,7 @@ package controllers.changeofficer
 
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
+import models.changeofficer.{NewOfficer, SoleProprietor, RoleInBusiness, ChangeOfficer}
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
@@ -59,6 +60,10 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
           cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
+        when {
+          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))))
+
         val result = controller.get()(request)
 
         status(result) mustBe OK
@@ -71,6 +76,31 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
           html.select(s"input[type=radio][value=${person.personName.get.fullNameWithoutSpace}]").size() mustBe 1
         }
       }
+
+      "prepopulate the view with the selected person" in new TestFixture {
+
+        val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
+          ResponsiblePeople(Some(PersonName("Test", None, "Person", None, None)))
+
+        val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
+
+        when {
+          cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(responsiblePeople))
+
+        when {
+          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        val html = Jsoup.parse(contentAsString(result))
+
+        html.select("input[type=radio][value=TestPerson]").hasAttr("checked") mustBe true
+      }
+
     }
   }
 
