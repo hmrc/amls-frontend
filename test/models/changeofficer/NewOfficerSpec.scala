@@ -16,7 +16,8 @@
 
 package models.changeofficer
 
-import cats.data.Validated.Valid
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, Path}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
@@ -51,6 +52,12 @@ class NewOfficerSpec extends PlaySpec with MustMatchers {
       val model = NewOfficer("testName")
 
       NewOfficer.formReads.validate(form) mustBe Valid(model)
+    }
+
+    "fail validation when no option is selected" in {
+      NewOfficer.formReads.validate(Map.empty) mustBe Invalid(Seq(
+        Path \ "person" -> Seq(ValidationError("changeofficer.newnominatedofficer.validationerror"))
+      ))
     }
   }
 }
