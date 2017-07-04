@@ -42,6 +42,8 @@ trait ApplicationConfig {
   def returnLinkToggle: Boolean
 
   def frontendBaseUrl: String
+
+  def showChangeOfficerLink: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -127,4 +129,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
+
+  override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
 }

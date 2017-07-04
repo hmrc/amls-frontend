@@ -131,7 +131,12 @@ trait StatusController extends BaseController {
 
         Ok {
           //noinspection ScalaStyle
-          status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, endDate, renewalFlow = false, allowDeRegister = ApplicationConfig.allowDeRegisterToggle)
+          status_supervised(mlrRegNumber.getOrElse(""),
+            businessNameOption,
+            endDate,
+            renewalFlow = false,
+            allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
+            showChangeOfficer = ApplicationConfig.showChangeOfficerLink)
         }
 
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
@@ -167,7 +172,13 @@ trait StatusController extends BaseController {
                 Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
               }
             }
-          case _ => Future.successful(Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true, ApplicationConfig.allowDeRegisterToggle)))
+          case _ => Future.successful(Ok(
+            status_supervised(mlrRegNumber.getOrElse(""),
+              businessNameOption,
+              renewalDate,
+              true,
+              ApplicationConfig.allowDeRegisterToggle,
+              ApplicationConfig.showChangeOfficerLink)))
         }
       }
     }

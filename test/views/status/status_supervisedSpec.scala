@@ -87,5 +87,11 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
+    "not contain the link to change the nominated officer" in new ViewFixture {
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, true, false)
+
+      html must not include controllers.changeofficer.routes.StillEmployedController.get.url
+    }
+
   }
 }
