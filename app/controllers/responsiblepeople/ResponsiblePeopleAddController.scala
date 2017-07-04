@@ -20,6 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
@@ -30,12 +31,19 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
     implicit authContext => implicit request => {
       addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
         Redirect {
-          displayGuidance match {
-            case true => controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx, flow)
-            case false => controllers.responsiblepeople.routes.PersonNameController.get(idx)
+          flow match {
+            case Some(flowChangeOfficer) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
+            case _ => redirectDependingOnGuidance(displayGuidance, idx, flow)
           }
         }
       }
+    }
+  }
+
+  private def redirectDependingOnGuidance(displayGuidance: Boolean, idx: Int, flow: Option[String]) = {
+    displayGuidance match {
+      case true => controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx, flow)
+      case false => controllers.responsiblepeople.routes.PersonNameController.get(idx)
     }
   }
 }

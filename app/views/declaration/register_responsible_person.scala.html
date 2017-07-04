@@ -16,6 +16,8 @@
 
 @import include._
 @import forms2._
+@import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
+
 @(subtitle: String)(implicit request: Request[_],m:Messages)
 
 @header = {
@@ -45,7 +47,7 @@ gutter = true
     </ul>
 
     @anchor(
-        attrHref = controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("fromDeclaration")).toString,
+        attrHref = controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration)).toString,
         attrRole = true,
         linkText = Messages("button.continue"),
         visuallyhidden = Messages("summary.businessactivities")
