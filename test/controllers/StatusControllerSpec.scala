@@ -400,7 +400,13 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.renewalsubmitted.description"))
+        val html = contentAsString(result)
+        html must include(Messages("status.renewalsubmitted.description"))
+
+        val doc = Jsoup.parse(html)
+
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
       }
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
@@ -550,7 +556,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val html = contentAsString(result)
         html must include(Messages("status.renewalnotsubmitted.description"))
 
-        println(html)
         val doc = Jsoup.parse(html)
         doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
@@ -876,6 +881,20 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
 
         when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
           .thenReturn(Future.successful(true))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is RenewalSubmitted" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(RenewalSubmitted(Some(LocalDate.now)), statusResponse.some))
 
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))

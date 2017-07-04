@@ -161,7 +161,7 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
           case Some(r) =>
