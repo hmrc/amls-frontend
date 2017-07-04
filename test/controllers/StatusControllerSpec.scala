@@ -493,7 +493,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange)))
+            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address],"safeId", None))
           )))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
@@ -546,7 +547,12 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.renewalnotsubmitted.description"))
+        val html = contentAsString(result)
+        html must include(Messages("status.renewalnotsubmitted.description"))
+
+        println(html)
+        val doc = Jsoup.parse(html)
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
       }
     }
@@ -853,6 +859,23 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
 
         when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
           .thenReturn(Future.successful(false))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is ReadyForRenewal, and isRenewalComplete is true" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(Some(LocalDate.now)), statusResponse.some))
+
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))

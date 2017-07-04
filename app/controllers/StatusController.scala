@@ -167,7 +167,7 @@ trait StatusController extends BaseController {
           case Some(r) =>
             renewalService.isRenewalComplete(r) flatMap { complete =>
               if (complete) {
-                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
               } else {
                 Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
               }
