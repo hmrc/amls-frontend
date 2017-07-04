@@ -91,16 +91,28 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   private def checkCompletionOfMsbAndHvd(renewal: Renewal, msbServices: Option[MsbServices]) = {
 
     msbServices match {
-      case Some(x) if x.msbServices.contains(CurrencyExchange) =>
+      case Some(x) if x.msbServices.contains(CurrencyExchange) & x.msbServices.contains(TransmittingMoney) =>
         renewal match {
           case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
           case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
           case _ => false
         }
+      case Some(x) if x.msbServices.contains(CurrencyExchange) =>
+        renewal match {
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, Some(_), _) => true
+          case _ => false
+        }
+      case Some(x) if x.msbServices.contains(TransmittingMoney) =>
+        renewal match {
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_),None, _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_), None, _) => true
+          case _ => false
+        }
       case _ =>
         renewal match {
-        case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_), None, _) => true
-        case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_), None, _) => true
+        case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, _) => true
+        case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, _) => true
         case _ => false
       }
     }
@@ -109,16 +121,28 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[MsbServices]) = {
 
     msbServices match {
-      case Some(x) if x.msbServices.contains(CurrencyExchange) =>
+      case Some(x) if x.msbServices.contains(CurrencyExchange) & x.msbServices.contains(TransmittingMoney) =>
         renewal match {
           case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
           case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
           case _ => false
         }
-      case _ =>
+      case Some(x) if x.msbServices.contains(CurrencyExchange) =>
+        renewal match {
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), Some(_), None, None, None, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), Some(_), None, None, None, Some(_), _) => true
+          case _ => false
+        }
+      case Some(x) if x.msbServices.contains(TransmittingMoney) =>
         renewal match {
           case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), None, Some(_), Some(_), Some(_), None, _) => true
           case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), None, Some(_), Some(_), Some(_), None, _) => true
+          case _ => false
+        }
+      case _ =>
+        renewal match {
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), None, None, None, None, None, _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), None, None, None, None, None, _) => true
           case _ => false
         }
     }
