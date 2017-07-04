@@ -35,7 +35,8 @@ object NewOfficer {
 
   implicit val formReads: Rule[UrlFormEncoded, NewOfficer] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "person").read[String] map { p => NewOfficer(p) }
+    (__ \ "person").read[String]
+      .withMessage("changeofficer.newnominatedofficer.validationerror") map { p => NewOfficer(p) }
   }
 
 }

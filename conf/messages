@@ -1606,7 +1606,7 @@ changeofficer.roleinbusiness.other.lbl = Please specify
 changeofficer.roleinbusiness.validationerror.othermissing = You haven’t specified their role in the business. Enter their role in the business
 changeofficer.newnominatedofficer.heading = Who is the business’s new nominated officer?
 changeofficer.newnominatedofficer.title = Who is the business’s new nominated officer?
-
+changeofficer.newnominatedofficer.validationerror = You must select a nominated officer. Select one of the following people
 
 ###############################  Notifications ###############################
 
