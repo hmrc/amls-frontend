@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{NewOfficer, SoleProprietor, RoleInBusiness, ChangeOfficer}
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
 import play.api.inject.bind
@@ -136,10 +137,10 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
           cache.save[ChangeOfficer](any(),any())(any(),any(),any())
         } thenReturn Future.successful(mock[CacheMap])
 
-        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "-1"))
+        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "someoneElse"))
         status(result) mustBe(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some("changeofficer")).url)
+        redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer)).url)
 
       }
 

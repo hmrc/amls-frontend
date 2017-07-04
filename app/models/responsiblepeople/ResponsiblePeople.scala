@@ -161,6 +161,9 @@ object ResponsiblePeople {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
+  val flowChangeOfficer = "changeofficer"
+  val flowFromDeclaration = "fromDeclaration"
+
   val key = "responsible-people"
 
   implicit val mongoKey = new MongoKey[ResponsiblePeople] {

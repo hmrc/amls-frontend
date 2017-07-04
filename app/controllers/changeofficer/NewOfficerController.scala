@@ -24,6 +24,7 @@ import controllers.BaseController
 import forms.{InvalidForm, ValidForm, Form2, EmptyForm}
 import models.changeofficer.{NewOfficer, ChangeOfficer}
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -57,7 +58,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
         case ValidForm(_, data) =>
 
           data match {
-            case NewOfficer("-1") => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some("changeofficer"))))
+            case NewOfficer("someoneElse") => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
             case _ => {
               val result = for {
                 changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))

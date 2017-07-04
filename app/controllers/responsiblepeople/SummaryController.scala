@@ -20,8 +20,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.{BaseController, declaration}
 import models.responsiblepeople.ResponsiblePeople
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
-import services.StatusService
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
+import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -50,8 +50,8 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       flow match {
         case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case Some("fromDeclaration") => redirectFromDeclarationFlow()
-        case Some("changeofficer") => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
+        case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
+        case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
       }
     }
 
