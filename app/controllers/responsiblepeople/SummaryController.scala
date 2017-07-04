@@ -24,6 +24,8 @@ import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.ControllerHelper
 import views.html.responsiblepeople._
 
@@ -48,33 +50,40 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       flow match {
         case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case Some("fromDeclaration") => {
-          for {
-            status <- statusService.getStatus
-            hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-          } yield status match {
-            case SubmissionReady | NotCompleted => {
-              hasNominatedOfficer match {
-                case true => Redirect(controllers.routes.FeeGuidanceController.get())
-                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-              }
-            }
-            case SubmissionReadyForReview => {
-              hasNominatedOfficer match {
-                case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
-                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-              }
-            }
-            case _ => {
-              hasNominatedOfficer match {
-                case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
-                case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
-              }
-            }
-          }
-        }
+        case Some("fromDeclaration") => redirectFromDeclarationFlow()
+        case Some("changeofficer") => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
       }
     }
+
+  private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) = {
+    for {
+      status <- statusService.getStatus
+      hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+    } yield status match {
+      case SubmissionReady | NotCompleted => redirectReadyOrNotCompleted(hasNominatedOfficer)
+      case SubmissionReadyForReview => redirectReadyForReview(hasNominatedOfficer)
+      case _ => redirectOtherStatus(hasNominatedOfficer)
+    }
+  }
+
+  private def redirectReadyOrNotCompleted(hasNominatedOfficer: Boolean) = {
+    hasNominatedOfficer match {
+      case true => Redirect(controllers.routes.FeeGuidanceController.get())
+      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+    }
+  }
+  private def redirectReadyForReview(hasNominatedOfficer: Boolean) = {
+    hasNominatedOfficer match {
+      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
+      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+    }
+  }
+  private def redirectOtherStatus(hasNominatedOfficer: Boolean) = {
+    hasNominatedOfficer match {
+      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
+      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
+    }
+  }
 }
 
 object SummaryController extends SummaryController {

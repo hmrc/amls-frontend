@@ -126,6 +126,23 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
       }
 
+      "respond with SEE_OTHER and redirect to the ResponsiblePeopleAddController" in new TestFixture {
+
+        when {
+          cache.fetch[ChangeOfficer](any())(any(),any(), any())
+        } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
+
+        when {
+          cache.save[ChangeOfficer](any(),any())(any(),any(),any())
+        } thenReturn Future.successful(mock[CacheMap])
+
+        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "-1"))
+        status(result) mustBe(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some("changeofficer")).url)
+
+      }
+
       "respond with BAD_REQUEST when invalid data is posted" in new TestFixture {
 
         val result = controller.post()(request)
