@@ -58,7 +58,8 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
         case ValidForm(_, data) =>
 
           data match {
-            case NewOfficer("someoneElse") => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
+            case NewOfficer("someoneElse") =>
+              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
             case _ => {
               val result = for {
                 changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
@@ -70,7 +71,6 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
               result getOrElse InternalServerError("No ChangeOfficer Role found")
             }
           }
-
       }
   }
 
@@ -80,7 +80,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
     } yield {
-      (selectedOfficer, people)
+      (selectedOfficer, people.filter(p => p.personName.isDefined))
     }
   }
 }

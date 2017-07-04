@@ -131,7 +131,12 @@ trait StatusController extends BaseController {
 
         Ok {
           //noinspection ScalaStyle
-          status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, endDate, renewalFlow = false, allowDeRegister = ApplicationConfig.allowDeRegisterToggle)
+          status_supervised(mlrRegNumber.getOrElse(""),
+            businessNameOption,
+            endDate,
+            renewalFlow = false,
+            allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
+            showChangeOfficer = ApplicationConfig.showChangeOfficerLink)
         }
 
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
@@ -156,18 +161,24 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
           case Some(r) =>
             renewalService.isRenewalComplete(r) flatMap { complete =>
               if (complete) {
-                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
               } else {
-                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
               }
             }
-          case _ => Future.successful(Ok(status_supervised(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, true, ApplicationConfig.allowDeRegisterToggle)))
+          case _ => Future.successful(Ok(
+            status_supervised(mlrRegNumber.getOrElse(""),
+              businessNameOption,
+              renewalDate,
+              true,
+              ApplicationConfig.allowDeRegisterToggle,
+              ApplicationConfig.showChangeOfficerLink)))
         }
       }
     }

@@ -46,6 +46,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
   override lazy val app = GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
+    .configure("microservice.services.feature-toggle.change-officer" -> true)
+    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
     .build()
 
   trait Fixture extends AuthorisedFixture {
@@ -398,7 +400,13 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.renewalsubmitted.description"))
+        val html = contentAsString(result)
+        html must include(Messages("status.renewalsubmitted.description"))
+
+        val doc = Jsoup.parse(html)
+
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
       }
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
@@ -491,7 +499,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange)))
+            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address],"safeId", None))
           )))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
@@ -544,7 +553,11 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.renewalnotsubmitted.description"))
+        val html = contentAsString(result)
+        html must include(Messages("status.renewalnotsubmitted.description"))
+
+        val doc = Jsoup.parse(html)
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
       }
     }
@@ -602,6 +615,86 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+      }
+    }
+
+    "show the change officer link" when {
+      "application status is SubmissionDecisionApproved" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(LocalDate.now.plusDays(30)), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
+        contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+        val doc = Jsoup.parse(contentAsString(result))
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
+      }
+
+      "application status is ReadyForRenewal" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+        val doc = Jsoup.parse(contentAsString(result))
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
       }
     }
   }
@@ -708,3 +801,107 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
     }
   }
 }
+
+class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with OneAppPerSuite {
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.change-officer" -> false)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val cacheMap = mock[CacheMap]
+
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
+    }
+
+    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+    val statusResponse = mock[ReadStatusResponse]
+    when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+      .thenReturn(
+        Some(BusinessMatching(Some(reviewDetails), None)))
+
+    when(controller.landingService.cacheMap(any(), any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+
+  }
+
+  "The status controller" must {
+    "not show the change officer link" when {
+      "status is SubmissionDecisionApproved" in new Fixture {
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is ReadyForRenewal" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(Some(LocalDate.now)), statusResponse.some))
+
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(false))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is ReadyForRenewal, and isRenewalComplete is true" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(Some(LocalDate.now)), statusResponse.some))
+
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is RenewalSubmitted" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(RenewalSubmitted(Some(LocalDate.now)), statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+    }
+  }
+}
+
