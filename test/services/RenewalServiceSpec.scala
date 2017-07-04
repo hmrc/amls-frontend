@@ -1003,7 +1003,8 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                 .thenReturn(Some(BusinessMatching(
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
-                  )))
+                  ))),
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
 
               val model = Renewal(
