@@ -49,11 +49,13 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
     lazy val controller = injector.instanceOf[NewOfficerController]
 
-    val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
+    lazy val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
+    lazy val emptyPerson = ResponsiblePeople()
+    lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
 
     when {
       cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
-    } thenReturn Future.successful(Some(responsiblePeople))
+    } thenReturn Future.successful(Some(responsiblePeopleWithEmptyPerson))
 
     when {
       cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
@@ -62,7 +64,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
   "The NewOfficerController" when {
     "get is called" must {
-      "get the view and show all the responsible people" in new TestFixture {
+      "get the view and show all the responsible people, except people with no name" in new TestFixture {
         val result = controller.get()(request)
 
         status(result) mustBe OK
@@ -78,7 +80,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
       "prepopulate the view with the selected person" in new TestFixture {
 
-        override val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
+        override lazy val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
           ResponsiblePeople(Some(PersonName("Test", None, "Person", None, None)))
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
