@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{NewOfficer, SoleProprietor, RoleInBusiness, ChangeOfficer}
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
 import play.api.inject.bind
@@ -123,6 +124,23 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
             RoleInBusiness(Set(models.changeofficer.SoleProprietor)),
             Some(NewOfficer("testName"))
           )))(any(),any(),any())
+
+      }
+
+      "respond with SEE_OTHER and redirect to the ResponsiblePeopleAddController" in new TestFixture {
+
+        when {
+          cache.fetch[ChangeOfficer](any())(any(),any(), any())
+        } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
+
+        when {
+          cache.save[ChangeOfficer](any(),any())(any(),any(),any())
+        } thenReturn Future.successful(mock[CacheMap])
+
+        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "someoneElse"))
+        status(result) mustBe(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer)).url)
 
       }
 

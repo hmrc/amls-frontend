@@ -34,6 +34,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
+import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -241,7 +242,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some("fromDeclaration")).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration)).url))
       }
     }
 

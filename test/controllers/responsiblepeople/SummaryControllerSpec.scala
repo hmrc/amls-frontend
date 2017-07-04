@@ -19,6 +19,8 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
+import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -93,8 +95,16 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   "Post" must {
 
+    "redirect to change officer who is the new nominated officer page" when {
+      "flow flag is set to 'changeofficer'" in new Fixture {
+        val result = controller.post(Some(flowChangeOfficer))(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.changeofficer.routes.NewOfficerController.get.url))
+      }
+    }
+
     "redirect to 'registration progress page'" when {
-      "'fromDeclaration flag set to None'" in new Fixture {
+      "'flow flag set to None'" in new Fixture {
         val result = controller.post(None)(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
@@ -102,7 +112,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to 'Who is the business’s nominated officer?'" when {
-      "'fromDeclaration flag set to Some('fromDeclaration') and status is pending'" in new Fixture {
+      "'flow flag set to Some('fromDeclaration') and status is pending'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -114,14 +124,14 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
 
-        val result = controller.post(Some("fromDeclaration"))(request)
+        val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get.url))
       }
     }
 
     "redirect to 'Who is the business’s nominated officer?'" when {
-      "'fromDeclaration flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
+      "'flow flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None,None,None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -133,7 +143,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val result = controller.post(Some("fromDeclaration"))(request)
+        val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment().url))
       }
@@ -141,7 +151,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
 
     "redirect to 'Fee Guidance'" when {
-      "'fromDeclaration flag set to Some('fromDeclaration') and status is pre amendment'" in new Fixture {
+      "'flow flag set to Some('fromDeclaration') and status is pre amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -153,7 +163,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
 
-        val result = controller.post(Some("fromDeclaration"))(request)
+        val result = controller.post(Some(flowFromDeclaration))(request)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get.url))
@@ -161,7 +171,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to 'Who is registering this business?'" when {
-      "'fromDeclaration flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
+      "'flow flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -173,11 +183,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val result = controller.post(Some("fromDeclaration"))(request)
+        val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url))
       }
-      "'fromDeclaration flag set to Some('fromDeclaration') and status is amendment'" in new Fixture {
+      s"'flow flag set to Some($flowFromDeclaration) and status is amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None,None, None, None, None, Some(positions))
@@ -189,7 +199,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
 
-        val result = controller.post(Some("fromDeclaration"))(request)
+        val result = controller.post(Some(flowFromDeclaration))(request)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))

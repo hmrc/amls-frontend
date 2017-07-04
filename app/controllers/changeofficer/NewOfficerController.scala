@@ -24,6 +24,7 @@ import controllers.BaseController
 import forms.{InvalidForm, ValidForm, Form2, EmptyForm}
 import models.changeofficer.{NewOfficer, ChangeOfficer}
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -52,20 +53,23 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
             BadRequest(views.html.changeofficer.new_nominated_officer(f, t._2))
           }
 
-          result getOrElse {
-            InternalServerError("Could not get the list of responsible people")
-          }
+          result getOrElse InternalServerError("Could not get the list of responsible people")
 
         case ValidForm(_, data) =>
 
-          val result = for {
-            changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
-            _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
-          } yield {
-            Redirect(controllers.changeofficer.routes.FurtherUpdatesController.get())
-          }
+          data match {
+            case NewOfficer("someoneElse") => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
+            case _ => {
+              val result = for {
+                changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+                _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
+              } yield {
+                Redirect(controllers.changeofficer.routes.FurtherUpdatesController.get())
+              }
 
-          result getOrElse InternalServerError("No ChangeOfficer Role found")
+              result getOrElse InternalServerError("No ChangeOfficer Role found")
+            }
+          }
 
       }
   }
