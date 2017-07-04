@@ -1607,6 +1607,8 @@ changeofficer.roleinbusiness.validationerror.othermissing = You haven’t specif
 changeofficer.newnominatedofficer.heading = Who is the business’s new nominated officer?
 changeofficer.newnominatedofficer.title = Who is the business’s new nominated officer?
 changeofficer.newnominatedofficer.validationerror = You must select a nominated officer. Select one of the following people
+changeofficer.changelink.heading = Nominated Officer:
+changeofficer.changelink.text = change
 
 ###############################  Notifications ###############################
 

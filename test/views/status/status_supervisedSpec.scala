@@ -62,6 +62,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
 
+      html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
     }
 
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {
