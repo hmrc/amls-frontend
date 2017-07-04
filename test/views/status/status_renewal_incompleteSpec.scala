@@ -64,6 +64,17 @@ class status_renewal_incompleteSpec extends GenericTestHelper with MustMatchers 
 
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description")).text must be(Messages("status.renewalincomplete.description"))
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description2", endDateFormatted)).text must be(Messages("status.renewalincomplete.description2", endDateFormatted))
+
+      html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
+
+    }
+
+    "not contain the link to change the nominated officer" in new ViewFixture {
+
+      val endDate = new LocalDate(2017,1,1)
+      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate), false)
+
+      html must not include controllers.changeofficer.routes.StillEmployedController.get.url
     }
   }
 }

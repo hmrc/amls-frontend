@@ -169,7 +169,7 @@ trait StatusController extends BaseController {
               if (complete) {
                 Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
               } else {
-                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate)))
+                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
               }
             }
           case _ => Future.successful(Ok(

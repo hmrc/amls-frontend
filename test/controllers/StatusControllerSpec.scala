@@ -644,6 +644,47 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
       }
+
+      "application status is ReadyForRenewal" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+        val doc = Jsoup.parse(contentAsString(result))
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
+      }
     }
   }
 }
@@ -787,16 +828,37 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
     when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(controller.statusService.getDetailedStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
   }
 
   "The status controller" must {
-    "not show the change officer link" in new Fixture {
-      val result = controller.get()(request)
-      val doc = Jsoup.parse(contentAsString(result))
+    "not show the change officer link" when {
+      "status is SubmissionDecisionApproved" in new Fixture {
 
-      Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
+
+      "status is ReadyForRenewal" in new Fixture {
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(ReadyForRenewal(Some(LocalDate.now)), statusResponse.some))
+
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(false))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        Option(doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").first()) must not be defined
+      }
     }
   }
 }
