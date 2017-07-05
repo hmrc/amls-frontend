@@ -17,10 +17,13 @@
 package controllers.renewal
 
 import cats.implicits._
-import models.renewal.{Renewal, TransactionsInLast12Months}
+import connectors.DataCacheConnector
+import models.Country
+import models.businessmatching._
+import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -38,8 +41,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
+    val mockDataCacheConnector = mock[DataCacheConnector]
 
-    lazy val controller = new TransactionsInLast12MonthsController(self.authConnector, renewalService)
+    lazy val controller = new TransactionsInLast12MonthsController(self.authConnector, mockDataCacheConnector, renewalService)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -50,9 +54,15 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
     def formData(valid: Boolean) = if (valid) {"txnAmount" -> "1500"} else {"txnAmount" -> "abc"}
     def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
 
+    val cache = mock[CacheMap]
+
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
-    } thenReturn Future.successful(mock[CacheMap])
+    } thenReturn Future.successful(cache)
+
+    when {
+      mockDataCacheConnector.fetchAll(any(), any())
+    } thenReturn Future.successful(Some(cache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
       block(await(controller.post(edit)(formRequest(valid))))
@@ -95,15 +105,107 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
   }
 
   "Calling the POST action" when {
-    "posting valid data" must {
-      "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
-        post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
+    "posting valid data" when {
+
+      "msb has customers from outside the UK" must {
+        "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
+
+          when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+            .thenReturn(Some(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+            )))
+
+          when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(MsbServices(Set(TransmittingMoney)))
+            )))
+
+          post() { result =>
+            result.header.status mustBe SEE_OTHER
+            result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
+          }
+        }
+      }
+
+      "msb does not have customers from outside the UK" when {
+        "msb is CurrencyExchange" must {
+          "redirect to CETransactionsInLast12MonthsController" in new FormSubmissionFixture {
+
+            when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+              .thenReturn(Some(Renewal(
+                customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+              )))
+
+            when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+              .thenReturn(Some(BusinessMatching(
+                activities = Some(BusinessActivities(Set(HighValueDealing))),
+                msbServices = Some(MsbServices(Set(TransmittingMoney)))
+              )))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe routes.CETransactionsInLast12MonthsController.get().url.some
+            }
+          }
+        }
+        "msb is not CurrenyExchange" when {
+          "business activities include hvd" must {
+            "redirect to PercentageOfCashPaymentOver15000Controller" in new FormSubmissionFixture {
+
+              when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+                .thenReturn(Some(Renewal(
+                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+                )))
+
+              when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(HighValueDealing))),
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                )))
+
+              post() { result =>
+                result.header.status mustBe SEE_OTHER
+                result.header.headers.get("Location") mustBe routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+              }
+            }
+          }
+          "business activities do not include hvd" must {
+            "redirect to SummaryController" in new FormSubmissionFixture {
+
+              when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+                .thenReturn(Some(Renewal(
+                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+                )))
+
+              when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(HighValueDealing))),
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                )))
+
+              post() { result =>
+                result.header.status mustBe SEE_OTHER
+                result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
+              }
+            }
+          }
         }
       }
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
+
+        when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(Renewal(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+          )))
+
+        when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing))),
+            msbServices = Some(MsbServices(Set(TransmittingMoney)))
+          )))
+
         post(edit = true) { result =>
           result.header.status mustBe SEE_OTHER
           result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
@@ -112,6 +214,18 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
       "return a bad request" when {
         "the form fails validation" in new FormSubmissionFixture {
+
+          when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+            .thenReturn(Some(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+            )))
+
+          when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(MsbServices(Set(TransmittingMoney)))
+            )))
+
           post(valid = false) { result =>
             result.header.status mustBe BAD_REQUEST
             verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
@@ -120,6 +234,18 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
+
+        when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(Renewal(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+          )))
+
+        when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing))),
+            msbServices = Some(MsbServices(Set(TransmittingMoney)))
+          )))
+
         post() { _ =>
           val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
