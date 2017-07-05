@@ -103,17 +103,13 @@
                     legend = "changeofficer.roleinbusiness.other.lbl",
                     jsHidden = false
                 ) {
-                    @textarea(
-                        field = f("otherPosition"),
-                        bold = false,
-                        largeWidth = true,
-                        cols = "30",
-                        rows ="1"
+                    @input(
+                        field = f("otherPosition")
                     )
                 }
             }
         </div>
 
-        @submit()
+        @submit(returnLink = false)
     }
 }
