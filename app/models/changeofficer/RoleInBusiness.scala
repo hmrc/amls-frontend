@@ -21,9 +21,10 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import models.ValidationRule
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
+import models.FormTypes._
+import jto.validation.forms.Rules._
 
 case class RoleInBusiness(roles: Set[Role])
 
@@ -76,6 +77,7 @@ object RoleInBusiness {
   }
 
   implicit val jsonReads: Reads[RoleInBusiness] = {
+    import play.api.libs.json.Reads._
     ((__ \ "positions").read[Seq[String]] and
       (__ \ "otherPosition").readNullable[String]).tupled.flatMap {
         case (roles, other) => RoleInBusiness(roles.map(v => stringToRole(v, other)).toSet)
@@ -93,6 +95,13 @@ object RoleInBusiness {
       Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
     case x => Valid(x)
   }
+
+  val maxDetailsLength = 255
+
+  val otherDetailsType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.declaration.specify.role") andThen
+    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
+    basicPunctuationPattern()
 
   implicit val formReads: Rule[UrlFormEncoded, RoleInBusiness] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
