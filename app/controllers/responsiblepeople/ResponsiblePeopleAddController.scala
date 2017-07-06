@@ -32,7 +32,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
       addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
         Redirect {
           flow match {
-            case Some(flowChangeOfficer) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
+            case Some(`flowChangeOfficer`) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
             case _ => redirectDependingOnGuidance(displayGuidance, idx, flow)
           }
         }
