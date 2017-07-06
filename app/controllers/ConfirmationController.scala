@@ -92,7 +92,7 @@ trait ConfirmationController extends BaseController {
   private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     isRenewalDefined flatMap {
       case true => getRenewalFees
-      case false => getVariationFees
+      //case false => getVariationFees
     }
   }
 
@@ -111,10 +111,14 @@ trait ConfirmationController extends BaseController {
 
   private def showVariationConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      (payRef, total, rows) <- OptionT.liftF(submissionResponseService.getVariation)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((payRef, total, rows, None),
+        routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
-      Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
+      ApplicationConfig.paymentsUrlLookupToggle match {
+        case true => Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
+        case _ => Ok(confirmation(payRef, total, rows))
+      }
     }
   }
 
@@ -185,7 +189,7 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+  /*private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getVariation flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
@@ -197,7 +201,7 @@ trait ConfirmationController extends BaseController {
       }
       case None => Future.failed(new Exception("Cannot get data from variation submission"))
     }
-  }
+  }*/
 
   private def getRenewalFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getRenewal flatMap {

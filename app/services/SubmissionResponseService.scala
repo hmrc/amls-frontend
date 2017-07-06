@@ -75,22 +75,23 @@ trait SubmissionResponseService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
+  ): Future[(String, Currency, Seq[BreakdownRow])] =
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
           cache <- option
           variation <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
         } yield {
-          val premisesFee: BigDecimal = getTotalPremisesFee(variation)
-          val peopleFee: BigDecimal = getPeopleFee(variation)
-          val totalFees: BigDecimal = peopleFee + premisesFee
-          val rows = getVariationBreakdown(variation, peopleFee)
-          val paymentRef = variation.paymentReference
-          Future.successful(Some((paymentRef, Currency(totalFees), rows)))
-        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+          val paymentReference = variation.getPaymentReference
+          val total = variation.getTotalFees
+          val rows = getVariationBreakdownRows(variation, premises, people, businessActivities)
+          Future.successful((paymentReference, Currency.fromBD(total), rows))
+        }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
-  }
 
   def getRenewal
   (implicit
@@ -120,6 +121,9 @@ trait SubmissionResponseService extends DataCacheService {
   private def premisesRowEntity(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises",
     response.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
 
+  private def premisesRowVariationEntity(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises",
+    variationResponse.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
+
   private def premisesHalfYear(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises.half",
     premisesRowEntity(response).feePer / 2)
 
@@ -128,7 +132,10 @@ trait SubmissionResponseService extends DataCacheService {
   private def peopleRowEntity(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
     response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
 
-  private val UnpaidPeople = RowEntity("confirmation.unpaidpeople", 0)
+  private def peopleRowVariationEntity(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
+    variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
+
+  private val responsiblePeopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
 
 
 
@@ -155,29 +162,6 @@ trait SubmissionResponseService extends DataCacheService {
     }
   }
 
-  private def getVariationBreakdown(variation: AmendVariationRenewalResponse, peopleFee: BigDecimal): Seq[BreakdownRow] = {
-
-    val breakdownRows = Seq()
-
-    def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
-      if (count > 0) {
-        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variation))))
-      } else {
-        Seq()
-      }
-    }
-
-    def rpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeople, peopleRowEntity(variation), getPeopleFee)
-    def fpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeopleFitAndProper, UnpaidPeople, getFitAndProperDeduction)
-
-    def tpFullYearRow: Seq[BreakdownRow] = variationRow(variation.addedFullYearTradingPremises, premisesRowEntity(variation), getFullPremisesFee)
-    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(variation.halfYearlyTradingPremises, premisesHalfYear(variation), getHalfYearPremisesFee)
-    def tpZeroRow: Seq[BreakdownRow] = variationRow(variation.zeroRatedTradingPremises, PremisesZero, getZeroPremisesFee)
-
-    rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-
-  }
-
   private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse, peopleFee: BigDecimal): Seq[BreakdownRow] = {
 
     val breakdownRows = Seq()
@@ -191,7 +175,7 @@ trait SubmissionResponseService extends DataCacheService {
     }
 
     def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleRowEntity(renewal), getRenewalPeopleFee)
-    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, UnpaidPeople, getRenewalFitAndProperDeduction)
+    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, responsiblePeopleFPPassed, getRenewalFitAndProperDeduction)
 
     def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesRowEntity(renewal), getRenewalFullPremisesFee)
     def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), getRenewalHalfYearPremisesFee)
@@ -245,6 +229,15 @@ trait SubmissionResponseService extends DataCacheService {
       Seq(BreakdownRow(premisesRowEntity(submission).message, premises.size, premisesRowEntity(submission).feePer, submission.getPremiseFee))
   }
 
+  private def getVariationBreakdownRows
+  (variation: AmendVariationRenewalResponse,
+   premises: Seq[TradingPremises],
+   people: Seq[ResponsiblePeople],
+   businessActivities: BusinessSevices): Seq[BreakdownRow] = {
+    responsiblePeopleVariationRows(people, variation, businessActivities) ++
+    tradingPremisesVariationRows(premises,variation)
+  }
+
   private def responsiblePeopleRows(
                                      people: Seq[ResponsiblePeople],
                                      subscription: SubmissionResponse,
@@ -265,7 +258,76 @@ trait SubmissionResponseService extends DataCacheService {
           Seq(BreakdownRow(peopleRowEntity(subscription).message, a.size, peopleRowEntity(subscription).feePer,
             Currency.fromBD(subscription.getFpFee.getOrElse(0)))) ++
             (if (b.nonEmpty) {
-              Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
+              Seq(BreakdownRow(responsiblePeopleFPPassed.message, b.size, max(0, responsiblePeopleFPPassed.feePer), Currency.fromBD(max(0, responsiblePeopleFPPassed.feePer))))
+            } else {
+              Seq.empty
+            })
+      }
+    } else {
+      Seq.empty
+    }
+  }
+
+  private def tradingPremisesVariationRows(
+                                          premises: Seq[TradingPremises],
+                                          variationRenewalResponse: AmendVariationRenewalResponse
+                                          ): Seq[BreakdownRow] = {
+    val breakdownRows = Seq()
+
+    def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
+      if (count > 0) {
+        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variationRenewalResponse))))
+      } else {
+        Seq()
+      }
+    }
+
+    def tpFullYearRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.addedFullYearTradingPremises,
+      premisesRowVariationEntity(variationRenewalResponse),
+      getRenewalFullPremisesFee
+    )
+
+    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.halfYearlyTradingPremises,
+      premisesHalfYear(variationRenewalResponse),
+      getRenewalHalfYearPremisesFee
+    )
+
+    def tpZeroRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.zeroRatedTradingPremises,
+      PremisesZero,
+      getRenewalZeroPremisesFee
+    )
+
+    tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+  }
+
+  private def responsiblePeopleVariationRows(
+                                     people: Seq[ResponsiblePeople],
+                                     variation: AmendVariationRenewalResponse,
+                                     businessActivities: BusinessSevices
+                                   ): Seq[BreakdownRow] = {
+
+    val showBreakdown = variation.getFpFee match {
+      case None => businessActivities.businessActivities.exists(act => act == MSB || act == TrustAndCompanyServices)
+      case _ => true
+    }
+
+    if (showBreakdown) {
+
+      val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+      people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
+        case (passed, feeRqd) =>
+          println("passed " + passed + "feeRqd " + feeRqd)
+          (if (feeRqd.nonEmpty) {
+            Seq(BreakdownRow(peopleRowVariationEntity(variation).message, feeRqd.size, peopleRowVariationEntity(variation).feePer,
+              Currency.fromBD(variation.getFpFee.getOrElse(0))))
+          } else {
+            Seq.empty
+          }) ++
+            (if(passed.nonEmpty) {
+              Seq(BreakdownRow(responsiblePeopleFPPassed.message, passed.size, max(0, responsiblePeopleFPPassed.feePer), Currency.fromBD(max(0, responsiblePeopleFPPassed.feePer))))
             } else {
               Seq.empty
             })
