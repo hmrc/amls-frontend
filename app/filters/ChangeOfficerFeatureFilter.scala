@@ -26,19 +26,15 @@ import play.api.mvc.Results._
 import scala.concurrent.Future
 
 class ChangeOfficerFeatureFilter @Inject()(config: ServicesConfig)(implicit val mat: Materializer) extends Filter {
-  override def apply(f: (RequestHeader) => Future[Result])(request: RequestHeader) = {
-    import utils.Strings._
-    println(request.path in Console.YELLOW)
-    println(controllers.changeofficer.Flow.journeyUrls.toString in Console.CYAN)
-
+  override def apply(nextAction: (RequestHeader) => Future[Result])(request: RequestHeader) = {
     if (controllers.changeofficer.Flow.journeyUrls.contains(request.path)) {
       if (config.getConfBool("feature-toggle.change-officer", false)) {
-        f(request)
+        nextAction(request)
       } else {
         Future.successful(NotFound)
       }
     } else {
-      f(request)
+      nextAction(request)
     }
   }
 }

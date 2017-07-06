@@ -16,28 +16,39 @@
 
 package filters
 
-import akka.stream.Materializer
-import org.scalatest.TestData
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, OneAppPerTest, PlaySpec}
-import play.api.Environment
-import uk.gov.hmrc.play.config.inject.ServicesConfig
-import play.api.inject.bind
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Action, Results}
 import play.api.test.FakeRequest
-import play.api.test._
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 
-class ChangeOfficerFeatureOnFilterSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Results with MicroserviceFilterSupport {
+sealed trait FilterSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Results with MicroserviceFilterSupport {
+
+  val featureOn: Boolean
 
   override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.change-officer" -> true)
+    .configure("microservice.services.feature-toggle.change-officer" -> featureOn)
     .build()
 
   lazy val filter = app.injector.instanceOf[ChangeOfficerFeatureFilter]
   val nextAction = Action(Ok("ok"))
+
+  "The filter" must {
+    "allow all pages that are not within the 'change officer' flow" in {
+      val request = FakeRequest("GET", controllers.routes.LandingController.get().url)
+      val result = filter(nextAction)(request).run()
+
+      status(result) mustBe OK
+    }
+  }
+}
+
+
+class ChangeOfficerFeatureOnFilterSpec extends FilterSpec {
+
+  override val featureOn = true
 
   "ChangeOfficerFeatureOnFilter" must {
     "allow access to the change officer journey" when {
@@ -54,17 +65,12 @@ class ChangeOfficerFeatureOnFilterSpec extends PlaySpec with MockitoSugar with O
   }
 }
 
-class ChangeOfficerFeatureOffFilterSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Results with MicroserviceFilterSupport {
+class ChangeOfficerFeatureOffFilterSpec extends FilterSpec {
 
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.change-officer" -> false)
-    .build()
-
-  lazy val filter = app.injector.instanceOf[ChangeOfficerFeatureFilter]
-  val nextAction = Action(Ok("ok"))
+  override val featureOn = false
 
   "ChangeOfficerFeatureOffFilter" must {
-    "allow access to the change officer journey" when {
+    "prevent access to the change officer journey" when {
       "the feature is turned off" in {
 
         controllers.changeofficer.Flow.journeyUrls foreach { url =>
