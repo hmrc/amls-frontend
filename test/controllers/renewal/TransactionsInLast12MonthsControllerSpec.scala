@@ -112,7 +112,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
           when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
             .thenReturn(Some(Renewal(
-              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB")))))
             )))
 
           when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -134,13 +134,13 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
             when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
               .thenReturn(Some(Renewal(
-                customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+                customersOutsideUK = Some(CustomersOutsideUK(None))
               )))
 
             when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
               .thenReturn(Some(BusinessMatching(
                 activities = Some(BusinessActivities(Set(HighValueDealing))),
-                msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange)))
               )))
 
             post() { result =>
@@ -155,7 +155,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
               when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
                 .thenReturn(Some(Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+                  customersOutsideUK = Some(CustomersOutsideUK(None))
                 )))
 
               when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -175,12 +175,12 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
               when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
                 .thenReturn(Some(Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
+                  customersOutsideUK = Some(CustomersOutsideUK(None))
                 )))
 
               when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
                 .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(HighValueDealing))),
+                  activities = Some(BusinessActivities(Set(MoneyServiceBusiness))),
                   msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
 

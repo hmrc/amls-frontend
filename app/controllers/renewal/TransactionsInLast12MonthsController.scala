@@ -21,7 +21,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.renewal.{Renewal, TransactionsInLast12Months}
+import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.transactions_in_last_12_months
@@ -40,21 +40,20 @@ class TransactionsInLast12MonthsController @Inject()(
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        val block = for {
+        (for {
           renewal <- OptionT(renewalService.getRenewal)
           transfers <- OptionT.fromOption[Future](renewal.transactionsInLast12Months)
         } yield {
           Ok(transactions_in_last_12_months(Form2[TransactionsInLast12Months](transfers), edit))
-        }
-
-        block getOrElse Ok(transactions_in_last_12_months(EmptyForm, edit))
+        }) getOrElse Ok(transactions_in_last_12_months(EmptyForm, edit))
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         Form2[TransactionsInLast12Months](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(transactions_in_last_12_months(f, edit)))
-          case ValidForm(_, model) => {
+          case ValidForm(_, model) =>
             dataCacheConnector.fetchAll flatMap {
               optMap =>
                 (for {
@@ -65,23 +64,31 @@ class TransactionsInLast12MonthsController @Inject()(
                   activities <- bm.activities
                 } yield {
                   renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
-                    redirectTo(services.msbServices, activities.businessActivities, edit)
+                    redirectTo(hasCustomersOutsideUK(renewal), services.msbServices, activities.businessActivities, edit)
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
-          }
         }
   }
 
-  private def redirectTo(services: Set[MsbService], businessActivities: Set[BusinessActivity], edit: Boolean) =
-    if ((services contains CurrencyExchange) && !edit ) {
+  private def redirectTo(hasCustomersOutsideUK: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
+    if (edit) {
+      Redirect(routes.SummaryController.get())
+    } else if (hasCustomersOutsideUK) {
+      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+    } else if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
-    }
-    else if ((businessActivities contains HighValueDealing) && !edit ) {
+    } else if ((activities contains HighValueDealing) && !edit) {
       Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
-    }
-    else {
+    } else {
       Redirect(routes.SummaryController.get())
     }
+
+  private def hasCustomersOutsideUK(renewal: Renewal): Boolean = {
+    renewal.customersOutsideUK.flatMap {
+      case CustomersOutsideUK(Some(country)) => Some(country)
+      case _ => None
+    }.isDefined
+  }
 
 }
