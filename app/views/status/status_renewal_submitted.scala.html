@@ -40,10 +40,10 @@
 <div class="grid-layout grid-layout--stacked">
     <div class="grid-layout__column grid-layout__column--2-3">
         <div class="panel-indent panel-indent--gutter panel-border-wide">
-            (@businessName.map { bn =>
+            @businessName.map { bn =>
                 <p class="heading-small">@Messages("status.business")</p>
                 <p>@bn</p>
-            })
+            }
             <p class="heading-small">@Messages("lbl.registration.status")</p><p>@Messages("status.renewalsubmitted.text")</p>
             @if(showChangeOfficer){
                 <p class="heading-small">@Messages("changeofficer.changelink.heading")</p>
