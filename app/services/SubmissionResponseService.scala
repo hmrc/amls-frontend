@@ -116,7 +116,6 @@ trait SubmissionResponseService extends DataCacheService {
     }
   }
 
-
   private def submissionRowEntity(response: SubmissionResponse) = RowEntity("confirmation.submission", response.getRegistrationFee)
 
   private def premisesRowEntity(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises",
@@ -138,11 +137,8 @@ trait SubmissionResponseService extends DataCacheService {
 
   private val responsiblePeopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
 
-
-
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.getRegistrationFee == 0) 0 else 1
-
 
   private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
     for {
@@ -202,21 +198,8 @@ trait SubmissionResponseService extends DataCacheService {
 
   private def getRenewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
-  private def getTotalPremisesFee(variation: AmendVariationRenewalResponse): BigDecimal =
-    (premisesRowEntity(variation).feePer * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
-
-  private def getFullPremisesFee(variation: AmendVariationRenewalResponse): BigDecimal =
-    premisesRowEntity(variation).feePer * variation.addedFullYearTradingPremises
-
   private def getHalfYearPremisesFee(variation: AmendVariationRenewalResponse): BigDecimal =
     premisesHalfYear(variation).feePer * variation.halfYearlyTradingPremises
-
-  private def getZeroPremisesFee(variation: AmendVariationRenewalResponse): BigDecimal = 0
-
-  private def getPeopleFee(variation: AmendVariationRenewalResponse): BigDecimal =
-    peopleRowEntity(variation).feePer * variation.addedResponsiblePeople
-
-  private def getFitAndProperDeduction(variation: AmendVariationRenewalResponse): BigDecimal = 0
 
   private def getBreakdownRows
   (submission: SubmissionResponse,
