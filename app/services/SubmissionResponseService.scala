@@ -106,8 +106,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           cache <- option
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
-          val premisesFee: BigDecimal = getRenewalTotalPremisesFee(renewal)
-          val peopleFee: BigDecimal = getRenewalPeopleFee(renewal)
+          val premisesFee: BigDecimal = renewalTotalPremisesFee(renewal)
+          val peopleFee: BigDecimal = renewalPeopleFee(renewal)
           val totalFees: BigDecimal = peopleFee + premisesFee
           val rows = getRenewalBreakdown(renewal, peopleFee)
           val paymentRef = renewal.paymentReference
@@ -150,12 +150,12 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       }
     }
 
-    def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleRow(renewal), getRenewalPeopleFee)
-    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, peopleFPPassed, getRenewalFitAndProperDeduction)
+    def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleRow(renewal), renewalPeopleFee)
+    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
 
-    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesRow(renewal), getRenewalFullPremisesFee)
-    def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), getRenewalHalfYearPremisesFee)
-    def tpZeroRow: Seq[BreakdownRow] = renewalRow(renewal.zeroRatedTradingPremises, PremisesZero, getRenewalZeroPremisesFee)
+    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesRow(renewal), renewalFullPremisesFee)
+    def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), renewalHalfYearPremisesFee)
+    def tpZeroRow: Seq[BreakdownRow] = renewalRow(renewal.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
     rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
@@ -229,19 +229,19 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     def tpFullYearRow: Seq[BreakdownRow] = variationRow(
       variationRenewalResponse.addedFullYearTradingPremises,
       premisesVariationRow(variationRenewalResponse),
-      getRenewalFullPremisesFee
+      renewalFullPremisesFee
     )
 
     def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
       variationRenewalResponse.halfYearlyTradingPremises,
       premisesHalfYear(variationRenewalResponse),
-      getRenewalHalfYearPremisesFee
+      renewalHalfYearPremisesFee
     )
 
     def tpZeroRow: Seq[BreakdownRow] = variationRow(
       variationRenewalResponse.zeroRatedTradingPremises,
       PremisesZero,
-      getRenewalZeroPremisesFee
+      renewalZeroPremisesFee
     )
 
     tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
@@ -263,7 +263,6 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
       people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
         case (passed, feeRqd) =>
-          println("passed " + passed + "feeRqd " + feeRqd)
           (if (feeRqd.nonEmpty) {
             Seq(BreakdownRow(peopleVariationRow(variation).message, feeRqd.size, peopleVariationRow(variation).feePer,
               Currency.fromBD(variation.getFpFee.getOrElse(0))))
@@ -309,21 +308,21 @@ sealed trait FeeCalculations {
   def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
     variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
 
-  def getRenewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
-    (premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises) + getRenewalHalfYearPremisesFee(renewal)
+  def renewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
+    (premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises) + renewalHalfYearPremisesFee(renewal)
 
-  def getRenewalFullPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
+  def renewalFullPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises
 
-  def getRenewalHalfYearPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
+  def renewalHalfYearPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     premisesHalfYear(renewal).feePer * renewal.halfYearlyTradingPremises
 
-  def getRenewalPeopleFee(renewal: AmendVariationRenewalResponse): BigDecimal =
+  def renewalPeopleFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     peopleRow(renewal).feePer * renewal.addedResponsiblePeople
 
-  def getRenewalFitAndProperDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
+  def renewalFitAndProperDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
-  def getRenewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
+  def renewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
   val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
 
