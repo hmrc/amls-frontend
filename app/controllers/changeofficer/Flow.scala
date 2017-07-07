@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-import javax.inject.Inject
+package controllers.changeofficer
 
-import filters.{ChangeOfficerFeatureFilter, ConfirmationFilter}
-import play.api.http.DefaultHttpFilters
+object Flow {
 
-class Filters @Inject()(confirmationFilter: ConfirmationFilter, changeOfficerFeatureFilter: ChangeOfficerFeatureFilter)
-  extends DefaultHttpFilters(confirmationFilter, changeOfficerFeatureFilter)
+  val journeyUrls = Seq(
+    controllers.changeofficer.routes.StillEmployedController.get().url,
+    controllers.changeofficer.routes.RoleInBusinessController.get().url,
+    controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url,
+    controllers.changeofficer.routes.NewOfficerController.get().url,
+    controllers.changeofficer.routes.FurtherUpdatesController.get().url
+  )
 
+}

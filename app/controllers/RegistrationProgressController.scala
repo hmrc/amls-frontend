@@ -16,9 +16,11 @@
 
 package controllers
 
-import config.AMLSAuthConnector
+import cats.data.OptionT
+import config.{ApplicationConfig, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
@@ -29,9 +31,10 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.ControllerHelper
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
+import cats.implicits._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,39 +49,8 @@ trait RegistrationProgressController extends BaseController {
 
   protected[controllers] def statusService: StatusService
 
-  private def declarationAvailable(seq: Seq[Section]): Boolean =
-    seq forall {
-      _.status == Completed
-    }
-
-  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
-
-    sections.foldLeft((true, false)) { (acc, s) =>
-      (acc._1 && s.status == Completed,
-        acc._2 || s.hasChanged)
-    } match {
-      case (true, true) => true
-      case _ => false
-    }
-  }
-
-  private def isRenewalFlow()(implicit hc: HeaderCarrier,
-                              authContext: AuthContext,
-                              request: Request[AnyContent]): Future[Boolean] = {
-    statusService.getStatus flatMap {
-      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        dataCache.fetch[Renewal](Renewal.key) map {
-          case Some(_) => true
-          case None => false
-        }
-
-      case _ => Future.successful(false)
-    }
-  }
-
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
+    implicit authContext => implicit request =>
 
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
@@ -101,6 +73,36 @@ trait RegistrationProgressController extends BaseController {
         }
   }
 
+  private def isRenewalFlow()(implicit hc: HeaderCarrier,
+                              authContext: AuthContext,
+                              request: Request[AnyContent]): Future[Boolean] = {
+    statusService.getStatus flatMap {
+      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
+        dataCache.fetch[Renewal](Renewal.key) map {
+          case Some(_) => true
+          case None => false
+        }
+
+      case _ => Future.successful(false)
+    }
+  }
+
+  private def declarationAvailable(seq: Seq[Section]): Boolean =
+    seq forall {
+      _.status == Completed
+    }
+
+  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
+
+    sections.foldLeft((true, false)) { (acc, s) =>
+      (acc._1 && s.status == Completed,
+        acc._2 || s.hasChanged)
+    } match {
+      case (true, true) => true
+      case _ => false
+    }
+  }
+
   private def preApplicationComplete(cache: CacheMap)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -118,32 +120,31 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
-  def redirectWithNominatedOfficer(status: SubmissionStatus) = {
-    status match {
-      case SubmissionReady | NotCompleted => Redirect(routes.FeeGuidanceController.get())
-      case SubmissionReadyForReview => Redirect(declaration.routes.WhoIsRegisteringController.get())
-      case ReadyForRenewal(_) => Redirect(declaration.routes.WhoIsRegisteringController.getWithRenewal())
-      case _ => Redirect(declaration.routes.WhoIsRegisteringController.getWithAmendment())
-    }
-  }
-
-  def redirectWithoutNominatedOfficer(status: SubmissionStatus) = {
-    status match {
-      case SubmissionReady | NotCompleted | SubmissionReadyForReview => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-      case _ => Redirect(declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
-    }
-  }
-
   def post: Action[AnyContent] = Authorised.async {
     implicit authContext =>
       implicit request =>
-        for {
-          status <- statusService.getStatus
-          hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-        } yield hasNominatedOfficer match {
-          case true => redirectWithNominatedOfficer(status)
-          case false => redirectWithoutNominatedOfficer(status)
+        val result = for {
+          status <- OptionT.liftF(statusService.getStatus)
+          responsiblePeople <- OptionT(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+          hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
+          businessmatching <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
+          reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+          businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+        } yield {
+
+            businessType match {
+              case Partnership => {
+                if (ApplicationConfig.getConfBool("feature-toggle.partner", false) && (DeclarationHelper.numberOfPartners(responsiblePeople) < 2)) {
+                  Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+                } else {
+                  Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
+                }
+              }
+              case _ => Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
+            }
+
         }
+      result getOrElse NotFound(notFoundView)
   }
 }
 
