@@ -116,12 +116,9 @@ trait ConfirmationController extends BaseController {
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((payRef, total, rows, None),
         routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
-      ApplicationConfig.paymentsUrlLookupToggle match {
-        case true => Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
-        case _ => Ok(confirmation(payRef, total, rows))
+      Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
       }
     }
-  }
 
   private def showAmendmentConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
