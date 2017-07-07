@@ -232,7 +232,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
         whenReady(TestSubmissionResponseService.getAmendment) {
           _ foreach {
             case (_, _, rows, _) =>
-              val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
+              val unpaidRow = rows.filter(_.label == "confirmation.responsiblepeople.fp.passed").head
               unpaidRow.perItm.value mustBe 0
               unpaidRow.total.value mustBe 0
           }
@@ -316,7 +316,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.unpaidpeople"
+              row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
           }
         }
@@ -347,7 +347,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
 
@@ -376,7 +376,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
 
@@ -385,40 +385,38 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
     }
 
     "getVariation is called" must {
-      "retrieve data from variation submission" in new Fixture {
+      "notify user of variation fees to pay in breakdown" when {
+        "there is a Responsible People fee to pay" in new Fixture {
 
-        when {
-          TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
+          when {
+            TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
+          } thenReturn Future.successful(Some(cache))
 
-        when {
-          cache.getEntry[AmendVariationRenewalResponse](any())(any())
-        } thenReturn Some(variationResponse.copy(
-          paymentReference = Some("12345"),
-          addedResponsiblePeople = 1,
-          addedFullYearTradingPremises = 1,
-          halfYearlyTradingPremises = 3,
-          zeroRatedTradingPremises = 1
-        ))
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(
+            fpFee = Some(100)
+          ))
 
-        val rows = Seq(
-          BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(rpFee))
-        ) ++ Seq(
-          BreakdownRow("confirmation.tradingpremises.zero", 1, Currency(0), Currency(0))
-        ) ++ Seq(
-          BreakdownRow("confirmation.tradingpremises.half", 3, Currency(57.50), Currency(tpHalfFee * 3))
-        ) ++ Seq(
-          BreakdownRow("confirmation.tradingpremises", 1, Currency(115), Currency(tpFee))
-        )
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
 
-        val response = Some(Some("12345"), Currency.fromBD(totalFee), rows)
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
 
-        whenReady(TestSubmissionResponseService.getVariation) {
-          result =>
-            result must equal(response)
+          val result = await(TestSubmissionResponseService.getVariation)
+
+          result match {
+            case Some((_, _, rows)) => {
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
+            }
+          }
         }
-
       }
+
 
       "not include responsible people in breakdown" when {
 
@@ -441,7 +439,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.unpaidpeople"
+              row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
           }
         }
@@ -455,7 +453,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
             processingDate = "",
             etmpFormBundleNumber = "",
             registrationFee = 100,
-            fpFee = None,
+            fpFee = Some(130.0),
             fpFeeRate = Some(130),
             premiseFee = 0,
             premiseFeeRate = Some(125),
@@ -473,8 +471,16 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponseWithRate)
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows)) =>
@@ -484,7 +490,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
               breakdownRows.head.total mustBe Currency(rpFeeWithRate)
               breakdownRows.length mustBe 1
 
-              breakdownRows.count(row => row.label.equals("confirmation.unpaidpeople")) mustBe 0
+              breakdownRows.count(row => row.label.equals("confirmation.responsiblepeople.fp.passed")) mustBe 0
             case _ => false
           }
         }
@@ -499,8 +505,16 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows)) =>
@@ -520,8 +534,16 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
+
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows)) =>
@@ -541,8 +563,16 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows)) =>
@@ -551,29 +581,6 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
               breakdownRows.head.perItm mustBe Currency(0)
               breakdownRows.head.total mustBe Currency(0)
               breakdownRows.length mustBe 1
-            case _ => false
-          }
-        }
-
-        "there is a Responsible Persons fee to pay" in new Fixture {
-
-          when {
-            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
-
-          when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
-          } thenReturn Some(variationResponse.copy(addedResponsiblePeople = 1))
-
-          whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
-              breakdownRows.head.label mustBe "confirmation.responsiblepeople"
-              breakdownRows.head.quantity mustBe 1
-              breakdownRows.head.perItm mustBe Currency(rpFee)
-              breakdownRows.head.total mustBe Currency(rpFee)
-              breakdownRows.length mustBe 1
-
-              breakdownRows.count(row => row.label.equals("confirmation.unpaidpeople")) mustBe 0
             case _ => false
           }
         }
@@ -608,7 +615,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
           when {
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true))))
 
           when {
             activities.businessActivities
@@ -619,7 +626,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -655,7 +662,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
           when {
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true))))
 
           when {
             activities.businessActivities
@@ -666,7 +673,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case Some((_, _, rows)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -679,8 +686,9 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
-            cache.getEntry[AmendVariationRenewalResponse](any())(any())
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(
+            fpFee = Some(rpFee),
             addedResponsiblePeople = 1,
             addedResponsiblePeopleFitAndProper = 1,
             addedFullYearTradingPremises = 1,
@@ -688,15 +696,22 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
             zeroRatedTradingPremises = 1
           ))
 
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true)), ResponsiblePeople()))
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows)) =>
-
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFee)
               breakdownRows.head.total mustBe Currency(rpFee)
 
-              breakdownRows(1).label mustBe "confirmation.unpaidpeople"
+              breakdownRows(1).label mustBe "confirmation.responsiblepeople.fp.passed"
               breakdownRows(1).quantity mustBe 1
               breakdownRows(1).perItm mustBe Currency(0)
               breakdownRows(1).total mustBe Currency(0)
@@ -748,7 +763,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case (_, _, rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -801,7 +816,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
               rows.last.perItm mustBe Currency(tpFeeWithRate)
               rows.last.total mustBe Currency(0)
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -829,7 +844,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case (_, _, rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -857,7 +872,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case (_, _, rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-              rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -884,7 +899,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           result match {
             case (_, _, rows) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.unpaidpeople"
+              row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
           }
         }

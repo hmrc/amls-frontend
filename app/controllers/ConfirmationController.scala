@@ -99,7 +99,8 @@ trait ConfirmationController extends BaseController {
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees,
+        routes.ConfirmationController.paymentConfirmation(payRef).url))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -112,11 +113,12 @@ trait ConfirmationController extends BaseController {
   private def showVariationConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((payRef, total, rows, None),
+        routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
       Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
+      }
     }
-  }
 
   private def showAmendmentConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     def returnLocation(ref: String) = routes.ConfirmationController.paymentConfirmation(ref).url
@@ -178,7 +180,8 @@ trait ConfirmationController extends BaseController {
     submissionResponseService.getAmendment flatMap {
       case Some((paymentRef, total, rows, difference)) =>
         (difference, paymentRef) match {
-          case (Some(currency), Some(payRef)) if currency.value > 0 => Future.successful(Some((payRef, total, rows, difference)))
+          case (Some(currency), Some(payRef)) if currency.value > 0 =>
+            Future.successful(Some((payRef, total, rows, difference)))
           case _ => Future.successful(None)
         }
       case None => Future.failed(new Exception("Cannot get data from amendment submission"))
