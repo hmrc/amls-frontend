@@ -165,7 +165,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
       //noinspection ScalaStyle
       when(controller.submissionResponseService.getVariation(any(), any(), any()))
-        .thenReturn(Future.successful(paymentRefNo, Currency.fromInt(150), Seq()))
+        .thenReturn(Future.successful(Some(Some(paymentRefNo), Currency.fromInt(150), Seq())))
 
       setupStatus(SubmissionDecisionApproved)
 
@@ -220,7 +220,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       //noinspection ScalaStyle
       when {
         controller.submissionResponseService.getVariation(any(), any(), any())
-      } thenReturn Future.successful(paymentRefNo, Currency.fromInt(150), Seq())
+      } thenReturn Future.successful(Some(Some(paymentRefNo), Currency.fromInt(150), Seq()))
 
       setupStatus(SubmissionDecisionApproved)
 
@@ -291,7 +291,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         setupStatus(SubmissionDecisionApproved)
 
         when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful("", Currency.fromInt(0), Seq()))
+          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq())))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -304,7 +304,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         setupStatus(SubmissionDecisionApproved)
 
         when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful("", Currency.fromInt(0), Seq()))
+          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq())))
 
         val result = controller.get()(request)
 
@@ -319,7 +319,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
         when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful("", Currency.fromInt(0), Seq()))
+          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq())))
 
         val result = controller.get()(request)
 
@@ -372,7 +372,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         } thenReturn Future.successful(None)
 
         when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful("payeref", Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10)))))
+          .thenReturn(Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10))))))
 
 
         val result = controller.get()(request)

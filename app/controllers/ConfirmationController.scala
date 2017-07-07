@@ -92,14 +92,15 @@ trait ConfirmationController extends BaseController {
   private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     isRenewalDefined flatMap {
       case true => getRenewalFees
-      //case false => getVariationFees
+      case false => getVariationFees
     }
   }
 
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees,
+        routes.ConfirmationController.paymentConfirmation(payRef).url))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -111,7 +112,7 @@ trait ConfirmationController extends BaseController {
 
   private def showVariationConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      (payRef, total, rows) <- OptionT.liftF(submissionResponseService.getVariation)
+      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((payRef, total, rows, None),
         routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
@@ -182,14 +183,15 @@ trait ConfirmationController extends BaseController {
     submissionResponseService.getAmendment flatMap {
       case Some((paymentRef, total, rows, difference)) =>
         (difference, paymentRef) match {
-          case (Some(currency), Some(payRef)) if currency.value > 0 => Future.successful(Some((payRef, total, rows, difference)))
+          case (Some(currency), Some(payRef)) if currency.value > 0 =>
+            Future.successful(Some((payRef, total, rows, difference)))
           case _ => Future.successful(None)
         }
       case None => Future.failed(new Exception("Cannot get data from amendment submission"))
     }
   }
 
-  /*private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+  private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getVariation flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
@@ -201,7 +203,7 @@ trait ConfirmationController extends BaseController {
       }
       case None => Future.failed(new Exception("Cannot get data from variation submission"))
     }
-  }*/
+  }
 
   private def getRenewalFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getRenewal flatMap {

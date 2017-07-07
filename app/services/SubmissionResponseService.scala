@@ -75,7 +75,7 @@ trait SubmissionResponseService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow])] =
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -86,12 +86,13 @@ trait SubmissionResponseService extends DataCacheService {
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          val paymentReference = variation.getPaymentReference
+          val paymentReference = variation.paymentReference
           val total = variation.getTotalFees
           val rows = getVariationBreakdownRows(variation, premises, people, businessActivities)
-          Future.successful((paymentReference, Currency.fromBD(total), rows))
+          Future.successful(Some((paymentReference, Currency.fromBD(total), rows)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
+  }
 
   def getRenewal
   (implicit
