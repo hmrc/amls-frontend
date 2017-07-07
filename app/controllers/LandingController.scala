@@ -16,8 +16,9 @@
 
 package controllers
 
+import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -36,6 +37,7 @@ import play.api.Logger
 import play.api.mvc.{Action, Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -46,6 +48,8 @@ trait LandingController extends BaseController {
   private[controllers] def landingService: LandingService
 
   private[controllers] def enrolmentsService: AuthEnrolmentsService
+
+  private[controllers] def auditConnector: AuditConnector
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
@@ -82,9 +86,10 @@ trait LandingController extends BaseController {
           amlsRef <- amlsReferenceNumber
         } yield (reviewDetails, amlsRef) match {
           case (Some(rd), None) =>
-            landingService.updateReviewDetails(rd) map {
-              x => {
-                FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
+            landingService.updateReviewDetails(rd) map { _ => {
+              auditConnector.sendEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse("")))
+
+              FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
                   case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
                   case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
                 }
@@ -204,4 +209,5 @@ object LandingController extends LandingController {
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+  override private[controllers] def auditConnector = AMLSAuditConnector
 }
