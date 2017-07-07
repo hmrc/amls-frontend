@@ -14,11 +14,27 @@
  * limitations under the License.
  */
 
-import javax.inject.Inject
+package controllers.declaration
 
-import filters.{ChangeOfficerFeatureFilter, ConfirmationFilter}
-import play.api.http.DefaultHttpFilters
+import javax.inject.{Inject, Singleton}
 
-class Filters @Inject()(confirmationFilter: ConfirmationFilter, changeOfficerFeatureFilter: ChangeOfficerFeatureFilter)
-  extends DefaultHttpFilters(confirmationFilter, changeOfficerFeatureFilter)
+import controllers.BaseController
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.Future
+
+
+@Singleton
+class RegisterPartnersController @Inject()(
+                                          val authConnector: AuthConnector
+                                          ) extends BaseController {
+
+  def get() = Authorised.async {
+    implicit authContext => implicit request => {
+
+      Future.successful(Ok(""))
+
+    }
+  }
+
+}
