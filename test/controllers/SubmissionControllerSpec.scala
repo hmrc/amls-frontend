@@ -125,19 +125,6 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
-
-    "post must return a 'Duplicate Business Partner' error page when 422 is returned from the middle tier" in new Fixture {
-
-      when {
-        controller.subscriptionService.subscribe(any(), any(), any())
-      } thenReturn Future.failed(Upstream4xxResponse("Error", 422, 500))
-
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
-
-      val result = controller.post()(request)
-
-      status(result) mustBe UNPROCESSABLE_ENTITY
-    }
   }
 
   it when {
