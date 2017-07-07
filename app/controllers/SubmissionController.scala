@@ -18,6 +18,7 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
+import exceptions.DuplicateEnrolmentException
 import models.{SubmissionResponse, SubscriptionResponse}
 import models.status._
 import org.jsoup.HttpStatusException
@@ -25,7 +26,7 @@ import play.api.Play
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import views.html.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -58,6 +59,8 @@ trait SubmissionController extends BaseController {
             Redirect(controllers.routes.LandingController.get())
           }
         case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+      } recoverWith {
+        case e: DuplicateEnrolmentException => Future.successful(Ok(""))
       }
   }
 

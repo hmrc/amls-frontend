@@ -27,8 +27,9 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
+import exceptions.DuplicateEnrolmentException
 
 import scala.concurrent.Future
 
@@ -124,6 +125,22 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+    }
+
+    "show the correct help page when a 502 is encountered while trying to enrol the user" in new Fixture {
+      val msg = "HMRC-MLR-ORG duplicate enrolment"
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(DuplicateEnrolmentException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe OK
     }
   }
 
