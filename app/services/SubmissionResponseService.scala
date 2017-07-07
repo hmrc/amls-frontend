@@ -18,7 +18,7 @@ package services
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessMatching, TrustAndCompanyServices, BusinessActivities => BusinessSevices, MoneyServiceBusiness => MSB}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
@@ -33,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 sealed case class RowEntity(message: String, feePer: BigDecimal)
 
 trait SubmissionResponseService extends FeeCalculations with DataCacheService {
-
 
   def getSubscription
   (implicit
@@ -140,13 +139,13 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
   private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse, peopleFee: BigDecimal): Seq[BreakdownRow] = {
 
-    val breakdownRows = Seq()
+    val breakdownRows = Seq.empty
 
     def renewalRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
       if (count > 0) {
         breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(renewal))))
       } else {
-        Seq()
+        Seq.empty
       }
     }
 
@@ -165,47 +164,43 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
   (submission: SubmissionResponse,
    premises: Seq[TradingPremises],
    people: Seq[ResponsiblePeople],
-   businessActivities: BusinessSevices,
+   businessActivities: BusinessActivities,
    subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(BreakdownRow(submissionRow(submission).message, subQuantity,
-      submissionRow(submission).feePer, subQuantity * submissionRow(submission).feePer)) ++
-      responsiblePeopleRows(people, submission, businessActivities) ++
-      Seq(BreakdownRow(premisesRow(submission).message, premises.size, premisesRow(submission).feePer, submission.getPremiseFee))
+    Seq(
+      BreakdownRow(submissionRow(submission).message, subQuantity, submissionRow(submission).feePer, subQuantity * submissionRow(submission).feePer)
+    ) ++ responsiblePeopleRows(people, submission, businessActivities.businessActivities) ++ Seq(
+      BreakdownRow(premisesRow(submission).message, premises.size, premisesRow(submission).feePer, submission.getPremiseFee)
+    )
   }
 
   private def getVariationBreakdownRows
   (variation: AmendVariationRenewalResponse,
    premises: Seq[TradingPremises],
    people: Seq[ResponsiblePeople],
-   businessActivities: BusinessSevices): Seq[BreakdownRow] = {
-    responsiblePeopleVariationRows(people, variation, businessActivities) ++
-    tradingPremisesVariationRows(premises,variation)
+   businessActivities: BusinessActivities): Seq[BreakdownRow] = {
+    responsiblePeopleVariationRows(people, variation, businessActivities.businessActivities) ++
+      tradingPremisesVariationRows(premises, variation)
   }
 
   private def responsiblePeopleRows(
                                      people: Seq[ResponsiblePeople],
                                      subscription: SubmissionResponse,
-                                     businessActivities: BusinessSevices
+                                     activities: Set[BusinessActivity]
                                    ): Seq[BreakdownRow] = {
 
-    val showBreakdown = subscription.getFpFee match {
-      case None => businessActivities.businessActivities.exists(act => act == MSB || act == TrustAndCompanyServices)
-      case _ => true
-    }
+    if (showBreakdown(subscription.getFpFee, activities)) {
 
-    if (showBreakdown) {
-
-      val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
-
-      people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
-        case (b, a) =>
-          Seq(BreakdownRow(peopleRow(subscription).message, a.size, peopleRow(subscription).feePer,
-            Currency.fromBD(subscription.getFpFee.getOrElse(0)))) ++
-            (if (b.nonEmpty) {
-              Seq(BreakdownRow(peopleFPPassed.message, b.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
-            } else {
-              Seq.empty
-            })
+      splitPeopleByFitAndProperTest(people) match {
+        case (passedFP, notFP) =>
+          Seq(
+            BreakdownRow(peopleRow(subscription).message, notFP.size, peopleRow(subscription).feePer, Currency.fromBD(subscription.getFpFee.getOrElse(0)))
+          ) ++ (if (passedFP.nonEmpty) {
+            Seq(
+              BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
+            )
+          } else {
+            Seq.empty
+          })
       }
     } else {
       Seq.empty
@@ -213,16 +208,16 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
   }
 
   private def tradingPremisesVariationRows(
-                                          premises: Seq[TradingPremises],
-                                          variationRenewalResponse: AmendVariationRenewalResponse
+                                            premises: Seq[TradingPremises],
+                                            variationRenewalResponse: AmendVariationRenewalResponse
                                           ): Seq[BreakdownRow] = {
-    val breakdownRows = Seq()
+    val breakdownRows = Seq.empty
 
     def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
       if (count > 0) {
         breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variationRenewalResponse))))
       } else {
-        Seq()
+        Seq.empty
       }
     }
 
@@ -248,37 +243,37 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
   }
 
   private def responsiblePeopleVariationRows(
-                                     people: Seq[ResponsiblePeople],
-                                     variation: AmendVariationRenewalResponse,
-                                     businessActivities: BusinessSevices
-                                   ): Seq[BreakdownRow] = {
+                                              people: Seq[ResponsiblePeople],
+                                              variation: AmendVariationRenewalResponse,
+                                              activities: Set[BusinessActivity]): Seq[BreakdownRow] = {
 
-    val showBreakdown = variation.getFpFee match {
-      case None => businessActivities.businessActivities.exists(act => act == MSB || act == TrustAndCompanyServices)
-      case _ => true
-    }
+    if (showBreakdown(variation.getFpFee, activities)) {
 
-    if (showBreakdown) {
-
-      val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
-      people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
-        case (passed, feeRqd) =>
-          (if (feeRqd.nonEmpty) {
-            Seq(BreakdownRow(peopleVariationRow(variation).message, feeRqd.size, peopleVariationRow(variation).feePer,
-              Currency.fromBD(variation.getFpFee.getOrElse(0))))
+      splitPeopleByFitAndProperTest(people) match {
+        case (passedFP, notFP) =>
+          (if (notFP.nonEmpty) {
+            Seq(
+              BreakdownRow(peopleVariationRow(variation).message, notFP.size, peopleVariationRow(variation).feePer,Currency.fromBD(variation.getFpFee.getOrElse(0)))
+            )} else {
+              Seq.empty
+          }) ++ (if (passedFP.nonEmpty) {
+            Seq(BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
           } else {
             Seq.empty
-          }) ++
-            (if(passed.nonEmpty) {
-              Seq(BreakdownRow(peopleFPPassed.message, passed.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
-            } else {
-              Seq.empty
-            })
+          })
       }
     } else {
       Seq.empty
     }
   }
+
+  private val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+
+  private val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
+    fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
+
+  private val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
+    people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
 }
 
