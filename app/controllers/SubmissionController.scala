@@ -57,8 +57,6 @@ trait SubmissionController extends BaseController {
             Redirect(controllers.routes.LandingController.get())
           }
         case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
-      } recover {
-        case Upstream4xxResponse(_, UNPROCESSABLE_ENTITY, _, _) => UnprocessableEntity(duplicate_submission())
       }
   }
 
