@@ -73,7 +73,7 @@ object NotificationDetails {
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
 
     inputString.split("-").toList match {
-      case label :: date :: Nil => {
+      case _ :: _ :: Nil => {
         val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
         Some(EndDateDetails(dateValue, None))
       }
