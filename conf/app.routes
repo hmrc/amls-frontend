@@ -530,3 +530,6 @@ GET         /renewal/receiving                                                  
 POST        /renewal/receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                               @controllers.renewal.SummaryController.get()
+
+# Test routes - MUST include 'test-only' to be excluded by NGINX
+GET         /test-only/duplicate-submission                                           controllers.StatusController.duplicateSubmissionTest()

@@ -20,11 +20,11 @@
 @()(implicit request: Request[_], m: Messages)
 
 @header = {
- @heading("error.submission.duplicate.title")
+    @heading("error.submission.duplicate.title")
 }
 
 @main(m("error.submission.duplicate.title"), heading = header) {
 
-  @m("error.submission.duplicate_enrolment.content").paragraphizeH
+    @m("error.submission.duplicate_enrolment.content").paragraphizeH
 
 }

@@ -89,6 +89,11 @@ trait StatusController extends BaseController {
     }
   }
 
+  def duplicateSubmissionTest = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true, true)))
+  }
+
   private def getPageBasedOnStatus(mlrRegNumber: Option[String],
                                    statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                    businessNameOption: Option[String],
