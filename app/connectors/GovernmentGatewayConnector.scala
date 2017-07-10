@@ -18,6 +18,7 @@ package connectors
 
 import audit.EnrolEvent
 import config.{AMLSAuditConnector, ApplicationConfig, WSHttp}
+import exceptions.DuplicateEnrolmentException
 import models.governmentgateway.{EnrolmentRequest, EnrolmentResponse}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
@@ -32,6 +33,8 @@ trait GovernmentGatewayConnector {
   protected def http: HttpPost
   protected def enrolUrl: String
   private[connectors] def audit: Audit
+
+  private val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
 
   def enrol
   (request: EnrolmentRequest)
@@ -48,6 +51,9 @@ trait GovernmentGatewayConnector {
         Logger.debug(s"$prefix - Successful Response: ${response.json}")
         response
     } recoverWith {
+      case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>
+        Logger.warn(s"$prefix - '${e.getMessage}' error encountered")
+        Future.failed(DuplicateEnrolmentException(e.getMessage, e))
       case e =>
         Logger.warn(s"$prefix - Failure response")
         Future.failed(e)

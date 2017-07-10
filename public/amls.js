@@ -203,8 +203,8 @@ $(function () {
     duplicateErrorWrapper.find('.report-error__toggle').remove();
   }
 
-  var dupFeeNotFoundDiv = $('.dup_feenotfound');
-  if(dupFeeNotFoundDiv.length) {
+  var partialDeskproForm = $('.partial-deskpro-form');
+  if(partialDeskproForm.length) {
 
     $('#get-help-action').remove();
     var container = $('.report-error__content');
@@ -220,17 +220,16 @@ $(function () {
     };
 
     reportActionField
-        .val('Submit my application')
+        .val(partialDeskproForm.data('action-value'))
         .closest('.form-group-compound')
         .css(css);
 
     reportErrorField
-        .val('Paying for my application')
+        .val(partialDeskproForm.data('error-value'))
         .closest('.form-group-compound')
         .css(css);
 
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
-
   }
 
 });
