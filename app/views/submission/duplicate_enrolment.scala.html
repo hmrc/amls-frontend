@@ -16,15 +16,25 @@
 
 @import include._
 @import utils.Strings._
+@import config.{ApplicationConfig => appConfig}
 
 @()(implicit request: Request[_], m: Messages)
+
+@getHelpForm = {
+    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+}
 
 @header = {
     @heading("error.submission.duplicate.title")
 }
 
-@main(m("error.submission.duplicate.title"), heading = header) {
+@main(m("error.submission.duplicate.title"), heading = header, showGetHelpForm = false) {
 
     @m("error.submission.duplicate_enrolment.content").paragraphizeH
 
+    <div class="partial-deskpro-form" data-action-value="Submit my application" data-error-value="Paying for my application">
+        <div class="get-help-form">
+        @getHelpForm
+        </div>
+    </div>
 }
