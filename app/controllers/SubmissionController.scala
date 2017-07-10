@@ -22,7 +22,7 @@ import exceptions.DuplicateEnrolmentException
 import models.{SubmissionResponse, SubscriptionResponse}
 import models.status._
 import org.jsoup.HttpStatusException
-import play.api.Play
+import play.api.{Logger, Play}
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -60,7 +60,9 @@ trait SubmissionController extends BaseController {
           }
         case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
       } recoverWith {
-        case e: DuplicateEnrolmentException => Future.successful(Ok(""))
+        case e: DuplicateEnrolmentException =>
+          Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
+          Future.successful(Ok(views.html.submission.duplicate_enrolment()))
       }
   }
 

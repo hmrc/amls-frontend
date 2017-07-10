@@ -16,4 +16,4 @@
 
 package exceptions
 
-case class DuplicateEnrolmentException(message: String, exception: Exception) extends Exception(message, exception)
+case class DuplicateEnrolmentException(message: String, exception: Throwable) extends Exception(message, exception)
