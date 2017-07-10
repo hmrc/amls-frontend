@@ -26,7 +26,9 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Result
 import play.api.test.Helpers._
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -45,6 +47,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
+    val renewalService = mock[RenewalService]
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -53,10 +56,50 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[RenewalService].to(renewalService))
       .build()
 
     val controller = app.injector.instanceOf[CustomersOutsideUKController]
 
+  }
+
+  trait FormSubmissionFixture extends Fixture {
+    def formData(valid: Boolean) = if (valid) {
+      "isOutside" -> "false"
+    } else {
+      "isOutside" -> "abc"
+    }
+
+    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+
+    val cache = mock[CacheMap]
+
+    when {
+      renewalService.updateRenewal(any())(any(), any(), any())
+    } thenReturn Future.successful(cache)
+
+    when {
+      dataCacheConnector.fetchAll(any(), any())
+    } thenReturn Future.successful(Some(cache))
+
+    when(cache.getEntry[Renewal](Renewal.key))
+      .thenReturn(Some(Renewal(
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB")))))
+      )))
+
+    def post(
+              edit: Boolean = false,
+              valid: Boolean = true,
+              activities: BusinessActivities = BusinessActivities(Set.empty)
+            )(block: Result => Unit) = block({
+
+      when(cache.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(
+          activities = Some(activities)
+        )))
+
+      await(controller.post(edit)(formRequest(valid)))
+    })
   }
 
   "The customer outside uk controller" when {
@@ -101,28 +144,11 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       "given valid data" must {
 
         "redirect to the summary page" when {
-          "business is not an hvd" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching()))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          "business is not an hvd" in new FormSubmissionFixture {
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+            }
           }
         }
 
@@ -181,46 +207,32 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       }
 
       "respond with BAD_REQUEST" when {
-        "given invalid data represented by an empty string" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> "true",
-            "countries[0]" -> "",
-            "countries[1]" -> ""
-          )
-
-          when(dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#countries]").html() must include(Messages("error.required.renewal.country.name"))
-        }
-        "mandatory fields are missing" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> ""
-          )
-
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isOutside]").html() must include(Messages("error.required.renewal.ba.select.country"))
+        "given invalid data" in new FormSubmissionFixture {
+          post(valid = false) { result =>
+            result.header.status mustBe BAD_REQUEST
+          }
         }
       }
     }
 
+  }
+
+  it must {
+    "remove data from SendTheLargestAmountsOfMoney and MostTransactions" when {
+      "CustomersOutsideUK is edited from yes to no" in new FormSubmissionFixture {
+
+        post(edit = true) { result =>
+          result.header.status mustBe SEE_OTHER
+
+          verify(renewalService)
+            .updateRenewal(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(None)),
+              sendTheLargestAmountsOfMoney = None,
+              mostTransactions = None
+            ))(any(), any(), any())
+        }
+
+      }
+    }
   }
 }
