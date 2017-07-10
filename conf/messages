@@ -85,6 +85,10 @@ error.submission.duplicate.content = We’re sorry that there’s a problem. Ple
 error.submission.duplicate_enrolment.content = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.\n\
   If you’re unable to use that account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
 
+error.submission.wrong_credentials.content = Your account doesn’t have enough access rights to register.\n\
+  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.\n\
+  If you are unable to change your access rights, can’t create a new organisation account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
