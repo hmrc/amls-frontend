@@ -78,7 +78,8 @@ error.invalid.mlr.number = Enter a valid Money Laundering Regulations registrati
 error.invalid.year = Enter a valid date in the format DD MM YYYY
 error.invalid.year.post1900 = The year can’t be before 1900
 
-error.submission.duplicate.title = There’s a problem with your application
+error.submission.problem.title = There’s a problem with your application
+
 error.submission.duplicate.content = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.\n\
   Please don’t try to resubmit your application, as this won’t work.
 

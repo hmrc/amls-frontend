@@ -34,7 +34,7 @@ class DuplicateSubmissionViewSpec extends GenericTestHelper {
   "The html content" must {
     "have the correct title and subtitles" in new ViewFixture {
 
-      doc.title mustBe s"""${Messages("error.submission.duplicate.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"""
+      doc.title mustBe s"""${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"""
 
     }
 

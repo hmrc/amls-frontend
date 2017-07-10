@@ -31,8 +31,8 @@ class wrong_credential_typeSpec extends GenericTestHelper with MustMatchers {
 
   "The 'wrong credential type' template" must {
     "have the correct title, headings and content" in new ViewFixture {
-      doc.title mustBe s"${Messages("error.submission.wrong_credentials.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      doc.select("header h1").text mustBe Messages("error.submission.wrong_credentials.title")
+      doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      doc.select("header h1").text mustBe Messages("error.submission.problem.title")
 
       validateParagraphizedContent("error.submission.wrong_credentials.content")
     }
