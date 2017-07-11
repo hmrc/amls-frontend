@@ -78,12 +78,17 @@ error.invalid.mlr.number = Enter a valid Money Laundering Regulations registrati
 error.invalid.year = Enter a valid date in the format DD MM YYYY
 error.invalid.year.post1900 = The year can’t be before 1900
 
-error.submission.duplicate.title = There’s a problem with your application
+error.submission.problem.title = There’s a problem with your application
+
 error.submission.duplicate.content = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.\n\
   Please don’t try to resubmit your application, as this won’t work.
 
 error.submission.duplicate_enrolment.content = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.\n\
   If you’re unable to use that account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+
+error.submission.wrong_credentials.content = Your account doesn’t have enough access rights to register.\n\
+  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.\n\
+  If you are unable to change your access rights, can’t create a new organisation account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
 
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################

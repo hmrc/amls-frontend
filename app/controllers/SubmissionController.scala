@@ -18,7 +18,7 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
-import exceptions.DuplicateEnrolmentException
+import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.{SubmissionResponse, SubscriptionResponse}
 import models.status._
 import org.jsoup.HttpStatusException
@@ -63,6 +63,9 @@ trait SubmissionController extends BaseController {
         case e: DuplicateEnrolmentException =>
           Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
           Future.successful(Ok(views.html.submission.duplicate_enrolment()))
+        case e: InvalidEnrolmentCredentialsException =>
+          Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
+          Future.successful(Ok(views.html.submission.wrong_credential_type()))
       }
   }
 
