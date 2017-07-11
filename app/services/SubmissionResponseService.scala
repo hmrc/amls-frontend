@@ -105,10 +105,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           cache <- option
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
-          val premisesFee: BigDecimal = renewalTotalPremisesFee(renewal)
-          val peopleFee: BigDecimal = renewalPeopleFee(renewal)
-          val totalFees: BigDecimal = peopleFee + premisesFee
-          val rows = getRenewalBreakdown(renewal, peopleFee)
+          val totalFees: BigDecimal = renewal.getTotalFees
+          val rows = getRenewalBreakdown(renewal)
           val paymentRef = renewal.paymentReference
           Future.successful(Some((paymentRef, Currency(totalFees), rows)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
@@ -137,7 +135,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
   }
 
-  private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse, peopleFee: BigDecimal): Seq[BreakdownRow] = {
+  private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
 
     val breakdownRows = Seq.empty
 
