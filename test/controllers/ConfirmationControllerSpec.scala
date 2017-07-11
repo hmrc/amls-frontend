@@ -24,7 +24,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
-import models.{SubscriptionFees, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -361,6 +361,33 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
         status(result) mustBe OK
         Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
+      }
+
+      "a renewal status and has 1 FP RP and 1 Not FP RP then load renewal confirmation showing each row with respective costs" in new Fixture {
+
+        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(Renewal()))
+
+        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some((
+            Some("payeref"),
+            Currency.fromInt(100),
+            Seq(
+              BreakdownRow("confirmation.responsiblepeople.fp.passed",1, Currency(0), Currency(0)),
+              BreakdownRow("confirmation.responsiblepeople",1, Currency(100), Currency(100)),
+              BreakdownRow("confirmation.tradingpremises.half",2, Currency(50), Currency(100))
+            )))))
+
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
+        contentAsString(result) must include(Messages("confirmation.responsiblepeople.fp.passed"))
+        contentAsString(result) must include(Messages("confirmation.responsiblepeople"))
+        contentAsString(result) must include(Messages("confirmation.tradingpremises.half"))
       }
 
 
