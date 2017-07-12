@@ -131,7 +131,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
               post(edit = true) { result =>
                 result.header.status mustBe SEE_OTHER
-                result.header.headers.get("Location") mustEqual routes.MostTransactionsController.get().url.some
+                result.header.headers.get("Location") mustEqual routes.MostTransactionsController.get(true).url.some
               }
             }
           }
