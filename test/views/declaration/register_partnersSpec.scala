@@ -74,7 +74,7 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
 
-      html must include(Messages("message key for no partners"))
+      html must include(Messages("declaration.register.partners.none.text"))
     }
 
     "show the correct text when there is one current partner" in new ViewFixture {
@@ -88,7 +88,7 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
 
-      html must include(Messages("message key for one partner", currentPartners.head))
+      html must include(Messages("declaration.register.partners.one.text", currentPartners.head))
     }
 
 

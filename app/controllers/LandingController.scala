@@ -120,7 +120,8 @@ trait LandingController extends BaseController {
     }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
   }
 
-  private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
+                                (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
@@ -186,7 +187,8 @@ trait LandingController extends BaseController {
         case Some(cacheMap) => {
           //there is data in S4l
           if (dataHasChanged(cacheMap)) {
-            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key), cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
+            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
+              cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
               case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
               case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
               case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))

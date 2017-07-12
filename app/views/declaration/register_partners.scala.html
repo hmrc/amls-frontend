@@ -36,7 +36,11 @@
             jsHidden = false,
             gutter = true
         ) {
-            <p>@Messages("declaration.who.is.business.nominated.officer.text")</p>
+            <p>@if(currentPartners.size == 0) {
+                @Messages("declaration.register.partners.none.text")
+            } else {
+                @Messages("declaration.register.partners.one.text", currentPartners.head)
+            }</p>
         }
 
         @fieldset(
