@@ -194,7 +194,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
             .updateRenewal(eqTo(Renewal(
               customersOutsideUK = Some(CustomersOutsideUK(None)),
               sendTheLargestAmountsOfMoney = None,
-              mostTransactions = None
+              mostTransactions = None,
+              hasChanged = true
             )))(any(), any(), any())
         }
 
