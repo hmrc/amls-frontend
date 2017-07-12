@@ -120,7 +120,7 @@
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
-                    editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
+                    editUrl = if(isEditable) { controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString } else ""
                 ) {
                     <p>@otherCountries.money match {
                         case true => {@Messages("lbl.yes")}
