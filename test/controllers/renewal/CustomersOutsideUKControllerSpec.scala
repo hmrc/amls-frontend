@@ -19,14 +19,17 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.renewal.{CustomersOutsideUK, Renewal}
+import models.renewal.{CustomersOutsideUK, MostTransactions, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -45,6 +48,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
+    val renewalService = mock[RenewalService]
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -53,10 +57,56 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[RenewalService].to(renewalService))
       .build()
 
     val controller = app.injector.instanceOf[CustomersOutsideUKController]
 
+  }
+
+  trait FormSubmissionFixture extends Fixture {
+    def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
+      case Some(d) => d
+      case None => request.withFormUrlEncodedBody("isOutside" -> "false")
+    }
+
+    def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
+
+    val cache = mock[CacheMap]
+
+    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("GB","GB"))
+    val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
+
+    when {
+      renewalService.updateRenewal(any())(any(), any(), any())
+    } thenReturn Future.successful(cache)
+
+    when {
+      dataCacheConnector.fetchAll(any(), any())
+    } thenReturn Future.successful(Some(cache))
+
+    when {
+      cache.getEntry[Renewal](Renewal.key)
+    } thenReturn Some(Renewal(
+      customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))),
+      sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+      mostTransactions = Some(mostTransactions)
+    ))
+
+    def post(
+              edit: Boolean = false,
+              data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
+              activities: BusinessActivities = BusinessActivities(Set.empty)
+            )(block: Result => Unit) = block({
+
+      when {
+        cache.getEntry[BusinessMatching](BusinessMatching.key)
+      } thenReturn{
+        Some(BusinessMatching(activities = Some(activities)))
+      }
+
+      await(controller.post(edit)(formRequest(data)))
+    })
   }
 
   "The customer outside uk controller" when {
@@ -64,8 +114,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(dataCacheConnector.fetch[Renewal](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(renewalService.getRenewal(any(),any(),any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
 
@@ -81,7 +131,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+        when(renewalService.getRenewal(any(),any(),any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
         val result = controller.get()(request)
@@ -101,126 +151,83 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       "given valid data" must {
 
         "redirect to the summary page" when {
-          "business is not an hvd" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching()))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          "business is not an hvd" in new FormSubmissionFixture {
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+            }
           }
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is an hvd" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
+          "business is an hvd" in new FormSubmissionFixture {
+            post(activities = BusinessActivities(Set(HighValueDealing))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+            }
           }
         }
 
         "redirect to the Msb Turnover page" when {
-          "business is an msb" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing))))))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.TotalThroughputController.get().url))
+          "business is an msb" in new FormSubmissionFixture {
+            post(activities = BusinessActivities(Set(MoneyServiceBusiness))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
+            }
           }
         }
 
       }
 
       "respond with BAD_REQUEST" when {
-        "given invalid data represented by an empty string" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> "true",
-            "countries[0]" -> "",
-            "countries[1]" -> ""
-          )
-
-          when(dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#countries]").html() must include(Messages("error.required.renewal.country.name"))
-        }
-        "mandatory fields are missing" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "isOutside" -> ""
-          )
-
-          when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isOutside]").html() must include(Messages("error.required.renewal.ba.select.country"))
+        "given invalid data" in new FormSubmissionFixture {
+          post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
+            result.header.status mustBe BAD_REQUEST
+          }
         }
       }
     }
 
+  }
+
+  it must {
+    "remove data from SendTheLargestAmountsOfMoney and MostTransactions" when {
+      "CustomersOutsideUK is edited from yes to no" in new FormSubmissionFixture {
+
+        post(edit = true) { result =>
+          result.header.status mustBe SEE_OTHER
+
+          verify(renewalService)
+            .updateRenewal(eqTo(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(None)),
+              sendTheLargestAmountsOfMoney = None,
+              mostTransactions = None,
+              hasChanged = true
+            )))(any(), any(), any())
+        }
+
+      }
+    }
+    "keep data from SendTheLargestAmountsOfMoney and MostTransactions" when {
+      "only countries are changed in the update of renewal" in new FormSubmissionFixture {
+
+        val data = request.withFormUrlEncodedBody(
+          "isOutside" -> "true",
+          "countries[0]" -> "US")
+
+        post(edit = true, data = Some(data)) { result =>
+          result.header.status mustBe SEE_OTHER
+
+          verify(renewalService)
+            .updateRenewal(eqTo(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United States","US"))))),
+              sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+              mostTransactions = Some(mostTransactions),
+              hasChanged = true
+            )))(any(), any(), any())
+        }
+
+      }
+    }
   }
 }
