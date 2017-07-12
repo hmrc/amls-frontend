@@ -62,24 +62,38 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
       }
 
     }
-//
-//    "prepopulate the selected nominated officer" in new ViewFixture {
-//
-//      val people = Seq(
-//        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-//        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
-//      )
-//
-//      val f = Form2(BusinessNominatedOfficer("TestPerson1"))
-//
-//      def view = views.html.declaration.select_business_nominated_officer("subheading", f, people)
-//
-//      doc.select("input[type=radio][id=value-TestPerson1").hasAttr("checked") mustBe true
-//
-//    }
-//
+
+    "show the correct text when there are no current partners" in new ViewFixture {
+
+      val people = Seq(
+        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
+        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
+      )
+
+      val currentPartners = Seq.empty
+
+      def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
+
+      html must include(Messages("message key for no partners"))
+    }
+
+    "show the correct text when there is one current partner" in new ViewFixture {
+
+      val people = Seq(
+        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
+        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
+      )
+
+      val currentPartners = Seq("firstName lastName")
+
+      def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
+
+      html must include(Messages("message key for one partner", currentPartners.head))
+    }
+
+
 //    "show the 'register someone else' radio button" in new ViewFixture {
-//      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
+//      def view = views.html.declaration.register_partners("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
 //
 //      Option(doc.select("input[type=radio][id=value--1]")) must be(defined)
 //      doc.select("label[for=value--1]").text() must include(Messages("lbl.register.some.one.else"))
