@@ -19,14 +19,15 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.renewal.{CustomersOutsideUK, Renewal}
+import models.renewal.{CustomersOutsideUK, MostTransactions, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -64,15 +65,17 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
   }
 
   trait FormSubmissionFixture extends Fixture {
-    def formData(valid: Boolean) = if (valid) {
-      "isOutside" -> "false"
-    } else {
-      "isOutside" -> "abc"
+    def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
+      case Some(d) => d
+      case None => request.withFormUrlEncodedBody("isOutside" -> "false")
     }
 
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
 
     val cache = mock[CacheMap]
+
+    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("GB","GB"))
+    val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
 
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
@@ -84,11 +87,15 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     when {
       cache.getEntry[Renewal](Renewal.key)
-    } thenReturn Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB")))))))
+    } thenReturn Some(Renewal(
+      customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))),
+      sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+      mostTransactions = Some(mostTransactions)
+    ))
 
     def post(
               edit: Boolean = false,
-              valid: Boolean = true,
+              data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
               activities: BusinessActivities = BusinessActivities(Set.empty)
             )(block: Result => Unit) = block({
 
@@ -98,7 +105,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         Some(BusinessMatching(activities = Some(activities)))
       }
 
-      await(controller.post(edit)(formRequest(valid)))
+      await(controller.post(edit)(formRequest(data)))
     })
   }
 
@@ -174,7 +181,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new FormSubmissionFixture {
-          post(valid = false) { result =>
+          post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
             result.header.status mustBe BAD_REQUEST
           }
         }
@@ -195,6 +202,27 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
               customersOutsideUK = Some(CustomersOutsideUK(None)),
               sendTheLargestAmountsOfMoney = None,
               mostTransactions = None,
+              hasChanged = true
+            )))(any(), any(), any())
+        }
+
+      }
+    }
+    "keep data from SendTheLargestAmountsOfMoney and MostTransactions" when {
+      "only countries are changed in the update of renewal" in new FormSubmissionFixture {
+
+        val data = request.withFormUrlEncodedBody(
+          "isOutside" -> "true",
+          "countries[0]" -> "US")
+
+        post(edit = true, data = Some(data)) { result =>
+          result.header.status mustBe SEE_OTHER
+
+          verify(renewalService)
+            .updateRenewal(eqTo(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United States","US"))))),
+              sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+              mostTransactions = Some(mostTransactions),
               hasChanged = true
             )))(any(), any(), any())
         }
