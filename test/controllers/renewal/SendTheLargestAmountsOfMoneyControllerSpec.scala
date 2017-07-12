@@ -19,7 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.Country
-import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
+import models.renewal.{CustomersOutsideUK, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -117,6 +117,23 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
           post(edit = true){ result =>
             result.header.status must be (SEE_OTHER)
             result.header.headers.get("Location")  must be(routes.SummaryController.get().url.some)
+          }
+        }
+        "redirect to SendTheLargestAmountsOfMoneyController" when {
+          "CustomersOutsideUK is contains countries" when {
+            "MostTransactions is None" in new FormSubmissionFixture {
+
+              when(mockRenewalService.getRenewal(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Renewal(
+                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
+                  mostTransactions = None
+                ))))
+
+              post(edit = true) { result =>
+                result.header.status mustBe SEE_OTHER
+                result.header.headers.get("Location") mustEqual routes.MostTransactionsController.get(true).url.some
+              }
+            }
           }
         }
       }

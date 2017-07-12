@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,47 +37,57 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                                             ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      renewalService.getRenewal map {
-        response =>
-          val form: Form2[CustomersOutsideUK] = (for {
-            renewal <- response
-            customers <- renewal.customersOutsideUK
-          } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
-          Ok(customers_outside_uk(form, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        renewalService.getRenewal map {
+          response =>
+            val form: Form2[CustomersOutsideUK] = (for {
+              renewal <- response
+              customers <- renewal.customersOutsideUK
+            } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
+            Ok(customers_outside_uk(form, edit))
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[CustomersOutsideUK](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(customers_outside_uk(f, edit)))
-        case ValidForm(_, data) => {
-          dataCacheConnector.fetchAll flatMap { optionalCache =>
-            (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              renewal <- cache.getEntry[Renewal](Renewal.key)
-            } yield {
-              renewalService.updateRenewal({
-                if(hasCustomersOutsideUK(renewal.customersOutsideUK) && !hasCustomersOutsideUK(Some(data))){
-                  renewal.customersOutsideUK(data).copy(sendTheLargestAmountsOfMoney = None, mostTransactions = None)
-                } else {
-                  renewal.customersOutsideUK(data)
+    implicit authContext =>
+      implicit request =>
+        Form2[CustomersOutsideUK](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(customers_outside_uk(f, edit)))
+          case ValidForm(_, data) => {
+            dataCacheConnector.fetchAll flatMap { optionalCache =>
+              (for {
+                cache <- optionalCache
+                businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                renewal <- cache.getEntry[Renewal](Renewal.key)
+              } yield {
+                renewalService.updateRenewal({
+                  if (hasCustomersOutsideUK(renewal.customersOutsideUK) && !hasCustomersOutsideUK(Some(data))) {
+                    renewal.customersOutsideUK(data).copy(sendTheLargestAmountsOfMoney = None, mostTransactions = None)
+                  } else {
+                    renewal.customersOutsideUK(data)
+                  }
+                }) map { _ =>
+                  redirect(edit, data, renewal, businessMatching)
                 }
-              }) map { _ =>
-                redirect(edit, businessMatching)
-              }
-            }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
+              }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
+            }
           }
         }
-      }
   }
 
-  private def redirect(edit: Boolean, businessMatching: BusinessMatching) = {
+  private def redirect(edit: Boolean, data: CustomersOutsideUK, renewal: Renewal, businessMatching: BusinessMatching) = {
     edit match {
-      case true => Redirect(routes.SummaryController.get())
+      case true => if (
+        msbServicesContainsTransmittingMoney(businessMatching.msbServices) &&
+          !hasCustomersOutsideUK(renewal.customersOutsideUK) &&
+          hasCustomersOutsideUK(Some(data))
+      ) {
+        Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
+      } else {
+        Redirect(routes.SummaryController.get())
+      }
       case false => redirectDependingOnActivities(businessMatching)
     }
   }
@@ -95,6 +105,13 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
       case CustomersOutsideUK(Some(country)) => Some(country)
       case _ => None
     }.isDefined
+  }
+
+  private def msbServicesContainsTransmittingMoney(msbServices: Option[MsbServices]): Boolean = {
+    msbServices match {
+      case Some(services) => services.msbServices.contains(TransmittingMoney)
+      case _ => false
+    }
   }
 
 }
