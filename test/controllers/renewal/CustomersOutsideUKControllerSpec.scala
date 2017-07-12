@@ -65,6 +65,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
   }
 
   trait FormSubmissionFixture extends Fixture {
+
     def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
       case None => request.withFormUrlEncodedBody("isOutside" -> "false")
@@ -76,6 +77,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
     val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("GB","GB"))
     val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
+    val customersOutsideUK = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
 
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
@@ -88,7 +90,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     when {
       cache.getEntry[Renewal](Renewal.key)
     } thenReturn Some(Renewal(
-      customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))),
+      customersOutsideUK = Some(customersOutsideUK),
       sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
       mostTransactions = Some(mostTransactions)
     ))
@@ -96,8 +98,20 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     def post(
               edit: Boolean = false,
               data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
-              activities: BusinessActivities = BusinessActivities(Set.empty)
+              activities: BusinessActivities = BusinessActivities(Set.empty),
+              renewal: Option[Renewal] = None
             )(block: Result => Unit) = block({
+
+      when {
+        cache.getEntry[Renewal](Renewal.key)
+      } thenReturn Some(renewal match {
+        case Some(r) => r
+        case None => Renewal(
+          customersOutsideUK = Some(customersOutsideUK),
+          sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+          mostTransactions = Some(mostTransactions)
+        )
+      })
 
       when {
         cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -173,6 +187,33 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
             post(activities = BusinessActivities(Set(MoneyServiceBusiness))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
+            }
+          }
+        }
+
+        "redirect to SendTheLargestAmountsOfMoneyController" when {
+          "edit is true" when {
+            "business is an msb including Transmitting Money services" when {
+              "CustomersOutsideUK is edited from no to yes" in new FormSubmissionFixture {
+
+                val data = request.withFormUrlEncodedBody(
+                  "isOutside" -> "true",
+                  "countries[0]" -> "US")
+
+                val renewal = Renewal(
+                  customersOutsideUK = Some(CustomersOutsideUK(None))
+                )
+
+                post(
+                  edit = true,
+                  data = Some(data),
+                  activities = BusinessActivities(Set(MoneyServiceBusiness)),
+                  renewal = Some(renewal)
+                ) { result =>
+                  result.header.status mustBe SEE_OTHER
+                  result.header.headers.get("Location") mustBe Some(routes.SendTheLargestAmountsOfMoneyController.get().url)
+                }
+              }
             }
           }
         }
