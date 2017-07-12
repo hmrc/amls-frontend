@@ -18,7 +18,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, MostTransactions, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -98,7 +98,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
     def post(
               edit: Boolean = false,
               data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
-              activities: BusinessActivities = BusinessActivities(Set.empty),
+              businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set.empty))),
               renewal: Option[Renewal] = None
             )(block: Result => Unit) = block({
 
@@ -116,7 +116,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       when {
         cache.getEntry[BusinessMatching](BusinessMatching.key)
       } thenReturn{
-        Some(BusinessMatching(activities = Some(activities)))
+        Some(businessMatching)
       }
 
       await(controller.post(edit)(formRequest(data)))
@@ -175,7 +175,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
           "business is an hvd" in new FormSubmissionFixture {
-            post(activities = BusinessActivities(Set(HighValueDealing))) { result =>
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
             }
@@ -184,7 +184,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
 
         "redirect to the Msb Turnover page" when {
           "business is an msb" in new FormSubmissionFixture {
-            post(activities = BusinessActivities(Set(MoneyServiceBusiness))) { result =>
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
             }
@@ -204,10 +204,14 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
                   customersOutsideUK = Some(CustomersOutsideUK(None))
                 )
 
+                val businessMatching = BusinessMatching(
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                )
+
                 post(
                   edit = true,
                   data = Some(data),
-                  activities = BusinessActivities(Set(MoneyServiceBusiness)),
+                  businessMatching = businessMatching,
                   renewal = Some(renewal)
                 ) { result =>
                   result.header.status mustBe SEE_OTHER
