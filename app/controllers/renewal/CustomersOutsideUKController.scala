@@ -60,7 +60,13 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               renewal <- cache.getEntry[Renewal](Renewal.key)
             } yield {
-              renewalService.updateRenewal(renewal.customersOutsideUK(data)) map { _ =>
+              renewalService.updateRenewal({
+                if(hasCustomersOutsideUK(renewal.customersOutsideUK) && !hasCustomersOutsideUK(Some(data))){
+                  renewal.customersOutsideUK(data).copy(sendTheLargestAmountsOfMoney = None, mostTransactions = None)
+                } else {
+                  renewal.customersOutsideUK(data)
+                }
+              }) map { _ =>
                 redirect(edit, businessMatching)
               }
             }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
@@ -83,6 +89,14 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
       case _ => Redirect(routes.SummaryController.get())
     }
   }
+
+  private def hasCustomersOutsideUK(customersOutsideUK: Option[CustomersOutsideUK]): Boolean = {
+    customersOutsideUK.flatMap {
+      case CustomersOutsideUK(Some(country)) => Some(country)
+      case _ => None
+    }.isDefined
+  }
+
 }
 
 

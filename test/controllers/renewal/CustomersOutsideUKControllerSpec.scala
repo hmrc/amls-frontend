@@ -21,7 +21,7 @@ import models.Country
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
@@ -92,10 +92,11 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
               activities: BusinessActivities = BusinessActivities(Set.empty)
             )(block: Result => Unit) = block({
 
-      when(cache.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(
-          activities = Some(activities)
-        )))
+      when {
+        cache.getEntry[BusinessMatching](BusinessMatching.key)
+      } thenReturn{
+        Some(BusinessMatching(activities = Some(activities)))
+      }
 
       await(controller.post(edit)(formRequest(valid)))
     })
@@ -190,11 +191,11 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
           result.header.status mustBe SEE_OTHER
 
           verify(renewalService)
-            .updateRenewal(Renewal(
+            .updateRenewal(eqTo(Renewal(
               customersOutsideUK = Some(CustomersOutsideUK(None)),
               sendTheLargestAmountsOfMoney = None,
               mostTransactions = None
-            ))(any(), any(), any())
+            )))(any(), any(), any())
         }
 
       }
