@@ -18,8 +18,9 @@ package connectors
 
 import audit.EnrolEvent
 import config.{AMLSAuditConnector, ApplicationConfig, WSHttp}
+import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.governmentgateway.{EnrolmentRequest, EnrolmentResponse}
-import play.api.Logger
+import play.api.Logger.{debug, warn}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.config.AppName
@@ -33,6 +34,11 @@ trait GovernmentGatewayConnector {
   protected def enrolUrl: String
   private[connectors] def audit: Audit
 
+  private val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
+  private val invalidCredentialsMessage = "The credential has the wrong type of role"
+
+  private def msg(msg: String) = s"[GovernmentGatewayConnector][enrol] - $msg"
+
   def enrol
   (request: EnrolmentRequest)
   (implicit
@@ -40,16 +46,23 @@ trait GovernmentGatewayConnector {
    ec: ExecutionContext,
    reqW: Writes[EnrolmentRequest]
   ): Future[HttpResponse] = {
-    val prefix = "[GovernmentGatewayConnector][enrol]"
-    Logger.debug(s"$prefix - Request Body: ${Json.toJson(request)}")
+
+    debug(msg(s"Request body: ${Json.toJson(request)}"))
+
     http.POST[EnrolmentRequest, HttpResponse](enrolUrl, request) map {
       response =>
         audit.sendDataEvent(EnrolEvent(request, response))
-        Logger.debug(s"$prefix - Successful Response: ${response.json}")
+        debug(msg("Successful Response: ${response.json}"))
         response
     } recoverWith {
+      case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>
+        warn(msg(s"'${e.getMessage}' error encountered"))
+        Future.failed(DuplicateEnrolmentException(e.getMessage, e))
+      case e: Throwable if e.getMessage.contains(invalidCredentialsMessage) =>
+        warn(msg(s"'${e.getMessage}' error encountered"))
+        Future.failed(InvalidEnrolmentCredentialsException(e.getMessage, e))
       case e =>
-        Logger.warn(s"$prefix - Failure response")
+        warn(msg("Failure response"))
         Future.failed(e)
     }
   }

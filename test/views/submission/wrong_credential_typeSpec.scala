@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package views
+package views.submission
 
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.Html
 import utils.GenericTestHelper
+import views.Fixture
 
-class DuplicateSubmissionViewSpec extends GenericTestHelper {
+class wrong_credential_typeSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    val requestWithToken = addToken(request)
 
-    val getHelpView = Html("<p>Get help here</p>")
-
-    def view = views.html.duplicate_submission()
-
+    override def view = views.html.submission.wrong_credential_type()
   }
 
-  "The html content" must {
-    "have the correct title and subtitles" in new ViewFixture {
+  "The 'wrong credential type' template" must {
+    "have the correct title, headings and content" in new ViewFixture {
+      doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      doc.select("header h1").text mustBe Messages("error.submission.problem.title")
 
-      doc.title mustBe s"""${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"""
-
-    }
-
-    "have the correct content" in new ViewFixture {
-      import utils.Strings._
-
-      doc.getElementById("page-content").html.replace("\n","") mustBe Messages("error.submission.duplicate.content").paragraphize
+      validateParagraphizedContent("error.submission.wrong_credentials.content")
     }
   }
 

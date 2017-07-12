@@ -27,8 +27,11 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
+import exceptions._
+import views.ParagraphHelpers
+import org.jsoup._
 
 import scala.concurrent.Future
 
@@ -126,17 +129,42 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
 
-    "post must return a 'Duplicate Business Partner' error page when 422 is returned from the middle tier" in new Fixture {
+    "show the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+      val msg = "HMRC-MLR-ORG duplicate enrolment"
 
       when {
         controller.subscriptionService.subscribe(any(), any(), any())
-      } thenReturn Future.failed(Upstream4xxResponse("Error", 422, 500))
+      } thenReturn Future.failed(DuplicateEnrolmentException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
 
-      status(result) mustBe UNPROCESSABLE_ENTITY
+      status(result) mustBe OK
+
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateParagraphizedContent("error.submission.duplicate_enrolment.content")
+    }
+
+    "show the correct help page when an invalid enrolment credentials error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+      val msg = "invalid credentials"
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+
+      val result = controller.post()(request)
+
+      status(result) mustBe OK
+
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateParagraphizedContent("error.submission.wrong_credentials.content")
     }
   }
 

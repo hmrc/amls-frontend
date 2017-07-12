@@ -17,6 +17,7 @@
 package views
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
@@ -25,21 +26,23 @@ import utils.Strings.TextHelpers
 
 import scala.collection.JavaConverters._
 
-trait Fixture extends MustMatchers {
-  implicit val request = FakeRequest()
-
-  def view: HtmlFormat.Appendable
-  lazy val html = view.body
-  lazy val doc = Jsoup.parse(html)
-  lazy val form = doc.getElementsByTag("form").first()
-  lazy val heading = doc.getElementsByTag("h1").first()
-  lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
-  lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
-
-  def validateParagraphizedContent(messageKey: String)(implicit messages: Messages): Unit = {
+trait ParagraphHelpers extends MustMatchers {
+  // TODO: refactor this into a scalatest matcher
+  def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit = {
     for(p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala) {
       doc.body().toString must include(p.text())
     }
   }
+}
 
+trait Fixture extends MustMatchers with ParagraphHelpers {
+  implicit val request = FakeRequest()
+
+  def view: HtmlFormat.Appendable
+  lazy val html = view.body
+  implicit lazy val doc = Jsoup.parse(html)
+  lazy val form = doc.getElementsByTag("form").first()
+  lazy val heading = doc.getElementsByTag("h1").first()
+  lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
+  lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
 }

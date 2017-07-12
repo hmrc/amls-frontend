@@ -137,8 +137,12 @@ $(function () {
         }
       } else {
         if ($inputs.filter(pred).length === 0) {
+          $self.attr({
+            'aria-controls': $target.attr('id'),
+            'aria-expanded': 'false'
+          });
           if ($self.prop('checked') === false) {
-            $target.hide();
+            $target.hide().attr('aria-hidden', 'true');
           }
         }
       }
@@ -147,12 +151,14 @@ $(function () {
         $inputs.filter(checkedInputs).prop('checked', false);
         $inputs.filter('input, select, textarea').val('');
         $inputs.filter('option').prop('selected', false);
-        $target.hide();
+        $self.attr('aria-expanded', 'false');
+        $target.hide().attr('aria-hidden', 'true');
       }
 
       $self.change(function () {
         if ($self.prop('checked') === true) {
-          $target.show();
+          $self.attr('aria-expanded', 'true');
+          $target.show().attr('aria-hidden', 'false');
         } else {
           hide();
         }
@@ -203,8 +209,8 @@ $(function () {
     duplicateErrorWrapper.find('.report-error__toggle').remove();
   }
 
-  var dupFeeNotFoundDiv = $('.dup_feenotfound');
-  if(dupFeeNotFoundDiv.length) {
+  var partialDeskproForm = $('.partial-deskpro-form');
+  if(partialDeskproForm.length) {
 
     $('#get-help-action').remove();
     var container = $('.report-error__content');
@@ -220,17 +226,16 @@ $(function () {
     };
 
     reportActionField
-        .val('Submit my application')
+        .val(partialDeskproForm.data('action-value'))
         .closest('.form-group-compound')
         .css(css);
 
     reportErrorField
-        .val('Paying for my application')
+        .val(partialDeskproForm.data('error-value'))
         .closest('.form-group-compound')
         .css(css);
 
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
-
   }
 
 });

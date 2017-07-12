@@ -77,8 +77,8 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
         checkCompletionOfHvd(renewal)
       } else {
         renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, None, None, None, None, None, None, _) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, None, None, None, None, None, None, _) => true
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _, _, _, _, _, _, _) => true
           case _ => false
         }
       }
@@ -106,38 +106,38 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
             }
           case None =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, Some(_), _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, Some(_), _) => true
               case _ => false
             }
         }
       }
       case Some(x) if x.msbServices.contains(CurrencyExchange) =>
         renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, Some(_), _) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), _) => true
           case _ => false
         }
       case Some(x) if x.msbServices.contains(TransmittingMoney) => {
         maybeCountry match {
           case Some(_) =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_), None, _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), Some(_), Some(_), None, _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), _, _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), _, _) => true
               case _ => false
             }
           case None =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), None, None, None, _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, Some(_), None, None, None, _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), _, _, _, _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), _, _, _, _) => true
               case _ => false
             }
         }
       }
       case _ =>
         renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, _) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, _) => true
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _) => true
           case _ => false
         }
     }
@@ -155,44 +155,44 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
         maybeCountry match {
           case Some(_) =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
               case _ => false
             }
           case None =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), Some(_), Some(_), None, None, Some(_), _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), Some(_), Some(_), None, None, Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), Some(_), Some(_), _, _, Some(_), _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), Some(_), Some(_), _, _, Some(_), _) => true
               case _ => false
             }
         }
       }
       case Some(x) if x.msbServices.contains(CurrencyExchange) =>
         renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), Some(_), None, None, None, Some(_), _) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), Some(_), None, None, None, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), Some(_), _, _, _, Some(_), _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), Some(_), _, _, _, Some(_), _) => true
           case _ => false
         }
       case Some(x) if x.msbServices.contains(TransmittingMoney) => {
         maybeCountry match {
           case Some(_) =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), None, Some(_), Some(_), Some(_), None, _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), None, Some(_), Some(_), Some(_), None, _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), _, Some(_), Some(_), Some(_), _, _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), _, Some(_), Some(_), Some(_), _, _) => true
               case _ => false
             }
           case None =>
             renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), None, Some(_), None, None, None, _) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), None, Some(_), None, None, None, _) => true
+              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), _, Some(_), _, _, _, _) => true
+              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), _, Some(_), _, _, _, _) => true
               case _ => false
             }
         }
       }
       case _ =>
         renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), None, None, Some(_), None, None, None, None, None, _) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), None, None, Some(_), None, None, None, None, None, _) => true
+          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, Some(_), _, _, _, _, _, _) => true
+          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, Some(_), _, _, _, _, _, _) => true
           case _ => false
         }
     }
@@ -200,8 +200,8 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   private def checkCompletionOfHvd(renewal: Renewal) = {
     renewal match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, None, _) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), None, None, None, None, None, None, _) => true
+      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
+      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
       case _ => false
     }
   }
