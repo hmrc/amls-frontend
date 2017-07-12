@@ -364,6 +364,11 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       ninoType.validate(nino.toLowerCase) mustBe Valid(nino)
     }
 
+    "successfully validate Isle of Man code" in {
+      val nino = "MN123456A"
+      ninoType.validate(nino) mustBe Valid(nino)
+    }
+
     "successfully validate nino including spaces and dashes" in {
       val testNino = nextNino
       val spacedNino = testNino.grouped(2).mkString(" ")

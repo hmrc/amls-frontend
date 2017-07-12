@@ -49,4 +49,9 @@ trait TestOnlyController extends BaseController with Actions {
       Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true, true)))
   }
 
+  def wrongCredentials = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.submission.wrong_credential_type()))
+  }
+
 }

@@ -32,7 +32,8 @@ class duplicate_enrolmentSpec extends GenericTestHelper with MustMatchers {
   "The duplicate enrolment view" must {
     "display the correct title and headings" in new ViewFixture {
 
-      doc.select("header h1").text() mustBe Messages("error.submission.duplicate.title")
+      doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      doc.select("header h1").text() mustBe Messages("error.submission.problem.title")
 
       validateParagraphizedContent("error.submission.duplicate_enrolment.content")
     }

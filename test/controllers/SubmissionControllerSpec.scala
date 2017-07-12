@@ -29,7 +29,7 @@ import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
-import exceptions.DuplicateEnrolmentException
+import exceptions._
 import views.ParagraphHelpers
 import org.jsoup._
 
@@ -129,7 +129,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
 
-    "show the correct help page when a 502 is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "show the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate enrolment"
 
       when {
@@ -146,6 +146,25 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
       implicit val doc = Jsoup.parse(contentAsString(result))
       validateParagraphizedContent("error.submission.duplicate_enrolment.content")
+    }
+
+    "show the correct help page when an invalid enrolment credentials error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+      val msg = "invalid credentials"
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+
+      val result = controller.post()(request)
+
+      status(result) mustBe OK
+
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateParagraphizedContent("error.submission.wrong_credentials.content")
     }
   }
 
