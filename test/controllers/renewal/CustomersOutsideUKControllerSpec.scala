@@ -82,10 +82,9 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
       dataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cache))
 
-    when(cache.getEntry[Renewal](Renewal.key))
-      .thenReturn(Some(Renewal(
-        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB")))))
-      )))
+    when {
+      cache.getEntry[Renewal](Renewal.key)
+    } thenReturn Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB")))))))
 
     def post(
               edit: Boolean = false,
@@ -153,54 +152,20 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is an hvd" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
+          "business is an hvd" in new FormSubmissionFixture {
+            post(activities = BusinessActivities(Set(HighValueDealing))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+            }
           }
         }
 
         "redirect to the Msb Turnover page" when {
-          "business is an msb" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "isOutside" -> "true",
-              "countries[0]" -> "GB",
-              "countries[1]" -> "US"
-            )
-
-            when(dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing))))))
-
-            when(mockCacheMap.getEntry[Renewal](Renewal.key))
-              .thenReturn(Some(Renewal()))
-
-            when(dataCacheConnector.save[Renewal](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.TotalThroughputController.get().url))
+          "business is an msb" in new FormSubmissionFixture {
+            post(activities = BusinessActivities(Set(MoneyServiceBusiness))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
+            }
           }
         }
 
