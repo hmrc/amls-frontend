@@ -153,7 +153,6 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
           }
         }
 
-
         "status is renewal amendment" in new Fixture {
           run(RenewalSubmitted(None)) { _ =>
             val result = controller.get()(request)

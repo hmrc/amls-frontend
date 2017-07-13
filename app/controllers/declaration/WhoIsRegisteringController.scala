@@ -56,34 +56,6 @@ trait WhoIsRegisteringController extends BaseController {
       }
   }
 
-  def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
-
-    val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
-    val rp: ResponsiblePeople = rpOption.getOrElse(ResponsiblePeople.default(None))
-
-    rp.personName match {
-      case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
-        rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
-      case _ => None
-    }
-  }
-
-  implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
-    import models.responsiblepeople._
-
-    RoleWithinBusinessRelease7(
-    positions.map {
-      case BeneficialOwner => models.declaration.release7.BeneficialShareholder
-      case Director => models.declaration.release7.Director
-      case InternalAccountant => models.declaration.release7.InternalAccountant
-      case NominatedOfficer => models.declaration.release7.NominatedOfficer
-      case Partner => models.declaration.release7.Partner
-      case SoleProprietor => models.declaration.release7.SoleProprietor
-      case DesignatedMember => models.declaration.release7.DesignatedMember
-    }
-    )
-  }
-
   def post: Action[AnyContent] = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhoIsRegistering](request.body) match {
@@ -141,6 +113,33 @@ trait WhoIsRegisteringController extends BaseController {
       case _ => Redirect(routes.AddPersonController.get())
     }
 
+  private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
+
+    val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
+    val rp: ResponsiblePeople = rpOption.getOrElse(ResponsiblePeople.default(None))
+
+    rp.personName match {
+      case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
+        rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
+      case _ => None
+    }
+  }
+
+  private def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
+    import models.responsiblepeople._
+
+    RoleWithinBusinessRelease7(
+      positions.map {
+        case BeneficialOwner => models.declaration.release7.BeneficialShareholder
+        case Director => models.declaration.release7.Director
+        case InternalAccountant => models.declaration.release7.InternalAccountant
+        case NominatedOfficer => models.declaration.release7.NominatedOfficer
+        case Partner => models.declaration.release7.Partner
+        case SoleProprietor => models.declaration.release7.SoleProprietor
+        case DesignatedMember => models.declaration.release7.DesignatedMember
+      }
+    )
+  }
 }
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
