@@ -129,12 +129,8 @@ trait StatusController extends BaseController {
     } yield {
 
       businessType match {
-        case Partnership => {
-          if (ApplicationConfig.getConfBool("feature-toggle.partner", false) && (DeclarationHelper.numberOfPartners(responsiblePeople) < 2)) {
-            controllers.declaration.routes.RegisterPartnersController.get()
-          } else {
-            DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
-          }
+        case Partnership if (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
+          controllers.declaration.routes.RegisterPartnersController.get()
         }
         case _ => DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
       }
