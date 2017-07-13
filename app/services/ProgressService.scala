@@ -16,12 +16,14 @@
 
 package services
 
+import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
+import models.businessmatching.BusinessType.Partnership
 import models.businessmatching.{BusinessActivities => _, _}
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
@@ -34,12 +36,15 @@ import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{ControllerHelper, DeclarationHelper}
+import play.api.mvc.{Action, AnyContent, Request}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ProgressService {
 
   private[services] def cacheConnector: DataCacheConnector
+  protected[controllers] def statusService: StatusService
 
   private def dependentSections(implicit cache: CacheMap): Set[Section] =
     (for {
@@ -91,8 +96,32 @@ trait ProgressService {
       mandatorySections(cache) ++
       dependentSections(cache)
   }
+
+  def getSubmitRedirect(implicit
+                        hc: HeaderCarrier,
+                        ac: AuthContext,
+                        ec: ExecutionContext
+                       ) = {
+    val result = for {
+      status <- OptionT.liftF(statusService.getStatus)
+      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
+      businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+    } yield {
+      businessType match {
+        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
+          controllers.declaration.routes.RegisterPartnersController.get()
+        case _ =>
+          DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
+      }
+    }
+    result getOrElse NotFound(notFoundView)
+  }
 }
 
 object ProgressService extends ProgressService {
   override private[services] val cacheConnector = DataCacheConnector
+  override protected[controllers] val statusService = StatusService
 }
