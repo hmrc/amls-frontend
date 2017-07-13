@@ -42,9 +42,7 @@ object DeclarationHelper {
   private def routeWithNominatedOfficer(status: SubmissionStatus) = {
     status match {
       case SubmissionReady | NotCompleted => routes.FeeGuidanceController.get()
-      case SubmissionReadyForReview => declaration.routes.WhoIsRegisteringController.get()
-      case ReadyForRenewal(_) => declaration.routes.WhoIsRegisteringController.getWithRenewal()
-      case _ => declaration.routes.WhoIsRegisteringController.getWithAmendment()
+      case _ => declaration.routes.WhoIsRegisteringController.get()
     }
   }
 

@@ -243,8 +243,8 @@ GET         /business-activities/check-your-answers                             
 GET         /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
 POST        /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.post()
 
-GET         /update-information/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.getWithAmendment()
-GET         /update-information/who-is-registering-renewal                            controllers.declaration.WhoIsRegisteringController.getWithRenewal()
+GET         /update-information/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
+GET         /update-information/who-is-registering-renewal                            controllers.declaration.WhoIsRegisteringController.get()
 
 GET         /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 POST        /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()

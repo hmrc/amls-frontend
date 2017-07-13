@@ -168,11 +168,10 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
         "status is renewal" in new Fixture {
           run(ReadyForRenewal(None), Some(mock[Renewal])) { _ =>
-            val result = controller.getWithRenewal(request)
+            val result = controller.get(request)
             status(result) must be(OK)
 
             val htmlValue = Jsoup.parse(contentAsString(result))
-
             contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
           }
         }

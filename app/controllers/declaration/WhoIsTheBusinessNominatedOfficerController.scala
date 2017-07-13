@@ -104,7 +104,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
             } yield serviceStatus match {
               case SubmissionReady | NotCompleted => Redirect(controllers.routes.FeeGuidanceController.get())
               case SubmissionReadyForReview => Redirect(routes.WhoIsRegisteringController.get())
-              case _ => Redirect(routes.WhoIsRegisteringController.getWithAmendment())
+              case _ => Redirect(routes.WhoIsRegisteringController.get())
             }
           }
         }

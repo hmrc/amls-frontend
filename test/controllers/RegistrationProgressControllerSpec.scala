@@ -568,7 +568,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
             val result = controller.post()(request)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url)
+            redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
           }
 
           "status is renewal" in new Fixture {
@@ -596,7 +596,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
             val result = controller.post()(request)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithRenewal().url)
+            redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
           }
         }
       }

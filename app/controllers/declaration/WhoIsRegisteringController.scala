@@ -39,9 +39,10 @@ import scala.concurrent.Future
 trait WhoIsRegisteringController extends BaseController {
 
   private[controllers] def amlsConnector: AmlsConnector
+  private[controllers] def renewalService: RenewalService
+
   def dataCacheConnector: DataCacheConnector
   def statusService: StatusService
-  private[controllers] def renewalService: RenewalService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -54,10 +55,6 @@ trait WhoIsRegisteringController extends BaseController {
           ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
-
-  def getWithAmendment = get
-
-  def getWithRenewal = get
 
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
