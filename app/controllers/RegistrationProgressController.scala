@@ -133,13 +133,13 @@ trait RegistrationProgressController extends BaseController {
         } yield {
 
             businessType match {
-              case Partnership if ApplicationConfig.getConfBool("feature-toggle.partner", false) &&
-                (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
+
+              case Partnership if (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
                   Redirect(controllers.declaration.routes.RegisterPartnersController.get())
               }
-              case _ => Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
+              case _ =>
+                Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
             }
-
         }
       result getOrElse NotFound(notFoundView)
   }
