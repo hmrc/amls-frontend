@@ -33,7 +33,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
   }
 
   "position_within_business view" must {
-    "have correct title, headings and form fields" in new ViewFixture {
+    "have correct title, headings" in new ViewFixture {
       val form2 = EmptyForm
 
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
@@ -47,6 +47,25 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsByAttributeValue("name", "positions[]") must not be empty
 
+    }
+
+    "have the correct fields" when {
+      "business is a SoleProprietor" in new ViewFixture{
+
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.SoleProprietor, None, name)
+
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.06"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
+
+      }
+      "business is a Partnership" in new ViewFixture{
+
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.Partnership, None, name)
+
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.05"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
+
+      }
     }
 
     "show errors in the correct locations" in new ViewFixture {
