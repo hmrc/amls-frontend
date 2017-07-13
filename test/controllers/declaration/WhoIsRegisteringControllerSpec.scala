@@ -61,11 +61,9 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
     val cacheMap = mock[CacheMap]
 
-    val name = PersonName("firstName", None, "lastName", None, None)
-
     val responsiblePeople = (for {
-      p1 <- responsiblePersonGen.map(p => p.copy(personName = Some(name)))
-      p2 <- responsiblePersonGen.map(p => p.copy(personName = Some(name), status = Some(StatusConstants.Deleted)))
+      p1 <- responsiblePersonGen
+      p2 <- responsiblePersonGen.map(p => p.copy(status = Some(StatusConstants.Deleted)))
     } yield {
       Seq(p1, p2)
     }).sample.get
@@ -114,7 +112,7 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
             val htmlValue = Jsoup.parse(contentAsString(result))
             htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
 
             contentAsString(result) must include(Messages("submit.amendment.application"))
           }
@@ -127,7 +125,7 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
             val htmlValue = Jsoup.parse(contentAsString(result))
             htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
 
             contentAsString(result) must include(Messages("submit.amendment.application"))
           }
@@ -140,7 +138,7 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
             val htmlValue = Jsoup.parse(contentAsString(result))
             htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
+            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
 
             contentAsString(result) must include(Messages("submit.registration"))
           }
@@ -205,7 +203,7 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
 
-      "on post invalid data show error" in new Fixture {
+      "show error when invalid data is posted" in new Fixture {
         run(SubmissionReady) { _ =>
           val newRequest = request.withFormUrlEncodedBody()
           val result = controller.post()(newRequest)
