@@ -58,7 +58,7 @@ class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
 
     def guidanceOptions(currentCount: Int) = Table(
       ("guidanceRequested", "expectedRedirect"),
-      (true, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
+      (true, controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1)),
       (false, controllers.responsiblepeople.routes.PersonNameController.get(currentCount + 1, false))
     )
   }
