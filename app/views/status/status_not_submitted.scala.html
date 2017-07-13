@@ -20,7 +20,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String])(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], call: Call)(implicit request: Request[_],m:Messages)
 
 @main2(title = Messages("status.submissionready.heading") +" - Your registration") {
 
@@ -64,7 +64,7 @@
             </ol>
         </div>
         <div class="grid-layout__column grid-layout__column--2-3">
-            @include.status.rightpanel_submissionready()
+            @include.status.rightpanel_submissionready(call: Call)
         </div>
     </div>
 }

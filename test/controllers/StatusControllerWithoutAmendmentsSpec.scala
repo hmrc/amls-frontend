@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{AmlsNotificationConnector, FeeConnector}
+import connectors.{AmlsNotificationConnector, DataCacheConnector, FeeConnector}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -28,11 +28,11 @@ import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.{RenewalService, AuthEnrolmentsService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, LandingService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.NotFoundException
 import utils.AuthorisedFixture
@@ -51,6 +51,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       override private[controllers] val statusService: StatusService = mock[StatusService]
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
     }
   }
 

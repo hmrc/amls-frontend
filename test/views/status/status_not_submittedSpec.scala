@@ -19,6 +19,7 @@ package views.status
 import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import utils.GenericTestHelper
 import views.Fixture
 
@@ -26,6 +27,8 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val call = mock[Call]
   }
 
   "status_not_submitted view" must {
@@ -35,7 +38,7 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"))
+      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"), call)
 
       doc.title must be(Messages("status.submissionready.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissionready.heading"))
@@ -44,7 +47,7 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"))
+      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"), call)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -67,7 +70,7 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "contains expected content 'update/amend information'" in new ViewFixture {
 
-      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"))
+      def view = views.html.status.status_not_submitted("XAML00000000000", Some("business Name"), call)
 
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
@@ -80,7 +83,7 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
     "do not show business name when 'business name' is empty" in new ViewFixture {
 
-      def view = views.html.status.status_not_submitted("XAML00000000000", None)
+      def view = views.html.status.status_not_submitted("XAML00000000000", None, call)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
 

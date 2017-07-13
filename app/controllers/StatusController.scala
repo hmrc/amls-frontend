@@ -17,21 +17,27 @@
 package controllers
 
 import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.FeeConnector
+import connectors.{DataCacheConnector, FeeConnector}
 import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
+import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Play
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, Call, Request}
 import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.status._
 
 import scala.concurrent.Future
+
+
 
 
 trait StatusController extends BaseController {
@@ -45,6 +51,8 @@ trait StatusController extends BaseController {
   private[controllers] def feeConnector: FeeConnector
 
   private[controllers] def renewalService: RenewalService
+
+  protected[controllers] def dataCache: DataCacheConnector
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -98,7 +106,7 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        Future.successful(getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission))
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
             (SubmissionWithdrawn, _) | (DeRegistered, _) =>
@@ -109,16 +117,48 @@ trait StatusController extends BaseController {
     }
   }
 
+  private def redirectToNextPage (implicit auth: AuthContext, request: Request[AnyContent]) : Future[Call] = {
+
+    val result = for {
+      status <- OptionT.liftF(statusService.getStatus)
+      responsiblePeople <- OptionT(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
+      businessmatching <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
+      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+    } yield {
+
+      businessType match {
+        case Partnership => {
+          if (ApplicationConfig.getConfBool("feature-toggle.partner", false) && (DeclarationHelper.numberOfPartners(responsiblePeople) < 2)) {
+            controllers.declaration.routes.RegisterPartnersController.get()
+          } else {
+            DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
+          }
+        }
+        case _ => DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
+      }
+
+    }
+    result getOrElse controllers.routes.RegistrationProgressController.get()
+  }
+
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
                                        status: SubmissionStatus,
                                        businessNameOption: Option[String],
-                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent]) = {
+                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent], authContext: AuthContext) = {
     status match {
-      case NotCompleted => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-      case SubmissionReady => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
-      case _ => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+      case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      case SubmissionReady =>
+        {
+          redirectToNextPage map (
+            x =>
+            Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, x))
+            )
+        }
+      case _ => Future.successful(Ok(status_submitted(mlrRegNumber.getOrElse(""),
         businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
-        fromDuplicateSubmission))
+        fromDuplicateSubmission)))
     }
   }
 
@@ -193,6 +233,7 @@ object StatusController extends StatusController {
   override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
+  override protected[controllers] val dataCache = DataCacheConnector
   // $COVERAGE-ON$
 
 }
