@@ -29,6 +29,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
 import play.api.mvc.Result
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 
@@ -64,7 +65,11 @@ class TransactionsInLast12MonthsController @Inject()(
                   activities <- bm.activities
                 } yield {
                   renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
-                    redirectTo(hasCustomersOutsideUK(renewal), services.msbServices, activities.businessActivities, edit)
+                    redirectTo(
+                      ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK),
+                      services.msbServices,
+                      activities.businessActivities, edit
+                    )
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
@@ -83,12 +88,5 @@ class TransactionsInLast12MonthsController @Inject()(
     } else {
       Redirect(routes.SummaryController.get())
     }
-
-  private def hasCustomersOutsideUK(renewal: Renewal): Boolean = {
-    renewal.customersOutsideUK.flatMap {
-      case CustomersOutsideUK(Some(country)) => Some(country)
-      case _ => None
-    }.isDefined
-  }
 
 }

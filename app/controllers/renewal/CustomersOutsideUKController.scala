@@ -63,7 +63,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                 renewal <- cache.getEntry[Renewal](Renewal.key)
               } yield {
                 renewalService.updateRenewal({
-                  if (hasCustomersOutsideUK(renewal.customersOutsideUK) && !hasCustomersOutsideUK(Some(data))) {
+                  if (ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK) && !ControllerHelper.hasCustomersOutsideUK(Some(data))) {
                     renewal.customersOutsideUK(data).copy(sendTheLargestAmountsOfMoney = None, mostTransactions = None)
                   } else {
                     renewal.customersOutsideUK(data)
@@ -81,8 +81,8 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
     edit match {
       case true => if (
         msbServicesContainsTransmittingMoney(businessMatching.msbServices) &&
-          !hasCustomersOutsideUK(renewal.customersOutsideUK) &&
-          hasCustomersOutsideUK(Some(data))
+          !ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK) &&
+          ControllerHelper.hasCustomersOutsideUK(Some(data))
       ) {
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
       } else {
@@ -98,13 +98,6 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
       case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case _ => Redirect(routes.SummaryController.get())
     }
-  }
-
-  private def hasCustomersOutsideUK(customersOutsideUK: Option[CustomersOutsideUK]): Boolean = {
-    customersOutsideUK.flatMap {
-      case CustomersOutsideUK(Some(country)) => Some(country)
-      case _ => None
-    }.isDefined
   }
 
   private def msbServicesContainsTransmittingMoney(msbServices: Option[MsbServices]): Boolean = {
