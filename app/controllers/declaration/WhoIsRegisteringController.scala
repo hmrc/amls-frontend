@@ -125,7 +125,7 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  private def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
+  private implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
     import models.responsiblepeople._
 
     RoleWithinBusinessRelease7(

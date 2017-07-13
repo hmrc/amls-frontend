@@ -16,9 +16,10 @@
 
 package generators
 
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople._
 import org.scalacheck.Gen
 import models.FormTypes
+import org.joda.time.LocalDate
 
 trait ResponsiblePersonGenerator {
 
@@ -26,14 +27,29 @@ trait ResponsiblePersonGenerator {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
+  val positionInBusinessGen =
+    Gen.someOf(
+      BeneficialOwner,
+      InternalAccountant,
+      Director,
+      NominatedOfficer,
+      Partner,
+      SoleProprietor,
+      DesignatedMember
+    )
+
+  val positionsGen = for {
+    positions <- positionInBusinessGen
+  } yield Positions(positions.toSet, Some(new LocalDate()))
+
   val personNameGen: Gen[PersonName] = for {
     firstName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
     lastName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
   } yield PersonName(firstName, None, lastName, None, None)
 
-
-  val responsiblePeopleGen: Gen[ResponsiblePeople] = for {
+  val responsiblePersonGen: Gen[ResponsiblePeople] = for {
     personName <- personNameGen
-  } yield ResponsiblePeople(Some(personName))
+    positions <- positionsGen
+  } yield ResponsiblePeople(Some(personName), positions = Some(positions))
 
 }

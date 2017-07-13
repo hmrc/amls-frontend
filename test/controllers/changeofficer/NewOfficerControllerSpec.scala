@@ -49,7 +49,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
     lazy val controller = injector.instanceOf[NewOfficerController]
 
-    lazy val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
+    lazy val responsiblePeople = Gen.listOf(responsiblePersonGen).sample.get
     lazy val emptyPerson = ResponsiblePeople()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
 
@@ -80,7 +80,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
 
       "prepopulate the view with the selected person" in new TestFixture {
 
-        override lazy val responsiblePeople = Gen.listOfN(3, responsiblePeopleGen).sample.get :+
+        override lazy val responsiblePeople = Gen.listOfN(3, responsiblePersonGen).sample.get :+
           ResponsiblePeople(Some(PersonName("Test", None, "Person", None, None)))
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))

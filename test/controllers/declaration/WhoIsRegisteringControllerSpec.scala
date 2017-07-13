@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import generators.ResponsiblePersonGenerator
 import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.renewal.Renewal
@@ -39,7 +40,7 @@ import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
-class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar {
+class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -60,22 +61,14 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
     val cacheMap = mock[CacheMap]
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+    val name = PersonName("firstName", None, "lastName", None, None)
 
-    val rp = ResponsiblePeople(
-      personName = Some(personName),
-      positions = Some(positions),
-      status = None
-    )
-
-    val rp1 = ResponsiblePeople(
-      personName = Some(personName),
-      positions = Some(positions),
-      status = Some(StatusConstants.Deleted)
-    )
-
-    val responsiblePeople = Seq(rp, rp1)
+    val responsiblePeople = (for {
+      p1 <- responsiblePersonGen.map(p => p.copy(personName = Some(name)))
+      p2 <- responsiblePersonGen.map(p => p.copy(personName = Some(name), status = Some(StatusConstants.Deleted)))
+    } yield {
+      Seq(p1, p2)
+    }).sample.get
 
     def run(status: SubmissionStatus, renewal: Option[Renewal] = None)(block: Unit => Any) = {
       when {
