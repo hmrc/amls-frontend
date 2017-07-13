@@ -50,7 +50,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
     }
 
     "have the correct fields" when {
-      "business is a SoleProprietor" in new ViewFixture{
+      "business type is SoleProprietor" in new ViewFixture{
 
         def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.SoleProprietor, None, name)
 
@@ -58,7 +58,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
         form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
 
       }
-      "business is a Partnership" in new ViewFixture{
+      "business type is Partnership" in new ViewFixture{
 
         def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.Partnership, None, name)
 
@@ -66,6 +66,28 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
         form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
 
       }
+      "business type is LimitedCompany" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.LimitedCompany, None, name)
+
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.01"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.02"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
+      }
+      "business type is UnincorporatedBody" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.UnincorporatedBody, None, name)
+
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.01"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.02"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
+      }
+      "business type is LPrLLP" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.LPrLLP, None, name)
+
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.04"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.05"))
+        form.text() must include(Messages("responsiblepeople.position_within_business.lbl.07"))
+      }
+
     }
 
     "show errors in the correct locations" in new ViewFixture {
