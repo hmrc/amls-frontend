@@ -14,34 +14,28 @@
  * limitations under the License.
  */
 
-package views
+package views.submission
 
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.Html
 import utils.GenericTestHelper
+import views.Fixture
 
-class DuplicateSubmissionViewSpec extends GenericTestHelper {
+class duplicate_enrolmentSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    val getHelpView = Html("<p>Get help here</p>")
-
-    def view = views.html.duplicate_submission()
-
+    def view = views.html.submission.duplicate_enrolment()
   }
 
-  "The html content" must {
-    "have the correct title and subtitles" in new ViewFixture {
+  "The duplicate enrolment view" must {
+    "display the correct title and headings" in new ViewFixture {
 
-      doc.title mustBe s"""${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"""
+      doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      doc.select("header h1").text() mustBe Messages("error.submission.problem.title")
 
-    }
-
-    "have the correct content" in new ViewFixture {
-      import utils.Strings._
-
-      doc.getElementById("page-content").html.replace("\n","") mustBe Messages("error.submission.duplicate.content").paragraphize
+      validateParagraphizedContent("error.submission.duplicate_enrolment.content")
     }
   }
 

@@ -16,19 +16,21 @@
 
 package controllers.testonly
 
-import config.{BusinessCustomerSessionCache, AMLSAuthConnector, AmlsShortLivedCache}
-import controllers.auth.AmlsRegime
+import config.{AMLSAuthConnector, AmlsShortLivedCache, BusinessCustomerSessionCache}
+import controllers.BaseController
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import views.html.status.status_submitted
+
+import scala.concurrent.Future
 
 object TestOnlyController extends TestOnlyController {
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
 
-trait TestOnlyController extends FrontendController with Actions {
+trait TestOnlyController extends BaseController with Actions {
 
-  def dropSave4Later = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def dropSave4Later = Authorised.async {
     implicit user =>
       implicit request =>
         BusinessCustomerSessionCache.remove()
@@ -36,4 +38,20 @@ trait TestOnlyController extends FrontendController with Actions {
           Ok("Cache successfully cleared")
         }
   }
+
+  def duplicateEnrolment = Authorised.async {
+    implicit user => implicit request =>
+      Future.successful(Ok(views.html.submission.duplicate_enrolment()))
+  }
+
+  def duplicateSubmission = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true, true)))
+  }
+
+  def wrongCredentials = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.submission.wrong_credential_type()))
+  }
+
 }

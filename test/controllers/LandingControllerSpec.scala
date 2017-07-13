@@ -34,7 +34,7 @@ import models.tradingpremises.TradingPremises
 import models.{Country, SubscriptionFees, SubscriptionResponse}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito
+import org.mockito.{ArgumentCaptor, Mockito}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
@@ -45,11 +45,14 @@ import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.{AuditEvent, ExtendedDataEvent}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,12 +62,15 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
   trait Fixture extends AuthorisedFixture {
     self =>
+
     val request = addToken(authRequest)
+
     val controller = new LandingController {
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
       override val shortLivedCache = mock[ShortLivedCache]
+      override val auditConnector = mock[AuditConnector]
     }
   }
 
@@ -122,9 +128,12 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
+
+          verify(controller.auditConnector).sendEvent(any[ExtendedDataEvent])(any(), any())
         }
 
         "the landing service has review details with invalid postcode" in new Fixture {
@@ -138,6 +147,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
@@ -258,6 +268,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
+      override def auditConnector = mock[AuditConnector]
     }
 
     when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))

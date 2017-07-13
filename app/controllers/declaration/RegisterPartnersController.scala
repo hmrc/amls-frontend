@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import include._
-@import utils.Strings._
+package controllers.declaration
 
-@()(implicit messages: Messages, request: Request[AnyContent])
+import javax.inject.{Inject, Singleton}
 
-@main(title = messages("error.submission.problem.title"), bodyClasses = Some("duplicate-submission-page")) {
+import controllers.BaseController
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-    @heading(
-        messages("error.submission.problem.title")
-    )
+import scala.concurrent.Future
 
-    <div id="page-content">
-        @messages("error.submission.duplicate.content").paragraphizeH
-    </div>
+
+@Singleton
+class RegisterPartnersController @Inject()(
+                                          val authConnector: AuthConnector
+                                          ) extends BaseController {
+
+  def get() = Authorised.async {
+    implicit authContext => implicit request => {
+
+      Future.successful(Ok(""))
+
+    }
+  }
+
 }

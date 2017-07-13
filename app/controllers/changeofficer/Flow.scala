@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import include._
-@import utils.Strings._
+package controllers.changeofficer
 
-@()(implicit messages: Messages, request: Request[AnyContent])
+object Flow {
 
-@main(title = messages("error.submission.problem.title"), bodyClasses = Some("duplicate-submission-page")) {
+  val journeyUrls = Seq(
+    controllers.changeofficer.routes.StillEmployedController.get().url,
+    controllers.changeofficer.routes.RoleInBusinessController.get().url,
+    controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url,
+    controllers.changeofficer.routes.NewOfficerController.get().url,
+    controllers.changeofficer.routes.FurtherUpdatesController.get().url
+  )
 
-    @heading(
-        messages("error.submission.problem.title")
-    )
-
-    <div id="page-content">
-        @messages("error.submission.duplicate.content").paragraphizeH
-    </div>
 }

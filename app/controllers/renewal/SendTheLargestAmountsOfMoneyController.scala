@@ -56,12 +56,19 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
           for {
             renewal <- renewalService.getRenewal
             _ <- renewalService.updateRenewal(renewal.sendTheLargestAmountsOfMoney(data))
-          } yield redirectDependingOnEdit(edit)
+          } yield redirectTo(edit, renewal)
       }
   }
 
-  def redirectDependingOnEdit(edit:Boolean) = edit match {
-    case true  => Redirect(routes.SummaryController.get())
+  def redirectTo(edit:Boolean, renewal: Renewal) = edit match {
+    case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get())
     case _ => Redirect(routes.MostTransactionsController.get(edit))
+  }
+
+  private def mostTransactionsDataRequired(renewal: Renewal): Boolean = {
+    (renewal.customersOutsideUK, renewal.mostTransactions) match {
+      case (Some(_), None) => true
+      case _ => false
+    }
   }
 }

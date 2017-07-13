@@ -153,7 +153,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(false)
         document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(false)
         document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("change-answer") must be(false)
         document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("change-answer") must be(false)
