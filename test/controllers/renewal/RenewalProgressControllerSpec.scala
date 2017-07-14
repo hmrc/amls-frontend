@@ -209,70 +209,11 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "redirect to the who is registering page when the form is posted" in new Fixture {
-      val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-      val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
-      val responsiblePeople = Seq(rp1, rp2)
-
-      val businessMatching = BusinessMatching(reviewDetails = Some(
-        ReviewDetails(
-          "Business Name",
-          Some(models.businessmatching.BusinessType.SoleProprietor),
-          mock[Address],
-          "safeId",
-          None
-        )
-      ))
-
-      when(statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(ReadyForRenewal(Some(renewalDate))))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
-        thenReturn(Future.successful(Some(responsiblePeople)))
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(businessMatching)))
-
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.post()(request)
-
-      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithRenewal().url)
-    }
-
-    "redirect to the nominated officer page when the form is posted" in new Fixture {
-      val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-      val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
-      val responsiblePeople = Seq(rp1, rp2)
-
-      val businessMatching = BusinessMatching(reviewDetails = Some(
-        ReviewDetails(
-          "Business Name",
-          Some(models.businessmatching.BusinessType.SoleProprietor),
-          mock[Address],
-          "safeId",
-          None
-        )
-      ))
-
-      when(statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(ReadyForRenewal(Some(renewalDate))))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
-        thenReturn(Future.successful(Some(responsiblePeople)))
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(businessMatching)))
-
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.post()(request)
-
-      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
+    "post is called" when {
+      "ensure getSubmitRedirect is called" in new Fixture{
+        val result = controller.post()(request)
+        verify(controller.progressService).getSubmitRedirect(any(), any(), any())
+      }
     }
 
   }

@@ -84,24 +84,10 @@ class RenewalProgressController @Inject()
   def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-        val result = for {
-          status <- OptionT.liftF(statusService.getStatus)
-          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-          hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
-          businessmatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-          reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
-          businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-        } yield {
-
-          businessType match {
-            case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
-              Redirect(controllers.declaration.routes.RegisterPartnersController.get())
-            }
-            case _ => Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
-          }
+        progressService.getSubmitRedirect map {
+          case Some(url) => Redirect(url)
+          case _ => InternalServerError("Could not get data for redirect")
         }
-        result getOrElse NotFound(notFoundView)
   }
 
 }
