@@ -23,12 +23,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
 import models.registrationprogress.{Completed, Section}
+import models.responsiblepeople.ResponsiblePeople
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
@@ -83,7 +85,23 @@ class RenewalProgressController @Inject()
     implicit authContext =>
       implicit request =>
 
-      Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get()))
+        val result = for {
+          status <- OptionT.liftF(statusService.getStatus)
+          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+          hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
+          businessmatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+          reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+          businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+        } yield {
+
+          businessType match {
+            case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
+              Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+            }
+            case _ => Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
+          }
+        }
+        result getOrElse NotFound(notFoundView)
   }
 
 }

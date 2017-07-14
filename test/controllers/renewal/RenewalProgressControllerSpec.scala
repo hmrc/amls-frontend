@@ -18,9 +18,11 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.ReadStatusResponse
+import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section}
-import models.status.{ReadyForRenewal, RenewalSubmitted}
+import models.responsiblepeople._
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -207,13 +209,70 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "redirect to the declaration page when the form is posted" in new Fixture {
+    "redirect to the who is registering page when the form is posted" in new Fixture {
+      val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+      val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+      val responsiblePeople = Seq(rp1, rp2)
+
+      val businessMatching = BusinessMatching(reviewDetails = Some(
+        ReviewDetails(
+          "Business Name",
+          Some(models.businessmatching.BusinessType.SoleProprietor),
+          mock[Address],
+          "safeId",
+          None
+        )
+      ))
+
+      when(statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(ReadyForRenewal(Some(renewalDate))))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(responsiblePeople)))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(businessMatching)))
+
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val result = controller.post()(request)
 
-      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.getWithRenewal().url)
+    }
+
+    "redirect to the nominated officer page when the form is posted" in new Fixture {
+      val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+      val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+      val responsiblePeople = Seq(rp1, rp2)
+
+      val businessMatching = BusinessMatching(reviewDetails = Some(
+        ReviewDetails(
+          "Business Name",
+          Some(models.businessmatching.BusinessType.SoleProprietor),
+          mock[Address],
+          "safeId",
+          None
+        )
+      ))
+
+      when(statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(ReadyForRenewal(Some(renewalDate))))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(responsiblePeople)))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(businessMatching)))
+
+      when(statusService.getDetailedStatus(any(), any(), any()))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+      val result = controller.post()(request)
+
+      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url)
     }
 
   }

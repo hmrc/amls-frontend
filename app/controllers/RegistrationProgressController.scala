@@ -123,7 +123,23 @@ trait RegistrationProgressController extends BaseController {
   def post: Action[AnyContent] = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ProgressService.getSubmitRedirect
+        val result = for {
+          status <- OptionT.liftF(statusService.getStatus)
+          responsiblePeople <- OptionT(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+          hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
+          businessmatching <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
+          reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+          businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+        } yield {
+
+          businessType match {
+            case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
+                Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+            }
+            case _ => Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
+          }
+        }
+        result getOrElse NotFound(notFoundView)
   }
 }
 

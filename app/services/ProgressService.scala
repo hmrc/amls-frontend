@@ -37,14 +37,14 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, DeclarationHelper}
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent, Call, Request}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ProgressService {
 
   private[services] def cacheConnector: DataCacheConnector
-  protected[controllers] def statusService: StatusService
+  private[services] def statusService: StatusService
 
   private def dependentSections(implicit cache: CacheMap): Set[Section] =
     (for {
@@ -97,11 +97,8 @@ trait ProgressService {
       dependentSections(cache)
   }
 
-  def getSubmitRedirect(implicit
-                        hc: HeaderCarrier,
-                        ac: AuthContext,
-                        ec: ExecutionContext
-                       ) = {
+  /*def getSubmitRedirect (implicit auth: AuthContext, request: Request[AnyContent]) : Future[Call] = {
+
     val result = for {
       status <- OptionT.liftF(statusService.getStatus)
       responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
@@ -110,18 +107,20 @@ trait ProgressService {
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
     } yield {
+
       businessType match {
-        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
+        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
           controllers.declaration.routes.RegisterPartnersController.get()
-        case _ =>
-          DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
+        }
+        case _ => DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
       }
+
     }
-    result getOrElse NotFound(notFoundView)
-  }
+    result getOrElse controllers.routes.RegistrationProgressController.get()
+  }*/
 }
 
 object ProgressService extends ProgressService {
   override private[services] val cacheConnector = DataCacheConnector
-  override protected[controllers] val statusService = StatusService
+  override private[services] val statusService = StatusService
 }
