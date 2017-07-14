@@ -38,6 +38,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, DeclarationHelper}
 import play.api.mvc.{Action, AnyContent, Call, Request}
+import cats.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -97,9 +98,9 @@ trait ProgressService {
       dependentSections(cache)
   }
 
-  /*def getSubmitRedirect (implicit auth: AuthContext, request: Request[AnyContent]) : Future[Call] = {
+  def getSubmitRedirect (implicit auth: AuthContext,  ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 
-    val result = for {
+    val result: OptionT[Future, Option[Call]] = for {
       status <- OptionT.liftF(statusService.getStatus)
       responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
       hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
@@ -110,14 +111,14 @@ trait ProgressService {
 
       businessType match {
         case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
-          controllers.declaration.routes.RegisterPartnersController.get()
+          Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
-        case _ => DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
+        case _ =>
+          Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
       }
-
     }
-    result getOrElse controllers.routes.RegistrationProgressController.get()
-  }*/
+    result getOrElse none[Call]
+  }
 }
 
 object ProgressService extends ProgressService {
