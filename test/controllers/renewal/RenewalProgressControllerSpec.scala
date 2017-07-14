@@ -18,9 +18,11 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.ReadStatusResponse
+import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section}
-import models.status.{ReadyForRenewal, RenewalSubmitted}
+import models.responsiblepeople._
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -207,13 +209,11 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "redirect to the declaration page when the form is posted" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.post()(request)
-
-      redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+    "post is called" when {
+      "ensure getSubmitRedirect is called" in new Fixture{
+        val result = controller.post()(request)
+        verify(controller.progressService).getSubmitRedirect(any(), any(), any())
+      }
     }
 
   }
