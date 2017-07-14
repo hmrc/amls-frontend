@@ -208,13 +208,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       status(result) mustBe 500
 
     }
-
-    "post is called" when {
-      "ensure getSubmitRedirect is called" in new Fixture{
-        val result = controller.post()(request)
-        verify(controller.progressService).getSubmitRedirect(any(), any(), any())
-      }
-    }
+    
 
   }
 

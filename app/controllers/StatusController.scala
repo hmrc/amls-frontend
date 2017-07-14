@@ -52,6 +52,8 @@ trait StatusController extends BaseController {
 
   private[controllers] def renewalService: RenewalService
 
+  private[controllers] def progressService: ProgressService
+
   protected[controllers] def dataCache: DataCacheConnector
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
@@ -117,28 +119,6 @@ trait StatusController extends BaseController {
     }
   }
 
-  private def redirectToNextPage (implicit auth: AuthContext, request: Request[AnyContent]) : Future[Call] = {
-
-    val result = for {
-      status <- OptionT.liftF(statusService.getStatus)
-      responsiblePeople <- OptionT(dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
-      businessmatching <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
-      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
-      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-    } yield {
-
-      businessType match {
-        case Partnership if (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
-          controllers.declaration.routes.RegisterPartnersController.get()
-        }
-        case _ => DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status)
-      }
-
-    }
-    result getOrElse controllers.routes.RegistrationProgressController.get()
-  }
-
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
                                        status: SubmissionStatus,
                                        businessNameOption: Option[String],
@@ -147,10 +127,10 @@ trait StatusController extends BaseController {
       case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
       case SubmissionReady =>
         {
-          redirectToNextPage map (
-            x =>
-            Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, x))
-            )
+          OptionT(progressService.getSubmitRedirect) map (
+            url =>
+              Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
+            ) getOrElse InternalServerError("Unable to get redirect data")
         }
       case _ => Future.successful(Ok(status_submitted(mlrRegNumber.getOrElse(""),
         businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
@@ -225,6 +205,7 @@ object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
+  override private[controllers] val progressService: ProgressService = ProgressService
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector

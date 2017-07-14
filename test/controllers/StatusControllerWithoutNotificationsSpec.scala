@@ -32,7 +32,7 @@ import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, LandingService, RenewalService, StatusService}
+import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.http.NotFoundException
 import utils.AuthorisedFixture
@@ -49,6 +49,7 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
       override val authConnector = self.authConnector
       override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val progressService: ProgressService = mock[ProgressService]
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
