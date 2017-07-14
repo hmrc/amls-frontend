@@ -53,7 +53,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
       def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String): Unit = {
         if(i <= 9){
-          if(positions.contains(i)){
+          if(positions contains i){
             formText must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))
             assertLabelIncluded(i + 1)
           } else {
