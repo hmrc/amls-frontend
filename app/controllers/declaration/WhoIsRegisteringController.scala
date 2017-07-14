@@ -71,17 +71,14 @@ trait WhoIsRegisteringController extends BaseController {
                 cache <- optionalCache
                 responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
               } yield {
-                dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
-                  case "-1" => {
+                  case "-1" =>
                     redirectToAddPersonPage
-                  }
-                  case _ => {
+                  case _ =>
                     getAddPerson(data, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted))) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     redirectToDeclarationPage
-                  }
                 }
               }) getOrElse redirectToDeclarationPage
           }
@@ -114,14 +111,14 @@ trait WhoIsRegisteringController extends BaseController {
     }
 
   private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
-
-    val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
-    val rp: ResponsiblePeople = rpOption.getOrElse(ResponsiblePeople.default(None))
-
-    rp.personName match {
-      case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
-        rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
-      case _ => None
+    for {
+      selectedIndex <- whoIsRegistering.indexValue
+      selectedPerson <- responsiblePeople.zipWithIndex.collect {
+        case (person, i) if i == selectedIndex => person
+      }.headOption
+      personName <- selectedPerson.personName
+    } yield {
+      AddPerson(personName.firstName, personName.middleName, personName.lastName, selectedPerson.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions))
     }
   }
 

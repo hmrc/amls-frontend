@@ -52,4 +52,8 @@ trait ResponsiblePersonGenerator {
     positions <- positionsGen
   } yield ResponsiblePeople(Some(personName), positions = Some(positions))
 
+  def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePeople] = for {
+    person <- responsiblePersonGen
+  } yield person.copy(positions = positions.fold[Option[Positions]](None)(p => Some(Positions(p, None))))
+
 }
