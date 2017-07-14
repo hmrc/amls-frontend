@@ -64,7 +64,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
 
     }
 
-    "shows radio buttons for each person in the model" in new ViewFixture {
+    "show radio buttons for each person in the model" in new ViewFixture {
 
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("A Person"))
 
@@ -82,8 +82,8 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
       radioButtons.get(1).parent().html() must include("A Name 2")
     }
 
-    "pre-populates the form" in new ViewFixture {
-      val f = Form2(WhoIsRegistering("APerson"))
+    "pre-populate the form" in new ViewFixture {
+      val f = Form2(WhoIsRegistering("1"))
 
       val people = Seq(
         ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1", None, None))),
@@ -92,7 +92,7 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.declaration.who_is_registering_this_registration(f, people)
 
-      doc.select("form input[type=radio][checked]").`val` mustBe "APerson"
+      doc.select("form input[type=radio][checked]").`val` mustBe "1"
     }
   }
 }
