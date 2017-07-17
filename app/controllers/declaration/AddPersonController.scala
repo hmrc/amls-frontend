@@ -85,8 +85,8 @@ trait AddPersonController extends BaseController {
             status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
           case SubmissionReadyForReview | SubmissionDecisionApproved =>
             status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
-          case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-            status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
+          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
+          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
           case _ => throw new Exception("Incorrect status - Page not permitted for this status")
 
         }
