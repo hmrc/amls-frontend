@@ -23,12 +23,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
 import models.registrationprogress.{Completed, Section}
+import models.responsiblepeople.ResponsiblePeople
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
@@ -82,8 +84,10 @@ class RenewalProgressController @Inject()
   def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-      Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get()))
+        progressService.getSubmitRedirect map {
+          case Some(url) => Redirect(url)
+          case _ => InternalServerError("Could not get data for redirect")
+        }
   }
 
 }

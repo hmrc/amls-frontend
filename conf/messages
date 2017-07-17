@@ -1185,6 +1185,9 @@ declaration.renewal.who.is.registering.text = One person must take responsibilit
 declaration.register.responsible.person.title = You need to register as a responsible person
 declaration.register.responsible.person.description = Because of your role in the business, you’ll need to add yourself to the list of responsible people.
 
+declaration.register.partners.none.text = You have no partners registered
+declaration.register.partners.one.text = You have already registered {0} as a partner
+
 declaration.who.is.business.nominated.officer = Who is the business’s nominated officer?
 declaration.who.is.business.nominated.officer.text = You need to appoint a nominated officer before you can submit your application. The nominated officer must be one of the responsible people you’ve registered.
 
