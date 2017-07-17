@@ -17,21 +17,27 @@
 package controllers
 
 import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.FeeConnector
+import connectors.{DataCacheConnector, FeeConnector}
 import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
+import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Play
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, Call, Request}
 import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.status._
 
 import scala.concurrent.Future
+
+
 
 
 trait StatusController extends BaseController {
@@ -45,6 +51,10 @@ trait StatusController extends BaseController {
   private[controllers] def feeConnector: FeeConnector
 
   private[controllers] def renewalService: RenewalService
+
+  private[controllers] def progressService: ProgressService
+
+  protected[controllers] def dataCache: DataCacheConnector
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -98,7 +108,7 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        Future.successful(getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission))
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
             (SubmissionWithdrawn, _) | (DeRegistered, _) =>
@@ -112,13 +122,19 @@ trait StatusController extends BaseController {
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
                                        status: SubmissionStatus,
                                        businessNameOption: Option[String],
-                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent]) = {
+                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent], authContext: AuthContext) = {
     status match {
-      case NotCompleted => Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption))
-      case SubmissionReady => Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption))
-      case _ => Ok(status_submitted(mlrRegNumber.getOrElse(""),
+      case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      case SubmissionReady =>
+        {
+          OptionT(progressService.getSubmitRedirect) map (
+            url =>
+              Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
+            ) getOrElse InternalServerError("Unable to get redirect data")
+        }
+      case _ => Future.successful(Ok(status_submitted(mlrRegNumber.getOrElse(""),
         businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
-        fromDuplicateSubmission))
+        fromDuplicateSubmission)))
     }
   }
 
@@ -189,10 +205,12 @@ object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
+  override private[controllers] val progressService: ProgressService = ProgressService
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
+  override protected[controllers] val dataCache = DataCacheConnector
   // $COVERAGE-ON$
 
 }
