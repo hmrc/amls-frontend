@@ -90,7 +90,7 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
 
       html must include(Messages("declaration.register.partners.one.text", currentPartners.head))
     }
-    
+
 
   }
 }
