@@ -92,12 +92,5 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
     }
 
 
-//    "show the 'register someone else' radio button" in new ViewFixture {
-//      def view = views.html.declaration.register_partners("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
-//
-//      Option(doc.select("input[type=radio][id=value--1]")) must be(defined)
-//      doc.select("label[for=value--1]").text() must include(Messages("lbl.register.some.one.else"))
-//    }
-
   }
 }

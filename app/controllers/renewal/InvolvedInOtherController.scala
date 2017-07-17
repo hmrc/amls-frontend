@@ -99,10 +99,10 @@ class InvolvedInOtherController @Inject()(
 
   private def getUpdatedRenewal(renewal: Option[Renewal], data: InvolvedInOther): Renewal = {
     (renewal, data) match {
-      case (Some(renew), InvolvedInOtherYes(_)) => {
+      case (Some(_), InvolvedInOtherYes(_)) => {
         renewal.involvedInOtherActivities(data)
       }
-      case (Some(renew), InvolvedInOtherNo) => {
+      case (Some(_), InvolvedInOtherNo) => {
         renewal.involvedInOtherActivities(data).resetBusinessTurnover
       }
       case (None, _) => {

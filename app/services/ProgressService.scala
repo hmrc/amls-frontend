@@ -110,7 +110,7 @@ trait ProgressService {
     } yield {
 
       businessType match {
-        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
+        case Partnership if ApplicationConfig.getConfBool("feature-toggle.partner", false) && (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
           Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
         case _ =>

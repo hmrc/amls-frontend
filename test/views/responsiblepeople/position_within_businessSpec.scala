@@ -33,7 +33,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
   }
 
   "position_within_business view" must {
-    "have correct title, headings and form fields" in new ViewFixture {
+    "have correct title, headings" in new ViewFixture {
       val form2 = EmptyForm
 
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
@@ -46,6 +46,70 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "positions[]") must not be empty
+
+    }
+
+    "have the correct fields" when {
+
+      def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String): Unit = {
+        if(i <= 9){
+          if(positions contains i){
+            formText must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))
+            assertLabelIncluded(i + 1)
+          } else {
+            formText must not include Messages(s"responsiblepeople.position_within_business.lbl.0$i")
+            assertLabelIncluded(i + 1)
+          }
+        }
+      }
+
+      "business type is SoleProprietor" in new ViewFixture{
+
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.SoleProprietor, None, name)
+
+        implicit val positions = List(4,6)
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
+      "business type is Partnership" in new ViewFixture{
+
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.Partnership, None, name)
+
+        implicit val positions = List(4,5)
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
+      "business type is LimitedCompany" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.LimitedCompany, None, name)
+
+        implicit val positions = List(1,2,4)
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
+      "business type is UnincorporatedBody" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.UnincorporatedBody, None, name)
+
+        implicit val positions = List(1,2,4)
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
+      "business type is LPrLLP" in new ViewFixture {
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, BusinessType.LPrLLP, None, name)
+
+        implicit val positions = List(4,5,7)
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
 
     }
 

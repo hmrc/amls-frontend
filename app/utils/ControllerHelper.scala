@@ -16,17 +16,15 @@
 
 package utils
 
-import controllers.tradingpremises.routes
 import models.businessmatching._
-import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople, UKResidence}
+import models.renewal.CustomersOutsideUK
+import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.TradingPremises
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
-import play.api.mvc.{AnyContent, Request, Results}
+import play.api.mvc.Request
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -69,6 +67,13 @@ object ControllerHelper {
     }
   }
 
+  def hasCustomersOutsideUK(customersOutsideUK: Option[CustomersOutsideUK]): Boolean = {
+    customersOutsideUK.flatMap {
+      case CustomersOutsideUK(Some(country)) => Some(country)
+      case _ => None
+    }.isDefined
+  }
+
   def isTCSPSelected(bm: Option[BusinessMatching]): Boolean = {
     bm match {
       case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
@@ -108,7 +113,6 @@ object ControllerHelper {
       case _ =>  false
     }
   }
-
 
   def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
