@@ -89,18 +89,19 @@ trait ConfirmationController extends BaseController {
      dataCacheConnector.fetch[Renewal](Renewal.key).map ( _.isDefined)
   }
 
-  private def getVariationRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    isRenewalDefined flatMap {
-      case true => getRenewalFees
-      case false => getVariationFees
-    }
+  private def getVariationOrRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+    getRenewalOrVariationData(
+      isRenewalDefined flatMap {
+        case true => submissionResponseService.getRenewal
+        case false => submissionResponseService.getVariation
+      }
+    )
   }
 
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees,
-        routes.ConfirmationController.paymentConfirmation(payRef).url))
+      fees@(payRef, total, rows, _) <- OptionT(getVariationOrRenewalFees)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -112,7 +113,7 @@ trait ConfirmationController extends BaseController {
 
   private def showVariationConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, _) <- OptionT(getVariationRenewalFees)
+      _@(payRef, total, rows, _) <- OptionT(getVariationOrRenewalFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((payRef, total, rows, None),
         routes.ConfirmationController.paymentConfirmation(payRef).url))
     } yield {
@@ -188,22 +189,10 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def getVariationFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionResponseService.getVariation flatMap {
-      case Some((paymentRef, total, rows)) => {
-        paymentRef match {
-          case Some(payRef) if total.value > 0 =>
-            Future.successful(Some((payRef, total, rows, None)))
-          case _ =>
-            Future.successful(None)
-        }
-      }
-      case None => Future.failed(new Exception("Cannot get data from variation submission"))
-    }
-  }
 
-  private def getRenewalFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionResponseService.getRenewal flatMap {
+  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow])]])
+                                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+    getData flatMap {
       case Some((paymentRef, total, rows)) => {
         paymentRef match {
           case Some(payRef) if total.value > 0 =>
@@ -212,7 +201,7 @@ trait ConfirmationController extends BaseController {
             Future.successful(None)
         }
       }
-      case None => Future.failed(new Exception("Cannot get data from variation submission"))
+      case None => Future.failed(new Exception("Cannot get data from submission"))
     }
   }
 }
