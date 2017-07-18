@@ -208,7 +208,6 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       status(result) mustBe 500
 
     }
-    
 
   }
 

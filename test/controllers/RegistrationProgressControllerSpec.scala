@@ -418,6 +418,5 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         }
       }
     }
-
   }
 }
