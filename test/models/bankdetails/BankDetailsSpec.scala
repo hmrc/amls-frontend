@@ -26,7 +26,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-
+import models.bankdetails.BankDetails._
 
 class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 

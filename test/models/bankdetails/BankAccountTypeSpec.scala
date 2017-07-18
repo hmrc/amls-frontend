@@ -57,7 +57,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("01"))) must be (Valid(Some(PersonalAccount)))
       BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("02"))) must be (Valid(Some(BelongsToBusiness)))
       BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("03"))) must be (Valid(Some(BelongsToOtherBusiness)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("04"))) must be (Valid(None))
+      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("04"))) must be (Valid(Some(NoBankAccountUsed)))
 
     }
 
@@ -71,7 +71,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       BankAccountType.formWrites.writes(Some(PersonalAccount)) must be (Map("bankAccountType" -> Seq("01")))
       BankAccountType.formWrites.writes(Some(BelongsToBusiness)) must be (Map("bankAccountType" -> Seq("02")))
       BankAccountType.formWrites.writes(Some(BelongsToOtherBusiness)) must be (Map("bankAccountType" -> Seq("03")))
-      BankAccountType.formWrites.writes(None) must be (Map.empty)
+      BankAccountType.formWrites.writes(Some(NoBankAccountUsed)) must be (Map("bankAccountType" -> Seq("04")))
     }
 
     "validate Json read" in {
@@ -81,7 +81,8 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
         be (JsSuccess(BelongsToBusiness, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "03")) must
         be (JsSuccess(BelongsToOtherBusiness, JsPath))
-
+      Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "04")) must
+        be (JsSuccess(NoBankAccountUsed, JsPath))
     }
 
     "fail Json read on invalid data" in  {
@@ -93,6 +94,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       Json.toJson(PersonalAccount) must be (Json.obj("bankAccountType" -> "01"))
       Json.toJson(BelongsToBusiness) must be (Json.obj("bankAccountType" -> "02"))
       Json.toJson(BelongsToOtherBusiness) must be (Json.obj("bankAccountType" -> "03"))
+      Json.toJson(NoBankAccountUsed) must be (Json.obj("bankAccountType" -> "04"))
     }
   }
 

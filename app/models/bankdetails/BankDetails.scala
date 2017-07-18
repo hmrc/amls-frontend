@@ -36,11 +36,14 @@ case class BankDetails (
       case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v))
     }
   }
-  def bankAccount(v: BankAccount): BankDetails = {
-    this.copy(bankAccount = Some(v), hasChanged = hasChanged || !this.bankAccount.contains(v))
+
+  def bankAccount(value: Option[BankAccount]): BankDetails = {
+    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value))
   }
+
   def isComplete: Boolean =
     this match {
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _) => true
       case BankDetails(Some(_), Some(_), _, _, status) => true
       case BankDetails(None, None, _,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
@@ -51,6 +54,8 @@ object BankDetails {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+
+  implicit def maybeBankAccount(account: BankAccount): Option[BankAccount] = Some(account)
 
   def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists {x => x.hasChanged || x.status.contains(StatusConstants.Deleted)}
 
