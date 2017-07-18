@@ -43,12 +43,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
-  val paymentsConnector = mock[PayApiConnector]
-
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
-    .bindings(bind[PayApiConnector].to(paymentsConnector))
     .configure("microservice.services.feature-toggle.partner" -> true)
     .build()
 
