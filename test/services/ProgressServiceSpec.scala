@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector, PayApiConnector}
 import models.ReadStatusResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -29,15 +29,28 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.inject._
+import play.api.{Application, Mode}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.GenericTestHelper
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProgressServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with OneAppPerSuite {
+
+  val paymentsConnector = mock[PayApiConnector]
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[PayApiConnector].to(paymentsConnector))
+    .configure("microservice.services.feature-toggle.partner" -> true)
+    .build()
 
   object TestProgressService extends ProgressService {
 
