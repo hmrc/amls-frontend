@@ -20,16 +20,39 @@ import cats.data.OptionT
 import controllers.{declaration, routes}
 import models.responsiblepeople.{ResponsiblePeople, Partner}
 import models.status._
+import play.api.mvc.{AnyContent, Request}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 object DeclarationHelper {
 
+  def currentPartnersNames(responsiblePeople: Seq[ResponsiblePeople]): Seq[String] = {
+    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
+      case p if p.positions.get.positions.contains(Partner) => p.personName.get.fullName
+    }
+  }
+
   def numberOfPartners(responsiblePeople: Seq[ResponsiblePeople]): Int = {
-    responsiblePeople.collect({
-      case p if p.positions.isDefined & p.status.isEmpty => p.positions.get.positions
-    }).count(_.contains(Partner))
+
+    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
+      case p if p.positions.get.positions.contains(Partner) => p
+    }).size
+  }
+
+  def nonPartners(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
+      case p if !p.positions.get.positions.contains(Partner) => p
+    })
+  }
+
+  private def nonDeletedResponsiblePeopleWithPositions(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+    responsiblePeople.collect {
+      case p if p.positions.isDefined & p.status.isEmpty => p
+    }
   }
 
   def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus) = {
@@ -48,9 +71,18 @@ object DeclarationHelper {
 
   private def routeWithoutNominatedOfficer(status: SubmissionStatus) = {
     status match {
-      case SubmissionReady | NotCompleted | SubmissionReadyForReview => declaration.routes.WhoIsTheBusinessNominatedOfficerController.get()
+      case SubmissionReady | NotCompleted | SubmissionReadyForReview | ReadyForRenewal(_) =>
+        declaration.routes.WhoIsTheBusinessNominatedOfficerController.get()
       case _ => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
     }
   }
 
+  def statusSubtitle()(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[String] = {
+    statusService.getStatus map {
+      case SubmissionReady => "submit.registration"
+      case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
+      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+  }
 }

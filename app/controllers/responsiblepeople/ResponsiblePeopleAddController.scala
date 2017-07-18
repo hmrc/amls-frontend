@@ -20,11 +20,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-
-import scala.concurrent.Future
 
 trait ResponsiblePeopleAddController extends BaseController with RepeatingSection {
   def get(displayGuidance: Boolean = true, flow: Option[String] = None) = Authorised.async {
@@ -32,7 +29,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
       addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
         Redirect {
           flow match {
-            case Some(`flowChangeOfficer`) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
+            case Some(_) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
             case _ => redirectDependingOnGuidance(displayGuidance, idx, flow)
           }
         }
@@ -42,7 +39,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
 
   private def redirectDependingOnGuidance(displayGuidance: Boolean, idx: Int, flow: Option[String]) = {
     displayGuidance match {
-      case true => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
+      case true => controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx, flow)
       case false => controllers.responsiblepeople.routes.PersonNameController.get(idx)
     }
   }

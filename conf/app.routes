@@ -246,6 +246,9 @@ POST        /submit-application/who-is-registering                              
 GET         /update-information/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
 GET         /update-information/who-is-registering-renewal                            controllers.declaration.WhoIsRegisteringController.get()
 
+GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
+POST         /declaration/partner                                                     @controllers.declaration.RegisterPartnersController.post()
+
 GET         /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 POST        /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
@@ -272,8 +275,6 @@ GET         /update-information/further-updates                                 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
-
-GET         /update-information/partner                                               @controllers.declaration.RegisterPartnersController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
 GET         /update-information/declaration                                           controllers.declaration.DeclarationController.getWithAmendment()

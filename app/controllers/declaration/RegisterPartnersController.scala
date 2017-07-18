@@ -18,23 +18,47 @@ package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
+import models.responsiblepeople.ResponsiblePeople
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.DeclarationHelper._
 
 import scala.concurrent.Future
 
 
 @Singleton
-class RegisterPartnersController @Inject()(
-                                          val authConnector: AuthConnector
+class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
+                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val statusService: StatusService
                                           ) extends BaseController {
+
 
   def get() = Authorised.async {
     implicit authContext => implicit request => {
 
-      Future.successful(Ok(""))
-
+      val result = for {
+        subtitle <- OptionT.liftF(statusSubtitle())
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      } yield {
+        Ok(views.html.declaration.register_partners(
+          subtitle,
+          EmptyForm,
+          nonPartners(responsiblePeople),
+          currentPartnersNames(responsiblePeople)
+        ))
+      }
+      result getOrElse InternalServerError("failure getting status")
     }
   }
 
+  def post() = Authorised.async {
+    implicit authContext => implicit request => {
+      Future.successful(Ok(""))
+    }
+  }
 }
