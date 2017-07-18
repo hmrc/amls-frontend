@@ -209,7 +209,7 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           .thenReturn(Future.successful(Some(businessMatching)))
 
         whenReady(TestProgressService.getSubmitRedirect) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
 
@@ -238,7 +238,7 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           .thenReturn(Future.successful(Some(businessMatching)))
 
         whenReady(TestProgressService.getSubmitRedirect) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.getWithRenewal())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
     }

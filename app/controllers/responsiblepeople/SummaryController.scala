@@ -80,7 +80,7 @@ trait SummaryController extends BaseController {
   }
   private def redirectOtherStatus(hasNominatedOfficer: Boolean) = {
     hasNominatedOfficer match {
-      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment())
+      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
       case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
     }
   }

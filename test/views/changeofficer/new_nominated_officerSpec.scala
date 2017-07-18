@@ -36,7 +36,7 @@ class new_nominated_officerSpec extends GenericTestHelper with MustMatchers with
 
       val form2 = EmptyForm
 
-      val responsiblePeople = Gen.listOf(responsiblePeopleGen).sample.get
+      val responsiblePeople = Gen.listOf(responsiblePersonGen).sample.get
 
 
       def view = views.html.changeofficer.new_nominated_officer(EmptyForm, responsiblePeople)

@@ -39,9 +39,10 @@ import scala.concurrent.Future
 trait WhoIsRegisteringController extends BaseController {
 
   private[controllers] def amlsConnector: AmlsConnector
+  private[controllers] def renewalService: RenewalService
+
   def dataCacheConnector: DataCacheConnector
   def statusService: StatusService
-  private[controllers] def renewalService: RenewalService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -53,38 +54,6 @@ trait WhoIsRegisteringController extends BaseController {
           } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted)))
           ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
-  }
-
-  def getWithAmendment = get
-
-  def getWithRenewal = get
-
-  def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
-
-    val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
-    val rp: ResponsiblePeople = rpOption.getOrElse(ResponsiblePeople.default(None))
-
-    rp.personName match {
-      case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
-        rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
-      case _ => None
-    }
-  }
-
-  implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
-    import models.responsiblepeople._
-
-    RoleWithinBusinessRelease7(
-    positions.map {
-      case BeneficialOwner => models.declaration.release7.BeneficialShareholder
-      case Director => models.declaration.release7.Director
-      case InternalAccountant => models.declaration.release7.InternalAccountant
-      case NominatedOfficer => models.declaration.release7.NominatedOfficer
-      case Partner => models.declaration.release7.Partner
-      case SoleProprietor => models.declaration.release7.SoleProprietor
-      case DesignatedMember => models.declaration.release7.DesignatedMember
-    }
-    )
   }
 
   def post: Action[AnyContent] = Authorised.async {
@@ -102,17 +71,14 @@ trait WhoIsRegisteringController extends BaseController {
                 cache <- optionalCache
                 responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
               } yield {
-                dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
-                  case "-1" => {
+                  case "-1" =>
                     redirectToAddPersonPage
-                  }
-                  case _ => {
+                  case _ =>
                     getAddPerson(data, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted))) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     redirectToDeclarationPage
-                  }
                 }
               }) getOrElse redirectToDeclarationPage
           }
@@ -144,6 +110,33 @@ trait WhoIsRegisteringController extends BaseController {
       case _ => Redirect(routes.AddPersonController.get())
     }
 
+  private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
+    for {
+      selectedIndex <- whoIsRegistering.indexValue
+      selectedPerson <- responsiblePeople.zipWithIndex.collect {
+        case (person, i) if i == selectedIndex => person
+      }.headOption
+      personName <- selectedPerson.personName
+    } yield {
+      AddPerson(personName.firstName, personName.middleName, personName.lastName, selectedPerson.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions))
+    }
+  }
+
+  private implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusinessRelease7 = {
+    import models.responsiblepeople._
+
+    RoleWithinBusinessRelease7(
+      positions.map {
+        case BeneficialOwner => models.declaration.release7.BeneficialShareholder
+        case Director => models.declaration.release7.Director
+        case InternalAccountant => models.declaration.release7.InternalAccountant
+        case NominatedOfficer => models.declaration.release7.NominatedOfficer
+        case Partner => models.declaration.release7.Partner
+        case SoleProprietor => models.declaration.release7.SoleProprietor
+        case DesignatedMember => models.declaration.release7.DesignatedMember
+      }
+    )
+  }
 }
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
