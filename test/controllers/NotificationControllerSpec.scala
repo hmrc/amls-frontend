@@ -358,7 +358,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         status(result) mustBe 200
         contentAsString(result) must not include msgTxt
-        contentAsString(result) must include("We're no longer considering refusal and your application will continue as normal.")
+        contentAsString(result) must include("We’re no longer considering refusal and your application will continue as normal.")
 
       }
     }

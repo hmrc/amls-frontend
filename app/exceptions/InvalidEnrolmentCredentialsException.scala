@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(call: Call)(implicit request: Request[_],m:Messages)
-<p>@Messages("status.submissionready.description")</p>
-<p>@Messages("status.submissionready.description2")</p>
-<p>@Messages("status.submissionready.description3")</p>
-<a href="@call.url" class="button" type="submit">@Messages("status.submissionready.buttontext")</a>
+package exceptions
+
+case class InvalidEnrolmentCredentialsException(msg: String, cause: Throwable) extends Throwable(msg, cause)

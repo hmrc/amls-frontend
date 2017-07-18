@@ -69,7 +69,7 @@
                             value = "04"
                         )
                     }
-                    case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                    case (BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.01",
@@ -85,7 +85,7 @@
                             labelText = "responsiblepeople.position_within_business.lbl.04",
                             value = "04"
                         )
-                        @if(ApplicationConfig.release7 && (businessType == BusinessType.LPrLLP)) {
+                        @if(businessType == BusinessType.LPrLLP) {
                             @checkbox(
                                 f = f("positions[]"),
                                 labelText = "responsiblepeople.position_within_business.lbl.07",
@@ -93,7 +93,24 @@
                             )
                         }
                     }
-                }
+                    case BusinessType.LPrLLP => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.05",
+                            value = "05"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.07",
+                            value = "07"
+                        )
+                    }
+            }
             }
         </div>
 

@@ -31,6 +31,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
+import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -57,9 +58,10 @@ class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
     }
 
     def guidanceOptions(currentCount: Int) = Table(
-      ("guidanceRequested", "expectedRedirect"),
-      (true, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
-      (false, controllers.responsiblepeople.routes.PersonNameController.get(currentCount + 1, false))
+      ("guidanceRequested", "fromDeclaration", "expectedRedirect"),
+      (true, Some(`flowFromDeclaration`), controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1, Some(`flowFromDeclaration`))),
+      (true, None, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
+      (false, None, controllers.responsiblepeople.routes.PersonNameController.get(currentCount + 1, false))
     )
   }
 
@@ -77,16 +79,16 @@ class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
         val partitions = Seq (zeroCase, reasonableCounts)
 
         forAll(reasonableCounts, minSuccessful(requiredSuccess)) { currentCount: Int =>
-          forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, expectedRedirect: Call) =>
+          forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
             val testSeq  = buildTestSequence(currentCount)
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(testSeq)))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(testSeq)))
 
             when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val resultF = controller.get(guidanceRequested)(request)
+            val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
 
             status(resultF) must be(SEE_OTHER)
             redirectLocation(resultF) must be(Some(expectedRedirect.url))
