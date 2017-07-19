@@ -46,7 +46,7 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
         GovernmentGatewayService.ggConnector.enrol(any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (GovernmentGatewayService.enrol("mlrRefNo", "safeId")) {
+      whenReady (GovernmentGatewayService.enrol("mlrRefNo", "safeId", "postcode")) {
         result =>
           result must equal (response)
       }
