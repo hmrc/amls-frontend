@@ -27,6 +27,7 @@ case object PersonalAccount extends BankAccountType
 case object BelongsToBusiness extends BankAccountType
 case object BelongsToOtherBusiness extends BankAccountType
 case class SomeOtherAccountType(t: String) extends BankAccountType
+case object NoBankAccountUsed extends BankAccountType
 
 object BankAccountType {
 
@@ -40,7 +41,7 @@ object BankAccountType {
         case "01" => Some(PersonalAccount)
         case "02" => Some(BelongsToBusiness)
         case "03" => Some(BelongsToOtherBusiness)
-        case "04" => None
+        case "04" => Some(NoBankAccountUsed)
         case _ =>
           (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
       }
@@ -50,6 +51,7 @@ object BankAccountType {
     case Some(PersonalAccount) => "bankAccountType" -> "01"
     case Some(BelongsToBusiness) => "bankAccountType" -> "02"
     case Some(BelongsToOtherBusiness) => "bankAccountType" -> "03"
+    case Some(NoBankAccountUsed) => "bankAccountType" -> "04"
     case _ => Map.empty
   }
 
@@ -59,6 +61,7 @@ object BankAccountType {
       case "01" => PersonalAccount
       case "02" => BelongsToBusiness
       case "03" => BelongsToOtherBusiness
+      case "04" => NoBankAccountUsed
       case _ =>
         play.api.data.validation.ValidationError("error.invalid")
     }
@@ -68,6 +71,7 @@ object BankAccountType {
     case PersonalAccount => Json.obj("bankAccountType"->"01")
     case BelongsToBusiness => Json.obj("bankAccountType" -> "02")
     case BelongsToOtherBusiness => Json.obj("bankAccountType" -> "03")
+    case NoBankAccountUsed => Json.obj("bankAccountType" -> "04")
   }
 
 }
