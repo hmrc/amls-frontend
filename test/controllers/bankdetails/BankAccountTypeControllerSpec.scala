@@ -54,7 +54,11 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         "there is no bank account type information yet" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None, status = Some(StatusConstants.Deleted))))))
+            .thenReturn(Future.successful(Some(Seq(
+              BankDetails(None, None, status = Some(StatusConstants.Deleted)),
+              BankDetails(Some(NoBankAccountUsed), None, status = Some(StatusConstants.Added))
+            ))))
+
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionReady))
 

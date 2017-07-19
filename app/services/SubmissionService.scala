@@ -21,9 +21,9 @@ import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector
 import exceptions.NoEnrolmentException
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
-import models.bankdetails.BankDetails
+import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessActivities => BusinessSevices, BusinessMatching, MoneyServiceBusiness => MSB}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessSevices, MoneyServiceBusiness => MSB}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -170,7 +170,7 @@ trait SubmissionService extends DataCacheService {
   def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {
       case Some(bankAccts) => {
-        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty || x.bankAccountType.contains(NoBankAccountUsed))
         bankDtls.nonEmpty match {
           case true => Some(bankDtls)
           case false => Some(Seq.empty)
