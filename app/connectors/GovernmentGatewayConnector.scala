@@ -52,7 +52,7 @@ trait GovernmentGatewayConnector {
     http.POST[EnrolmentRequest, HttpResponse](enrolUrl, request) map {
       response =>
         audit.sendDataEvent(EnrolEvent(request, response))
-        debug(msg("Successful Response: ${response.json}"))
+        debug(msg(s"Successful Response: ${response.json}"))
         response
     } recoverWith {
       case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>

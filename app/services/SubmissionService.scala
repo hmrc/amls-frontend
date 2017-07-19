@@ -19,11 +19,11 @@ package services
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
 import exceptions.NoEnrolmentException
-import models.aboutthebusiness.AboutTheBusiness
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessActivities => BusinessSevices, BusinessMatching, MoneyServiceBusiness => MSB}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessSevices, MoneyServiceBusiness => MSB}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -63,11 +63,16 @@ trait SubmissionService extends DataCacheService {
     for {
       cache <- getCache
       safeId <- safeId(cache)
-      subscription <- amlsConnector.subscribe(createSubscriptionRequest(cache), safeId)
+      request <- Future.successful(createSubscriptionRequest(cache))
+      subscription <- amlsConnector.subscribe(request, safeId)
       _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
       _ <- ggService.enrol(
         safeId = safeId,
-        mlrRefNo = subscription.amlsRefNo
+        mlrRefNo = subscription.amlsRefNo,
+        postCode = request.aboutTheBusinessSection.fold("")(_.registeredOffice match {
+          case Some(o: RegisteredOfficeUK) => o.postCode
+          case _ => ""
+        })
       )
     } yield subscription
   }
@@ -192,7 +197,7 @@ object SubmissionService extends SubmissionService {
     override private[services] def ggConnector: GovernmentGatewayConnector = GovernmentGatewayConnector
 
     override def enrol
-    (mlrRefNo: String, safeId: String)
+    (mlrRefNo: String, safeId: String, postCode: String)
     (implicit
      hc: HeaderCarrier,
      ec: ExecutionContext

@@ -28,14 +28,15 @@ trait GovernmentGatewayService {
   private[services] def ggConnector: GovernmentGatewayConnector
 
   def enrol
-  (mlrRefNo: String, safeId: String)
+  (mlrRefNo: String, safeId: String, postCode: String)
   (implicit
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): Future[HttpResponse] =
     ggConnector.enrol(EnrolmentRequest(
       mlrRefNo = mlrRefNo,
-      safeId = safeId
+      safeId = safeId,
+      postCode = postCode
     ))
 }
 

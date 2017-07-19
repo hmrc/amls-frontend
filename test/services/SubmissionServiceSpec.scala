@@ -18,7 +18,7 @@ package services
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
-import models.aboutthebusiness.AboutTheBusiness
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
@@ -102,6 +102,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     val reviewDetails = mock[ReviewDetails]
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
+    val aboutTheBusiness = mock[AboutTheBusiness]
     val cache = mock[CacheMap]
 
     when {
@@ -113,6 +114,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       businessMatching.reviewDetails
     } thenReturn Some(reviewDetails)
+    when {
+      aboutTheBusiness.registeredOffice
+    } thenReturn Some(RegisteredOfficeUK("Line 1", "Line 2", None, None, "postcode", None))
     when {
       businessMatching.activities
     } thenReturn Some(activities)
@@ -127,7 +131,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     } thenReturn Some(mock[EstateAgentBusiness])
     when {
       cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-    } thenReturn Some(mock[AboutTheBusiness])
+    } thenReturn Some(aboutTheBusiness)
     when {
       cache.getEntry[Seq[BankDetails]](BankDetails.key)
     } thenReturn Some(mock[Seq[BankDetails]])
@@ -154,7 +158,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Future.successful(subscriptionResponse)
 
         when {
-          TestSubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
+          TestSubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
         } thenReturn Future.successful(enrolmentResponse)
 
         whenReady(TestSubmissionService.subscribe) {
