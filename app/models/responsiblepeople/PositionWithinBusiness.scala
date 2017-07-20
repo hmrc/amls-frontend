@@ -23,7 +23,8 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes, _}
-import cats.data.Validated.{Valid, Invalid}
+import cats.data.Validated.{Invalid, Valid}
+import models.businessmatching.BusinessType
 import utils.TraversableValidators._
 
 import scala.collection.immutable.HashSet
@@ -98,6 +99,17 @@ object PositionWithinBusiness {
     case SoleProprietor => JsString("06")
     case DesignatedMember => JsString("07")
   }
+
+  val positionsPerBusinessType = {
+    List(
+      BusinessType.SoleProprietor -> List(NominatedOfficer, SoleProprietor),
+      BusinessType.Partnership -> List(NominatedOfficer, Partner),
+      BusinessType.LimitedCompany -> List(BeneficialOwner, Director, NominatedOfficer),
+      BusinessType.UnincorporatedBody -> List(BeneficialOwner, Director, NominatedOfficer),
+      BusinessType.LPrLLP -> List(NominatedOfficer, Partner, DesignatedMember)
+    )
+  }
+
 }
 
 object Positions {
