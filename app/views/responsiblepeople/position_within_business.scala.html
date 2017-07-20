@@ -49,12 +49,14 @@
                             labelText = "responsiblepeople.position_within_business.lbl.06",
                             value = "06"
                         )
+            @if(displayNominatedOfficer){
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.04",
                             value = "04"
                         )
                     }
+            }
                     case BusinessType.Partnership => {
                         @checkbox(
                             f = f("positions[]"),

@@ -63,7 +63,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
         }
       }
 
-      val testCases = Map(
+      val testCases = List(
         (BusinessType.SoleProprietor, List(4, 6)),
         (BusinessType.Partnership, List(4, 5)),
         (BusinessType.LimitedCompany, List(1, 2, 4)),
