@@ -46,8 +46,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 
 class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.partner" -> true))
-
   trait Fixture extends AuthorisedFixture {self =>
     val request = addToken(authRequest)
     val controller = new RegistrationProgressController {
