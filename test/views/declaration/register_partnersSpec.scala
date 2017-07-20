@@ -17,7 +17,8 @@
 package views.declaration
 
 import cats.implicits._
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm}
+import jto.validation.{Path, ValidationError}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.scalatest.MustMatchers
@@ -39,6 +40,22 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
       doc.title mustBe s"${Messages("declaration.register.partners.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.register.partners.title"))
       subHeading.html must include("subheading")
+    }
+
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "value") -> Seq(ValidationError("not a message Key"))
+        ))
+
+      def view = views.html.declaration.register_partners("subheading", form2, Seq(ResponsiblePeople()), Seq("partner1"))
+
+      errorSummary.html() must include("not a message Key")
+
+      doc.getElementById("value")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
     }
 
     "have a list of responsible people" in new ViewFixture {

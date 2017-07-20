@@ -247,7 +247,7 @@ GET         /update-information/who-is-registering                              
 GET         /update-information/who-is-registering-renewal                            controllers.declaration.WhoIsRegisteringController.get()
 
 GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
-POST         /declaration/partner                                                     @controllers.declaration.RegisterPartnersController.post()
+POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
 
 GET         /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 POST        /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()

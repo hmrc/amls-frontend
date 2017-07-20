@@ -59,6 +59,9 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Check that you’ve entered the correct web address
 
+error.required.declaration.partners = You must select a partner. Select one of the partners or register someone else
+
+
 error.invalid.maxlength.40 = You can’t enter more than 40 characters
 error.invalid.maxlength.120 = You can’t enter more than 120 characters
 error.invalid.maxlength.140 = You can’t enter more than 140 characters
@@ -1187,6 +1190,9 @@ declaration.register.responsible.person.description = Because of your role in th
 
 declaration.register.partners.none.text = You have no partners registered
 declaration.register.partners.one.text = You have already registered {0} as a partner
+declaration.register.partners.desc = You need to register all the partners in your business. There must be at least 2 people in a partnership.
+declaration.register.partners.title = Who are the business’s partners?
+
 
 declaration.who.is.business.nominated.officer = Who is the business’s nominated officer?
 declaration.who.is.business.nominated.officer.text = You need to appoint a nominated officer before you can submit your application. The nominated officer must be one of the responsible people you’ve registered.
