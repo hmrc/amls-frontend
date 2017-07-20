@@ -36,7 +36,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
     "have correct title, headings" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
 
       doc.title must be(Messages("responsiblepeople.position_within_business.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -52,8 +52,8 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
     "have the correct fields" when {
 
       def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String): Unit = {
-        if(i <= 9){
-          if(positions contains i){
+        if (i <= 9) {
+          if (positions contains i) {
             formText must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))
             assertLabelIncluded(i + 1)
           } else {
@@ -63,27 +63,41 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
         }
       }
 
-      Map(
-        (BusinessType.SoleProprietor, List(4,6)),
-        (BusinessType.Partnership, List(4,5)),
-        (BusinessType.LimitedCompany, List(1,2,4)),
-        (BusinessType.UnincorporatedBody, List(1,2,4)),
-        (BusinessType.LPrLLP, List(4,5,7))
-      ) foreach {
-        case (businessType, positionsToDisplay) => {
-          s"$businessType" in new ViewFixture{
+      val testCases = Map(
+        (BusinessType.SoleProprietor, List(4, 6)),
+        (BusinessType.Partnership, List(4, 5)),
+        (BusinessType.LimitedCompany, List(1, 2, 4)),
+        (BusinessType.UnincorporatedBody, List(1, 2, 4)),
+        (BusinessType.LPrLLP, List(4, 5, 7))
+      )
 
-            def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, None, name)
+      "nominated officer has not been selected previously" when {
+        testCases foreach {
+          case (businessType, positionsToDisplay) => {
+            s"$businessType" in new ViewFixture {
 
-            implicit val positions = positionsToDisplay
-            implicit val formText = form.text()
+              def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, true, None)
 
-            assertLabelIncluded()
+              implicit val positions = positionsToDisplay
+              implicit val formText = form.text()
 
+              assertLabelIncluded()
+
+            }
           }
         }
       }
 
+      "nominated officer has been selected previously" in new ViewFixture {
+
+        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, testCases.head._1, name, false, None)
+
+        implicit val positions = testCases.head._2.filterNot(_.equals(4))
+        implicit val formText = form.text()
+
+        assertLabelIncluded()
+
+      }
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -92,7 +106,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
           (Path \ "positions") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, None, name)
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
 
       errorSummary.html() must include("not a message Key")
     }

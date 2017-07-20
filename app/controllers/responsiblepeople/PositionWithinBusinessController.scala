@@ -41,9 +41,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
             getData[ResponsiblePeople](cache, index) match {
               case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,Some(positions),_,_,_,_,_,_,_,_,_,_))
-              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, flow, personName.titleName))
+              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, true, flow))
               case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(position_within_business(EmptyForm, edit, index, bt, flow, personName.titleName))
+              => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, true, flow))
               case _
               => NotFound(notFoundView)
             }
@@ -62,7 +62,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                   .getOrElse(BusinessType.SoleProprietor)
                 getData[ResponsiblePeople](cache, index) match {
-                  case rp => BadRequest(position_within_business(f, edit, index, bt, flow, ControllerHelper.rpTitleName(rp)))
+                  case rp => BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(rp), true, flow))
                 }
               }).getOrElse(NotFound(notFoundView))
             }

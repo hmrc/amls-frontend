@@ -19,7 +19,7 @@
 @import config.ApplicationConfig
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, flow: Option[String], personName: String)(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, personName: String, displayNominatedOfficer: Boolean, flow: Option[String])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -30,8 +30,6 @@
     title = Messages("responsiblepeople.position_within_business.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-
-
 
     <p>@Messages("lbl.select.all")</p>
 
