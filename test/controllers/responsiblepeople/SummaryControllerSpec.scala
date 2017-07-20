@@ -185,8 +185,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment().url))
+        redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
       }
+
       s"'flow flag set to Some($flowFromDeclaration) and status is amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))

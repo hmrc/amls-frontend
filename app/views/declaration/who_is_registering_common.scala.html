@@ -20,17 +20,18 @@
 
 @(title: String, f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit m: Messages, request: Request[_])
 
-    @fieldset(
-        f = f("person"),
-        legend = title,
-        legendHidden = true,
-        panel = false
-    ) {
-        @model.map { people =>
-            @people.personName.map { obj =>
-            @radio(f("person"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)
-            }
+@fieldset(
+    f = f("person"),
+    legend = title,
+    legendHidden = true,
+    panel = false
+) {
+    @model.zipWithIndex.map { case (person, i) =>
+        @person.personName.map { obj =>
+            @radio(f("person"), obj.firstName+" "+obj.lastName, s"$i")
         }
-        <p class="form-block">@Messages("lbl.or")</p>
-        @radio(f("person"), Messages("lbl.some.one.else"), "-1")
     }
+
+    <p class="form-block">@Messages("lbl.or")</p>
+    @radio(f("person"), Messages("lbl.some.one.else"), "-1")
+}

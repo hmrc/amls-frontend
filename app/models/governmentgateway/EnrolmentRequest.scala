@@ -16,11 +16,13 @@
 
 package models.governmentgateway
 
-import play.api.libs.json.{Writes, Json}
+import config.ApplicationConfig
+import play.api.libs.json.{JsString, Json, Writes}
 
 case class EnrolmentRequest(
-                           mlrRefNo: String,
-                           safeId: String
+                             mlrRefNo: String,
+                             safeId: String,
+                             postCode: String
                            )
 
 object EnrolmentRequest {
@@ -28,16 +30,27 @@ object EnrolmentRequest {
   implicit val writes: Writes[EnrolmentRequest] =
     Writes[EnrolmentRequest] {
       request =>
+        val facts = ApplicationConfig.sendPostcodeKnownFact match {
+          case true => Seq(
+            request.mlrRefNo,
+            "",
+            "",
+            request.postCode
+          )
+          case _ =>
+            Seq(
+              request.mlrRefNo,
+              "",
+              "",
+              request.safeId
+            )
+        }
+
         Json.obj(
           "portalId" -> "Default",
           "serviceName" -> "HMRC-MLR-ORG",
           "friendlyName" -> "AMLS Enrolment",
-          "knownFacts" -> Seq(
-            request.mlrRefNo,
-            "",
-            "",
-            request.safeId
-          )
+          "knownFacts" -> facts
         )
     }
 }

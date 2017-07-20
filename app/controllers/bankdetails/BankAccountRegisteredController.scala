@@ -20,11 +20,10 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.bankdetails.BankDetails
+import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.responsiblepeople.BankAccountRegistered
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import utils.StatusConstants
-
 
 import scala.concurrent.Future
 
@@ -34,11 +33,18 @@ trait BankAccountRegisteredController extends BaseController {
 
   def get(index: Int) =
     Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) map {
-          case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm,
-            data.filter(_.bankAccountType.isDefined).count(!_.status.contains(StatusConstants.Deleted))))
-          case _ => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, index))
+      implicit authContext =>
+        implicit request => {
+
+          val filter: BankDetails => Boolean = details =>
+            details.bankAccountType.isDefined &&
+              !details.bankAccountType.contains(NoBankAccountUsed) &&
+              !details.status.contains(StatusConstants.Deleted)
+
+          dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) map {
+            case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, data.filter(filter).size))
+            case _ => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, index))
+          }
         }
     }
 

@@ -16,16 +16,21 @@
 
 package models.governmentgateway
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 
-class EnrolmentRequestSpec extends PlaySpec {
+class EnrolmentRequestSpec extends PlaySpec with OneAppPerSuite {
+
+  override implicit lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> true)
+    .build()
 
   "EnrolmentRequest" must {
 
     "serialise correctly" in {
 
-      val model = EnrolmentRequest("foo", "bar")
+      val model = EnrolmentRequest("foo", "bar", "TE1 1ET")
       val json = Json.obj(
           "portalId" -> "Default",
           "serviceName" -> "HMRC-MLR-ORG",
@@ -34,7 +39,7 @@ class EnrolmentRequestSpec extends PlaySpec {
             "foo",
             "",
             "",
-            "bar"
+            "TE1 1ET"
           )
         )
 
@@ -42,4 +47,35 @@ class EnrolmentRequestSpec extends PlaySpec {
         equal (json)
     }
   }
+
+}
+
+class EnrolmentRequestWithoutPostcodeSpec extends PlaySpec with OneAppPerSuite {
+
+  override implicit lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> false)
+    .build()
+
+  "EnrolmentRequest" must {
+
+    "serialise correctly without sending the postcode" in {
+
+      val model = EnrolmentRequest("foo", "bar", "unused")
+      val json = Json.obj(
+        "portalId" -> "Default",
+        "serviceName" -> "HMRC-MLR-ORG",
+        "friendlyName" -> "AMLS Enrolment",
+        "knownFacts" -> Seq(
+          "foo",
+          "",
+          "",
+          "bar"
+        )
+      )
+
+      Json.toJson(model) must
+        equal (json)
+    }
+  }
+
 }

@@ -44,6 +44,8 @@ trait ApplicationConfig {
   def frontendBaseUrl: String
 
   def showChangeOfficerLink: Boolean
+
+  def sendPostcodeKnownFact: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -131,4 +133,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 
   override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
+
+    override def sendPostcodeKnownFact = getConfBool("feature-toggle.gg-knownfacts-postcode", false)
 }
