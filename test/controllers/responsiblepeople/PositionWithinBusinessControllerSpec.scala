@@ -389,21 +389,37 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
   "hasNominatedOfficer" must {
 
-    "return true when there is nominated officer" in new Fixture {
-      controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer))) must be(true)
+    "return true" when {
+      "there is nominated officer" in new Fixture {
+        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer))) must be(true)
+      }
+
+      "one rp is nominated officer" in new Fixture {
+        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer,noNominatedOfficer))) must be(true)
+      }
     }
 
-    "return true when one rp is nominated officer" in new Fixture {
-      controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer,noNominatedOfficer))) must be(true)
+    "return false" when {
+      "no responsible people" in new Fixture {
+        controller.hasNominatedOfficer(Some(Nil)) must be(false)
+      }
+
+      "there is no nominated officer" in new Fixture {
+        controller.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(positions =
+          Some(DefaultValues.noNominatedOfficerPositions))))) must be(false)
+      }
     }
 
-    "return false when no responsible people" in new Fixture {
-      controller.hasNominatedOfficer(Some(Nil)) must be(false)
-    }
 
-    "return false when there is no nominated officer" in new Fixture {
-      controller.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(positions =
-        Some(DefaultValues.noNominatedOfficerPositions))))) must be(false)
+  }
+
+  "displayNominatedOfficer" must {
+    "return true" when {
+      "hasNominatedOfficer is false" in new Fixture {}
+      "this responsible person is the nominated" in new Fixture {}
+    }
+    "return false" when {
+      "hasNominatedOfficer is true" in new Fixture {}
     }
   }
 }
