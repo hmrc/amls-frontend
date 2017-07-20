@@ -22,7 +22,7 @@ import models.status.SubmissionDecisionApproved
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
-import services.StatusService
+import services.{ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.inject.bind
@@ -42,12 +42,14 @@ class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
+    val progressService = mock[ProgressService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[StatusService].to(statusService))
+      .overrides(bind[ProgressService].to(progressService))
       .build()
 
     val controller = app.injector.instanceOf[RegisterPartnersController]
