@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
+import play.api.libs.json.Json
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.position_within_business
 
@@ -33,28 +34,29 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetchAll map { optionalCache =>
-          (optionalCache map { cache =>
-            val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-              .getOrElse(BusinessType.SoleProprietor)
+      implicit authContext =>
+        implicit request =>
+          dataCacheConnector.fetchAll map { optionalCache =>
+            (optionalCache map { cache =>
+              val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                .getOrElse(BusinessType.SoleProprietor)
 
-            getData[ResponsiblePeople](cache, index) match {
-              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,Some(positions),_,_,_,_,_,_,_,_,_,_))
-              => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, true, flow))
-              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, true, flow))
-              case _
-              => NotFound(notFoundView)
-            }
-          }).getOrElse(NotFound(notFoundView))
-        }
+              getData[ResponsiblePeople](cache, index) match {
+                case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _, _))
+                => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, true, flow))
+                case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, true, flow))
+                case _
+                => NotFound(notFoundView)
+              }
+            }).getOrElse(NotFound(notFoundView))
+          }
     }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      import jto.validation.forms.Rules._
-      implicit authContext => implicit request =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
+    import jto.validation.forms.Rules._
+    implicit authContext =>
+      implicit request =>
         Form2[Positions](request.body) match {
           case f: InvalidForm =>
             dataCacheConnector.fetchAll map { optionalCache =>
@@ -67,13 +69,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               }).getOrElse(NotFound(notFoundView))
             }
           case ValidForm(_, data) => {
-            def personalTaxRouter = {
-              (data.personalTax, edit) match {
-                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index, false, flow))
-                case (false, true) => Redirect(routes.DetailedAnswersController.get(index, false))
-                case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
-              }
-            }
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.positions(data)
@@ -93,15 +88,16 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
-    }
+  }
 
   private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePeople]]): Boolean = {
     rpSeqOption match {
       case Some(rps) => rps.filterNot(_.status.contains(StatusConstants.Deleted)).exists {
-        rp => rp.positions match {
-          case Some(position) => position.isNominatedOfficer
-          case _ => false
-        }
+        rp =>
+          rp.positions match {
+            case Some(position) => position.isNominatedOfficer
+            case _ => false
+          }
       }
       case _ => false
     }

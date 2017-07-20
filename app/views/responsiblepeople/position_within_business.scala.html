@@ -49,25 +49,27 @@
                             labelText = "responsiblepeople.position_within_business.lbl.06",
                             value = "06"
                         )
-            @if(displayNominatedOfficer){
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.04",
-                            value = "04"
-                        )
+                        @if(displayNominatedOfficer){
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.04",
+                                value = "04"
+                            )
+                        }
                     }
-            }
                     case BusinessType.Partnership => {
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.05",
                             value = "05"
                         )
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.04",
-                            value = "04"
-                        )
+                        @if(displayNominatedOfficer){
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.04",
+                                value = "04"
+                            )
+                        }
                     }
                     case (BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
                         @checkbox(
@@ -80,11 +82,13 @@
                             labelText = "responsiblepeople.position_within_business.lbl.02",
                             value = "02"
                         )
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.04",
-                            value = "04"
-                        )
+                        @if(displayNominatedOfficer){
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.04",
+                                value = "04"
+                            )
+                        }
                         @if(businessType == BusinessType.LPrLLP) {
                             @checkbox(
                                 f = f("positions[]"),
@@ -94,11 +98,13 @@
                         }
                     }
                     case BusinessType.LPrLLP => {
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.04",
-                            value = "04"
-                        )
+                        @if(displayNominatedOfficer){
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.04",
+                                value = "04"
+                            )
+                        }
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.05",

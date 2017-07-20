@@ -64,11 +64,11 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
       }
 
       val testCases = List(
-        (BusinessType.SoleProprietor, List(4, 6)),
-        (BusinessType.Partnership, List(4, 5)),
-        (BusinessType.LimitedCompany, List(1, 2, 4)),
-        (BusinessType.UnincorporatedBody, List(1, 2, 4)),
-        (BusinessType.LPrLLP, List(4, 5, 7))
+        BusinessType.SoleProprietor -> List(4, 6),
+        BusinessType.Partnership -> List(4, 5),
+        BusinessType.LimitedCompany -> List(1, 2, 4),
+        BusinessType.UnincorporatedBody -> List(1, 2, 4),
+        BusinessType.LPrLLP -> List(4, 5, 7)
       )
 
       "nominated officer has not been selected previously" when {
@@ -88,15 +88,21 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
         }
       }
 
-      "nominated officer has been selected previously" in new ViewFixture {
+      "nominated officer has been selected previously" when {
+        testCases foreach {
+          case (businessType, positionsToDisplay) => {
+            s"$businessType" in new ViewFixture {
 
-        def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, testCases.head._1, name, false, None)
+              def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, false, None)
 
-        implicit val positions = testCases.head._2.filterNot(_.equals(4))
-        implicit val formText = form.text()
+              implicit val positions = positionsToDisplay.filterNot(_.equals(4))
+              implicit val formText = form.text()
 
-        assertLabelIncluded()
+              assertLabelIncluded()
 
+            }
+          }
+        }
       }
     }
 
