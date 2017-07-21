@@ -50,11 +50,11 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
                           (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     statusService.getStatus map {
       case SubmissionReady =>
-        status(register_partners("submit.registration", form, rp, currentPartnersNames(rp)))
+        status(register_partners("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        status(register_partners("submit.amendment.application", form, rp, currentPartnersNames(rp)))
+        status(register_partners("submit.amendment.application", form, getNonPartners(rp), currentPartnersNames(rp)))
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        status(register_partners("submit.renewal.application", form, rp, currentPartnersNames(rp)))
+        status(register_partners("submit.renewal.application", form, getNonPartners(rp), currentPartnersNames(rp)))
       case _ =>
         throw new Exception("Incorrect status - Page not permitted for this status")
     }
@@ -70,7 +70,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
       case Some(x) => Redirect(x)
       case _ => InternalServerError("Unable to get redirect url")
     }) recoverWith {
-      case x : Throwable => Future.successful(InternalServerError("Unable to save data"))
+      case x : Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
   }
 
@@ -123,7 +123,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
         case f: InvalidForm => {
           dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
             case Some(data) => {
-              businessPartnersView(BadRequest, f, getNonPartners(data))
+              businessPartnersView(BadRequest, f, data)
             }
             case None =>
               businessPartnersView(BadRequest, f, Seq.empty)

@@ -17,8 +17,10 @@
 package controllers.declaration
 
 import connectors.DataCacheConnector
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -29,8 +31,9 @@ import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.inject.bind
 import play.api.test.Helpers._
 import org.mockito.Mockito._
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import play.api.i18n.Messages
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -56,9 +59,12 @@ class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar
 
     val controller = app.injector.instanceOf[RegisterPartnersController]
 
+    val emptyCache = CacheMap("", Map.empty)
+
     val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1", None, Some("random"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+    val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(new LocalDate()))
     val rp = ResponsiblePeople (
       personName = Some(personName),
       positions = Some(positions),
@@ -66,7 +72,7 @@ class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar
     )
     val rp2 = ResponsiblePeople (
       personName = Some(personName1),
-      positions = Some(positions),
+      positions = Some(positions1),
       status = None
     )
     val rp1 = ResponsiblePeople(
@@ -97,6 +103,34 @@ class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar
     }
 
     "post is called" must {
+      "pass validation" when {
+        "selected option is a valid responsible person" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(responsiblePeoples)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
+            = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
+
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+            .thenReturn(Future.successful(Some(controllers.routes.FeeGuidanceController.get())))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
+
+
+        }
+      }
+
       "fail validation" when {
         "no option is selected on the UI and status is submissionready" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
