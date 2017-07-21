@@ -115,7 +115,9 @@ trait ConfirmationController extends BaseController {
     for {
       fees@(payRef, total, rows, difference) <- OptionT(getFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
-    } yield Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.links.nextUrl))
+    } yield {
+      Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.links.nextUrl))
+    }
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
@@ -177,12 +179,12 @@ trait ConfirmationController extends BaseController {
   }
 
 
-  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow])]])
+  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
                                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     getData flatMap {
-      case Some((paymentRef, total, rows)) => Future.successful(
+      case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, None))
+          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, difference))
           case _ => None
       })
       case None => Future.failed(new Exception("Cannot get data from submission"))

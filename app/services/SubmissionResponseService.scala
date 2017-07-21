@@ -74,7 +74,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -88,7 +88,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val paymentReference = variation.paymentReference
           val total = variation.getTotalFees
           val rows = getVariationBreakdownRows(variation, premises, people, businessActivities)
-          Future.successful(Some((paymentReference, Currency.fromBD(total), rows)))
+          val difference = variation.difference map Currency.fromBD
+          Future.successful(Some((paymentReference, Currency.fromBD(total), rows, difference)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -98,7 +99,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -108,7 +109,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val totalFees: BigDecimal = renewal.getTotalFees
           val rows = getRenewalBreakdown(renewal)
           val paymentRef = renewal.paymentReference
-          Future.successful(Some((paymentRef, Currency(totalFees), rows)))
+          val difference = renewal.difference
+          Future.successful(Some((paymentRef, Currency(totalFees), rows, difference map Currency.fromBD)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
