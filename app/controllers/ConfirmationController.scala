@@ -110,19 +110,25 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def showPostSubmissionConfirmation(getFees: Future[Option[ViewData]])
+  private def showPostSubmissionConfirmation(getFees: Future[Option[ViewData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, difference) <- OptionT(getFees)
       paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
-    } yield Ok(confirm_amendvariation(payRef, total, rows, difference, paymentsRedirect.links.nextUrl))
+    } yield {
+      val feeToPay = status match {
+        case SubmissionReadyForReview | RenewalSubmitted(_) => difference
+        case _ => Some(total)
+      }
+      Ok(confirm_amendvariation(payRef, total, rows, feeToPay, paymentsRedirect.links.nextUrl))
+    }
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
-      case SubmissionReadyForReview => showPostSubmissionConfirmation(getAmendmentFees)
-      case SubmissionDecisionApproved | RenewalSubmitted(_) => showPostSubmissionConfirmation(getVariationOrRenewalFees)
+      case SubmissionReadyForReview => showPostSubmissionConfirmation(getAmendmentFees, status)
+      case SubmissionDecisionApproved | RenewalSubmitted(_) => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
       case ReadyForRenewal(_) => showRenewalConfirmation
       case _ =>
         for {
@@ -177,12 +183,12 @@ trait ConfirmationController extends BaseController {
   }
 
 
-  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow])]])
+  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
                                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     getData flatMap {
-      case Some((paymentRef, total, rows)) => Future.successful(
+      case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, None))
+          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, difference))
           case _ => None
       })
       case None => Future.failed(new Exception("Cannot get data from submission"))

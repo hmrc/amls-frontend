@@ -409,7 +409,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows)) => {
+            case Some((_, _, rows, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -437,7 +437,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows)) => rows foreach { row =>
+            case Some((_, _, rows, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -460,10 +460,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeople = 1,
-            addedFullYearTradingPremises = 0,
-            halfYearlyTradingPremises = 0,
-            zeroRatedTradingPremises = 0
+            addedResponsiblePeople = 1
           )
 
           when {
@@ -483,7 +480,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
+            case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFeeWithRate)
@@ -517,7 +514,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
+            case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpFee)
@@ -546,7 +543,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
+            case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpHalfFee)
@@ -575,7 +572,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
+            case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(0)
@@ -624,7 +621,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows)) => {
+            case Some((_, _, rows, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -671,7 +668,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows)) => {
+            case Some((_, _, rows, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -705,7 +702,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           } thenReturn Some(Seq(TradingPremises()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows)) =>
+            case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFee)
