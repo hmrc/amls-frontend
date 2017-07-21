@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
 import models.Country
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
@@ -28,6 +29,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
 import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.i18n.Messages
@@ -39,14 +41,17 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar {
+class PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
+
+    val mockAuthConnector = self.authConnector
 
     val controller = new PositionWithinBusinessController {
       override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
+      override val authConnector = mockAuthConnector
     }
 
     object DefaultValues {
@@ -54,9 +59,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
 
-    val noNominatedOfficer = ResponsiblePeople(None, None, None,None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(None, None, None,None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None,None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
+    val noNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
+    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -276,9 +281,11 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+
           val mockCacheMap = mock[CacheMap]
+
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
@@ -383,7 +390,6 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
 
 
-
     }
   }
 
@@ -395,7 +401,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
 
       "one rp is nominated officer" in new Fixture {
-        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer,noNominatedOfficer))) must be(true)
+        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer, noNominatedOfficer))) must be(true)
       }
     }
 
@@ -405,8 +411,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
 
       "there is no nominated officer" in new Fixture {
-        controller.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(positions =
-          Some(DefaultValues.noNominatedOfficerPositions))))) must be(false)
+        controller.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(
+          positions = Some(DefaultValues.noNominatedOfficerPositions))
+        ))) must be(false)
       }
     }
 
@@ -415,11 +422,32 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
 
   "displayNominatedOfficer" must {
     "return true" when {
-      "hasNominatedOfficer is false" in new Fixture {}
-      "this responsible person is the nominated" in new Fixture {}
+      "this responsible person is the nominated officer" in new Fixture {
+
+        val responsiblePerson = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
+
+        controller.displayNominatedOfficer(responsiblePerson, true) mustBe true
+
+      }
+      "this responsible person is not the nominated" when {
+        "hasNominatedOfficer is false" in new Fixture {
+
+          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+
+          controller.displayNominatedOfficer(responsiblePerson, false) mustBe true
+
+        }
+      }
     }
     "return false" when {
-      "hasNominatedOfficer is true" in new Fixture {}
+      "this responsible person is not the nominated officer" when {
+        "hasNominatedOfficer is true" in new Fixture {
+
+          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+
+          controller.displayNominatedOfficer(responsiblePerson, true) mustBe false
+        }
+      }
     }
   }
 }

@@ -37,16 +37,17 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
         implicit request =>
           dataCacheConnector.fetchAll map { optionalCache =>
             (optionalCache map { cache =>
+
               val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 .getOrElse(BusinessType.SoleProprietor)
 
               val data = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
 
               getResponsiblePersonFromData(data,index) match {
-                case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _, _))
-                => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, !hasNominatedOfficer(data), flow))
-                case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, !hasNominatedOfficer(data), flow))
+                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _, _))
+                => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
                 case _
                 => NotFound(notFoundView)
               }
@@ -69,7 +70,8 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 val data = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
 
                 getResponsiblePersonFromData(data,index) match {
-                  case rp => BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(rp), !hasNominatedOfficer(data), flow))
+                  case s@Some(rp) =>
+                    BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(s), displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
                 }
               }).getOrElse(NotFound(notFoundView))
             }
@@ -106,6 +108,12 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
       }
       case _ => false
     }
+  }
+
+  private[controllers] def displayNominatedOfficer(rp: ResponsiblePeople, hasNominatedOfficer: Boolean): Boolean = {
+    (rp.positions.map{ positions =>
+      positions.positions.contains(NominatedOfficer)
+    } contains true) || !hasNominatedOfficer
   }
 
   private def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePeople]], index: Int) = data.flatMap{
