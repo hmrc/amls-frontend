@@ -20,7 +20,9 @@ import jto.validation.{From, Rule, To, Write}
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 
-case class BusinessPartners(value: String)
+case class BusinessPartners(value: String){
+  val indexValue = """([0-9]+)$""".r.findFirstIn(value) map {_.toInt}
+}
 
 object BusinessPartners {
 

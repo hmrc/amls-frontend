@@ -51,9 +51,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @model.map { people =>
+            @model.zipWithIndex.map { case (people, i) =>
                 @people.personName.map { obj =>
-                    @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace)
+                    @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace,  s"$i")
                 }
             }
         }
