@@ -24,18 +24,19 @@ import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
-
+import uk.gov.hmrc.play.http._
+import play.api.test.Helpers._
+import org.mockito.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience {
 
   object AmlsConnector extends AmlsConnector {
 
@@ -257,6 +258,23 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
           _ mustBe response
         }
       }
+    }
+  }
+
+  "savePayment" must {
+    "provide a paymentId and report the status of the response" in {
+
+      val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/payment/"
+      val id = "fcguhio"
+
+      when {
+        AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
+      } thenReturn Future.successful(HttpResponse(OK))
+
+      whenReady(AmlsConnector.savePayment(amlsRegistrationNumber, id)) {
+        _.status mustBe OK
+      }
+
     }
   }
 }

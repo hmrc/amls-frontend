@@ -193,6 +193,16 @@ trait AmlsConnector {
 
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
+
+  def savePayment(amlsRegistrationNumber: String, paymentId: String)
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/payment"
+
+    httpPost.POSTString[HttpResponse](postUrl, paymentId)
+  }
+
 }
 
 object AmlsConnector extends AmlsConnector {
