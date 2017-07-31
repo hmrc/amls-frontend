@@ -18,24 +18,37 @@ package connectors
 
 import javax.inject.Inject
 
+import cats.implicits._
 import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logger
 import play.api.libs.json.Json
+import services.PaymentService
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PayApiConnector @Inject()(httpPost: HttpPost, config: ServicesConfig) {
+class PayApiConnector @Inject()(
+                                 httpPost: HttpPost,
+                                 config: ServicesConfig,
+                                 paymentService: PaymentService
+                               ) {
 
   lazy val baseUrl = s"${config.baseUrl("pay-api")}/pay-api"
   private val log = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
-  
+
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
     if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {
       log(s"Creating payment: ${Json.toJson(request)}")
-      httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](s"$baseUrl/payment", request) map { r => Some(r) }
+      httpPost.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map { r =>
+        Future{
+          r.header("Location").map{ location =>
+            paymentService.savePayment(location)
+          }
+        }
+        r.some
+      }
     } else {
       Future.successful(None)
     }

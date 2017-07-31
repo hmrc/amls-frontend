@@ -269,10 +269,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
       when {
         AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
-      } thenReturn Future.successful(HttpResponse(OK))
+      } thenReturn Future.successful(HttpResponse(CREATED))
 
       whenReady(AmlsConnector.savePayment(amlsRegistrationNumber, id)) {
-        _.status mustBe OK
+        _.status mustBe CREATED
       }
 
     }
