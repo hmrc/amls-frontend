@@ -43,6 +43,11 @@
     }
 
     <p>@Messages("businessactivities.involved.other.hint")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("businessactivities.involved.listline1")</li>
+        <li>@Messages("businessactivities.involved.listline2")</li>
+        <li>@Messages("businessactivities.involved.listline3")</li>
+    </ul>
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
