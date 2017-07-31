@@ -435,6 +435,12 @@ div.grid-layout {
   padding-bottom: 30px;
 }
 
+
+.user-attention{
+  background-color: #005ea5;
+  color: #ffffff;
+  border-bottom: none;
+}
 @media screen and (max-width: 640px) {
   .application-submit,
   .user-attention {

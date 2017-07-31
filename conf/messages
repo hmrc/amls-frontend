@@ -857,7 +857,7 @@ aboutthebusiness.registeredoffice.lbl = Is this a UK address?
 aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
-aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
+aboutthebusiness.activity.start.date.title = When will your business start activities that need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 aboutthebusiness.lettersaddress.title = Is this the right address to send you letters?
 
