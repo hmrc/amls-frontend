@@ -481,7 +481,7 @@ start.before.heading = Before you register
 start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">registration fees</a> when you apply, renew, or when you make certain updates. You’ll need a credit or debit card for payment.
 start.utr.heading = Unique Taxpayer Reference (UTR)
 start.utr.heading1 = Registration fees
-start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR. You’ll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
+    start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR. You’ll find it in the header of any letter issued by HMRC. It may be labelled ‘Tax Reference’, ‘UTR’ or ‘Official Use’.
 
 ############################### Status page ###############################
 status.title = Your registration
