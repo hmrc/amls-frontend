@@ -24,69 +24,16 @@ import org.joda.time.LocalDate
 
 class RegistrationDetailsSpec extends PlaySpec with MustMatchers {
 
-  "The RegistrationDetails model" when {
-    "deserialised" must {
-      "produce the correct json" when {
-        "the data represents an organisation" in {
-          val expectedModel = RegistrationDetails(false, Organisation("Test Organisation", true, LLP))
+  "The RegistrationDetails model" must {
+    "deserialize from json" in {
+      val expectedModel = RegistrationDetails("Test Company", isIndividual = false)
 
-          val json = Json.obj(
-            "isAnIndividual" -> false,
-            "organisation" -> Json.obj(
-              "organisationName" -> "Test Organisation",
-              "isAGroup" -> true,
-              "organisationType" -> "LLP"
-            )
-          )
+      val json = Json.obj(
+        "companyName" -> "Test Company",
+        "isIndividual" -> false
+      )
 
-          Json.fromJson[RegistrationDetails](json) mustBe JsSuccess(expectedModel)
-        }
-
-        "the data represents an individual" in {
-          val expectedModel = RegistrationDetails(true, Individual("Firstname", "Middlename".some, "Lastname", new LocalDate(2002, 5, 10)))
-          val json = Json.obj(
-            "isAnIndividual" -> true,
-            "individual" -> Json.obj(
-              "firstName" -> "Firstname",
-              "middleName" -> "Middlename",
-              "lastName" -> "Lastname",
-              "dateOfBirth" -> "2002-05-10"
-            ))
-
-          Json.fromJson[RegistrationDetails](json) mustBe JsSuccess(expectedModel)
-        }
-      }
-    }
-  }
-
-  "The Organisation model" when {
-    "deserialised" must {
-      "produce the correct json" in {
-        val expectedModel = Organisation("Test Organisation", true, Partnership)
-
-        val json = Json.obj(
-          "organisationName" -> "Test Organisation",
-          "isAGroup" -> true,
-          "organisationType" -> "Partnership"
-        )
-
-        Json.fromJson[Organisation](json) mustBe JsSuccess(expectedModel)
-      }
-    }
-  }
-
-  "The organisation type objects" when {
-    "deserialised" must {
-      "produce the correct values" in {
-        Seq(
-          (Partnership, "Partnership"),
-          (LLP, "LLP"),
-          (CorporateBody, "Corporate body"),
-          (UnincorporatedBody, "Unincorporated body")
-        ) foreach {
-          case (t, str) => Json.fromJson[OrganisationType](JsString(str)) mustBe JsSuccess(t)
-        }
-      }
+      Json.fromJson[RegistrationDetails](json) mustBe JsSuccess(expectedModel)
     }
   }
 

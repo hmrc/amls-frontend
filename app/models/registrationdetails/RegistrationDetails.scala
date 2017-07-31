@@ -16,59 +16,10 @@
 
 package models.registrationdetails
 
-import org.joda.time.LocalDate
-import play.api.libs.json._
+import play.api.libs.json.Json
 
-sealed trait OrganisationType
-case object Partnership extends OrganisationType
-case object LLP extends OrganisationType
-case object CorporateBody extends OrganisationType
-case object UnincorporatedBody extends OrganisationType
-
-object OrganisationType {
-  implicit val reads = new Reads[OrganisationType] {
-    override def reads(json: JsValue) = json match {
-      case JsString("Partnership") => JsSuccess(Partnership)
-      case JsString("LLP") => JsSuccess(LLP)
-      case JsString("Corporate body") => JsSuccess(CorporateBody)
-      case JsString("Unincorporated body") => JsSuccess(UnincorporatedBody)
-      case x => JsError(s"Unable to parse the organisation type value: $x")
-    }
-  }
-}
-
-sealed trait OrganisationBodyDetails
-case class Organisation(organisationName: String, isAGroup: Boolean, organisationType: OrganisationType) extends OrganisationBodyDetails
-
-object Organisation {
-  implicit val orgReads = Json.reads[Organisation]
-}
-
-case class Individual(firstName: String, middleName: Option[String], lastName: String, dateOfBirth: LocalDate) extends OrganisationBodyDetails
-
-object Individual {
-  implicit val indReads = Json.reads[Individual]
-}
-
-object OrganisationBodyDetails {
-  implicit val reads: Reads[OrganisationBodyDetails] = {
-    import play.api.libs.json._
-    (__ \ "isAnIndividual").read[Boolean] flatMap {
-      case true => (__ \ "individual").read[Individual].map(identity[OrganisationBodyDetails])
-      case _ => (__ \ "organisation").read[Organisation].map(identity[OrganisationBodyDetails])
-    }
-  }
-}
-
-case class RegistrationDetails(isAnIndividual: Boolean, bodyDetails: OrganisationBodyDetails)
+case class RegistrationDetails(companyName: String, isIndividual: Boolean)
 
 object RegistrationDetails {
-  implicit val reads: Reads[RegistrationDetails] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-    (
-      (__ \ "isAnIndividual").read[Boolean] and
-        __.read[OrganisationBodyDetails]
-    )(RegistrationDetails.apply _)
-  }
+  implicit val reads = Json.reads[RegistrationDetails]
 }
