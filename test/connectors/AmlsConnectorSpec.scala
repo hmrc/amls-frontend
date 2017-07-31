@@ -284,7 +284,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "retrieve the registration details given a safe ID" in {
 
       val safeId = "SAFE_ID"
-      val url = s"${AmlsConnector.url}/org/TestOrgRef/details/$safeId"
+      val url = s"/amls/registration/org/TestOrgRef/details/$safeId"
 
       when {
         AmlsConnector.httpGet.GET[RegistrationDetails](eqTo(url))(any(), any())

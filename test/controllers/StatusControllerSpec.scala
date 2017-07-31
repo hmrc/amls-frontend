@@ -17,10 +17,11 @@
 package controllers
 
 import cats.implicits._
-import connectors.{DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
+import models.registrationdetails.RegistrationDetails
 import models.renewal._
 import models.responsiblepeople.{PersonName, _}
 import models.status._
@@ -65,12 +66,16 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
     val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
     val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
     val responsiblePeople = Seq(rp1, rp2)
+
+    when(controller.statusService.getDetailedStatus(any(), any(), any()))
+      .thenReturn(Future.successful((NotCompleted, None)))
   }
 
   val amlsRegistrationNumber = "XAML00000567890"
@@ -89,8 +94,11 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
   "StatusController" should {
-    "respond with OK and show business name on the status page" in new Fixture {
 
+    "respond with OK and show business name on the status page" in new Fixture {
+      when {
+        controller.amlsConnector.registrationDetails(any())(any(), any())
+      } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
@@ -101,15 +109,17 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
+      val statusResponse = mock[ReadStatusResponse]
+      when(statusResponse.safeId) thenReturn Some("X12345678")
+
       when(controller.statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((NotCompleted, None)))
+        .thenReturn(Future.successful((NotCompleted, Some(statusResponse))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("panel-indent").first().child(1).html() must be(reviewDetails.businessName)
-
+      document.getElementsByClass("panel-indent").first().child(1).html() must be("Test Company")
     }
 
     "show correct content" when {
@@ -493,7 +503,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
               HighValueDealing
             ))),
             msbServices = Some(MsbServices(Set(CurrencyExchange))),
-            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address],"safeId", None))
+            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
           )))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
@@ -562,6 +572,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+        when(statusResponse.safeId).thenReturn(None)
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
           .thenReturn(
@@ -590,6 +601,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+        when(statusResponse.safeId).thenReturn(None)
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
           .thenReturn(
@@ -714,6 +726,7 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -767,6 +780,7 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -820,6 +834,7 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),

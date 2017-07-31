@@ -206,7 +206,8 @@ trait AmlsConnector {
 
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$url/$accountType/$accountId/details/$safeId"
+    val regUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
+    val getUrl = s"$regUrl/$accountType/$accountId/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)
   }
