@@ -20,6 +20,7 @@ import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
+import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -33,6 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import uk.gov.hmrc.play.http._
 import play.api.test.Helpers._
 import org.mockito.Matchers
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -275,6 +277,22 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         _.status mustBe OK
       }
 
+    }
+  }
+
+  "registrationDetails" must {
+    "retrieve the registration details given a safe ID" in {
+
+      val safeId = "SAFE_ID"
+      val url = s"${AmlsConnector.url}/org/TestOrgRef/details/$safeId"
+
+      when {
+        AmlsConnector.httpGet.GET[RegistrationDetails](eqTo(url))(any(), any())
+      } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
+
+      whenReady(AmlsConnector.registrationDetails(safeId)) { result =>
+        result.companyName mustBe "Test Company"
+      }
     }
   }
 }

@@ -18,6 +18,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
+import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
@@ -201,6 +202,13 @@ trait AmlsConnector {
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/payment"
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
+  }
+
+  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$url/$accountType/$accountId/details/$safeId"
+
+    httpGet.GET[RegistrationDetails](getUrl)
   }
 
 }
