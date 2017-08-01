@@ -76,9 +76,14 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
+
+    when {
+      controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
   }
 
   val amlsRegistrationNumber = "XAML00000567890"
+
   val feeResponse = FeeResponse(
     SubscriptionResponseType,
     amlsRegistrationNumber,
@@ -90,6 +95,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     None,
     new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
   )
+
   val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
@@ -105,9 +111,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
         .thenReturn(Future.successful(None))
-
-      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn Some("X12345678")
@@ -125,7 +128,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     "show correct content" when {
 
       "application status is NotCompleted" in new Fixture {
-
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -748,6 +750,10 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
       .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+
+    when {
+      controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
   }
 
   "The status controller" must {
@@ -803,6 +809,10 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
       .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+    when {
+      controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
   }
 
   "The status controller" must {
@@ -856,6 +866,9 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
     when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
+    when {
+      controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
   }
 
   "The status controller" must {
