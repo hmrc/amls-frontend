@@ -112,7 +112,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("000000", "1234567890")))))
 
         views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
@@ -207,10 +207,10 @@ class summarySpec extends GenericTestHelper
       val accountNumberLength = Account.maxUKBankAccountNumberLength
 
       val genUKAccount: Gen[UKAccount] = for {
-        accountNumber <- Gen.listOfN[Char](accountNumberLength, Gen.numChar).map(_.mkString(""))
         sortCode <- Gen.listOfN[Char](sortCodeLength, Gen.numChar).map(_.mkString(""))
+        accountNumber <- Gen.listOfN[Char](accountNumberLength, Gen.numChar).map(_.mkString(""))
       } yield {
-        UKAccount(accountNumber, sortCode)
+        UKAccount(sortCode, accountNumber)
       }
 
       val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength, Gen.alphaChar).map(_.mkString(""))
@@ -229,11 +229,10 @@ class summarySpec extends GenericTestHelper
 
                   def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionReadyForReview)
 
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
-
-                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
                   accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
                 }
               }
             }
@@ -251,7 +250,7 @@ class summarySpec extends GenericTestHelper
 
                   def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
 
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
                   accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
@@ -277,7 +276,7 @@ class summarySpec extends GenericTestHelper
 
                   def view = views.html.bankdetails.summary(testdata, false, true, true, SubmissionReadyForReview)
 
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
                   accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
@@ -298,7 +297,7 @@ class summarySpec extends GenericTestHelper
 
                   def view = views.html.bankdetails.summary(testdata, false, true, true, SubmissionDecisionApproved)
 
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
+                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
                   accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))

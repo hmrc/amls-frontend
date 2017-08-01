@@ -64,8 +64,8 @@ object Account {
       (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
-            (__ \ "accountNumber").read(ukBankAccountNumberType) ~
-            (__ \ "sortCode").read(sortCodeType)
+              (__ \ "sortCode").read(sortCodeType) ~
+              (__ \ "accountNumber").read(ukBankAccountNumberType)
 
             ) (UKAccount.apply _)
         case false =>
@@ -83,8 +83,8 @@ object Account {
     case f: UKAccount =>
       Map(
         "isUK" -> Seq("true"),
-        "accountNumber" -> f.accountNumber,
-        "sortCode" -> f.sortCode
+        "sortCode" -> f.sortCode,
+        "accountNumber" -> f.accountNumber
       )
     case nonukacc: NonUKAccountNumber =>
       Map(
@@ -101,14 +101,14 @@ object Account {
     import play.api.libs.json._
     (__ \ "isUK").read[Boolean] flatMap {
       case true => (
-        (__ \ "accountNumber").read[String] and
-          (__ \ "sortCode").read[String]
+        (__ \ "sortCode").read[String] and
+          (__ \ "accountNumber").read[String]
         ) (UKAccount.apply _)
 
       case false =>
         (__ \ "isIBAN").read[Boolean] flatMap {
-          case true => (__ \ "IBANNumber").read[String] map  NonUKIBANNumber.apply
-          case false =>  (__ \ "nonUKAccountNumber").read[String] map  NonUKAccountNumber.apply
+          case true => (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
+          case false => (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
         }
     }
   }
@@ -117,8 +117,8 @@ object Account {
     case m: UKAccount =>
       Json.obj(
         "isUK" -> true,
-        "accountNumber" -> m.accountNumber,
-        "sortCode" -> m.sortCode
+        "sortCode" -> m.sortCode,
+        "accountNumber" -> m.accountNumber
       )
     case acc: NonUKAccountNumber =>
       Json.obj(
@@ -136,14 +136,14 @@ object Account {
 }
 
 case class UKAccount(
-                      accountNumber: String,
-                      sortCode: String
+                      sortCode: String,
+                      accountNumber: String
                     ) extends Account {
-  def displaySortCode:String = {
+  def displaySortCode: String = {
     // scalastyle:off magic.number
-    val pair1 = sortCode.substring(0,2)
-    val pair2 = sortCode.substring(2,4)
-    val pair3 = sortCode.substring(4,6)
+    val pair1 = sortCode.substring(0, 2)
+    val pair2 = sortCode.substring(2, 4)
+    val pair3 = sortCode.substring(4, 6)
     // scalastyle:on magic.number
     pair1 + "-" + pair2 + "-" + pair3
   }
@@ -153,10 +153,13 @@ case class UKAccount(
 sealed trait NonUKAccount extends Account
 
 case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
+
 case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
+
 case class BankAccount(accountName: String, account: Account)
 
 object BankAccount {
+
   import utils.MappingUtils.Implicits._
 
   val key = "bank-account"
