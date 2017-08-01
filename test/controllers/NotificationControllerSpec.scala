@@ -16,13 +16,14 @@
 
 package controllers
 
-import connectors.{AmlsNotificationConnector, DataCacheConnector}
+import connectors.{AmlsConnector, AmlsNotificationConnector, DataCacheConnector}
 import models.{Country, ReadStatusResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
+import models.registrationdetails.RegistrationDetails
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -95,21 +96,27 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
       override protected[controllers] val statusService = mock[StatusService]
+      override protected[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]
-
     val testBusinessName = "Ubunchews Accountancy Services"
+
     val testReviewDetails = ReviewDetails(
       testBusinessName,
       Some(BusinessType.LimitedCompany),
       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
       "XE0001234567890"
     )
+
     val testBusinessMatch = BusinessMatching(
       reviewDetails = Some(testReviewDetails)
     )
+
+    when {
+      controller.amlsConnector.registrationDetails(any())(any(), any())
+    } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 
   "getMessages" must {
@@ -131,31 +138,6 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val result = controller.getMessages()(request)
 
       status(result) mustBe OK
-    }
-
-    "throw an exception" when {
-
-      "business name cannot be retrieved" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("")))
-
-        when(controller.statusService.getReadStatus(any(), any(), any()))
-          .thenReturn(Future.successful(statusResponse))
-
-        when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
-          .thenReturn(Future.successful(testList))
-
-        val result = intercept[Exception] {
-          await(controller.getMessages()(request))
-        }
-
-        result.getMessage mustBe "Cannot retrieve business name"
-
-      }
-
     }
   }
 
@@ -459,21 +441,27 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
       override protected[controllers] val statusService = mock[StatusService]
+      override protected[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]
-
     val testBusinessName = "Test Business Name"
+
     val testReviewDetails = ReviewDetails(
       testBusinessName,
       Some(BusinessType.LimitedCompany),
       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
       "XE0000000000000"
     )
+
     val testBusinessMatch = BusinessMatching(
       reviewDetails = Some(testReviewDetails)
     )
+
+    when {
+      controller.amlsConnector.registrationDetails(any())(any(), any())
+    } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 
   "NotificationsControllerWithoutNotificationsSpec" must {
@@ -483,6 +471,115 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
       }
       "viewing an individual message" in new Fixture {
         status(controller.messageDetails("", ContactType.MindedToRevoke, amlsRegNumber)(request)) mustBe 404
+      }
+    }
+  }
+}
+
+class NotificationControllerWithoutBusinessNameLookupSpec extends GenericTestHelper with MockitoSugar {
+
+  val notificationService = mock[NotificationService]
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[NotificationService].to(notificationService))
+    .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
+    .build()
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+    val amlsRegNumber = "XJML00000200000"
+
+    val controller = new NotificationController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService = mock[StatusService]
+      override protected[controllers] val amlsConnector = mock[AmlsConnector]
+    }
+
+    val mockBusinessMatching = mock[BusinessMatching]
+    val mockReviewDetails = mock[ReviewDetails]
+    val testBusinessName = "Test Business Name"
+
+    val testReviewDetails = ReviewDetails(
+      testBusinessName,
+      Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+      "XE0000000000000"
+    )
+
+    val testBusinessMatch = BusinessMatching(
+      reviewDetails = Some(testReviewDetails)
+    )
+
+    val registrationDate = LocalDateTime.now()
+    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
+
+    val testNotifications = NotificationRow(
+      status = None,
+      contactType = None,
+      contactNumber = None,
+      variation = true,
+      receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+      false,
+      amlsRegNumber,
+      IDType("132456")
+    )
+
+    //noinspection ScalaStyle
+    val testList = Seq(
+      testNotifications.copy(contactType = Some(ApplicationApproval), receivedAt = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
+      testNotifications.copy(variation = true, receivedAt = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
+      testNotifications.copy(contactType = Some(RenewalApproval), receivedAt = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC))
+    )
+
+    when {
+      controller.amlsConnector.registrationDetails(any())(any(), any())
+    } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
+  }
+
+  "The Notifications controller" must {
+    "return the business name from BusinessMatching" in new Fixture {
+      when(controller.statusService.getReadStatus(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponse))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
+
+      when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      val result = controller.getMessages()(request)
+
+      status(result) mustBe OK
+    }
+
+    "throw an exception" when {
+      "business name cannot be retrieved" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("")))
+
+        when(controller.statusService.getReadStatus(any(), any(), any()))
+          .thenReturn(Future.successful(statusResponse))
+
+        when(controller.amlsNotificationService.getNotifications(any())(any(), any()))
+          .thenReturn(Future.successful(testList))
+
+        val result = intercept[Exception] {
+          await(controller.getMessages()(request))
+        }
+
+        result.getMessage mustBe "Cannot retrieve business name"
       }
     }
   }
