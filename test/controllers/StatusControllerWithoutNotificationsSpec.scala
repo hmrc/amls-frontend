@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{AmlsNotificationConnector, DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, AmlsNotificationConnector, DataCacheConnector, FeeConnector}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -53,6 +53,7 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
   }
 
