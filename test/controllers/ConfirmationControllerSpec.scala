@@ -17,7 +17,7 @@
 package controllers
 
 import cats.implicits._
-import connectors.{DataCacheConnector, KeystoreConnector, PayApiConnector, PaymentsConnector}
+import connectors._
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
@@ -72,6 +72,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
+      override val amlsConnector = mock[AmlsConnector]
     }
 
     val paymentRefNo = "XA000000000000"
@@ -562,6 +563,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
+      override val amlsConnector = mock[AmlsConnector]
     }
 
     val paymentRefNo = "XA000000000000"

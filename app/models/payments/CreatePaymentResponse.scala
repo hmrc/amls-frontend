@@ -25,7 +25,7 @@ object PayApiLinks {
   implicit val format = Json.format[PayApiLinks]
 }
 
-case class CreatePaymentResponse(links: PayApiLinks, paymentId: Option[String])
+case class CreatePaymentResponse(links: PayApiLinks, paymentId: Option[String] = None)
 
 object CreatePaymentResponse {
 
