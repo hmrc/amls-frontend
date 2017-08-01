@@ -27,7 +27,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
@@ -41,10 +41,10 @@ import scala.concurrent.Future
 class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience {
 
   object AmlsConnector extends AmlsConnector {
-
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
     override private[connectors] val url: String = "amls/subscription"
     override private[connectors] val httpGet: HttpGet = mock[HttpGet]
+    override private[connectors] val registrationUrl = "amls/registration"
   }
 
   val safeId = "SAFEID"
@@ -282,9 +282,8 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   "registrationDetails" must {
     "retrieve the registration details given a safe ID" in {
-
       val safeId = "SAFE_ID"
-      val url = s"/amls/registration/org/TestOrgRef/details/$safeId"
+      val url = s"${AmlsConnector.registrationUrl}/org/TestOrgRef/details/$safeId"
 
       when {
         AmlsConnector.httpGet.GET[RegistrationDetails](eqTo(url))(any(), any())

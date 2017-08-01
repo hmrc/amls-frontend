@@ -36,6 +36,8 @@ trait AmlsConnector {
 
   private[connectors] def url: String
 
+  private[connectors] def registrationUrl: String
+
   def subscribe
   (subscriptionRequest: SubscriptionRequest, safeId: String)
   (implicit
@@ -206,8 +208,7 @@ trait AmlsConnector {
 
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val regUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
-    val getUrl = s"$regUrl/$accountType/$accountId/details/$safeId"
+    val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)
   }
@@ -218,4 +219,5 @@ object AmlsConnector extends AmlsConnector {
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
   override private[connectors] def url = ApplicationConfig.subscriptionUrl
+  override private[connectors] def registrationUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
 }

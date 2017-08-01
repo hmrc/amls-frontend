@@ -734,6 +734,7 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
 
     val statusResponse = mock[ReadStatusResponse]
     when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+    when(statusResponse.safeId).thenReturn(None)
 
     when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
       .thenReturn(
@@ -788,6 +789,7 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
 
     val statusResponse = mock[ReadStatusResponse]
     when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+    when(statusResponse.safeId).thenReturn(None)
 
     when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
       .thenReturn(
@@ -842,6 +844,7 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
 
     val statusResponse = mock[ReadStatusResponse]
     when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+    when(statusResponse.safeId).thenReturn(None)
 
     when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
       .thenReturn(
