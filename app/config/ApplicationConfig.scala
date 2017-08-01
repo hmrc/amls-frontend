@@ -46,6 +46,8 @@ trait ApplicationConfig {
   def showChangeOfficerLink: Boolean
 
   def sendPostcodeKnownFact: Boolean
+
+  def businessNameLookup: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -106,16 +108,17 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     value
   }
 
-  override def release7:Boolean = {
+  override def release7: Boolean = {
     val value = getConfBool("feature-toggle.release7", false)
     value
   }
 
-  override def renewalsToggle:Boolean = getConfBool("feature-toggle.renewals", false)
+  override def renewalsToggle: Boolean = getConfBool("feature-toggle.renewals", false)
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
   val paymentsUrlLookupToggleName = "feature-toggle.payments-url-lookup"
+
   override def paymentsUrlLookupToggle = getConfBool(paymentsUrlLookupToggleName, false)
 
   override def allowWithdrawalToggle = getConfBool("feature-toggle.allow-withdrawal", false)
@@ -134,5 +137,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
 
-    override def sendPostcodeKnownFact = getConfBool("feature-toggle.gg-knownfacts-postcode", false)
+  override def sendPostcodeKnownFact = getConfBool("feature-toggle.gg-knownfacts-postcode", false)
+
+  override def businessNameLookup = getConfBool("feature-toggle.business-name-lookup", false)
 }
