@@ -16,12 +16,15 @@
 
 package models.notifications
 
+import cats.implicits._
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 import models.notifications.StatusType.DeRegistered
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import play.api.libs.json._
+
+import scala.util.matching.Regex
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
@@ -71,14 +74,13 @@ object NotificationDetails {
   }
 
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
-
-    inputString.split("-").toList match {
-      case _ :: _ :: Nil => {
-        val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
-        Some(EndDateDetails(dateValue, None))
-      }
-      case _ => None
+    val pattern = """End Date-(\d{2}/\d{2}/\d{4})""".r.unanchored
+    val matchToDetails: Regex.Match => Option[EndDateDetails] = m => {
+      val date = LocalDate.parse(m.group(1), DateTimeFormat.forPattern("dd/MM/yyyy"))
+      EndDateDetails(date, None).some
     }
+
+    pattern.findFirstMatchIn(inputString).fold(none[EndDateDetails])(matchToDetails)
   }
 
   def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
