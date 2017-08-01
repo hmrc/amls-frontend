@@ -19,11 +19,12 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
+import models.registrationdetails.RegistrationDetails
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -36,9 +37,6 @@ import utils.{ControllerHelper, DeclarationHelper}
 import views.html.status._
 
 import scala.concurrent.Future
-
-
-
 
 trait StatusController extends BaseController {
 
@@ -54,26 +52,18 @@ trait StatusController extends BaseController {
 
   private[controllers] def progressService: ProgressService
 
+  private[controllers] def amlsConnector: AmlsConnector
+
   protected[controllers] def dataCache: DataCacheConnector
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-        val businessName = landingService.cacheMap map {
-          case Some(cache) => {
-            val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
-            for {
-              reviewDetails <- businessMatching.reviewDetails
-            } yield reviewDetails.businessName
-          }
-          case None => None
-        }
-
         for {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
           statusInfo <- statusService.getDetailedStatus
-          businessNameOption <- businessName
+          statusResponse <- Future(statusInfo._2)
+          businessNameOption <- businessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
           page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse, fromDuplicateSubmission)
         } yield page
@@ -199,6 +189,23 @@ trait StatusController extends BaseController {
       }
     }
   }
+
+  private def businessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, String] = {
+    val businessNameFromAmls: String => OptionT[Future, String] = safeId =>
+      OptionT.liftF(amlsConnector.registrationDetails(safeId) map {
+        _.companyName
+      })
+
+    val fromCache = for {
+      cache <- OptionT(landingService.cacheMap)
+      bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      reviewDetails <- OptionT.fromOption[Future](bm.reviewDetails)
+    } yield reviewDetails.businessName
+
+    maybeSafeId.fold[OptionT[Future, String]](fromCache) { safeId =>
+      businessNameFromAmls(safeId)
+    }
+  }
 }
 
 object StatusController extends StatusController {
@@ -211,6 +218,7 @@ object StatusController extends StatusController {
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
   override protected[controllers] val dataCache = DataCacheConnector
+  override private[controllers] val amlsConnector = AmlsConnector
   // $COVERAGE-ON$
 
 }
