@@ -57,12 +57,12 @@ trait AmlsConnector {
     }
   }
 
-  def status(amlsRegistrationNumber: String)(implicit
-                                             headerCarrier: HeaderCarrier,
-                                             ec: ExecutionContext,
-                                             reqW: Writes[ReadStatusResponse],
-                                             ac: AuthContext
-  ): Future[ReadStatusResponse] = {
+  def status(amlsRegistrationNumber: String)
+            (implicit
+             headerCarrier: HeaderCarrier,
+             ec: ExecutionContext,
+             reqW: Writes[ReadStatusResponse],
+             ac: AuthContext): Future[ReadStatusResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -99,13 +99,13 @@ trait AmlsConnector {
 
   }
 
-  def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                                                                headerCarrier: HeaderCarrier,
-                                                                                ec: ExecutionContext,
-                                                                                reqW: Writes[SubscriptionRequest],
-                                                                                resW: Writes[AmendVariationRenewalResponse],
-                                                                                ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)
+            (implicit
+             headerCarrier: HeaderCarrier,
+             ec: ExecutionContext,
+             reqW: Writes[SubscriptionRequest],
+             resW: Writes[AmendVariationRenewalResponse],
+             ac: AuthContext): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -119,13 +119,13 @@ trait AmlsConnector {
     }
   }
 
-  def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                                                                   headerCarrier: HeaderCarrier,
-                                                                                   ec: ExecutionContext,
-                                                                                   reqW: Writes[SubscriptionRequest],
-                                                                                   resW: Writes[AmendVariationRenewalResponse],
-                                                                                   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)
+               (implicit
+                headerCarrier: HeaderCarrier,
+                ec: ExecutionContext,
+                reqW: Writes[SubscriptionRequest],
+                resW: Writes[AmendVariationRenewalResponse],
+                ac: AuthContext): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
