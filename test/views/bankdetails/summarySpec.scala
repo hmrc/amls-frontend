@@ -95,10 +95,10 @@ class summarySpec extends GenericTestHelper
       private val title = "Account Name"
 
       private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.sortcode") + ": 00-00-00",
-        Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890",
+        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.yes"),
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
+        Messages("bankdetails.bankaccount.sortcode") + ": 00-00-00",
+        Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890"
       )
 
       private val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
@@ -133,9 +133,10 @@ class summarySpec extends GenericTestHelper
       private val title = "Account Name"
 
       private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.accountnumber") + ": 56789",
+        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
+        Messages("bankdetails.bankaccount.accountnumber") + ": 56789"
+
       )
 
       val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
@@ -169,9 +170,9 @@ class summarySpec extends GenericTestHelper
       private val title = "Account Name"
 
       private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.iban") + ": 000000000",
+        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
         Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01")
+        Messages("bankdetails.bankaccount.iban") + ": 000000000"
       )
 
       val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
@@ -230,8 +231,9 @@ class summarySpec extends GenericTestHelper
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(1).first().text()
 
-                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
+                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
                 }
               }
             }
