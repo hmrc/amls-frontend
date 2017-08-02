@@ -64,8 +64,8 @@ object Account {
       (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
-              (__ \ "sortCode").read(sortCodeType) ~
-              (__ \ "accountNumber").read(ukBankAccountNumberType)
+            (__ \ "accountNumber").read(ukBankAccountNumberType) ~
+              (__ \ "sortCode").read(sortCodeType)
 
             ) (UKAccount.apply _)
         case false =>
@@ -83,8 +83,8 @@ object Account {
     case f: UKAccount =>
       Map(
         "isUK" -> Seq("true"),
-        "sortCode" -> f.sortCode,
-        "accountNumber" -> f.accountNumber
+        "accountNumber" -> f.accountNumber,
+        "sortCode" -> f.sortCode
       )
     case nonukacc: NonUKAccountNumber =>
       Map(
@@ -101,8 +101,8 @@ object Account {
     import play.api.libs.json._
     (__ \ "isUK").read[Boolean] flatMap {
       case true => (
-        (__ \ "sortCode").read[String] and
-          (__ \ "accountNumber").read[String]
+        (__ \ "accountNumber").read[String] and
+          (__ \ "sortCode").read[String]
         ) (UKAccount.apply _)
 
       case false =>
@@ -117,9 +117,9 @@ object Account {
     case m: UKAccount =>
       Json.obj(
         "isUK" -> true,
-        "sortCode" -> m.sortCode,
-        "accountNumber" -> m.accountNumber
-      )
+        "accountNumber" -> m.accountNumber,
+      "sortCode" -> m.sortCode
+    )
     case acc: NonUKAccountNumber =>
       Json.obj(
         "isUK" -> false,
@@ -136,9 +136,9 @@ object Account {
 }
 
 case class UKAccount(
-                      sortCode: String,
-                      accountNumber: String
-                    ) extends Account {
+                      accountNumber: String,
+                      sortCode: String
+) extends Account {
   def displaySortCode: String = {
     // scalastyle:off magic.number
     val pair1 = sortCode.substring(0, 2)

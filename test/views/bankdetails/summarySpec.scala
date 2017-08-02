@@ -112,7 +112,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("000000", "1234567890")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
 
         views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
       }
@@ -210,7 +210,7 @@ class summarySpec extends GenericTestHelper
         sortCode <- Gen.listOfN[Char](sortCodeLength, Gen.numChar).map(_.mkString(""))
         accountNumber <- Gen.listOfN[Char](accountNumberLength, Gen.numChar).map(_.mkString(""))
       } yield {
-        UKAccount(sortCode, accountNumber)
+        UKAccount(accountNumber, sortCode)
       }
 
       val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength, Gen.alphaChar).map(_.mkString(""))
