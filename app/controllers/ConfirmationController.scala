@@ -191,8 +191,8 @@ trait ConfirmationController extends BaseController {
       paymentId <- OptionT.fromOption[Future](response.paymentId)
       payment <- OptionT.liftF(amlsConnector.savePayment(paymentId, amlsRefNo))
     } yield payment.status).value flatMap {
-      case Some(OK) => Future.successful(response)
-      case _ => Future.failed(new Exception("Payment details failed to save"))
+      case Some(CREATED) => Future.successful(response)
+      case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
     }
   }
 
