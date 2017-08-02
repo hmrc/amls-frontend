@@ -404,7 +404,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(Messages("confirmation.tradingpremises.half"))
       }
 
-
       "a renewal and no data in save4later then load variation confirmation" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
