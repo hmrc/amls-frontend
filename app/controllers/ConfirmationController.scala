@@ -178,14 +178,21 @@ trait ConfirmationController extends BaseController {
 
     val amountInPence = (amount * 100).toInt
 
-    paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) map {
-      case Some(response) => {
-        response.paymentId map(amlsConnector.savePayment(_, amlsRefNo))
-        response
-      }
+    paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
+      case Some(response) => savePaymentBeforeResponse(response, amlsRefNo)
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
-        CreatePaymentResponse.default
+        Future.successful(CreatePaymentResponse.default)
+    }
+  }
+
+  private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String)(implicit hc: HeaderCarrier, authContext: AuthContext) = {
+    (for {
+      paymentId <- OptionT.fromOption[Future](response.paymentId)
+      payment <- OptionT.liftF(amlsConnector.savePayment(paymentId, amlsRefNo))
+    } yield payment.status).value flatMap {
+      case Some(CREATED) => Future.successful(response)
+      case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
     }
   }
 

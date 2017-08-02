@@ -40,7 +40,7 @@ import play.api.{Application, Mode}
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -117,7 +117,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     when {
       paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"))))
+    } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
+
+    when {
+      controller.amlsConnector.savePayment(any(),any())(any(),any(),any())
+    } thenReturn {
+      Future.successful(HttpResponse(CREATED))
+    }
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
@@ -403,7 +409,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(Messages("confirmation.responsiblepeople"))
         contentAsString(result) must include(Messages("confirmation.tradingpremises.half"))
       }
-
 
       "a renewal and no data in save4later then load variation confirmation" in new Fixture {
         setupStatus(ReadyForRenewal(Some(new LocalDate)))

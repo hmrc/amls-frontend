@@ -86,7 +86,8 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   val subscriptionResponse = SubscriptionResponse(
     etmpFormBundleNumber = "",
-    amlsRefNo = "", Some(SubscriptionFees(
+    amlsRefNo = amlsRegistrationNumber,
+    Some(SubscriptionFees(
       paymentReference = "",
       registrationFee = 0,
       fpFee = None,
@@ -109,6 +110,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     paymentReference = Some(""),
     difference = Some(0)
   )
+
   val renewalResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
@@ -121,7 +123,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     paymentReference = Some(""),
     difference = Some(0)
   )
-
 
   val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
 
