@@ -24,7 +24,6 @@ import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logger
 import play.api.http.Status.OK
 import play.api.libs.json.{JsSuccess, Json}
-import services.PaymentService
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 import utils.HttpResponseHelper
@@ -33,8 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
                                  httpPost: HttpPost,
-                                 config: ServicesConfig,
-                                 paymentService: PaymentService
+                                 config: ServicesConfig
                                ) extends HttpResponseHelper {
 
   lazy val baseUrl = s"${config.baseUrl("pay-api")}/pay-api"
