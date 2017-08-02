@@ -16,28 +16,23 @@
 
 package controllers
 
-import connectors.{AmlsConnector, AmlsNotificationConnector, DataCacheConnector, FeeConnector}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status._
-import models.{AmendVariationRenewalResponse, Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
-import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
+import models.{Country, FeeResponse}
 import org.jsoup.Jsoup
-import org.mockito.Matchers
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
-import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.http.NotFoundException
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
+
 class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
@@ -68,7 +63,7 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
       when(controller.landingService.cacheMap(any(), any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+      when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
@@ -79,6 +74,10 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
 
       when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
         .thenReturn(Future.successful(mock[FeeResponse]))
+
+      when {
+        controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDtls), None)))
 
       val result = controller.get()(request)
       status(result) must be(OK)

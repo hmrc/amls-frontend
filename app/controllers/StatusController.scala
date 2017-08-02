@@ -33,10 +33,10 @@ import play.api.mvc.{AnyContent, Call, Request}
 import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
-import utils.{ControllerHelper, DeclarationHelper}
+import utils.{BusinessName, ControllerHelper, DeclarationHelper}
 import views.html.status._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait StatusController extends BaseController {
 
@@ -63,9 +63,9 @@ trait StatusController extends BaseController {
           mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
           statusInfo <- statusService.getDetailedStatus
           statusResponse <- Future(statusInfo._2)
-          businessNameOption <- businessName(statusResponse.fold(none[String])(_.safeId)).value
+          maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, businessNameOption, feeResponse, fromDuplicateSubmission)
+          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission)
         } yield page
   }
 
@@ -101,7 +101,7 @@ trait StatusController extends BaseController {
         getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
-            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
+           (SubmissionWithdrawn, _) | (DeRegistered, _) =>
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
@@ -115,13 +115,12 @@ trait StatusController extends BaseController {
                                        feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent], authContext: AuthContext) = {
     status match {
       case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
-      case SubmissionReady =>
-        {
-          OptionT(progressService.getSubmitRedirect) map (
-            url =>
-              Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
-            ) getOrElse InternalServerError("Unable to get redirect data")
-        }
+      case SubmissionReady => {
+        OptionT(progressService.getSubmitRedirect) map (
+          url =>
+            Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
+          ) getOrElse InternalServerError("Unable to get redirect data")
+      }
       case _ => Future.successful(Ok(status_submitted(mlrRegNumber.getOrElse(""),
         businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
         fromDuplicateSubmission)))
@@ -190,22 +189,8 @@ trait StatusController extends BaseController {
     }
   }
 
-  private def businessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, String] = {
-    val businessNameFromAmls: String => OptionT[Future, String] = safeId =>
-      OptionT.liftF(amlsConnector.registrationDetails(safeId) map {
-        _.companyName
-      })
-
-    val fromCache = for {
-      cache <- OptionT(landingService.cacheMap)
-      bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-      reviewDetails <- OptionT.fromOption[Future](bm.reviewDetails)
-    } yield reviewDetails.businessName
-
-    maybeSafeId.fold[OptionT[Future, String]](fromCache) { safeId =>
-      businessNameFromAmls(safeId)
-    }
-  }
+  private def getBusinessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
+    BusinessName.getName(maybeSafeId)(hc, ac, ec, dataCache, amlsConnector)
 }
 
 object StatusController extends StatusController {
