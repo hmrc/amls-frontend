@@ -25,11 +25,11 @@ object PayApiLinks {
   implicit val format = Json.format[PayApiLinks]
 }
 
-case class CreatePaymentResponse(links: PayApiLinks)
+case class CreatePaymentResponse(links: PayApiLinks, paymentId: Option[String] = None)
 
 object CreatePaymentResponse {
 
-  def default = CreatePaymentResponse(PayApiLinks(ApplicationConfig.paymentsUrl))
+  def default = CreatePaymentResponse(PayApiLinks(ApplicationConfig.paymentsUrl), None)
 
   implicit val format = Json.format[CreatePaymentResponse]
 }

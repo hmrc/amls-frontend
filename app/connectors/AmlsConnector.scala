@@ -38,6 +38,8 @@ trait AmlsConnector {
 
   private[connectors] def registrationUrl: String
 
+  private[connectors] def paymentUrl: String
+
   def subscribe
   (subscriptionRequest: SubscriptionRequest, safeId: String)
   (implicit
@@ -60,12 +62,12 @@ trait AmlsConnector {
     }
   }
 
-  def status(amlsRegistrationNumber: String)(implicit
-                                             headerCarrier: HeaderCarrier,
-                                             ec: ExecutionContext,
-                                             reqW: Writes[ReadStatusResponse],
-                                             ac: AuthContext
-  ): Future[ReadStatusResponse] = {
+  def status(amlsRegistrationNumber: String)
+            (implicit
+             headerCarrier: HeaderCarrier,
+             ec: ExecutionContext,
+             reqW: Writes[ReadStatusResponse],
+             ac: AuthContext): Future[ReadStatusResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -102,13 +104,13 @@ trait AmlsConnector {
 
   }
 
-  def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                                                                headerCarrier: HeaderCarrier,
-                                                                                ec: ExecutionContext,
-                                                                                reqW: Writes[SubscriptionRequest],
-                                                                                resW: Writes[AmendVariationRenewalResponse],
-                                                                                ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)
+            (implicit
+             headerCarrier: HeaderCarrier,
+             ec: ExecutionContext,
+             reqW: Writes[SubscriptionRequest],
+             resW: Writes[AmendVariationRenewalResponse],
+             ac: AuthContext): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -122,13 +124,13 @@ trait AmlsConnector {
     }
   }
 
-  def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
-                                                                                   headerCarrier: HeaderCarrier,
-                                                                                   ec: ExecutionContext,
-                                                                                   reqW: Writes[SubscriptionRequest],
-                                                                                   resW: Writes[AmendVariationRenewalResponse],
-                                                                                   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)
+               (implicit
+                headerCarrier: HeaderCarrier,
+                ec: ExecutionContext,
+                reqW: Writes[SubscriptionRequest],
+                resW: Writes[AmendVariationRenewalResponse],
+                ac: AuthContext): Future[AmendVariationRenewalResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
@@ -197,11 +199,13 @@ trait AmlsConnector {
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
-  def savePayment(amlsRegistrationNumber: String, paymentId: String)
+  def savePayment(paymentId: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/payment"
+    val postUrl = s"$paymentUrl/$accountType/$accountId/"
+
+    Logger.debug(s"[AmlsConnector][savePayment]: URL $postUrl With paymentId $paymentId")
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
@@ -220,4 +224,5 @@ object AmlsConnector extends AmlsConnector {
   override private[connectors] val httpGet = WSHttp
   override private[connectors] def url = ApplicationConfig.subscriptionUrl
   override private[connectors] def registrationUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
+  override private[connectors] def paymentUrl = s"${ApplicationConfig.amlsUrl}/amls/payment"
 }

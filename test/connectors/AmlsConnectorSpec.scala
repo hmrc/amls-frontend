@@ -43,6 +43,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   object AmlsConnector extends AmlsConnector {
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
     override private[connectors] val url: String = "amls/subscription"
+    override private[connectors] val paymentUrl: String = "amls/payment"
     override private[connectors] val httpGet: HttpGet = mock[HttpGet]
     override private[connectors] val registrationUrl = "amls/registration"
   }
@@ -271,10 +272,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
       when {
         AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
-      } thenReturn Future.successful(HttpResponse(OK))
+      } thenReturn Future.successful(HttpResponse(CREATED))
 
-      whenReady(AmlsConnector.savePayment(amlsRegistrationNumber, id)) {
-        _.status mustBe OK
+      whenReady(AmlsConnector.savePayment(id)) {
+        _.status mustBe CREATED
       }
 
     }
