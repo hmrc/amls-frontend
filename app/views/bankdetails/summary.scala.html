@@ -75,14 +75,16 @@
                             canEdit
                         ) {
                             <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
-                                @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
                                     case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
                                     case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                 }</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
+                                <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
+                                @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
+
+
                             </ul>
                         }
                     }
@@ -94,13 +96,13 @@
                             canEdit
                         ) {
                             <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
                                     case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
                                     case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                 }</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
                             </ul>
                         }
                     }
@@ -112,13 +114,13 @@
                             canEdit
                         ) {
                             <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
                                 <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
                                     case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
                                     case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                 }</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
                             </ul>
                         }
                     }

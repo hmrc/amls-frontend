@@ -435,6 +435,12 @@ div.grid-layout {
   padding-bottom: 30px;
 }
 
+
+.user-attention{
+  background-color: #005ea5;
+  color: #ffffff;
+  border-bottom: none;
+}
 @media screen and (max-width: 640px) {
   .application-submit,
   .user-attention {
@@ -940,7 +946,7 @@ fieldset.panel-indent legend {
 .declaration {
   background: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
-  margin: 0;
+  margin: 0 0 40px 0;
   padding: 20px;
 }
 
@@ -1235,3 +1241,5 @@ details {
 .partial-deskpro-form .report-error {
   margin: 0;
 }
+
+
