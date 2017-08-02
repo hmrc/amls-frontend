@@ -19,7 +19,7 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.notifications.ContactType._
 import models.notifications._
@@ -28,20 +28,22 @@ import play.api.mvc.Request
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.FeatureToggle
+import utils.{BusinessName, FeatureToggle}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait NotificationController extends BaseController {
 
-  protected[controllers] val dataCacheConnector: DataCacheConnector
+  protected[controllers] implicit val dataCacheConnector: DataCacheConnector
 
   protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
   protected[controllers] def statusService: StatusService
 
   protected[controllers] lazy val amlsNotificationService: NotificationService = Play.current.injector.instanceOf[NotificationService]
+
+  protected[controllers] implicit val amlsConnector: AmlsConnector
 
   def getMessages = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
@@ -50,7 +52,7 @@ trait NotificationController extends BaseController {
           statusService.getReadStatus flatMap {
             case readStatus if readStatus.safeId.isDefined => {
               (for {
-                businessName <- OptionT(getBusinessName)
+                businessName <- BusinessName.getName(readStatus.safeId)
                 records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
               } yield {
                 Ok(views.html.notifications.your_messages(businessName, records))
@@ -68,7 +70,7 @@ trait NotificationController extends BaseController {
           statusService.getReadStatus flatMap {
             case readStatus if readStatus.safeId.isDefined =>
               (for {
-                businessName <- OptionT(getBusinessName)
+                businessName <- BusinessName.getName(readStatus.safeId)
                 details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
               } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details)) getOrElse NotFound(notFoundView)
             case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
@@ -91,16 +93,6 @@ trait NotificationController extends BaseController {
       case _ => Ok(views.html.notifications.message_details(details.subject, msgText))
     }
   }
-
-  private def getBusinessName(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[String]] = {
-    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map { businessMatching =>
-      for {
-        bm <- businessMatching
-        rd <- bm.reviewDetails
-      } yield rd.businessName
-    }
-  }
-
 }
 
 object NotificationController extends NotificationController {
@@ -109,4 +101,5 @@ object NotificationController extends NotificationController {
   override protected[controllers] val authEnrolmentsService = AuthEnrolmentsService
   override protected[controllers] val statusService = StatusService
   override protected val authConnector = AMLSAuthConnector
+  override protected[controllers] lazy val amlsConnector = AmlsConnector
 }

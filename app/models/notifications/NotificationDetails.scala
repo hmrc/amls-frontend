@@ -16,12 +16,15 @@
 
 package models.notifications
 
+import cats.implicits._
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 import models.notifications.StatusType.DeRegistered
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import play.api.libs.json._
+
+import scala.util.matching.Regex
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
@@ -59,27 +62,28 @@ object NotificationDetails {
 
   val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
+  private val parseDate: String => LocalDate =
+    input => LocalDate.parse(input, DateTimeFormat.forPattern("dd/MM/yyyy"))
+
+  private val extractEndDate: String => Option[LocalDate] = input => {
+    val pattern = """(?i)[\w\s]+-(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
+    pattern.findFirstMatchIn(input).fold(none[LocalDate])(m => parseDate(m.group(1)).some)
+  }
+
+  private val extractReference: String => Option[String] = input => {
+    val pattern = """(?i)[\w\s]+-([a-z][a-z0-9]+)""".r.unanchored
+    pattern.findFirstMatchIn(input).fold(none[String])(m => m.group(1).some)
+  }
+
   def convertEndDateWithRefMessageText(inputString: String): Option[EndDateDetails] = {
-
-    inputString.split("\\|").toList match {
-      case date :: ref :: Nil => {
-        val dateValue = LocalDate.parse(splitByDash(date), DateTimeFormat.forPattern("dd/MM/yyyy"))
-        Some(EndDateDetails(dateValue, Some(splitByDash(ref))))
-      }
-      case _ => None
-    }
+    for {
+      date <- extractEndDate(inputString)
+      ref <- extractReference(inputString)
+    } yield EndDateDetails(date, ref.some)
   }
 
-  def convertEndDateMessageText(inputString: String): Option[EndDateDetails] = {
-
-    inputString.split("-").toList match {
-      case _ :: _ :: Nil => {
-        val dateValue = LocalDate.parse(splitByDash(inputString), DateTimeFormat.forPattern("dd/MM/yyyy"))
-        Some(EndDateDetails(dateValue, None))
-      }
-      case _ => None
-    }
-  }
+  def convertEndDateMessageText(inputString: String): Option[EndDateDetails] =
+    extractEndDate(inputString) map { date => EndDateDetails(date, None) }
 
   def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
     inputString.split("\\|").toList match {

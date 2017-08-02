@@ -65,7 +65,7 @@ object Account {
         case true =>
           (
             (__ \ "accountNumber").read(ukBankAccountNumberType) ~
-            (__ \ "sortCode").read(sortCodeType)
+              (__ \ "sortCode").read(sortCodeType)
 
             ) (UKAccount.apply _)
         case false =>
@@ -107,8 +107,8 @@ object Account {
 
       case false =>
         (__ \ "isIBAN").read[Boolean] flatMap {
-          case true => (__ \ "IBANNumber").read[String] map  NonUKIBANNumber.apply
-          case false =>  (__ \ "nonUKAccountNumber").read[String] map  NonUKAccountNumber.apply
+          case true => (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
+          case false => (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
         }
     }
   }
@@ -118,8 +118,8 @@ object Account {
       Json.obj(
         "isUK" -> true,
         "accountNumber" -> m.accountNumber,
-        "sortCode" -> m.sortCode
-      )
+      "sortCode" -> m.sortCode
+    )
     case acc: NonUKAccountNumber =>
       Json.obj(
         "isUK" -> false,
@@ -138,12 +138,12 @@ object Account {
 case class UKAccount(
                       accountNumber: String,
                       sortCode: String
-                    ) extends Account {
-  def displaySortCode:String = {
+) extends Account {
+  def displaySortCode: String = {
     // scalastyle:off magic.number
-    val pair1 = sortCode.substring(0,2)
-    val pair2 = sortCode.substring(2,4)
-    val pair3 = sortCode.substring(4,6)
+    val pair1 = sortCode.substring(0, 2)
+    val pair2 = sortCode.substring(2, 4)
+    val pair3 = sortCode.substring(4, 6)
     // scalastyle:on magic.number
     pair1 + "-" + pair2 + "-" + pair3
   }
@@ -153,10 +153,13 @@ case class UKAccount(
 sealed trait NonUKAccount extends Account
 
 case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
+
 case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
+
 case class BankAccount(accountName: String, account: Account)
 
 object BankAccount {
+
   import utils.MappingUtils.Implicits._
 
   val key = "bank-account"
