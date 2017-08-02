@@ -16,6 +16,7 @@
 
 package connectors
 
+import generators.AmlsReferenceNumberGenerator
 import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
@@ -38,7 +39,7 @@ import org.mockito.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience {
+class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
 
   object AmlsConnector extends AmlsConnector {
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
@@ -49,7 +50,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   val safeId = "SAFEID"
-  val amlsRegistrationNumber = "AMLSREGNO"
 
   val subscriptionRequest = SubscriptionRequest(
     businessMatchingSection = None,
@@ -274,7 +274,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
       } thenReturn Future.successful(HttpResponse(CREATED))
 
-      whenReady(AmlsConnector.savePayment(id)) {
+      whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber)) {
         _.status mustBe CREATED
       }
 

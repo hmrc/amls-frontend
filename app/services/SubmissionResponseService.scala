@@ -39,7 +39,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow])] =
+  ): Future[(String, Currency, Seq[BreakdownRow], String)] =
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -54,7 +54,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val paymentReference = subscription.getPaymentReference
           val total = subscription.getTotalFees
           val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
-          Future.successful((paymentReference, Currency.fromBD(total), rows))
+          val amlsRefNo = subscription.amlsRefNo
+          Future.successful((paymentReference, Currency.fromBD(total), rows, amlsRefNo))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
