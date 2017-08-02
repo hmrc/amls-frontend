@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package models.payments
+package services
 
-import config.ApplicationConfig
-import play.api.libs.json.Json
+import javax.inject.{Inject, Singleton}
 
-case class PayApiLinks(nextUrl: String)
+@Singleton
+class PaymentService @Inject()(){
 
-object PayApiLinks {
-  implicit val format = Json.format[PayApiLinks]
-}
+  def savePayment(paymentId: String) = ???
 
-case class CreatePaymentResponse(links: PayApiLinks, paymentId: Option[String] = None)
 
-object CreatePaymentResponse {
-
-  def default = CreatePaymentResponse(PayApiLinks(ApplicationConfig.paymentsUrl), None)
-
-  implicit val format = Json.format[CreatePaymentResponse]
 }

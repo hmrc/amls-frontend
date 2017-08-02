@@ -19,7 +19,7 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{DataCacheConnector, KeystoreConnector, PayApiConnector}
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
 import models.businessmatching.BusinessMatching
 import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
@@ -43,6 +43,8 @@ trait ConfirmationController extends BaseController {
   private[controllers] val keystoreConnector: KeystoreConnector
 
   private[controllers] val dataCacheConnector: DataCacheConnector
+
+  private[controllers] val amlsConnector: AmlsConnector
 
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
 
@@ -150,20 +152,30 @@ trait ConfirmationController extends BaseController {
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def requestPaymentsUrl(data: ViewData, returnUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_])
-  : Future[CreatePaymentResponse] = data match {
-    case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
-    case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl)
-    case _ => Future.successful(CreatePaymentResponse.default)
-  }
+  private def requestPaymentsUrl(data: ViewData, returnUrl: String)
+                                (implicit hc: HeaderCarrier,
+                                 ec: ExecutionContext,
+                                 authContext: AuthContext,
+                                 request: Request[_]): Future[CreatePaymentResponse] =
+    data match {
+      case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
+      case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl)
+      case _ => Future.successful(CreatePaymentResponse.default)
+    }
 
   private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)
-                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[CreatePaymentResponse] = {
+                                  (implicit hc: HeaderCarrier,
+                                   ec: ExecutionContext,
+                                   authContext: AuthContext,
+                                   request: Request[_]): Future[CreatePaymentResponse] = {
 
     val amountInPence = (amount * 100).toInt
 
     paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) map {
-      case Some(redirect) => redirect
+      case Some(response) => {
+        response.paymentId map amlsConnector.savePayment
+        response
+      }
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
         CreatePaymentResponse.default
@@ -203,4 +215,5 @@ object ConfirmationController extends ConfirmationController {
   override val statusService: StatusService = StatusService
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
+  override private[controllers] val amlsConnector = AmlsConnector
 }

@@ -26,14 +26,16 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
+class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience {
 
   implicit val headerCarrier = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
@@ -85,8 +87,10 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[CreatePaymentRequest, CreatePaymentResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any())
-          } thenReturn Future.successful(validResponse)
+            httpPost.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any())
+          } thenReturn Future.successful(
+            HttpResponse(OK,Some(Json.toJson(validResponse)))
+          )
 
           whenReady(connector.createPayment(validRequest)) {
             case Some(response) => response.links.nextUrl mustBe paymentUrl
