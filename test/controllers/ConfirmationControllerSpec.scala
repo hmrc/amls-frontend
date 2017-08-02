@@ -18,6 +18,7 @@ package controllers
 
 import cats.implicits._
 import connectors._
+import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
@@ -36,7 +37,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -45,7 +46,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
+class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator{
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -73,6 +74,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
       override val amlsConnector = mock[AmlsConnector]
+      override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
     val paymentRefNo = "XA000000000000"
@@ -97,10 +99,21 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
 
     reset(paymentsConnector)
 
-    when(controller.submissionResponseService.getSubscription(any(), any(), any()))
-      .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
+    when {
+      controller.submissionResponseService.getSubscription(any(), any(), any())
+    } thenReturn {
+      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
+    }
 
-    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
+    when {
+      controller.keystoreConnector.setConfirmationStatus(any(), any())
+    } thenReturn Future.successful()
+
+    when {
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+    } thenReturn {
+      Future.successful(Some(amlsRegistrationNumber))
+    }
 
     when {
       paymentsConnector.createPayment(any())(any(), any())
@@ -538,7 +551,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 }
 
-class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
+class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -564,6 +577,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
       override val amlsConnector = mock[AmlsConnector]
+      override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
     val paymentRefNo = "XA000000000000"
@@ -586,10 +600,21 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar {
 
     reset(paymentsConnector)
 
-    when(controller.submissionResponseService.getSubscription(any(), any(), any()))
-      .thenReturn(Future.successful((paymentRefNo, Currency.fromInt(0), Seq())))
+    when{
+      controller.submissionResponseService.getSubscription(any(), any(), any())
+    } thenReturn {
+      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
+    }
 
-    when(controller.keystoreConnector.setConfirmationStatus(any(), any())) thenReturn Future.successful()
+    when {
+      controller.keystoreConnector.setConfirmationStatus(any(), any())
+    } thenReturn Future.successful()
+
+    when {
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+    } thenReturn {
+      Future.successful(Some(amlsRegistrationNumber))
+    }
 
     when {
       paymentsConnector.createPayment(any())(any(), any())

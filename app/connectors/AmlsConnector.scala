@@ -199,13 +199,13 @@ trait AmlsConnector {
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
-  def savePayment(paymentId: String)
+  def savePayment(paymentId: String, amlsRefNo: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$paymentUrl/$accountType/$accountId/"
+    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/"
 
-    Logger.debug(s"[AmlsConnector][savePayment]: URL $postUrl With paymentId $paymentId")
+    Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }

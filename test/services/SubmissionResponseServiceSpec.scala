@@ -17,6 +17,7 @@
 package services
 
 import connectors.DataCacheConnector
+import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
@@ -40,7 +41,12 @@ import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
 
-class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
+class SubmissionResponseServiceSpec extends PlaySpec
+  with MockitoSugar
+  with ScalaFutures
+  with IntegrationPatience
+  with OneAppPerSuite
+  with AmlsReferenceNumberGenerator{
 
   trait Fixture {
 
@@ -61,7 +67,8 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "amlsRef", Some(SubscriptionFees(
+      amlsRefNo = amlsRegistrationNumber,
+      Some(SubscriptionFees(
         registrationFee = 0,
         fpFee = None,
         fpFeeRate = None,
@@ -758,7 +765,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows) => {
+            case (_, _, rows, amlsRegistrationNumber) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -769,7 +776,8 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
 
           val subscriptionResponseWithFeeRate = SubscriptionResponse(
             etmpFormBundleNumber = "",
-            amlsRefNo = "amlsRef",Some(SubscriptionFees(
+            amlsRefNo = amlsRegistrationNumber,
+            Some(SubscriptionFees(
             registrationFee = 100,
             fpFee = Some(125.0),
             fpFeeRate = Some(130.0),
@@ -797,7 +805,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           case class Test(str: String)
 
           result match {
-            case (_, _, rows) => {
+            case (_, _, rows, amlsRegistrationNumber) => {
               rows.head.label mustBe "confirmation.submission"
               rows.head.quantity mustBe 1
               rows.head.perItm mustBe Currency(rpFee)
@@ -839,7 +847,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows) => {
+            case (_, _, rows, amlsRegistrationNumber) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -867,7 +875,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows) => {
+            case (_, _, rows, amlsRegistrationNumber) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -894,7 +902,7 @@ class SubmissionResponseServiceSpec extends PlaySpec with MockitoSugar with Scal
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows) => rows foreach { row =>
+            case (_, _, rows, amlsRegistrationNumber) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }

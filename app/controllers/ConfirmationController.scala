@@ -28,7 +28,7 @@ import models.renewal.Renewal
 import models.status._
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
-import services.{StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.confirmation._
@@ -45,6 +45,8 @@ trait ConfirmationController extends BaseController {
   private[controllers] val dataCacheConnector: DataCacheConnector
 
   private[controllers] val amlsConnector: AmlsConnector
+
+  private[controllers] val authEnrolmentsService: AuthEnrolmentsService
 
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
 
@@ -102,7 +104,8 @@ trait ConfirmationController extends BaseController {
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationOrRenewalFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -116,7 +119,8 @@ trait ConfirmationController extends BaseController {
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       fees@(payRef, total, rows, difference) <- OptionT(getFees)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url))
+      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
     } yield {
       val feeToPay = status match {
         case SubmissionReadyForReview | RenewalSubmitted(_) => difference
@@ -134,9 +138,12 @@ trait ConfirmationController extends BaseController {
       case ReadyForRenewal(_) => showRenewalConfirmation
       case _ =>
         for {
-          (paymentRef, total, rows) <- OptionT.liftF(submissionResponseService.getSubscription)
-          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl((paymentRef, total, rows, None),
-            routes.ConfirmationController.paymentConfirmation(paymentRef).url))
+          (paymentRef, total, rows, amlsRefNo) <- OptionT.liftF(submissionResponseService.getSubscription)
+          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(
+            (paymentRef, total, rows, None),
+            routes.ConfirmationController.paymentConfirmation(paymentRef).url,
+            amlsRefNo
+          ))
         } yield {
           ApplicationConfig.paymentsUrlLookupToggle match {
             case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.links.nextUrl))
@@ -152,18 +159,18 @@ trait ConfirmationController extends BaseController {
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def requestPaymentsUrl(data: ViewData, returnUrl: String)
+  private def requestPaymentsUrl(data: ViewData, returnUrl: String, amlsRefNo: String)
                                 (implicit hc: HeaderCarrier,
                                  ec: ExecutionContext,
                                  authContext: AuthContext,
                                  request: Request[_]): Future[CreatePaymentResponse] =
     data match {
-      case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl)
-      case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl)
+      case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
+      case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 
-  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String)
+  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String, amlsRefNo: String)
                                   (implicit hc: HeaderCarrier,
                                    ec: ExecutionContext,
                                    authContext: AuthContext,
@@ -173,7 +180,7 @@ trait ConfirmationController extends BaseController {
 
     paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) map {
       case Some(response) => {
-        response.paymentId map amlsConnector.savePayment
+        response.paymentId map(amlsConnector.savePayment(_, amlsRefNo))
         response
       }
       case _ =>
@@ -216,4 +223,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
+  override private[controllers] val authEnrolmentsService = AuthEnrolmentsService
 }
