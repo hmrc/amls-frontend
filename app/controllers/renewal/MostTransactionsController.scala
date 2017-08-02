@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
+import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
 import services.RenewalService
@@ -47,9 +47,11 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def standardRouting(services: Set[MsbService], edit: Boolean): Result =
+  private def redirectTo(services: Set[MsbService], businessActivities: BusinessActivities, edit: Boolean): Result =
     if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
+    } else if(businessActivities.businessActivities contains HighValueDealing) {
+      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
     }
@@ -68,9 +70,10 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  ba <- bm.activities
                   services <- bm.msbServices
                 } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
-                  standardRouting(services.msbServices, edit)
+                  redirectTo(services.msbServices, ba, edit)
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
