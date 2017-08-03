@@ -19,7 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching.{BusinessMatching, ChequeCashingScrapMetal, CurrencyExchange, MsbServices}
+import models.businessmatching._
 import models.renewal.{CETransactionsInLast12Months, MostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -146,7 +146,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               .thenReturn(Some(incomingModel))
 
             when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set.empty))
+              )))
 
             when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
               .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -156,6 +159,47 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               result.header.headers.get("Location") mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
             }
 
+          }
+        }
+        "go to PercentageOfCashPaymentOver15000Controller" when {
+          "activities include hvd" in new FormSubmissionFixture {
+            val incomingModel = Renewal()
+
+            val msbServices = Some(MsbServices(Set.empty))
+
+            val outgoingModel = incomingModel.copy(
+              mostTransactions = Some(
+                MostTransactions(
+                  Seq(Country("United Kingdom", "GB"))
+                )
+              ), hasChanged = true
+            )
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "mostTransactionsCountries[]" -> "GB"
+            )
+
+            when(cache.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(cacheMap)))
+
+            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+              .thenReturn(Some(incomingModel))
+
+            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set(
+                  HighValueDealing
+                )))
+              )))
+
+            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustEqual routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+            }
           }
         }
         "go to SummaryController" when {
@@ -187,7 +231,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               .thenReturn(Some(incomingModel))
 
             when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set.empty))
+              )))
 
             when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
               .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -241,7 +288,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               .thenReturn(Some(incomingModel))
 
             when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set.empty))
+              )))
 
             when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
               .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -276,7 +326,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
             when(cache.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(cacheMap)))
             when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set.empty))
+              )))
             when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
               .thenReturn(Some(incomingModel))
             when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
