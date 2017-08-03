@@ -134,8 +134,8 @@ trait ConfirmationController extends BaseController {
 
     val maybeResult = status match {
       case SubmissionReadyForReview => showPostSubmissionConfirmation(getAmendmentFees, status)
-      case SubmissionDecisionApproved | RenewalSubmitted(_) => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
-      case ReadyForRenewal(_) => showRenewalConfirmation
+      case SubmissionDecisionApproved => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
       case _ =>
         for {
           (paymentRef, total, rows, amlsRefNo) <- OptionT.liftF(submissionResponseService.getSubscription)
