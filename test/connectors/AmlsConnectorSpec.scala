@@ -297,6 +297,19 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         case _ => fail("Payment was not found")
       }
     }
+
+    "return None when the payment record is not found" in {
+      val paymentRef = paymentRefGen.sample.get
+
+      when {
+        AmlsConnector.httpGet.GET[Payment](any())(any(), any())
+      } thenReturn Future.failed(new NotFoundException("Payment was not found"))
+
+      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+        case Some(_) => fail("None should be returned")
+        case _ =>
+      }
+    }
   }
 
   "registrationDetails" must {

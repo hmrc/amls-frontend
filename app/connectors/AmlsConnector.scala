@@ -218,12 +218,12 @@ trait AmlsConnector {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$paymentUrl/$accountType/$accountId/ref/$paymentReference"
 
-    println(getUrl in Console.YELLOW)
-
     Logger.debug(s"[AmlsConnector][getPaymentByReference]: Request to $getUrl with $paymentReference")
 
     httpGet.GET[Payment](getUrl) map { result =>
       Some(result)
+    } recover {
+      case _: NotFoundException => None
     }
   }
 
