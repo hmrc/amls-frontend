@@ -16,11 +16,12 @@
 
 package connectors
 
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
+import models.payments.Payment
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -39,7 +40,7 @@ import org.mockito.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
+class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   object AmlsConnector extends AmlsConnector {
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
@@ -268,7 +269,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   "savePayment" must {
     "provide a paymentId and report the status of the response" in {
 
-      val postUrl = s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/payment/"
       val id = "fcguhio"
 
       when {
@@ -279,6 +279,23 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         _.status mustBe CREATED
       }
 
+    }
+  }
+
+  "getPayment" must {
+    "retrieve a payment given the payment reference" in {
+      val paymentRef = paymentRefGen.sample.get
+      val payment = paymentGen.sample.get.copy(reference = paymentRef)
+      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/ref/$paymentRef"
+
+      when {
+        AmlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any())
+      } thenReturn Future.successful(payment)
+
+      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+        case Some(result) => result mustBe payment
+        case _ => fail("Payment was not found")
+      }
     }
   }
 

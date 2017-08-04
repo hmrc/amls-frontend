@@ -18,6 +18,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
+import models.payments.Payment
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
@@ -208,6 +209,22 @@ trait AmlsConnector {
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
+  }
+
+  def getPaymentByReference(paymentReference: String)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+    import utils.Strings._
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/ref/$paymentReference"
+
+    println(getUrl in Console.YELLOW)
+
+    Logger.debug(s"[AmlsConnector][getPaymentByReference]: Request to $getUrl with $paymentReference")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    }
   }
 
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
