@@ -66,12 +66,12 @@ object NotificationDetails {
     input => LocalDate.parse(input, DateTimeFormat.forPattern("dd/MM/yyyy"))
 
   private val extractEndDate: String => Option[LocalDate] = input => {
-    val pattern = """(?i)[\w\s]+-(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
+    val pattern = """(?i)[\w\s]+\s*-\s*(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
     pattern.findFirstMatchIn(input).fold(none[LocalDate])(m => parseDate(m.group(1)).some)
   }
 
   private val extractReference: String => Option[String] = input => {
-    val pattern = """(?i)[\w\s]+-([a-z][a-z0-9]+)""".r.unanchored
+    val pattern = """(?i)[\w\s]+\s*-\s*([a-z][a-z0-9]+)""".r.unanchored
     pattern.findFirstMatchIn(input).fold(none[String])(m => m.group(1).some)
   }
 

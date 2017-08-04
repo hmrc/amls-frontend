@@ -119,7 +119,7 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
   "convertEndDateWithRefMessageText" must {
     "convert the input message text into the model when there is both a date and a red in the input string" in {
 
-      val inputString = "parameter 1-31/07/2018|parameter 2-ABC1234"
+      val inputString = "parameter 1-31/07/2018|parameter 2- ABC1234"
 
       //noinspection ScalaStyle
       NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2018, 7, 31), Some("ABC1234")))
@@ -127,7 +127,7 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
     }
 
     "convert the input message text into the model when there are special characters in the input string" in {
-      val inputString = "<![CDATA[<P>parameter 1-31/07/2018|parameter 2-ABC1234</P>]]>"
+      val inputString = "<![CDATA[<P>parameter 1- 31/07/2018|parameter 2-ABC1234</P>]]>"
 
       //noinspection ScalaStyle
       NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2018, 7, 31), Some("ABC1234")))
