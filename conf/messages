@@ -731,6 +731,11 @@ confirmation.payment.amendvariation.info.keep_up_to_date = If any of your inform
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
+confirmation.payment.failed.title = Something went wrong with your payment
+confirmation.payment.failed.header = Something went wrong with your payment
+confirmation.payment.failed.reason.failure = Your payment failed
+confirmation.payment.failed.info = We’ve definitely received your application, but there has been a problem taking your payment. Your application won’t be reviewed until the fee has been paid.
+
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service
