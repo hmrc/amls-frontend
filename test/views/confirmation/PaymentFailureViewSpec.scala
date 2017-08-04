@@ -27,6 +27,7 @@ class PaymentFailureViewSpec extends GenericTestHelper with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
+    //noinspection ScalaStyle
     override def view = views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")
   }
 
