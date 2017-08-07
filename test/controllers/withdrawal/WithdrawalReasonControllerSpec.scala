@@ -21,6 +21,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Prop.Exception
@@ -95,16 +96,13 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
                 "withdrawalReason" -> "01"
               )
 
-              val withdrawal = WithdrawSubscriptionRequest(
-                WithdrawSubscriptionRequest.DefaultAckReference,
-                LocalDate.now(),
-                WithdrawalReason.OutOfScope
-              )
-
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 
-              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), eqTo(withdrawal))(any(), any(), any())
+              val captor = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+
+              captor.getValue.withdrawalReason mustBe WithdrawalReason.OutOfScope
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
 
@@ -116,17 +114,14 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
                 "specifyOtherReason" -> "reason"
               )
 
-              val withdrawal = WithdrawSubscriptionRequest(
-                WithdrawSubscriptionRequest.DefaultAckReference,
-                LocalDate.now(),
-                WithdrawalReason.Other("reason"),
-                "reason".some
-              )
-
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 
-              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), eqTo(withdrawal))(any(), any(), any())
+              val captor = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+
+              captor.getValue.withdrawalReason mustBe WithdrawalReason.Other("reason")
+              captor.getValue.withdrawalReasonOthers mustBe "reason".some
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
 

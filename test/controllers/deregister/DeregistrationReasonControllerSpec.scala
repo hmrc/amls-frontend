@@ -20,8 +20,10 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
+import models.withdrawal.WithdrawSubscriptionRequest
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
@@ -132,16 +134,13 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
                 "deregistrationReason" -> "01"
               )
 
-              val deregistration = DeRegisterSubscriptionRequest(
-                DeRegisterSubscriptionRequest.DefaultAckReference,
-                LocalDate.now(),
-                DeregistrationReason.OutOfScope
-              )
-
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 
-              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), eqTo(deregistration))(any(), any(), any())
+              val captor = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+
+              captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
 
@@ -153,20 +152,16 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
                 "specifyOtherReason" -> "reason"
               )
 
-              val deregistration = DeRegisterSubscriptionRequest(
-                DeRegisterSubscriptionRequest.DefaultAckReference,
-                LocalDate.now(),
-                DeregistrationReason.Other("reason"),
-                "reason".some
-              )
-
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 
-              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), eqTo(deregistration))(any(), any(), any())
+              val captor = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+
+              captor.getValue.deregistrationReason mustBe DeregistrationReason.Other("reason")
+              captor.getValue.deregReasonOther mustBe "reason".some
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
-
             }
           }
         }
