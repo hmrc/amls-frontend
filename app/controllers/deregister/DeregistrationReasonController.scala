@@ -31,6 +31,7 @@ import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
 import views.html.deregister.deregistration_reason
+import utils.AckRefGenerator
 
 import scala.concurrent.Future
 
@@ -65,7 +66,7 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
             case _ => None
           }
           val deregistration = DeRegisterSubscriptionRequest(
-            DeRegisterSubscriptionRequest.DefaultAckReference,
+            AckRefGenerator(),
             LocalDate.now(),
             data,
             deregistrationReasonOthers

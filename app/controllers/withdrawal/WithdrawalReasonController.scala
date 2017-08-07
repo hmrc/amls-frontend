@@ -30,6 +30,7 @@ import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.FeatureToggle
 import views.html.withdrawal.withdrawal_reason
+import utils.AckRefGenerator
 
 import scala.concurrent.Future
 
@@ -56,7 +57,7 @@ class WithdrawalReasonController @Inject()(
             case _ => None
           }
           val withdrawal = WithdrawSubscriptionRequest(
-            WithdrawSubscriptionRequest.DefaultAckReference,
+            AckRefGenerator(),
             LocalDate.now(),
             data,
             withdrawalReasonOthers
