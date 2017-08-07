@@ -18,10 +18,11 @@ package controllers
 
 import cats.implicits._
 import connectors._
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
+import models.payments.PaymentStatuses.Failed
 import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
@@ -46,7 +47,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator{
+class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -550,6 +551,24 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReference))
+      }
+
+      "the payment failed" in new Fixture {
+        setupStatus(SubmissionReadyForReview)
+
+        val paymentRef = paymentRefGen.sample.get
+        val payment = paymentGen.sample.get.copy(status = Failed)
+
+        when {
+          controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+        } thenReturn Future.successful(Some(payment))
+
+        val result = controller.paymentConfirmation(paymentRef)(request)
+
+        status(result) mustBe OK
+//        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+
+        verify(controller.amlsConnector).getPaymentByReference(paymentRef)
       }
 
     }
