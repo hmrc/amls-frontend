@@ -23,7 +23,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.deregister.DeRegisterSubscriptionResponse
 import models.status.SubmissionDecisionApproved
-import org.joda.time.LocalDateTime
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
@@ -53,7 +53,7 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false)
+    val readResponse = ReadStatusResponse(registrationDate, "", None, None, Some(LocalDate.now().plusYears(1)), Some(LocalDate.now()), false)
     val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
 
     when(reviewDetails.businessName).thenReturn(businessName)
@@ -63,8 +63,8 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
 
     when {
-      statusService.getDetailedStatus(any(), any(), any())
-    } thenReturn Future.successful(SubmissionDecisionApproved, statusResponse.some)
+      statusService.getReadStatus(any(), any(), any())
+    } thenReturn Future.successful(readResponse)
 
     when {
       enrolments.amlsRegistrationNumber(any(), any(), any())

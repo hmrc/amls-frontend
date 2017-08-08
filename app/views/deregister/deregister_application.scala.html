@@ -14,34 +14,35 @@
  * limitations under the License.
  *@
 
-@import org.joda.time.LocalDateTime
+@import org.joda.time.LocalDate
 @import utils.DateHelper
 @import include._
 @import utils.Strings._
 @import forms2._
 @import forms.EmptyForm
 
-@(businessName: String, processingDate: LocalDateTime, regNumber: String)(implicit request: Request[_], messages: Messages)
+@(businessName: String, currentRegYearEndDate: LocalDate, regNumber: String)(implicit request: Request[_], messages: Messages)
 
- @header = {
-  @heading("status.deregister.title", "summary.status")
- }
+@header = {
+    @heading("status.deregister.title", "summary.status")
+}
 
- @main(title = messages("status.deregister.title"), heading = header) {
 
-  <div class="panel-indent panel-indent--gutter panel-border-wide">
-   <p class="heading-small">@Messages("status.business")</p>
-   <p>@businessName</p>
-   <p class="heading-small">@Messages("lbl.registration.status")</p>
-   <p>@Messages("status.deregister.end-date.text", DateHelper.formatDate(processingDate))</p>
-   <p class="heading-small">@messages("status.referenceno")</p>
-   <p>@regNumber</p>
-  </div>
+@main(title = messages("status.deregister.title"), heading = header) {
 
-  @messages("status.deregister.body-content").paragraphizeH
+    <div class="panel-indent panel-indent--gutter panel-border-wide">
+        <p class="heading-small">@Messages("status.business")</p>
+        <p>@businessName</p>
+        <p class="heading-small">@Messages("lbl.registration.status")</p>
+        <p>@Messages("status.deregister.end-date.text", DateHelper.formatDate(currentRegYearEndDate))</p>
+        <p class="heading-small">@messages("status.referenceno")</p>
+        <p>@regNumber</p>
+    </div>
 
-  @form(EmptyForm, controllers.deregister.routes.DeRegisterApplicationController.post()) {
-   @submit(edit = false, Some(Messages("button.continue")), returnLink = false)
-  }
+    @messages("status.deregister.body-content").paragraphizeH
+
+    @form(EmptyForm, controllers.deregister.routes.DeRegisterApplicationController.post()) {
+        @submit(edit = false, Some(Messages("button.continue")), returnLink = false)
+    }
 
 }
