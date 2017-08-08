@@ -24,6 +24,7 @@ import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import models.registrationdetails.RegistrationDetails
+import models.status.SubmissionReadyForReview
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -158,6 +159,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(testBusinessMatch)))
 
@@ -194,6 +198,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
@@ -228,6 +235,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
@@ -264,6 +274,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
@@ -297,6 +310,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
@@ -332,6 +348,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
@@ -371,6 +390,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
         val result = controller.messageDetails("id", ContactType.RevocationReasons, amlsRegNumber)(request)
 
         status(result) mustBe 200
@@ -403,6 +425,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when(controller.statusService.getReadStatus(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse))
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
 
         when(controller.amlsNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))

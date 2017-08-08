@@ -20,14 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.businessmatching.BusinessMatching
 import models.notifications.ContactType._
 import models.notifications._
+import models.status.{SubmissionDecisionRejected, SubmissionStatus}
+import models.notifications.StatusType.DeRegistered
 import play.api.Play
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{BusinessName, FeatureToggle}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -72,25 +71,34 @@ trait NotificationController extends BaseController {
               (for {
                 businessName <- BusinessName.getName(readStatus.safeId)
                 details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
-              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details)) getOrElse NotFound(notFoundView)
+                status <- OptionT.liftF(statusService.getStatus)
+              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details, status)) getOrElse NotFound(notFoundView)
             case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
             case _ => Future.successful(BadRequest)
           }
     }
   }
 
-  private def contactTypeToResponse(contactType: ContactType, amlsRegNo: String, businessName: String, details: NotificationDetails)
+  private def contactTypeToResponse(contactType: ContactType, reference: String, businessName: String, details: NotificationDetails, status: SubmissionStatus)
                                    (implicit request: Request[_]) = {
+
     val msgText = details.messageText.getOrElse("")
 
     contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
-      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
-      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
-      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
-      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
-      case _ => Ok(views.html.notifications.message_details(details.subject, msgText))
+      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, reference, businessName))
+      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, reference, businessName))
+      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, reference, businessName, details.dateReceived))
+      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, reference, businessName, details.dateReceived))
+      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, reference))
+      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, reference))
+      case _ => {
+        (status, contactType) match {
+          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
+            Ok(views.html.notifications.message_details(details.subject, msgText, reference.some))
+          case _ =>
+            Ok(views.html.notifications.message_details(details.subject, msgText, None))
+        }
+      }
     }
   }
 }
