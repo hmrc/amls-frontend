@@ -22,7 +22,7 @@ import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentStatuses.Failed
+import models.payments.PaymentStatuses.{Cancelled, Failed}
 import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
@@ -565,7 +565,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         setupStatus(SubmissionReadyForReview)
 
         val payment = paymentGen.sample.get.copy(status = Failed)
-        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Failed)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
           controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
@@ -578,6 +578,25 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
+      }
+
+      "the payment was cancelled" in new Fixture {
+        setupStatus(SubmissionReadyForReview)
+
+        val payment = paymentGen.sample.get.copy(status = Cancelled)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
+
+        when {
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+        } thenReturn Future.successful(paymentStatus)
+
+        val result = controller.paymentConfirmation(payment.reference)(request)
+
+        status(result) mustBe OK
+
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }
     }
   }

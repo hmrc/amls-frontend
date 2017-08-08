@@ -67,9 +67,15 @@ trait ConfirmationController extends BaseController {
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
+
         val companyNameT = for {
           r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
         } yield r.reviewDetails.fold("")(_.businessName)
+
+        val msgFromPaymentStatus = Map[PaymentStatus, String](
+          PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
+          PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
+        )
 
         val result = for {
           status <- OptionT.liftF(statusService.getStatus)
@@ -78,13 +84,18 @@ trait ConfirmationController extends BaseController {
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByReference(reference))
         } yield (status, paymentStatus.currentStatus) match {
-          case (_, PaymentStatuses.Failed) => Ok(payment_failure("confirmation.payment.failed.reason.failure", Currency(payment.amountInPence.toDouble / 100), reference))
-          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) => Ok(payment_confirmation_amendvariation(businessName, reference))
+          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
+            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
+
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
+            Ok(payment_confirmation_amendvariation(businessName, reference))
+
           case (ReadyForRenewal(_), _) => if(renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
           }
+
           case _ => Ok(payment_confirmation(businessName, reference))
         }
 
