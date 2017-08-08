@@ -22,7 +22,8 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.notifications.ContactType._
 import models.notifications._
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview, SubmissionStatus}
+import models.status.{SubmissionDecisionRejected, SubmissionStatus}
+import models.notifications.StatusType.DeRegistered
 import play.api.Play
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
@@ -91,8 +92,8 @@ trait NotificationController extends BaseController {
       case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, reference))
       case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, reference))
       case _ => {
-        status match {
-          case SubmissionDecisionRejected =>
+        (status, contactType) match {
+          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
             Ok(views.html.notifications.message_details(details.subject, msgText, reference.some))
           case _ =>
             Ok(views.html.notifications.message_details(details.subject, msgText, None))
