@@ -27,6 +27,8 @@ class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
+    val safeId = "safeId"
+
     val businessName = "Fake Name Ltd."
 
   }
@@ -35,7 +37,7 @@ class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_reject("msgContent", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", safeId, businessName)
 
       doc.title must be(Messages("notifications.mtrj.title") +
         " - " + Messages("status.title") +
@@ -45,7 +47,7 @@ class minded_to_rejectSpec extends GenericTestHelper with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_reject("msgContent", businessName)
+      def view = views.html.notifications.minded_to_reject("msgContent", safeId, businessName)
 
       heading.html must be(Messages("notifications.mtrj.title"))
       subHeading.html must include(Messages("status.title"))

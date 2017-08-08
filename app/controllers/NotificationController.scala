@@ -79,17 +79,17 @@ trait NotificationController extends BaseController {
     }
   }
 
-  private def contactTypeToResponse(contactType: ContactType, amlsRegNo: String, businessName: String, details: NotificationDetails)
+  private def contactTypeToResponse(contactType: ContactType, reference: String, businessName: String, details: NotificationDetails)
                                    (implicit request: Request[_]) = {
     val msgText = details.messageText.getOrElse("")
 
     contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRegNo, businessName))
-      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, businessName))
-      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
-      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRegNo, businessName, details.dateReceived))
+      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, reference, businessName))
+      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, reference, businessName))
+      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, reference, businessName, details.dateReceived))
+      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, reference, businessName, details.dateReceived))
       case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRegNo))
+      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, reference))
       case _ => Ok(views.html.notifications.message_details(details.subject, msgText))
     }
   }
