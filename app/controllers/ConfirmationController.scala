@@ -75,9 +75,12 @@ trait ConfirmationController extends BaseController {
           status <- OptionT.liftF(statusService.getStatus)
           businessName <- companyNameT orElse OptionT.some("")
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
-        } yield status match {
-          case SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(payment_confirmation_amendvariation(businessName, reference))
-          case ReadyForRenewal(_) => if(renewalData.isDefined) {
+          paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
+          payment <- OptionT(amlsConnector.getPaymentByReference(reference))
+        } yield (status, paymentStatus.currentStatus) match {
+          case (_, PaymentStatuses.Failed) => Ok(payment_failure("confirmation.payment.failed.reason.failure", Currency(payment.amountInPence.toDouble / 100), reference))
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) => Ok(payment_confirmation_amendvariation(businessName, reference))
+          case (ReadyForRenewal(_), _) => if(renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))

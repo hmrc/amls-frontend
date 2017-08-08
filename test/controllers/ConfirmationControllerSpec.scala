@@ -121,6 +121,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
 
     when {
+      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+    } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
+
+    when {
+      controller.amlsConnector.getPaymentByReference(any())(any(), any(), any())
+    } thenReturn Future.successful(paymentGen.sample)
+
+    when {
       controller.amlsConnector.savePayment(any(),any())(any(),any(),any())
     } thenReturn {
       Future.successful(HttpResponse(CREATED))
@@ -556,21 +564,21 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       "the payment failed" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        val paymentRef = paymentRefGen.sample.get
         val payment = paymentGen.sample.get.copy(status = Failed)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Failed)
 
         when {
-          controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
-        } thenReturn Future.successful(Some(payment))
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+        } thenReturn Future.successful(paymentStatus)
 
-        val result = controller.paymentConfirmation(paymentRef)(request)
+        val result = controller.paymentConfirmation(payment.reference)(request)
 
         status(result) mustBe OK
-//        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
 
-        verify(controller.amlsConnector).getPaymentByReference(paymentRef)
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
-
     }
   }
 }
