@@ -164,4 +164,18 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
     }
   }
 
+  "processGenericMessage" must {
+    "extract the text if defined withing CDATA tags" in {
+      val inputString = "<![CDATA[<P>This is the message</P>]]>"
+
+      NotificationDetails.processGenericMessage(inputString) mustBe "<P>This is the message</P>"
+    }
+
+    "return the original text if not enclosed in CDATA tags" in {
+      val inputString = "This is a message"
+
+      NotificationDetails.processGenericMessage(inputString) mustBe inputString
+    }
+  }
+
 }
