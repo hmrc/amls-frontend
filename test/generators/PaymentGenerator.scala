@@ -18,7 +18,7 @@ package generators
 
 import java.time.LocalDateTime
 
-import models.payments.{Payment, PaymentStatus}
+import models.payments.{Payment, PaymentStatus, PaymentStatusResult}
 import models.payments.PaymentStatuses._
 import org.scalacheck.Gen
 
@@ -27,6 +27,8 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   val refLength = 10
 
   def paymentRefGen = stringOfLengthGen(refLength - 1) map { ref => s"X${ref.toUpperCase()}" }
+
+  def paymentIdGen = alphaNumOfLengthGen(15)
 
   def now = LocalDateTime.now()
 
@@ -61,5 +63,11 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     Some(now),
     paymentStatus
   )
+
+  val paymentStatusResultGen: Gen[PaymentStatusResult] = for {
+    paymentRef <- paymentRefGen
+    paymentId <- paymentIdGen
+    status <- paymentStatusGen
+  } yield PaymentStatusResult(paymentRef, paymentId, status)
 
 }

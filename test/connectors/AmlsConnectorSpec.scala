@@ -21,7 +21,7 @@ import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
-import models.payments.Payment
+import models.payments.{Payment, PaymentStatusResult, PaymentStatuses, RefreshPaymentStatusRequest}
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -36,6 +36,7 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import uk.gov.hmrc.play.http._
 import play.api.test.Helpers._
 import org.mockito.Matchers
+import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -44,6 +45,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   object AmlsConnector extends AmlsConnector {
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
+    override private[connectors] val httpPut: HttpPut = mock[HttpPut]
     override private[connectors] val url: String = "amls/subscription"
     override private[connectors] val paymentUrl: String = "amls/payment"
     override private[connectors] val httpGet: HttpGet = mock[HttpGet]
@@ -309,6 +311,18 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         case Some(_) => fail("None should be returned")
         case _ =>
       }
+    }
+  }
+
+  "AmlsConnector" must {
+    "refesh the payment status" in {
+      val result = paymentStatusResultGen.sample.get
+
+      when {
+        AmlsConnector.httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](any(), any())(any(), any(), any())
+      } thenReturn Future.successful(result)
+
+      whenReady(AmlsConnector.refreshPaymentStatus(result.amlsRef)) { r => r mustBe result }
     }
   }
 
