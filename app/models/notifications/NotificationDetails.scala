@@ -93,6 +93,11 @@ object NotificationDetails {
     }
   }
 
+  def processGenericMessage(msg: String): String = {
+    val pattern = """(?i)<!\[CDATA\[([^\]]+)\]\]>""".r.unanchored
+    pattern.findFirstMatchIn(msg).fold(msg)(m => m.group(1))
+  }
+
   private def splitByDash(s: String): String = s.split("-")(1)
 
   implicit val dateTimeRead: Reads[DateTime] = {

@@ -61,10 +61,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id))
         messageText <- OptionT.fromOption[Future](details.messageText)
-      } yield details.copy(messageText = Some(CustomAttributeProvider.commonMark(messageText)))).value
+      } yield details.copy(messageText = Some(CustomAttributeProvider.commonMark(NotificationDetails.processGenericMessage(messageText))))).value
     }
   }
-
 
   private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType)
                                  (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
