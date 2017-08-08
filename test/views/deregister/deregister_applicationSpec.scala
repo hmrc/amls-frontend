@@ -16,22 +16,22 @@
 
 package views.deregister
 
-import org.joda.time.LocalDateTime
+import generators.AmlsReferenceNumberGenerator
+import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
+class deregister_applicationSpec extends GenericTestHelper with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
     val businessName = "Test Business"
-    val processingDate = LocalDateTime.now()
-    val regNumber = "IUYSF894739847"
+    val currentRegYearEndDate = LocalDate.now()
 
-    def view = views.html.deregister.deregister_application(businessName, processingDate, regNumber)
+    def view = views.html.deregister.deregister_application(businessName, currentRegYearEndDate, amlsRegistrationNumber)
   }
 
   "deregister_application view" must {
@@ -42,7 +42,7 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers {
       doc.title mustBe title
       heading.html must be(Messages("status.deregister.title"))
       subHeading.html must include(Messages("summary.status"))
-      //code to check existance of form fields			
+
     }
 
     "have correct body content" in new ViewFixture {
