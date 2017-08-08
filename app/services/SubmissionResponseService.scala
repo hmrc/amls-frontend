@@ -191,7 +191,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
     if (showBreakdown(subscription.getFpFee, activities)) {
 
-      splitPeopleByFitAndProperTest(people) match {
+      splitPeopleByFitAndProperTest(people.filter(_.lineId.isEmpty)) match {
         case (passedFP, notFP) =>
           Seq(
             BreakdownRow(peopleRow(subscription).message, notFP.size, peopleRow(subscription).feePer, Currency.fromBD(subscription.getFpFee.getOrElse(0)))
