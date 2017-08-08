@@ -20,14 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.businessmatching.BusinessMatching
 import models.notifications.ContactType._
 import models.notifications._
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview, SubmissionStatus}
 import play.api.Play
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{BusinessName, FeatureToggle}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -72,15 +70,17 @@ trait NotificationController extends BaseController {
               (for {
                 businessName <- BusinessName.getName(readStatus.safeId)
                 details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
-              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details)) getOrElse NotFound(notFoundView)
+                status <- OptionT.liftF(statusService.getStatus)
+              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details, status)) getOrElse NotFound(notFoundView)
             case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
             case _ => Future.successful(BadRequest)
           }
     }
   }
 
-  private def contactTypeToResponse(contactType: ContactType, reference: String, businessName: String, details: NotificationDetails)
+  private def contactTypeToResponse(contactType: ContactType, reference: String, businessName: String, details: NotificationDetails, status: SubmissionStatus)
                                    (implicit request: Request[_]) = {
+
     val msgText = details.messageText.getOrElse("")
 
     contactType match {
@@ -90,7 +90,14 @@ trait NotificationController extends BaseController {
       case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, reference, businessName, details.dateReceived))
       case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, reference))
       case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, reference))
-      case _ => Ok(views.html.notifications.message_details(details.subject, msgText))
+      case _ => {
+        status match {
+          case SubmissionDecisionRejected =>
+            Ok(views.html.notifications.message_details(details.subject, msgText, reference.some))
+          case _ =>
+            Ok(views.html.notifications.message_details(details.subject, msgText, None))
+        }
+      }
     }
   }
 }
