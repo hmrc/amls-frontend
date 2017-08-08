@@ -69,32 +69,39 @@ trait NotificationController extends BaseController {
           statusService.getReadStatus flatMap {
             case readStatus if readStatus.safeId.isDefined =>
               (for {
+                safeId <- OptionT.fromOption[Future](readStatus.safeId)
                 businessName <- BusinessName.getName(readStatus.safeId)
                 details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
                 status <- OptionT.liftF(statusService.getStatus)
-              } yield contactTypeToResponse(contactType, amlsRegNo, businessName, details, status)) getOrElse NotFound(notFoundView)
+              } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
             case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
             case _ => Future.successful(BadRequest)
           }
     }
   }
 
-  private def contactTypeToResponse(contactType: ContactType, reference: String, businessName: String, details: NotificationDetails, status: SubmissionStatus)
-                                   (implicit request: Request[_]) = {
+  private def contactTypeToResponse(
+                                     contactType: ContactType,
+                                     reference: (String, String),
+                                     businessName: String,
+                                     details: NotificationDetails,
+                                     status: SubmissionStatus)(implicit request: Request[_]) = {
 
     val msgText = details.messageText.getOrElse("")
 
+    val (amlsRefNo, safeId) = reference
+
     contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, reference, businessName))
-      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, reference, businessName))
-      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, reference, businessName, details.dateReceived))
-      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, reference, businessName, details.dateReceived))
-      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, reference))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, reference))
+      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRefNo, businessName))
+      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, safeId, businessName))
+      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, safeId, businessName, details.dateReceived))
+      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRefNo, businessName, details.dateReceived))
+      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, safeId))
+      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRefNo))
       case _ => {
         (status, contactType) match {
           case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
-            Ok(views.html.notifications.message_details(details.subject, msgText, reference.some))
+            Ok(views.html.notifications.message_details(details.subject, msgText, safeId.some))
           case _ =>
             Ok(views.html.notifications.message_details(details.subject, msgText, None))
         }
