@@ -281,6 +281,7 @@ GET         /update-information/declaration                                     
 
 GET         /confirmation                                                             controllers.ConfirmationController.get()
 GET         /confirmation/payment-complete                                            controllers.ConfirmationController.paymentConfirmation(reference: String)
+POST        /confirmation/payment/retry                                               controllers.ConfirmationController.retryPayment()
 
 GET         /responsible-people/add                                                   controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
 
