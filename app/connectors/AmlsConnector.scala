@@ -18,6 +18,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
+import models.payments.{Payment, PaymentStatusResult, RefreshPaymentStatusRequest}
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
@@ -25,6 +26,7 @@ import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, _}
+import play.api.http.Status.OK
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,6 +35,8 @@ trait AmlsConnector {
   private[connectors] def httpPost: HttpPost
 
   private[connectors] def httpGet: HttpGet
+
+  private[connectors] def httpPut: HttpPut
 
   private[connectors] def url: String
 
@@ -210,6 +214,29 @@ trait AmlsConnector {
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
 
+  def getPaymentByReference(paymentReference: String)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/ref/$paymentReference"
+
+    Logger.debug(s"[AmlsConnector][getPaymentByReference]: Request to $getUrl with $paymentReference")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    } recover {
+      case _: NotFoundException => None
+    }
+  }
+
+  def refreshPaymentStatus(paymentReference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[PaymentStatusResult] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
+
+    Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
+
+    httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
+  }
+
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
@@ -222,6 +249,7 @@ trait AmlsConnector {
 object AmlsConnector extends AmlsConnector {
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
+  override private[connectors] val httpPut = WSHttp
   override private[connectors] def url = ApplicationConfig.subscriptionUrl
   override private[connectors] def registrationUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
   override private[connectors] def paymentUrl = s"${ApplicationConfig.amlsUrl}/amls/payment"
