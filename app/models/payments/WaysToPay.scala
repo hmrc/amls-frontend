@@ -16,6 +16,28 @@
 
 package models.payments
 
-class WaysToPay {
+import enumeratum._
+import jto.validation.{From, Rule, Write}
+import jto.validation.forms.UrlFormEncoded
+
+sealed abstract class WaysToPay extends EnumEntry
+
+object WaysToPay extends PlayEnum[WaysToPay] {
+
+  import utils.MappingUtils.Implicits._
+
+  case object `card` extends WaysToPay
+  case object `bacs` extends WaysToPay
+
+  override def values = findValues
+
+  implicit val formRule: Rule[UrlFormEncoded, WaysToPay] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    (__ \ "waysToPay").read[WaysToPay].withMessage("")
+  }
+
+  implicit val formWrites: Write[WaysToPay, UrlFormEncoded] = Write { __ =>
+    Map("waysToPay" -> Seq(__.entryName))
+  }
 
 }

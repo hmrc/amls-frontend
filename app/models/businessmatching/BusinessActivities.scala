@@ -67,14 +67,14 @@ case object TelephonePaymentService extends BusinessActivity
 object BusinessActivity {
 
   implicit val activityFormRead = Rule[String, BusinessActivity] {
-      case "01" => Success(AccountancyServices)
-      case "02" => Success(BillPaymentServices)
-      case "03" => Success(EstateAgentBusinessService)
-      case "04" => Success(HighValueDealing)
-      case "05" => Success(MoneyServiceBusiness)
-      case "06" => Success(TrustAndCompanyServices)
-      case "07" => Success(TelephonePaymentService)
-      case _ => Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
+      case "01" => Valid(AccountancyServices)
+      case "02" => Valid(BillPaymentServices)
+      case "03" => Valid(EstateAgentBusinessService)
+      case "04" => Valid(HighValueDealing)
+      case "05" => Valid(MoneyServiceBusiness)
+      case "06" => Valid(TrustAndCompanyServices)
+      case "07" => Valid(TelephonePaymentService)
+      case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val activityFormWrite = Write[BusinessActivity, String] {

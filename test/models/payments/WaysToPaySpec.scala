@@ -16,8 +16,35 @@
 
 package models.payments
 
+import jto.validation.Valid
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import utils.GenericTestHelper
 
-class WaysToPaySpec extends PlaySpec {
+class WaysToPaySpec extends PlaySpec with GenericTestHelper  with MockitoSugar {
+
+  "Form Validation" must {
+
+    "successfully validate" when {
+      "on selecting card" in {
+
+        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.`card`.entryName))) must be(Valid(WaysToPay.`card`))
+
+        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.`bacs`.entryName))) must be(Valid(WaysToPay.`bacs`))
+
+      }
+    }
+
+    "write correct data from enum" in {
+
+      WaysToPay.formWrites.writes(WaysToPay.`card`) must
+        be(Map("waysToPay" -> Seq("card")))
+
+      WaysToPay.formWrites.writes(WaysToPay.`bacs`) must
+        be(Map("waysToPay" -> Seq("bacs")))
+
+    }
+
+  }
 
 }

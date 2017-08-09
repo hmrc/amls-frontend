@@ -50,7 +50,7 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum" % "1.5.10"
+    "com.beachape" %% "enumeratum-play" % "1.5.10"
 
   )
 

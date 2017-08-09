@@ -84,21 +84,21 @@ object ProvidedServices {
     From[UrlFormEncoded] { __ =>
           (__ \ "services").read(serviceType) flatMap { z =>
             z.map {
-              case "01" => Rule[UrlFormEncoded, TcspService](_ => Success(PhonecallHandling))
-              case "02" => Rule[UrlFormEncoded, TcspService](_ => Success(EmailHandling))
-              case "03" => Rule[UrlFormEncoded, TcspService](_ => Success(EmailServer))
-              case "04" => Rule[UrlFormEncoded, TcspService](_ => Success(SelfCollectMailboxes))
-              case "05" => Rule[UrlFormEncoded, TcspService](_ => Success(MailForwarding))
-              case "06" => Rule[UrlFormEncoded, TcspService](_ => Success(Receptionist))
-              case "07" => Rule[UrlFormEncoded, TcspService](_ => Success(ConferenceRooms))
+              case "01" => Rule[UrlFormEncoded, TcspService](_ => Valid(PhonecallHandling))
+              case "02" => Rule[UrlFormEncoded, TcspService](_ => Valid(EmailHandling))
+              case "03" => Rule[UrlFormEncoded, TcspService](_ => Valid(EmailServer))
+              case "04" => Rule[UrlFormEncoded, TcspService](_ => Valid(SelfCollectMailboxes))
+              case "05" => Rule[UrlFormEncoded, TcspService](_ => Valid(MailForwarding))
+              case "06" => Rule[UrlFormEncoded, TcspService](_ => Valid(Receptionist))
+              case "07" => Rule[UrlFormEncoded, TcspService](_ => Valid(ConferenceRooms))
               case "08" =>
                 (__ \ "details").read(serviceDetailsType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, TcspService] { _ =>
-                  Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
+                  Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
                 }
             }.foldLeft[Rule[UrlFormEncoded, Set[TcspService]]](
-              Rule[UrlFormEncoded, Set[TcspService]](_ => Success(Set.empty))
+              Rule[UrlFormEncoded, Set[TcspService]](_ => Valid(Set.empty))
             ) {
               case (m, n) =>
                   n flatMap { x =>
