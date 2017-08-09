@@ -28,7 +28,11 @@ trait BaseGenerator {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
+  //noinspection ScalaStyle
   def numGen = Gen.chooseNum(0,1000)
+
+  //noinspection ScalaStyle
+  val paymentAmountGen = Gen.chooseNum[Double](100, 200)
 
   def safeIdGen = for {
     ref <- alphaNumOfLengthGen(9)

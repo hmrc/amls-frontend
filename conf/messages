@@ -735,6 +735,7 @@ confirmation.payment.failed.title = Something went wrong with your payment
 confirmation.payment.failed.header = Something went wrong with your payment
 confirmation.payment.failed.reason.failure = Your payment failed
 confirmation.payment.failed.info = We’ve definitely received your application, but there has been a problem taking your payment. Your application won’t be reviewed until the fee has been paid.
+confirmation.payment.button.retry = Try to pay again
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
