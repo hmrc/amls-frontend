@@ -24,10 +24,9 @@ import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
-import models.deregister.DeRegisterSubscriptionRequest
-import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.FeatureToggle
 import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
@@ -41,30 +40,25 @@ class DeRegisterApplicationController @Inject()
   amls: AmlsConnector
 ) extends BaseController {
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request =>
-
-      if(!ApplicationConfig.allowDeRegisterToggle) {
-        Future.successful(NotFound)
-      } else {
-        val maybeProcessingDate = for {
-          status <- OptionT.liftF(statusService.getDetailedStatus)
-          response <- OptionT.fromOption[Future](status._2)
-        } yield response.processingDate
-
-        (for {
-          bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-          details <- OptionT.fromOption[Future](bm.reviewDetails)
-          processingDate <- maybeProcessingDate
-          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
-        } yield {
-          Ok(deregister_application(details.businessName, processingDate, amlsRegNumber))
-        }) getOrElse InternalServerError("Could not show the de-register page")
-      }
+  def get() = FeatureToggle(ApplicationConfig.allowDeRegisterToggle) {
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          (for {
+            readStatus <- OptionT.liftF(statusService.getReadStatus)
+            bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
+            details <- OptionT.fromOption[Future](bm.reviewDetails)
+            currentRegYearEndDate <- OptionT.fromOption[Future](readStatus.currentRegYearEndDate)
+            amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+          } yield {
+            Ok(deregister_application(details.businessName, currentRegYearEndDate, amlsRegNumber))
+          }) getOrElse InternalServerError("Could not show the de-register page")
+    }
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Redirect(routes.DeregistrationReasonController.get()))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Redirect(routes.DeregistrationReasonController.get()))
   }
 }

@@ -17,16 +17,19 @@
 @import include._
 @import forms2._
 
-@(msgTitle: String, msgContent: String)(implicit request: Request[_],m:Messages)
+@(msgTitle: String, msgContent: String, reference: Option[String])(implicit request: Request[_],m:Messages)
 
 @header = {
-@heading(msgTitle, "summary.status")
+    @heading(msgTitle, "summary.status")
 }
 
 @main(
-title = Messages(msgTitle) + " - " + Messages("summary.status"),
-heading = header
+    title = Messages(msgTitle) + " - " + Messages("summary.status"),
+    heading = header
 )  {
+    @reference.map{ ref =>
+        <p>Your reference: @ref</p>
+    }
     <p>@Html(msgContent)</p>
     <a href="@controllers.routes.NotificationController.getMessages().url" class="back-link">@Messages("button.back")</a>
 }

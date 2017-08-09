@@ -27,13 +27,15 @@ class no_longer_minded_to_rejectSpec extends GenericTestHelper with MustMatchers
 
     implicit val requestWithToken = addToken(request)
 
+    val safeId = "safeId"
+
   }
 
   "minded_to_reject view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_reject("msgContent")
+      def view = views.html.notifications.no_longer_minded_to_reject("msgContent", safeId)
 
       doc.title must be(Messages("notifications.nmrj.title") +
         " - " + Messages("status.title") +
@@ -43,7 +45,7 @@ class no_longer_minded_to_rejectSpec extends GenericTestHelper with MustMatchers
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_reject("msgContent")
+      def view = views.html.notifications.no_longer_minded_to_reject("msgContent", safeId)
 
       heading.html must be(Messages("notifications.nmrj.title"))
       subHeading.html must include(Messages("status.title"))
