@@ -392,6 +392,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
     }
 
     "getVariation is called" must {
+
       "notify user of variation fees to pay in breakdown" when {
         "there is a Responsible People fee to pay" in new Fixture {
 
@@ -402,16 +403,9 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(
-            fpFee = Some(100)
+            fpFee = Some(100),
+            addedResponsiblePeople = 1
           ))
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
 
           val result = await(TestSubmissionResponseService.getVariation)
 
@@ -426,20 +420,11 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
 
       "not include responsible people in breakdown" when {
-
         "there is no fee returned in a variation response because business type is not msb or tcsp" in new Fixture {
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(fpFee = None))
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
 
           val result = await(TestSubmissionResponseService.getVariation)
 
@@ -453,7 +438,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
       }
 
       "notify user of amendment fees to pay in breakdown" when {
-
         "there is a Responsible Persons fee to pay with dynamic fpFeeRate" in new Fixture {
 
           val variationResponseWithRate = AmendVariationRenewalResponse(
@@ -477,14 +461,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponseWithRate)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows, _)) =>
@@ -512,14 +488,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
 
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
-
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises"
@@ -540,14 +508,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
-
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows, _)) =>
@@ -569,14 +529,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows, _)) =>
@@ -612,14 +564,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(testVariationResponse)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true))))
 
           when {
             activities.businessActivities
@@ -661,14 +605,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(testVariationResponse)
 
           when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true))))
-
-          when {
             activities.businessActivities
           } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
 
@@ -699,14 +635,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
             halfYearlyTradingPremises = 1,
             zeroRatedTradingPremises = 1
           ))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true)), ResponsiblePeople()))
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
 
           whenReady(TestSubmissionResponseService.getVariation) {
             case Some((_, _, breakdownRows, _)) =>
