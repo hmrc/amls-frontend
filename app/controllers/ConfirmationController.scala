@@ -26,11 +26,13 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
+import models.ReadStatusResponse
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.BusinessName
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,9 +44,9 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
-  private[controllers] val dataCacheConnector: DataCacheConnector
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector
 
-  private[controllers] val amlsConnector: AmlsConnector
+  private[controllers] implicit val amlsConnector: AmlsConnector
 
   private[controllers] val authEnrolmentsService: AuthEnrolmentsService
 
@@ -67,21 +69,34 @@ trait ConfirmationController extends BaseController {
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        val companyNameT = for {
-          r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-        } yield r.reviewDetails.fold("")(_.businessName)
+
+        def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
+          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")){ r => BusinessName.getName(r.safeId) }
+
+        val msgFromPaymentStatus = Map[PaymentStatus, String](
+          PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
+          PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
+        )
 
         val result = for {
-          status <- OptionT.liftF(statusService.getStatus)
-          businessName <- companyNameT orElse OptionT.some("")
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
-        } yield status match {
-          case SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(payment_confirmation_amendvariation(businessName, reference))
-          case ReadyForRenewal(_) => if(renewalData.isDefined) {
+          paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
+          payment <- OptionT(amlsConnector.getPaymentByReference(reference))
+        } yield (status, paymentStatus.currentStatus) match {
+          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
+            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
+
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
+            Ok(payment_confirmation_amendvariation(businessName, reference))
+
+          case (ReadyForRenewal(_), _) => if(renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
           }
+
           case _ => Ok(payment_confirmation(businessName, reference))
         }
 

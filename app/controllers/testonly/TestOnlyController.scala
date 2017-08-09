@@ -17,7 +17,9 @@
 package controllers.testonly
 
 import config.{AMLSAuthConnector, AmlsShortLivedCache, BusinessCustomerSessionCache}
+import connectors.AmlsConnector
 import controllers.BaseController
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.status.status_submitted
@@ -52,6 +54,19 @@ trait TestOnlyController extends BaseController with Actions {
   def wrongCredentials = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.submission.wrong_credential_type()))
+  }
+
+  def getPayment(ref: String) = Authorised.async {
+    implicit authContext => implicit request =>
+      AmlsConnector.getPaymentByReference(ref) map {
+        case Some(p) => Ok(Json.toJson(p))
+        case _ => Ok(s"The payment for $ref was not found")
+      }
+  }
+
+  def paymentFailure = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
   }
 
 }

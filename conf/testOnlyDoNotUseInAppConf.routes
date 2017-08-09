@@ -14,6 +14,8 @@ GET        /anti-money-laundering/test-only/drop-save4later                     
 GET        /anti-money-laundering/test-only/duplicate-enrolment                  controllers.testonly.TestOnlyController.duplicateEnrolment
 GET        /anti-money-laundering/test-only/duplicate-submission                 controllers.testonly.TestOnlyController.duplicateSubmission
 GET        /anti-money-laundering/test-only/invalid-enrolment-credentials        controllers.testonly.TestOnlyController.wrongCredentials
+GET        /anti-money-laundering/test-only/payment/failure                      controllers.testonly.TestOnlyController.paymentFailure
+GET        /anti-money-laundering/test-only/payment/:ref                         controllers.testonly.TestOnlyController.getPayment(ref)
 
 # Add all the application routes to the prod.routes file
 ->         /                                                                     prod.Routes

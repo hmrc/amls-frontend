@@ -21,11 +21,7 @@ import org.scalacheck.Gen
 import models.FormTypes
 import org.joda.time.LocalDate
 
-trait ResponsiblePersonGenerator {
-
-  def stringOfLengthGen(maxLength: Int) = {
-    Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
-  }
+trait ResponsiblePersonGenerator extends BaseGenerator {
 
   val positionInBusinessGen =
     Gen.someOf(

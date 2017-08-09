@@ -45,4 +45,7 @@ trait Fixture extends MustMatchers with ParagraphHelpers {
   lazy val heading = doc.getElementsByTag("h1").first()
   lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
   lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
+
+  def validateTitle(title: String)(implicit m: Messages) =
+    doc.title mustBe s"${m(title)} - ${m("title.amls")} - ${m("title.gov")}"
 }

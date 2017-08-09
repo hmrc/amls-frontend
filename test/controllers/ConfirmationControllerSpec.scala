@@ -18,14 +18,15 @@ package controllers
 
 import cats.implicits._
 import connectors._
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
+import models.payments.PaymentStatuses.{Cancelled, Failed}
 import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
-import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -46,7 +47,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator{
+class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -55,6 +56,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
     .configure("microservice.services.feature-toggle.payments-url-lookup" -> true)
+    .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
     .build()
 
   trait Fixture extends AuthorisedFixture {
@@ -110,7 +112,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful()
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
     } thenReturn {
       Future.successful(Some(amlsRegistrationNumber))
     }
@@ -120,7 +122,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
 
     when {
-      controller.amlsConnector.savePayment(any(),any())(any(),any(),any())
+      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+    } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
+
+    when {
+      controller.amlsConnector.getPaymentByReference(any())(any(), any(), any())
+    } thenReturn Future.successful(paymentGen.sample)
+
+    when {
+      controller.amlsConnector.savePayment(any(), any())(any(), any(), any())
     } thenReturn {
       Future.successful(HttpResponse(CREATED))
     }
@@ -145,6 +155,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       when {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
+
+      val statusResponse = mock[ReadStatusResponse]
+      when(statusResponse.safeId) thenReturn safeIdGen.sample
+
+      when {
+        controller.statusService.getDetailedStatus(any(), any(), any())
+      } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
 
@@ -206,7 +223,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
       } thenReturn Future.successful(Some(Renewal(Some(InvolvedInOtherNo))))
 
-      when{
+      when {
         controller.submissionResponseService.getRenewal(any(), any(), any())
       } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq(), None)))
 
@@ -375,7 +392,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         } thenReturn Future.successful(Some(Renewal()))
 
         when(controller.submissionResponseService.getRenewal(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10))), None))))
+          .thenReturn(Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None))))
 
 
         val result = controller.get()(request)
@@ -396,9 +413,9 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
             Some("payeref"),
             Currency.fromInt(100),
             Seq(
-              BreakdownRow("confirmation.responsiblepeople.fp.passed",1, Currency(0), Currency(0)),
-              BreakdownRow("confirmation.responsiblepeople",1, Currency(100), Currency(100)),
-              BreakdownRow("confirmation.tradingpremises.half",2, Currency(50), Currency(100))
+              BreakdownRow("confirmation.responsiblepeople.fp.passed", 1, Currency(0), Currency(0)),
+              BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(100)),
+              BreakdownRow("confirmation.tradingpremises.half", 2, Currency(50), Currency(100))
             ), None))))
 
 
@@ -418,7 +435,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         } thenReturn Future.successful(None)
 
         when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("",10, Currency(10), Currency(10))), None)))
+          .thenReturn(Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None)))
 
 
         val result = controller.get()(request)
@@ -552,6 +569,43 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReference))
       }
 
+      "the payment failed" in new Fixture {
+        setupStatus(SubmissionReadyForReview)
+
+        val payment = paymentGen.sample.get.copy(status = Failed)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
+
+        when {
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+        } thenReturn Future.successful(paymentStatus)
+
+        val result = controller.paymentConfirmation(payment.reference)(request)
+
+        status(result) mustBe OK
+
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
+      }
+
+      "the payment was cancelled" in new Fixture {
+        setupStatus(SubmissionReadyForReview)
+
+        val payment = paymentGen.sample.get.copy(status = Cancelled)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
+
+        when {
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+        } thenReturn Future.successful(paymentStatus)
+
+        val result = controller.paymentConfirmation(payment.reference)(request)
+
+        status(result) mustBe OK
+
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+      }
     }
   }
 }
@@ -567,7 +621,8 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     .configure("microservice.services.feature-toggle.payments-url-lookup" -> false)
     .build()
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture {
+    self =>
 
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
@@ -605,7 +660,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
 
     reset(paymentsConnector)
 
-    when{
+    when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
       Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
@@ -616,7 +671,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful()
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
     } thenReturn {
       Future.successful(Some(amlsRegistrationNumber))
     }
