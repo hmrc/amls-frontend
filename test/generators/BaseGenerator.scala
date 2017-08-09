@@ -30,4 +30,8 @@ trait BaseGenerator {
 
   def numGen = Gen.chooseNum(0,1000)
 
+  def safeIdGen = for {
+    ref <- alphaNumOfLengthGen(9)
+  } yield s"X${ref.toUpperCase}"
+
 }

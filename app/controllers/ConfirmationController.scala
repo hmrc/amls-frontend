@@ -26,11 +26,13 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
+import models.ReadStatusResponse
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.BusinessName
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,9 +44,9 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val keystoreConnector: KeystoreConnector
 
-  private[controllers] val dataCacheConnector: DataCacheConnector
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector
 
-  private[controllers] val amlsConnector: AmlsConnector
+  private[controllers] implicit val amlsConnector: AmlsConnector
 
   private[controllers] val authEnrolmentsService: AuthEnrolmentsService
 
@@ -68,9 +70,8 @@ trait ConfirmationController extends BaseController {
     implicit authContext =>
       implicit request =>
 
-        val companyNameT = for {
-          r <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-        } yield r.reviewDetails.fold("")(_.businessName)
+        def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
+          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")){ r => BusinessName.getName(r.safeId) }
 
         val msgFromPaymentStatus = Map[PaymentStatus, String](
           PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
@@ -78,8 +79,8 @@ trait ConfirmationController extends BaseController {
         )
 
         val result = for {
-          status <- OptionT.liftF(statusService.getStatus)
-          businessName <- companyNameT orElse OptionT.some("")
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByReference(reference))
