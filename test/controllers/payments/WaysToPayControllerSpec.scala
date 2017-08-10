@@ -16,8 +16,38 @@
 
 package controllers.payments
 
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import play.api.test.Helpers._
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-class WaysToPayControllerSpec extends PlaySpec {
+class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper {
+
+  trait Fixture extends AuthorisedFixture { self =>
+
+    val request = addToken(authRequest)
+
+    val controller = new WaysToPayController(
+      authConnector = self.authConnector
+    )
+
+  }
+
+  "WaysToPayController" when {
+
+    "get is called" must {
+
+      "return OK with view" in new Fixture {
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+      }
+
+    }
+
+  }
 
 }
