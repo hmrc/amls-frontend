@@ -16,10 +16,10 @@
 
 package controllers.payments
 
+import models.payments.WaysToPay
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -38,17 +38,31 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
   "WaysToPayController" when {
 
     "get is called" must {
-
       "return OK with view" in new Fixture {
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
-
         contentAsString(result) must include(Messages("payments.waystopay.title"))
 
       }
+    }
 
+    "post is called" must {
+      "redirect to TypeOfBankController" when {
+        "enum is bacs" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "waysToPay" -> WaysToPay.Bacs.entryName
+          )
+
+          val result = controller.post()(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be (Some(controllers.payments.routes.TypeOfBankController.get().url))
+
+        }
+      }
     }
 
   }

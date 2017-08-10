@@ -16,34 +16,23 @@
 
 package controllers.payments
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.payments.WaysToPay
-import models.payments.WaysToPay._
 
-import scala.concurrent.Future
+class TypeOfBankController @Inject()(
+                                    val authConnector: AuthConnector
+                                    ) extends BaseController{
 
-@Singleton
-class WaysToPayController @Inject()(
-                                     val authConnector: AuthConnector
-                                   ) extends BaseController{
-
-  def get() = Authorised.async {
+  def get() = Authorised.async{
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
+      ???
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Form2[WaysToPay](request.body) match {
-          case ValidForm(_, data) => data match {
-            case Bacs => Future.successful(Redirect(controllers.payments.routes.TypeOfBankController.get()))
-          }
-        }
+  def post() = Authorised.async{
+    implicit authContext => implicit request =>
+      ???
   }
 
 }

@@ -27,19 +27,20 @@ object WaysToPay extends PlayEnum[WaysToPay] {
 
   import utils.MappingUtils.Implicits._
 
-  case object `card` extends WaysToPay
-  case object `bacs` extends WaysToPay
+  case object Card extends WaysToPay
+  case object Bacs extends WaysToPay
 
   override def values = findValues
-  implicit val waysToPayReader = EnumFormatForm.reader(WaysToPay)
+
+  val pathName = "waysToPay"
 
   implicit val formRule: Rule[UrlFormEncoded, WaysToPay] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "waysToPay").read[WaysToPay].withMessage("")
+    (__ \ pathName).read(EnumFormatForm.reader(WaysToPay)).withMessage("...")
   }
 
   implicit val formWrites: Write[WaysToPay, UrlFormEncoded] = Write { __ =>
-    Map("waysToPay" -> Seq(__.entryName))
+    Map(pathName -> Seq(__.entryName))
   }
 
 }

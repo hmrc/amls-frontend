@@ -28,20 +28,20 @@ class WaysToPaySpec extends PlaySpec with GenericTestHelper  with MockitoSugar {
     "successfully validate" when {
       "on selecting card" in {
 
-        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.`card`.entryName))) must be(Valid(WaysToPay.`card`))
+        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.Card.entryName))) must be(Valid(WaysToPay.Card))
 
-        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.`bacs`.entryName))) must be(Valid(WaysToPay.`bacs`))
+        WaysToPay.formRule.validate(Map("waysToPay" -> Seq(WaysToPay.Bacs.entryName))) must be(Valid(WaysToPay.Bacs))
 
       }
     }
 
     "write correct data from enum" in {
 
-      WaysToPay.formWrites.writes(WaysToPay.`card`) must
-        be(Map("waysToPay" -> Seq("card")))
+      WaysToPay.formWrites.writes(WaysToPay.Card) must
+        be(Map("waysToPay" -> Seq(WaysToPay.Card.entryName)))
 
-      WaysToPay.formWrites.writes(WaysToPay.`bacs`) must
-        be(Map("waysToPay" -> Seq("bacs")))
+      WaysToPay.formWrites.writes(WaysToPay.Bacs) must
+        be(Map("waysToPay" -> Seq(WaysToPay.Bacs.entryName)))
 
     }
 

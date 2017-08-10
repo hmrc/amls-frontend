@@ -29,6 +29,14 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false
+    ){
+        <p>@Messages("payments.waystopay.info")</p>
+        <p>@Messages("payments.waystopay.lead.time")</p>
+    }
+
     @form(f, controllers.payments.routes.WaysToPayController.post()) {
 
         @fieldset(
@@ -43,14 +51,12 @@
                 @radio(
                     f = f("waysToPay"),
                     labelText = "payments.waystopay.card",
-                    value = "card",
-                    inline = true
+                    value = "card"
                 )
                 @radio(
                     f = f("waysToPay"),
                     labelText = "payments.waystopay.bacs",
-                    value = "bacs",
-                    inline = true
+                    value = "bacs"
                 )
             }
         }

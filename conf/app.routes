@@ -259,6 +259,9 @@ GET         /submit-application/fee-guidance                                    
 GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get()
 POST        /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.post()
 
+GET         /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.get()
+POST        /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.post()
+
 GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
 
