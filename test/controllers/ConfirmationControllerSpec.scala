@@ -445,6 +445,38 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     }
 
+    "allow a payment to be retried" in new Fixture {
+      val paymentRef = paymentRefGen.sample.get
+      val paymentsRedirectUrl = "/payments"
+      val amountInPence = (paymentAmountGen.sample.get * 100).toInt
+      val postData = "paymentRef" -> paymentRef
+
+      when {
+        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+      } thenReturn Future.successful(Some(paymentGen.sample.get.copy(reference = paymentRef, amountInPence = amountInPence)))
+
+      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(paymentsRedirectUrl)
+
+      verify(controller.paymentsConnector).createPayment(eqTo(
+        CreatePaymentRequest("other", paymentRef, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentRef))))(any(), any())
+    }
+
+    "fail if a payment cannot be retried" in new Fixture {
+      val paymentRef = paymentRefGen.sample.get
+      val postData = "paymentRef" -> paymentRef
+
+      when {
+        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+      } thenReturn Future.successful(None)
+
+      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+    }
+
     "show the correct payment confirmation page" when {
       "the application status is 'new submission'" in new Fixture {
         setupStatus(SubmissionReady)
@@ -687,7 +719,6 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
   "ConfirmationController" must {
 
     "show the old confirmation screen when the payments url lookup is toggled off" in new Fixture {
-
       val companyName = "My Test Company"
 
       val model = BusinessMatching(

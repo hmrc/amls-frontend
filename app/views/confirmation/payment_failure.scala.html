@@ -17,6 +17,8 @@
 @import include._
 @import utils.Strings.TextHelpers
 @import models.confirmation._
+@import include.forms2._
+@import forms.EmptyForm
 
 @(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages)
 
@@ -38,5 +40,10 @@
         <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
             <span class="heading-large payment-ref">@reference</span></p>
     </div>
+
+    @form(EmptyForm, controllers.routes.ConfirmationController.retryPayment()) {
+        <input type="hidden" name="paymentRef" value="@reference">
+        <input type="submit" name="submit" class="button" value="@messages("confirmation.payment.button.retry")">
+    }
 }
 
