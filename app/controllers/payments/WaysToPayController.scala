@@ -18,13 +18,15 @@ package controllers.payments
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.PayApiConnector
-import controllers.BaseController
+import controllers.{BaseController, routes}
 import forms.{EmptyForm, Form2, ValidForm}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.payments.WaysToPay
+import models.payments.{CreatePaymentResponse, WaysToPay}
 import models.payments.WaysToPay._
-import services.{PaymentsService, StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 
 import scala.concurrent.Future
 
@@ -34,7 +36,8 @@ class WaysToPayController @Inject()(
                                      val paymentsConnector: PayApiConnector,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
-                                     val submissionResponseService: SubmissionResponseService
+                                     val submissionResponseService: SubmissionResponseService,
+                                     val authEnrolmentsService: AuthEnrolmentsService
                                    ) extends BaseController{
 
   def get() = Authorised.async {
@@ -47,6 +50,17 @@ class WaysToPayController @Inject()(
       implicit request =>
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
+            case Card => {
+              (for {
+                data@(payRef, total, rows, difference) <- OptionT(paymentsService.getAmendmentFees)
+                amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+                paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
+                  data,
+                  controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,
+                  amlsRefNo
+                ))
+              } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse Redirect(CreatePaymentResponse.default.links.nextUrl)
+            }
             case Bacs => Future.successful(Redirect(controllers.payments.routes.TypeOfBankController.get()))
           }
         }

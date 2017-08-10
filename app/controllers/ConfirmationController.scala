@@ -167,7 +167,7 @@ trait ConfirmationController extends BaseController {
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
-      case SubmissionReadyForReview => showPostSubmissionConfirmation(getAmendmentFees, status)
+      case SubmissionReadyForReview => showPostSubmissionConfirmation(paymentsService.getAmendmentFees, status)
       case SubmissionDecisionApproved => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
       case _ =>
@@ -192,20 +192,6 @@ trait ConfirmationController extends BaseController {
 
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
-
-  private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionResponseService.getAmendment flatMap {
-      case Some((paymentRef, total, rows, difference)) =>
-        Future.successful(
-          (difference, paymentRef) match {
-            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, difference))
-            case _ => None
-          }
-        )
-      case None => Future.failed(new Exception("Cannot get data from amendment submission"))
-    }
-  }
-
 
   private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
                                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {

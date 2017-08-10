@@ -30,7 +30,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{PaymentsService, StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -46,7 +46,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       paymentsConnector = mock[PayApiConnector],
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
-      submissionResponseService = mock[SubmissionResponseService]
+      submissionResponseService = mock[SubmissionResponseService],
+      authEnrolmentsService = mock[AuthEnrolmentsService]
     )
 
     val paymentRefNo = "XA000000000000"
@@ -92,19 +93,24 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
+          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
+
           when {
             controller.statusService.getStatus(any(), any(), any())
           } thenReturn Future.successful(SubmissionReadyForReview)
 
           when {
-            controller.submissionResponseService.getAmendment(any(), any(), any())
-          } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))))
+            controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+          when {
+            controller.paymentsService.getAmendmentFees(any(), any())
+          } thenReturn Future.successful(Some(data))
 
           when {
             controller.paymentsService.requestPaymentsUrl(
-              (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))),
-              "/paymentConfirmation",
-              amlsRegistrationNumber)(any(),any(),any(),any())
+              eqTo(data), eqTo("/payments"), eqTo(amlsRegistrationNumber)
+            )(any(),any(),any(),any())
           } thenReturn Future.successful(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber)))
 
           val result = controller.post()(postRequest)
@@ -116,8 +122,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           })(any(), any())
 
           verify(controller.paymentsService).requestPaymentsUrl(
-            (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))),
-            "/paymentConfirmation",
+            data,
+            "/payments",
             amlsRegistrationNumber
           )(any(),any(),any(),any())
 

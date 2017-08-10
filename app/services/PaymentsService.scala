@@ -34,7 +34,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class PaymentsService @Inject()(
                                val amlsConnector: AmlsConnector,
-                               val paymentsConnector: PayApiConnector
+                               val paymentsConnector: PayApiConnector,
+                               val submissionResponseService: SubmissionResponseService
                                ){
 
   type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
@@ -75,6 +76,19 @@ class PaymentsService @Inject()(
     } yield payment.status).value flatMap {
       case Some(CREATED) => Future.successful(response)
       case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
+    }
+  }
+
+  def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+    submissionResponseService.getAmendment flatMap {
+      case Some((paymentRef, total, rows, difference)) =>
+        Future.successful(
+          (difference, paymentRef) match {
+            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, difference))
+            case _ => None
+          }
+        )
+      case None => Future.failed(new Exception("Cannot get data from amendment submission"))
     }
   }
 
