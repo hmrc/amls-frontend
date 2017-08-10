@@ -29,7 +29,7 @@ import models.status._
 import models.ReadStatusResponse
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
-import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.BusinessName
@@ -51,6 +51,8 @@ trait ConfirmationController extends BaseController {
   private[controllers] val authEnrolmentsService: AuthEnrolmentsService
 
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
+
+  private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
 
   val statusService: StatusService
 
@@ -110,7 +112,7 @@ trait ConfirmationController extends BaseController {
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
           oldPayment <- OptionT(amlsConnector.getPaymentByReference(paymentRef))
           amlsRefNumber <- OptionT.fromOption[Future](oldPayment.amlsRefNo) orElse OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          newPayment <- OptionT.liftF(paymentsUrlOrDefault(
+          newPayment <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
             paymentRef,
             oldPayment.amountInPence.toDouble / 100,
             controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
@@ -137,7 +139,7 @@ trait ConfirmationController extends BaseController {
     for {
       fees@(payRef, total, rows, _) <- OptionT(getVariationOrRenewalFees)
       amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
+      paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -152,7 +154,7 @@ trait ConfirmationController extends BaseController {
     for {
       fees@(payRef, total, rows, difference) <- OptionT(getFees)
       amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
+      paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
     } yield {
       val feeToPay = status match {
         case SubmissionReadyForReview | RenewalSubmitted(_) => difference
@@ -171,7 +173,7 @@ trait ConfirmationController extends BaseController {
       case _ =>
         for {
           (paymentRef, total, rows, amlsRefNo) <- OptionT.liftF(submissionResponseService.getSubscription)
-          paymentsRedirect <- OptionT.liftF(requestPaymentsUrl(
+          paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
             (paymentRef, total, rows, None),
             routes.ConfirmationController.paymentConfirmation(paymentRef).url,
             amlsRefNo
@@ -191,51 +193,15 @@ trait ConfirmationController extends BaseController {
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def requestPaymentsUrl(data: ViewData, returnUrl: String, amlsRefNo: String)
-                                (implicit hc: HeaderCarrier,
-                                 ec: ExecutionContext,
-                                 authContext: AuthContext,
-                                 request: Request[_]): Future[CreatePaymentResponse] =
-    data match {
-      case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
-      case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
-      case _ => Future.successful(CreatePaymentResponse.default)
-    }
-
-  private def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String, amlsRefNo: String)
-                                  (implicit hc: HeaderCarrier,
-                                   ec: ExecutionContext,
-                                   authContext: AuthContext,
-                                   request: Request[_]): Future[CreatePaymentResponse] = {
-
-    val amountInPence = (amount * 100).toInt
-
-    paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
-      case Some(response) => savePaymentBeforeResponse(response, amlsRefNo)
-      case _ =>
-        Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
-        Future.successful(CreatePaymentResponse.default)
-    }
-  }
-
-  private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String)(implicit hc: HeaderCarrier, authContext: AuthContext) = {
-    (for {
-      paymentId <- OptionT.fromOption[Future](response.paymentId)
-      payment <- OptionT.liftF(amlsConnector.savePayment(paymentId, amlsRefNo))
-    } yield payment.status).value flatMap {
-      case Some(CREATED) => Future.successful(response)
-      case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
-    }
-  }
-
   private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
     submissionResponseService.getAmendment flatMap {
       case Some((paymentRef, total, rows, difference)) =>
-        (difference, paymentRef) match {
-          case (Some(currency), Some(payRef)) if currency.value > 0 =>
-            Future.successful(Some((payRef, total, rows, difference)))
-          case _ => Future.successful(None)
-        }
+        Future.successful(
+          (difference, paymentRef) match {
+            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, difference))
+            case _ => None
+          }
+        )
       case None => Future.failed(new Exception("Cannot get data from amendment submission"))
     }
   }

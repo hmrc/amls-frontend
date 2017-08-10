@@ -18,17 +18,23 @@ package controllers.payments
 
 import javax.inject.{Inject, Singleton}
 
+import connectors.PayApiConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, ValidForm}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import models.payments.WaysToPay
 import models.payments.WaysToPay._
+import services.{PaymentsService, StatusService, SubmissionResponseService}
 
 import scala.concurrent.Future
 
 @Singleton
 class WaysToPayController @Inject()(
-                                     val authConnector: AuthConnector
+                                     val authConnector: AuthConnector,
+                                     val paymentsConnector: PayApiConnector,
+                                     val statusService: StatusService,
+                                     val paymentsService: PaymentsService,
+                                     val submissionResponseService: SubmissionResponseService
                                    ) extends BaseController{
 
   def get() = Authorised.async {
