@@ -18,6 +18,7 @@ package controllers.payments
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.i18n.Messages
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -43,6 +44,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
         val result = controller.get()(request)
 
         status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("payments.waystopay.title"))
 
       }
 

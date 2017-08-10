@@ -19,6 +19,7 @@ package controllers.payments
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -30,7 +31,7 @@ class WaysToPayController @Inject()(
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok)
+      Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
   }
 
   def post() = Authorised.async {
