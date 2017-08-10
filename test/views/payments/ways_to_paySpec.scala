@@ -33,22 +33,31 @@ class ways_to_paySpec extends GenericTestHelper with MustMatchers {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
-      val form2 = EmptyForm
+      def view = views.html.payments.ways_to_pay(EmptyForm)
 
-      def view = views.html.payments.ways_to_pay()
+      doc.title must startWith(Messages("payments.waystopay.title"))
+      heading.html must be(Messages("payments.waystopay.header"))
+      subHeading.html must include(Messages("submit.registration"))
 
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
-        ))
+      val form2: InvalidForm = InvalidForm(Map.empty, Seq(
+        (Path \ "waysToPay") -> Seq(ValidationError("not a message Key"))
+      ))
 
-      def view = views.html.payments.ways_to_pay()
+      def view = views.html.payments.ways_to_pay(form2)
+
+      errorSummary.html() must include("not a message Key")
+    }
+
+    "display all fields" in new ViewFixture {
+
+      def view = views.html.payments.ways_to_pay(EmptyForm)
+
+      doc.getElementsByAttributeValue("for", "waysToPay-card") must not be empty
+      doc.getElementsByAttributeValue("for", "waysToPay-bacs") must not be empty
 
     }
   }

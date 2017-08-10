@@ -736,6 +736,12 @@ confirmation.payment.failed.header = Something went wrong with your payment
 confirmation.payment.failed.reason.failure = Your payment failed
 confirmation.payment.failed.info = We’ve definitely received your application, but there has been a problem taking your payment. Your application won’t be reviewed until the fee has been paid.
 
+payments.waystopay.title = How do you want to pay your fee?
+payments.waystopay.header = How do you want to pay your fee?
+
+payments.waystopay.card = Debit or credit card
+payments.waystopay.bacs = Bacs
+
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service

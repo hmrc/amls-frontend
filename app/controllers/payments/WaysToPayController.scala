@@ -33,4 +33,9 @@ class WaysToPayController @Inject()(
       Future.successful(Ok)
   }
 
+  def post() = Authorised.async {
+    implicit authContext => implicit request =>
+      ???
+  }
+
 }

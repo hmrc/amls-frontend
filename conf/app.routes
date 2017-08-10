@@ -256,6 +256,9 @@ GET         /update-information/nominated-officer                               
 
 GET         /submit-application/fee-guidance                                          @controllers.FeeGuidanceController.get()
 
+GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get()
+POST        /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.post()
+
 GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
 
