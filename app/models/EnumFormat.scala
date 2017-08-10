@@ -16,7 +16,9 @@
 
 package models
 
+import cats.data.Validated.{Invalid, Valid}
 import enumeratum.{Enum, EnumEntry}
+import jto.validation.{Rule, ValidationError => FormValidationError}
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
@@ -32,4 +34,11 @@ object EnumFormat {
     },
     Writes(v => JsString(v.entryName))
   )
+}
+
+object EnumFormatForm {
+  def reader[T <: EnumEntry](e: Enum[T]) = Rule.fromMapping[String, T] {
+    case s if e.withNameOption(s).isDefined => Valid(e.withName(s))
+    case _ => Invalid(List(FormValidationError("error")))
+  }
 }

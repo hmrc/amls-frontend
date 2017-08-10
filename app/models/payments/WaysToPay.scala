@@ -19,6 +19,7 @@ package models.payments
 import enumeratum._
 import jto.validation.{From, Rule, Write}
 import jto.validation.forms.UrlFormEncoded
+import models.EnumFormatForm
 
 sealed abstract class WaysToPay extends EnumEntry
 
@@ -30,6 +31,7 @@ object WaysToPay extends PlayEnum[WaysToPay] {
   case object `bacs` extends WaysToPay
 
   override def values = findValues
+  implicit val waysToPayReader = EnumFormatForm.reader(WaysToPay)
 
   implicit val formRule: Rule[UrlFormEncoded, WaysToPay] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
