@@ -73,7 +73,7 @@ trait ConfirmationController extends BaseController {
       implicit request =>
 
         def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
-          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")){ r => BusinessName.getName(r.safeId) }
+          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
 
         val msgFromPaymentStatus = Map[PaymentStatus, String](
           PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
@@ -93,7 +93,7 @@ trait ConfirmationController extends BaseController {
           case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
 
-          case (ReadyForRenewal(_), _) => if(renewalData.isDefined) {
+          case (ReadyForRenewal(_), _) => if (renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
@@ -106,7 +106,8 @@ trait ConfirmationController extends BaseController {
   }
 
   def retryPayment = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         val result = for {
           form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
@@ -123,28 +124,17 @@ trait ConfirmationController extends BaseController {
   }
 
   private def isRenewalDefined(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Boolean] = {
-     dataCacheConnector.fetch[Renewal](Renewal.key).map ( _.isDefined)
-  }
-
-  private def getVariationOrRenewalFees(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    getRenewalOrVariationData(
-      isRenewalDefined flatMap {
-        case true => submissionResponseService.getRenewal
-        case false => submissionResponseService.getVariation
-      }
-    )
+    dataCacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
   }
 
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, _) <- OptionT(getVariationOrRenewalFees)
-      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
+      _@(payRef, total, rows, _) <- OptionT(submissionResponseService.getSubmissionData)
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
-        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
-        case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), paymentsRedirect.links.nextUrl))
+        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url))
+        case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url))
       }
     }
   }
@@ -152,15 +142,13 @@ trait ConfirmationController extends BaseController {
   private def showPostSubmissionConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, Right(difference)) <- OptionT(getFees)
-      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
+      _@(payRef, total, rows, Right(difference)) <- OptionT(getFees)
     } yield {
       val feeToPay = status match {
         case SubmissionReadyForReview | RenewalSubmitted(_) => difference
         case _ => Some(total)
       }
-      Ok(confirm_amendvariation(payRef, total, rows, feeToPay, paymentsRedirect.links.nextUrl))
+      Ok(confirm_amendvariation(payRef, total, rows, feeToPay, controllers.payments.routes.WaysToPayController.get().url))
     }
   }
 
@@ -168,22 +156,16 @@ trait ConfirmationController extends BaseController {
 
     val maybeResult = status match {
       case SubmissionReadyForReview => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
-      case SubmissionDecisionApproved => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
+      case SubmissionDecisionApproved => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
-      case _ =>
-        for {
-          (paymentRef, total, rows, Left(amlsRefNo)) <- OptionT.liftF(submissionResponseService.getSubscription)
-          paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
-            (paymentRef, total, rows, Right(None)),
-            routes.ConfirmationController.paymentConfirmation(paymentRef).url,
-            amlsRefNo
-          ))
-        } yield {
+      case _ => OptionT.liftF(submissionResponseService.getSubscription map {
+        case (paymentRef, total, rows, Left(_)) => {
           ApplicationConfig.paymentsUrlLookupToggle match {
-            case true => Ok(confirmation_new(paymentRef, total, rows, paymentsRedirect.links.nextUrl))
+            case true => Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
             case _ => Ok(confirmation(paymentRef, total, rows))
           }
         }
+      })
     }
 
     lazy val noFeeResult = for {
@@ -200,7 +182,7 @@ trait ConfirmationController extends BaseController {
         paymentRef match {
           case Some(payRef) if total.value > 0 => Some((payRef, total, rows, Right(difference)))
           case _ => None
-      })
+        })
       case None => Future.failed(new Exception("Cannot get data from submission"))
     }
   }
