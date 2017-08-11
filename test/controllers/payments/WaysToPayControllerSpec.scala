@@ -108,26 +108,19 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           } thenReturn Future.successful(Some(data))
 
           when {
-            controller.paymentsService.requestPaymentsUrl(
-              eqTo(data), eqTo("/payments"), eqTo(amlsRegistrationNumber)
-            )(any(),any(),any(),any())
+            controller.paymentsService.requestPaymentsUrl(any(),any(),any())(any(),any(),any(),any())
           } thenReturn Future.successful(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber)))
 
           val result = controller.post()(postRequest)
           val body = contentAsString(result)
 
-          //noinspection ScalaStyle
-          verify(controller.paymentsConnector).createPayment(eqTo{
-            CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", 10000, paymentsReturnLocation(paymentRefNo))
-          })(any(), any())
-
           verify(controller.paymentsService).requestPaymentsUrl(
-            data,
-            "/payments",
-            amlsRegistrationNumber
+            eqTo(data),
+            eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).url),
+            eqTo(amlsRegistrationNumber)
           )(any(),any(),any(),any())
 
-          redirectLocation(result) mustBe "/payments"
+          redirectLocation(result) mustBe Some("/payments")
         }
 
       }
