@@ -104,7 +104,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
+      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {
@@ -695,7 +695,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
+      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {

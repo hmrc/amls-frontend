@@ -16,11 +16,14 @@
 
 package services
 
+import cats.implicits._
+import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,12 +37,16 @@ sealed case class RowEntity(message: String, feePer: BigDecimal)
 
 trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
+  private[services] val statusService: StatusService
+
+  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
+
   def getSubscription
   (implicit
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow], String)] =
+  ): Future[SubmissionData] =
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -55,7 +62,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val total = subscription.getTotalFees
           val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
           val amlsRefNo = subscription.amlsRefNo
-          Future.successful((paymentReference, Currency.fromBD(total), rows, amlsRefNo))
+          Future.successful((paymentReference, Currency.fromBD(total), rows, Left(amlsRefNo)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
@@ -120,18 +127,18 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
   private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
     for {
       cache <- option
-      amendment <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+      amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
       premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
       people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
       businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       businessActivities <- businessMatching.activities
     } yield {
-      val subQuantity = subscriptionQuantity(amendment)
-      val total = amendment.totalFees
-      val difference = amendment.difference map Currency.fromBD
+      val subQuantity = subscriptionQuantity(amendmentResponse)
+      val total = amendmentResponse.totalFees
+      val difference = amendmentResponse.difference map Currency.fromBD
       val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
-      val rows = getBreakdownRows(amendment, filteredPremises, people, businessActivities, subQuantity)
-      val paymentRef = amendment.paymentReference
+      val rows = getBreakdownRows(amendmentResponse, filteredPremises, people, businessActivities, subQuantity)
+      val paymentRef = amendmentResponse.paymentReference
       Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }
   }
@@ -149,10 +156,13 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
 
     def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleVariationRow(renewal), renewalPeopleFee)
+
     def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
 
-    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesVariationRow(renewal), renewalFullPremisesFee)
+    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesVariationRow(renewal), fullPremisesFee)
+
     def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), renewalHalfYearPremisesFee)
+
     def tpZeroRow: Seq[BreakdownRow] = renewalRow(renewal.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
     rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
@@ -215,7 +225,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     def tpFullYearRow: Seq[BreakdownRow] = variationRow(
       variationRenewalResponse.addedFullYearTradingPremises,
       premisesVariationRow(variationRenewalResponse),
-      renewalFullPremisesFee
+      fullPremisesFee
     )
 
     def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
@@ -244,8 +254,9 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       (if (notFP > 0) {
         Seq(
           BreakdownRow(peopleVariationRow(variationResponse).message, notFP, peopleVariationRow(variationResponse).feePer, Currency.fromBD(variationResponse.getFpFee.getOrElse(0)))
-        )} else {
-          Seq.empty
+        )
+      } else {
+        Seq.empty
       }) ++ (if (passedFP > 0) {
         Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
       } else {
@@ -254,6 +265,42 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
     } else {
       Seq.empty
+    }
+  }
+
+  private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+    getAmendment flatMap {
+      case Some((paymentRef, total, rows, difference)) =>
+        Future.successful(
+          (difference, paymentRef) match {
+            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, Right(difference)))
+            case _ => None
+          }
+        )
+      case None => Future.failed(new Exception("Cannot get data from amendment submission"))
+    }
+  }
+
+  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
+                                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+    getData flatMap {
+      case Some((paymentRef, total, rows, difference)) => Future.successful(
+        paymentRef match {
+          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, Right(difference)))
+          case _ => None
+        })
+      case None => Future.failed(new Exception("Cannot get data from submission"))
+    }
+  }
+
+  def getSubmissionData(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+    statusService.getStatus flatMap {
+      case SubmissionReadyForReview => getAmendmentFees
+      case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
+      case ReadyForRenewal(_) => getRenewalOrVariationData(getRenewal)
+      case _ => getSubscription map {
+        case (payRef, total, breakdown, amlsRefNo@Left(_)) => (payRef, total, breakdown, amlsRefNo).some
+      }
     }
   }
 
@@ -270,6 +317,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 object SubmissionResponseService extends SubmissionResponseService {
   // $COVERAGE-OFF$
   override private[services] val cacheConnector = DataCacheConnector
+  override private[services] val statusService = StatusService
 }
 
 sealed trait FeeCalculations {
@@ -299,7 +347,7 @@ sealed trait FeeCalculations {
   def renewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     (premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises) + renewalHalfYearPremisesFee(renewal)
 
-  def renewalFullPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
+  def fullPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     premisesVariationRow(renewal).feePer * renewal.addedFullYearTradingPremises
 
   def renewalHalfYearPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =

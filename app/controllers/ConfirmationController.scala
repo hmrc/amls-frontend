@@ -56,7 +56,7 @@ trait ConfirmationController extends BaseController {
 
   val statusService: StatusService
 
-  type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
+  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -149,10 +149,10 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def showPostSubmissionConfirmation(getFees: Future[Option[ViewData]], status: SubmissionStatus)
+  private def showPostSubmissionConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      fees@(payRef, total, rows, difference) <- OptionT(getFees)
+      fees@(payRef, total, rows, Right(difference)) <- OptionT(getFees)
       amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
       paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(fees, routes.ConfirmationController.paymentConfirmation(payRef).url, amlsRefNo))
     } yield {
@@ -167,14 +167,14 @@ trait ConfirmationController extends BaseController {
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
-      case SubmissionReadyForReview => showPostSubmissionConfirmation(paymentsService.getAmendmentFees, status)
+      case SubmissionReadyForReview => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
       case SubmissionDecisionApproved => showPostSubmissionConfirmation(getVariationOrRenewalFees, status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
       case _ =>
         for {
-          (paymentRef, total, rows, amlsRefNo) <- OptionT.liftF(submissionResponseService.getSubscription)
+          (paymentRef, total, rows, Left(amlsRefNo)) <- OptionT.liftF(submissionResponseService.getSubscription)
           paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
-            (paymentRef, total, rows, None),
+            (paymentRef, total, rows, Right(None)),
             routes.ConfirmationController.paymentConfirmation(paymentRef).url,
             amlsRefNo
           ))
@@ -194,11 +194,11 @@ trait ConfirmationController extends BaseController {
   }
 
   private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
-                                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
+                                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[SubmissionData]] = {
     getData flatMap {
       case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, difference))
+          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, Right(difference)))
           case _ => None
       })
       case None => Future.failed(new Exception("Cannot get data from submission"))

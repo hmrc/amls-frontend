@@ -16,14 +16,11 @@
 
 package controllers.payments
 
-import connectors.{PayApiConnector, PaymentsConnector}
+import connectors.PayApiConnector
 import generators.AmlsReferenceNumberGenerator
 import models.confirmation.Currency
 import models.payments._
-import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.joda.time.LocalDate
-import org.jsoup.Jsoup
+import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
@@ -31,15 +28,21 @@ import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 
     val request = addToken(authRequest)
+
+    implicit val hc: HeaderCarrier = new HeaderCarrier()
+    implicit val ac: AuthContext = mock[AuthContext]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new WaysToPayController(
       authConnector = self.authConnector,
@@ -87,24 +90,20 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       }
 
       "enum is card" must {
-        "go to the payments url for an amendment" in new Fixture {
+        "go to the payments url" in new Fixture {
 
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
-          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
-
-          when {
-            controller.statusService.getStatus(any(), any(), any())
-          } thenReturn Future.successful(SubmissionReadyForReview)
+          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
 
           when {
             controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
           } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
           when {
-            controller.paymentsService.getAmendmentFees(any(), any())
+            controller.submissionResponseService.getSubmissionData(any(),any(),any())
           } thenReturn Future.successful(Some(data))
 
           when {
@@ -123,6 +122,31 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           redirectLocation(result) mustBe Some("/payments")
         }
 
+        "go to the default payments url when submission data cannot be retrieved" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "waysToPay" -> WaysToPay.Card.entryName
+          )
+
+          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
+
+          when {
+            controller.statusService.getStatus(any(), any(), any())
+          } thenReturn Future.successful(SubmissionReadyForReview)
+
+          when {
+            controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+          when {
+            controller.submissionResponseService.getSubmissionData(any(),any(),any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.post()(postRequest)
+          val body = contentAsString(result)
+
+          redirectLocation(result) mustBe Some(CreatePaymentResponse.default.links.nextUrl)
+        }
       }
     }
 

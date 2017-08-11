@@ -21,12 +21,12 @@ import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.PayApiConnector
-import controllers.{BaseController, routes}
+import controllers.BaseController
 import forms.{EmptyForm, Form2, ValidForm}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.payments.{CreatePaymentResponse, WaysToPay}
 import models.payments.WaysToPay._
+import models.payments.{CreatePaymentResponse, WaysToPay}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
@@ -52,7 +52,7 @@ class WaysToPayController @Inject()(
           case ValidForm(_, data) => data match {
             case Card => {
               (for {
-                data@(payRef,_,_,_) <- OptionT(paymentsService.getAmendmentFees)
+                data@(payRef,_,_,_) <- OptionT(submissionResponseService.getSubmissionData)
                 amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
                 paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
                   data,

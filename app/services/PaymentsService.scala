@@ -23,6 +23,7 @@ import cats.data.OptionT
 import connectors.{AmlsConnector, PayApiConnector}
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, ReturnLocation}
+import models.status.SubmissionReadyForReview
 import play.api.{Logger, Play}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,19 +36,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PaymentsService @Inject()(
                                val amlsConnector: AmlsConnector,
                                val paymentsConnector: PayApiConnector,
-                               val submissionResponseService: SubmissionResponseService
+                               val submissionResponseService: SubmissionResponseService,
+                               val statusService: StatusService
                                ){
 
-  type ViewData = (String, Currency, Seq[BreakdownRow], Option[Currency])
+  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
-  def requestPaymentsUrl(data: ViewData, returnUrl: String, amlsRefNo: String)
+  def requestPaymentsUrl(data: SubmissionData, returnUrl: String, amlsRefNo: String)
                                 (implicit hc: HeaderCarrier,
                                  ec: ExecutionContext,
                                  authContext: AuthContext,
                                  request: Request[_]): Future[CreatePaymentResponse] =
     data match {
-      case (ref, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
-      case (ref, total, _, None) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
+      case (ref, _, _, Right(Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
+      case (ref, total, _, Right(None)) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 
@@ -76,19 +78,6 @@ class PaymentsService @Inject()(
     } yield payment.status).value flatMap {
       case Some(CREATED) => Future.successful(response)
       case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
-    }
-  }
-
-  def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[ViewData]] = {
-    submissionResponseService.getAmendment flatMap {
-      case Some((paymentRef, total, rows, difference)) =>
-        Future.successful(
-          (difference, paymentRef) match {
-            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, difference))
-            case _ => None
-          }
-        )
-      case None => Future.failed(new Exception("Cannot get data from amendment submission"))
     }
   }
 
