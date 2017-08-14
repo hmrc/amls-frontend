@@ -24,6 +24,7 @@ import controllers.BaseController
 import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankDetailsController @Inject()(
