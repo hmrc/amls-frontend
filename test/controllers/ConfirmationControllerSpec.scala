@@ -38,7 +38,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -49,11 +49,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
+  val mockAmlsConnector = mock[AmlsConnector]
+  val paymentsService = new PaymentsService(mockAmlsConnector, paymentsConnector, mock[SubmissionResponseService],mock[StatusService])
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
+    .bindings(bind[PaymentsService].to(paymentsService))
     .configure("microservice.services.feature-toggle.payments-url-lookup" -> true)
     .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
     .build()
@@ -75,7 +78,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
-      override val amlsConnector = mock[AmlsConnector]
+      override val amlsConnector = mockAmlsConnector
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
@@ -122,15 +125,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
 
     when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByReference(any())(any(), any(), any())
+      mockAmlsConnector.getPaymentByReference(any())(any(), any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any())(any(), any(), any())
+      mockAmlsConnector.savePayment(any(), any())(any(), any(), any())
     } thenReturn {
       Future.successful(HttpResponse(CREATED))
     }
@@ -379,14 +382,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "allow a payment to be retried" in new Fixture {
+
       val paymentRef = paymentRefGen.sample.get
       val paymentsRedirectUrl = "/payments"
       val amountInPence = (paymentAmountGen.sample.get * 100).toInt
       val postData = "paymentRef" -> paymentRef
+      val payment = paymentGen.sample.get
 
       when {
-        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
-      } thenReturn Future.successful(Some(paymentGen.sample.get.copy(reference = paymentRef, amountInPence = amountInPence)))
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+      } thenReturn Future.successful(Some(payment.copy(reference = paymentRef, amountInPence = amountInPence)))
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
@@ -402,7 +407,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val postData = "paymentRef" -> paymentRef
 
       when {
-        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -541,14 +546,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val result = controller.paymentConfirmation(payment.reference)(request)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
@@ -560,14 +565,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val result = controller.paymentConfirmation(payment.reference)(request)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }
