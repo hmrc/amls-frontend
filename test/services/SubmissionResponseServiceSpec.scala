@@ -851,7 +851,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(0)
 
-          val data = (paymentRefNo, currency, Seq(
+          val data = (Some(paymentRefNo), currency, Seq(
             BreakdownRow("confirmation.submission", 0, 0, 0),
             BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
           ), Left(amlsRegistrationNumber))
@@ -882,7 +882,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (paymentRefNo, currency, Seq(
+          val data = (Some(paymentRefNo), currency, Seq(
             BreakdownRow("confirmation.submission", 1, 100, 100),
             BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
           ), Right(Some(currency)))
@@ -913,7 +913,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (paymentRefNo, currency, Seq(), Right(Some(currency)))
+          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
@@ -933,7 +933,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (paymentRefNo, currency, Seq(), Right(Some(currency)))
+          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)

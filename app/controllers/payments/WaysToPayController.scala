@@ -52,8 +52,9 @@ class WaysToPayController @Inject()(
           case ValidForm(_, data) => data match {
             case Card => {
               (for {
-                data@(payRef,_,_,_) <- OptionT(submissionResponseService.getSubmissionData)
+                data@(paymentReference,_,_,_) <- OptionT(submissionResponseService.getSubmissionData)
                 amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+                payRef <- OptionT.fromOption[Future](paymentReference)
                 paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
                   data,
                   controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,

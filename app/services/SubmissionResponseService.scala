@@ -39,7 +39,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
   private[services] val statusService: StatusService
 
-  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
+  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def getSubscription
   (implicit
@@ -62,7 +62,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val total = subscription.getTotalFees
           val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
           val amlsRefNo = subscription.amlsRefNo
-          Future.successful((paymentReference, Currency.fromBD(total), rows, Left(amlsRefNo)))
+          Future.successful((paymentReference.some, Currency.fromBD(total), rows, Left(amlsRefNo)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
@@ -273,7 +273,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       case Some((paymentRef, total, rows, difference)) =>
         Future.successful(
           (difference, paymentRef) match {
-            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((payRef, total, rows, Right(difference)))
+            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((paymentRef, total, rows, Right(difference)))
             case _ => None
           }
         )
@@ -286,7 +286,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     getData flatMap {
       case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, Right(difference)))
+          case Some(payRef) if total.value > 0 => Some((paymentRef, total, rows, Right(difference)))
           case _ => None
         })
       case None => Future.failed(new Exception("Cannot get data from submission"))
@@ -295,7 +295,10 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
   def getSubmissionData(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     statusService.getStatus flatMap {
-      case SubmissionReadyForReview => getAmendmentFees
+      case SubmissionReadyForReview => {
+        println(">>>>")
+        getAmendmentFees
+      }
       case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
       case ReadyForRenewal(_) => getRenewalOrVariationData(getRenewal)
       case _ => getSubscription map {

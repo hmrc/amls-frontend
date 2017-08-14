@@ -40,7 +40,7 @@ class PaymentsService @Inject()(
                                val statusService: StatusService
                                ){
 
-  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
+  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def requestPaymentsUrl(data: SubmissionData, returnUrl: String, amlsRefNo: String)
                                 (implicit hc: HeaderCarrier,
@@ -48,12 +48,12 @@ class PaymentsService @Inject()(
                                  authContext: AuthContext,
                                  request: Request[_]): Future[CreatePaymentResponse] =
     data match {
-      case (ref, _, _, Right(Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
-      case (ref, total, _, Right(None)) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
+      case (Some(ref), _, _, Right(Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
+      case (Some(ref), total, _, Right(None)) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 
-  def paymentsUrlOrDefault(ref: String, amount: Double, returnUrl: String, amlsRefNo: String)
+  def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String)
                                   (implicit hc: HeaderCarrier,
                                    ec: ExecutionContext,
                                    authContext: AuthContext,
@@ -62,7 +62,7 @@ class PaymentsService @Inject()(
 
     val amountInPence = (amount * 100).toInt
 
-    paymentsConnector.createPayment(CreatePaymentRequest("other", ref, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
+    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
       case Some(response) => savePaymentBeforeResponse(response, amlsRefNo)
       case _ =>
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")

@@ -56,8 +56,6 @@ trait ConfirmationController extends BaseController {
 
   val statusService: StatusService
 
-  type SubmissionData = (String, Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
-
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -66,7 +64,9 @@ trait ConfirmationController extends BaseController {
           result <- resultFromStatus(status)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
+
   }
+  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
@@ -129,7 +129,7 @@ trait ConfirmationController extends BaseController {
 
   private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      _@(payRef, total, rows, _) <- OptionT(submissionResponseService.getSubmissionData)
+      _@(Some(payRef), total, rows, _) <- OptionT(submissionResponseService.getSubmissionData)
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -142,7 +142,7 @@ trait ConfirmationController extends BaseController {
   private def showPostSubmissionConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      _@(payRef, total, rows, Right(difference)) <- OptionT(getFees)
+      _@(Some(payRef), total, rows, Right(difference)) <- OptionT(getFees)
     } yield {
       val feeToPay = status match {
         case SubmissionReadyForReview | RenewalSubmitted(_) => difference
@@ -159,7 +159,7 @@ trait ConfirmationController extends BaseController {
       case SubmissionDecisionApproved => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
-        case (paymentRef, total, rows, Left(_)) => {
+        case (Some(paymentRef), total, rows, Left(_)) => {
           ApplicationConfig.paymentsUrlLookupToggle match {
             case true => Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
             case _ => Ok(confirmation(paymentRef, total, rows))
@@ -180,7 +180,7 @@ trait ConfirmationController extends BaseController {
     getData flatMap {
       case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef, total, rows, Right(difference)))
+          case Some(payRef) if total.value > 0 => Some((payRef.some, total, rows, Right(difference)))
           case _ => None
         })
       case None => Future.failed(new Exception("Cannot get data from submission"))

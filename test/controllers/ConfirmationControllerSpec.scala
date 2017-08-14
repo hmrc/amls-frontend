@@ -104,7 +104,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
+      Future.successful((Some(paymentRefNo), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {
@@ -196,10 +196,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when {
           controller.submissionResponseService.getSubmissionData(any(),any(),any())
-        } thenReturn Future.successful(Some((paymentRefNo, Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+        } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+
+        println("....")
 
         val result = controller.get()(request)
         status(result) mustBe OK
+
+        println(contentAsString(result))
 
         Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
@@ -213,7 +217,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         when {
           controller.submissionResponseService.getSubmissionData(any(),any(),any())
-        } thenReturn Future.successful(Some((paymentRefNo, Currency.fromInt(0), Seq(), Right(None))))
+        } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(None))))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -624,7 +628,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
+      Future.successful((Some(paymentRefNo), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {

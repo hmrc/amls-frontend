@@ -96,7 +96,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
-          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
+          val data = (Some(paymentRefNo), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
 
           when {
             controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
