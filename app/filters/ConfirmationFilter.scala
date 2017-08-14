@@ -35,6 +35,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     val exclusionSet = Seq(
       controllers.routes.LandingController.get().url,
       controllers.routes.ConfirmationController.get().url,
+      controllers.payments.routes.WaysToPayController.get().url,
       "/pay-online/other-taxes",
       "/confirmation/payment-complete"
     )

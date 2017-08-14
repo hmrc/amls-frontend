@@ -286,7 +286,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     getData flatMap {
       case Some((paymentRef, total, rows, difference)) => Future.successful(
         paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((paymentRef, total, rows, Right(difference)))
+          case Some(_) if total.value > 0 => Some((paymentRef, total, rows, Right(difference)))
           case _ => None
         })
       case None => Future.failed(new Exception("Cannot get data from submission"))

@@ -19,7 +19,7 @@ package modules
 import com.google.inject.AbstractModule
 import config.WSHttp
 import connectors._
-import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.http.HttpPost
 
 class Module extends AbstractModule {
@@ -35,6 +35,7 @@ class Module extends AbstractModule {
     bind(classOf[ProgressService]).toInstance(ProgressService)
     bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
     bind(classOf[StatusService]).toInstance(StatusService)
+    bind(classOf[SubmissionResponseService]).toInstance(SubmissionResponseService)
     bind(classOf[AuthEnrolmentsService]).toInstance(AuthEnrolmentsService)
     bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
   }

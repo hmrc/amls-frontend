@@ -175,17 +175,6 @@ trait ConfirmationController extends BaseController {
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
-                                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[SubmissionData]] = {
-    getData flatMap {
-      case Some((paymentRef, total, rows, difference)) => Future.successful(
-        paymentRef match {
-          case Some(payRef) if total.value > 0 => Some((payRef.some, total, rows, Right(difference)))
-          case _ => None
-        })
-      case None => Future.failed(new Exception("Cannot get data from submission"))
-    }
-  }
 }
 
 object ConfirmationController extends ConfirmationController {
