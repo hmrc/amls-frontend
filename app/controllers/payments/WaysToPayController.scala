@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.PayApiConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.payments.WaysToPay._
 import models.payments.{CreatePaymentResponse, WaysToPay}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
@@ -65,6 +65,7 @@ class WaysToPayController @Inject()(
             }
             case Bacs => Future.successful(Redirect(controllers.payments.routes.TypeOfBankController.get()))
           }
+          case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
         }
   }
 

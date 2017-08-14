@@ -156,6 +156,19 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           redirectLocation(result) mustBe Some(CreatePaymentResponse.default.links.nextUrl)
         }
       }
+
+      "request is invalid" must {
+        "return BAD_REQUEST" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "waysToPay" -> "01"
+          )
+
+          val result = controller.post()(postRequest)
+          status(result) mustBe BAD_REQUEST
+
+        }
+      }
     }
 
   }
