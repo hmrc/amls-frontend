@@ -98,12 +98,18 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
           val data = (Some(paymentRefNo), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
 
+          val status = SubmissionReadyForReview
+
           when {
             controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
           } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
           when {
-            controller.submissionResponseService.getSubmissionData(any(),any(),any())
+            controller.statusService.getStatus(any(),any(),any())
+          } thenReturn Future.successful(status)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
           } thenReturn Future.successful(Some(data))
 
           when {
@@ -130,16 +136,18 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
           val data = (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
 
+          val status = SubmissionReadyForReview
+
           when {
             controller.statusService.getStatus(any(), any(), any())
-          } thenReturn Future.successful(SubmissionReadyForReview)
+          } thenReturn Future.successful(status)
 
           when {
             controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
           } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
           when {
-            controller.submissionResponseService.getSubmissionData(any(),any(),any())
+            controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
           } thenReturn Future.successful(None)
 
           val result = controller.post()(postRequest)

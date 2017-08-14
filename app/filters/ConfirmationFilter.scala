@@ -70,7 +70,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
                 Redirect(targetUrl)
               }
 
-            case x => nextFilter(rh)
+            case _ => nextFilter(rh)
           }
 
         case _ => nextFilter(rh)

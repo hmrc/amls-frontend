@@ -127,9 +127,9 @@ trait ConfirmationController extends BaseController {
     dataCacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
   }
 
-  private def showRenewalConfirmation(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def showRenewalConfirmation(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      _@(Some(payRef), total, rows, _) <- OptionT(submissionResponseService.getSubmissionData)
+      _@(Some(payRef), total, rows, _) <- OptionT(submissionResponseService.getSubmissionData(status))
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -155,9 +155,9 @@ trait ConfirmationController extends BaseController {
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
-      case SubmissionReadyForReview => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
-      case SubmissionDecisionApproved => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData, status)
-      case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation
+      case SubmissionReadyForReview => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
+      case SubmissionDecisionApproved => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation(status)
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
         case (Some(paymentRef), total, rows, Left(_)) => {
           ApplicationConfig.paymentsUrlLookupToggle match {

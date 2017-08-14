@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,8 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 sealed case class RowEntity(message: String, feePer: BigDecimal)
 
 trait SubmissionResponseService extends FeeCalculations with DataCacheService {
-
-  private[services] val statusService: StatusService
 
   type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
@@ -293,8 +291,8 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
   }
 
-  def getSubmissionData(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
-    statusService.getStatus flatMap {
+  def getSubmissionData(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+    status match {
       case SubmissionReadyForReview => getAmendmentFees
       case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
       case ReadyForRenewal(_) => getRenewalOrVariationData(getRenewal)
@@ -317,7 +315,6 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 object SubmissionResponseService extends SubmissionResponseService {
   // $COVERAGE-OFF$
   override private[services] val cacheConnector = DataCacheConnector
-  override private[services] val statusService = StatusService
 }
 
 sealed trait FeeCalculations {

@@ -54,7 +54,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
     val TestSubmissionResponseService = new SubmissionResponseService {
       override private[services] val cacheConnector = mock[DataCacheConnector]
-      override private[services] val statusService = mock[StatusService]
     }
 
     val rpFee: BigDecimal = 100
@@ -868,11 +867,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          when {
-            TestSubmissionResponseService.statusService.getStatus(any(),any(),any())
-          } thenReturn Future.successful(SubmissionReady)
-
-          val result = TestSubmissionResponseService.getSubmissionData
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
 
           await(result) mustBe Some(data)
 
@@ -899,11 +894,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          when {
-            TestSubmissionResponseService.statusService.getStatus(any(),any(),any())
-          } thenReturn Future.successful(SubmissionReadyForReview)
-
-          val result = TestSubmissionResponseService.getSubmissionData
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview)
 
           await(result) mustBe Some(data)
 
@@ -919,11 +910,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-          when {
-            TestSubmissionResponseService.statusService.getStatus(any(),any(),any())
-          } thenReturn Future.successful(SubmissionDecisionApproved)
-
-          val result = TestSubmissionResponseService.getSubmissionData
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved)
 
           await(result) mustBe Some(data)
 
@@ -947,11 +934,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          when {
-            TestSubmissionResponseService.statusService.getStatus(any(),any(),any())
-          } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
-
-          val result = TestSubmissionResponseService.getSubmissionData
+          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
 
           await(result) mustBe Some(data)
 
