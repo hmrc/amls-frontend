@@ -155,6 +155,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     def setupStatus(status: SubmissionStatus): Unit = {
+
       when {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
@@ -200,8 +201,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when {
           controller.submissionResponseService.getSubmissionData(any(),any(),any())
         } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
-
-        println("....")
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -580,7 +579,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
   }
 }
 
-class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator {
+class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator{
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -610,12 +609,10 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    val paymentRefNo = "XA000000000000"
-
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "", Some(SubscriptionFees(
-        paymentReference = paymentRefNo,
+        paymentReference = paymentReferenceNumber,
         registrationFee = 0,
         fpFee = None,
         fpFeeRate = None,
@@ -633,7 +630,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((Some(paymentRefNo), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
+      Future.successful((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {
@@ -650,7 +647,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(None)
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber))
 
   }
 
@@ -668,11 +665,18 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       } thenReturn Future.successful(Some(model))
 
       //noinspection ScalaStyle
-      when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+      when {
+        controller.submissionResponseService.getAmendment(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReadyForReview)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(any(),any(),any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+
 
       val result = controller.get()(request)
       val body = contentAsString(result)
@@ -681,10 +685,10 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
         //noinspection ScalaStyle
         CreatePaymentRequest(
           "other",
-          paymentRefNo,
+          paymentReferenceNumber,
           "AMLS Payment",
           10000,
-          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo)))
+          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber)))
       })(any(), any())
 
       Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true

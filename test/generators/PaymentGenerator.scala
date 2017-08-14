@@ -70,4 +70,6 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     status <- paymentStatusGen
   } yield PaymentStatusResult(paymentRef, paymentId, status)
 
+  lazy val paymentReferenceNumber = paymentRefGen.sample.get
+
 }

@@ -295,10 +295,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
 
   def getSubmissionData(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     statusService.getStatus flatMap {
-      case SubmissionReadyForReview => {
-        println(">>>>")
-        getAmendmentFees
-      }
+      case SubmissionReadyForReview => getAmendmentFees
       case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
       case ReadyForRenewal(_) => getRenewalOrVariationData(getRenewal)
       case _ => getSubscription map {
