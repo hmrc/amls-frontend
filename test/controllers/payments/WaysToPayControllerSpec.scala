@@ -17,7 +17,7 @@
 package controllers.payments
 
 import connectors.PayApiConnector
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.confirmation.Currency
 import models.payments._
 import models.status.SubmissionReadyForReview
@@ -34,7 +34,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator {
+class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -52,8 +52,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService]
     )
-
-    val paymentRefNo = "XA000000000000"
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
@@ -96,7 +94,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
-          val data = (Some(paymentRefNo), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
+          val data = (Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
 
           val status = SubmissionReadyForReview
 
@@ -121,7 +119,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
           verify(controller.paymentsService).requestPaymentsUrl(
             eqTo(data),
-            eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo).url),
+            eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber).url),
             eqTo(amlsRegistrationNumber)
           )(any(),any(),any(),any())
 
@@ -134,7 +132,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
-          val data = (paymentRefNo, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
+          val data = (paymentReferenceNumber, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
 
           val status = SubmissionReadyForReview
 

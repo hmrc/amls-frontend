@@ -19,33 +19,20 @@ package controllers.payments
 import javax.inject.Inject
 
 import controllers.BaseController
-import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
-import scala.util.Try
-
-class TypeOfBankController @Inject()(
-                                    val authConnector: AuthConnector
+class BankDetailsController @Inject()(
+                                      val authConnector: AuthConnector
                                     ) extends BaseController{
 
-  def get() = Authorised.async {
+  def get() = Authorised.async{
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.payments.type_of_bank(EmptyForm)))
+      ???
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        request.body.asFormUrlEncoded map { form =>
-          Try{
-            if(form("typeOfBank").head.toBoolean){
-              Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get().url))
-            } else {
-              Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get().url))
-            }
-          } getOrElse Future.successful(BadRequest)
-        } getOrElse Future.successful(BadRequest)
+  def post() = Authorised.async{
+    implicit authContext => implicit request =>
+      ???
   }
 
 }

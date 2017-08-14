@@ -746,6 +746,9 @@ payments.waystopay.lead.time = Payments usually take 3 working days.
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
 
+payments.typeofbank.title = Will you be paying from a UK bank account?
+payments.typeofbank.header = Will you be paying from a UK bank account?
+
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service
