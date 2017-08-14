@@ -155,8 +155,8 @@ trait ConfirmationController extends BaseController {
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
-      case SubmissionReadyForReview => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
-      case SubmissionDecisionApproved => showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
+      case SubmissionReadyForReview | SubmissionDecisionApproved =>
+        showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation(status)
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
         case (Some(paymentRef), total, rows, Left(_)) => {
