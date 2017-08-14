@@ -262,8 +262,7 @@ POST        /submit-application/ways-to-pay                                     
 GET         /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.get()
 POST        /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.post()
 
-GET         /submit-application/bank-details                                          @controllers.payments.BankDetailsController.get()
-POST        /submit-application/bank-details                                          @controllers.payments.BankDetailsController.post()
+GET         /submit-application/bank-details                                          @controllers.payments.BankDetailsController.get(isUK: Boolean ?= true)
 
 GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()

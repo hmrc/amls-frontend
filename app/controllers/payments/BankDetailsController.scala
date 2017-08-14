@@ -19,20 +19,19 @@ package controllers.payments
 import javax.inject.Inject
 
 import controllers.BaseController
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 class BankDetailsController @Inject()(
                                       val authConnector: AuthConnector
                                     ) extends BaseController{
 
-  def get() = Authorised.async{
-    implicit authContext => implicit request =>
-      ???
-  }
 
-  def post() = Authorised.async{
+  def get(isUK: Boolean = true) = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+      Future.successful(Ok(views.html.payments.bank_details(isUK)))
   }
 
 }

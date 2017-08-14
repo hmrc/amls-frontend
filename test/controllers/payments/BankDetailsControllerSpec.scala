@@ -34,7 +34,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
+class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper{
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -44,13 +44,13 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
     implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
-    val controller = new TypeOfBankController(
+    val controller = new BankDetailsController(
       authConnector = self.authConnector
     )
 
   }
 
-  "TypeOfBankController" when {
+  "BankDetailsController" when {
 
     "get is called" must {
       "return OK with view" in new Fixture {
@@ -58,54 +58,8 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("payments.typeofbank.title"))
+        contentAsString(result) must include(Messages("payments.bankdetails.title"))
 
-      }
-    }
-
-    "post is called" when {
-
-      "form value is true" must {
-        "redirect to BankDetails" in new Fixture {
-
-          val postRequest = request.withFormUrlEncodedBody(
-            "typeOfBank" -> "true"
-          )
-
-          val result = controller.post()(postRequest)
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get().url))
-
-        }
-      }
-
-      "form value is false" must {
-        "redirect to BankDetails" in new Fixture {
-
-          val postRequest = request.withFormUrlEncodedBody(
-            "typeOfBank" -> "false"
-          )
-
-          val result = controller.post()(postRequest)
-          val body = contentAsString(result)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get().url))
-        }
-      }
-
-      "request is invalid" must {
-        "return BAD_REQUEST" in new Fixture {
-
-          val postRequest = request.withFormUrlEncodedBody(
-            "typeOfBank" -> "01"
-          )
-
-          val result = controller.post()(postRequest)
-          status(result) mustBe BAD_REQUEST
-
-        }
       }
     }
 
