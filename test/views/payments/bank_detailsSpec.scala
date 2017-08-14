@@ -16,11 +16,12 @@
 
 package views.payments
 
+import generators.PaymentGenerator
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class bank_detailsSpec extends GenericTestHelper {
+class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -30,7 +31,7 @@ class bank_detailsSpec extends GenericTestHelper {
 
     "have correct title, headings" in new ViewFixture {
 
-      def view = views.html.payments.bank_details(true)
+      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber)
 
       doc.title must startWith(Messages("payments.bankdetails.title"))
       heading.html must be(Messages("payments.bankdetails.header"))
@@ -42,7 +43,7 @@ class bank_detailsSpec extends GenericTestHelper {
 
       "non UK" in new Fixture {
 
-        def view = views.html.payments.bank_details(false)
+        def view = views.html.payments.bank_details(false, 0, paymentReferenceNumber)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.value")) must not be empty
@@ -56,7 +57,7 @@ class bank_detailsSpec extends GenericTestHelper {
 
       "uk" in new Fixture {
 
-        def view = views.html.payments.bank_details(true)
+        def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.value")) must not be empty

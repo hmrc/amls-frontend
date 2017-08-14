@@ -17,7 +17,7 @@
 package controllers.payments
 
 import connectors.PayApiConnector
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.confirmation.Currency
 import models.payments._
 import models.status.SubmissionReadyForReview
@@ -34,7 +34,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper{
+class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator{
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -45,7 +45,9 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper{
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new BankDetailsController(
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      submissionResponseService = mock[SubmissionResponseService]
     )
 
   }
@@ -54,6 +56,16 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper{
 
     "get is called" must {
       "return OK with view" in new Fixture {
+
+        val submissionSatus = SubmissionReadyForReview
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(submissionSatus)
+
+        when {
+          controller.submissionResponseService.getSubmissionData(eqTo(submissionSatus))(any(),any(),any())
+        } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency(200), Seq.empty, Right(None))))
 
         val result = controller.get()(request)
 
