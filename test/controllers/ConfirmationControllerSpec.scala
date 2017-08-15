@@ -370,7 +370,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         } thenReturn Future.successful(None)
 
         when {
-          controller.submissionResponseService.getSubmissionData(ReadyForRenewal(Some(new LocalDate)))(any(),any(),any())
+          controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(),any(),any())
         } thenReturn Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), Right(None)))
 
         val result = controller.get()(request)
@@ -611,7 +611,8 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "", Some(SubscriptionFees(
+      amlsRefNo = amlsRegistrationNumber,
+      Some(SubscriptionFees(
         paymentReference = paymentReferenceNumber,
         registrationFee = 0,
         fpFee = None,
