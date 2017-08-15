@@ -124,12 +124,11 @@ trait ConfirmationController extends BaseController {
           form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
           oldPayment <- OptionT(amlsConnector.getPaymentByReference(paymentRef))
-          amlsRefNumber <- OptionT.fromOption[Future](oldPayment.amlsRefNo) orElse OptionT(authEnrolmentsService.amlsRegistrationNumber)
           newPayment <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
               paymentRef,
               oldPayment.amountInPence.toDouble / 100,
               controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
-              amlsRefNumber))
+              oldPayment.amlsRefNo))
         } yield Redirect(newPayment.links.nextUrl)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")

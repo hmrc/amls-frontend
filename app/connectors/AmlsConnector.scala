@@ -18,7 +18,7 @@ package connectors
 
 import config.{ApplicationConfig, WSHttp}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
-import models.payments.{Payment, PaymentStatusResult, RefreshPaymentStatusRequest}
+import models.payments.{Payment, PaymentStatusResult, RefreshPaymentStatusRequest, UpdateBacsRequest}
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
@@ -242,6 +242,13 @@ trait AmlsConnector {
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)
+  }
+
+  def updateBacsStatus(ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val putUrl = s"$paymentUrl/$accountType/$accountId/$ref/bacs"
+
+    httpPut.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
   }
 
 }

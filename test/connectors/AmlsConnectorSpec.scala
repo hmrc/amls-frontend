@@ -21,7 +21,7 @@ import models.{AmendVariationRenewalResponse, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
-import models.payments.{Payment, PaymentStatusResult, PaymentStatuses, RefreshPaymentStatusRequest}
+import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -310,6 +310,22 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
         case Some(_) => fail("None should be returned")
         case _ =>
+      }
+    }
+  }
+
+  "updateBacsStatus" must {
+    "send the isBacs flag to the middle tier" in {
+      val paymentRef = paymentRefGen.sample.get
+      val putUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/$paymentRef/bacs"
+      val bacsRequest = UpdateBacsRequest(true)
+
+      when {
+        AmlsConnector.httpPut.PUT[UpdateBacsRequest, HttpResponse](any(), any())(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(OK))
+
+      whenReady(AmlsConnector.updateBacsStatus(paymentRef, bacsRequest)) { result =>
+        verify(AmlsConnector.httpPut).PUT(eqTo(putUrl), eqTo(bacsRequest))(any(), any(), any())
       }
     }
   }

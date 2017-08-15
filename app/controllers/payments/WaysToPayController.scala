@@ -27,7 +27,7 @@ import models.payments.WaysToPay._
 import models.payments.{CreatePaymentResponse, WaysToPay}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
+import models.payments.UpdateBacsRequest
 import scala.concurrent.Future
 
 @Singleton
@@ -38,32 +38,45 @@ class WaysToPayController @Inject()(
                                      val paymentsService: PaymentsService,
                                      val submissionResponseService: SubmissionResponseService,
                                      val authEnrolmentsService: AuthEnrolmentsService
-                                   ) extends BaseController{
+                                   ) extends BaseController {
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
   }
 
   def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
+
+        val submissionDetails = for {
+          status <- OptionT.liftF(statusService.getStatus)
+          data@(paymentReference, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+          payRef <- OptionT.fromOption[Future](paymentReference)
+        } yield (amlsRefNo, payRef, data)
+
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
             case Card => {
               (for {
-                status <- OptionT.liftF(statusService.getStatus)
-                data@(paymentReference,_,_,_) <- OptionT(submissionResponseService.getSubmissionData(status))
-                amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-                payRef <- OptionT.fromOption[Future](paymentReference)
+                (amlsRefNo, payRef, submissionData) <- submissionDetails
                 paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
-                  data,
+                  submissionData,
                   controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,
                   amlsRefNo
                 ))
+                _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(false)))
               } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
             }
-            case Bacs => Future.successful(Redirect(controllers.payments.routes.TypeOfBankController.get()))
+            case Bacs =>
+              val bankTypeResult = for {
+                (amlsRefNo, payRef, _) <- submissionDetails
+                _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(true)))
+              } yield Redirect(controllers.payments.routes.TypeOfBankController.get())
+
+              bankTypeResult getOrElse InternalServerError("Unable to save BACS info")
           }
           case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
         }
