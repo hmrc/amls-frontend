@@ -36,16 +36,14 @@ object PaymentStatuses extends Enum[PaymentStatus] {
 
 case class Payment(
                     _id: String,
-                    amlsRefNo: Option[String],
+                    amlsRefNo: String,
                     reference: String,
                     description: String,
                     amountInPence: Int,
-                    commissionInPence: Int,
-                    totalInPence: Int,
-                    returnUrl: String,
-                    additionalInformation: Map[String, String],
-                    confirmed: Option[LocalDateTime],
-                    status: PaymentStatus)
+                    status: PaymentStatus,
+                    createdAt: LocalDateTime,
+                    isBacs: Option[Boolean] = None,
+                    updatedAt: Option[LocalDateTime] = None)
 
 object Payment {
   implicit val statusFormat = EnumFormat(PaymentStatuses)
