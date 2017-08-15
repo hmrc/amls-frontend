@@ -196,7 +196,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "an amendment has difference(/Some(0))" in new Fixture {
 
-        setupStatus(SubmissionReadyForReview)
+        setupStatus(SubmissionDecisionApproved)
 
         when {
           controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReadyForReview))(any(),any(),any())
@@ -204,8 +204,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         val result = controller.get()(request)
         status(result) mustBe OK
-
-        println(contentAsString(result))
 
         Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
         contentAsString(result) must include(Messages("confirmation.no.fee"))
