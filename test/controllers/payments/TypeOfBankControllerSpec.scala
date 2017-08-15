@@ -75,7 +75,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
           val result = controller.post()(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get().url))
+          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(true).url))
 
         }
       }
@@ -91,7 +91,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
           val body = contentAsString(result)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get().url))
+          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(false).url))
         }
       }
 

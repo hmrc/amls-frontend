@@ -272,7 +272,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       case Some((paymentRef, total, rows, difference)) =>
         Future.successful(
           (difference, paymentRef) match {
-            case (Some(currency), Some(payRef)) if currency.value > 0 => Some((paymentRef, total, rows, Right(difference)))
+            case (Some(currency), Some(_)) if currency.value > 0 => Some((paymentRef, total, rows, Right(difference)))
             case _ => None
           }
         )

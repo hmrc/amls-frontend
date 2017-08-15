@@ -55,6 +55,8 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
 
+  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
+
   val statusService: StatusService
 
   def get() = Authorised.async {
@@ -67,7 +69,6 @@ trait ConfirmationController extends BaseController {
         } yield result
 
   }
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
@@ -104,6 +105,16 @@ trait ConfirmationController extends BaseController {
         }
 
         result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
+  }
+
+  def bacsConfirmation() = Authorised.async {
+    implicit request =>
+      implicit authContext =>
+        statusService.getReadStatus flatMap { readStatus =>
+          BusinessName.getName(readStatus.safeId).value map {
+            case Some(name) => Ok(views.html.confirmation.confirmation_bacs(name))
+          }
+        }
   }
 
   def retryPayment = Authorised.async {

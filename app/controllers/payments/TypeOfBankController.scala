@@ -39,11 +39,9 @@ class TypeOfBankController @Inject()(
       implicit request =>
         request.body.asFormUrlEncoded map { form =>
           Try{
-            if(form("typeOfBank").head.toBoolean){
-              Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get().url))
-            } else {
-              Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get().url))
-            }
+            Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
+              form("typeOfBank").head.toBoolean
+            ).url))
           } getOrElse Future.successful(BadRequest)
         } getOrElse Future.successful(BadRequest)
   }

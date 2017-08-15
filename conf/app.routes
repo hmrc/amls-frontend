@@ -262,7 +262,10 @@ POST        /submit-application/ways-to-pay                                     
 GET         /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.get()
 POST        /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.post()
 
-GET         /submit-application/bank-details                                          @controllers.payments.BankDetailsController.get(isUK: Boolean ?= true)
+GET         /submit-application/bank-details/                                         @controllers.payments.BankDetailsController.get(isUK: Boolean = true)
+GET         /submit-application/bank-details-non-uk/                                  @controllers.payments.BankDetailsController.get(isUK: Boolean = false)
+
+GET         /submit-application/confirm-bacs/                                         controllers.ConfirmationController.bacsConfirmation()
 
 GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
@@ -321,17 +324,17 @@ POST        /responsible-people/address/:index/date-change                      
 GET         /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/residency/:index                                      controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/passport/:index                         @controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /responsible-people/passport/:index                                       @controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/passport/:index                                       @controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/nonuk-passport/:index                   @controllers.responsiblepeople.PersonNonUKPassportController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /responsible-people/nonuk-passport/:index                                 @controllers.responsiblepeople.PersonNonUKPassportController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/nonuk-passport/:index                                 @controllers.responsiblepeople.PersonNonUKPassportController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/date-of-birth/:index                   @controllers.responsiblepeople.DateOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /responsible-people/date-of-birth/:index                                  @controllers.responsiblepeople.DateOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/date-of-birth/:index                                  @controllers.responsiblepeople.DateOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
 POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)

@@ -728,6 +728,14 @@ confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
 confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 
+confirmation.payment.bacs.title = You have submitted the application
+confirmation.payment.bacs.header = You’ve submitted
+
+confirmation.payment.bacs.received = Your application will be reviewed when HM Revenue and Customs receives your payment. You can sign into this service at any time to see the status of your application.
+confirmation.payment.bacs.time = The review process can take up to 45 days. You'll get an email when the decision has been made.
+confirmation.payment.bacs.trade = You must not trade in activities covered by the Money Laundering Regulations until your application is approved.
+
+
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 

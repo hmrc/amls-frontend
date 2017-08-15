@@ -27,7 +27,7 @@ import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
 import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -613,6 +613,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+      }
+
+      "bacs confirmation is requested" in new Fixture {
+
+        when {
+          controller.statusService.getReadStatus(any(),any(),any())
+        } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
+
+        val result = controller.bacsConfirmation()(request)
+
+        status(result) mustBe OK
+
+        Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
+
       }
     }
   }
