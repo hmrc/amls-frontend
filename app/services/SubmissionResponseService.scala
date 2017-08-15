@@ -80,7 +80,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[SubmissionData]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -93,7 +93,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val total = variationResponse.getTotalFees
           val rows = getVariationBreakdownRows(variationResponse, businessActivities)
           val difference = variationResponse.difference map Currency.fromBD
-          Future.successful(Some((paymentReference, Currency.fromBD(total), rows, difference)))
+          Future.successful(Some((paymentReference, Currency.fromBD(total), rows, Right(difference))))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -103,7 +103,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[SubmissionData]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -114,7 +114,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
           val rows = getRenewalBreakdown(renewal)
           val paymentRef = renewal.paymentReference
           val difference = renewal.difference
-          Future.successful(Some((paymentRef, Currency(totalFees), rows, difference map Currency.fromBD)))
+          Future.successful(Some((paymentRef, Currency(totalFees), rows, Right(difference map Currency.fromBD))))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
@@ -279,12 +279,12 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
   }
 
-  private def getRenewalOrVariationData(getData: Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]])
+  private def getRenewalOrVariationData(getData: Future[Option[SubmissionData]])
                                        (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     getData flatMap {
-      case Some((paymentRef, total, rows, difference)) => Future.successful(
+      case Some((paymentRef, total, rows, difference@Right(_))) => Future.successful(
         paymentRef match {
-          case Some(_) if total.value > 0 => Some((paymentRef, total, rows, Right(difference)))
+          case Some(_) if total.value > 0 => Some((paymentRef, total, rows, difference))
           case _ => None
         })
       case None => Future.failed(new Exception("Cannot get data from submission"))

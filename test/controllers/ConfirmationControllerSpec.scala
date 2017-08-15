@@ -82,12 +82,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    val paymentRefNo = "XA000000000000"
-
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "", Some(SubscriptionFees(
-        paymentReference = paymentRefNo,
+      amlsRefNo = amlsRegistrationNumber, Some(SubscriptionFees(
+        paymentReference = paymentReferenceNumber,
         registrationFee = 0,
         fpFee = None,
         fpFeeRate = None,
@@ -107,7 +105,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((Some(paymentRefNo), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
+      Future.successful((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {
@@ -189,7 +187,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
-      contentAsString(result) must include(paymentRefNo)
+      contentAsString(result) must include(paymentReferenceNumber)
     }
 
     "notify user there is no fee" when {
@@ -204,7 +202,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
           when {
             controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-          } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+          } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -221,7 +219,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
           when {
             controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-          } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(None))))
+          } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(None))))
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -290,11 +288,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
       "a variation when status is ready for renewal and no renewal data in save4later" in new Fixture {
 
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+        val submissionStatus = ReadyForRenewal(Some(new LocalDate))
+
+        setupStatus(submissionStatus)
 
         when {
-          controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(),any(),any())
-        } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
+          controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+        } thenReturn Future.successful(Some(Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(None)))
 
         val result = controller.get()(request)
 
@@ -326,6 +326,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
 
       "a renewal status and has data then load renewal confirmation" in new Fixture {
+
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
         when {
@@ -371,6 +372,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
 
       "a renewal and no data in save4later then load variation confirmation" in new Fixture {
+
         setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
         when {
@@ -390,15 +392,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "allow a payment to be retried" in new Fixture {
 
-      val paymentRef = paymentRefGen.sample.get
       val paymentsRedirectUrl = "/payments"
       val amountInPence = (paymentAmountGen.sample.get * 100).toInt
-      val postData = "paymentRef" -> paymentRef
+      val postData = "paymentRef" -> paymentReferenceNumber
       val payment = paymentGen.sample.get
 
       when {
-        mockAmlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
-      } thenReturn Future.successful(Some(payment.copy(reference = paymentRef, amountInPence = amountInPence)))
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+      } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
@@ -406,15 +407,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       redirectLocation(result) mustBe Some(paymentsRedirectUrl)
 
       verify(controller.paymentsConnector).createPayment(eqTo(
-        CreatePaymentRequest("other", paymentRef, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentRef))))(any(), any())
+        CreatePaymentRequest("other", paymentReferenceNumber, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentReferenceNumber))))(any(), any())
     }
 
     "fail if a payment cannot be retried" in new Fixture {
-      val paymentRef = paymentRefGen.sample.get
-      val postData = "paymentRef" -> paymentRef
+
+      val postData = "paymentRef" -> paymentReferenceNumber
 
       when {
-        mockAmlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -424,25 +425,24 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "show the correct payment confirmation page" when {
       "the application status is 'new submission'" in new Fixture {
+
         setupStatus(SubmissionReady)
 
-        val paymentReference = "X0000000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
       }
 
       "the application status is 'pending'" in new Fixture {
         setupStatus(SubmissionReadyForReview)
 
-        val paymentReference = "X00000000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -450,16 +450,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'approved'" in new Fixture {
+
         setupStatus(SubmissionDecisionApproved)
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -467,16 +467,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'Renewal Submitted'" in new Fixture {
+
         setupStatus(RenewalSubmitted(None))
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -484,21 +484,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal'" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
-        val paymentReference = "X00000000000"
+        setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -506,16 +505,16 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.renewal.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
+
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -523,30 +522,30 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "there is no business name" in new Fixture {
-        setupStatus(SubmissionReady)
 
-        val paymentReference = "X00000000000000000"
+        setupStatus(SubmissionReady)
 
         when {
           controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
         } thenReturn Future.successful(none[BusinessMatching])
 
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReference))
+        doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReferenceNumber))
       }
 
       "the payment failed" in new Fixture {
+
         setupStatus(SubmissionReadyForReview)
 
         val payment = paymentGen.sample.get.copy(status = Failed)
@@ -566,6 +565,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       }
 
       "the payment was cancelled" in new Fixture {
+
         setupStatus(SubmissionReadyForReview)
 
         val payment = paymentGen.sample.get.copy(status = Cancelled)
