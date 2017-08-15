@@ -17,21 +17,24 @@
 package services
 
 import connectors.{AmlsConnector, PayApiConnector}
+import generators.PaymentGenerator
 import models.confirmation.Currency
-import models.status.SubmissionReadyForReview
+import models.payments.UpdateBacsRequest
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.MustMatchers
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PaymentsServiceSpec extends PlaySpec with MustMatchers with MockitoSugar with GenericTestHelper {
+class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with GenericTestHelper with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -56,7 +59,21 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with MockitoSugar w
 
   "PaymentService" when {
 
+    "updateBacsStatus is call" must {
+      "use the connector to update the bacs status" in new Fixture {
+        val paymentRef = paymentRefGen.sample.get
+        val request = UpdateBacsRequest(true)
 
+        when {
+          testPaymentService.amlsConnector.updateBacsStatus(any(), any())(any(), any(), any())
+        } thenReturn Future.successful(HttpResponse(OK))
+
+        whenReady(testPaymentService.updateBacsStatus(paymentRef, request)) { _ =>
+          verify(testPaymentService.amlsConnector).updateBacsStatus(eqTo(paymentRef), eqTo(request))(any(), any(), any())
+        }
+
+      }
+    }
 
   }
 

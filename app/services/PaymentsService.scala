@@ -22,7 +22,7 @@ import cats.implicits._
 import cats.data.OptionT
 import connectors.{AmlsConnector, PayApiConnector}
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.{CreatePaymentRequest, CreatePaymentResponse, ReturnLocation}
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse, ReturnLocation, UpdateBacsRequest}
 import models.status.SubmissionReadyForReview
 import play.api.{Logger, Play}
 import play.api.mvc.Request
@@ -70,6 +70,10 @@ class PaymentsService @Inject()(
     }
 
   }
+
+  def updateBacsStatus(paymentReference: String, request: UpdateBacsRequest)
+                      (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[_] =
+    amlsConnector.updateBacsStatus(paymentReference, request)
 
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String)(implicit hc: HeaderCarrier, authContext: AuthContext) = {
     (for {
