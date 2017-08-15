@@ -29,55 +29,60 @@
 ) {
 
     <div class="form-group">
-        <div class="grid-border">
-            <div class="grid-row">
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @if(isUK){
-                        @Messages("payments.bankdetails.sortcode.name")
-                    } else {
-                        @Messages("payments.bankdetails.bics.name")
-                    }
-                </div>
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @if(isUK){
-                        @Messages("payments.bankdetails.sortcode.value")
-                    } else {
-                        @Messages("payments.bankdetails.bics.value")
-                    }
-                </div>
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @if(isUK){
-                        @Messages("payments.bankdetails.accountnumber.name")
-                    } else {
-                        @Messages("payments.bankdetails.iban.name")
-                    }
-                </div>
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @if(isUK){
-                        @Messages("payments.bankdetails.iban.value")
-                    } else {
-                        @Messages("payments.bankdetails.iban.value")
-                    }
-                </div>
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @Messages("payments.bankdetails.accountname.name")
-                </div>
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @Messages("payments.bankdetails.accountname.value")
-                </div>
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @Messages("payments.bankdetails.fee.name")
-                </div>
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @fee
-                </div>
-
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @Messages("payments.bankdetails.reference.name")
-                </div>
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @paymentReference
-                </div>
+        <div class="grid-layout grid-border">
+            <div class="grid-layout__column grid-layout__column--1-3">
+                @if(isUK){
+                    @Messages("payments.bankdetails.sortcode.name")
+                } else {
+                    @Messages("payments.bankdetails.bics.name")
+                }
+            </div>
+            <div class="grid-layout__column grid-layout__column--2-3">
+                @if(isUK){
+                    @Messages("payments.bankdetails.sortcode.value")
+                } else {
+                    @Messages("payments.bankdetails.bics.value")
+                }
+            </div>
+        </div>
+        <div class="grid-layout grid-border">
+            <div class="grid-layout__column grid-layout__column--1-3">
+                @if(isUK){
+                    @Messages("payments.bankdetails.accountnumber.name")
+                } else {
+                    @Messages("payments.bankdetails.iban.name")
+                }
+            </div>
+            <div class="grid-layout__column grid-layout__column--2-3">
+                @if(isUK){
+                    @Messages("payments.bankdetails.iban.value")
+                } else {
+                    @Messages("payments.bankdetails.iban.value")
+                }
+            </div>
+        </div>
+        <div class="grid-layout grid-border">
+            <div class="grid-layout__column grid-layout__column--1-3">
+                @Messages("payments.bankdetails.accountname.name")
+            </div>
+            <div class="grid-layout__column grid-layout__column--2-3">
+                @Messages("payments.bankdetails.accountname.value")
+            </div>
+        </div>
+        <div class="grid-layout grid-border">
+            <div class="grid-layout__column grid-layout__column--1-3">
+                @Messages("payments.bankdetails.fee.name")
+            </div>
+            <div class="grid-layout__column grid-layout__column--2-3">
+                @fee
+            </div>
+        </div>
+        <div class="grid-layout grid-border">
+            <div class="grid-layout__column grid-layout__column--1-3">
+                @Messages("payments.bankdetails.reference.name")
+            </div>
+            <div class="grid-layout__column grid-layout__column--2-3">
+                @paymentReference
             </div>
         </div>
     </div>
