@@ -126,15 +126,18 @@ trait ConfirmationController extends BaseController {
 
   private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    for {
-      _@(Some(payRef), total, rows, _) <- OptionT(getFees)
-      renewalDefined <- OptionT.liftF(submissionResponseService.isRenewalDefined)
-    } yield {
-      renewalDefined match {
-        case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url))
-        case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url))
+
+    OptionT(submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
+      getFees map {
+        case Some((Some(payRef), total, rows, _)) if total.value > 0 => {
+          isRenewalDefined match {
+            case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
+            case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
+          }
+        }
+        case _ => None
       }
-    }
+    })
   }
 
   private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
