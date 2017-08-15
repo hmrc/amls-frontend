@@ -166,7 +166,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
-        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
@@ -209,7 +209,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
         )
 
-        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>

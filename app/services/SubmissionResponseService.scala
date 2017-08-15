@@ -70,7 +70,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[SubmissionData]] = {
     cacheConnector.fetchAll flatMap {
       getDataForAmendment(_) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
@@ -138,7 +138,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
       val rows = getBreakdownRows(amendmentResponse, filteredPremises, people, businessActivities, subQuantity)
       val paymentRef = amendmentResponse.paymentReference
-      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
+      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, Right(difference))))
     }
   }
 
@@ -267,41 +267,16 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
   }
 
-  private def getAmendmentFees(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
-    getAmendment flatMap {
-      case Some((paymentRef, total, rows, difference)) =>
-        Future.successful(
-          (difference, paymentRef) match {
-            case (Some(currency), Some(_)) if currency.value > 0 => Some((paymentRef, total, rows, Right(difference)))
-            case _ => None
-          }
-        )
-      case None => Future.failed(new Exception("Cannot get data from amendment submission"))
-    }
-  }
-
-  private def getRenewalOrVariationData(getData: Future[Option[SubmissionData]])
-                                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
-    getData flatMap {
-      case Some((paymentRef, total, rows, difference@Right(_))) => Future.successful(
-        paymentRef match {
-          case Some(_) if total.value > 0 => Some((paymentRef, total, rows, difference))
-          case _ => None
-        })
-      case None => Future.failed(new Exception("Cannot get data from submission"))
-    }
-  }
-
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
 
   def getSubmissionData(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     status match {
-      case SubmissionReadyForReview => getAmendmentFees
-      case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
+      case SubmissionReadyForReview => getAmendment
+      case SubmissionDecisionApproved => getVariation
       case ReadyForRenewal(_) => isRenewalDefined flatMap {
-        case true => getRenewalOrVariationData(getRenewal)
-        case false => getRenewalOrVariationData(getVariation)
+        case true => getRenewal
+        case false => getVariation
       }
       case _ => getSubscription map {
         case (payRef, total, breakdown, amlsRefNo@Left(_)) => (payRef, total, breakdown, amlsRefNo).some

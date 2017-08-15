@@ -723,7 +723,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       //noinspection ScalaStyle
       when {
         controller.submissionResponseService.getAmendment(any(), any(), any())
-      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))))
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))))
 
       when {
         controller.statusService.getStatus(any(), any(), any())
@@ -732,20 +732,9 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       when {
         controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
       } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
-
-
+      
       val result = controller.get()(request)
       val body = contentAsString(result)
-
-      verify(paymentsConnector).createPayment(eqTo {
-        //noinspection ScalaStyle
-        CreatePaymentRequest(
-          "other",
-          paymentReferenceNumber,
-          "AMLS Payment",
-          10000,
-          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber)))
-      })(any(), any())
 
       Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true
     }
