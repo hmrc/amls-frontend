@@ -138,7 +138,7 @@ trait ConfirmationController extends BaseController {
   private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    OptionT(submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
+    submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
       getFees map {
         case Some((Some(payRef), total, rows, _)) if total.value > 0 => {
           isRenewalDefined match {
@@ -148,25 +148,25 @@ trait ConfirmationController extends BaseController {
         }
         case _ => None
       }
-    })
+    }
   }
 
-  private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
+  private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]])
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    OptionT(getFees map {
+    getFees map {
       case Some(_@(Some(payRef), total, rows, Right(Some(difference)))) if difference.value > 0 =>
         Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
-    })
+    }
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val maybeResult = status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        showAmendmentVariationConfirmation(submissionResponseService.getSubmissionData(status), status)
+        OptionT(showAmendmentVariationConfirmation(submissionResponseService.getSubmissionData(status)))
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        showRenewalConfirmation(submissionResponseService.getSubmissionData(status), status)
+        OptionT(showRenewalConfirmation(submissionResponseService.getSubmissionData(status), status))
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
         case (Some(paymentRef), total, rows, Left(_)) => {
           ApplicationConfig.paymentsUrlLookupToggle match {

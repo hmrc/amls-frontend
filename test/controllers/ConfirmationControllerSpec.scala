@@ -732,7 +732,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       when {
         controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
       } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
-      
+
       val result = controller.get()(request)
       val body = contentAsString(result)
 
