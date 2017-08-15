@@ -35,6 +35,7 @@
     @form(f, controllers.renewal.routes.TransactionsInLast12MonthsController.post(edit)) {
 
         @input(
+            classes = Seq("form-control-1-4"),
             field = f("txnAmount"),
             labelText = "Transfers",
             labelHidden = true,
