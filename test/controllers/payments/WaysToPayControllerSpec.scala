@@ -31,6 +31,7 @@ import services.{AuthEnrolmentsService, PaymentsService, StatusService, Submissi
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
+import uk.gov.hmrc.play.http.HttpResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -54,6 +55,26 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
+
+    when {
+      controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(HttpResponse(OK))
+
+    val data = (Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
+
+    val submissionStatus = SubmissionReadyForReview
+
+    when {
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+    } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+    when {
+      controller.statusService.getStatus(any(),any(),any())
+    } thenReturn Future.successful(submissionStatus)
+
+    when {
+      controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(),any(),any())
+    } thenReturn Future.successful(Some(data))
 
   }
 
@@ -84,6 +105,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.payments.routes.TypeOfBankController.get().url))
 
+          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(true)))(any(), any(), any())
+
         }
       }
 
@@ -93,22 +116,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
           )
-
-          val data = (Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
-
-          val status = SubmissionReadyForReview
-
-          when {
-            controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
-          } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-          when {
-            controller.statusService.getStatus(any(),any(),any())
-          } thenReturn Future.successful(status)
-
-          when {
-            controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
-          } thenReturn Future.successful(Some(data))
 
           when {
             controller.paymentsService.requestPaymentsUrl(any(),any(),any())(any(),any(),any(),any())
@@ -124,6 +131,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           )(any(),any(),any(),any())
 
           redirectLocation(result) mustBe Some("/payments")
+
+          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(false)))(any(), any(), any())
         }
 
         "go to the default payments url when submission data cannot be retrieved" in new Fixture {
@@ -131,8 +140,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
           )
-
-          val data = (paymentReferenceNumber, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
 
           val status = SubmissionReadyForReview
 
