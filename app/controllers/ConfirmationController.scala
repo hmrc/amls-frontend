@@ -161,13 +161,15 @@ trait ConfirmationController extends BaseController {
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
+    val submissionData = submissionResponseService.getSubmissionData(status)
+
     val maybeResult = status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        OptionT(showAmendmentVariationConfirmation(submissionResponseService.getSubmissionData(status)))
+        OptionT(showAmendmentVariationConfirmation(submissionData))
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        OptionT(showRenewalConfirmation(submissionResponseService.getSubmissionData(status), status))
-      case _ => OptionT.liftF(submissionResponseService.getSubscription map {
-        case (Some(paymentRef), total, rows, Left(_)) => {
+        OptionT(showRenewalConfirmation(submissionData, status))
+      case _ => OptionT.liftF(submissionData map {
+        case Some((Some(paymentRef), total, rows, Left(_))) => {
           ApplicationConfig.paymentsUrlLookupToggle match {
             case true => Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
             case _ => Ok(confirmation(paymentRef, total, rows))

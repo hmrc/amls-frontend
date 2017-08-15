@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMa
 import models.confirmation.{BreakdownRow, Currency}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
+import models.status._
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -274,7 +274,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     status match {
       case SubmissionReadyForReview => getAmendment
       case SubmissionDecisionApproved => getVariation
-      case ReadyForRenewal(_) => isRenewalDefined flatMap {
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined flatMap {
         case true => getRenewal
         case false => getVariation
       }

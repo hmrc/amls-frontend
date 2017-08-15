@@ -103,10 +103,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     reset(paymentsConnector)
 
     when {
-      controller.submissionResponseService.getSubscription(any(), any(), any())
-    } thenReturn Future.successful((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
-
-    when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
     } thenReturn Future.successful()
 
@@ -163,7 +159,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "write a confirmation value to Keystore" in new Fixture {
 
-      setupStatus(SubmissionReady)
+      val submissionStatus = SubmissionReady
+
+      setupStatus(submissionStatus)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber))))
 
       val result = controller.get()(request)
 
@@ -174,7 +176,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
-      setupStatus(SubmissionReady)
+      val submissionStatus = SubmissionReady
+
+      setupStatus(submissionStatus)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
