@@ -22,6 +22,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
+import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.TradingPremises
@@ -291,11 +292,17 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     }
   }
 
+  def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
+    cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
+
   def getSubmissionData(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     status match {
       case SubmissionReadyForReview => getAmendmentFees
       case SubmissionDecisionApproved => getRenewalOrVariationData(getVariation)
-      case ReadyForRenewal(_) => getRenewalOrVariationData(getRenewal)
+      case ReadyForRenewal(_) => isRenewalDefined flatMap {
+        case true => getRenewalOrVariationData(getRenewal)
+        case false => getRenewalOrVariationData(getVariation)
+      }
       case _ => getSubscription map {
         case (payRef, total, breakdown, amlsRefNo@Left(_)) => (payRef, total, breakdown, amlsRefNo).some
       }

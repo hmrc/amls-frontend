@@ -124,15 +124,11 @@ trait ConfirmationController extends BaseController {
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }
 
-  private def isRenewalDefined(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Boolean] = {
-    dataCacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
-  }
-
   private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
       _@(Some(payRef), total, rows, _) <- OptionT(getFees)
-      renewalDefined <- OptionT.liftF(isRenewalDefined)
+      renewalDefined <- OptionT.liftF(submissionResponseService.isRenewalDefined)
     } yield {
       renewalDefined match {
         case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url))

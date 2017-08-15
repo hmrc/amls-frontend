@@ -21,6 +21,7 @@ import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
+import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
@@ -927,12 +928,8 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
           when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            TestSubmissionResponseService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+          } thenReturn Future.successful(Some(Renewal()))
 
           val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
 
