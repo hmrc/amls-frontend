@@ -61,7 +61,7 @@ class WaysToPayController @Inject()(
                   controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,
                   amlsRefNo
                 ))
-              } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse Redirect(CreatePaymentResponse.default.links.nextUrl)
+              } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
             }
             case Bacs => Future.successful(Redirect(controllers.payments.routes.TypeOfBankController.get()))
           }

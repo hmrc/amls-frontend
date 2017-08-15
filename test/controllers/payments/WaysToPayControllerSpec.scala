@@ -126,32 +126,34 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           redirectLocation(result) mustBe Some("/payments")
         }
 
-        "go to the default payments url when submission data cannot be retrieved" in new Fixture {
+        "return 500" when {
+          "payment info cannot be retrieved" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
-            "waysToPay" -> WaysToPay.Card.entryName
-          )
+            val postRequest = request.withFormUrlEncodedBody(
+              "waysToPay" -> WaysToPay.Card.entryName
+            )
 
-          val data = (paymentReferenceNumber, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
+            val data = (paymentReferenceNumber, Currency.fromInt(100), Seq(), Some(Currency.fromInt(100)))
 
-          val status = SubmissionReadyForReview
+            val submissionStatus = SubmissionReadyForReview
 
-          when {
-            controller.statusService.getStatus(any(), any(), any())
-          } thenReturn Future.successful(status)
+            when {
+              controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+            } thenReturn Future.successful(None)
 
-          when {
-            controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
-          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+            when {
+              controller.statusService.getStatus(any(), any(), any())
+            } thenReturn Future.successful(submissionStatus)
 
-          when {
-            controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
-          } thenReturn Future.successful(None)
+            when {
+              controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(),any(),any())
+            } thenReturn Future.successful(None)
 
-          val result = controller.post()(postRequest)
-          val body = contentAsString(result)
+            val result = controller.post()(postRequest)
+            val body = contentAsString(result)
 
-          redirectLocation(result) mustBe Some(CreatePaymentResponse.default.links.nextUrl)
+            status(result) mustBe 500
+          }
         }
       }
 
