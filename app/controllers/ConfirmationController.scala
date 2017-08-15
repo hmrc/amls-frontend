@@ -144,6 +144,7 @@ trait ConfirmationController extends BaseController {
     for {
       _@(Some(payRef), total, rows, Right(_)) <- OptionT(getFees)
     } yield {
+      println("????")
       Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url))
     }
   }
