@@ -37,6 +37,7 @@ import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Right
 
 trait ConfirmationController extends BaseController {
 
@@ -127,9 +128,10 @@ trait ConfirmationController extends BaseController {
     dataCacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
   }
 
-  private def showRenewalConfirmation(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
+                                     (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      _@(Some(payRef), total, rows, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+      _@(Some(payRef), total, rows, _) <- OptionT(getFees)
       renewalDefined <- OptionT.liftF(isRenewalDefined)
     } yield {
       renewalDefined match {
@@ -141,12 +143,11 @@ trait ConfirmationController extends BaseController {
 
   private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    for {
-      _@(Some(payRef), total, rows, Right(_)) <- OptionT(getFees)
-    } yield {
-      println("????")
-      Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url))
-    }
+    OptionT(getFees map {
+      case Some(_@(Some(payRef), total, rows, Right(Some(difference)))) if difference.value > 0 =>
+        Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
+      case _ => None
+    })
   }
 
   private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
@@ -154,7 +155,8 @@ trait ConfirmationController extends BaseController {
     val maybeResult = status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
         showAmendmentVariationConfirmation(submissionResponseService.getSubmissionData(status), status)
-      case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation(status)
+      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
+        showRenewalConfirmation(submissionResponseService.getSubmissionData(status), status)
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
         case (Some(paymentRef), total, rows, Left(_)) => {
           ApplicationConfig.paymentsUrlLookupToggle match {
