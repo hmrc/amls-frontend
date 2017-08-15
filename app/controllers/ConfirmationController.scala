@@ -139,16 +139,12 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def showPostSubmissionConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
+  private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                             (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     for {
-      _@(Some(payRef), total, rows, Right(difference)) <- OptionT(getFees)
+      _@(Some(payRef), total, rows, Right(_)) <- OptionT(getFees)
     } yield {
-      val feeToPay = status match {
-        case SubmissionReadyForReview | RenewalSubmitted(_) => difference
-        case _ => Some(total)
-      }
-      Ok(confirm_amendvariation(payRef, total, rows, feeToPay, controllers.payments.routes.WaysToPayController.get().url))
+      Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url))
     }
   }
 
@@ -156,7 +152,7 @@ trait ConfirmationController extends BaseController {
 
     val maybeResult = status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        showPostSubmissionConfirmation(submissionResponseService.getSubmissionData(status), status)
+        showAmendmentVariationConfirmation(submissionResponseService.getSubmissionData(status), status)
       case ReadyForRenewal(_) | RenewalSubmitted(_) => showRenewalConfirmation(status)
       case _ => OptionT.liftF(submissionResponseService.getSubscription map {
         case (Some(paymentRef), total, rows, Left(_)) => {

@@ -194,87 +194,98 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "notify user there is no fee" when {
 
-      "an amendment has difference(/Some(0))" in new Fixture {
+      "submitting an amendment" which {
 
-        setupStatus(SubmissionDecisionApproved)
+        val submissionStatus = SubmissionReadyForReview
 
-        when {
-          controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReadyForReview))(any(),any(),any())
-        } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+        "has difference(/Some(0))" in new Fixture {
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
+          setupStatus(submissionStatus)
 
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
 
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+
+        }
+
+        "has no difference(/None)" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(None))))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
+
+        "has no payment reference" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((None, Currency.fromInt(0), Seq(), Right(None))))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+
+        }
       }
 
-      "an amendment has no difference(/None)" in new Fixture {
+      "submitting a variation" which {
 
-        setupStatus(SubmissionReadyForReview)
+        val submissionStatus = SubmissionDecisionApproved
 
-        when {
-          controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReadyForReview))(any(),any(),any())
-        } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Right(None))))
+        "has no payment reference" in new Fixture {
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
+          setupStatus(submissionStatus)
 
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
 
-      "an amendment has no payment reference" in new Fixture {
+          val result = controller.get()(request)
+          status(result) mustBe OK
 
-        setupStatus(SubmissionReadyForReview)
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
 
-        when {
-          controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReadyForReview))(any(),any(),any())
-        } thenReturn Future.successful(Some((None, Currency.fromInt(0), Seq(), Right(None))))
+        "is without the addition of tp or rp" in new Fixture {
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
+          setupStatus(submissionStatus)
 
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
 
-      }
+          val result = controller.get()(request)
 
-      "a variation has no payment reference" in new Fixture {
+          status(result) mustBe OK
 
-        setupStatus(SubmissionDecisionApproved)
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
 
-        when {
-          controller.submissionResponseService.getSubmissionData(eqTo(SubmissionDecisionApproved))(any(),any(),any())
-        } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
-
-        val result = controller.get()(request)
-        status(result) mustBe OK
-
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
-
-      "a variation without the addition of tp or rp" in new Fixture {
-
-        setupStatus(SubmissionDecisionApproved)
-
-        when {
-          controller.submissionResponseService.getSubmissionData(eqTo(SubmissionDecisionApproved))(any(),any(),any())
-        } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
-
-        val result = controller.get()(request)
-
-        status(result) mustBe OK
-
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
       }
 
       "a variation when status is ready for renewal and no renewal data in save4later" in new Fixture {
@@ -337,8 +348,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         when {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(Some(Renewal()))
-
-
+        
         when {
           controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(),any(),any())
         } thenReturn Future.successful(Some((
