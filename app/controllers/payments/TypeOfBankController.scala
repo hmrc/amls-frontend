@@ -19,11 +19,11 @@ package controllers.payments
 import javax.inject.Inject
 
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.payments.TypeOfBank
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
-import scala.util.Try
 
 class TypeOfBankController @Inject()(
                                     val authConnector: AuthConnector
@@ -37,13 +37,12 @@ class TypeOfBankController @Inject()(
   def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        request.body.asFormUrlEncoded map { form =>
-          Try{
-            Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
-              form("typeOfBank").head.toBoolean
-            ).url))
-          } getOrElse Future.successful(BadRequest)
-        } getOrElse Future.successful(BadRequest)
+        Form2[TypeOfBank](request.body) match {
+          case ValidForm(_, data) => Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
+            data.isUK
+          ).url))
+          case f: InvalidForm => Future.successful(BadRequest(views.html.payments.type_of_bank(f)))
+        }
   }
 
 }

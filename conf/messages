@@ -760,6 +760,8 @@ payments.waystopay.error = You must select a payment method. Please select you w
 payments.typeofbank.title = Will you be paying from a UK bank account?
 payments.typeofbank.header = Will you be paying from a UK bank account?
 
+payments.typeofbank.error = Select yes if you will be paying from a UK bank account
+
 payments.bankdetails.title = Payment Details
 payments.bankdetails.header = Payment Details
 payments.bankdetails.bics.name = Bank identifier code (BIC)
