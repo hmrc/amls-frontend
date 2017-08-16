@@ -214,8 +214,8 @@ trait AmlsConnector {
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
 
-  def getPaymentByReference(paymentReference: String)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+  def getPaymentByPaymentReference(paymentReference: String)
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$paymentUrl/$accountType/$accountId/ref/$paymentReference"
 

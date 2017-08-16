@@ -294,7 +294,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any())
       } thenReturn Future.successful(payment)
 
-      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+      whenReady(AmlsConnector.getPaymentByPaymentReference(paymentRef)) {
         case Some(result) => result mustBe payment
         case _ => fail("Payment was not found")
       }
@@ -307,7 +307,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpGet.GET[Payment](any())(any(), any())
       } thenReturn Future.failed(new NotFoundException("Payment was not found"))
 
-      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+      whenReady(AmlsConnector.getPaymentByPaymentReference(paymentRef)) {
         case Some(_) => fail("None should be returned")
         case _ =>
       }

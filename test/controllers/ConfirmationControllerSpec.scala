@@ -119,7 +119,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      mockAmlsConnector.getPaymentByReference(any())(any(), any(), any())
+      mockAmlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
@@ -403,7 +403,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val payment = paymentGen.sample.get
 
       when {
-        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        mockAmlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -420,7 +420,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val postData = "paymentRef" -> paymentReferenceNumber
 
       when {
-        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        mockAmlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
