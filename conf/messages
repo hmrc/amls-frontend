@@ -755,6 +755,8 @@ payments.waystopay.lead.time = Payments usually take 3 working days.
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
 
+payments.waystopay.error = You must select a payment method. Please select you want to pay your fee
+
 payments.typeofbank.title = Will you be paying from a UK bank account?
 payments.typeofbank.header = Will you be paying from a UK bank account?
 
