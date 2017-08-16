@@ -228,6 +228,20 @@ trait AmlsConnector {
     }
   }
 
+  def getPaymentByAmlsReference(amlsRef: String)
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
+
+    Logger.debug(s"[AmlsConnector][getPaymentByReference]: Request to $getUrl with $amlsRef")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    } recover {
+      case _: NotFoundException => None
+    }
+  }
+
   def refreshPaymentStatus(paymentReference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[PaymentStatusResult] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
