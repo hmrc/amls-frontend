@@ -26,8 +26,8 @@ import models.payments.PaymentStatuses.{Cancelled, Failed}
 import models.payments._
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
-import models.{AmendVariationRenewalResponse, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.LocalDate
+import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -38,23 +38,25 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
+  val mockAmlsConnector = mock[AmlsConnector]
+  val paymentsService = new PaymentsService(mockAmlsConnector, paymentsConnector, mock[SubmissionResponseService],mock[StatusService])
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
+    .bindings(bind[PaymentsService].to(paymentsService))
     .configure("microservice.services.feature-toggle.payments-url-lookup" -> true)
     .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
     .build()
@@ -64,6 +66,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     self =>
 
     implicit val authContext = mock[AuthContext]
+    implicit val executionContext = mock[ExecutionContext]
     implicit val headerCarrier = HeaderCarrier()
 
     val baseUrl = "http://localhost"
@@ -75,16 +78,14 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
-      override val amlsConnector = mock[AmlsConnector]
+      override val amlsConnector = mockAmlsConnector
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    val paymentRefNo = "XA000000000000"
-
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "", Some(SubscriptionFees(
-        paymentReference = paymentRefNo,
+      amlsRefNo = amlsRegistrationNumber, Some(SubscriptionFees(
+        paymentReference = paymentReferenceNumber,
         registrationFee = 0,
         fpFee = None,
         fpFeeRate = None,
@@ -102,42 +103,33 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     reset(paymentsConnector)
 
     when {
-      controller.submissionResponseService.getSubscription(any(), any(), any())
-    } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
-    }
-
-    when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
     } thenReturn Future.successful()
 
     when {
       controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn {
-      Future.successful(Some(amlsRegistrationNumber))
-    }
+    } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
     when {
       paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
 
     when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByReference(any())(any(), any(), any())
+      mockAmlsConnector.getPaymentByReference(any())(any(), any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any())(any(), any(), any())
-    } thenReturn {
-      Future.successful(HttpResponse(CREATED))
-    }
+      mockAmlsConnector.savePayment(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(HttpResponse(CREATED))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
     def setupBusinessMatching(companyName: String) = {
+
       val model = BusinessMatching(
         reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
       )
@@ -146,12 +138,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       } thenReturn Future.successful(Some(model))
 
-      when {
-        controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-      } thenReturn Future.successful(None)
     }
 
     def setupStatus(status: SubmissionStatus): Unit = {
+
       when {
         controller.statusService.getStatus(any(), any(), any())
       } thenReturn Future.successful(status)
@@ -169,7 +159,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "write a confirmation value to Keystore" in new Fixture {
 
-      setupStatus(SubmissionReady)
+      val submissionStatus = SubmissionReady
+
+      setupStatus(submissionStatus)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber))))
 
       val result = controller.get()(request)
 
@@ -179,281 +175,236 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     }
 
-    "query the payments service for the payments url for an amendment" in new Fixture {
-
-      //noinspection ScalaStyle
-      when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
-
-      setupStatus(SubmissionReadyForReview)
-
-      val result = controller.get()(request)
-      val body = contentAsString(result)
-
-      //noinspection ScalaStyle
-      verify(paymentsConnector).createPayment(eqTo {
-        CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", 10000, paymentsReturnLocation(paymentRefNo))
-      })(any(), any())
-
-      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
-    }
-
-    "query the payments service for the payments url for a variation" in new Fixture {
-
-      //noinspection ScalaStyle
-      when(controller.submissionResponseService.getVariation(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Some(paymentRefNo), Currency.fromInt(150), Seq(), None)))
-
-      setupStatus(SubmissionDecisionApproved)
-
-      val result = controller.get()(request)
-      val body = contentAsString(result)
-
-      //noinspection ScalaStyle
-      verify(paymentsConnector).createPayment(eqTo {
-        CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", 15000, paymentsReturnLocation(paymentRefNo))
-      })(any(), any())
-
-      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
-    }
-
-    "query the payments service for the payments url for a renewal" in new Fixture {
-
-      when {
-        controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(Renewal(Some(InvolvedInOtherNo))))
-
-      when {
-        controller.submissionResponseService.getRenewal(any(), any(), any())
-      } thenReturn Future.successful(Some((Some(paymentRefNo), Currency.fromInt(150), Seq(), None)))
-
-      setupStatus(ReadyForRenewal(Some(new LocalDate())))
-
-      val result = controller.get()(request)
-      val body = contentAsString(result)
-
-      verify(paymentsConnector).createPayment(eqTo {
-        //noinspection ScalaStyle
-        CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", amountInPence = 15000, paymentsReturnLocation(paymentRefNo))
-      })(any(), any())
-
-      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
-    }
-
-    "query the payments service for the payments url for a new submission" in new Fixture {
-      setupStatus(SubmissionReady)
-
-      val result = controller.get()(request)
-      val body = contentAsString(result)
-
-      verify(paymentsConnector).createPayment(eqTo {
-        CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", amountInPence = 0, paymentsReturnLocation(paymentRefNo))
-      })(any(), any())
-
-      Jsoup.parse(body).select("a.button").attr("href") mustBe "/payments"
-    }
-
-    "return the default configured url for payments if none was returned by the payments service" in new Fixture {
-      //noinspection ScalaStyle
-      when {
-        controller.submissionResponseService.getVariation(any(), any(), any())
-      } thenReturn Future.successful(Some(Some(paymentRefNo), Currency.fromInt(150), Seq(), None))
-
-      setupStatus(SubmissionDecisionApproved)
-
-      when(paymentsConnector.createPayment(any())(any(), any())) thenReturn Future.successful(None)
-
-      val result = controller.get()(request)
-      val doc = Jsoup.parse(contentAsString(result))
-
-      verify(paymentsConnector).createPayment(eqTo {
-        //noinspection ScalaStyle
-        CreatePaymentRequest("other", paymentRefNo, "AMLS Payment", amountInPence = 15000, paymentsReturnLocation(paymentRefNo))
-      })(any(), any())
-
-      doc.select(".button").first.attr("href") must include("/pay-online/other-taxes")
-    }
-
     "notify user of progress if application has not already been submitted" in new Fixture {
-      setupStatus(SubmissionReady)
+      val submissionStatus = SubmissionReady
+
+      setupStatus(submissionStatus)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
-      contentAsString(result) must include(paymentRefNo)
+      contentAsString(result) must include(paymentReferenceNumber)
     }
 
     "notify user there is no fee" when {
 
-      "an amendment has difference(/Some(0))" in new Fixture {
-        setupStatus(SubmissionReadyForReview)
+      "submitting an amendment" which {
 
-        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), Some(Currency.fromInt(0))))))
+        val submissionStatus = SubmissionReadyForReview
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+        "has difference(/Some(0))" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+
+        }
+
+        "has no difference(/None)" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(None))))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
+
+        "has no payment reference" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some((None, Currency.fromInt(0), Seq(), Right(None))))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+
+        }
       }
 
-      "an amendment has no difference(/None)" in new Fixture {
-        setupStatus(SubmissionReadyForReview)
+      "submitting a variation" which {
 
-        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(0), Seq(), None))))
+        val submissionStatus = SubmissionDecisionApproved
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+        "has no payment reference" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
+
+        "is without the addition of tp or rp" in new Fixture {
+
+          setupStatus(submissionStatus)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), Right(None)))
+
+          val result = controller.get()(request)
+
+          status(result) mustBe OK
+
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
+
       }
 
-      "an amendment has no payment reference" in new Fixture {
-        setupStatus(SubmissionReadyForReview)
+      "submitting a renewal" which {
 
-        when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-          .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq(), None))))
+        "has no renewal data in save4later for a variation" in new Fixture {
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+          val submissionStatus = ReadyForRenewal(Some(new LocalDate))
 
-      "a variation has no payment reference" in new Fixture {
-        setupStatus(SubmissionDecisionApproved)
+          setupStatus(submissionStatus)
 
-        when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), None)))
+          when {
+            controller.submissionResponseService.isRenewalDefined(any(), any(), any())
+          } thenReturn Future.successful(false)
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(None)))
 
-      "a variation without the addition of tp or rp" in new Fixture {
-        setupStatus(SubmissionDecisionApproved)
+          val result = controller.get()(request)
 
-        when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), None)))
+          status(result) mustBe OK
 
-        val result = controller.get()(request)
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
 
-        status(result) mustBe OK
+        "has no payment reference" in new Fixture {
 
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+          setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
-      "a variation when status is ready for renewal and no renewal data in save4later" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+          when {
+            controller.submissionResponseService.isRenewalDefined(any(), any(), any())
+          } thenReturn Future.successful(true)
 
-        when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq(), None)))
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+          } thenReturn Future.successful(Some((None, Currency.fromInt(0), Seq(), Right(None))))
 
-        val result = controller.get()(request)
+          val result = controller.get()(request)
+          status(result) mustBe OK
 
-        status(result) mustBe OK
+          Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+          contentAsString(result) must include(Messages("confirmation.no.fee"))
+          contentAsString(result) must include(companyName)
+        }
 
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+        "has data then load renewal confirmation" in new Fixture {
 
-      "a renewal has no payment reference" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+          setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(Renewal(Some(InvolvedInOtherNo))))
+          when {
+            controller.submissionResponseService.isRenewalDefined(any(), any(), any())
+          } thenReturn Future.successful(true)
 
-        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
-          .thenReturn(Future.successful(Some((None, Currency.fromInt(0), Seq(), None))))
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+          } thenReturn Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), Right(None))))
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
-      }
+          val result = controller.get()(request)
+          status(result) mustBe OK
+          Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
+        }
 
-      "a renewal status and has data then load renewal confirmation" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
+        "has 1 FP RP and 1 Not FP RP then load renewal confirmation showing each row with respective costs" in new Fixture {
 
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(Renewal()))
+          setupStatus(ReadyForRenewal(Some(new LocalDate)))
 
-        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
-          .thenReturn(Future.successful(Some((Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None))))
+          when {
+            controller.submissionResponseService.isRenewalDefined(any(), any(), any())
+          } thenReturn Future.successful(true)
 
-
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
-      }
-
-      "a renewal status and has 1 FP RP and 1 Not FP RP then load renewal confirmation showing each row with respective costs" in new Fixture {
-
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(Renewal()))
-
-        when(controller.submissionResponseService.getRenewal(any(), any(), any()))
-          .thenReturn(Future.successful(Some((
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+          } thenReturn Future.successful(Some((
             Some("payeref"),
             Currency.fromInt(100),
             Seq(
               BreakdownRow("confirmation.responsiblepeople.fp.passed", 1, Currency(0), Currency(0)),
               BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(100)),
               BreakdownRow("confirmation.tradingpremises.half", 2, Currency(50), Currency(100))
-            ), None))))
+            ), Right(None))))
 
+          val result = controller.get()(request)
+          status(result) mustBe OK
 
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
-        contentAsString(result) must include(Messages("confirmation.responsiblepeople.fp.passed"))
-        contentAsString(result) must include(Messages("confirmation.responsiblepeople"))
-        contentAsString(result) must include(Messages("confirmation.tradingpremises.half"))
+          Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.renewal.title"))
+          contentAsString(result) must include(Messages("confirmation.responsiblepeople.fp.passed"))
+          contentAsString(result) must include(Messages("confirmation.responsiblepeople"))
+          contentAsString(result) must include(Messages("confirmation.tradingpremises.half"))
+        }
+
+        "has no data in save4later then load variation confirmation" in new Fixture {
+
+          setupStatus(ReadyForRenewal(Some(new LocalDate)))
+
+          when {
+            controller.submissionResponseService.isRenewalDefined(any(), any(), any())
+          } thenReturn Future.successful(false)
+
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+          } thenReturn Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), Right(None)))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+          Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.amendment.header"))
+        }
       }
-
-      "a renewal and no data in save4later then load variation confirmation" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate)))
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        when(controller.submissionResponseService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None)))
-
-
-        val result = controller.get()(request)
-        status(result) mustBe OK
-        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.amendment.header"))
-      }
-
     }
 
     "allow a payment to be retried" in new Fixture {
-      val paymentRef = paymentRefGen.sample.get
+
       val paymentsRedirectUrl = "/payments"
       val amountInPence = (paymentAmountGen.sample.get * 100).toInt
-      val postData = "paymentRef" -> paymentRef
+      val postData = "paymentRef" -> paymentReferenceNumber
+      val payment = paymentGen.sample.get
 
       when {
-        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
-      } thenReturn Future.successful(Some(paymentGen.sample.get.copy(reference = paymentRef, amountInPence = amountInPence)))
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+      } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
@@ -461,15 +412,15 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       redirectLocation(result) mustBe Some(paymentsRedirectUrl)
 
       verify(controller.paymentsConnector).createPayment(eqTo(
-        CreatePaymentRequest("other", paymentRef, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentRef))))(any(), any())
+        CreatePaymentRequest("other", paymentReferenceNumber, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentReferenceNumber))))(any(), any())
     }
 
     "fail if a payment cannot be retried" in new Fixture {
-      val paymentRef = paymentRefGen.sample.get
-      val postData = "paymentRef" -> paymentRef
+
+      val postData = "paymentRef" -> paymentReferenceNumber
 
       when {
-        controller.amlsConnector.getPaymentByReference(eqTo(paymentRef))(any(), any(), any())
+        mockAmlsConnector.getPaymentByReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -478,26 +429,35 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     }
 
     "show the correct payment confirmation page" when {
+
       "the application status is 'new submission'" in new Fixture {
+
         setupStatus(SubmissionReady)
 
-        val paymentReference = "X0000000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
 
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
       }
 
       "the application status is 'pending'" in new Fixture {
+
         setupStatus(SubmissionReadyForReview)
 
-        val paymentReference = "X00000000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -505,16 +465,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'approved'" in new Fixture {
+
         setupStatus(SubmissionDecisionApproved)
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -522,16 +486,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'Renewal Submitted'" in new Fixture {
+
         setupStatus(RenewalSubmitted(None))
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -539,21 +507,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal'" in new Fixture {
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
-        val paymentReference = "X00000000000"
+        setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
           controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -561,16 +528,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.renewal.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
+
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
-        val paymentReference = "X00000000000"
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
@@ -578,71 +549,98 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReference)
+        doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "there is no business name" in new Fixture {
+
         setupStatus(SubmissionReady)
 
-        val paymentReference = "X00000000000000000"
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
 
         when {
           controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
         } thenReturn Future.successful(none[BusinessMatching])
 
-        val result = controller.paymentConfirmation(paymentReference)(request)
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReference))
+        doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReferenceNumber))
       }
 
       "the payment failed" in new Fixture {
+
         setupStatus(SubmissionReadyForReview)
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Failed)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val result = controller.paymentConfirmation(payment.reference)(request)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
 
       "the payment was cancelled" in new Fixture {
+
         setupStatus(SubmissionReadyForReview)
+        
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Cancelled)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val result = controller.paymentConfirmation(payment.reference)(request)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+      }
+
+      "bacs confirmation is requested" in new Fixture {
+
+        when {
+          controller.statusService.getReadStatus(any(),any(),any())
+        } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
+
+        val result = controller.bacsConfirmation()(request)
+
+        status(result) mustBe OK
+
+        Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
+
       }
     }
   }
 }
 
-class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator {
+class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator{
 
   val paymentsConnector = mock[PayApiConnector]
 
@@ -672,12 +670,11 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    val paymentRefNo = "XA000000000000"
-
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "", Some(SubscriptionFees(
-        paymentReference = paymentRefNo,
+      amlsRefNo = amlsRegistrationNumber,
+      Some(SubscriptionFees(
+        paymentReference = paymentReferenceNumber,
         registrationFee = 0,
         fpFee = None,
         fpFeeRate = None,
@@ -695,7 +692,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubscription(any(), any(), any())
     } thenReturn {
-      Future.successful((paymentRefNo, Currency.fromInt(0), Seq(), amlsRegistrationNumber))
+      Future.successful((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
     }
 
     when {
@@ -712,7 +709,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(None)
 
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo))
+    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber))
 
   }
 
@@ -725,29 +722,27 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
         reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
       )
 
+      val status = SubmissionReadyForReview
+
       when {
         controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       } thenReturn Future.successful(Some(model))
 
       //noinspection ScalaStyle
-      when(controller.submissionResponseService.getAmendment(any(), any(), any()))
-        .thenReturn(Future.successful(Some((Some(paymentRefNo), Currency.fromInt(100), Seq(), Some(Currency.fromInt(100))))))
+      when {
+        controller.submissionResponseService.getAmendment(any(), any(), any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(status)
+
+      when {
+        controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
+      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
 
       val result = controller.get()(request)
       val body = contentAsString(result)
-
-      verify(paymentsConnector).createPayment(eqTo {
-        //noinspection ScalaStyle
-        CreatePaymentRequest(
-          "other",
-          paymentRefNo,
-          "AMLS Payment",
-          10000,
-          ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentRefNo)))
-      })(any(), any())
 
       Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true
     }

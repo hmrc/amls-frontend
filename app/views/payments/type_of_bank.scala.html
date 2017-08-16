@@ -21,50 +21,43 @@
 
 @header = {
     @errorSummary(f)
-    @heading("payments.waystopay.header", "submit.registration")
+    @heading("payments.typeofbank.header", "submit.registration")
 }
 
 @main(
-    title = Messages("payments.waystopay.title") + " - " + Messages("submit.registration"),
+    title = Messages("payments.typeofbank.title") + " - " + Messages("submit.registration"),
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ){
-        <p>@Messages("payments.waystopay.info")</p>
-        <p>@Messages("payments.waystopay.lead.time")</p>
-    }
-
-    @form(f, controllers.payments.routes.WaysToPayController.post()) {
+    @form(f, controllers.payments.routes.TypeOfBankController.post()) {
 
         @fieldset(
-            f = f("waysToPay-fieldset"),
-            legend = "payments.waystopay.title",
+            f = f("typeOfBank-fieldset"),
+            legend = "payments.typeofbank.title",
             legendHidden = true,
             panel = false
         ) {
             @errorGroup(
-                field = f("waysToPay")
+                field = f("typeOfBank")
             ) {
                 @radio(
-                    f = f("waysToPay"),
-                    labelText = "payments.waystopay.card",
-                    value = "Card"
+                    f = f("typeOfBank"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
                 )
                 @radio(
-                    f = f("waysToPay"),
-                    labelText = "payments.waystopay.bacs",
-                    value = "Bacs"
+                    f = f("typeOfBank"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
                 )
             }
-        }
+    }
 
-        @submit(
-            returnLink = false
-        )
+    @submit(
+        returnLink = false
+    )
 
     }
 }

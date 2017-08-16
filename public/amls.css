@@ -420,6 +420,10 @@ div.grid-layout {
   border-left: solid 10px #bfc1c3;
 }
 
+.grid-border {
+  border-bottom: 1px solid #bfc1c3;
+  padding: 10px 0;
+}
 
 /********************************************************************/
 

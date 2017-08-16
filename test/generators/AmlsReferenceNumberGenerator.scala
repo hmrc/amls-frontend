@@ -27,6 +27,6 @@ trait AmlsReferenceNumberGenerator {
     } yield s"X${a}ML00000$b"
   }
 
-  val amlsRegistrationNumber = amlsRefNoGen.sample.get
+  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
 
 }

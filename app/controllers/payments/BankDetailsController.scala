@@ -18,31 +18,32 @@ package controllers.payments
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.payments.TypeOfBank
+import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TypeOfBankController @Inject()(
-                                    val authConnector: AuthConnector
+class BankDetailsController @Inject()(
+                                      val authConnector: AuthConnector,
+                                      val submissionResponseService: SubmissionResponseService,
+                                      val statusService: StatusService
                                     ) extends BaseController{
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.payments.type_of_bank(EmptyForm)))
-  }
 
-  def post() = Authorised.async {
+  def get(isUK: Boolean = true) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[TypeOfBank](request.body) match {
-          case ValidForm(_, data) => Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
-            data.isUK
-          ).url))
-          case f: InvalidForm => Future.successful(BadRequest(views.html.payments.type_of_bank(f)))
-        }
+        (for {
+          status <- OptionT.liftF(statusService.getStatus)
+          (payRef, fee, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          paymentReference <- OptionT.fromOption[Future](payRef)
+        } yield {
+          Ok(views.html.payments.bank_details(isUK, fee, paymentReference))
+        }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 
 }

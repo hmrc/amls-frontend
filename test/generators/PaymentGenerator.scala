@@ -46,22 +46,15 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     ref <- paymentRefGen
     desc <- alphaNumOfLengthGen(refLength)
     amountInPence <- numGen
-    commissionInPence <- numGen
-    totalInPence <- numGen
-    url <- alphaNumOfLengthGen(refLength)
     paymentStatus <- paymentStatusGen
   } yield Payment (
     _id,
-    Some(amlsRefNo),
+    amlsRefNo,
     ref,
     desc,
     amountInPence,
-    commissionInPence,
-    totalInPence,
-    url,
-    Map.empty,
-    Some(now),
-    paymentStatus
+    paymentStatus,
+    now
   )
 
   val paymentStatusResultGen: Gen[PaymentStatusResult] = for {
@@ -69,5 +62,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     paymentId <- paymentIdGen
     status <- paymentStatusGen
   } yield PaymentStatusResult(paymentRef, paymentId, status)
+
+  lazy val paymentReferenceNumber = paymentRefGen.sample.get
 
 }

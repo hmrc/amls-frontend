@@ -16,22 +16,65 @@
 
 package controllers.payments
 
-import models.payments.WaysToPay
+import connectors.PayApiConnector
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
+import models.confirmation.Currency
+import models.payments._
+import models.status.SubmissionReadyForReview
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
+import uk.gov.hmrc.play.http.HttpResponse
 
-class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper {
+import scala.concurrent.{ExecutionContext, Future}
+
+class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 
     val request = addToken(authRequest)
 
+    implicit val hc: HeaderCarrier = new HeaderCarrier()
+    implicit val ac: AuthContext = mock[AuthContext]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
+
     val controller = new WaysToPayController(
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      paymentsConnector = mock[PayApiConnector],
+      statusService = mock[StatusService],
+      paymentsService = mock[PaymentsService],
+      submissionResponseService = mock[SubmissionResponseService],
+      authEnrolmentsService = mock[AuthEnrolmentsService]
     )
+
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
+
+    when {
+      controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(HttpResponse(OK))
+
+    val data = (Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
+
+    val submissionStatus = SubmissionReadyForReview
+
+    when {
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+    } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+    when {
+      controller.statusService.getStatus(any(),any(),any())
+    } thenReturn Future.successful(submissionStatus)
+
+    when {
+      controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(),any(),any())
+    } thenReturn Future.successful(Some(data))
 
   }
 
@@ -48,9 +91,10 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       }
     }
 
-    "post is called" must {
-      "redirect to TypeOfBankController" when {
-        "enum is bacs" in new Fixture {
+    "post is called" when {
+
+      "enum is bacs" must {
+        "redirect to TypeOfBankController" in new Fixture {
 
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Bacs.entryName
@@ -60,6 +104,73 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.payments.routes.TypeOfBankController.get().url))
+
+          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(true)))(any(), any(), any())
+
+        }
+      }
+
+      "enum is card" must {
+        "go to the payments url" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "waysToPay" -> WaysToPay.Card.entryName
+          )
+
+          when {
+            controller.paymentsService.requestPaymentsUrl(any(),any(),any())(any(),any(),any(),any())
+          } thenReturn Future.successful(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber)))
+
+          val result = controller.post()(postRequest)
+          val body = contentAsString(result)
+
+          verify(controller.paymentsService).requestPaymentsUrl(
+            eqTo(data),
+            eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber).url),
+            eqTo(amlsRegistrationNumber)
+          )(any(),any(),any(),any())
+
+          redirectLocation(result) mustBe Some("/payments")
+
+          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(false)))(any(), any(), any())
+        }
+
+        "return 500" when {
+          "payment info cannot be retrieved" in new Fixture {
+
+            val postRequest = request.withFormUrlEncodedBody(
+              "waysToPay" -> WaysToPay.Card.entryName
+            )
+            
+            when {
+              controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+            } thenReturn Future.successful(None)
+
+            when {
+              controller.statusService.getStatus(any(), any(), any())
+            } thenReturn Future.successful(submissionStatus)
+
+            when {
+              controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(),any(),any())
+            } thenReturn Future.successful(None)
+
+            val result = controller.post()(postRequest)
+            val body = contentAsString(result)
+
+            status(result) mustBe 500
+          }
+        }
+      }
+
+      "request is invalid" must {
+        "return BAD_REQUEST" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "waysToPay" -> "01"
+          )
+
+          val result = controller.post()(postRequest)
+          status(result) mustBe BAD_REQUEST
 
         }
       }

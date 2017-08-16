@@ -21,9 +21,12 @@ import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
+import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -62,6 +65,8 @@ class SubmissionResponseServiceSpec extends PlaySpec
     val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
     val totalFee: BigDecimal = rpFee + tpTotalFee
 
+    val paymentRefNo = "XA000000000000"
+
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
@@ -75,7 +80,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
         premiseFee = 0,
         premiseFeeRate = None,
         totalFees = 0,
-        paymentReference = ""
+        paymentReference = paymentRefNo
       )))
 
     val amendmentResponse = AmendVariationRenewalResponse(
@@ -87,7 +92,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
       premiseFee = 0,
       premiseFeeRate = None,
       totalFees = 100,
-      paymentReference = Some("XA000000000000"),
+      paymentReference = Some(paymentRefNo),
       difference = Some(0)
     )
 
@@ -108,7 +113,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
       zeroRatedTradingPremises = 0
     )
 
-    val amlsRegistrationNumber = "amlsRegNo"
     val reviewDetails = mock[ReviewDetails]
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
@@ -162,7 +166,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
-        val response = Some(Some("XA000000000000"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
@@ -181,7 +185,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           premiseFee = 150,
           premiseFeeRate = Some(150),
           totalFees = 100,
-          paymentReference = Some("XA000000000000"),
+          paymentReference = Some(paymentRefNo),
           difference = Some(0)
         )
 
@@ -205,7 +209,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
         )
 
-        val response = Some(Some("XA000000000000"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
@@ -693,7 +697,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, amlsRegistrationNumber) => {
+            case (_, _, rows, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -733,7 +737,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           case class Test(str: String)
 
           result match {
-            case (_, _, rows, amlsRegistrationNumber) => {
+            case (_, _, rows, _) => {
               rows.head.label mustBe "confirmation.submission"
               rows.head.quantity mustBe 1
               rows.head.perItm mustBe Currency(rpFee)
@@ -775,7 +779,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, amlsRegistrationNumber) => {
+            case (_, _, rows, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -803,7 +807,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, amlsRegistrationNumber) => {
+            case (_, _, rows, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -830,7 +834,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, amlsRegistrationNumber) => rows foreach { row =>
+            case (_, _, rows, _) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -838,5 +842,103 @@ class SubmissionResponseServiceSpec extends PlaySpec
         }
       }
     }
+
+    "getSubmissionData is called" must {
+
+      "return submission data" when {
+
+        "Submission/SubmissionReady" in new Fixture {
+
+          val currency = Currency.fromInt(0)
+
+          val data = (Some(paymentRefNo), currency, Seq(
+            BreakdownRow("confirmation.submission", 0, 0, 0),
+            BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+          ), Left(amlsRegistrationNumber))
+
+          when {
+            cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          } thenReturn Some(subscriptionResponse)
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
+
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
+
+          await(result) mustBe Some(data)
+
+        }
+
+        "Amendment/SubmissionReadyForReview" in new Fixture {
+
+          val currency = Currency.fromInt(100)
+
+          val data = (Some(paymentRefNo), currency, Seq(
+            BreakdownRow("confirmation.submission", 1, 100, 100),
+            BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+          ), Right(Some(currency)))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
+
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview)
+
+          await(result) mustBe Some(data)
+
+        }
+
+        "Variation/SubmissionDecisionApproved" in new Fixture {
+
+          val currency = Currency.fromInt(100)
+
+          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved)
+
+          await(result) mustBe Some(data)
+
+        }
+
+        "Renewal/ReadyForRenewal" in new Fixture {
+
+          val currency = Currency.fromInt(100)
+
+          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          when {
+            TestSubmissionResponseService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+          } thenReturn Future.successful(Some(Renewal()))
+
+          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
+
+          await(result) mustBe Some(data)
+
+        }
+      }
+
+    }
+
   }
 }

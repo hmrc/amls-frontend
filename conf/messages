@@ -728,6 +728,14 @@ confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
 confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 
+confirmation.payment.bacs.title = You have submitted the application
+confirmation.payment.bacs.header = You’ve submitted
+
+confirmation.payment.bacs.received = Your application will be reviewed when HM Revenue and Customs receives your payment. You can sign into this service at any time to see the status of your application.
+confirmation.payment.bacs.time = The review process can take up to 45 days. You'll get an email when the decision has been made.
+confirmation.payment.bacs.trade = You must not trade in activities covered by the Money Laundering Regulations until your application is approved.
+
+
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
@@ -746,6 +754,30 @@ payments.waystopay.lead.time = Payments usually take 3 working days.
 
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
+
+payments.waystopay.error = You must select a payment method. Please select how you want to pay your fee
+
+payments.typeofbank.title = Will you be paying from a UK bank account?
+payments.typeofbank.header = Will you be paying from a UK bank account?
+
+payments.typeofbank.error = Select yes if you will be paying from a UK bank account
+
+payments.bankdetails.title = Payment Details
+payments.bankdetails.header = Payment Details
+payments.bankdetails.bics.name = Bank identifier code (BIC)
+payments.bankdetails.bics.value = BARCGB22
+payments.bankdetails.iban.name = Account number (IBAN)
+payments.bankdetails.iban.value = GB03BARC20114783977692
+payments.bankdetails.accountnumber.name = Account number
+payments.bankdetails.accountnumber.value = 83977692
+payments.bankdetails.accountname.name = Account name
+payments.bankdetails.accountname.value = HMRC Shipley Receipts
+payments.bankdetails.sortcode.name = Sort code
+payments.bankdetails.sortcode.value = 20 11 47
+payments.bankdetails.fee.name = Fee
+payments.bankdetails.reference.name = Reference
+payments.bankdetails.warning = Your payment may be delayed if you use the wrong reference.
+
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration

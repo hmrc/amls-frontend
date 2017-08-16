@@ -15,21 +15,30 @@
  *@
 
 @import include._
+@import forms2._
 
-@(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages)
+@(businessName: String)(implicit request: Request[_],m:Messages)
 
-@main(title = messages("confirmation.payment.title")){
+@main(
+    title = Messages("confirmation.payment.bacs.title") + " - " + Messages("submit.registration")
+) {
 
-    <div class="confirmation">
-        <h1 class="heading-large">@Messages("confirmation.payment.lede")</h1>
-        <p>
-            @companyName
-            <br>
-            @messages("confirmation.payment.reference_header", paymentReference)
-        </p>
-    </div>
 
-    <p>@messages("confirmation.payment.info.hmrc_review")</p>
+<div class="confirmation">
+    <h1 class="heading-large"><span class="visuallyhidden">This section is </span>@Messages("confirmation.payment.bacs.header")</h1>
+    <p>@businessName</p>
+</div>
+
+    <p>@Messages("confirmation.payment.bacs.received")</p>
+
+    <p>@Messages("confirmation.payment.bacs.time")</p>
+
+    @panel(
+        jsHidden = false,
+        wide = true
+    ){
+        <p>@Messages("confirmation.payment.bacs.trade")</p>
+    }
 
     @footer()
 

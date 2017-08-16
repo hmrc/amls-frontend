@@ -35,6 +35,11 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     val exclusionSet = Seq(
       controllers.routes.LandingController.get().url,
       controllers.routes.ConfirmationController.get().url,
+      controllers.routes.ConfirmationController.bacsConfirmation().url,
+      controllers.payments.routes.WaysToPayController.get().url,
+      controllers.payments.routes.TypeOfBankController.get().url,
+      controllers.payments.routes.BankDetailsController.get(true).url,
+      controllers.payments.routes.BankDetailsController.get(false).url,
       "/pay-online/other-taxes",
       "/confirmation/payment-complete"
     )
@@ -69,7 +74,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
                 Redirect(targetUrl)
               }
 
-            case x => nextFilter(rh)
+            case _ => nextFilter(rh)
           }
 
         case _ => nextFilter(rh)

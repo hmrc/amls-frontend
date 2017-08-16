@@ -15,22 +15,18 @@
  *@
 
 @import include._
+@import forms2._
 
-@(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages)
+@()(implicit messages: Messages, request: Request[_])
 
-@main(title = messages("confirmation.payment.title")){
+<h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
 
-    <div class="confirmation">
-        <h1 class="heading-large">@Messages("confirmation.payment.lede")</h1>
-        <p>
-            @companyName
-            <br>
-            @messages("confirmation.payment.reference_header", paymentReference)
-        </p>
-    </div>
+<p>@messages("confirmation.payment.info.keep_up_to_date")</p>
 
-    <p>@messages("confirmation.payment.info.hmrc_review")</p>
+<ul class="list list-bullet">
+    <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
+    <li>@messages("confirmation.payment.info.keep_up_to_date.item2")</li>
+    <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
+</ul>
 
-    @footer()
-
-}
+<a class="button" href="@controllers.routes.LandingController.get()" role="button">@Messages("confirmation.payment.status_button.text")</a>

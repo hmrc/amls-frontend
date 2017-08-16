@@ -16,31 +16,25 @@
 
 package models.payments
 
-import enumeratum._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
-import models.EnumFormatForm
 
-sealed abstract class WaysToPay extends EnumEntry
+case class TypeOfBank(isUK: Boolean)
 
-object WaysToPay extends PlayEnum[WaysToPay] {
+object TypeOfBank {
+
+  val pathName = "typeOfBank"
 
   import utils.MappingUtils.Implicits._
 
-  case object Card extends WaysToPay
-  case object Bacs extends WaysToPay
+  implicit val formRule: Rule[UrlFormEncoded, TypeOfBank] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ pathName).read[Boolean].withMessage("payments.typeofbank.error") map TypeOfBank.apply
+    }
 
-  override def values = findValues
-
-  val pathName = "waysToPay"
-
-  implicit val formRule: Rule[UrlFormEncoded, WaysToPay] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ pathName).read(EnumFormatForm.reader(WaysToPay)).withMessage("payments.waystopay.error")
-  }
-
-  implicit val formWrites: Write[WaysToPay, UrlFormEncoded] = Write { __ =>
-    Map(pathName -> Seq(__.entryName))
+  implicit val formWrites = Write[TypeOfBank, UrlFormEncoded] {
+    case TypeOfBank(value) => Map(pathName -> Seq(value.toString))
   }
 
 }
