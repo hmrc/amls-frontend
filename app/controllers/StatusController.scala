@@ -29,7 +29,7 @@ import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Play
-import play.api.mvc.{AnyContent, Call, Request}
+import play.api.mvc.{AnyContent, Call, Request, Result}
 import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
@@ -112,7 +112,13 @@ trait StatusController extends BaseController {
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
                                        status: SubmissionStatus,
                                        businessNameOption: Option[String],
-                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)(implicit request: Request[AnyContent], authContext: AuthContext) = {
+                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)
+                                      (implicit request: Request[AnyContent], authContext: AuthContext): Future[Result] = {
+    val isBacsPayment = for {
+      amlsRegNo <- OptionT.fromOption[Future](mlrRegNumber)
+      payment <- OptionT(amlsConnector.getPaymentByAmlsReference(amlsRegNo))
+    } yield payment.isBacs.getOrElse(false)
+
     status match {
       case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
       case SubmissionReady => {
@@ -121,9 +127,14 @@ trait StatusController extends BaseController {
             Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
-      case _ => Future.successful(Ok(status_submitted(mlrRegNumber.getOrElse(""),
-        businessNameOption, feeResponse, ApplicationConfig.allowWithdrawalToggle,
-        fromDuplicateSubmission)))
+      case _ => isBacsPayment.value map { maybeBacs =>
+        Ok(status_submitted(mlrRegNumber.getOrElse(""),
+          businessNameOption,
+          feeResponse,
+          ApplicationConfig.allowWithdrawalToggle,
+          fromDuplicateSubmission,
+          showBacsContent = maybeBacs.getOrElse(false)))
+      }
     }
   }
 

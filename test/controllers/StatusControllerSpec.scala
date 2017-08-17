@@ -18,6 +18,7 @@ package controllers
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
+import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
@@ -44,7 +45,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite {
+class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 
@@ -81,8 +82,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
   }
-
-  val amlsRegistrationNumber = "XAML00000567890"
 
   val feeResponse = FeeResponse(
     SubscriptionResponseType,
@@ -126,6 +125,37 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     }
 
     "show correct content" when {
+
+      "the application status is Ready For Review, and the user has elected to pay by BACS" in new Fixture {
+        val paymentRef = paymentRefGen.sample.get
+        val payment = paymentGen.sample.get.copy(isBacs = Some(true))
+        val feeResponse = mock[FeeResponse]
+
+        when(controller.feeConnector.feeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionReadyForReview, None)))
+
+        when(controller.amlsConnector.getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any()))
+          .thenReturn(Future.successful(Some(payment)))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        verify(controller.amlsConnector).getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any())
+
+        contentAsString(result) must include(Messages("status.submissionreadyforreview.bacs"))
+      }
 
       "application status is NotCompleted" in new Fixture {
 
