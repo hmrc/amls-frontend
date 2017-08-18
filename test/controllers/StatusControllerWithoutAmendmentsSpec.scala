@@ -75,6 +75,9 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
         .thenReturn(Future.successful(mock[FeeResponse]))
 
+      when(controller.amlsConnector.getPaymentByAmlsReference(any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
       when {
         controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDtls), None)))

@@ -19,9 +19,14 @@
 @import forms2._
 @import models.FeeResponse
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse], showBacsInfo: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
-<p>@Messages("status.submissionreadyforreview.description")</p>
+@if(showBacsInfo) {
+    <p>@Messages("status.submissionreadyforreview.bacs")</p>
+} else {
+    <p>@Messages("status.submissionreadyforreview.description")</p>
+}
+
 <p>@Messages("status.submissionreadyforreview.description2")</p>
 
 @feeResponse.map {fee =>

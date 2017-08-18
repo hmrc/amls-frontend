@@ -43,6 +43,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   val paymentGen: Gen[Payment] = for {
     _id <- alphaNumOfLengthGen(refLength)
     amlsRefNo <- amlsRefNoGen
+    safeId <- amlsRefNoGen
     ref <- paymentRefGen
     desc <- alphaNumOfLengthGen(refLength)
     amountInPence <- numGen
@@ -50,6 +51,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   } yield Payment (
     _id,
     amlsRefNo,
+    safeId,
     ref,
     desc,
     amountInPence,

@@ -74,8 +74,6 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
-
-
     }
 
     "contains 'update/amend information' content and link" in new ViewFixture {
@@ -140,6 +138,14 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+    }
+
+    "show specific content when the user has elected to pay by BACS" in new ViewFixture {
+      val form2 = EmptyForm
+
+      def view = views.html.status.status_submitted("XAML00000000000", Some("business Name"), None, showBacsContent = true)
+
+      validateParagraphizedContent("status.submissionreadyforreview.bacs")
     }
   }
 }

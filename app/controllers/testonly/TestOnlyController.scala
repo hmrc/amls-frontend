@@ -58,7 +58,7 @@ trait TestOnlyController extends BaseController with Actions {
 
   def getPayment(ref: String) = Authorised.async {
     implicit authContext => implicit request =>
-      AmlsConnector.getPaymentByReference(ref) map {
+      AmlsConnector.getPaymentByPaymentReference(ref) map {
         case Some(p) => Ok(Json.toJson(p))
         case _ => Ok(s"The payment for $ref was not found")
       }

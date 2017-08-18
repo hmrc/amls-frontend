@@ -87,7 +87,7 @@ trait ConfirmationController extends BaseController {
           businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
-          payment <- OptionT(amlsConnector.getPaymentByReference(reference))
+          payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
         } yield (status, paymentStatus.currentStatus) match {
           case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
@@ -123,12 +123,13 @@ trait ConfirmationController extends BaseController {
         val result = for {
           form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
-          oldPayment <- OptionT(amlsConnector.getPaymentByReference(paymentRef))
+          oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef))
           newPayment <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
               paymentRef,
               oldPayment.amountInPence.toDouble / 100,
               controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
-              oldPayment.amlsRefNo))
+              oldPayment.amlsRefNo,
+              oldPayment.safeId))
         } yield Redirect(newPayment.links.nextUrl)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")

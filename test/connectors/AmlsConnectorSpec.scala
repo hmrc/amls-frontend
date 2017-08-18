@@ -277,24 +277,24 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
       } thenReturn Future.successful(HttpResponse(CREATED))
 
-      whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber)) {
+      whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber, safeId)) {
         _.status mustBe CREATED
       }
 
     }
   }
 
-  "getPayment" must {
+  "getPaymentByPaymentReference" must {
     "retrieve a payment given the payment reference" in {
       val paymentRef = paymentRefGen.sample.get
       val payment = paymentGen.sample.get.copy(reference = paymentRef)
-      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/ref/$paymentRef"
+      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/payref/$paymentRef"
 
       when {
         AmlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any())
       } thenReturn Future.successful(payment)
 
-      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+      whenReady(AmlsConnector.getPaymentByPaymentReference(paymentRef)) {
         case Some(result) => result mustBe payment
         case _ => fail("Payment was not found")
       }
@@ -307,7 +307,37 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpGet.GET[Payment](any())(any(), any())
       } thenReturn Future.failed(new NotFoundException("Payment was not found"))
 
-      whenReady(AmlsConnector.getPaymentByReference(paymentRef)) {
+      whenReady(AmlsConnector.getPaymentByPaymentReference(paymentRef)) {
+        case Some(_) => fail("None should be returned")
+        case _ =>
+      }
+    }
+  }
+
+  "getPaymentByAmlsReference" must {
+    "retrieve a payment given an AMLS reference number" in {
+      val amlsRef = amlsRefNoGen.sample.get
+      val payment = paymentGen.sample.get.copy(amlsRefNo = amlsRef)
+      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/amlsref/$amlsRef"
+
+      when {
+        AmlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any())
+      } thenReturn Future.successful(payment)
+
+      whenReady(AmlsConnector.getPaymentByAmlsReference(amlsRef)) {
+        case Some(result) => result mustBe payment
+        case _ => fail("Payment was not found")
+      }
+    }
+
+    "return None when the payment record is not found" in {
+      val amlsRef = amlsRefNoGen.sample.get
+
+      when {
+        AmlsConnector.httpGet.GET[Payment](any())(any(), any())
+      } thenReturn Future.failed(new NotFoundException("Payment was not found"))
+
+      whenReady(AmlsConnector.getPaymentByAmlsReference(amlsRef)) {
         case Some(_) => fail("None should be returned")
         case _ =>
       }

@@ -36,6 +36,7 @@ import scala.concurrent.Future
 
 class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with GenericTestHelper with PaymentGenerator {
 
+  //noinspection ScalaStyle
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -50,6 +51,7 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
     )
 
     val paymentRefNo = "XA000000000000"
+    val safeId = amlsRefNoGen.sample.get
 
     val currency = Currency.fromInt(100)
 

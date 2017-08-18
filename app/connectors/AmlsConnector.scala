@@ -203,23 +203,37 @@ trait AmlsConnector {
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
-  def savePayment(paymentId: String, amlsRefNo: String)
+  def savePayment(paymentId: String, amlsRefNo: String, safeId: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/"
+    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
 
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
 
-  def getPaymentByReference(paymentReference: String)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+  def getPaymentByPaymentReference(paymentReference: String)
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$paymentUrl/$accountType/$accountId/ref/$paymentReference"
+    val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
 
-    Logger.debug(s"[AmlsConnector][getPaymentByReference]: Request to $getUrl with $paymentReference")
+    Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    } recover {
+      case _: NotFoundException => None
+    }
+  }
+
+  def getPaymentByAmlsReference(amlsRef: String)
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
+
+    Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
 
     httpGet.GET[Payment](getUrl) map { result =>
       Some(result)
