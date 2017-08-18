@@ -37,6 +37,18 @@ class StillEmployedSpec extends PlaySpec with MustMatchers {
         }
       }
 
+      "'no' is selected" must {
+        "return a valid form model" in {
+          val formData = Map(
+            "stillEmployed" -> Seq("false")
+          )
+
+          val result = StillEmployed.formReads.validate(formData)
+
+          result mustBe Valid(StillEmployedNo)
+        }
+      }
+
       "nothing is selected" must {
         "return the validation errors" in {
           val formData = Map.empty[String, Seq[String]]
@@ -55,6 +67,12 @@ class StillEmployedSpec extends PlaySpec with MustMatchers {
           val result = StillEmployed.formWrites.writes(model)
 
           result mustBe Map("stillEmployed" -> Seq("true"))
+        }
+        "StillEmployed is 'no'" in {
+          val model = StillEmployedNo
+          val result = StillEmployed.formWrites.writes(model)
+
+          result mustBe Map("stillEmployed" -> Seq("false"))
         }
       }
     }
