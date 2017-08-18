@@ -128,7 +128,8 @@ trait ConfirmationController extends BaseController {
               paymentRef,
               oldPayment.amountInPence.toDouble / 100,
               controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
-              oldPayment.amlsRefNo))
+              oldPayment.amlsRefNo,
+              oldPayment.safeId))
         } yield Redirect(newPayment.links.nextUrl)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")

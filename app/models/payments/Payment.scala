@@ -37,6 +37,7 @@ object PaymentStatuses extends Enum[PaymentStatus] {
 case class Payment(
                     _id: String,
                     amlsRefNo: String,
+                    safeId: String,
                     reference: String,
                     description: String,
                     amountInPence: Int,

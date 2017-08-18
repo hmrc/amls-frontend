@@ -123,7 +123,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      mockAmlsConnector.savePayment(any(), any())(any(), any(), any())
+      mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))

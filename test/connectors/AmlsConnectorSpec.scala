@@ -277,7 +277,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         AmlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any())
       } thenReturn Future.successful(HttpResponse(CREATED))
 
-      whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber)) {
+      whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber, safeId)) {
         _.status mustBe CREATED
       }
 
@@ -288,7 +288,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "retrieve a payment given the payment reference" in {
       val paymentRef = paymentRefGen.sample.get
       val payment = paymentGen.sample.get.copy(reference = paymentRef)
-      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/ref/$paymentRef"
+      val getUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/payref/$paymentRef"
 
       when {
         AmlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any())

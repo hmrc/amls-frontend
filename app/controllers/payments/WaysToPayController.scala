@@ -51,6 +51,9 @@ class WaysToPayController @Inject()(
       implicit request =>
 
         val submissionDetails = for {
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          data@(paymentReference, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getStatus)
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
           amlsRefNo <- {
@@ -60,24 +63,25 @@ class WaysToPayController @Inject()(
             }
           }
           payRef <- OptionT.fromOption[Future](paymentReference)
-        } yield (amlsRefNo, payRef, data)
+        } yield (amlsRefNo, payRef, data, detailedStatus.fold[String]("")(_.safeId.getOrElse("")))
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
             case Card => {
               (for {
-                (amlsRefNo, payRef, submissionData) <- submissionDetails
+                (amlsRefNo, payRef, submissionData, safeId) <- submissionDetails
                 paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
                   submissionData,
                   controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,
-                  amlsRefNo
+                  amlsRefNo,
+                  safeId
                 ))
                 _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(false)))
               } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
             }
             case Bacs =>
               val bankTypeResult = for {
-                (_, payRef, _) <- submissionDetails
+                (_, payRef, _, _) <- submissionDetails
                 _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(true)))
               } yield Redirect(controllers.payments.routes.TypeOfBankController.get())
 
