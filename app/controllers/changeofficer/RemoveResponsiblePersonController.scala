@@ -24,7 +24,10 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject()(val authConnector: AuthConnector) extends BaseController {
-  def get = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext => implicit request => Future.successful(Ok)
+  }
+  def post() = Authorised.async {
+    implicit authContext => implicit request => ???
   }
 }
