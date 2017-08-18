@@ -78,6 +78,15 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
         label.text() must include(n.fullName)
       }
 
+      val id = s"value--1"
+      val e = doc.getElementById(id)
+
+      Option(e) must be(defined)
+      e.`val` mustBe "-1"
+
+      val label = doc.select(s"label[for=$id]")
+      label.text() must include(Messages("lbl.register.some.one.else"))
+
     }
 
     "show the correct text when there are no current partners" in new ViewFixture {

@@ -21,6 +21,7 @@ import play.api.libs.json.Writes
 
 sealed trait StillEmployed
 case object StillEmployedYes extends StillEmployed
+case object StillEmployedNo extends StillEmployed
 
 object StillEmployed {
   import jto.validation._
@@ -30,10 +31,12 @@ object StillEmployed {
     import jto.validation.forms.Rules._
     (__ \ "stillEmployed").read[Boolean].withMessage("changeofficer.stillemployed.validationerror") map {
       case true => StillEmployedYes
+      case false  => StillEmployedNo
     }
   }
 
   implicit val formWrites: Write[StillEmployed, UrlFormEncoded] = Write {
     case StillEmployedYes => "stillEmployed" -> "true"
+    case StillEmployedNo => "stillEmployed" -> "false"
   }
 }

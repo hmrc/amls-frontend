@@ -38,7 +38,6 @@ import controllers.declaration
 
 import scala.concurrent.Future
 
-
 @Singleton
 class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
@@ -70,7 +69,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
       case Some(x) => Redirect(x)
       case _ => InternalServerError("Unable to get redirect url")
     }) recoverWith {
-      case x : Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
+      case _ : Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
   }
 
@@ -81,7 +80,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
         val updatedList = rpSeq.filter(!_.status.contains(StatusConstants.Deleted)).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
             case true => {
-              val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions.+(Partner), p.startDate)))
+              val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions + Partner, p.startDate)))
               responsiblePerson.copy(positions = position)
             }
             case false => responsiblePerson

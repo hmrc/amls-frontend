@@ -22,8 +22,8 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
-import forms.{EmptyForm, Form2, InvalidForm}
-import models.changeofficer.StillEmployed
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -46,7 +46,12 @@ class StillEmployedController @Inject()
           (getNominatedOfficerName map (name =>
             BadRequest(views.html.changeofficer.still_employed(x, name))
             )) getOrElse InternalServerError("No responsible people found")
-        case _ => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
+        case ValidForm(_, data) => {
+          data match {
+            case StillEmployedYes => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
+            case StillEmployedNo => Future.successful(Redirect(controllers.changeofficer.routes.RemoveResponsiblePersonController.get()))
+          }
+        }
       }
   }
 }
