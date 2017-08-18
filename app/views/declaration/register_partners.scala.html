@@ -56,7 +56,7 @@
                     @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace,  s"$i")
                 }
             }
-            @radio(f("value"), Messages("lbl.register.some.one.else"), "someoneelse", "someoneelse")
+            @radio(f("value"), Messages("lbl.register.some.one.else"), "-1")
         }
         @submit()
     }
