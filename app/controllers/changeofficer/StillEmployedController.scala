@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.changeofficer.{StillEmployed, StillEmployedYes}
+import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -49,6 +49,7 @@ class StillEmployedController @Inject()
         case ValidForm(_, data) => {
           data match {
             case StillEmployedYes => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
+            case StillEmployedNo => Future.successful(Redirect(controllers.changeofficer.routes.RemoveResponsiblePersonController.get()))
           }
         }
       }

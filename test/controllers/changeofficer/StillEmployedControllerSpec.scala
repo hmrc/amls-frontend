@@ -94,9 +94,9 @@ class StillEmployedControllerSpec extends GenericTestHelper {
           redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
         }
         "response is 'no', and redirect to RemoveResponsiblePerson" in new TestFixture {
-          val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
+          val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "false"))
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(1, true).url)
+          redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url)
         }
       }
     }
