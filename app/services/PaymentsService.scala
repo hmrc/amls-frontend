@@ -49,7 +49,7 @@ class PaymentsService @Inject()(
                                  request: Request[_]): Future[CreatePaymentResponse] =
     data match {
       case (Some(ref), _, _, Right(Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo)
-      case (Some(ref), total, _, Right(None)) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
+      case (Some(ref), total, _, _) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 

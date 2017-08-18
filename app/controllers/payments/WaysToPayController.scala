@@ -23,11 +23,11 @@ import cats.implicits._
 import connectors.PayApiConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.payments.{UpdateBacsRequest, WaysToPay}
 import models.payments.WaysToPay._
-import models.payments.{CreatePaymentResponse, WaysToPay}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.payments.UpdateBacsRequest
+
 import scala.concurrent.Future
 
 @Singleton
@@ -52,8 +52,13 @@ class WaysToPayController @Inject()(
 
         val submissionDetails = for {
           status <- OptionT.liftF(statusService.getStatus)
-          data@(paymentReference, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
-          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+          data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+          amlsRefNo <- {
+            e match {
+              case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+              case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
+            }
+          }
           payRef <- OptionT.fromOption[Future](paymentReference)
         } yield (amlsRefNo, payRef, data)
 
@@ -72,7 +77,7 @@ class WaysToPayController @Inject()(
             }
             case Bacs =>
               val bankTypeResult = for {
-                (amlsRefNo, payRef, _) <- submissionDetails
+                (_, payRef, _) <- submissionDetails
                 _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(true)))
               } yield Redirect(controllers.payments.routes.TypeOfBankController.get())
 
