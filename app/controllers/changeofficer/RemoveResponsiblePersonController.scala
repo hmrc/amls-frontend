@@ -18,15 +18,25 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.changeofficer.Helpers.getNominatedOfficerName
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
+class RemoveResponsiblePersonController @Inject()(
+                                                   val authConnector: AuthConnector,
+                                                   implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
 
-class RemoveResponsiblePersonController @Inject()(val authConnector: AuthConnector) extends BaseController {
   def get() = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext => implicit request => {
+      (getNominatedOfficerName map (name =>
+        Ok(views.html.changeofficer.remove_responsible_person(EmptyForm, name))
+        )) getOrElse InternalServerError("No responsible people found")
+    }
   }
+
   def post() = Authorised.async {
     implicit authContext => implicit request => ???
   }

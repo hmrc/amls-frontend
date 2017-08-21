@@ -33,7 +33,6 @@ class StillEmployedController @Inject()
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-
       (getNominatedOfficerName map (name =>
         Ok(views.html.changeofficer.still_employed(EmptyForm, name))
         )) getOrElse InternalServerError("No responsible people found")

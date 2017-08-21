@@ -21,25 +21,32 @@
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("", personName), "summary.updateinformation")
+    @headingWithPlaceholder(("changeofficer.removeresponsibleperson.heading", personName), "summary.updateinformation")
 }
 
 @main(
-    title = Messages("", personName) + " - " + Messages("summary.updateinformation"),
+    title = Messages("changeofficer.removeresponsibleperson.title", personName) + " - " + Messages("summary.updateinformation"),
     heading = header
 ) {
 
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ){
+        @Messages("changeofficer.removeresponsibleperson.info", personName)
+    }
+
     @form(f, controllers.changeofficer.routes.RemoveResponsiblePersonController.post()) {
 
-    @date(
-        f = f,
-        p = "date",
-        labelText = "",
-        example = true,
-        legendHidden = true
-    )
+        @date(
+            f = f,
+            p = "date",
+            labelText = Messages("changeofficer.removeresponsibleperson.lbl", personName),
+            example = true
+        )
 
-    @submit(false, Some(Messages("button.saveandcontinue")))
+        @submit(false, Some(Messages("button.saveandcontinue")))
 
     }
 }

@@ -16,22 +16,46 @@
 
 package controllers.changeofficer
 
+import connectors.DataCacheConnector
+import models.responsiblepeople._
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
+import scala.concurrent.Future
+
 class RemoveResponsiblePersonControllerSpec extends GenericTestHelper {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
+    val dataCacheConnector = mock[DataCacheConnector]
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
 
     lazy val controller = injector.instanceOf[RemoveResponsiblePersonController]
+
+
+    val nominatedOfficer = ResponsiblePeople(
+      personName = Some(PersonName("firstName", None, "lastName",None, None)),
+      positions = Some(Positions(Set(NominatedOfficer),None))
+    )
+
+    val otherResponsiblePerson = ResponsiblePeople(
+      personName = Some(PersonName("otherFirstName", None, "otherLastName",None, None)),
+      positions = Some(Positions(Set(Director),None))
+    )
+
+    when(dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
   }
 
   "The RemoveResponsiblePersonController" must {
@@ -39,6 +63,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper {
       val result = controller.get()(request)
 
       status(result) mustBe OK
+      contentAsString(result) must include(Messages("changeofficer.removeresponsibleperson.title"))
     }
   }
 

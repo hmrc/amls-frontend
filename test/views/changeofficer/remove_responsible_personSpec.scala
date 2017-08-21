@@ -32,7 +32,7 @@ class remove_responsible_personSpec extends GenericTestHelper with MustMatchers 
     implicit val requestWithToken = addToken(request)
   }
 
-  "vat_registered view" must {
+  "remove_responsible_person view" must {
     "have correct title" in new ViewFixture {
 
       def view = views.html.changeofficer.remove_responsible_person(EmptyForm, "testName")
@@ -51,17 +51,23 @@ class remove_responsible_personSpec extends GenericTestHelper with MustMatchers 
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2 = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "date") -> Seq(ValidationError("not a message Key"))
-        ))
+      val messageKey1 = "definitely not a message key"
+      val dateField = "date"
 
-      def view = views.html.changeofficer.still_employed(form2, "testName")
+      val form2: InvalidForm = InvalidForm(
+        Map("thing" -> Seq("thing")),
+        Seq((Path \ dateField, Seq(ValidationError(messageKey1))))
+      )
 
-      errorSummary.html() must include("not a message Key")
+      def view = views.html.changeofficer.remove_responsible_person(form2, "first last")
 
-      doc.getElementById("date")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      errorSummary.html() must include(messageKey1)
+
+      doc.getElementById(dateField).html() must include(messageKey1)
+
+      doc.getElementsByAttributeValue("name", "date.day") must not be empty
+      doc.getElementsByAttributeValue("name", "date.month") must not be empty
+      doc.getElementsByAttributeValue("name", "date.year") must not be empty
     }
 
   }
