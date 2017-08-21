@@ -18,19 +18,20 @@ package generators
 
 import java.time.LocalDateTime
 
-import models.payments.{Payment, PaymentStatus, PaymentStatusResult}
+import models.payments.{CreateBacsPaymentRequest, Payment, PaymentStatus, PaymentStatusResult}
 import models.payments.PaymentStatuses._
 import org.scalacheck.Gen
 
+//noinspection ScalaStyle
 trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
 
   val refLength = 10
 
-  def paymentRefGen = stringOfLengthGen(refLength - 1) map { ref => s"X${ref.toUpperCase()}" }
+  def paymentRefGen: Gen[String] = stringOfLengthGen(refLength - 1) map { ref => s"X${ref.toUpperCase()}" }
 
-  def paymentIdGen = alphaNumOfLengthGen(15)
+  def paymentIdGen: Gen[String] = alphaNumOfLengthGen(15)
 
-  def now = LocalDateTime.now()
+  def now: LocalDateTime = LocalDateTime.now()
 
   def paymentStatusGen: Gen[PaymentStatus] = Gen.oneOf(
     Created,
@@ -65,6 +66,13 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     status <- paymentStatusGen
   } yield PaymentStatusResult(paymentRef, paymentId, status)
 
-  lazy val paymentReferenceNumber = paymentRefGen.sample.get
+  val createBacsPaymentGen: Gen[CreateBacsPaymentRequest] = for {
+    amlsRef <- amlsRefNoGen
+    safeId <- amlsRefNoGen
+    payRef <- paymentRefGen
+    amount <- numGen
+  } yield CreateBacsPaymentRequest(amlsRef, payRef, safeId, amount)
+
+  lazy val paymentReferenceNumber: String = paymentRefGen.sample.get
 
 }

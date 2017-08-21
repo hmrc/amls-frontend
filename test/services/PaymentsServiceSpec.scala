@@ -61,7 +61,7 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
   "PaymentService" when {
 
-    "updateBacsStatus is call" must {
+    "updateBacsStatus is called" must {
       "use the connector to update the bacs status" in new Fixture {
         val paymentRef = paymentRefGen.sample.get
         val request = UpdateBacsRequest(true)
@@ -76,7 +76,6 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
       }
     }
-
   }
 
 }
