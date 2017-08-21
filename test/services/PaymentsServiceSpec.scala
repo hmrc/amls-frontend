@@ -19,7 +19,7 @@ package services
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import models.payments.UpdateBacsRequest
+import models.payments.{CreateBacsPaymentRequest, Payment, UpdateBacsRequest}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -76,6 +76,22 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
       }
     }
+
+    "createBacs payment is called" must {
+      "use the connector to create a new bacs payment" in new Fixture {
+        val request: CreateBacsPaymentRequest = createBacsPaymentGen.sample.get
+        val payment: Payment = paymentGen.sample.get
+
+        when {
+          testPaymentService.amlsConnector.createBacsPayment(eqTo(request))(any(), any(), any())
+        } thenReturn Future.successful(payment)
+
+        whenReady(testPaymentService.createBacsPayment(request)) {
+          _ mustBe payment
+        }
+      }
+    }
+
   }
 
 }
