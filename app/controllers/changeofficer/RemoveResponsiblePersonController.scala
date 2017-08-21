@@ -22,13 +22,17 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers.getNominatedOfficerName
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.changeofficer.RemovalDate
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject()(
                                                    val authConnector: AuthConnector,
-                                                   implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                   implicit val dataCacheConnector: DataCacheConnector
 
+                                                 ) extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request => {
       (getNominatedOfficerName map (name =>
@@ -38,6 +42,12 @@ class RemoveResponsiblePersonController @Inject()(
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request => ???
+    implicit authContext => implicit request =>
+        Form2[RemovalDate](request.body) match {
+          case f: InvalidForm => (getNominatedOfficerName map { name =>
+            BadRequest(views.html.changeofficer.remove_responsible_person(f, name))
+          }) getOrElse InternalServerError("No responsible people found")
+          case ValidForm(_, data) => Future.successful(Redirect(routes.NewOfficerController.get()))
+        }
   }
 }
