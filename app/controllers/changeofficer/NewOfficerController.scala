@@ -33,6 +33,7 @@ import scala.concurrent.Future
 import cats.implicits._
 
 class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
+
   def get = Authorised.async {
     implicit authContext => implicit request =>
 

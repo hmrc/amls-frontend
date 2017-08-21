@@ -29,17 +29,30 @@ object Helpers {
   def getNominatedOfficerName()(implicit authContext: AuthContext,
                                 headerCarrier: HeaderCarrier,
                                 dataCacheConnector: DataCacheConnector,
-                                f: cats.Monad[Future]) = {
+                                f: cats.Monad[Future]): OptionT[Future, String] = {
     for {
       people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
+      (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(people))
       name <- OptionT.fromOption[Future](nominatedOfficer.personName)
     } yield {
       name.fullName
     }
   }
 
-  def getOfficer(people: Seq[ResponsiblePeople]) = {
-    people.find(_.positions.fold(false)(p => p.positions.contains(NominatedOfficer)))
+  def getOfficer(people: Seq[ResponsiblePeople]): Option[(ResponsiblePeople, Int)] = {
+    people.zipWithIndex.map {
+      case (person, index) => (person, index + 1)
+    }.find(_._1.positions.fold(false)(p => p.positions.contains(NominatedOfficer)))
   }
+
+  def getNominatedOfficerWithIndex()(implicit authContext: AuthContext,
+                                headerCarrier: HeaderCarrier,
+                                dataCacheConnector: DataCacheConnector,
+                                f: cats.Monad[Future]): OptionT[Future, (ResponsiblePeople, Int)] = {
+    for {
+      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
+    } yield nominatedOfficer
+  }
+
 }

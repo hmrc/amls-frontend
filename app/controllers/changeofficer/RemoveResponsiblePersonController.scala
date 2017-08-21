@@ -18,21 +18,22 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.changeofficer.Helpers.getNominatedOfficerName
+import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.RemovalDate
+import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
+import utils.{RepeatingSection, StatusConstants}
 
 class RemoveResponsiblePersonController @Inject()(
                                                    val authConnector: AuthConnector,
                                                    implicit val dataCacheConnector: DataCacheConnector
+                                                 ) extends BaseController with RepeatingSection {
 
-                                                 ) extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request => {
       (getNominatedOfficerName map (name =>
@@ -47,7 +48,14 @@ class RemoveResponsiblePersonController @Inject()(
           case f: InvalidForm => (getNominatedOfficerName map { name =>
             BadRequest(views.html.changeofficer.remove_responsible_person(f, name))
           }) getOrElse InternalServerError("No responsible people found")
-          case ValidForm(_, data) => Future.successful(Redirect(routes.NewOfficerController.get()))
+          case ValidForm(_, data) => {
+            (for {
+              (_, index) <- getNominatedOfficerWithIndex
+              _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index) { rp =>
+                rp.copy(status = Some(StatusConstants.Deleted), endDate = Some(ResponsiblePersonEndDate(data.date)), hasChanged = true)
+              })
+            } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")
+          }
         }
   }
 }
