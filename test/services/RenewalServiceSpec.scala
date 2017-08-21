@@ -19,6 +19,7 @@ package services
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
+import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness => moneyServiceBusiness}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -68,6 +69,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
     val mockCacheMap = mock[CacheMap]
 
+    val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
+    val msbModelDoNotSendMoneyToOtherCountries = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)))
+
   }
 
   "The renewal service" must {
@@ -98,6 +102,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
             ))),
             msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
           )))
+
+        when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+          .thenReturn(Some(msbModel))
 
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
@@ -172,6 +179,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
                     Some(BusinessTurnover.First),
@@ -204,6 +214,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
                     None,
@@ -223,7 +236,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
-              "there are NOT customers outside the UK" when {
+              "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
 
                   when(dataCache.fetchAll(any(), any()))
@@ -237,6 +250,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -269,6 +285,10 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
+
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -305,6 +325,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     msbServices = Some(MsbServices(Set(CurrencyExchange)))
                   )))
 
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
+
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
                   Some(BusinessTurnover.First),
@@ -336,6 +359,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     ))),
                     msbServices = Some(MsbServices(Set(CurrencyExchange)))
                   )))
+
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -374,6 +400,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
                     Some(BusinessTurnover.First),
@@ -406,6 +435,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
                     None,
@@ -425,7 +457,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
-              "there are NOT customers outside the UK" when {
+              "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
 
                   when(dataCache.fetchAll(any(), any()))
@@ -439,6 +471,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -471,6 +506,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -507,6 +545,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
+
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
                   Some(BusinessTurnover.First),
@@ -538,6 +579,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     ))),
                     msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
+
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -579,6 +623,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
                     Some(BusinessTurnover.First),
@@ -610,6 +657,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
                     None,
@@ -629,7 +679,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
-              "there are NOT customers outside the UK" when {
+              "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
 
                   when(dataCache.fetchAll(any(), any()))
@@ -642,6 +692,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -673,6 +726,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -708,6 +764,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     msbServices = Some(MsbServices(Set(CurrencyExchange)))
                   )))
 
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
+
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
                   Some(BusinessTurnover.First),
@@ -738,6 +797,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     ))),
                     msbServices = Some(MsbServices(Set(CurrencyExchange)))
                   )))
+
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -776,6 +838,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
                     Some(BusinessTurnover.First),
@@ -807,6 +872,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
 
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModel))
+
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
                     None,
@@ -826,7 +894,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
-              "there are NOT customers outside the UK" when {
+              "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
 
                   when(dataCache.fetchAll(any(), any()))
@@ -839,6 +907,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -870,6 +941,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                       ))),
                       msbServices = Some(MsbServices(Set(TransmittingMoney)))
                     )))
+
+                  when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                    .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -906,6 +980,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
+
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
                   Some(BusinessTurnover.First),
@@ -935,6 +1012,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                     ))),
                     msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
+
+                when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                  .thenReturn(Some(msbModel))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -974,6 +1054,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                 )))
               )))
 
+            when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+              .thenReturn(Some(msbModel))
+
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
               Some(BusinessTurnover.First),
@@ -1003,6 +1086,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   HighValueDealing
                 )))
               )))
+
+            when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+              .thenReturn(Some(msbModel))
 
             val model = Renewal(
               Some(InvolvedInOtherNo),
@@ -1036,6 +1122,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                 )))
               )))
 
+            when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+              .thenReturn(Some(msbModel))
+
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
               Some(BusinessTurnover.First),
@@ -1065,6 +1154,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   TelephonePaymentService
                 )))
               )))
+
+            when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+              .thenReturn(Some(msbModel))
 
             val model = Renewal(
               Some(InvolvedInOtherNo),
@@ -1106,6 +1198,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
+
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
                 Some(BusinessTurnover.First),
@@ -1138,6 +1233,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   ))),
                   msbServices = Some(MsbServices(Set(CurrencyExchange)))
                 )))
+
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1173,6 +1271,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   ))),
                   msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
+
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1210,6 +1311,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
+
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
                 Some(BusinessTurnover.First),
@@ -1241,6 +1345,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   ))),
                   msbServices = Some(MsbServices(Set(CurrencyExchange)))
                 )))
+
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1275,6 +1382,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   ))),
                   msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
+
+              when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModel))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1312,6 +1422,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                 )))
               )))
 
+          when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+            .thenReturn(Some(msbModel))
+
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
               Some(BusinessTurnover.First),
@@ -1342,6 +1455,9 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
                   MoneyServiceBusiness
                 )))
               )))
+
+          when(mockCacheMap.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+            .thenReturn(Some(msbModel))
 
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),

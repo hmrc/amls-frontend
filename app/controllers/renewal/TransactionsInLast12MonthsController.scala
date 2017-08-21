@@ -28,6 +28,7 @@ import views.html.renewal.transactions_in_last_12_months
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import play.api.mvc.Result
 import utils.ControllerHelper
 
@@ -63,10 +64,11 @@ class TransactionsInLast12MonthsController @Inject()(
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                   activities <- bm.activities
+                  msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
                 } yield {
                   renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
                     redirectTo(
-                      ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK),
+                      msb.sendMoneyToOtherCountry.get.money,
                       services.msbServices,
                       activities.businessActivities, edit
                     )
@@ -76,10 +78,10 @@ class TransactionsInLast12MonthsController @Inject()(
         }
   }
 
-  private def redirectTo(hasCustomersOutsideUK: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
+  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
     if (edit) {
       Redirect(routes.SummaryController.get())
-    } else if (hasCustomersOutsideUK) {
+    } else if (sendMoneyToOtherCountry) {
       Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
     } else if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
