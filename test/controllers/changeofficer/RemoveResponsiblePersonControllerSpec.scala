@@ -17,6 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
+import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -109,6 +110,10 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
             hasChanged = true),
           otherResponsiblePerson
         )))(any(), any(), any())
+
+        verify(controller.dataCacheConnector).save[ChangeOfficer](any(), meq(
+          ChangeOfficer(RoleInBusiness(Set.empty[Role]))
+        ))(any(),any(),any())
 
       }
       "return BAD_REQUEST for invalid form" in new TestFixture {

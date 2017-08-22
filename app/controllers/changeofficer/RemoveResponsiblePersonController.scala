@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.changeofficer.RemovalDate
+import models.changeofficer.{ChangeOfficer, RemovalDate, Role, RoleInBusiness}
 import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
@@ -54,6 +54,7 @@ class RemoveResponsiblePersonController @Inject()(
               _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index) { rp =>
                 rp.copy(status = Some(StatusConstants.Deleted), endDate = Some(ResponsiblePersonEndDate(data.date)), hasChanged = true)
               })
+              _ <- OptionT.liftF(dataCacheConnector.save[ChangeOfficer](ChangeOfficer.key, ChangeOfficer(RoleInBusiness(Set.empty[Role]))))
             } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")
           }
         }
