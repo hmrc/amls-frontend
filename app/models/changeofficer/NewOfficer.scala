@@ -19,12 +19,16 @@ package models.changeofficer
 import play.api.libs.json.Json
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
+import org.joda.time.LocalDate
 import utils.MappingUtils.Implicits._
 
+sealed trait Officer
 
-case class NewOfficer(name: String)
+case class NewOfficer(name: String) extends Officer
+case class OldOfficer(name: String, endDate: LocalDate) extends Officer
 
 object NewOfficer {
+
   implicit val formats = Json.format[NewOfficer]
 
   implicit val formWrites = Write[NewOfficer, UrlFormEncoded] { data =>
@@ -39,4 +43,8 @@ object NewOfficer {
       .withMessage("changeofficer.newnominatedofficer.validationerror") map { p => NewOfficer(p) }
   }
 
+}
+
+object OldOfficer {
+  implicit val formats = Json.format[OldOfficer]
 }

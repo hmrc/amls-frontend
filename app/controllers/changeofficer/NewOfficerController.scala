@@ -21,8 +21,8 @@ import javax.inject.Inject
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{InvalidForm, ValidForm, Form2, EmptyForm}
-import models.changeofficer.{NewOfficer, ChangeOfficer}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.changeofficer.{ChangeOfficer, NewOfficer}
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -31,8 +31,10 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import cats.implicits._
+import utils.StatusConstants
 
 class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
+
   def get = Authorised.async {
     implicit authContext => implicit request =>
 
@@ -79,8 +81,6 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
       changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
-    } yield {
-      (selectedOfficer, people.filter(p => p.personName.isDefined))
-    }
+    } yield (selectedOfficer, people.filter(p => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)))
   }
 }

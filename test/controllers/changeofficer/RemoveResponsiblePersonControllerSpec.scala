@@ -16,30 +16,141 @@
 
 package controllers.changeofficer
 
+import connectors.DataCacheConnector
+import models.changeofficer.{ChangeOfficer, OldOfficer, Role, RoleInBusiness}
+import models.responsiblepeople._
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 
-class RemoveResponsiblePersonControllerSpec extends GenericTestHelper {
+import scala.concurrent.Future
+
+class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
+    val dataCacheConnector = mock[DataCacheConnector]
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
 
     lazy val controller = injector.instanceOf[RemoveResponsiblePersonController]
+
+    val nominatedOfficer = ResponsiblePeople(
+      personName = Some(PersonName("firstName", None, "lastName",None, None)),
+      positions = Some(Positions(Set(NominatedOfficer),None))
+    )
+
+    val otherResponsiblePerson = ResponsiblePeople(
+      personName = Some(PersonName("otherFirstName", None, "otherLastName",None, None)),
+      positions = Some(Positions(Set(Director),None))
+    )
+
+    when {
+      dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson)))
+
+    when {
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
+    } thenReturn Future.successful(CacheMap("", Map.empty))
+
   }
 
-  "The RemoveResponsiblePersonController" must {
-    "get the view" in new TestFixture {
-      val result = controller.get()(request)
+  "The RemoveResponsiblePersonController" when {
 
-      status(result) mustBe OK
+    "get is called" must {
+      "display the view" in new TestFixture {
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+        contentAsString(result) must include(Messages("changeofficer.removeresponsibleperson.title"))
+      }
+
+      "return INTERNAL_SERVER_ERROR" when {
+        "nominated officer name cannot be found" in new TestFixture {
+
+          when {
+            dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.get()(request)
+
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+      }
     }
+
+    "post is called" must {
+      "Redirect to NewOfficerController" in new TestFixture {
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "date.day" -> "10",
+          "date.month" -> "11",
+          "date.year" -> "2001"
+        ))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
+
+        verify(controller.dataCacheConnector).save[ChangeOfficer](any(), meq(
+          ChangeOfficer(
+            roleInBusiness = RoleInBusiness(Set.empty[Role]),
+            oldOfficer = Some(OldOfficer(nominatedOfficer.personName.get.fullName, new LocalDate(2001,11,10)))
+          )
+        ))(any(),any(),any())
+
+      }
+      "return BAD_REQUEST for invalid form" in new TestFixture {
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "date.day" -> "a",
+          "date.month" -> "b",
+          "date.year" -> "c"
+        ))
+
+        status(result) mustBe BAD_REQUEST
+      }
+
+      "return INTERNAL_SERVER_ERROR" when {
+        "nominated officer name cannot be found" when {
+          "invalid form is submitted" in new TestFixture {
+
+            when {
+              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            } thenReturn Future.successful(None)
+
+            val result = controller.post()(request)
+
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
+          "valid form is submitted" in new TestFixture {
+
+            when {
+              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            } thenReturn Future.successful(None)
+
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "date.day" -> "a",
+              "date.month" -> "b",
+              "date.year" -> "c"
+            ))
+
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
+        }
+      }
+    }
+
   }
 
 }

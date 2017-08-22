@@ -1669,14 +1669,23 @@ hvd.percentage.lbl.05 = 81% to 100%
 changeofficer.personstillemployed.title = Does this person still work for your business?
 changeofficer.stillemployed.title = Does {0} still work for your business?
 changeofficer.stillemployed.validationerror = You must select yes or no. Select yes, if they are still working for your business
+
 changeofficer.roleinbusiness.heading = What’s {0}’s role in the business now?
 changeofficer.roleinbusiness.title = What’s this person’s role in the business now?
 changeofficer.roleinbusiness.validationerror = You must select a business role. Select one of the following roles
 changeofficer.roleinbusiness.other.lbl = Please specify
 changeofficer.roleinbusiness.validationerror.othermissing = You haven’t specified their role in the business. Enter their role in the business
+
 changeofficer.newnominatedofficer.heading = Who is the business’s new nominated officer?
 changeofficer.newnominatedofficer.title = Who is the business’s new nominated officer?
 changeofficer.newnominatedofficer.validationerror = You must select a nominated officer. Select one of the following people
+
+changeofficer.removeresponsibleperson.title = Remove a responsible person
+changeofficer.removeresponsibleperson.heading = Remove a responsible person
+changeofficer.removeresponsibleperson.info = Based on your answers, {0} doesn’t need to be registered as a responsible person any more.
+changeofficer.removeresponsibleperson.lbl = When did {0} stop being your nominated officer?
+
+
 changeofficer.changelink.heading = Nominated Officer:
 changeofficer.changelink.text = change
 

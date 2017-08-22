@@ -18,13 +18,44 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.changeofficer.Helpers._
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.changeofficer._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 
-import scala.concurrent.Future
+class RemoveResponsiblePersonController @Inject()(
+                                                   val authConnector: AuthConnector,
+                                                   implicit val dataCacheConnector: DataCacheConnector
+                                                 ) extends BaseController with RepeatingSection {
 
-class RemoveResponsiblePersonController @Inject()(val authConnector: AuthConnector) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+  def get() = Authorised.async {
+    implicit authContext => implicit request => {
+      (getNominatedOfficerName map (name =>
+        Ok(views.html.changeofficer.remove_responsible_person(EmptyForm, name))
+        )) getOrElse InternalServerError("No responsible people found")
+    }
+  }
+
+  def post() = Authorised.async {
+    implicit authContext => implicit request =>
+        Form2[RemovalDate](request.body) match {
+          case f: InvalidForm => (getNominatedOfficerName map { name =>
+            BadRequest(views.html.changeofficer.remove_responsible_person(f, name))
+          }) getOrElse InternalServerError("No responsible people found")
+          case ValidForm(_, data) => {
+            (for {
+              name <- getNominatedOfficerName
+              _ <- OptionT.liftF(dataCacheConnector.save[ChangeOfficer](ChangeOfficer.key, ChangeOfficer(
+                roleInBusiness = RoleInBusiness(Set.empty[Role]),
+                oldOfficer = Some(OldOfficer(name, data.date))
+              )))
+            } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")
+          }
+        }
   }
 }
