@@ -17,7 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, OldOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -103,16 +103,11 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
 
-        verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
-          nominatedOfficer.copy(
-            status = Some(StatusConstants.Deleted),
-            endDate = Some(ResponsiblePersonEndDate(new LocalDate(2001, 11, 10))),
-            hasChanged = true),
-          otherResponsiblePerson
-        )))(any(), any(), any())
-
         verify(controller.dataCacheConnector).save[ChangeOfficer](any(), meq(
-          ChangeOfficer(RoleInBusiness(Set.empty[Role]))
+          ChangeOfficer(
+            roleInBusiness = RoleInBusiness(Set.empty[Role]),
+            oldOfficer = Some(OldOfficer(nominatedOfficer.personName.get.fullName, new LocalDate(2001,11,10)))
+          )
         ))(any(),any(),any())
 
       }
