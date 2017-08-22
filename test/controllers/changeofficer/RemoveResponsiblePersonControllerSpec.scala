@@ -56,8 +56,14 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
       positions = Some(Positions(Set(Director),None))
     )
 
-    when(dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
+    when {
+      dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson)))
+
+    when {
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
+    } thenReturn Future.successful(CacheMap("", Map.empty))
+
   }
 
   "The RemoveResponsiblePersonController" when {
@@ -69,14 +75,23 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
         status(result) mustBe OK
         contentAsString(result) must include(Messages("changeofficer.removeresponsibleperson.title"))
       }
+
+      "return INTERNAL_SERVER_ERROR" when {
+        "nominated officer name cannot be found" in new TestFixture {
+
+          when {
+            dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.get()(request)
+
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+      }
     }
 
     "post is called" must {
       "Redirect to NewOfficerController" in new TestFixture {
-
-        when {
-          controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "date.day" -> "10",
@@ -104,6 +119,35 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
         ))
 
         status(result) mustBe BAD_REQUEST
+      }
+
+      "return INTERNAL_SERVER_ERROR" when {
+        "nominated officer name cannot be found" when {
+          "invalid form is submitted" in new TestFixture {
+
+            when {
+              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            } thenReturn Future.successful(None)
+
+            val result = controller.post()(request)
+
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
+          "valid form is submitted" in new TestFixture {
+
+            when {
+              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            } thenReturn Future.successful(None)
+
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "date.day" -> "a",
+              "date.month" -> "b",
+              "date.year" -> "c"
+            ))
+
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
+        }
       }
     }
 
