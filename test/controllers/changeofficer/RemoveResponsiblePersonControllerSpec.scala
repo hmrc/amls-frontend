@@ -26,6 +26,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 
@@ -72,30 +73,28 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
 
     "post is called" must {
       "Redirect to NewOfficerController" in new TestFixture {
+
+        when {
+          controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
         val result = controller.post()(request.withFormUrlEncodedBody(
           "date.day" -> "10",
           "date.month" -> "11",
           "date.year" -> "2001"
         ))
 
-        val responsiblePerson = ResponsiblePeople(personName = Some(PersonName("First", Some("Middle"), "Last", None, None)))
-
         status(result) mustBe SEE_OTHER
-
-        when{
-          controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(
-          Seq(responsiblePerson)
-        ))
+        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
 
         verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
-          responsiblePerson.copy(
+          nominatedOfficer.copy(
             status = Some(StatusConstants.Deleted),
             endDate = Some(ResponsiblePersonEndDate(new LocalDate(2001, 11, 10))),
-            hasChanged = true)
-          )))(any(), any(), any())
+            hasChanged = true),
+          otherResponsiblePerson
+        )))(any(), any(), any())
 
-        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
       }
       "return BAD_REQUEST for invalid form" in new TestFixture {
         val result = controller.post()(request.withFormUrlEncodedBody(
