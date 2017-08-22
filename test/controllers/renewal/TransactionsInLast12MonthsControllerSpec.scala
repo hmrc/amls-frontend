@@ -20,6 +20,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
+import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness => moneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -48,6 +49,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
     when {
       renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(Renewal().some)
+
+    val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
+    val msbModelDoNotSendMoneyToOtherCountries = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)))
   }
 
   trait FormSubmissionFixture extends Fixture {
@@ -107,7 +111,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
   "Calling the POST action" when {
     "posting valid data" when {
 
-      "msb has customers from outside the UK" must {
+      "they do send money to other countries" must {
         "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
 
           when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
@@ -121,6 +125,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
               msbServices = Some(MsbServices(Set(TransmittingMoney)))
             )))
 
+          when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+            .thenReturn(Some(msbModel))
+
           post() { result =>
             result.header.status mustBe SEE_OTHER
             result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
@@ -128,7 +135,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
         }
       }
 
-      "msb does not have customers from outside the UK" when {
+      "they do not send money to other countries" when {
         "msb is CurrencyExchange" must {
           "redirect to CETransactionsInLast12MonthsController" in new FormSubmissionFixture {
 
@@ -142,6 +149,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
                 activities = Some(BusinessActivities(Set(HighValueDealing))),
                 msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange)))
               )))
+
+            when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+              .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
             post() { result =>
               result.header.status mustBe SEE_OTHER
@@ -164,6 +174,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
                   msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
 
+              when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
+
               post() { result =>
                 result.header.status mustBe SEE_OTHER
                 result.header.headers.get("Location") mustBe routes.PercentageOfCashPaymentOver15000Controller.get().url.some
@@ -183,6 +196,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
                   activities = Some(BusinessActivities(Set(MoneyServiceBusiness))),
                   msbServices = Some(MsbServices(Set(TransmittingMoney)))
                 )))
+
+              when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+                .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
 
               post() { result =>
                 result.header.status mustBe SEE_OTHER
@@ -206,6 +222,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
             msbServices = Some(MsbServices(Set(TransmittingMoney)))
           )))
 
+        when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+          .thenReturn(Some(msbModel))
+
         post(edit = true) { result =>
           result.header.status mustBe SEE_OTHER
           result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
@@ -226,6 +245,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
               msbServices = Some(MsbServices(Set(TransmittingMoney)))
             )))
 
+          when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+            .thenReturn(Some(msbModel))
+
           post(valid = false) { result =>
             result.header.status mustBe BAD_REQUEST
             verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
@@ -245,6 +267,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
             activities = Some(BusinessActivities(Set(HighValueDealing))),
             msbServices = Some(MsbServices(Set(TransmittingMoney)))
           )))
+
+        when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+          .thenReturn(Some(msbModel))
 
         post() { _ =>
           val captor = ArgumentCaptor.forClass(classOf[Renewal])
