@@ -84,6 +84,12 @@ class PaymentsService @Inject()(
                        (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[Payment] =
     amlsConnector.createBacsPayment(request)
 
+  def amountFromSubmissionData(submissionData: SubmissionData): Option[Currency] = submissionData match {
+    case (_, _, _, Right(Some(x))) => Some(x)
+    case (_, total, _, _) => Some(total)
+    case _ => None
+  }
+
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String)
                                        (implicit hc: HeaderCarrier, authContext: AuthContext) = {
     (for {

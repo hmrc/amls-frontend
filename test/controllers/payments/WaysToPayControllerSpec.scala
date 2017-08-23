@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 import uk.gov.hmrc.play.http.HttpResponse
 import models.ReadStatusResponse
-import models.payments.{WaysToPay, ReturnLocation, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks}
+import models.payments.{WaysToPay, ReturnLocation, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks, CreateBacsPaymentRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -115,7 +115,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.payments.routes.TypeOfBankController.get().url))
 
-          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(true)))(any(), any(), any())
+          val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 100)
+          verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel))(any(), any(), any())
 
         }
       }
