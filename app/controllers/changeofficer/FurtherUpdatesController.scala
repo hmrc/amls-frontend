@@ -19,7 +19,7 @@ package controllers.changeofficer
 import javax.inject.Inject
 
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.{FurtherUpdates, FurtherUpdatesNo, FurtherUpdatesYes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -41,6 +41,7 @@ class FurtherUpdatesController @Inject()(val authConnector: AuthConnector) exten
             case FurtherUpdatesYes => controllers.routes.RegistrationProgressController.get()
             case FurtherUpdatesNo => controllers.declaration.routes.WhoIsRegisteringController.get()
         }))
+        case f: InvalidForm => Future.successful(BadRequest(views.html.changeofficer.further_updates(f)))
       }
   }
 

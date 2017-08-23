@@ -63,6 +63,13 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         }
       }
+      "return BAD_REQUEST" when {
+        "form is invalid" in new TestFixture {
+          val result = controller.post()(request)
+
+          status(result) mustBe BAD_REQUEST
+        }
+      }
     }
 
   }
