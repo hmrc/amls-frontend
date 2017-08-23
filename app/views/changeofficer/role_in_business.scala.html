@@ -107,6 +107,15 @@
                         field = f("otherPosition")
                     )
                 }
+
+                <p class="form-block">@Messages("lbl.or")</p>
+
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "lbl.none.of.the.above",
+                    value = ""
+                )
+
             }
         </div>
 

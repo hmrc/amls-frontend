@@ -56,6 +56,12 @@ object RoleInBusiness {
     case "other" if other.isDefined => Other(other.get)
   }
 
+  def setRoles(roles: Seq[String], other: Option[String]) = if(roles.contains("")){
+    Set.empty[Role]
+  } else {
+    roles.map(v => stringToRole(v, other)).toSet
+  }
+
   def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
       case Director => "director"
@@ -86,7 +92,7 @@ object RoleInBusiness {
   }
 
   val roleFormReads = Rule.fromMapping[(Seq[String], Option[String]), Set[Role]] {
-    case (roles, other) if roles.nonEmpty => Valid(roles.map(v => stringToRole(v, other)).toSet)
+    case (roles, other) if roles.nonEmpty => Valid(setRoles(roles,other))
     case _ => Invalid(ValidationError(validationErrorKey))
   }
 
