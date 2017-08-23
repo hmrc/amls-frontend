@@ -27,4 +27,8 @@ class FurtherUpdatesController @Inject()(val authConnector: AuthConnector) exten
   def get = Authorised.async {
     implicit authContext => implicit request => Future.successful(Ok)
   }
+  def post = Authorised.async {
+    implicit authContext => implicit request => Future.successful(Ok)
+  }
+
 }

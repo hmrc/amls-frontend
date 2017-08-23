@@ -282,6 +282,7 @@ GET         /update-information/new-nominated-officer                           
 POST        /update-information/new-nominated-officer                                 @controllers.changeofficer.NewOfficerController.post()
 
 GET         /update-information/further-updates                                       @controllers.changeofficer.FurtherUpdatesController.get()
+POST        /update-information/further-updates                                       @controllers.changeofficer.FurtherUpdatesController.post()
 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
