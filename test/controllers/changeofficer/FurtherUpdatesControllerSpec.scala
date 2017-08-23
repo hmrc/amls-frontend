@@ -55,12 +55,12 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
           redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
         }
       }
-      "redirect to LandingController" when {
+      "redirect to RegistrationProgressController" when {
         "furtherUpdates equals yes" in new TestFixture {
           val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "true"))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         }
       }
     }

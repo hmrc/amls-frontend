@@ -38,7 +38,7 @@ class FurtherUpdatesController @Inject()(val authConnector: AuthConnector) exten
       implicit request => Form2[FurtherUpdates](request.body) match {
         case ValidForm(_, data) => Future.successful(Redirect(
           data match {
-            case FurtherUpdatesYes => controllers.routes.LandingController.get()
+            case FurtherUpdatesYes => controllers.routes.RegistrationProgressController.get()
             case FurtherUpdatesNo => controllers.declaration.routes.WhoIsRegisteringController.get()
         }))
       }
