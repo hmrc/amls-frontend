@@ -1692,6 +1692,7 @@ changeofficer.changelink.text = change
 
 changeofficer.furtherupdates.title = Do you need to make other updates to your information?
 changeofficer.furtherupdates.heading = Do you need to make other updates to your information?
+changeofficer.furtherupdates.validationerror = You must select yes or no. Select yes, if you have any other changes
 
 ###############################  Notifications ###############################
 

@@ -35,13 +35,36 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
   }
 
-  "The FurtherUpdatesController" must {
-    "get the view" in new TestFixture {
-      val result = controller.get()(request)
+  "The FurtherUpdatesController" when {
 
-      status(result) mustBe OK
-      contentAsString(result) must include(Messages("changeofficer.furtherupdates.title"))
+    "get is called" must {
+      "display further_updates" in new TestFixture {
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+        contentAsString(result) must include(Messages("changeofficer.furtherupdates.title"))
+      }
     }
+
+    "post is called" must {
+      "redirect to WhoIsRegisteringController" when {
+        "furtherUpdates equals no" in new TestFixture {
+          val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+        }
+      }
+      "redirect to LandingController" when {
+        "furtherUpdates equals yes" in new TestFixture {
+          val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "true"))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+        }
+      }
+    }
+
   }
 
 }
