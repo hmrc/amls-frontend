@@ -33,13 +33,13 @@ import play.api.http.Status._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
 class PaymentsService @Inject()(
                                  val amlsConnector: AmlsConnector,
                                  val paymentsConnector: PayApiConnector,
                                  val submissionResponseService: SubmissionResponseService,
                                  val statusService: StatusService
                                ) {
-
   type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def requestPaymentsUrl(data: SubmissionData, returnUrl: String, amlsRefNo: String, safeId: String)

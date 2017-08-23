@@ -79,6 +79,14 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     } thenReturn Future.successful(submissionStatus)
 
     when {
+      controller.paymentsService.amountFromSubmissionData(any())
+    } thenReturn Some(Currency.fromInt(100))
+
+    when {
+      controller.paymentsService.createBacsPayment(any())(any(), any(), any())
+    } thenReturn Future.successful(paymentGen.sample.get)
+
+    when {
       controller.statusService.getDetailedStatus(any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
@@ -105,7 +113,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
       "enum is bacs" must {
         "redirect to TypeOfBankController" in new Fixture {
-
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Bacs.entryName
           )
@@ -115,7 +122,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.payments.routes.TypeOfBankController.get().url))
 
-          val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 100)
+          val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 10000)
           verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel))(any(), any(), any())
 
         }
@@ -123,7 +130,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
       "enum is card" must {
         "go to the payments url" in new Fixture {
-
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
           )
@@ -143,8 +149,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           )(any(), any(), any(), any())
 
           redirectLocation(result) mustBe Some("/payments")
-
-          verify(controller.paymentsService).updateBacsStatus(any(), eqTo(UpdateBacsRequest(false)))(any(), any(), any())
         }
 
         "return 500" when {

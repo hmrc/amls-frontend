@@ -54,9 +54,6 @@ class WaysToPayController @Inject()(
 
         val submissionDetails = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
-          data@(paymentReference, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
-          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          status <- OptionT.liftF(statusService.getStatus)
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
           amlsRefNo <- {
             e match {
@@ -94,5 +91,4 @@ class WaysToPayController @Inject()(
           case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
         }
   }
-
 }
