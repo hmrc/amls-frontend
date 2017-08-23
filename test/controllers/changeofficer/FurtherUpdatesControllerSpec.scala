@@ -16,21 +16,66 @@
 
 package controllers.changeofficer
 
+import connectors.DataCacheConnector
+import models.changeofficer.{ChangeOfficer, NewOfficer, OldOfficer, RoleInBusiness}
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper {
+import scala.concurrent.Future
+
+class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
+    val dataCacheConnector = mock[DataCacheConnector]
+    val cacheMap = mock[CacheMap]
+
+    val changeOfficer = ChangeOfficer(
+      RoleInBusiness(Set.empty),
+      Some(NewOfficer("NewOfficer")),
+      Some(OldOfficer("OldOfficer", new LocalDate(2001,10,11)))
+    )
+
+    val responsiblePeople = Seq(
+      ResponsiblePeople(
+        personName = Some(PersonName("New", None, "Officer", None, None))
+      ),
+      ResponsiblePeople(
+        personName = Some(PersonName("Old", None, "Officer", None, None))
+      )
+    )
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
+
+    when {
+      dataCacheConnector.fetchAll(any(),any())
+    } thenReturn Future.successful(Some(cacheMap))
+
+    when {
+      cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
+    } thenReturn Some(changeOfficer)
+
+    when {
+      cacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())
+    } thenReturn Some(responsiblePeople)
+
+    when {
+      dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+    } thenReturn Future.successful(CacheMap("", Map.empty))
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
   }
@@ -72,6 +117,19 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
       }
     }
 
+  }
+
+  it must {
+    "replace old officer with new officer before redirecting" in new TestFixture {
+
+      val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
+
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+
+      status(result) mustBe SEE_OTHER
+
+
+    }
   }
 
 }
