@@ -34,6 +34,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       RoleInBusiness.roleFormReads.validate((Seq("partner"), None)) mustBe Valid(Set(Partner))
       RoleInBusiness.roleFormReads.validate((Seq("desigmemb"), None)) mustBe Valid(Set(DesignatedMember))
       RoleInBusiness.roleFormReads.validate((Seq("other"), Some("another role"))) mustBe Valid(Set(Other("another role")))
+      RoleInBusiness.roleFormReads.validate((Seq(""), None)) mustBe Valid(Set.empty[Role])
     }
 
     "convert valid form into the model" in {
@@ -45,6 +46,16 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       val result = RoleInBusiness.formReads.validate(formData)
 
       result mustBe Valid(RoleInBusiness(Set(SoleProprietor, Director)))
+    }
+
+    "convert empty string to empty set" in {
+      val formData = Map(
+        "positions[0]" -> Seq("")
+      )
+
+      val result = RoleInBusiness.formReads.validate(formData)
+
+      result mustBe Valid(RoleInBusiness(Set.empty[Role]))
     }
 
     "convert empty form into a set of validation errors" in {
