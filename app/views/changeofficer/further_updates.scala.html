@@ -17,38 +17,38 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], name: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_])(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading(Messages("changeofficer.stillemployed.title", name), "summary.updateinformation")
+    @heading(Messages("changeofficer.furtherupdates.heading"), "summary.updateinformation")
 }
 
 @main(
-    title = Messages("changeofficer.personstillemployed.title") + " - " + Messages("summary.updateinformation"),
+    title = Messages("changeofficer.furtherupdates.title") + " - " + Messages("summary.updateinformation"),
     heading = header
 ) {
 
-    @form(f, controllers.changeofficer.routes.StillEmployedController.post()) {
+    @form(f, controllers.changeofficer.routes.FurtherUpdatesController.post()) {
 
         @fieldset(
-            f = f("stillemployed-fieldset"),
-            legend = "changeofficer.stillemployed.title",
+            f = f("furtherUpdates-fieldset"),
+            legend = "changeofficer.furtherupdates.title",
             legendHidden = true,
             panel = false
         ) {
 
             @errorGroup(
-                field = f("stillEmployed")
+                field = f("furtherUpdates")
             ) {
                 @radio(
-                    f = f("stillEmployed"),
+                    f = f("furtherUpdates"),
                     labelText = "lbl.yes",
                     value = "true",
                     inline = true
                 )
                 @radio(
-                    f = f("stillEmployed"),
+                    f = f("furtherUpdates"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
