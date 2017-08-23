@@ -419,6 +419,7 @@ lbl.add.another.country = Add another country
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 lbl.1200.character.limit=1200 character limit
+lbl.none.of.the.above = None of the above
 
 lbl.give.details = Please give details
 

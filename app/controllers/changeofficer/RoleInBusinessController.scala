@@ -59,7 +59,11 @@ class RoleInBusinessController @Inject()
 
         case ValidForm(_, data) =>
           dataCacheConnector.save(ChangeOfficer.key, ChangeOfficer(data)) map { _ =>
-            Redirect(controllers.changeofficer.routes.NewOfficerController.get())
+            if(data.roles.isEmpty){
+              Redirect(routes.RemoveResponsiblePersonController.get())
+            } else {
+              Redirect(routes.NewOfficerController.get())
+            }
           }
       }
   }

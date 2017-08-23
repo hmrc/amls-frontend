@@ -21,7 +21,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor, _}
-import models.changeofficer.{ChangeOfficer, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -103,17 +103,33 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
     }
 
     "when post is called" must {
-      "respond with SEE_OTHER when yes is selected" in new TestFixture {
+      "redirect to NewOfficerController" when {
+        "a role is selected without 'none of the above' being selected" in new TestFixture {
 
-        when(cache.save(any(), any())(any(),any(), any()))
-          .thenReturn(Future.successful(mock[CacheMap]))
+          when(cache.save(any(), any())(any(),any(), any()))
+            .thenReturn(Future.successful(mock[CacheMap]))
 
-        val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "soleprop"))
+          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "soleprop"))
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.NewOfficerController.get().url)
 
-        verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))(any(),any(),any())
+          verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))(any(),any(),any())
+        }
+      }
+      "redirect to RemoveResponsiblePersonController" when {
+        "'none of the above' is selected" in new TestFixture {
+
+          when(cache.save(any(), any())(any(),any(), any()))
+            .thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> ""))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.RemoveResponsiblePersonController.get().url)
+
+          verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set.empty[Role]))))(any(),any(),any())
+        }
       }
 
       "respond with BAD_REQUEST when no options selected and show the error message and the name" in new TestFixture {
