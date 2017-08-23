@@ -16,6 +16,7 @@
 
 package controllers.changeofficer
 
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
@@ -39,6 +40,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
       val result = controller.get()(request)
 
       status(result) mustBe OK
+      contentAsString(result) must include(Messages("changeofficer.furtherupdates.title"))
     }
   }
 

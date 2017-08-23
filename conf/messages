@@ -1690,6 +1690,9 @@ changeofficer.removeresponsibleperson.lbl = When did {0} stop being your nominat
 changeofficer.changelink.heading = Nominated Officer:
 changeofficer.changelink.text = change
 
+changeofficer.furtherupdates.title = Do you need to make other updates to your information?
+changeofficer.furtherupdates.heading = Do you need to make other updates to your information?
+
 ###############################  Notifications ###############################
 
 notifications.subject.ApplicationApproval = Application Approval

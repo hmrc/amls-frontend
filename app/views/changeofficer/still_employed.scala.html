@@ -19,10 +19,6 @@
 
 @(f: forms.Form2[_], name: String)(implicit request: Request[_],m:Messages)
 
-@target = @{
-    s"""${f("vrnNumber").id}-panel"""
-}
-
 @header = {
     @errorSummary(f)
     @heading(Messages("changeofficer.stillemployed.title", name), "summary.updateinformation")
@@ -49,7 +45,6 @@
                     f = f("stillEmployed"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
                     inline = true
                 )
                 @radio(

@@ -19,14 +19,19 @@ package controllers.changeofficer
 import javax.inject.Inject
 
 import controllers.BaseController
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 class FurtherUpdatesController @Inject()(val authConnector: AuthConnector) extends BaseController {
+
   def get = Authorised.async {
-    implicit authContext => implicit request => Future.successful(Ok)
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(views.html.changeofficer.further_updates(EmptyForm)))
   }
+
   def post = Authorised.async {
     implicit authContext => implicit request => Future.successful(Ok)
   }
