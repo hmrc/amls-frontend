@@ -136,6 +136,8 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
 
       val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
+      status(result) mustBe SEE_OTHER
+
       verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
         newOfficer.copy(
           positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
@@ -144,9 +146,6 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
         oldOfficer
       ))
       )(any(),any(),any())
-
-      status(result) mustBe SEE_OTHER
-
 
     }
   }

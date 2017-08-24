@@ -46,7 +46,6 @@ class FurtherUpdatesController @Inject()(
     implicit authContext =>
       implicit request => Form2[FurtherUpdates](request.body) match {
         case ValidForm(_, data) => {
-
           (for {
             cache <- OptionT(dataCacheConnector.fetchAll)
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
