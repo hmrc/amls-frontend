@@ -16,21 +16,78 @@
 
 package controllers.changeofficer
 
+import connectors.DataCacheConnector
+import models.changeofficer.{ChangeOfficer, NewOfficer, OldOfficer, RoleInBusiness}
+import models.responsiblepeople._
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper {
+import scala.concurrent.Future
+
+class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
+    val dataCacheConnector = mock[DataCacheConnector]
+    val cacheMap = mock[CacheMap]
+
+    val changeOfficer = ChangeOfficer(
+      RoleInBusiness(Set.empty),
+      Some(NewOfficer("NewOfficer")),
+      Some(OldOfficer("OldOfficer", new LocalDate(2001,10,11)))
+    )
+
+    val newOfficer = ResponsiblePeople(
+      personName = Some(PersonName("New", None, "Officer", None, None)),
+      positions = Some(Positions(Set(
+        DesignatedMember
+      ), None)))
+
+    val oldOfficer = ResponsiblePeople(
+      personName = Some(PersonName("Old", None, "Officer", None, None)),
+      positions = Some(Positions(Set(
+        SoleProprietor
+      ), None)))
+
+    val responsiblePeople = Seq(
+      newOfficer,
+      oldOfficer
+    )
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
+
+    when {
+      controller.dataCacheConnector.fetchAll(any(),any())
+    } thenReturn Future.successful(Some(cacheMap))
+
+    when {
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
+    } thenReturn Future.successful(Some(responsiblePeople))
+
+    when {
+      cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
+    } thenReturn Some(changeOfficer)
+
+    when {
+      cacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())
+    } thenReturn Some(responsiblePeople)
+
+    when {
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(),any(),any())
+    } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
   }
@@ -63,8 +120,34 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         }
       }
+      "return BAD_REQUEST" when {
+        "form is invalid" in new TestFixture {
+          val result = controller.post()(request)
+
+          status(result) mustBe BAD_REQUEST
+        }
+      }
     }
 
+  }
+
+  it must {
+    "replace old officer with new officer before redirecting" in new TestFixture {
+
+      val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
+
+      status(result) mustBe SEE_OTHER
+
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
+        newOfficer.copy(
+          positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+          hasChanged = true
+        ),
+        oldOfficer
+      ))
+      )(any(),any(),any())
+
+    }
   }
 
 }

@@ -18,9 +18,11 @@ package controllers.changeofficer
 
 import cats.data.OptionT
 import connectors.DataCacheConnector
+import models.changeofficer.NewOfficer
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.StatusConstants
 
 import scala.concurrent.Future
 
@@ -53,6 +55,14 @@ object Helpers {
       people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
       nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
     } yield nominatedOfficer
+  }
+
+  def matchNominatedOfficerWithResponsiblePerson(newOfficer: NewOfficer, responsiblePeople: Seq[ResponsiblePeople]) = {
+    responsiblePeople.zipWithIndex.filter {
+      case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
+    } find {
+      case (p, _) => p.personName.get.fullNameWithoutSpace.equals(newOfficer.name)
+    }
   }
 
 }

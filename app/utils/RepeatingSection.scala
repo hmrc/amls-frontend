@@ -219,7 +219,8 @@ trait RepeatingSection {
    formats: Format[T],
    key: MongoKey[T],
    ec: ExecutionContext
-  ): Future[_] ={
-    dataCacheConnector.save[Seq[T]](key(), data)}
+  ): Future[_] = {
+    dataCacheConnector.save[Seq[T]](key(), data)
+  }
 }
 
