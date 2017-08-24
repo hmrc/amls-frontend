@@ -45,7 +45,7 @@ object Helpers {
     people.zipWithIndex.map {
       case (person, index) => (person, index + 1)
     } find {
-      case (person, _) => person.positions.fold(false)(p => p.positions.contains(NominatedOfficer))
+      case (person, _) => person.positions.fold(false)(_.positions contains NominatedOfficer)
     }
   }
 
@@ -63,7 +63,7 @@ object Helpers {
     responsiblePeople.zipWithIndex.filter {
       case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
     } find {
-      case (p, _) => p.personName.get.fullNameWithoutSpace.equals(newOfficer.name)
+      case (p, _) => p.personName.fold(false)(_.fullNameWithoutSpace equals newOfficer.name)
     }
   }
 

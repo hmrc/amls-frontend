@@ -25,9 +25,9 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
-import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
+import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople, ResponsiblePersonEndDate}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -53,7 +53,7 @@ class FurtherUpdatesController @Inject()(
             (_, iNew) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.newOfficer, responsiblePeople))
             (_, iOld) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.oldOfficer, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
-              updateNominatedOfficers(responsiblePeople, iNew, iOld)
+              updateNominatedOfficers(responsiblePeople, changeOfficer, iNew, iOld)
             }))
           } yield {
             Redirect(
@@ -67,8 +67,8 @@ class FurtherUpdatesController @Inject()(
       }
   }
 
-  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], iNew: Int, iOld: Int) = {
-    removeNominatedOfficers(responsiblePeople).patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
+  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], changeOfficer: ChangeOfficer, iNew: Int, iOld: Int) = {
+    removeNominatedOfficers(responsiblePeople, changeOfficer.oldOfficer).patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
   }
 
   private def getNominatedOfficer(officer: Option[Officer], responsiblePeople: Seq[ResponsiblePeople]) = {
@@ -81,21 +81,26 @@ class FurtherUpdatesController @Inject()(
   }
 
   private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
-    val positions = responsiblePerson.positions.get
+    val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
     responsiblePerson.positions(
       Positions(positions.positions + NominatedOfficer, positions.startDate)
     )
   }
 
-  private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
-
+  private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], oldOfficer: Option[OldOfficer]): Seq[ResponsiblePeople] = {
     responsiblePeople map { responsiblePerson =>
-      val positions = responsiblePerson.positions.get
-      responsiblePerson.positions(
+
+      val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
+
+      (oldOfficer match {
+        case Some(o) if responsiblePerson.personName.fold(false)(_.fullNameWithoutSpace equals o.name) =>
+          responsiblePerson.status(StatusConstants.Deleted).copy(endDate = Some(ResponsiblePersonEndDate(o.endDate)))
+        case _ => responsiblePerson
+      }).positions(
         Positions(positions.positions - NominatedOfficer, positions.startDate)
       )
-    }
 
+    }
   }
 
 }
