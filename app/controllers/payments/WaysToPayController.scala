@@ -27,6 +27,8 @@ import models.payments.{UpdateBacsRequest, WaysToPay}
 import models.payments.WaysToPay._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.payments.CreateBacsPaymentRequest
+import models.confirmation.Currency
 
 import scala.concurrent.Future
 
@@ -52,9 +54,6 @@ class WaysToPayController @Inject()(
 
         val submissionDetails = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
-          data@(paymentReference, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
-          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          status <- OptionT.liftF(statusService.getStatus)
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
           amlsRefNo <- {
             e match {
@@ -64,6 +63,7 @@ class WaysToPayController @Inject()(
           }
           payRef <- OptionT.fromOption[Future](paymentReference)
         } yield (amlsRefNo, payRef, data, detailedStatus.fold[String]("")(_.safeId.getOrElse("")))
+
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
@@ -76,13 +76,14 @@ class WaysToPayController @Inject()(
                   amlsRefNo,
                   safeId
                 ))
-                _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(false)))
               } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
             }
             case Bacs =>
               val bankTypeResult = for {
-                (_, payRef, _, _) <- submissionDetails
-                _ <- OptionT.liftF(paymentsService.updateBacsStatus(payRef, UpdateBacsRequest(true)))
+                (amlsRef, payRef, submissionData, safeId) <- submissionDetails
+                _ <- OptionT.liftF(paymentsService.createBacsPayment(
+                  CreateBacsPaymentRequest(amlsRef, payRef, safeId,
+                    paymentsService.amountFromSubmissionData(submissionData).fold(0)(_.map(_ * 100).value.toInt))))
               } yield Redirect(controllers.payments.routes.TypeOfBankController.get())
 
               bankTypeResult getOrElse InternalServerError("Unable to save BACS info")
@@ -90,5 +91,4 @@ class WaysToPayController @Inject()(
           case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
         }
   }
-
 }

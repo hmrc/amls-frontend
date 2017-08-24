@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package models.confirmation
+package models.payments
 
-case class Currency(value: BigDecimal) {
+import play.api.libs.json.Json
 
-  override def toString: String =
-    f"£$value%1.2f"
+case class CreateBacsPaymentRequest(amlsReference: String, paymentReference: String, safeId: String, amountInPence: Int)
 
-  def map(fn: BigDecimal => BigDecimal): Currency = fn(value)
-}
-
-object Currency {
-
-  implicit def fromBD(value: BigDecimal): Currency = Currency(value)
-
-  implicit def fromInt(value: Int): Currency = Currency(value)
-
-  implicit def currencyToDouble(c: Currency): Double = c.value.toDouble
-
-  implicit def currencyToFloat(c: Currency): Float = c.value.toFloat
-
+case object CreateBacsPaymentRequest {
+  implicit val format = Json.format[CreateBacsPaymentRequest]
 }
