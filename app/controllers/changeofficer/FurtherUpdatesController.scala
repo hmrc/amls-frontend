@@ -53,9 +53,7 @@ class FurtherUpdatesController @Inject()(
             (_, iNew) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.newOfficer, responsiblePeople))
             (_, iOld) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.oldOfficer, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
-              responsiblePeople
-                .patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
-                .patch(iOld, Seq(removeNominatedOfficer(responsiblePeople(iOld))), 1)
+              updateNominatedOfficers(responsiblePeople, iNew, iOld)
             }))
           } yield {
             Redirect(
@@ -67,6 +65,10 @@ class FurtherUpdatesController @Inject()(
         }
         case f: InvalidForm => Future.successful(BadRequest(views.html.changeofficer.further_updates(f)))
       }
+  }
+
+  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], iNew: Int, iOld: Int) = {
+    removeNominatedOfficers(responsiblePeople).patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
   }
 
   private def getNominatedOfficer(officer: Option[Officer], responsiblePeople: Seq[ResponsiblePeople]) = {
@@ -85,11 +87,15 @@ class FurtherUpdatesController @Inject()(
     )
   }
 
-  private def removeNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
-    val positions = responsiblePerson.positions.get
-    responsiblePerson.positions(
-      Positions(positions.positions - NominatedOfficer, positions.startDate)
-    )
+  private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+
+    responsiblePeople map { responsiblePerson =>
+      val positions = responsiblePerson.positions.get
+      responsiblePerson.positions(
+        Positions(positions.positions - NominatedOfficer, positions.startDate)
+      )
+    }
+
   }
 
 }

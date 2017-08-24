@@ -138,24 +138,46 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
         val result = controller invokePrivate addNominatedOfficer(newOfficer)
 
         result must equal(newOfficer.copy(
-          positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+          positions = Some(Positions(Set(DesignatedMember, NominatedOfficer), newOfficer.positions.get.startDate)),
           hasChanged = true
         ))
 
       }
     }
-    "removeNominatedOfficer is called" must {
+
+    "removeNominatedOfficers is called" must {
       "remove NominatedOfficer from the positions of the given responsible person" in new TestFixture {
 
-        val removeNominatedOfficer = PrivateMethod[ResponsiblePeople]('removeNominatedOfficer)
+        val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('removeNominatedOfficers)
 
-        val result = controller invokePrivate removeNominatedOfficer(oldOfficer)
+        val result = controller invokePrivate removeNominatedOfficers(responsiblePeople)
 
-        result must equal(oldOfficer.copy(
-          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
-          hasChanged = true
+        result must equal(Seq(
+          newOfficer,
+          oldOfficer.copy(
+            positions = Some(Positions(Set.empty[PositionWithinBusiness], oldOfficer.positions.get.startDate)),
+            hasChanged = true
+          )))
+      }
+    }
+
+    "updateNominatedOfficers is called" must {
+      "return a collection of responsible people with updated nominated officers" in new TestFixture {
+
+        val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
+
+        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0, 1)
+
+        result must equal(Seq(
+          newOfficer.copy(
+            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+            hasChanged = true
+          ),
+          oldOfficer.copy(
+            positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+            hasChanged = true
+          )
         ))
-
       }
     }
 
@@ -177,8 +199,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
           positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
           hasChanged = true
         )
-      ))
-      )(any(),any(),any())
+      )))(any(),any(),any())
 
     }
   }
