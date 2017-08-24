@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.changeofficer.{ChangeOfficer, FurtherUpdates, FurtherUpdatesNo, FurtherUpdatesYes}
+import models.changeofficer._
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
@@ -50,10 +50,8 @@ class FurtherUpdatesController @Inject()(
             cache <- OptionT(dataCacheConnector.fetchAll)
             responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
-            newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
-            oldOfficer <- OptionT.fromOption[Future](changeOfficer.oldOfficer)
-            (_, iNew) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
-            (_, iOld) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(oldOfficer, responsiblePeople))
+            (_, iNew) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.newOfficer, responsiblePeople))
+            (_, iOld) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.oldOfficer, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
               responsiblePeople
                 .patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
@@ -71,14 +69,23 @@ class FurtherUpdatesController @Inject()(
       }
   }
 
-  private def addNominatedOfficer(responsiblePerson: ResponsiblePeople) = {
+  private def getNominatedOfficer(officer: Option[Officer], responsiblePeople: Seq[ResponsiblePeople]) = {
+    officer match {
+      case Some(_) => officer flatMap { o =>
+        matchOfficerWithResponsiblePerson(o, responsiblePeople)
+      }
+      case _ => getOfficer(responsiblePeople)
+    }
+  }
+
+  private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
     val positions = responsiblePerson.positions.get
     responsiblePerson.positions(
       Positions(positions.positions + NominatedOfficer, positions.startDate)
     )
   }
 
-  private def removeNominatedOfficer(responsiblePerson: ResponsiblePeople) = {
+  private def removeNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
     val positions = responsiblePerson.positions.get
     responsiblePerson.positions(
       Positions(positions.positions - NominatedOfficer, positions.startDate)
