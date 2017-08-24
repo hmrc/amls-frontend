@@ -44,6 +44,7 @@ import scala.concurrent.Future
 class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   object AmlsConnector extends AmlsConnector {
+
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
     override private[connectors] val httpPut: HttpPut = mock[HttpPut]
     override private[connectors] val url: String = "amls/subscription"
@@ -279,6 +280,23 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
       whenReady(AmlsConnector.savePayment(id, amlsRegistrationNumber, safeId)) {
         _.status mustBe CREATED
+      }
+
+    }
+  }
+
+  "createBacsPayment" must {
+    "send a request to AMLS to create a BACS payment" in {
+      val request = createBacsPaymentGen.sample.get
+      val payment = paymentGen.sample.get
+      val postUrl = s"${AmlsConnector.paymentUrl}/org/TestOrgRef/bacs"
+
+      when {
+        AmlsConnector.httpPost.POST[CreateBacsPaymentRequest, Payment](eqTo(postUrl), eqTo(request), any())(any(), any(), any())
+      } thenReturn Future.successful(payment)
+
+      whenReady(AmlsConnector.createBacsPayment(request)) { result =>
+        result mustBe payment
       }
 
     }
