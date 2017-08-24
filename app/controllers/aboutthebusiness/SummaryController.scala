@@ -16,10 +16,12 @@
 
 package controllers.aboutthebusiness
 
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness.AboutTheBusiness
+import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import views.html.aboutthebusiness._
@@ -34,13 +36,24 @@ trait SummaryController extends BaseController {
       for {
         aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
         status <- statusService.getStatus
+        businessMatching <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
       } yield aboutTheBusiness match {
         case Some(data) => {
           val showRegisteredForMLR = status match {
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
             case _ => false
           }
-          Ok(summary(data, showRegisteredForMLR))
+
+          val maybeBT = for {
+            bm <- businessMatching
+            rd <- bm.reviewDetails
+            bt <- rd.businessType
+          } yield {
+            Ok(summary(data, showRegisteredForMLR, bt))
+          }
+
+          maybeBT.getOrElse(Redirect(controllers.routes.RegistrationProgressController.get()))
+
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }

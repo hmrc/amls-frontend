@@ -18,9 +18,12 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.Country
 import models.aboutthebusiness.AboutTheBusiness
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status.SubmissionReady
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
@@ -40,6 +43,19 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
     }
+
+    val testBusinessName = "Ubunchews Accountancy Services"
+
+    val testReviewDetails = ReviewDetails(
+      testBusinessName,
+      Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
+      "XE0001234567890"
+    )
+
+    val testBusinessMatch = BusinessMatching(
+      reviewDetails = Some(testReviewDetails)
+    )
   }
 
   "Get" must {
@@ -53,7 +69,10 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = AboutTheBusiness(None, None, None, None)
 
-      when(controller.dataCache.fetch[AboutTheBusiness](any())
+      when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+      when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       when(controller.statusService.getStatus(any(),any(),any()))
@@ -65,8 +84,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[AboutTheBusiness](any())
+      when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
 
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReady))

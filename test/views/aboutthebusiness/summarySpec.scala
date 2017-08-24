@@ -17,11 +17,12 @@
 package views.aboutthebusiness
 
 import models.aboutthebusiness._
+import models.businessmatching.BusinessType
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
 
@@ -40,20 +41,20 @@ class summarySpec extends GenericTestHelper
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true)
+      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true, BusinessType.LimitedCompany)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true)
+      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true, BusinessType.LimitedCompany)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
     }
 
     "does not show registered for mlr question when approved" in new ViewFixture {
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), false)
+      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), false, BusinessType.LimitedCompany)
 
       html must not include Messages("aboutthebusiness.registeredformlr.title")
     }
@@ -83,7 +84,7 @@ class summarySpec extends GenericTestHelper
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           false
-        ),true
+        ),true, BusinessType.LimitedCompany
       )
 
       forAll(sectionChecks) { (key, check) => {
