@@ -18,7 +18,7 @@ package controllers.changeofficer
 
 import connectors.DataCacheConnector
 import models.changeofficer.{ChangeOfficer, NewOfficer, OldOfficer, RoleInBusiness}
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -47,13 +47,21 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
       Some(OldOfficer("OldOfficer", new LocalDate(2001,10,11)))
     )
 
+    val newOfficer = ResponsiblePeople(
+      personName = Some(PersonName("New", None, "Officer", None, None)),
+      positions = Some(Positions(Set(
+        DesignatedMember
+      ), None)))
+
+    val oldOfficer = ResponsiblePeople(
+      personName = Some(PersonName("Old", None, "Officer", None, None)),
+      positions = Some(Positions(Set(
+        SoleProprietor
+      ), None)))
+
     val responsiblePeople = Seq(
-      ResponsiblePeople(
-        personName = Some(PersonName("New", None, "Officer", None, None))
-      ),
-      ResponsiblePeople(
-        personName = Some(PersonName("Old", None, "Officer", None, None))
-      )
+      newOfficer,
+      oldOfficer
     )
 
     val injector = new GuiceInjectorBuilder()
@@ -62,8 +70,12 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
       .build()
 
     when {
-      dataCacheConnector.fetchAll(any(),any())
+      controller.dataCacheConnector.fetchAll(any(),any())
     } thenReturn Future.successful(Some(cacheMap))
+
+    when {
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
+    } thenReturn Future.successful(Some(responsiblePeople))
 
     when {
       cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
@@ -74,8 +86,8 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
     } thenReturn Some(responsiblePeople)
 
     when {
-      dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
-    } thenReturn Future.successful(CacheMap("", Map.empty))
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(),any(),any())
+    } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
   }
@@ -124,7 +136,14 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
 
       val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
-      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
+        newOfficer.copy(
+          positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+          hasChanged = true
+        ),
+        oldOfficer
+      ))
+      )(any(),any(),any())
 
       status(result) mustBe SEE_OTHER
 

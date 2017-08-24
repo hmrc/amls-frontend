@@ -18,15 +18,16 @@ package controllers.changeofficer
 
 import javax.inject.Inject
 
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.{ChangeOfficer, FurtherUpdates, FurtherUpdatesNo, FurtherUpdatesYes}
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
@@ -46,30 +47,25 @@ class FurtherUpdatesController @Inject()(
       implicit request => Form2[FurtherUpdates](request.body) match {
         case ValidForm(_, data) => {
 
-          for {
+          (for {
             cache <- OptionT(dataCacheConnector.fetchAll)
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
             responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-            (person, index) <- OptionT.fromOption[Future](responsiblePeople.zipWithIndex.filter {
-              case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
-            } find {
-              case (p, _) => p.personName.get.fullNameWithoutSpace.equals(newOfficer.name)
-            })
-          } yield {
-            updateDataStrict[ResponsiblePeople](index + 1){ p =>
-              val positions = person.positions.get
-              person.positions(
+            (_, index) <- OptionT.fromOption[Future](matchNominatedOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
+            _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index + 1){ p =>
+              val positions = p.positions.get
+              p.positions(
                 Positions(positions.positions + NominatedOfficer, positions.startDate)
               )
-            }
-          }
-
-          Future.successful(Redirect(
-            data match {
-              case FurtherUpdatesYes => controllers.routes.RegistrationProgressController.get()
-              case FurtherUpdatesNo => controllers.declaration.routes.WhoIsRegisteringController.get()
-            }))
+            })
+          } yield {
+            Redirect(
+              data match {
+                case FurtherUpdatesYes => controllers.routes.RegistrationProgressController.get()
+                case FurtherUpdatesNo => controllers.declaration.routes.WhoIsRegisteringController.get()
+              })
+          }) getOrElse InternalServerError("Cannot save new Nominated Officer")
         }
         case f: InvalidForm => Future.successful(BadRequest(views.html.changeofficer.further_updates(f)))
       }
