@@ -117,6 +117,24 @@
                         )
                     }
             }
+
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "responsiblepeople.position_within_business.lbl.09",
+                    value = "other",
+                    target = "#otherPosition-fieldset"
+                )
+
+                @fieldset(
+                    f = f("otherPosition-fieldset"),
+                    legend = "responsiblepeople.position_within_business.other_position.lbl",
+                    jsHidden = false
+                ) {
+                    @input(
+                        field = f("otherPosition")
+                    )
+                }
+
             }
         </div>
 

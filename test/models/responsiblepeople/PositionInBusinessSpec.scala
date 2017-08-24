@@ -22,6 +22,7 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
+import utils.TraversableValidators._
 
 class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -37,6 +38,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         PositionWithinBusiness.formRule.validate("05") must be (Valid(Partner))
         PositionWithinBusiness.formRule.validate("06") must be (Valid(SoleProprietor))
         PositionWithinBusiness.formRule.validate("07") must be (Valid(DesignatedMember))
+        PositionWithinBusiness.formRule.validate("other") must be (Valid(OtherSelection))
       }
 
       "fail to validate an empty string" in {
@@ -52,6 +54,8 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
+
+
     }
 
     "write correct data from enum value" in {
@@ -62,8 +66,54 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       PositionWithinBusiness.formWrite.writes(Partner) must be("05")
       PositionWithinBusiness.formWrite.writes(SoleProprietor) must be("06")
       PositionWithinBusiness.formWrite.writes(DesignatedMember) must be("07")
+      PositionWithinBusiness.formWrite.writes(Other("")) must be("other")
     }
 
+  }
+
+  "Positions" must {
+    "successfully read whole form" in {
+      val form = Map(
+        "positions[0]" -> Seq("01"),
+        "positions[1]" -> Seq("other"),
+        "otherPosition" -> Seq("some other position"),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("1970")
+      )
+
+      //noinspection ScalaStyle
+      Positions.formReads.validate(form) mustBe
+        Valid(Positions(
+          Set(BeneficialOwner, Other("some other position")),
+          Some(new LocalDate(1970, 1, 1))))
+    }
+
+    "successfully write whole form" in {
+      //noinspection ScalaStyle
+      val model = Positions(Set(InternalAccountant, Other("some other position")), Some(new LocalDate(1999, 5, 1)))
+
+      Positions.formWrites.writes(model) mustBe Map(
+        "positions[]" -> Seq("03", "other"),
+        "otherPosition" -> Seq("some other position"),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("5"),
+        "startDate.year" -> Seq("1999")
+      )
+    }
+
+    "fail to validate when no 'other' value is given" in {
+      val form = Map(
+        "positions[0]" -> Seq("01"),
+        "positions[1]" -> Seq("other"),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("1970")
+      )
+
+      Positions.formReads.validate(form) mustBe
+        Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    }
   }
 
   "Positions hasNominatedOfficer" must {

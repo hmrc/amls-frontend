@@ -24,6 +24,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes, _}
 import cats.data.Validated.{Invalid, Valid}
+import models.ValidationRule
 import models.businessmatching.BusinessType
 import utils.TraversableValidators._
 
@@ -54,6 +55,10 @@ case object SoleProprietor extends PositionWithinBusiness
 
 case object DesignatedMember extends PositionWithinBusiness
 
+private case object OtherSelection extends PositionWithinBusiness
+
+case class Other(value: String) extends PositionWithinBusiness
+
 object PositionWithinBusiness {
 
   implicit val formRule = Rule[String, PositionWithinBusiness] {
@@ -64,6 +69,7 @@ object PositionWithinBusiness {
     case "05" => Valid(Partner)
     case "06" => Valid(SoleProprietor)
     case "07" => Valid(DesignatedMember)
+    case "other" => Valid(OtherSelection)
     case _ =>
       Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
   }
@@ -76,6 +82,7 @@ object PositionWithinBusiness {
     case Partner => "05"
     case SoleProprietor => "06"
     case DesignatedMember => "07"
+    case Other(_) => "other"
   }
 
   implicit val jsonReads: Reads[PositionWithinBusiness] =
@@ -116,14 +123,25 @@ object Positions {
 
   import utils.MappingUtils.Implicits._
 
-  implicit def formReads
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[PositionWithinBusiness]]
-  ): Rule[UrlFormEncoded, Positions] =
+  private val otherTypeLength = 255
+  private val otherType = notEmpty.withMessage("error.required.eab.redress.scheme.name") andThen
+    maxLength(otherTypeLength).withMessage("error.invalid.eab.redress.scheme.name")
+
+  private val positionReader = minLengthR[Set[PositionWithinBusiness]](1).withMessage("error.required.positionWithinBusiness")
+
+  private val positionValidator = Rule[(Set[PositionWithinBusiness], Option[String]), Set[PositionWithinBusiness]] {
+    case (s, None) if s.contains(OtherSelection) =>
+      Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    case (s, Some(other)) if s.contains(OtherSelection) => Valid(s.collect {
+      case OtherSelection => Other(other)
+      case x => x
+    })
+    case (s, _) => Valid(s)
+  }
+
+  implicit def formReads: Rule[UrlFormEncoded, Positions] =
     From[UrlFormEncoded] { __ =>
-      ((__ \ "positions")
-        .read(minLengthR[Set[PositionWithinBusiness]](1)
-          .withMessage("error.required.positionWithinBusiness")) ~
+      (((__ \ "positions").read(positionReader) ~ (__ \ "otherPosition").read[Option[String]]).tupled.andThen(positionValidator) ~
         (__ \ "startDate").read(localDateFutureRule.map { x: LocalDate => Some(x) })) (Positions.apply)
     }
 
@@ -138,6 +156,10 @@ object Positions {
             s"startDate.$key" -> value
         }
         case _ => Nil
+      }
+    } ++ {
+      data.positions.collectFirst {
+        case Other(v) => "otherPosition" -> Seq(v)
       }
     }
   }
