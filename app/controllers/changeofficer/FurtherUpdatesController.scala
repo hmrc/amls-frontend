@@ -48,16 +48,17 @@ class FurtherUpdatesController @Inject()(
         case ValidForm(_, data) => {
           (for {
             cache <- OptionT(dataCacheConnector.fetchAll)
+            responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
-            responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-            (_, index) <- OptionT.fromOption[Future](matchNominatedOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
-            _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index + 1){ p =>
-              val positions = p.positions.get
-              p.positions(
-                Positions(positions.positions + NominatedOfficer, positions.startDate)
-              )
-            })
+            oldOfficer <- OptionT.fromOption[Future](changeOfficer.oldOfficer)
+            (_, iNew) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
+            (_, iOld) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(oldOfficer, responsiblePeople))
+            _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
+              responsiblePeople
+                .patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
+                .patch(iOld, Seq(removeNominatedOfficer(responsiblePeople(iOld))), 1)
+            }))
           } yield {
             Redirect(
               data match {
@@ -68,6 +69,20 @@ class FurtherUpdatesController @Inject()(
         }
         case f: InvalidForm => Future.successful(BadRequest(views.html.changeofficer.further_updates(f)))
       }
+  }
+
+  private def addNominatedOfficer(responsiblePerson: ResponsiblePeople) = {
+    val positions = responsiblePerson.positions.get
+    responsiblePerson.positions(
+      Positions(positions.positions + NominatedOfficer, positions.startDate)
+    )
+  }
+
+  private def removeNominatedOfficer(responsiblePerson: ResponsiblePeople) = {
+    val positions = responsiblePerson.positions.get
+    responsiblePerson.positions(
+      Positions(positions.positions - NominatedOfficer, positions.startDate)
+    )
   }
 
 }

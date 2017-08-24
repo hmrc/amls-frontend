@@ -18,7 +18,7 @@ package controllers.changeofficer
 
 import cats.data.OptionT
 import connectors.DataCacheConnector
-import models.changeofficer.NewOfficer
+import models.changeofficer.{NewOfficer, Officer}
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -57,7 +57,7 @@ object Helpers {
     } yield nominatedOfficer
   }
 
-  def matchNominatedOfficerWithResponsiblePerson(newOfficer: NewOfficer, responsiblePeople: Seq[ResponsiblePeople]) = {
+  def matchOfficerWithResponsiblePerson(newOfficer: Officer, responsiblePeople: Seq[ResponsiblePeople]) = {
     responsiblePeople.zipWithIndex.filter {
       case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
     } find {

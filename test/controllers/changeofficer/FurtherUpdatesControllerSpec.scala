@@ -56,7 +56,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
     val oldOfficer = ResponsiblePeople(
       personName = Some(PersonName("Old", None, "Officer", None, None)),
       positions = Some(Positions(Set(
-        SoleProprietor
+        NominatedOfficer
       ), None)))
 
     val responsiblePeople = Seq(
@@ -143,7 +143,10 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
           positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
           hasChanged = true
         ),
-        oldOfficer
+        oldOfficer.copy(
+          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+          hasChanged = true
+        )
       ))
       )(any(),any(),any())
 
