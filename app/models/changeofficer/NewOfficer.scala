@@ -22,7 +22,9 @@ import jto.validation._
 import org.joda.time.LocalDate
 import utils.MappingUtils.Implicits._
 
-sealed trait Officer
+sealed abstract class Officer {
+  def name: String
+}
 
 case class NewOfficer(name: String) extends Officer
 case class OldOfficer(name: String, endDate: LocalDate) extends Officer

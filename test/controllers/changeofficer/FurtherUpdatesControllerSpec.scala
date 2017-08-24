@@ -22,6 +22,7 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -33,7 +34,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
+class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester{
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -56,7 +57,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
     val oldOfficer = ResponsiblePeople(
       personName = Some(PersonName("Old", None, "Officer", None, None)),
       positions = Some(Positions(Set(
-        SoleProprietor
+        NominatedOfficer
       ), None)))
 
     val responsiblePeople = Seq(
@@ -129,6 +130,57 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
       }
     }
 
+    "addNominatedOfficer is called" must {
+      "add NominatedOfficer to the positions of the given responsible person" in new TestFixture {
+
+        val addNominatedOfficer = PrivateMethod[ResponsiblePeople]('addNominatedOfficer)
+
+        val result = controller invokePrivate addNominatedOfficer(newOfficer)
+
+        result must equal(newOfficer.copy(
+          positions = Some(Positions(Set(DesignatedMember, NominatedOfficer), newOfficer.positions.get.startDate)),
+          hasChanged = true
+        ))
+
+      }
+    }
+
+    "removeNominatedOfficers is called" must {
+      "remove NominatedOfficer from the positions of the given responsible person" in new TestFixture {
+
+        val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('removeNominatedOfficers)
+
+        val result = controller invokePrivate removeNominatedOfficers(responsiblePeople)
+
+        result must equal(Seq(
+          newOfficer,
+          oldOfficer.copy(
+            positions = Some(Positions(Set.empty[PositionWithinBusiness], oldOfficer.positions.get.startDate)),
+            hasChanged = true
+          )))
+      }
+    }
+
+    "updateNominatedOfficers is called" must {
+      "return a collection of responsible people with updated nominated officers" in new TestFixture {
+
+        val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
+
+        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0, 1)
+
+        result must equal(Seq(
+          newOfficer.copy(
+            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+            hasChanged = true
+          ),
+          oldOfficer.copy(
+            positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+            hasChanged = true
+          )
+        ))
+      }
+    }
+
   }
 
   it must {
@@ -143,9 +195,11 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar{
           positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
           hasChanged = true
         ),
-        oldOfficer
-      ))
-      )(any(),any(),any())
+        oldOfficer.copy(
+          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+          hasChanged = true
+        )
+      )))(any(),any(),any())
 
     }
   }
