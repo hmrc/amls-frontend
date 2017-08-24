@@ -16,13 +16,11 @@
 
 package models.responsiblepeople
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json._
-import utils.TraversableValidators._
 
 class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -133,6 +131,15 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
   "JSON validation" must {
 
+    "convert to json" in {
+      val model = Positions(Set(BeneficialOwner, Other("some other role")), Some(new LocalDate(1970, 1, 1)))
+
+      Json.toJson(model) mustBe Json.obj(
+        "positions" -> JsArray(Seq(JsString("01"), Json.obj("other" -> "some other role"))),
+        "startDate" -> "1970-01-01"
+      )
+    }
+
     "successfully validate given a BeneficialOwner value" in {
       Json.fromJson[PositionWithinBusiness](JsString("01")) must
         be(JsSuccess(BeneficialOwner))
@@ -168,6 +175,10 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(DesignatedMember))
     }
 
+    "successfully validate given an OtherSelection value" in {
+      Json.fromJson[PositionWithinBusiness](Json.obj("other" -> "some other role")) mustBe JsSuccess(Other("some other role"))
+    }
+
     "fail to validate when given an empty value" in {
       Json.fromJson[PositionWithinBusiness](JsString("")) must
         be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
@@ -199,6 +210,10 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value for DesignatedMember" in {
       Json.toJson(DesignatedMember) must be(JsString("07"))
+    }
+
+    "write the correct value for Other" in {
+      Json.toJson(Other("some new role")) mustBe Json.obj("other" -> "some new role")
     }
   }
 

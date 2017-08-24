@@ -94,6 +94,7 @@ object PositionWithinBusiness {
       case JsString("05") => JsSuccess(Partner)
       case JsString("06") => JsSuccess(SoleProprietor)
       case JsString("07") => JsSuccess(DesignatedMember)
+      case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
       case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
@@ -105,6 +106,7 @@ object PositionWithinBusiness {
     case Partner => JsString("05")
     case SoleProprietor => JsString("06")
     case DesignatedMember => JsString("07")
+    case Other(value) => Json.obj("other" -> value)
   }
 
   val positionsPerBusinessType = {
@@ -120,12 +122,7 @@ object PositionWithinBusiness {
 }
 
 object Positions {
-
   import utils.MappingUtils.Implicits._
-
-  private val otherTypeLength = 255
-  private val otherType = notEmpty.withMessage("error.required.eab.redress.scheme.name") andThen
-    maxLength(otherTypeLength).withMessage("error.invalid.eab.redress.scheme.name")
 
   private val positionReader = minLengthR[Set[PositionWithinBusiness]](1).withMessage("error.required.positionWithinBusiness")
 
