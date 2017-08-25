@@ -25,6 +25,7 @@ import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
 import jto.validation.forms.Rules._
+import models.responsiblepeople.PositionWithinBusiness
 
 case class RoleInBusiness(roles: Set[Role])
 
@@ -125,4 +126,22 @@ object RoleInBusiness {
           "otherPosition" -> otherRole
         )
   }
+
+  implicit def conv(roles: Set[Role]): Set[PositionWithinBusiness] = roles map {conv}
+
+  implicit def conv(role: Role): PositionWithinBusiness = {
+    import models.responsiblepeople.{SoleProprietor => SoleProprietor$, Director => Director$, BeneficialOwner => BeneficialOwner$, InternalAccountant => InternalAccountant$, Partner => Partner$, DesignatedMember => DesignatedMember$, Other => Other$}
+
+    role match {
+      case SoleProprietor => SoleProprietor$
+      case Director => Director$
+      case BeneficialOwner => BeneficialOwner$
+      case InternalAccountant => InternalAccountant$
+      case Partner => Partner$
+      case DesignatedMember => DesignatedMember$
+      case Other(s) => Other$(s)
+    }
+
+  }
+
 }
