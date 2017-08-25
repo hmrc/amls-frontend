@@ -193,7 +193,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
         await(result) must equal((
           NewOfficer(""),
           Seq(
-            responsiblePeople(0),
+            responsiblePeople.head,
             responsiblePeople(2),
             responsiblePeople(4)
           )
