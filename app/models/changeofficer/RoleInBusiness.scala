@@ -31,10 +31,9 @@ case class RoleInBusiness(roles: Set[Role])
 sealed trait Role
 
 case object SoleProprietor extends Role
-case object InternalAccountant extends Role
-case object BeneficialShareholder extends Role
+case object BeneficialOwner extends Role
 case object Director extends Role
-case object ExternalAccountant extends Role
+case object InternalAccountant extends Role
 case object Partner extends Role
 case object DesignatedMember extends Role
 
@@ -47,9 +46,8 @@ object RoleInBusiness {
   //noinspection ScalaStyle
   def stringToRole(role: String, other: Option[String]): Role = role match {
     case "soleprop" => SoleProprietor
+    case "benown" => BeneficialOwner
     case "director" => Director
-    case "bensharehold" => BeneficialShareholder
-    case "extAccountant" => ExternalAccountant
     case "intAccountant" => InternalAccountant
     case "partner" => Partner
     case "desigmemb" => DesignatedMember
@@ -65,8 +63,7 @@ object RoleInBusiness {
   def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
       case Director => "director"
-      case BeneficialShareholder => "bensharehold"
-      case ExternalAccountant => "extAccountant"
+      case BeneficialOwner => "benown"
       case InternalAccountant => "intAccountant"
       case Partner => "partner"
       case DesignatedMember => "desigmemb"

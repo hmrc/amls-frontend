@@ -27,9 +27,8 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "validate a role" in {
       RoleInBusiness.roleFormReads.validate((Seq("soleprop"), None)) mustBe Valid(Set(SoleProprietor))
-      RoleInBusiness.roleFormReads.validate((Seq("bensharehold"), None)) mustBe Valid(Set(BeneficialShareholder))
+      RoleInBusiness.roleFormReads.validate((Seq("benown"), None)) mustBe Valid(Set(BeneficialOwner))
       RoleInBusiness.roleFormReads.validate((Seq("director"), None)) mustBe Valid(Set(Director))
-      RoleInBusiness.roleFormReads.validate((Seq("extAccountant"), None)) mustBe Valid(Set(ExternalAccountant))
       RoleInBusiness.roleFormReads.validate((Seq("intAccountant"), None)) mustBe Valid(Set(InternalAccountant))
       RoleInBusiness.roleFormReads.validate((Seq("partner"), None)) mustBe Valid(Set(Partner))
       RoleInBusiness.roleFormReads.validate((Seq("desigmemb"), None)) mustBe Valid(Set(DesignatedMember))
