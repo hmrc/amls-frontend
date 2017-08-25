@@ -17,7 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, Director => Director$}
 import models.responsiblepeople._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -165,7 +165,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0)
+        val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople, 0)
 
         result must equal(Seq(
           newOfficer.copy(
@@ -186,7 +186,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
     "update the roles of old officer and new before redirecting" in new TestFixture {
 
       override val changeOfficer = ChangeOfficer(
-        RoleInBusiness(Set.empty),
+        RoleInBusiness(Set(Director$)),
         Some(NewOfficer("NewOfficer"))
       )
 
@@ -206,7 +206,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
         ),
         oldOfficer.copy(
           positions = Some(Positions(
-            oldOfficer.positions.get.positions - NominatedOfficer,
+            oldOfficer.positions.get.positions - NominatedOfficer + Director,
             oldOfficer.positions.get.startDate)
           ),
           hasChanged = true

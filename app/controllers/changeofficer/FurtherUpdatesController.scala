@@ -50,10 +50,11 @@ class FurtherUpdatesController @Inject()(
             cache <- OptionT(dataCacheConnector.fetchAll)
             responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
+            oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
             (_, index) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
-              updateNominatedOfficers(responsiblePeople, index)
+              updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
             }))
           } yield {
             Redirect(
@@ -67,8 +68,16 @@ class FurtherUpdatesController @Inject()(
       }
   }
 
-  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], index: Int) = {
-    removeNominatedOfficers(responsiblePeople).patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
+  private def updateNominatedOfficers(oldOfficer: (ResponsiblePeople, Int), roles: RoleInBusiness, responsiblePeople: Seq[ResponsiblePeople], index: Int) = {
+    removeNominatedOfficers(responsiblePeople)
+      .patch(oldOfficer._2 - 1, Seq(updateRoles(oldOfficer._1, roles)), 1)
+      .patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
+  }
+
+  private def updateRoles(oldOfficer: ResponsiblePeople, rolesInBusiness: RoleInBusiness): ResponsiblePeople = {
+    import models.changeofficer.RoleInBusiness._
+    val positions = oldOfficer.positions.fold(Positions(Set.empty, None))(p => p)
+    oldOfficer.positions(Positions(rolesInBusiness.roles, positions.startDate))
   }
 
   private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
@@ -79,13 +88,11 @@ class FurtherUpdatesController @Inject()(
   }
 
   private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
-
     responsiblePeople map { responsiblePerson =>
       val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
       responsiblePerson.positions(
         Positions(positions.positions - NominatedOfficer, positions.startDate)
       )
-
     }
   }
 
