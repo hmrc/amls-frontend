@@ -79,7 +79,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                 rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
               }
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
+              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
               case false => Redirect(routes.NationalityController.get(index, edit, flow))
             }
           }.recoverWith {

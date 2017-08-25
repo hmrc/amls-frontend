@@ -70,7 +70,7 @@ trait TrainingController extends RepeatingSection with BaseController {
     cacheMapOpt match {
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-          case (true, _) => Redirect(routes.DetailedAnswersController.get(index))
+          case (true, _) => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts)),_,_,_,_, _)))
             if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
           => Redirect(routes.FitAndProperController.get(index, false, flow))

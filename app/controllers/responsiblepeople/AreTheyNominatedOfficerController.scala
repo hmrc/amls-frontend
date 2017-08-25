@@ -95,7 +95,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
                                       flow: Option[String])(implicit request: Request[AnyContent]) = {
     rpSeqOption match {
       case Some(rpSeq) => edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index))
+        case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
         case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
       }
       case _ => NotFound(notFoundView)

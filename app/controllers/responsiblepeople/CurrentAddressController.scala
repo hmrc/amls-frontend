@@ -108,7 +108,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           }.isDefined && originalAddress.isDefined) {
             Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
           } else {
-            Redirect(routes.DetailedAnswersController.get(index, edit))
+            Redirect(routes.DetailedAnswersController.get(index, edit, flow))
           }
         }
       } else {

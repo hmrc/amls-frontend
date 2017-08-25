@@ -22,6 +22,7 @@ import models.Country
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -366,9 +367,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
           val mockCacheMap = mock[CacheMap]
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-          val result = controller.post(RecordId, true)(newRequest)
+          val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
         }
 
         "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected" in new Fixture {

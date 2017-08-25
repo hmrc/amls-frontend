@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -27,14 +28,13 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
-
 
 import scala.concurrent.Future
 
@@ -98,9 +98,9 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-          val result = controller.post(RecordId,true)(newRequest)
+          val result = controller.post(RecordId,true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
         }
       }
       "when edit is false" must {

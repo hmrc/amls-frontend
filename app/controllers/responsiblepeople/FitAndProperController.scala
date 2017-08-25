@@ -59,7 +59,7 @@ trait FitAndProperController extends RepeatingSection with BaseController {
                   rp.hasAlreadyPassedFitAndProper(data)
                 }
               } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
                 case false => Redirect(routes.PersonRegisteredController.get(index, flow))
               }
             }.recoverWith {

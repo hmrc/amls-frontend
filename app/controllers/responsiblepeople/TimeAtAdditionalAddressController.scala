@@ -78,7 +78,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
   private def redirectTo(index: Int, edit: Boolean, flow: Option[String], data: TimeAtAddress) = {
     data match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
-      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index,edit, flow))
       case _ => Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow))
     }
   }

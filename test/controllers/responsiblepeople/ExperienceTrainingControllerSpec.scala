@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePeople}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.responsiblepeople.ResponsiblePeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -260,9 +261,9 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(RecordId, true)(newRequest)
+      val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
     }
   }
 }

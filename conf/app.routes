@@ -340,7 +340,7 @@ POST        /responsible-people/nationality/:index                              
 
 GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
 POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
-GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false)
+GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -390,8 +390,8 @@ POST        /responsible-people/contacting-you/:index                           
 GET         /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.get(index:Int, flow: Option[String] ?= None)
 POST        /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, flow: Option[String] ?= None)
 
-GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
-POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String)
+GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean, flow: Option[String] ?= None)
+POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String, flow: Option[String] ?= None)
 
 GET         /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

@@ -42,7 +42,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
     }
   }
 
-  def get(index: Int, complete: Boolean = false) = Authorised.async {
+  def get(index: Int, complete: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       for {
         rp <- getData[ResponsiblePeople](index)
@@ -50,18 +50,18 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       } yield rp match {
         case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
           Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, complete, showRemovalDateField(status, rp.get.lineId.isDefined)
+            EmptyForm, index, personName.fullName, complete, showRemovalDateField(status, rp.get.lineId.isDefined), flow
           ))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, personName: String) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, personName: String, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
 
         def redirectAppropriately = complete match {
           case true => Redirect(routes.YourAnswersController.get())
-          case false => Redirect(routes.SummaryController.get())
+          case false => Redirect(routes.SummaryController.get(flow))
         }
 
         def removeWithoutDate = removeDataStrict[ResponsiblePeople](index) map { _ =>
@@ -81,7 +81,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
               )
               Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
                 case f: InvalidForm if people.get.lineId.isDefined =>
-                  Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
+                  Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true, flow)))
                 case ValidForm(_, data) => {
                   for {
                     _ <- updateDataStrict[ResponsiblePeople](index) { tp =>

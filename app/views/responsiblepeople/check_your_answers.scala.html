@@ -58,8 +58,8 @@
                     @responsiblePerson.personName.map { personDetails =>
                         @checkYourAnswersListing(
                             item = personDetails.fullName,
-                            editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1, false).toString,
-                            removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false).toString
+                            editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1, false, flow).toString,
+                            removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false, flow).toString
                         )
                     }
                 }

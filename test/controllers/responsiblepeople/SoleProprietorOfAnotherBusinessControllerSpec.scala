@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.{PersonName, ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegisteredNo}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -139,9 +140,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
             when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
-            val result = controller.post(1,true)(newRequest)
+            val result = controller.post(1,true,Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
           }
         }
 
