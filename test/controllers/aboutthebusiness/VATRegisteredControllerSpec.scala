@@ -169,7 +169,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
-     redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true).url))
+     redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
    }
 
   }
