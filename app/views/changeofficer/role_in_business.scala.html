@@ -45,9 +45,9 @@
                 panel = false
             ) {
                 @businessType match {
-                    case BusinessType.SoleProprietor => {
-                        @checkbox(
-                            f = f("positions[]"),
+                   case BusinessType.SoleProprietor => {
+                       @checkbox(
+                           f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.06",
                             value = "soleprop"
                         )
@@ -59,11 +59,11 @@
                             value = "partner"
                         )
                     }
-                    case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                    case (BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
                         @checkbox(
                             f = f("positions[]"),
                             labelText = "responsiblepeople.position_within_business.lbl.01",
-                            value = "bensharehold"
+                            value = "benown"
                         )
                         @checkbox(
                             f = f("positions[]"),
@@ -78,18 +78,19 @@
                             )
                         }
                     }
+                    case BusinessType.LPrLLP => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.05",
+                            value = "partner"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.07",
+                            value = "desigmemb"
+                        )
+                    }
                 }
-
-                @checkbox(
-                    f = f("positions[]"),
-                    labelText = "responsiblepeople.position_within_business.lbl.03",
-                    value = "intAccountant"
-                )
-                @checkbox(
-                    f = f("positions[]"),
-                    labelText = "responsiblepeople.position_within_business.lbl.08",
-                    value = "extAccountant"
-                )
 
                 @checkbox(
                     f = f("positions[]"),
