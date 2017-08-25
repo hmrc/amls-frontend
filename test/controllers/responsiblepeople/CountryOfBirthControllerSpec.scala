@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.Country
+import models.responsiblepeople.ResponsiblePeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -144,10 +145,10 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-          val result = controllers.post(RecordId, edit = true)(requestWithParams)
+          val result = controllers.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
           verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
             meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any(), any())
         }

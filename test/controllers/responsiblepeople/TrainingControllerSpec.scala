@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching._
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.{PersonName, ResponsiblePeople, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -218,9 +219,9 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(emptyCache)))
 
-            val result = controller.post(recordId, true)(newRequest)
+            val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, true, Some(flowFromDeclaration)).url))
           }
 
 

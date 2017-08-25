@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -394,10 +395,10 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = additionalAddressController.post(RecordId, edit = true)(requestWithParams)
+          val result = additionalAddressController.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(additionalAddressController.auditConnector).sendEvent(captor.capture())(any(), any())

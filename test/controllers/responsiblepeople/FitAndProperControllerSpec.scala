@@ -17,7 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{VATRegisteredYes, PersonName, ResponsiblePeople, VATRegisteredNo}
+import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo, VATRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -168,9 +169,9 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(1, true)(newRequest)
+          val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
         }
       }
     }

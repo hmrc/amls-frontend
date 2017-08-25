@@ -40,14 +40,14 @@ trait DetailedAnswersController extends BaseController {
     }
   }
 
-  def get(index: Int, fromYourAnswers: Boolean) =
+  def get(index: Int, fromYourAnswers: Boolean, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
           case Some(data) => {
             data.lift(index - 1) match {
               case Some(x) => showHideAddressMove(x.lineId) map {showHide =>
-                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide, ControllerHelper.rpTitleName(Some(x))))
+                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide, ControllerHelper.rpTitleName(Some(x)), flow))
               }
               case _ => Future.successful(NotFound(notFoundView))
             }
