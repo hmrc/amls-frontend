@@ -134,6 +134,7 @@ trait WhoIsRegisteringController extends BaseController {
         case Partner => models.declaration.release7.Partner
         case SoleProprietor => models.declaration.release7.SoleProprietor
         case DesignatedMember => models.declaration.release7.DesignatedMember
+        case Other(d) => models.declaration.release7.Other(d)
       }
     )
   }
