@@ -183,7 +183,17 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
   }
 
   it must {
-    "replace old officer with new officer before redirecting" in new TestFixture {
+    "update the roles of old officer and new before redirecting" in new TestFixture {
+
+      override val changeOfficer = ChangeOfficer(
+        RoleInBusiness(Set.empty),
+        Some(NewOfficer("NewOfficer"))
+      )
+
+      when {
+        cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
+      } thenReturn Some(changeOfficer)
+
 
       val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
@@ -195,7 +205,10 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
           hasChanged = true
         ),
         oldOfficer.copy(
-          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+          positions = Some(Positions(
+            oldOfficer.positions.get.positions - NominatedOfficer,
+            oldOfficer.positions.get.startDate)
+          ),
           hasChanged = true
         )
       )))(any(), any(), any())
