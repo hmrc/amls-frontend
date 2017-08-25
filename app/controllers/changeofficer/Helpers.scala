@@ -18,7 +18,7 @@ package controllers.changeofficer
 
 import cats.data.OptionT
 import connectors.DataCacheConnector
-import models.changeofficer.{NewOfficer, Officer}
+import models.changeofficer.NewOfficer
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -45,7 +45,7 @@ object Helpers {
     people.zipWithIndex.map {
       case (person, index) => (person, index + 1)
     } find {
-      case (person, _) => person.positions.fold(false)(p => p.positions.contains(NominatedOfficer))
+      case (person, _) => person.positions.fold(false)(_.positions contains NominatedOfficer)
     }
   }
 
@@ -59,11 +59,11 @@ object Helpers {
     } yield nominatedOfficer
   }
 
-  def matchOfficerWithResponsiblePerson(newOfficer: Officer, responsiblePeople: Seq[ResponsiblePeople]) = {
+  def matchOfficerWithResponsiblePerson(newOfficer: NewOfficer, responsiblePeople: Seq[ResponsiblePeople]) = {
     responsiblePeople.zipWithIndex.filter {
       case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
     } find {
-      case (p, _) => p.personName.get.fullNameWithoutSpace.equals(newOfficer.name)
+      case (p, _) => p.personName.fold(false)(_.fullNameWithoutSpace equals newOfficer.name)
     }
   }
 

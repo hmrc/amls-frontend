@@ -34,16 +34,18 @@ heading = header
     @form(f, controllers.changeofficer.routes.NewOfficerController.post()) {
 
         @fieldset(
-        f = f("person"),
-        legend = "changeofficer.newnominatedofficer.title",
-        legendHidden = true,
-        panel = false
+            f = f("person"),
+            legend = "changeofficer.newnominatedofficer.title",
+            legendHidden = true,
+            panel = false
         ) {
             <div class="form-group">
                 @responsiblePeople.map { person =>
                     @radio(f("person"), person.personName.get.fullName, person.personName.get.fullNameWithoutSpace)
                 }
-                <p class="form-block">@Messages("lbl.or")</p>
+                @if(responsiblePeople.nonEmpty){
+                    <p class="form-block">@Messages("lbl.or")</p>
+                }
                 @radio(f("person"), Messages("lbl.some.one.else"), "someoneElse")
             </div>
 

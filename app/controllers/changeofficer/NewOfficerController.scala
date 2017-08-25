@@ -22,7 +22,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.changeofficer.{ChangeOfficer, NewOfficer}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -64,7 +64,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
             case _ => {
               val result = for {
-                changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+                changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
                 _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
               } yield {
                 Redirect(controllers.changeofficer.routes.FurtherUpdatesController.get())
@@ -76,10 +76,10 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       }
   }
 
-  private def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
+  def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
     for {
       people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key))
+      changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
     } yield (selectedOfficer, people.filter(p => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)))
   }

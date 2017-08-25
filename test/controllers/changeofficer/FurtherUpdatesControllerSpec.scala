@@ -17,9 +17,8 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, NewOfficer, OldOfficer, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -34,9 +33,10 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester{
+class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture {
+    self =>
     val request = addToken(self.authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -44,8 +44,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
     val changeOfficer = ChangeOfficer(
       RoleInBusiness(Set.empty),
-      Some(NewOfficer("NewOfficer")),
-      Some(OldOfficer("OldOfficer", new LocalDate(2001,10,11)))
+      Some(NewOfficer("NewOfficer"))
     )
 
     val newOfficer = ResponsiblePeople(
@@ -71,11 +70,11 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
       .build()
 
     when {
-      controller.dataCacheConnector.fetchAll(any(),any())
+      controller.dataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(responsiblePeople))
 
     when {
@@ -87,7 +86,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
     } thenReturn Some(responsiblePeople)
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(),any(),any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
     } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
@@ -166,7 +165,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0, 1)
+        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0)
 
         result must equal(Seq(
           newOfficer.copy(
@@ -199,7 +198,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
           positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
           hasChanged = true
         )
-      )))(any(),any(),any())
+      )))(any(), any(), any())
 
     }
   }

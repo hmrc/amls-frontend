@@ -17,7 +17,6 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, OldOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -103,13 +102,6 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.changeofficer.routes.NewOfficerController.get().url)
 
-        verify(controller.dataCacheConnector).save[ChangeOfficer](any(), meq(
-          ChangeOfficer(
-            roleInBusiness = RoleInBusiness(Set.empty[Role]),
-            oldOfficer = Some(OldOfficer(nominatedOfficer.personName.get.fullName, new LocalDate(2001,11,10)))
-          )
-        ))(any(),any(),any())
-
       }
       "return BAD_REQUEST for invalid form" in new TestFixture {
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -153,4 +145,27 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with Mocki
 
   }
 
+  it must {
+    "save the responsible person as deleted given an end date" in new TestFixture {
+      val result = controller.post()(request.withFormUrlEncodedBody(
+        "date.day" -> "10",
+        "date.month" -> "11",
+        "date.year" -> "2001"
+      ))
+
+      status(result) mustBe SEE_OTHER
+
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(
+        Seq(
+          nominatedOfficer.copy(
+            endDate = Some(ResponsiblePersonEndDate(new LocalDate(2001,11,10))),
+            status = Some(StatusConstants.Deleted),
+            hasChanged = true
+          ),
+          otherResponsiblePerson
+        )
+      ))(any(),any(),any())
+
+    }
+  }
 }
