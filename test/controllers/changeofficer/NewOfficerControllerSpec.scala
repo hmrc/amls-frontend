@@ -16,10 +16,12 @@
 
 package controllers.changeofficer
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
-import models.changeofficer.{NewOfficer, SoleProprietor, RoleInBusiness, ChangeOfficer}
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
+import models.responsiblepeople._
 import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
@@ -28,14 +30,19 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
+import org.scalatest.concurrent.ScalaFutures
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonGenerator {
+class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -53,13 +60,15 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
     lazy val emptyPerson = ResponsiblePeople()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
 
+    lazy val changeOfficer = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))
+
     when {
       cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(responsiblePeopleWithEmptyPerson))
 
     when {
       cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
-    } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))))
+    } thenReturn Future.successful(Some(changeOfficer))
   }
 
   "The NewOfficerController" when {
@@ -157,6 +166,39 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
         responsiblePeople foreach { p =>
           contentAsString(result) must include(p.personName.get.fullName)
         }
+      }
+
+    }
+
+    "getPeopleAndSelectedOfficer" must {
+
+      "return all responsible people with name defined and without deleted status" in new TestFixture {
+
+        override lazy val responsiblePeople = List(
+          responsiblePersonGen.sample.get,
+          responsiblePersonGen.sample.get.copy(personName = None),
+          responsiblePersonGen.sample.get,
+          responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+          responsiblePersonGen.sample.get
+        )
+
+        when {
+          cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
+        } thenReturn Future.successful(Some(responsiblePeople))
+
+        val getPeopleAndSelectedOfficer = PrivateMethod[OptionT[Future, (NewOfficer, Seq[ResponsiblePeople])]]('getPeopleAndSelectedOfficer)
+
+        val result = controller invokePrivate getPeopleAndSelectedOfficer(HeaderCarrier(), mock[AuthContext]) getOrElse fail("Could not retrieve")
+
+        await(result) must equal((
+          NewOfficer(""),
+          Seq(
+            responsiblePeople(0),
+            responsiblePeople(2),
+            responsiblePeople(4)
+          )
+        ))
+
       }
 
     }

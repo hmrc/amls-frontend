@@ -34,9 +34,10 @@ import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 
 import scala.concurrent.Future
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester{
+class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture {
+    self =>
     val request = addToken(self.authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -70,11 +71,11 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
       .build()
 
     when {
-      controller.dataCacheConnector.fetchAll(any(),any())
+      controller.dataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(responsiblePeople))
 
     when {
@@ -86,7 +87,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
     } thenReturn Some(responsiblePeople)
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(),any(),any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
     } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
@@ -149,7 +150,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('removeNominatedOfficers)
 
-        val result = controller invokePrivate removeNominatedOfficers(responsiblePeople, changeOfficer.oldOfficer)
+        val result = controller invokePrivate removeNominatedOfficers(responsiblePeople)
 
         result must equal(Seq(
           newOfficer,
@@ -158,31 +159,6 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
             hasChanged = true
           )))
       }
-      "add deleted status and endDate" when {
-        "old officer is defined" in new TestFixture {
-
-          val endDate = new LocalDate(2001,10,11)
-
-          override val changeOfficer = ChangeOfficer(
-            RoleInBusiness(Set.empty),
-            Some(NewOfficer("NewOfficer")),
-            Some(OldOfficer("OldOfficer", endDate))
-          )
-
-          val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('removeNominatedOfficers)
-
-          val result = controller invokePrivate removeNominatedOfficers(responsiblePeople, changeOfficer.oldOfficer)
-
-          result must equal(Seq(
-            newOfficer,
-            oldOfficer.copy(
-              positions = Some(Positions(Set.empty[PositionWithinBusiness], oldOfficer.positions.get.startDate)),
-              endDate = Some(ResponsiblePersonEndDate(endDate)),
-              status = Some(StatusConstants.Deleted),
-              hasChanged = true
-            )))
-        }
-      }
     }
 
     "updateNominatedOfficers is called" must {
@@ -190,7 +166,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, changeOfficer, 0, 1)
+        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0, 1)
 
         result must equal(Seq(
           newOfficer.copy(
@@ -208,57 +184,23 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
   }
 
   it must {
-    "replace old officer with new officer before redirecting" which {
-      "updates responsible person status to deleted if given an end date" in new TestFixture {
+    "replace old officer with new officer before redirecting" in new TestFixture {
 
-        val endDate = new LocalDate(2001,10,11)
+      val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
-        override val changeOfficer = ChangeOfficer(
-          RoleInBusiness(Set.empty),
-          Some(NewOfficer("NewOfficer")),
-          Some(OldOfficer("OldOfficer", endDate))
+      status(result) mustBe SEE_OTHER
+
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
+        newOfficer.copy(
+          positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+          hasChanged = true
+        ),
+        oldOfficer.copy(
+          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+          hasChanged = true
         )
+      )))(any(), any(), any())
 
-        when {
-          cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
-        } thenReturn Some(changeOfficer)
-
-        val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
-
-        status(result) mustBe SEE_OTHER
-
-        verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
-          newOfficer.copy(
-            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
-            hasChanged = true
-          ),
-          oldOfficer.copy(
-            positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
-            status = Some(StatusConstants.Deleted),
-            endDate = Some(ResponsiblePersonEndDate(endDate)),
-            hasChanged = true
-          )
-        )))(any(),any(),any())
-
-      }
-      "leaves responsible person status as is if not given an end date" in new TestFixture {
-
-        val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
-
-        status(result) mustBe SEE_OTHER
-
-        verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
-          newOfficer.copy(
-            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
-            hasChanged = true
-          ),
-          oldOfficer.copy(
-            positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
-            hasChanged = true
-          )
-        )))(any(),any(),any())
-
-      }
     }
   }
 
