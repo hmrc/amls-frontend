@@ -50,10 +50,10 @@ class FurtherUpdatesController @Inject()(
             cache <- OptionT(dataCacheConnector.fetchAll)
             responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
-            (_, iNew) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.newOfficer, responsiblePeople))
-            (_, iOld) <- OptionT.fromOption[Future](getNominatedOfficer(changeOfficer.oldOfficer, responsiblePeople))
+            newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
+            (_, index) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
-              updateNominatedOfficers(responsiblePeople, iNew, iOld)
+              updateNominatedOfficers(responsiblePeople, index)
             }))
           } yield {
             Redirect(
@@ -67,17 +67,8 @@ class FurtherUpdatesController @Inject()(
       }
   }
 
-  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], iNew: Int, iOld: Int) = {
-    removeNominatedOfficers(responsiblePeople).patch(iNew, Seq(addNominatedOfficer(responsiblePeople(iNew))), 1)
-  }
-
-  private def getNominatedOfficer(officer: Option[Officer], responsiblePeople: Seq[ResponsiblePeople]) = {
-    officer match {
-      case Some(_) => officer flatMap { o =>
-        matchOfficerWithResponsiblePerson(o, responsiblePeople)
-      }
-      case _ => getOfficer(responsiblePeople)
-    }
+  private def updateNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople], index: Int) = {
+    removeNominatedOfficers(responsiblePeople).patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
   }
 
   private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {

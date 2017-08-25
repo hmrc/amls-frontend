@@ -18,7 +18,7 @@ package models.changeofficer
 
 import play.api.libs.json.Json
 
-case class ChangeOfficer(roleInBusiness: RoleInBusiness, newOfficer: Option[NewOfficer] = None, oldOfficer: Option[OldOfficer] = None)
+case class ChangeOfficer(roleInBusiness: RoleInBusiness, newOfficer: Option[NewOfficer] = None)
 
 object ChangeOfficer {
   implicit val format = Json.format[ChangeOfficer]

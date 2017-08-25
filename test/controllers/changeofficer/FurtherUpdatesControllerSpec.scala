@@ -17,9 +17,8 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, NewOfficer, OldOfficer, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -30,7 +29,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -166,7 +165,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0, 1)
+        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0)
 
         result must equal(Seq(
           newOfficer.copy(

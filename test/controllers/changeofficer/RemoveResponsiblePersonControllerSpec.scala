@@ -17,7 +17,6 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, OldOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
