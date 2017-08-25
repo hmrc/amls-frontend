@@ -17,7 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
-import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
+import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, Director => Director$}
 import models.responsiblepeople._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -165,7 +165,7 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers(responsiblePeople, 0)
+        val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople, 0)
 
         result must equal(Seq(
           newOfficer.copy(
@@ -183,7 +183,17 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
   }
 
   it must {
-    "replace old officer with new officer before redirecting" in new TestFixture {
+    "update the roles of old officer and new before redirecting" in new TestFixture {
+
+      override val changeOfficer = ChangeOfficer(
+        RoleInBusiness(Set(Director$)),
+        Some(NewOfficer("NewOfficer"))
+      )
+
+      when {
+        cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
+      } thenReturn Some(changeOfficer)
+
 
       val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
@@ -195,7 +205,10 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
           hasChanged = true
         ),
         oldOfficer.copy(
-          positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+          positions = Some(Positions(
+            oldOfficer.positions.get.positions - NominatedOfficer + Director,
+            oldOfficer.positions.get.startDate)
+          ),
           hasChanged = true
         )
       )))(any(), any(), any())

@@ -25,16 +25,16 @@ import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
 import jto.validation.forms.Rules._
+import models.responsiblepeople.PositionWithinBusiness
 
 case class RoleInBusiness(roles: Set[Role])
 
 sealed trait Role
 
 case object SoleProprietor extends Role
-case object InternalAccountant extends Role
-case object BeneficialShareholder extends Role
+case object BeneficialOwner extends Role
 case object Director extends Role
-case object ExternalAccountant extends Role
+case object InternalAccountant extends Role
 case object Partner extends Role
 case object DesignatedMember extends Role
 
@@ -47,9 +47,8 @@ object RoleInBusiness {
   //noinspection ScalaStyle
   def stringToRole(role: String, other: Option[String]): Role = role match {
     case "soleprop" => SoleProprietor
+    case "benown" => BeneficialOwner
     case "director" => Director
-    case "bensharehold" => BeneficialShareholder
-    case "extAccountant" => ExternalAccountant
     case "intAccountant" => InternalAccountant
     case "partner" => Partner
     case "desigmemb" => DesignatedMember
@@ -65,8 +64,7 @@ object RoleInBusiness {
   def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
       case Director => "director"
-      case BeneficialShareholder => "bensharehold"
-      case ExternalAccountant => "extAccountant"
+      case BeneficialOwner => "benown"
       case InternalAccountant => "intAccountant"
       case Partner => "partner"
       case DesignatedMember => "desigmemb"
@@ -128,4 +126,22 @@ object RoleInBusiness {
           "otherPosition" -> otherRole
         )
   }
+
+  implicit def conv(roles: Set[Role]): Set[PositionWithinBusiness] = roles map {conv}
+
+  implicit def conv(role: Role): PositionWithinBusiness = {
+    import models.responsiblepeople.{SoleProprietor => SoleProprietor$, Director => Director$, BeneficialOwner => BeneficialOwner$, InternalAccountant => InternalAccountant$, Partner => Partner$, DesignatedMember => DesignatedMember$, Other => Other$}
+
+    role match {
+      case SoleProprietor => SoleProprietor$
+      case Director => Director$
+      case BeneficialOwner => BeneficialOwner$
+      case InternalAccountant => InternalAccountant$
+      case Partner => Partner$
+      case DesignatedMember => DesignatedMember$
+      case Other(s) => Other$(s)
+    }
+
+  }
+
 }
