@@ -16,6 +16,7 @@
 
 package audit
 
+import models.confirmation.Currency
 import models.governmentgateway.EnrolmentRequest
 import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
@@ -24,7 +25,7 @@ import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 object BacsPaymentEvent {
-  def apply(ukBank: Boolean)(implicit
+  def apply(ukBank: Boolean, amlsRef: String, payRef: String, amount: Currency)(implicit
    hc: HeaderCarrier,
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
@@ -33,7 +34,10 @@ object BacsPaymentEvent {
       auditType = "bacsPayment",
       tags = hc.toAuditTags("Bacs Payment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
-        "ukBank" -> ukBank.toString
+        "ukBank" -> ukBank.toString,
+        "amlsReferenceNumber" -> amlsRef,
+        "paymentReference" -> payRef,
+        "amount" -> amount.value.toString
       )
     )
 }
