@@ -18,15 +18,18 @@ package controllers.payments
 
 import javax.inject.Inject
 
+import audit.BacsPaymentEvent
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.payments.TypeOfBank
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(
-                                    val authConnector: AuthConnector
+                                    val authConnector: AuthConnector,
+                                    val auditConnector: AuditConnector
                                     ) extends BaseController{
 
   def get() = Authorised.async {
@@ -38,7 +41,9 @@ class TypeOfBankController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[TypeOfBank](request.body) match {
-          case ValidForm(_, data) => Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
+          case ValidForm(_, data) =>
+            auditConnector.sendEvent(BacsPaymentEvent(data.isUK))
+            Future.successful(Redirect(controllers.payments.routes.BankDetailsController.get(
             data.isUK
           ).url))
           case f: InvalidForm => Future.successful(BadRequest(views.html.payments.type_of_bank(f)))

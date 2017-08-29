@@ -16,6 +16,7 @@
 
 package controllers.payments
 
+import audit.BacsPaymentEvent
 import connectors.PayApiConnector
 import generators.AmlsReferenceNumberGenerator
 import models.confirmation.Currency
@@ -28,6 +29,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -43,9 +45,11 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
+    val auditConnector = mock[AuditConnector]
 
     val controller = new TypeOfBankController(
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      auditConnector = auditConnector
     )
 
   }
@@ -76,7 +80,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(true).url))
-
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
@@ -92,6 +96,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(false).url))
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
