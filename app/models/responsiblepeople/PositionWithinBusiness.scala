@@ -16,19 +16,15 @@
 
 package models.responsiblepeople
 
-import models.FormTypes._
-import org.joda.time.LocalDate
-import jto.validation._
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
-import play.api.libs.json.{Json, Reads, Writes, _}
-import cats.data.Validated.{Invalid, Valid}
-import models.ValidationRule
+import models.FormTypes._
 import models.businessmatching.BusinessType
+import org.joda.time.LocalDate
+import play.api.libs.json.{Json, Reads, Writes, _}
 import utils.TraversableValidators._
-
-import scala.collection.immutable.HashSet
 
 case class Positions(positions: Set[PositionWithinBusiness], startDate: Option[LocalDate]) {
 
@@ -55,23 +51,24 @@ case object SoleProprietor extends PositionWithinBusiness
 
 case object DesignatedMember extends PositionWithinBusiness
 
-private case object OtherSelection extends PositionWithinBusiness
-
 case class Other(value: String) extends PositionWithinBusiness
 
 object PositionWithinBusiness {
 
-  implicit val formRule = Rule[String, PositionWithinBusiness] {
-    case "01" => Valid(BeneficialOwner)
-    case "02" => Valid(Director)
-    case "03" => Valid(InternalAccountant)
-    case "04" => Valid(NominatedOfficer)
-    case "05" => Valid(Partner)
-    case "06" => Valid(SoleProprietor)
-    case "07" => Valid(DesignatedMember)
-    case "other" => Valid(OtherSelection)
-    case _ =>
-      Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
+  protected[responsiblepeople] val formRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]] {
+    case (s, None) if s.contains("other") =>
+      Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    case (s, o) => Valid(s map {
+      case "01" => BeneficialOwner
+      case "02" => Director
+      case "03" => InternalAccountant
+      case "04" => NominatedOfficer
+      case "05" => Partner
+      case "06" => SoleProprietor
+      case "07" => DesignatedMember
+      case "other" => Other(o.get)
+      case v => throw new Exception(s"Invalid form value '$v'")
+    })
   }
 
   implicit val formWrite = Write[PositionWithinBusiness, String] {
@@ -118,29 +115,24 @@ object PositionWithinBusiness {
       BusinessType.LPrLLP -> List(NominatedOfficer, Partner, DesignatedMember)
     )
   }
-
 }
 
 object Positions {
-  import utils.MappingUtils.Implicits._
 
-  private val positionReader = minLengthR[Set[PositionWithinBusiness]](1).withMessage("error.required.positionWithinBusiness")
+  import utils.MappingUtils.Implicits.RichRule
 
-  private val positionValidator = Rule[(Set[PositionWithinBusiness], Option[String]), Set[PositionWithinBusiness]] {
-    case (s, None) if s.contains(OtherSelection) =>
-      Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    case (s, Some(other)) if s.contains(OtherSelection) => Valid(s.collect {
-      case OtherSelection => Other(other)
-      case x => x
-    })
-    case (s, _) => Valid(s)
+  protected[responsiblepeople] val positionReader = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
+
+  private val otherLength = 255
+  private val otherPositionReader = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
+
+  implicit def formReads: Rule[UrlFormEncoded, Positions] = From[UrlFormEncoded] { __ =>
+    (((__ \ "positions").read(positionReader) ~
+        (__ \ "otherPosition").read(otherPositionReader))
+        .tupled.andThen(PositionWithinBusiness.formRule) ~ (__ \ "startDate").read(localDateFutureRule).map(Some(_))
+    )(Positions.apply)
+
   }
-
-  implicit def formReads: Rule[UrlFormEncoded, Positions] =
-    From[UrlFormEncoded] { __ =>
-      (((__ \ "positions").read(positionReader) ~ (__ \ "otherPosition").read[Option[String]]).tupled.andThen(positionValidator) ~
-        (__ \ "startDate").read(localDateFutureRule.map { x: LocalDate => Some(x) })) (Positions.apply)
-    }
 
   implicit def formWrites
   (implicit

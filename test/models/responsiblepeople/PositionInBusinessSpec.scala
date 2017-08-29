@@ -29,31 +29,22 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
     "PositionInBusiness" must {
 
       "successfully validate" in {
-        PositionWithinBusiness.formRule.validate("01") must be (Valid(BeneficialOwner))
-        PositionWithinBusiness.formRule.validate("02") must be (Valid(Director))
-        PositionWithinBusiness.formRule.validate("03") must be (Valid(InternalAccountant))
-        PositionWithinBusiness.formRule.validate("04") must be (Valid(NominatedOfficer))
-        PositionWithinBusiness.formRule.validate("05") must be (Valid(Partner))
-        PositionWithinBusiness.formRule.validate("06") must be (Valid(SoleProprietor))
-        PositionWithinBusiness.formRule.validate("07") must be (Valid(DesignatedMember))
-        PositionWithinBusiness.formRule.validate("other") must be (Valid(OtherSelection))
+        PositionWithinBusiness.formRule.validate((Set("01"), None)) mustBe Valid(Set(BeneficialOwner))
+        PositionWithinBusiness.formRule.validate((Set("02"), None)) mustBe Valid(Set(Director))
+        PositionWithinBusiness.formRule.validate((Set("03"), None)) mustBe Valid(Set(InternalAccountant))
+        PositionWithinBusiness.formRule.validate((Set("04"), None)) mustBe Valid(Set(NominatedOfficer))
+        PositionWithinBusiness.formRule.validate((Set("05"), None)) mustBe Valid(Set(Partner))
+        PositionWithinBusiness.formRule.validate((Set("06"), None)) mustBe Valid(Set(SoleProprietor))
+        PositionWithinBusiness.formRule.validate((Set("07"), None)) mustBe Valid(Set(DesignatedMember))
+        PositionWithinBusiness.formRule.validate((Set("other"), Some("some other role"))) mustBe Valid(Set(Other("some other role")))
       }
 
       "fail to validate an empty string" in {
-        PositionWithinBusiness.formRule.validate("") must
+        Positions.positionReader.validate(Set.empty[String]) must
           be(Invalid(Seq(
-            (Path \ "positions") -> Seq(ValidationError("error.invalid"))
+            Path -> Seq(ValidationError("error.required.positionWithinBusiness"))
           )))
       }
-
-      "fail to validate an invalid string" in {
-        PositionWithinBusiness.formRule.validate("10") must
-          be(Invalid(Seq(
-            (Path \ "positions") -> Seq(ValidationError("error.invalid"))
-          )))
-      }
-
-
     }
 
     "write correct data from enum value" in {
@@ -111,6 +102,19 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
       Positions.formReads.validate(form) mustBe
         Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    }
+
+    "fail to validate when an invalid valid was given" in {
+      val form = Map(
+        "positions[0]" -> Seq("10"),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("1970")
+      )
+
+      intercept[Exception] {
+        Positions.formReads.validate(form)
+      }
     }
   }
 

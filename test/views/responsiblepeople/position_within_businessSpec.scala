@@ -19,6 +19,7 @@ package views.responsiblepeople
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessType
+import org.jsoup.nodes.{Document, Element}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -28,8 +29,21 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
     val name = "firstName lastName"
+
+    def validateOtherSelection = {
+      val (otherCheckbox, otherLabel) = checkboxAndLabel("positions-other")(doc)
+      otherCheckbox mustBe defined
+      otherLabel mustBe defined
+      otherLabel map (_.text must include(Messages("responsiblepeople.position_within_business.lbl.09")))
+    }
+
+  }
+
+  def checkboxAndLabel(id: String)(implicit doc: Document): (Option[Element], Option[Element]) = {
+    val cb = Option(doc.getElementById(id))
+    val lbl = cb.fold[Option[Element]](None)(c => Option(c.parent))
+    (cb, lbl)
   }
 
   "position_within_business view" must {
@@ -46,18 +60,26 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "positions[]") must not be empty
-
     }
 
     "have the correct fields" when {
 
-      def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String): Unit = {
+      def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String, html: Document): Unit = {
+
+        val (checkbox, label) = checkboxAndLabel(s"positions-0$i")
+
         if (i <= 9) {
+
           if (positions contains i) {
-            formText must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))
+            checkbox mustBe defined
+            label mustBe defined
+            label map {_.text() must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))}
+
             assertLabelIncluded(i + 1)
           } else {
-            formText must not include Messages(s"responsiblepeople.position_within_business.lbl.0$i")
+            checkbox must not be defined
+            label must not be defined
+
             assertLabelIncluded(i + 1)
           }
         }
@@ -78,11 +100,9 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
               def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, true, None)
 
-              implicit val positions = positionsToDisplay
-              implicit val formText = form.text()
 
-              assertLabelIncluded()
 
+              assertLabelIncluded()(positionsToDisplay, form.text, doc)
             }
           }
         }
@@ -95,11 +115,8 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
               def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, false, None)
 
-              implicit val positions = positionsToDisplay.filterNot(_.equals(4))
-              implicit val formText = form.text()
-
-              assertLabelIncluded()
-
+              validateOtherSelection
+              assertLabelIncluded()(positionsToDisplay.filterNot(_.equals(4)), form.text, doc)
             }
           }
         }
@@ -114,6 +131,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
 
+      validateOtherSelection
       errorSummary.html() must include("not a message Key")
     }
   }
