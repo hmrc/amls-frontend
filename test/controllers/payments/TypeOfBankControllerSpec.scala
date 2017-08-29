@@ -18,12 +18,13 @@ package controllers.payments
 
 import audit.BacsPaymentEvent
 import connectors.PayApiConnector
-import generators.AmlsReferenceNumberGenerator
-import models.confirmation.Currency
+import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
+import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
@@ -32,11 +33,13 @@ import services.{AuthEnrolmentsService, PaymentsService, StatusService, Submissi
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
+class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -45,12 +48,35 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    val auditConnector = mock[AuditConnector]
 
     val controller = new TypeOfBankController(
       authConnector = self.authConnector,
-      auditConnector = auditConnector
+      auditConnector = mock[AuditConnector],
+      statusService = mock[StatusService],
+      submissionResponseService = mock[SubmissionResponseService],
+      authEnrolmentsService = mock[AuthEnrolmentsService],
+      paymentsService = mock[PaymentsService]
     )
+
+    val paymentRef = paymentRefGen.sample.get
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(mock[AuditResult])
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())
+    } thenReturn Future.successful(SubmissionReadyForReview)
+
+    val data = (Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Left(amlsRegistrationNumber))
+
+    when {
+      controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
+    } thenReturn Future.successful(Some(data))
+
+    when {
+      controller.paymentsService.amountFromSubmissionData(any())
+    } thenReturn Some(Currency.fromInt(100))
 
   }
 
@@ -80,7 +106,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(true).url))
-          verify(auditConnector).sendEvent(any())(any(), any())
+          verify(controller.auditConnector).sendEvent(any())(any(), any())
         }
       }
 
@@ -96,7 +122,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper{
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(false).url))
-          verify(auditConnector).sendEvent(any())(any(), any())
+          verify(controller.auditConnector).sendEvent(any())(any(), any())
         }
       }
 
