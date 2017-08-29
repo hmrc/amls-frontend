@@ -53,7 +53,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     corporationTaxRegistered = Some(regForCorpTax),
     contactingYou = Some(contactingYou),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
-    correspondenceAddress = Some(uKCorrespondenceAddress)
+    correspondenceAddress = Some(uKCorrespondenceAddress),
+    hasAccepted = true
   )
 
   val completeJson = Json.obj(
@@ -84,7 +85,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "correspondenceAddressLine4" -> "address 4",
       "correspondencePostCode" -> "AA11 1AA"
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 
   "AboutTheBusiness Serialisation" must {
@@ -114,7 +116,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
       "prevMLRRegNo" -> "12345678"
       ),
-      "hasChanged" -> false
+      "hasChanged" -> false,
+      "hasAccepted" -> false
     )
 
     val partialModel = AboutTheBusiness(Some(previouslyRegistered), None)

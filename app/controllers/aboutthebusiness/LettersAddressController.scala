@@ -35,7 +35,7 @@ trait LettersAddressController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _)) =>
+        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _, _)) =>
           Ok(letters_address(EmptyForm, registeredOffice, edit))
         case _ =>
           Redirect(routes.CorrespondenceAddressController.get(edit))

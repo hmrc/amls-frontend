@@ -30,7 +30,8 @@ case class AboutTheBusiness(
                              contactingYou: Option[ContactingYou] = None,
                              registeredOffice: Option[RegisteredOffice] = None,
                              correspondenceAddress: Option[CorrespondenceAddress] = None,
-                             hasChanged: Boolean = false
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false
                            ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness = {
@@ -61,7 +62,7 @@ case class AboutTheBusiness(
   def isComplete: Boolean =
     this match {
       case AboutTheBusiness(
-      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _
+      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, true
       ) => true
       case _ => false
     }
@@ -75,7 +76,7 @@ object AboutTheBusiness {
     cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
       case model if model.isComplete =>
         Section(messageKey, Completed, model.hasChanged, controllers.aboutthebusiness.routes.SummaryController.get())
-      case AboutTheBusiness(None, None, None, None, None, _, None, _) =>
+      case AboutTheBusiness(None, None, None, None, None, _, None, _, false) =>
         notStarted
       case model =>
         Section(messageKey, Started, model.hasChanged, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
@@ -100,6 +101,9 @@ object AboutTheBusiness {
         (__ \ "registeredOffice").readNullable[RegisteredOffice] and
         (__ \ "correspondenceAddress").readNullable[CorrespondenceAddress] and
         (__ \ "hasChanged").readNullable[Boolean].map {
+          _.getOrElse(false)
+        } and
+        (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
       ).apply(AboutTheBusiness.apply _)
