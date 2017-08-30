@@ -16,11 +16,12 @@
 
 @import include._
 @import forms2._
+@import forms.Form2
 @import models.aboutthebusiness._
 @import models.businessmatching.BusinessType
 @import utils._
 
-@(model: AboutTheBusiness, showRegisteredForMLR: Boolean, businessType: BusinessType)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], model: AboutTheBusiness, showRegisteredForMLR: Boolean, businessType: BusinessType)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.aboutbusiness")
@@ -128,9 +129,8 @@
         }
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @form(f, controllers.aboutthebusiness.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+    }
+
 }
