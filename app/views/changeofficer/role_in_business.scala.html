@@ -31,94 +31,15 @@
     heading = header
 ) {
 
-
-
     <p>@Messages("lbl.select.all")</p>
 
     @form(f, controllers.changeofficer.routes.RoleInBusinessController.post()) {
 
-        <div class="form-group">
-            @fieldset(
-                f = f("positions"),
-                legend = "responsiblepeople.position_within_business.title",
-                legendHidden = true,
-                panel = false
-            ) {
-                @businessType match {
-                   case BusinessType.SoleProprietor => {
-                       @checkbox(
-                           f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.06",
-                            value = "soleprop"
-                        )
-                    }
-                    case BusinessType.Partnership => {
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.05",
-                            value = "partner"
-                        )
-                    }
-                    case (BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.01",
-                            value = "benown"
-                        )
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.02",
-                            value = "director"
-                        )
-                        @if(businessType == BusinessType.LPrLLP) {
-                            @checkbox(
-                                f = f("positions[]"),
-                                labelText = "responsiblepeople.position_within_business.lbl.07",
-                                value = "desigmemb"
-                            )
-                        }
-                    }
-                    case BusinessType.LPrLLP => {
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.05",
-                            value = "partner"
-                        )
-                        @checkbox(
-                            f = f("positions[]"),
-                            labelText = "responsiblepeople.position_within_business.lbl.07",
-                            value = "desigmemb"
-                        )
-                    }
-                }
-
-                @checkbox(
-                    f = f("positions[]"),
-                    labelText = "responsiblepeople.position_within_business.lbl.09",
-                    value = "other",
-                    target = "#otherPosition-fieldset"
-                )
-
-                @fieldset(
-                    f = f("otherPosition-fieldset"),
-                    legend = "changeofficer.roleinbusiness.other.lbl",
-                    jsHidden = false
-                ) {
-                    @input(
-                        field = f("otherPosition")
-                    )
-                }
-
-                <p class="form-block">@Messages("lbl.or")</p>
-
-                @checkbox(
-                    f = f("positions[]"),
-                    labelText = "lbl.none.of.the.above",
-                    value = ""
-                )
-
-            }
-        </div>
+        @roles_within_business(
+            f,
+            businessType,
+            false
+        )
 
         @submit(returnLink = false)
     }
