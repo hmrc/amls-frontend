@@ -19,7 +19,7 @@ package models.responsiblepeople
 import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started}
-import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -104,6 +104,18 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           .thenReturn(None)
 
         ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+      }
+    }
+
+    "a partial address history has been given" must {
+      "be marked as incomplete" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when {
+          mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(incompleteAddressHistoryPerson))
+
+        ResponsiblePeople.section(mockCacheMap).status mustBe Started
       }
     }
 
@@ -597,14 +609,14 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   object DefaultValues {
 
-    private val residenceNonUk = NonUKResidence
-    private val residenceUk = UKResidence("AA111111A")
-    private val residenceCountry = Country("United Kingdom", "GB")
-    private val residenceNationality = Country("United Kingdom", "GB")
-    private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
-    private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
-    private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
-    private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
+    val residenceNonUk = NonUKResidence
+    val residenceUk = UKResidence("AA111111A")
+    val residenceCountry = Country("United Kingdom", "GB")
+    val residenceNationality = Country("United Kingdom", "GB")
+    val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
+    val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
+    val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
+    val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(OneToThreeYears))
     val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
     val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), new LocalDate(1990, 2, 24))
@@ -734,6 +746,11 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
+  val incompleteAddressHistoryPerson = completeModelUkResident.copy(
+    addressHistory = Some(DefaultValues.addressHistory.copy(
+      currentAddress = Some(DefaultValues.currentAddress.copy(timeAtAddress = Some(ZeroToFiveMonths))),
+      additionalAddress = Some(DefaultValues.additionalAddress.copy(timeAtAddress = Some(SixToElevenMonths)))
+    )))
 
   val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
@@ -953,7 +970,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
@@ -1040,7 +1057,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
@@ -1119,7 +1136,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
@@ -1201,7 +1218,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
@@ -1282,7 +1299,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
@@ -1356,7 +1373,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
           "personAddressPostCode" -> "AA11AA"
         ),
         "timeAtAddress" -> Json.obj(
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "03"
         )
       )
     ),
