@@ -64,14 +64,14 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
       val f = Form2[AddPerson](AddPerson.formWrites.writes(person) ++ RoleWithinBusinessRelease7.formWrites.writes(role))
 
-      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.LPrLLP), f)
+      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.UnincorporatedBody), f)
 
       doc.getElementById("firstName").`val` mustBe "Forename"
       doc.getElementById("middleName").`val` mustBe "Middlename"
       doc.getElementById("lastName").`val` mustBe "Surname"
 
-      doc.select("#positions input[checked]").get(0).`val` mustBe "08"
-      doc.select("#positions input[checked]").get(1).`val` mustBe "01"
+      doc.select("#positions input[checked]").get(0git).`val` mustBe "01"
+      doc.select("#positions input[checked]").get(1).`val` mustBe "08"
     }
 
     "pre-populate the 'other' field correctly" in new ViewFixture {
