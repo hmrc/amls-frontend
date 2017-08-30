@@ -28,6 +28,7 @@ import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import views.html.aboutthebusiness._
 
+
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
@@ -70,7 +71,6 @@ trait SummaryController extends BaseController {
       } yield {
         Redirect(controllers.routes.RegistrationProgressController.get())
       }
-
   }
 }
 
