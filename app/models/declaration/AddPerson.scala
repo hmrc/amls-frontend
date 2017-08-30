@@ -47,8 +47,6 @@ object AddPerson {
     }
   }
 
-
-
   //TODO: Update these read types to use correct name types.
   implicit def formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
@@ -88,11 +86,10 @@ object AddPerson {
       (__ \ "firstName").read[String] and
         (__ \ "middleName").readNullable[String] and
         (__ \ "lastName").read[String] and
-        (__.read[RoleWithinBusinessRelease7])
+        __.read[RoleWithinBusinessRelease7]
       ) (AddPerson.apply _)
 
   }
-
 
   implicit val jsonWrites: Writes[AddPerson] = {
     import play.api.libs.functional.syntax._
@@ -105,6 +102,5 @@ object AddPerson {
         __.write[RoleWithinBusinessRelease7]
       ) (unlift(AddPerson.unapply))
   }
-
 
 }

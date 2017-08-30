@@ -63,60 +63,12 @@
             }
         </div>
 
-        @if(config.ApplicationConfig.release7) {
-            @fieldset(
-                f = f("roleWithinBusiness"),
-                legend = "declaration.addperson.whatsyourrole",
-                bold = false,
-                panel = false
-            ) {
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.01", value = "BeneficialShareholder")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.02", value = "Director")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.03", value = "ExternalAccountant")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.04", value = "InternalAccountant")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.05", value = "NominatedOfficer")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.06", value = "Partner")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.07", value = "SoleProprietor")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.09", value = "DesignatedMember")
-                @checkbox(f = f("roleWithinBusiness[]"), labelText = "declaration.addperson.lbl.08", value = "Other", target = s"#$target")
-            }
-
-            @fieldset(
-                legend = "declaration.addperson.lbl.08",
-                legendHidden = true,
-                jsHidden = true,
-                classes = Seq("roleWithinBusinessOther-fieldset"),
-                f = f(target)
-            ) {
-                @input(
-                    field = f("roleWithinBusinessOther"),
-                    labelText = "lbl.pleasespecify"
-                )
-            }
-        } else {
-            @fieldset(
-                f = f("roleWithinBusiness"),
-                legend = "declaration.addperson.whatsyourrole",
-                bold = false,
-                panel = false
-            ) {
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.02", "02")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.03", "03")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.04", "04")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.05", "05")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
-            }
-
-            @fieldset(
-                legend = "declaration.addperson.lbl.08",
-                legendHidden = true,
-                f = f(target)
-            ) {
-                @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
-            }
+        @businessType.map{ bt =>
+            @roles_within_business(
+                f,
+                bt,
+                true
+            )
         }
 
         @submit()

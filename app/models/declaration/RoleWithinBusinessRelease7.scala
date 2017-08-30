@@ -47,6 +47,19 @@ sealed trait RoleType {
       case DesignatedMember => "DesignatedMember"
       case Other(_) => "Other"
     }
+  val formValue: String =
+    this match {
+      case BeneficialShareholder => "01"
+      case Director => "02"
+      case Partner => "05"
+      case InternalAccountant => "03"
+      case ExternalAccountant => "08"
+      case SoleProprietor => "06"
+      case NominatedOfficer => "04"
+      case DesignatedMember => "07"
+      case Other(_) => "other"
+    }
+
 }
 
 case object BeneficialShareholder extends RoleType
@@ -80,21 +93,21 @@ object RoleWithinBusinessRelease7 {
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      (readerURLFormEncoded \ "roleWithinBusiness").read(minLengthR[Set[String]](1).withMessage("error.required")) flatMap { z =>
+      (readerURLFormEncoded \ "positions").read(minLengthR[Set[String]](1).withMessage("error.required")) flatMap { z =>
         z.map {
-          case "BeneficialShareholder" => Rule[UrlFormEncoded, RoleType](_ => Valid(BeneficialShareholder))
-          case "Director" => Rule[UrlFormEncoded, RoleType](_ => Valid(Director))
-          case "Partner" => Rule[UrlFormEncoded, RoleType](_ => Valid(Partner))
-          case "InternalAccountant" => Rule[UrlFormEncoded, RoleType](_ => Valid(InternalAccountant))
-          case "ExternalAccountant" => Rule[UrlFormEncoded, RoleType](_ => Valid(ExternalAccountant))
-          case "SoleProprietor" => Rule[UrlFormEncoded, RoleType](_ => Valid(SoleProprietor))
-          case "NominatedOfficer" => Rule[UrlFormEncoded, RoleType](_ => Valid(NominatedOfficer))
-          case "DesignatedMember" => Rule[UrlFormEncoded, RoleType](_ => Valid(DesignatedMember))
-          case "Other" =>
-            (readerURLFormEncoded \ "roleWithinBusinessOther").read(otherDetailsType) map Other.apply
+          case "01" => Rule[UrlFormEncoded, RoleType](_ => Valid(BeneficialShareholder))
+          case "02" => Rule[UrlFormEncoded, RoleType](_ => Valid(Director))
+          case "05" => Rule[UrlFormEncoded, RoleType](_ => Valid(Partner))
+          case "03" => Rule[UrlFormEncoded, RoleType](_ => Valid(InternalAccountant))
+          case "08" => Rule[UrlFormEncoded, RoleType](_ => Valid(ExternalAccountant))
+          case "06" => Rule[UrlFormEncoded, RoleType](_ => Valid(SoleProprietor))
+          case "04" => Rule[UrlFormEncoded, RoleType](_ => Valid(NominatedOfficer))
+          case "07" => Rule[UrlFormEncoded, RoleType](_ => Valid(DesignatedMember))
+          case "other" =>
+            (readerURLFormEncoded \ "otherPosition").read(otherDetailsType) map Other.apply
           case _ =>
             Rule[UrlFormEncoded, RoleType] { _ =>
-              Invalid(Seq((Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))))
+              Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
             }
         }.foldLeft[Rule[UrlFormEncoded, Set[RoleType]]](
           Rule[UrlFormEncoded, Set[RoleType]](_ => Valid(Set.empty))
@@ -112,12 +125,12 @@ object RoleWithinBusinessRelease7 {
   implicit def formWrites = Write[RoleWithinBusinessRelease7, UrlFormEncoded] {
     case RoleWithinBusinessRelease7(transactions) =>
       Map(
-        "roleWithinBusiness[]" -> (transactions map {
-          _.value
+        "positions[]" -> (transactions map {
+          _.formValue
         }).toSeq
       ) ++ transactions.foldLeft[UrlFormEncoded](Map.empty) {
         case (m, Other(name)) =>
-          m ++ Map("roleWithinBusinessOther" -> Seq(name))
+          m ++ Map("otherPosition" -> Seq(name))
         case (m, _) =>
           m
       }
