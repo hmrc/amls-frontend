@@ -170,7 +170,32 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1).url))
+          }
 
+          "existing data is present" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "ukPassport" -> "false"
+            )
+
+            val responsiblePeople = ResponsiblePeople(
+              ukPassport = Some(UKPassportNo)
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+
+            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+              .thenReturn(Some(Seq(responsiblePeople)))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(1, false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, false).url))
           }
         }
       }
@@ -202,7 +227,6 @@ class PersonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar
             val result = controller.post(1, true)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true).url))
-
           }
         }
         "goes to DateOfBirthController" when {
