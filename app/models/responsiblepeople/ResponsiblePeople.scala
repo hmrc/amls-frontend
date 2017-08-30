@@ -23,6 +23,8 @@ import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
+import cats.implicits.none
+import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 
 import scala.collection.Seq
 
@@ -105,11 +107,27 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
+
     this match {
-      case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos),
-      Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP) if pos.startDate.isDefined && checkVatField(otherBusinessSP)=> true
+      case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP)
+        if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
       case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
       case _ => false
+    }
+
+  }
+
+  private def validateAddressHistory: Boolean = {
+    this.addressHistory.fold(false) { hist =>
+      (
+        hist.currentAddress.flatMap(_.timeAtAddress),
+        hist.additionalAddress.flatMap(_.timeAtAddress),
+        hist.additionalExtraAddress.flatMap(_.timeAtAddress)
+      ) match {
+        case (Some(ZeroToFiveMonths | SixToElevenMonths), None, None) => false
+        case (Some(ZeroToFiveMonths | SixToElevenMonths), Some(ZeroToFiveMonths | SixToElevenMonths), None) => false
+        case _ => true
+       }
     }
   }
 
