@@ -43,7 +43,6 @@
                 f = f("declaration-addperson"),
                 legend = "declaration.addperson.title",
                 legendHidden = true
-
             ) {
                 @input(
                     field = f("firstName"),
@@ -66,8 +65,9 @@
         @businessType.map{ bt =>
             @roles_within_business(
                 f,
-                bt,
-                true
+                businessType = bt,
+                displayNominatedOfficer = true,
+                isDeclaration = true
             )
         }
 

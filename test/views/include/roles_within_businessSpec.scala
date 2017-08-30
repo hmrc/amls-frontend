@@ -27,9 +27,10 @@ import utils.GenericTestHelper
 
 class roles_within_businessSpec extends GenericTestHelper with MustMatchers {
 
-  trait ViewFixture{
+  trait ViewFixture {
 
     def view: HtmlFormat.Appendable
+
     lazy val html = view.body
     implicit lazy val doc = Jsoup.parse(html)
 
@@ -48,45 +49,54 @@ class roles_within_businessSpec extends GenericTestHelper with MustMatchers {
     (cb, lbl)
   }
 
-  "have the correct fields" when {
+  def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], html: Document, isDeclaration: Boolean = false): Unit = {
 
-    def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], text: String, html: Document): Unit = {
+    val (checkbox, label) = checkboxAndLabel(s"positions-0$i")
 
-      val (checkbox, label) = checkboxAndLabel(s"positions-0$i")
+    if (i <= 9) {
 
-      if (i <= 9) {
-
-        if (positions contains i) {
-          checkbox mustBe defined
-          label mustBe defined
-          label foreach {_.text() must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))}
-
-          assertLabelIncluded(i + 1)
-        } else {
-          checkbox must not be defined
-          label must not be defined
-
-          assertLabelIncluded(i + 1)
+      if (positions contains i) {
+        checkbox mustBe defined
+        label mustBe defined
+        label foreach {
+          _.text() must include {
+            if (isDeclaration & i.equals(1)) {
+              Messages(s"declaration.addperson.lbl.0$i")
+            } else {
+              Messages(s"responsiblepeople.position_within_business.lbl.0$i")
+            }
+          }
         }
+
+        assertLabelIncluded(i + 1)
+      } else {
+        checkbox must not be defined
+        label must not be defined
+
+        assertLabelIncluded(i + 1)
       }
     }
+  }
 
-    val testCases = List(
-      BusinessType.SoleProprietor -> List(4, 6),
-      BusinessType.Partnership -> List(4, 5),
-      BusinessType.LimitedCompany -> List(1, 2, 4),
-      BusinessType.UnincorporatedBody -> List(1, 2, 4),
-      BusinessType.LPrLLP -> List(4, 5, 7)
-    )
+  val testCases = List(
+    BusinessType.SoleProprietor -> List(4, 6, 8),
+    BusinessType.Partnership -> List(4, 5, 8),
+    BusinessType.LimitedCompany -> List(1, 2, 4, 8),
+    BusinessType.UnincorporatedBody -> List(1, 2, 4, 8),
+    BusinessType.LPrLLP -> List(4, 5, 7, 8)
+  )
+
+  "have the correct fields" when {
 
     "nominated officer has not been selected previously" when {
       testCases foreach {
         case (businessType, positionsToDisplay) => {
           s"$businessType" in new ViewFixture {
 
-            def view = views.html.include.roles_within_business(EmptyForm, businessType, true)
+            def view = views.html.include.roles_within_business(EmptyForm, businessType, true, false)
 
-            assertLabelIncluded()(positionsToDisplay, doc.text, doc)
+            validateOtherSelection
+            assertLabelIncluded()(positionsToDisplay.filterNot(_.equals(8)), doc)
           }
         }
       }
@@ -97,10 +107,24 @@ class roles_within_businessSpec extends GenericTestHelper with MustMatchers {
         case (businessType, positionsToDisplay) => {
           s"$businessType" in new ViewFixture {
 
-            def view = views.html.include.roles_within_business(EmptyForm, businessType, false)
+            def view = views.html.include.roles_within_business(EmptyForm, businessType, false, false)
 
             validateOtherSelection
-            assertLabelIncluded()(positionsToDisplay.filterNot(_.equals(4)), doc.text, doc)
+            assertLabelIncluded()(positionsToDisplay.filterNot(_.equals(8)).filterNot(_.equals(4)), doc)
+          }
+        }
+      }
+    }
+
+    "external accountant is required for declaration" when {
+      testCases foreach {
+        case (businessType, positionsToDisplay) => {
+          s"$businessType" in new ViewFixture {
+
+            def view = views.html.include.roles_within_business(EmptyForm, businessType, false, true)
+
+            validateOtherSelection
+            assertLabelIncluded()(positionsToDisplay.filterNot(_.equals(4)), doc, true)
           }
         }
       }

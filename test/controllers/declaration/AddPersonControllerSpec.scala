@@ -298,7 +298,6 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 }
 
-
 class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with MockitoSugar {
 
   val userId = s"user-${UUID.randomUUID()}"
@@ -513,7 +512,6 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
   }
 
 }
-
 
 class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with MockitoSugar {
 

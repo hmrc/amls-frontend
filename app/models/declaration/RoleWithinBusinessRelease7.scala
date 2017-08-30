@@ -28,11 +28,7 @@ import utils.TraversableValidators.minLengthR
 
 //import models.declaration.Other
 
-case class RoleWithinBusinessRelease7(items: Set[RoleType]) {
-  def sorted = {
-    items.toSeq.sortBy(it => it.value)
-  }
-}
+case class RoleWithinBusinessRelease7(items: Set[RoleType])
 
 sealed trait RoleType {
   val value: String =
