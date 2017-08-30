@@ -290,7 +290,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#roleWithinBusiness]").html() must include("This field is required")
+          document.select("a[href=#positions]").html() must include("This field is required")
 
         }
       }
