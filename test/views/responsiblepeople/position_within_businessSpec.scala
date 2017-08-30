@@ -35,7 +35,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
       val (otherCheckbox, otherLabel) = checkboxAndLabel("positions-other")(doc)
       otherCheckbox mustBe defined
       otherLabel mustBe defined
-      otherLabel map (_.text must include(Messages("responsiblepeople.position_within_business.lbl.09")))
+      otherLabel foreach (_.text must include(Messages("responsiblepeople.position_within_business.lbl.09")))
     }
 
   }
@@ -73,7 +73,7 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
           if (positions contains i) {
             checkbox mustBe defined
             label mustBe defined
-            label map {_.text() must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))}
+            label foreach {_.text() must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))}
 
             assertLabelIncluded(i + 1)
           } else {
@@ -99,8 +99,6 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
             s"$businessType" in new ViewFixture {
 
               def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, true, None)
-
-
 
               assertLabelIncluded()(positionsToDisplay, form.text, doc)
             }
