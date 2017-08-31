@@ -16,9 +16,35 @@
 
 package controllers.renewal
 
-import org.scalatestplus.play.PlaySpec
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, GenericTestHelper}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import play.api.i18n.Messages
+import play.api.test.Helpers._
 
-class UpdateAnyInformationControllerSpec extends GenericTestHelper{
+class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
+  trait TestFixture extends AuthorisedFixture { self =>
+    val request = addToken(self.authRequest)
+
+    lazy val controller = new UpdateAnyInformationController(
+      self.authConnector
+    )
+
+  }
+
+  "UpdateAnyInformationController" when {
+    "get is called" must {
+
+      "respond with OK and include the person name" in new TestFixture {
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+        contentAsString(result) must include(Messages("renewal.updateanyinformation.title"))
+      }
+
+    }
+
+  }
 }

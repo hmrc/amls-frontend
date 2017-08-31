@@ -19,16 +19,17 @@ package controllers.renewal
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-@Singleton
-class UpdateAnyInformationController @Inject()(
-                                              val authConnector: AuthConnector
-                                              ) extends BaseController{
+import scala.concurrent.Future
 
-  def get = Authorised.async{
+@Singleton
+class UpdateAnyInformationController @Inject()(val authConnector: AuthConnector) extends BaseController {
+
+  def get = Authorised.async {
     implicit authContext => implicit request =>
-      ???
+      Future.successful(Ok(views.html.renewal.update_any_information(EmptyForm)))
   }
 
   def post = Authorised.async{
