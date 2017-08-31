@@ -137,7 +137,7 @@ trait LandingService {
         _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
           _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
             _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
-              _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection) flatMap {
+              _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)) flatMap {
                 _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
                   _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
                     _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
