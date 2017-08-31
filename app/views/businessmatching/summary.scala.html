@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
-@(model: BusinessMatching)(implicit request: Request[_],messages:Messages)
+@(model: BusinessMatching, allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.businessmatching")
@@ -51,7 +51,8 @@
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
-                        editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
+                        editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
+                        allowEdit = allowEdit
                     ) {
                         <p>@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
@@ -61,7 +62,8 @@
                 case BusinessType.UnincorporatedBody => {
                     @checkYourAnswers(
                         question = Messages("businessmatching.typeofbusiness.title"),
-                        editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString
+                        editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString,
+                        allowEdit = allowEdit
                     ) {
                         <p>@model.typeOfBusiness.map { business =>
                             @business.typeOfBusiness
@@ -76,7 +78,8 @@
     @model.activities.map { activity =>
         @checkYourAnswers(
             question = Messages("businessmatching.registerservices.title"),
-            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString,
+            allowEdit = allowEdit
         ) {
             <ul class="list list--comma">
                 @activity.businessActivities.map { line =>
@@ -97,7 +100,8 @@
             @model.msbServices.map { services =>
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
-                    editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
+                    editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
+                    allowEdit = allowEdit
                 ) {
                     <ul class="list list--comma">
                     @services.msbServices.map { svc =>
@@ -115,7 +119,8 @@
                     @model.businessAppliedForPSRNumber.map { psr =>
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
-                            editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString
+                            editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                            allowEdit = allowEdit
                         ) {
                             <p>@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
@@ -128,30 +133,38 @@
         }
     }
 
-    @model.businessAppliedForPSRNumber.map { psr =>
-        @psr match {
-            case BusinessAppliedForPSRNumberNo => {
-                @anchor(
-                    attrHref = appConfig.logoutUrl.toString,
-                    attrRole = true,
-                    linkText = Messages("button.logout")
-                )
-            }
-            case BusinessAppliedForPSRNumberYes(number) => {
-                @anchor(
-                    attrHref = controllers.routes.RegistrationProgressController.get().toString,
-                    attrRole = true,
-                    linkText = Messages("businessmatching.button.confirm.start")
-                )
+    @if(allowEdit) {
+        @model.businessAppliedForPSRNumber.map { psr =>
+            @psr match {
+                case BusinessAppliedForPSRNumberNo => {
+                    @anchor(
+                        attrHref = appConfig.logoutUrl.toString,
+                        attrRole = true,
+                        linkText = Messages("button.logout")
+                    )
+                }
+                case BusinessAppliedForPSRNumberYes(number) => {
+                    @anchor(
+                        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+                        attrRole = true,
+                        linkText = Messages("businessmatching.button.confirm.start")
+                    )
+                }
             }
         }
-    }
 
-    @if(model.businessAppliedForPSRNumber.isEmpty) {
+        @if(model.businessAppliedForPSRNumber.isEmpty) {
+            @anchor(
+                attrHref = controllers.routes.RegistrationProgressController.get().toString,
+                attrRole = true,
+                linkText = Messages("businessmatching.button.confirm.start")
+            )
+        }
+    } else {
         @anchor(
             attrHref = controllers.routes.RegistrationProgressController.get().toString,
             attrRole = true,
-            linkText = Messages("businessmatching.button.confirm.start")
+            linkText = Messages("businessmatching.summary.noedit.anchortext")
         )
     }
 }
