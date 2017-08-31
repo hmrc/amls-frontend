@@ -16,9 +16,9 @@
 
 package models.aboutthebusiness
 
+import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.libs.json.{Reads, Json}
-
+import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
@@ -63,6 +63,9 @@ case class AboutTheBusiness(
     this match {
       case AboutTheBusiness(
       Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, true
+      ) if ApplicationConfig.hasAcceptedToggle => true
+      case AboutTheBusiness(
+      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, _
       ) => true
       case _ => false
     }
