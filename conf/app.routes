@@ -71,6 +71,7 @@ POST        /about-the-business/letters-address                                 
 GET         /about-the-business/what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /about-the-business/check-your-answers                                    controllers.aboutthebusiness.SummaryController.get()
+POST        /about-the-business/check-your-answers                                    controllers.aboutthebusiness.SummaryController.post()
 
 GET         /trading-premises/what-you-need/:index                                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 

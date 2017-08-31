@@ -19,8 +19,9 @@
 @import models.aboutthebusiness._
 @import models.businessmatching.BusinessType
 @import utils._
+@import config.ApplicationConfig
 
-@(model: AboutTheBusiness, showRegisteredForMLR: Boolean, businessType: BusinessType)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: AboutTheBusiness, showRegisteredForMLR: Boolean, businessType: BusinessType)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.aboutbusiness")
@@ -128,9 +129,17 @@
         }
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @if(ApplicationConfig.hasAcceptedToggle) {
+        @form(f, controllers.aboutthebusiness.routes.SummaryController.post()) {
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+        }
+    } else {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcomplete")
+        )
+    }
+
+
 }

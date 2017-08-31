@@ -20,11 +20,14 @@ import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms._
 import models.aboutthebusiness.AboutTheBusiness
+import models.businessactivities.ExpectedAMLSTurnover
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import views.html.aboutthebusiness._
+
 
 trait SummaryController extends BaseController {
 
@@ -43,19 +46,30 @@ trait SummaryController extends BaseController {
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
             case _ => false
           }
-
           val maybeBT = for {
             bm <- businessMatching
             rd <- bm.reviewDetails
             bt <- rd.businessType
           } yield {
-            Ok(summary(data, showRegisteredForMLR, bt))
+            Ok(summary(EmptyForm, data, showRegisteredForMLR, bt))
           }
 
           maybeBT.getOrElse(Redirect(controllers.routes.RegistrationProgressController.get()))
 
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      for {
+        aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+        _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
+          aboutTheBusiness.copy(hasAccepted = true)
+        )
+      } yield {
+        Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }
