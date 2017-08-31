@@ -65,17 +65,7 @@
             @* Sidebar *@
             <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
                 <div class="application-submit">
-                    <h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
-
-                    <p>@messages("renewal.progress.submit.intro")</p>
-
-                    <form method="post" action="@controllers.routes.RegistrationProgressController.post().url">
-                        @CSRF.formField
-                        <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
-                            @messages("progress.submit")
-                        </button>
-                    </form>
-
+                    @application_submit(canSubmit)
                 </div>
             </div>
         </div>

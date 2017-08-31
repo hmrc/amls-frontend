@@ -23,17 +23,13 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.Partnership
 import models.registrationprogress.{Completed, Section}
-import models.responsiblepeople.ResponsiblePeople
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, DeclarationHelper}
+import utils.ControllerHelper
 import views.html.renewal.renewal_progress
-
-import scala.concurrent.Future
 
 @Singleton
 class RenewalProgressController @Inject()

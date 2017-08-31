@@ -462,6 +462,7 @@ lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
 link.return.registration.progress = Return to application progress
 link.return.renewal.progress = Return to renewal progress
+link.renewal.progress.change.answers = Change your answers
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -1754,6 +1755,8 @@ renewal.progress.tponly.intro = You need to complete the renewal section before 
   Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
+renewal.progress.submit.completed.intro = You have completed the renewal questions.
+renewal.progress.submit.completed.continue = You can continue making updates to your information, or submit your renewal.
 progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
