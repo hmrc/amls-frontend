@@ -1206,6 +1206,13 @@ submit.registration = Submit registration
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
 
+renewal.updateanyinformation.title = Do you want to update any other information?
+renewal.updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
+renewal.updateanyinformation.example = For example, you’ll need to update if:
+renewal.updateanyinformation.example.item1 = a responsible person leaves your business
+renewal.updateanyinformation.example.item2 = you start trading from a new premises
+renewal.updateanyinformation.example.item3 = your main contact number changes
+
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)

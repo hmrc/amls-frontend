@@ -21,31 +21,31 @@ import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
-class UpdateInformationSpec extends PlaySpec with MustMatchers {
+class UpdateAnyInformationSpec extends PlaySpec with MustMatchers {
 
-  "The UpdateInformation model" when {
+  "The UpdateAnyInformation model" when {
     "given a valid form" when {
       "'yes' is selected" must {
         "return a valid form model" in {
           val formData = Map(
-            "updateInformation" -> Seq("true")
+            "updateAnyInformation" -> Seq("true")
           )
 
-          val result = UpdateInformation.formReads.validate(formData)
+          val result = UpdateAnyInformation.formReads.validate(formData)
 
-          result mustBe Valid(UpdateInformationYes)
+          result mustBe Valid(UpdateAnyInformationYes)
         }
       }
 
       "'no' is selected" must {
         "return a valid form model" in {
           val formData = Map(
-            "updateInformation" -> Seq("false")
+            "updateAnyInformation" -> Seq("false")
           )
 
-          val result = UpdateInformation.formReads.validate(formData)
+          val result = UpdateAnyInformation.formReads.validate(formData)
 
-          result mustBe Valid(UpdateInformationNo)
+          result mustBe Valid(UpdateAnyInformationNo)
         }
       }
 
@@ -53,26 +53,26 @@ class UpdateInformationSpec extends PlaySpec with MustMatchers {
         "return the validation errors" in {
           val formData = Map.empty[String, Seq[String]]
 
-          val result = UpdateInformation.formReads.validate(formData)
+          val result = UpdateAnyInformation.formReads.validate(formData)
 
-          result mustBe Invalid(Seq(Path \ "updateInformation" -> Seq(ValidationError("changeofficer.updateinformation.validationerror"))))
+          result mustBe Invalid(Seq(Path \ "updateAnyInformation" -> Seq(ValidationError("renewal.updateanyInformation.validationerror"))))
         }
       }
     }
 
     "given a valid model" must {
       "return the form values" when {
-        "UpdateInformation is 'yes'" in {
-          val model = UpdateInformationYes
-          val result = UpdateInformation.formWrites.writes(model)
+        "UpdateAnyInformation is 'yes'" in {
+          val model = UpdateAnyInformationYes
+          val result = UpdateAnyInformation.formWrites.writes(model)
 
-          result mustBe Map("updateInformation" -> Seq("true"))
+          result mustBe Map("updateAnyInformation" -> Seq("true"))
         }
-        "UpdateInformation is 'no'" in {
-          val model = UpdateInformationNo
-          val result = UpdateInformation.formWrites.writes(model)
+        "UpdateAnyInformation is 'no'" in {
+          val model = UpdateAnyInformationNo
+          val result = UpdateAnyInformation.formWrites.writes(model)
 
-          result mustBe Map("updateInformation" -> Seq("false"))
+          result mustBe Map("updateAnyInformation" -> Seq("false"))
         }
       }
     }

@@ -18,24 +18,24 @@ package models.renewal
 
 import jto.validation.forms.UrlFormEncoded
 
-sealed trait UpdateInformation
-case object UpdateInformationYes extends UpdateInformation
-case object UpdateInformationNo extends UpdateInformation
+sealed trait UpdateAnyInformation
+case object UpdateAnyInformationYes extends UpdateAnyInformation
+case object UpdateAnyInformationNo extends UpdateAnyInformation
 
-object UpdateInformation {
+object UpdateAnyInformation {
   import jto.validation._
   import utils.MappingUtils.Implicits._
 
-  implicit val formReads: Rule[UrlFormEncoded, UpdateInformation] = From[UrlFormEncoded] { __ =>
+  implicit val formReads: Rule[UrlFormEncoded, UpdateAnyInformation] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "updateInformation").read[Boolean].withMessage("changeofficer.updateinformation.validationerror") map {
-      case true => UpdateInformationYes
-      case false  => UpdateInformationNo
+    (__ \ "updateAnyInformation").read[Boolean].withMessage("renewal.updateanyInformation.validationerror") map {
+      case true => UpdateAnyInformationYes
+      case false  => UpdateAnyInformationNo
     }
   }
 
-  implicit val formWrites: Write[UpdateInformation, UrlFormEncoded] = Write {
-    case UpdateInformationYes => "updateInformation" -> "true"
-    case UpdateInformationNo => "updateInformation" -> "false"
+  implicit val formWrites: Write[UpdateAnyInformation, UrlFormEncoded] = Write {
+    case UpdateAnyInformationYes => "updateAnyInformation" -> "true"
+    case UpdateAnyInformationNo => "updateAnyInformation" -> "false"
   }
 }
