@@ -1,0 +1,48 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import utils.Strings._
+@import views.html.helper.CSRF
+
+@(canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
+
+<h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
+
+@if(canSubmit){
+    <p>@messages("renewal.progress.submit.completed.intro")</p>
+    <p>@messages("renewal.progress.submit.completed.continue")</p>
+} else {
+    <p>@messages("renewal.progress.submit.intro")</p>
+}
+
+<form method="post" action="@controllers.routes.RegistrationProgressController.post().url">
+    @CSRF.formField
+    <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
+        @messages("progress.submit")
+    </button>
+</form>
+
+@if(canSubmit){
+    <p>
+        @anchor(
+            attrHref = controllers.renewal.routes.SummaryController.get().url,
+            linkText = Messages("link.renewal.progress.change.answers"),
+            visuallyhidden = Messages("link.renewal.progress.change.answers")
+        )
+    </p>
+}
