@@ -32,7 +32,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
       RoleInBusiness.roleFormReads.validate((Seq("03"), None)) mustBe Valid(Set(InternalAccountant))
       RoleInBusiness.roleFormReads.validate((Seq("05"), None)) mustBe Valid(Set(Partner))
       RoleInBusiness.roleFormReads.validate((Seq("07"), None)) mustBe Valid(Set(DesignatedMember))
-      RoleInBusiness.roleFormReads.validate((Seq("09"), Some("another role"))) mustBe Valid(Set(Other("another role")))
+      RoleInBusiness.roleFormReads.validate((Seq("other"), Some("another role"))) mustBe Valid(Set(Other("another role")))
       RoleInBusiness.roleFormReads.validate((Seq(""), None)) mustBe Valid(Set.empty[Role])
     }
 
@@ -66,7 +66,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "convert 'other' option into a valid model" in {
       val formData = Map(
-        "positions" -> Seq("09"),
+        "positions" -> Seq("other"),
         "otherPosition" -> Seq("Some other role")
       )
 
@@ -77,7 +77,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "fail validation when 'other' is specified but no other role is given" in {
       val formData = Map(
-        "positions" -> Seq("09")
+        "positions" -> Seq("other")
       )
 
       val result = RoleInBusiness.formReads.validate(formData)
@@ -87,7 +87,7 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
 
     "successfully write the model to the form" in {
       val formData = Map(
-        "positions[]" -> Seq("09"),
+        "positions[]" -> Seq("other"),
         "otherPosition" -> Seq("Some other role")
       )
 

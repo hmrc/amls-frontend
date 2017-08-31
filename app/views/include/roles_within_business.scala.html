@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], businessType: BusinessType, displayNominatedOfficer: Boolean)(implicit lang:Lang,  m: Messages)
+@(f: forms.Form2[_], businessType: BusinessType, displayNominatedOfficer: Boolean, isDeclaration: Boolean)(implicit lang:Lang, m:Messages)
 
 <div class="form-group">
     @fieldset(
@@ -57,11 +57,19 @@
                 }
             }
             case (BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
-                @checkbox(
-                    f = f("positions[]"),
-                    labelText = "responsiblepeople.position_within_business.lbl.01",
-                    value = "01"
-                )
+                @if(isDeclaration){
+                    @checkbox(
+                        f = f("positions[]"),
+                        labelText = "declaration.addperson.lbl.01",
+                        value = "01"
+                    )
+                } else {
+                    @checkbox(
+                        f = f("positions[]"),
+                        labelText = "responsiblepeople.position_within_business.lbl.01",
+                        value = "01"
+                    )
+                }
                 @checkbox(
                     f = f("positions[]"),
                     labelText = "responsiblepeople.position_within_business.lbl.02",
@@ -101,6 +109,14 @@
                     value = "07"
                 )
             }
+        }
+
+        @if(isDeclaration){
+            @checkbox(
+                f = f("positions[]"),
+                labelText = "responsiblepeople.position_within_business.lbl.08",
+                value = "08"
+            )
         }
         @checkbox(
             f = f("positions[]"),

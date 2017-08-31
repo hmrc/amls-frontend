@@ -96,7 +96,7 @@ object RoleInBusiness {
       case "03" => InternalAccountant
       case "05" => Partner
       case "07" => DesignatedMember
-      case "09" if other.isDefined => Other(other.get)
+      case "other" if other.isDefined => Other(other.get)
     }
 
     roles.map(v => stringToRole(v, other)).toSet
@@ -108,7 +108,7 @@ object RoleInBusiness {
   }
 
   val otherValidationRule: ValidationRule[(Seq[String], Option[String])] = Rule[(Seq[String], Option[String]), (Seq[String], Option[String])] {
-    case (roles, None) if roles.contains("09") =>
+    case (roles, None) if roles.contains("other") =>
       Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("changeofficer.roleinbusiness.validationerror.othermissing"))))
     case x => Valid(x)
   }
@@ -138,7 +138,7 @@ object RoleInBusiness {
       case InternalAccountant => "03"
       case Partner => "05"
       case DesignatedMember => "07"
-      case Other(_) => "09"
+      case Other(_) => "other"
     }
 
     val roleSet = data.roles.map(roleToString).toSeq
