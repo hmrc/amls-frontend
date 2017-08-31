@@ -148,7 +148,6 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-
   private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[MsbServices], msb: moneyServiceBusiness) = {
 
     val maybeCountry = renewal.customersOutsideUK.flatMap {
@@ -213,4 +212,19 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       case _ => false
     }
   }
+
+  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
+    sections.foldLeft((true, false)) { (acc, s) =>
+      (acc._1 && s.status == Completed,
+        acc._2 || s.hasChanged)
+    } match {
+      case (true, true) => true
+      case _ => false
+    }
+  }
+
+  def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
+    (renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections)
+  }
+
 }
