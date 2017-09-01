@@ -51,25 +51,21 @@ trait RegistrationProgressController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ => {
-            dataCache.fetchAll.flatMap {
-              _.map { cacheMap =>
-                val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
+            (for {
+              cacheMap <- OptionT(dataCache.fetchAll)
+              completePreApp <- OptionT(preApplicationComplete(cacheMap))
+            } yield {
+              val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
 
-                preApplicationComplete(cacheMap) map {
-                  case Some(x) => x match {
-                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-                    case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
-                  }
-                  case None => Redirect(controllers.routes.LandingController.get())
-                }
-
-              }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
-            }
-          }
+              completePreApp match {
+                  case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+                  case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
+              }
+            }) getOrElse Redirect(controllers.routes.LandingController.get())
+         }
         }
   }
 
