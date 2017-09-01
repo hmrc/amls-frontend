@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package generators
+package generators.businesscustomer
 
+import generators.{BaseGenerator, CountryGenerator}
+import models.businesscustomer.Address
 import org.scalacheck.Gen
 
-trait AmlsReferenceNumberGenerator {
+trait AddressGenerator extends BaseGenerator with CountryGenerator {
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
+  private val nameLength = 10
 
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
+  val addressGen: Gen[Address] = for {
+    line1 <- stringOfLengthGen(nameLength)
+    line2 <- stringOfLengthGen(nameLength)
+    postcode <- postcodeGen
+    country <- countryGen
+  } yield Address(line1, line2, None, None, Some(postcode), country)
+
 }

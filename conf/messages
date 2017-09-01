@@ -1071,6 +1071,7 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
+businessmatching.summary.noedit.anchortext = Update or view your information
 businessmatching.services.title = Which services does your business provide?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
