@@ -19,7 +19,7 @@ package controllers
 import connectors.DataCacheConnector
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.{Completed, NotStarted, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.responsiblepeople._
 import models.status._
@@ -273,8 +273,47 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         }
       }
 
-      "exclude business matching section from registration page" when {
-        "status is other then NotCompleted and SubmissionReady" in new Fixture {
+      "in any status" must {
+        "hide the business matching section" in new Fixture {
+          Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
+            val complete = mock[BusinessMatching]
+            when(complete.isComplete) thenReturn true
+
+            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+              .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(controller.statusService.getStatus(any(), any(), any()))
+              .thenReturn(Future.successful(subStatus))
+
+            val sections = Seq(
+              Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, false, mock[Call])
+            )
+
+            when(controller.progressService.sections(mockCacheMap))
+              .thenReturn(sections)
+
+            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+            val responseF = controller.get()(request)
+            status(responseF) must be(OK)
+
+            if (subStatus == SubmissionDecisionApproved) {
+              val doc = Jsoup.parse(contentAsString((responseF)))
+              doc.getElementsMatchingOwnText(Messages("amendment.text.1")).hasText must be(true)
+
+              val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
+              elements.size() must be(sections.size - 1)
+            }
+          }
+        }
+      }
+
+      "in the approved status" must {
+        "show the correct text on the screen" in new Fixture {
           val complete = mock[BusinessMatching]
           when(complete.isComplete) thenReturn true
 
@@ -285,7 +324,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val sections = Seq(
             Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -299,79 +338,15 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
+
           val doc = Jsoup.parse(contentAsString((responseF)))
           doc.getElementsMatchingOwnText(Messages("amendment.text.1")).hasText must be(true)
+
           val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
           elements.size() must be(sections.size - 1)
-
         }
       }
 
-      "include business matching section in registration page" when {
-        "status is SubmissionReady" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some("AMLSREFNO")))
-
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
-          val sections = Seq(
-            Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
-            Section("TESTSECTION2", Completed, false, mock[Call])
-          )
-
-          when(controller.progressService.sections(mockCacheMap))
-            .thenReturn(sections)
-
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
-          val responseF = controller.get()(request)
-          status(responseF) must be(OK)
-          val doc = Jsoup.parse(contentAsString((responseF)))
-          val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.completed"))
-          elements.size() must be(sections.size)
-
-        }
-      }
-
-      "include business matching section in registration page" when {
-        "status is NotCompleted" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some("AMLSREFNO")))
-
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
-
-          val sections = Seq(
-            Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
-            Section("TESTSECTION2", Completed, false, mock[Call])
-          )
-
-          when(controller.progressService.sections(mockCacheMap))
-            .thenReturn(sections)
-
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
-          val responseF = controller.get()(request)
-          status(responseF) must be(OK)
-          val doc = Jsoup.parse(contentAsString((responseF)))
-          val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.completed"))
-          elements.size() must be(sections.size)
-
-        }
-      }
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
           val complete = mock[BusinessMatching]
@@ -397,18 +372,18 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         }
       }
 
-      "pre application must throw an exception" when {
+      "pre application must redirect to the landing controller" when {
         "the business matching is incomplete" in new Fixture {
-          val cachmap = mock[CacheMap]
-          val complete = mock[BusinessMatching]
-          val emptyCacheMap = mock[CacheMap]
-
+          val businessMatching = mock[BusinessMatching]
 
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(cachmap)))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(complete.isComplete) thenReturn false
-          when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(businessMatching.isComplete) thenReturn false
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
+
+          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
+          when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)

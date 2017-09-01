@@ -57,11 +57,11 @@ trait RegistrationProgressController extends BaseController {
           case _ => {
             dataCache.fetchAll.flatMap {
               _.map { cacheMap =>
-                val sections = progressService.sections(cacheMap)
+                val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
 
                 preApplicationComplete(cacheMap) map {
                   case Some(x) => x match {
-                    case true => Ok(registration_amendment(sections.filter(_.name != BusinessMatching.messageKey), amendmentDeclarationAvailable(sections)))
+                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
                     case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
                   }
                   case None => Redirect(controllers.routes.LandingController.get())
