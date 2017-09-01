@@ -17,5 +17,6 @@ dist
 /RUNNING_PID
 /.settings
 *.iws
-
-    
+.ensime_cache
+ensime-langserver.log
+pc.stdout.log
