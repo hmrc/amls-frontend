@@ -59,12 +59,17 @@ trait RegistrationProgressController extends BaseController {
               completePreApp <- OptionT(preApplicationComplete(cacheMap))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
-              val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
+              (for {
+                reviewDetails <- businessMatching.reviewDetails
+              } yield {
+                val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
 
-              completePreApp match {
-                  case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-                  case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
-              }
+                completePreApp match {
+                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+                    case _ => Ok(registration_progress(sections, declarationAvailable(sections), reviewDetails.businessAddress))
+                }
+              }) getOrElse InternalServerError("Unable to retrieve the business details")
+
             }) getOrElse Redirect(controllers.routes.LandingController.get())
          }
         }
