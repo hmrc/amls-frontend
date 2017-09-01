@@ -57,6 +57,7 @@ trait RegistrationProgressController extends BaseController {
             (for {
               cacheMap <- OptionT(dataCache.fetchAll)
               completePreApp <- OptionT(preApplicationComplete(cacheMap))
+              businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
               val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
 

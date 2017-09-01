@@ -39,12 +39,12 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.any
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.i18n.Messages
-
+import generators.businesscustomer.ReviewDetailsGenerator
 import scala.concurrent.{ExecutionContext, Future}
 import org.mockito.Matchers.{eq => eqTo, _}
 
 
-class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
+class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar with ReviewDetailsGenerator {
 
   trait Fixture extends AuthorisedFixture {self =>
     val request = addToken(authRequest)
@@ -63,6 +63,12 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
     when(controller.dataCache.fetch[Renewal](any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
+
+    val completeBusinessMatching = mock[BusinessMatching]
+    when(completeBusinessMatching.isComplete) thenReturn true
+    when(completeBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
+
+    when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(completeBusinessMatching))
   }
 
 
@@ -70,9 +76,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     "get is called" when {
       "the user is enrolled into the AMLS Account" must {
         "show the update your information page" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -85,13 +88,13 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
           when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
+          
           val pageTitle = Messages("amendment.title") + " - " +
             Messages("title.yapp") + " - " +
             Messages("title.amls") + " - " + Messages("title.gov")
+
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
       }
@@ -131,9 +134,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             when(controller.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -142,8 +142,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(None))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -159,9 +157,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       "all sections are complete and" when {
         "a section has changed" must {
           "enable the submission button" in new Fixture {
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -174,8 +169,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
                 Section("TESTSECTION2", Completed, true, mock[Call])
               ))
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
             val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
@@ -187,9 +180,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
         "no section has changed" must {
           "disable the submission button" in new Fixture {
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(SubmissionReadyForReview))
 
@@ -205,8 +195,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
                 Section("TESTSECTION2", Completed, false, mock[Call])
               ))
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -220,9 +208,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       "some sections are not complete and" when {
         "a section has changed" must {
           "disable the submission button" in new Fixture {
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -235,8 +220,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
                 Section("TESTSECTION2", Completed, true, mock[Call])
               ))
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
             val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
@@ -247,9 +230,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
         "no section has changed" must {
           "disable the submission button" in new Fixture {
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -261,8 +241,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
                 Section("TESTSECTION1", NotStarted, false, mock[Call]),
                 Section("TESTSECTION2", Completed, false, mock[Call])
               ))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -276,9 +254,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       "in any status" must {
         "hide the business matching section" in new Fixture {
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
-            val complete = mock[BusinessMatching]
-            when(complete.isComplete) thenReturn true
-
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -296,8 +271,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             when(controller.progressService.sections(mockCacheMap))
               .thenReturn(sections)
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
@@ -314,9 +287,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "in the approved status" must {
         "show the correct text on the screen" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some("AMLSREFNO")))
 
@@ -334,8 +304,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
           when(controller.progressService.sections(mockCacheMap))
             .thenReturn(sections)
 
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
 
@@ -349,9 +317,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
-          val complete = mock[BusinessMatching]
-          when(complete.isComplete) thenReturn true
-
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -360,8 +325,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(None))
-
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
