@@ -56,8 +56,8 @@ class RenewalProgressController @Inject()
             val canSubmit = renewals.canSubmit(renewalSection, variationSections)
 
             statusInfo match {
-              case (ReadyForRenewal(renewalDate), _) => Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists, renewalDate))
-              case (RenewalSubmitted(renewalDate), _) => Ok(renewal_progress(renewalSection, variationSections, canSubmit, msbOrTcspExists, renewalDate))
+              case (ReadyForRenewal(renewalDate), _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, renewalDate))
+              case (RenewalSubmitted(renewalDate), _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, renewalDate))
               case _ => throw new Exception("Cannot get renewal date")
             }
           }

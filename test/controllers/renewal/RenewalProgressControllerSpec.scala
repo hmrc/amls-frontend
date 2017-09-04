@@ -174,7 +174,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
       val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
-      elements.size() must be(2)
+      elements.size() must be(1)
 
     }
 
@@ -187,19 +187,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       val element = html.select(".progress-step--details")
       element.text must include("A new section")
-      element.size mustBe 2
+      element.size mustBe 1
     }
-
-    "display the renewal section" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.get()(request)
-      val html = Jsoup.parse(contentAsString(result))
-
-      html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
-    }
-
+    
     "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))

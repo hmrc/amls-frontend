@@ -24,7 +24,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(renewalSection: Section, sections: Seq[Section], canSubmit: Boolean, msbOrTcspExists: Boolean, endDate: Option[LocalDate])(implicit messages: Messages, request: Request[_])
+@(sections: Seq[Section], canSubmit: Boolean, msbOrTcspExists: Boolean, endDate: Option[LocalDate])(implicit messages: Messages, request: Request[_])
 
 @header = {
     @heading("renewal.progress.title", "summary.status")
@@ -49,12 +49,6 @@
                 <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
                 }
             }
-            <div class="grid-layout grid-layout--stacked renewal-progress-section">
-                <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
-                    @section(renewalSection.name, renewalSection.status, renewalSection.hasChanged, renewalSection.call)
-                </ul>
-            </div>
-
             <div class="grid-layout grid-layout--stacked">
                 @section_list(sections)
             </div>
