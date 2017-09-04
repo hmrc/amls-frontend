@@ -546,3 +546,6 @@ GET         /renewal/receiving                                                  
 POST        /renewal/receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                               @controllers.renewal.SummaryController.get()
+
+GET         /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.get()
+POST        /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.post()
