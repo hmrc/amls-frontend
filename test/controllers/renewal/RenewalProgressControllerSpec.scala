@@ -142,7 +142,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "load the page when status is renewal submitted and one of the section is modified" in new Fixture {
+    "load the page when status is renewal submitted and one of the section is modified" in new Fixture  {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
@@ -153,12 +153,16 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
 
-      val sections = Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
-          Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
+      val sections = Seq(
+        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
+        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
       )
 
       when(controller.progressService.sections(cacheMap))
         .thenReturn(sections)
+
+      when(controller.renewals.canSubmit(any(),any()))
+        .thenReturn(true)
 
       val result = controller.get()(request)
 
