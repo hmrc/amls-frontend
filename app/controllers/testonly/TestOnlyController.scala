@@ -64,6 +64,15 @@ trait TestOnlyController extends BaseController with Actions {
       }
   }
 
+  def companyName = Authorised.async {
+    implicit authContext => implicit request =>
+      AmlsConnector.registrationDetails("XJ0000100093742") map { details =>
+        Ok(details.companyName)
+      } recover {
+        case _ => Ok("Failed to fetch registration details")
+      }
+  }
+
   def paymentFailure = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
