@@ -52,22 +52,8 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         </ul>
 
         @* Sidebar *@
-        <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
-            <div class="application-submit">
-                <h3 class="heading-small">Your business</h3>
-                <p>
-                    @Html(address.toLines.mkString("<br/>"))
-                </p>
-
-                <h3 class="heading-small">Services registering</h3>
-                <p>@serviceNames.map(name => Html(name + "<br/>"))</p>
-
-                <p><a href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
-                    @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
-                   </a>
-                </p>
-            </div>
-        </div>
+        @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+        
     </div>
 
     <div class="grid-layout grid-layout--stacked">
