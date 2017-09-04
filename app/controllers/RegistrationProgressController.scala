@@ -55,6 +55,7 @@ trait RegistrationProgressController extends BaseController {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ => {
             (for {
+              status <- OptionT.liftF(statusService.getStatus)
               cacheMap <- OptionT(dataCache.fetchAll)
               completePreApp <- OptionT(preApplicationComplete(cacheMap))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -63,10 +64,12 @@ trait RegistrationProgressController extends BaseController {
                 reviewDetails <- businessMatching.reviewDetails
               } yield {
                 val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
+                val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
+                val canEditPreApp = Set(NotCompleted, SubmissionReady).contains(status)
 
                 completePreApp match {
-                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-                    case _ => Ok(registration_progress(sections, declarationAvailable(sections), reviewDetails.businessAddress))
+                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
+                    case _ => Ok(registration_progress(sections, declarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
                 }
               }) getOrElse InternalServerError("Unable to retrieve the business details")
 

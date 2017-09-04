@@ -18,7 +18,7 @@ package controllers
 
 import connectors.DataCacheConnector
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.BusinessMatching
+import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.responsiblepeople._
@@ -43,7 +43,6 @@ import generators.businesscustomer.ReviewDetailsGenerator
 import scala.concurrent.{ExecutionContext, Future}
 import org.mockito.Matchers.{eq => eqTo, _}
 
-
 class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar with ReviewDetailsGenerator {
 
   trait Fixture extends AuthorisedFixture {self =>
@@ -67,6 +66,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
     val completeBusinessMatching = mock[BusinessMatching]
     when(completeBusinessMatching.isComplete) thenReturn true
     when(completeBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
+    when {
+      completeBusinessMatching.activities
+    } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
 
     when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(completeBusinessMatching))
   }
@@ -252,7 +254,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
 
       "in any status" must {
-        "hide the business matching section" in new Fixture {
+        "show the business activities and hide the business matching section" in new Fixture {
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some("AMLSREFNO")))
@@ -274,12 +276,14 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
-            if (subStatus == SubmissionDecisionApproved) {
-              val doc = Jsoup.parse(contentAsString((responseF)))
-              doc.getElementsMatchingOwnText(Messages("amendment.text.1")).hasText must be(true)
+            contentAsString(responseF) must not include(Messages(s"progress.${BusinessMatching.messageKey}.name"))
 
-              val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
-              elements.size() must be(sections.size - 1)
+            Seq(
+              "businessmatching.registerservices.servicename.lbl.01",
+              "businessmatching.registerservices.servicename.lbl.02",
+              "businessmatching.registerservices.servicename.lbl.03"
+            ) foreach { msg =>
+              contentAsString(responseF) must include(Messages(msg))
             }
           }
         }
@@ -312,6 +316,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
           val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
           elements.size() must be(sections.size - 1)
+
+          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.readonly"))
         }
       }
 

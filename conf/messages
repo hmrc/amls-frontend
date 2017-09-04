@@ -643,6 +643,8 @@ progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
+progress.preapplication.canedit = change
+progress.preapplication.readonly = view details
 
 #### Amendment page ####
 amendment.title = Update or view your information

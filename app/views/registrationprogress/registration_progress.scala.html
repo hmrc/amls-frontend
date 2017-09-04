@@ -21,7 +21,7 @@
 @import models.registrationprogress.Section
 @import models.businesscustomer.Address
 
-@(sections: Seq[Section], declarationAvailable: Boolean, address: Address)(implicit request: Request[_],m:Messages)
+@(sections: Seq[Section], declarationAvailable: Boolean, address: Address, serviceNames: Seq[String], canEditPreApplication: Boolean)(implicit request: Request[_],m:Messages)
 
 @main2(
 title = Messages("progress.title") + " - " + Messages("title.yapp")
@@ -58,9 +58,16 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
                 <p>
                     @Html(address.toLines.mkString("<br/>"))
                 </p>
+
+                <h3 class="heading-small">Services registering</h3>
+                <p>@serviceNames.map(name => Html(name + "<br/>"))</p>
+
+                <p><a href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
+                    @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
+                   </a>
+                </p>
             </div>
         </div>
-
     </div>
 
     <div class="grid-layout grid-layout--stacked">
