@@ -63,7 +63,6 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
   "UpdateAnyInformationController" when {
     "get is called" must {
-
       "respond with OK with update_any_information" in new TestFixture {
 
         when {
@@ -89,7 +88,44 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
         }
       }
+    }
 
+    "post is called" must {
+      "redirect to RenewalProgressController" when {
+        "yes is selected" in new TestFixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "updateAnyInformation" -> "true"
+          ))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.RenewalProgressController.get().url)
+
+        }
+      }
+      "redirect to WhoIsRegisteringController" when {
+        "no is selected" in new TestFixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "updateAnyInformation" -> "false"
+          ))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.declaration.routes.WhoIsRegisteringController.get().url)
+
+        }
+      }
+      "respond with BAD_REQUEST" when {
+        "an invalid form is submitted" in new TestFixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "updateAnyInformation" -> ""
+          ))
+
+          status(result) mustBe BAD_REQUEST
+
+        }
+      }
     }
 
   }

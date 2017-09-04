@@ -22,10 +22,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessMatching
+import models.renewal.{UpdateAnyInformation, UpdateAnyInformationNo, UpdateAnyInformationYes}
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 @Singleton
 class UpdateAnyInformationController @Inject()(
@@ -53,7 +56,13 @@ class UpdateAnyInformationController @Inject()(
 
   def post = Authorised.async{
     implicit authContext => implicit request =>
-      ???
+      Form2[UpdateAnyInformation](request.body) match {
+        case ValidForm(_, data) => data match {
+          case UpdateAnyInformationYes => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get().url))
+          case UpdateAnyInformationNo => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+        }
+        case f:InvalidForm => Future.successful(BadRequest(views.html.renewal.update_any_information(f)))
+      }
   }
 
 }
