@@ -28,7 +28,7 @@ object UpdateAnyInformation {
 
   implicit val formReads: Rule[UrlFormEncoded, UpdateAnyInformation] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "updateAnyInformation").read[Boolean].withMessage("renewal.updateanyInformation.validationerror") map {
+    (__ \ "updateAnyInformation").read[Boolean].withMessage("error.renewal.updateanyInformation.validationerror") map {
       case true => UpdateAnyInformationYes
       case false  => UpdateAnyInformationNo
     }

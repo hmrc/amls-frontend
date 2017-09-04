@@ -55,7 +55,7 @@ class UpdateAnyInformationSpec extends PlaySpec with MustMatchers {
 
           val result = UpdateAnyInformation.formReads.validate(formData)
 
-          result mustBe Invalid(Seq(Path \ "updateAnyInformation" -> Seq(ValidationError("renewal.updateanyInformation.validationerror"))))
+          result mustBe Invalid(Seq(Path \ "updateAnyInformation" -> Seq(ValidationError("error.renewal.updateanyInformation.validationerror"))))
         }
       }
     }
