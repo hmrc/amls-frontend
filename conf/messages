@@ -645,6 +645,8 @@ progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
+progress.preapplication.canedit = change
+progress.preapplication.readonly = view details
 
 #### Amendment page ####
 amendment.title = Update or view your information
@@ -1074,6 +1076,7 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
+businessmatching.summary.noedit.anchortext = Return to update or view your information
 businessmatching.services.title = Which services does your business provide?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
