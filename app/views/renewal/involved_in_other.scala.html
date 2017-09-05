@@ -42,14 +42,21 @@
             <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
     }
 
+
+    <p>@Messages("renewal.involvedinother.example")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.involvedinother.listline1")</li>
+        <li>@Messages("renewal.involvedinother.listline2")</li>
+        <li>@Messages("renewal.involvedinother.listline3")</li>
+    </ul>
+
     @form(f, controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
             legend = "renewal.involvedinother.title",
             legendHidden = true,
-            panel = false,
-            hint = "businessactivities.involved.other.hint"
+            panel = false
         ) {
             @errorGroup(
                 field = f("involvedInOther")

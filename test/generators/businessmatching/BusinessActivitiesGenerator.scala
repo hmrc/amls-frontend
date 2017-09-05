@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package generators
+package generators.businessmatching
 
+import generators.BaseGenerator
+import models.businessmatching._
 import org.scalacheck.Gen
 
-trait AmlsReferenceNumberGenerator {
+trait BusinessActivitiesGenerator extends BaseGenerator {
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
-
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
+  val businessActivitiesGen: Gen[BusinessActivities] = Gen.someOf(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  ) map { a => BusinessActivities(a.toSet) }
+  
 }

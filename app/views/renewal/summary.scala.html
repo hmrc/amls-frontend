@@ -123,20 +123,22 @@
         }
 
 
-        @model.sendTheLargestAmountsOfMoney.map { lom =>
-            @checkYourAnswers(
-                question = Messages("renewal.msb.largest.amounts.title"),
-                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
-            ) {
-                <ul class="list list--comma">
-                    @lom.countryList.map { country =>
-                        <li>@country.name</li>
-                    }
-                </ul>
-            }
-        }
+
 
         @if(services.msbServices.contains(TransmittingMoney)) {
+
+            @model.sendMoneyToOtherCountry.map { oc =>
+                @checkYourAnswers(
+                question = Messages("renewal.msb.send.money.title"),
+                editUrl = controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url
+            )   {
+                    <p>@oc.money match {
+                        case true => { @Messages("lbl.yes") }
+                        case false => { @Messages("lbl.no") }
+                    }</p>
+                }
+            }
+
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
@@ -149,6 +151,20 @@
                     </ul>
                 }
             }
+
+            @model.sendTheLargestAmountsOfMoney.map { lom =>
+                @checkYourAnswers(
+                question = Messages("renewal.msb.largest.amounts.title"),
+                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
+                ) {
+                <ul class="list list--comma">
+                    @lom.countryList.map { country =>
+                    <li>@country.name</li>
+                    }
+                </ul>
+                }
+            }
+
         }
 
         @if(services.msbServices.contains(CurrencyExchange)) {

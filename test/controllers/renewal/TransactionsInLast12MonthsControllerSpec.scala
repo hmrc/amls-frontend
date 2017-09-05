@@ -111,7 +111,31 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
   "Calling the POST action" when {
     "posting valid data" when {
 
-      "they do send money to other countries" must {
+      "msb is Money Transfers" must {
+        "redirect to SendMoneyToOtherCountriesController" in new FormSubmissionFixture {
+
+          when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+            .thenReturn(Some(Renewal(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB")))))
+            )))
+
+          when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              msbServices = Some(MsbServices(Set(TransmittingMoney)))
+            )))
+
+          when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+            .thenReturn(Some(msbModel))
+
+          post() { result =>
+            result.header.status mustBe SEE_OTHER
+            result.header.headers.get("Location") mustBe routes.SendMoneyToOtherCountryController.get().url.some
+          }
+
+        }
+      }
+
+      /*"they do send money to other countries" must {
         "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
 
           when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
@@ -133,9 +157,9 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
             result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
           }
         }
-      }
+      }*/
 
-      "they do not send money to other countries" when {
+      /*"they do not send money to other countries" when {
         "msb is CurrencyExchange" must {
           "redirect to CETransactionsInLast12MonthsController" in new FormSubmissionFixture {
 
@@ -207,7 +231,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
             }
           }
         }
-      }
+      }*/
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
 
