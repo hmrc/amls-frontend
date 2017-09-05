@@ -82,7 +82,7 @@ class roles_within_businessSpec extends GenericTestHelper with MustMatchers {
     BusinessType.SoleProprietor -> List(4, 6, 8),
     BusinessType.Partnership -> List(4, 5, 8),
     BusinessType.LimitedCompany -> List(1, 2, 4, 8),
-    BusinessType.UnincorporatedBody -> List(1, 2, 4, 8),
+    BusinessType.UnincorporatedBody -> List(4, 8),
     BusinessType.LPrLLP -> List(4, 5, 7, 8)
   )
 
