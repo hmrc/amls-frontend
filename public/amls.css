@@ -979,6 +979,7 @@ fieldset.panel-indent legend {
   float: left;
 }
 
+
 @media screen and (max-width: 640px) {
   .what-you-need > .grid-layout__column--1-3 {
     margin: 0 auto 15px;
@@ -1158,6 +1159,11 @@ details {
 
 .panel-indent--gutter {
   margin-top: 0;
+}
+
+/* Registration amendment */
+.registration-amendment .grid-layout.submit-application {
+  margin-top: 20px;
 }
 
 /* more GDS stuff overridden by Assets Frontend D: */

@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package generators
+package generators.businesscustomer
 
+import generators.businessmatching.BusinessTypeGenerator
+import generators.{BaseGenerator, CountryGenerator}
+import models.businesscustomer.ReviewDetails
 import org.scalacheck.Gen
 
-trait AmlsReferenceNumberGenerator {
+//noinspection ScalaStyle
+trait ReviewDetailsGenerator extends BaseGenerator
+  with AddressGenerator
+  with CountryGenerator
+  with BusinessTypeGenerator {
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
+  val reviewDetailsGen: Gen[ReviewDetails] = for {
+    businessName <- stringOfLengthGen(20)
+    bType <- businessTypeGen
+    address <- addressGen
+    safeId <- safeIdGen
+    utr <- numSequence(8)
+  } yield ReviewDetails(businessName, Some(bType), address, safeId, Some(utr))
 
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
 }

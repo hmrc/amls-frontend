@@ -39,23 +39,13 @@ trait SummaryController extends BaseController {
       for {
         aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
         status <- statusService.getStatus
-        businessMatching <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
       } yield aboutTheBusiness match {
         case Some(data) => {
           val showRegisteredForMLR = status match {
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
             case _ => false
           }
-          val maybeBT = for {
-            bm <- businessMatching
-            rd <- bm.reviewDetails
-            bt <- rd.businessType
-          } yield {
-            Ok(summary(EmptyForm, data, showRegisteredForMLR, bt))
-          }
-
-          maybeBT.getOrElse(Redirect(controllers.routes.RegistrationProgressController.get()))
-
+          Ok(summary(EmptyForm, data, showRegisteredForMLR))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }

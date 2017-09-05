@@ -14,18 +14,22 @@
  * limitations under the License.
  *@
 
-@(
-    question: String = "",
+@(question: String = "",
     classes: Seq[String] = Seq.empty,
     editUrl: String = "",
-    removeUrl: String = ""
-)(content: Html)(implicit lang:Lang,  m: Messages)
+    removeUrl: String = "",
+    allowEdit: Boolean = true
+)(content: Html)(implicit lang: Lang, m: Messages)
 
 <section class="check-your-answers @classes.mkString(" ")">
-    @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
-    <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
+    @if(question.nonEmpty) {
+        <h2 class="heading-small">@question</h2>
+    }
+<span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
     @content
-    @if(editUrl.nonEmpty){<footer class="group">
-        <p><a href="@editUrl" class="change-answer">@Messages("button.edit")<span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
-    </footer>}
+    @if(editUrl.nonEmpty && allowEdit) {
+        <footer class="group">
+            <p><a href="@editUrl" class="change-answer">@Messages("button.edit") <span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
+        </footer>
+    }
 </section>

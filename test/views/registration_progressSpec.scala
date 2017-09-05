@@ -22,8 +22,9 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.GenericTestHelper
+import generators.businesscustomer.AddressGenerator
 
-class registration_progressSpec extends GenericTestHelper with MockitoSugar {
+class registration_progressSpec extends GenericTestHelper with MockitoSugar with AddressGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -37,7 +38,7 @@ class registration_progressSpec extends GenericTestHelper with MockitoSugar {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.registrationprogress.registration_progress(sections, true)
+      def view = views.html.registrationprogress.registration_progress(sections, true, addressGen.sample.get, Seq.empty[String], true)
 
       doc.title must be(Messages("progress.title") + " - " +
         Messages("title.yapp") + " - " +

@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package generators.businessmatching
 
+import generators.BaseGenerator
+import models.businessmatching.BusinessType
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
 import org.scalacheck.Gen
 
-trait AmlsReferenceNumberGenerator {
+trait BusinessTypeGenerator extends BaseGenerator {
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
+  val businessTypeGen: Gen[BusinessType] = Gen.oneOf(SoleProprietor, LimitedCompany, Partnership, LPrLLP, UnincorporatedBody)
 
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
 }

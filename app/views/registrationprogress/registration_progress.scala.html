@@ -19,8 +19,9 @@
 @import include.forms2._
 @import views.html.helper.CSRF
 @import models.registrationprogress.Section
+@import models.businesscustomer.Address
 
-@(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_],m:Messages)
+@(sections: Seq[Section], declarationAvailable: Boolean, address: Address, serviceNames: Seq[String], canEditPreApplication: Boolean)(implicit request: Request[_],m:Messages)
 
 @main2(
 title = Messages("progress.title") + " - " + Messages("title.yapp")
@@ -43,32 +44,31 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
+        <ul class="grid-layout__column grid-layout__colum
+        n--2-3 progress-steps">
             @sections.map { case Section(name, status, _, call) =>
             @section(name, status, call)
             }
         </ul>
 
         @* Sidebar *@
-        <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
-            <div class="application-submit">
-                <h3 class="heading-small">@Messages("progress.submit.title")</h3>
+        @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+        
+    </div>
 
-               <p>@if(declarationAvailable) {
-                        @Messages("progress.declarationavailable")
-                    } else {
-                        @Messages("progress.declarationunavailable")
-                    }
-                </p>
-                <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
-                    @CSRF.formField
-                    <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
-                        @Messages("progress.submit")
-                    </button>
-                </form>
-
-            </div>
-        </div>
-
+    <div class="grid-layout grid-layout--stacked">
+        <h3 class="heading-small">@Messages("progress.submit.title")</h3>
+        <p>@if(declarationAvailable) {
+                @Messages("progress.declarationavailable")
+            } else {
+                @Messages("progress.declarationunavailable")
+            }
+        </p>
+        <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+            @CSRF.formField
+            <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
+                @Messages("progress.submit")
+            </button>
+        </form>
     </div>
 }

@@ -342,6 +342,8 @@ error.required.withdrawal.reason.other = You haven’t specified the reason for 
 error.required.deregistration.reason = You must select a reason for de-registering the business
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
+error.renewal.updateanyInformation.validationerror = Select yes if you want to update any other information
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -462,6 +464,7 @@ lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
 link.return.registration.progress = Return to application progress
 link.return.renewal.progress = Return to renewal progress
+link.renewal.progress.change.answers = Change your answers
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -642,6 +645,8 @@ progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
+progress.preapplication.canedit = change
+progress.preapplication.readonly = view details
 
 #### Amendment page ####
 amendment.title = Update or view your information
@@ -820,6 +825,7 @@ summary.checkyouranswers.agentspremises.section1 = Premises
 summary.checkyouranswers.agentspremises.section2 = Trading activities
 summary.checkyouranswers.agentspremises.section3 = Agents’ details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
+button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
 
@@ -1070,6 +1076,7 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
+businessmatching.summary.noedit.anchortext = Return to update or view your information
 businessmatching.services.title = Which services does your business provide?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
@@ -1204,6 +1211,13 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 submit.registration = Submit registration
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
+
+renewal.updateanyinformation.title = Do you want to update any other information?
+renewal.updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
+renewal.updateanyinformation.example = For example, you’ll need to update if:
+renewal.updateanyinformation.example.item1 = a responsible person leaves your business
+renewal.updateanyinformation.example.item2 = you start trading from a new premises
+renewal.updateanyinformation.example.item3 = your main contact number changes
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1754,6 +1768,8 @@ renewal.progress.tponly.intro = You need to complete the renewal section before 
   Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
+renewal.progress.submit.completed.intro = You have completed the renewal questions.
+renewal.progress.submit.completed.continue = You can continue making updates to your information, or submit your renewal.
 progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10

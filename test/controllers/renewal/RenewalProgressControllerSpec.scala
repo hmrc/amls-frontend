@@ -142,7 +142,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "load the page when status is renewal submitted and one of the section is modified" in new Fixture {
+    "load the page when status is renewal submitted and one of the section is modified" in new Fixture  {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
@@ -153,12 +153,16 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
 
-      val sections = Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
-          Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
+      val sections = Seq(
+        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
+        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
       )
 
       when(controller.progressService.sections(cacheMap))
         .thenReturn(sections)
+
+      when(controller.renewals.canSubmit(any(),any()))
+        .thenReturn(true)
 
       val result = controller.get()(request)
 
@@ -170,7 +174,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
       val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
-      elements.size() must be(2)
+      elements.size() must be(1)
 
     }
 
@@ -183,19 +187,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       val element = html.select(".progress-step--details")
       element.text must include("A new section")
-      element.size mustBe 2
+      element.size mustBe 1
     }
-
-    "display the renewal section" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.get()(request)
-      val html = Jsoup.parse(contentAsString(result))
-
-      html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
-    }
-
+    
     "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))

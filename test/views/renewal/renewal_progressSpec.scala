@@ -16,21 +16,17 @@
 
 package views.renewal
 
-import models.registrationprogress.{Completed, Section}
 import org.joda.time.LocalDate
-import play.api.i18n.Messages
-import utils.GenericTestHelper
-import views.Fixture
-import utils.DateHelper
-import utils.Strings.TextHelpers
 import org.scalatest.MustMatchers
+import play.api.i18n.Messages
+import utils.Strings.TextHelpers
+import utils.{DateHelper, GenericTestHelper}
+import views.Fixture
 
-class renewal_progressSpec extends GenericTestHelper {
+class renewal_progressSpec extends GenericTestHelper with MustMatchers{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
-    val renewalSection = Section("renewal", Completed, true, controllers.renewal.routes.SummaryController.get())
 
     val renewalDate = LocalDate.now().plusDays(15)
 
@@ -39,7 +35,8 @@ class renewal_progressSpec extends GenericTestHelper {
   "The renewal progress view" must {
 
     "Have the correct title and headings " in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
+
+      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, Some(renewalDate))
 
       doc.title must startWith(Messages("renewal.progress.title"))
 
@@ -51,31 +48,39 @@ class renewal_progressSpec extends GenericTestHelper {
       subHeading.html must include(Messages("summary.status"))
     }
 
-
     "enable the submit registration button" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, true, true, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, Some(renewalDate))
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
+
+      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.completed.intro"))
+      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.completed.continue"))
+
+      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
+
     }
 
     "disable the submit registration button" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, false, true,Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true,Some(renewalDate))
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
+
+      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
+      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")) must be(empty)
     }
 
     "show intro for MSB and TCSP businesses" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, false, true, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, Some(renewalDate))
 
       html must include (Messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
     "show intro for non MSB and TCSP businesses" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(renewalSection, Seq.empty, false, false, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, false, Some(renewalDate))
 
       html must include (Messages("renewal.progress.tponly.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
