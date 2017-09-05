@@ -21,7 +21,7 @@
 @(model: BusinessMatching, allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", "summary.businessmatching")
+    @heading("title.cya", if(allowEdit) "summary.businessmatching" else "")
 }
 
 @main(
@@ -29,12 +29,14 @@
     heading = header
 ) {
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ) {
-        @Messages("businessmatching.summary.icon.title")
+    @if(allowEdit) {
+        @panel(
+            jsHidden = false,
+            wide = true,
+            gutter = true
+        ) {
+            @Messages("businessmatching.summary.icon.title")
+        }
     }
 
     @model.reviewDetails.map { review =>
