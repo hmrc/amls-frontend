@@ -56,7 +56,6 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
     "pre-populate the fields correctly" in new ViewFixture {
 
       val role = RoleWithinBusinessRelease7(Set(
-        models.declaration.release7.BeneficialShareholder,
         models.declaration.release7.ExternalAccountant
       ))
 
@@ -70,8 +69,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
       doc.getElementById("middleName").`val` mustBe "Middlename"
       doc.getElementById("lastName").`val` mustBe "Surname"
 
-      doc.select("#positions input[checked]").get(0).`val` mustBe "01"
-      doc.select("#positions input[checked]").get(1).`val` mustBe "08"
+      doc.select("#positions input[checked]").get(0).`val` mustBe "08"
     }
 
     "pre-populate the 'other' field correctly" in new ViewFixture {
