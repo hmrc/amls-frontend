@@ -1775,6 +1775,12 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
+renewal.involvedinother.example = For example, you‘d answer ‘yes’ if you‘re:
+renewal.involvedinother.listline1 = a Money Service Business that’s also a newsagents shop
+renewal.involvedinother.listline2 = a Trust or Company Service Provider that’s also an recruitment agency
+renewal.involvedinother.listline3 = an Accountancy Service Provider that also sells software packages
+
+
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
