@@ -19,22 +19,19 @@ package controllers.renewal
 import javax.inject.Inject
 
 import cats.data.OptionT
-import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
-import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal.transactions_in_last_12_months
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.mvc.Result
-import utils.ControllerHelper
+import models.renewal.{Renewal, SendMoneyToOtherCountry}
+import services.RenewalService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future
 
-class TransactionsInLast12MonthsController @Inject()(
+class SendMoneyToOtherCountryController @Inject()(
                                                       val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
                                                       renewalService: RenewalService) extends BaseController {
@@ -44,17 +41,17 @@ class TransactionsInLast12MonthsController @Inject()(
       implicit request =>
         (for {
           renewal <- OptionT(renewalService.getRenewal)
-          transfers <- OptionT.fromOption[Future](renewal.transactionsInLast12Months)
+          otherCountry <- OptionT.fromOption[Future](renewal.sendMoneyToOtherCountry)
         } yield {
-          Ok(transactions_in_last_12_months(Form2[TransactionsInLast12Months](transfers), edit))
-        }) getOrElse Ok(transactions_in_last_12_months(EmptyForm, edit))
+          Ok(send_money_to_other_country(Form2[SendMoneyToOtherCountry](otherCountry), edit))
+        }) getOrElse Ok(send_money_to_other_country(EmptyForm, edit))
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[TransactionsInLast12Months](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(transactions_in_last_12_months(f, edit)))
+        Form2[SendMoneyToOtherCountry](request.body) match {
+          case f: InvalidForm => Future.successful(BadRequest(send_money_to_other_country(f, edit)))
           case ValidForm(_, model) =>
             dataCacheConnector.fetchAll flatMap {
               optMap =>
@@ -63,28 +60,25 @@ class TransactionsInLast12MonthsController @Inject()(
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
-                  //activities <- bm.activities
-                  //msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                  activities <- bm.activities
                 } yield {
-                  renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
-                    redirectTo(services.msbServices, edit)
+
+                  renewalService.updateRenewal(renewal.sendMoneyToOtherCountry(model).copy(
+                    mostTransactions = None, sendTheLargestAmountsOfMoney = None)) map { _ =>
+
+                    redirectTo(
+                      model.money,
+                      services.msbServices,
+                      activities.businessActivities, edit
+                    )
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
   }
 
-   private def redirectTo(services: Set[MsbService], edit: Boolean) =
-     if (edit) {
-       Redirect(routes.SummaryController.get())
-     } else if (services contains TransmittingMoney) {
-       Redirect(routes.SendMoneyToOtherCountryController.get())
-     } else {
-       Redirect(routes.SummaryController.get())
-     }
-
-  /*private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
-    if (edit) {
+  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
+    if (!sendMoneyToOtherCountry && edit) {
       Redirect(routes.SummaryController.get())
     } else if (sendMoneyToOtherCountry) {
       Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
@@ -94,6 +88,6 @@ class TransactionsInLast12MonthsController @Inject()(
       Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
-    }*/
+    }
 
 }

@@ -1783,6 +1783,8 @@ renewal.msb.whichcurrencies.header = Which currencies did you supply the most to
 renewal.msb.which_currencies.foreign_currencies_question =  Did you deal in physical foreign currencies in the last 12 months?
 renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 
+renewal.msb.send.money.title = Did you send money to other countries in the last 12 months?
+
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
