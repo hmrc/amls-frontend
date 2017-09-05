@@ -31,7 +31,8 @@ case class Renewal(
                     sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                     mostTransactions: Option[MostTransactions] = None,
                     ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
-                    hasChanged: Boolean = false
+                    hasChanged: Boolean = false,
+                    sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None
 ) {
   def involvedInOtherActivities(model: InvolvedInOther): Renewal =
     this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model))
@@ -62,6 +63,9 @@ case class Renewal(
 
   def transactionsInLast12Months(model: TransactionsInLast12Months): Renewal =
     this.copy(transactionsInLast12Months = Some(model), hasChanged = hasChanged || !this.transactionsInLast12Months.contains(model))
+
+  def sendMoneyToOtherCountry(model: SendMoneyToOtherCountry): Renewal =
+    this.copy(sendMoneyToOtherCountry = Some(model), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(model))
 
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
     this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
