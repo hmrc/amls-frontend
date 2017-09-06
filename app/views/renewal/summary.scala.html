@@ -139,6 +139,19 @@
                 }
             }
 
+            @model.sendTheLargestAmountsOfMoney.map { lom =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.largest.amounts.title"),
+                    editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
+                ) {
+                <ul class="list list--comma">
+                    @lom.countryList.map { country =>
+                        <li>@country.name</li>
+                    }
+                </ul>
+                }
+            }
+
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
@@ -149,19 +162,6 @@
                             <li>@country.name</li>
                         }
                     </ul>
-                }
-            }
-
-            @model.sendTheLargestAmountsOfMoney.map { lom =>
-                @checkYourAnswers(
-                question = Messages("renewal.msb.largest.amounts.title"),
-                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
-                ) {
-                <ul class="list list--comma">
-                    @lom.countryList.map { country =>
-                    <li>@country.name</li>
-                    }
-                </ul>
                 }
             }
 
