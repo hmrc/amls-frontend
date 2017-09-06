@@ -68,7 +68,9 @@ class renewal_progressSpec extends GenericTestHelper with MustMatchers{
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
 
       doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
-      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")) must be(empty)
+
+      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+
     }
 
     "show intro for MSB and TCSP businesses" in new ViewFixture {
