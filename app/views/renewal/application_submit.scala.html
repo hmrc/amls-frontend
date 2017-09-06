@@ -45,4 +45,12 @@
             visuallyhidden = Messages("link.renewal.progress.change.answers")
         )
     </p>
+} else {
+    <p>
+        @anchor(
+            attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+            linkText = Messages("link.renewal.progress.change.answers"),
+            visuallyhidden = Messages("link.renewal.progress.change.answers")
+        )
+    </p>
 }
