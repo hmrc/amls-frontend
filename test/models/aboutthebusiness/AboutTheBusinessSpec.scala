@@ -110,6 +110,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     }
   }
 
+  "isComplete must return true" in {
+    completeModel.isComplete must be(true)
+  }
+
   "Partially complete AboutTheBusiness" must {
 
     val partialJson = Json.obj(
@@ -130,6 +134,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Deserialise as expected" in {
       partialJson.as[AboutTheBusiness] must
         be(partialModel)
+    }
+
+    "isComplete must return false" in {
+      partialModel.isComplete must be(false)
     }
   }
 

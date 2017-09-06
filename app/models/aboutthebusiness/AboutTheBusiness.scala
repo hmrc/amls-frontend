@@ -65,6 +65,9 @@ case class AboutTheBusiness(
       Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, true
       ) if ApplicationConfig.hasAcceptedToggle => true
       case AboutTheBusiness(
+      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, false
+      ) if ApplicationConfig.hasAcceptedToggle => false
+      case AboutTheBusiness(
       Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _, _
       ) => true
       case _ => false
