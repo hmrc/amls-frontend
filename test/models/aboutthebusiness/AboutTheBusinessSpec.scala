@@ -18,10 +18,13 @@ package models.aboutthebusiness
 
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
+import play.api.test.FakeApplication
 
-class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
+class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
 
@@ -99,6 +102,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       completeJson.as[AboutTheBusiness] must
         be(completeModel)
     }
+
+    "isComplete must return true" in {
+      completeModel.isComplete must be(true)
+    }
   }
 
   it when {
@@ -108,10 +115,6 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           be (completeModel)
       }
     }
-  }
-
-  "isComplete must return true" in {
-    completeModel.isComplete must be(true)
   }
 
   "Partially complete AboutTheBusiness" must {
