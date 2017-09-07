@@ -29,10 +29,12 @@ import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
 import uk.gov.hmrc.play.http.HttpResponse
 import models.ReadStatusResponse
-import models.payments.{WaysToPay, ReturnLocation, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks, CreateBacsPaymentRequest}
+import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, ReturnLocation, UpdateBacsRequest, WaysToPay}
+import cats.data.OptionT
+import cats.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -54,7 +56,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
       submissionResponseService = mock[SubmissionResponseService],
-      authEnrolmentsService = mock[AuthEnrolmentsService]
+      authEnrolmentsService = mock[AuthEnrolmentsService],
+      amlsRefBroker = mock[AmlsRefNumberBroker]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
@@ -62,6 +65,10 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     when {
       controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(OK))
+
+    when {
+      controller.amlsRefBroker.get(any(), any(), any())
+    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
 
     val data = (Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))
 
@@ -87,7 +94,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     } thenReturn Future.successful(paymentGen.sample.get)
 
     when {
-      controller.statusService.getDetailedStatus(any(), any(), any())
+      controller.statusService.getDetailedStatus(eqTo(amlsRegistrationNumber))(any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {

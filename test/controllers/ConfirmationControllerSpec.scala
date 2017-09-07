@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.OptionT
 import cats.implicits._
 import connectors._
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
@@ -42,7 +43,8 @@ import services.{AuthEnrolmentsService, PaymentsService, StatusService, Submissi
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, GenericTestHelper, AmlsRefNumberBroker}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -80,6 +82,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val dataCacheConnector = mock[DataCacheConnector]
       override val amlsConnector = mockAmlsConnector
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override val amlsRefBroker = mock[AmlsRefNumberBroker]
     }
 
     val response = SubscriptionResponse(
@@ -125,6 +128,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
+
+    when {
+      controller.amlsRefBroker.get(any(), any(), any())
+    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
@@ -626,7 +633,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       "bacs confirmation is requested" in new Fixture {
 
         when {
-          controller.statusService.getReadStatus(any(),any(),any())
+          controller.statusService.getReadStatus(any())(any(),any(),any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         val result = controller.bacsConfirmation()(request)
@@ -668,6 +675,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       override val dataCacheConnector = mock[DataCacheConnector]
       override val amlsConnector = mock[AmlsConnector]
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override val amlsRefBroker = mock[AmlsRefNumberBroker]
     }
 
     val response = SubscriptionResponse(
@@ -708,6 +716,10 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
     when {
       paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(None)
+
+    when {
+      controller.amlsRefBroker.get(any(), any(), any())
+    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
 
     val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber))
 
