@@ -51,13 +51,25 @@ trait ConfirmRegisteredOfficeController extends BaseController {
     }
   }
 
+  def hasRegisteredAddress(aboutTheBusiness: Future[Option[AboutTheBusiness]]) : Future[Option[Boolean]] = {
+    aboutTheBusiness.map {
+      case Some(atb) => Some(atb.registeredOffice.isDefined)
+      case _ => Some(false)
+    }
+  }
+
+
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)) map {
-          case Some(data) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
-          case _ => Redirect(routes.RegisteredOfficeController.get())
-        }
+        (for {
+          hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)))
+          bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)))
+        } yield (hra,bma) match {
+          case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
+          case _ => Redirect(routes.RegisteredOfficeController.get(edit))
+        }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
+
   }
 
   def post(edit: Boolean = false) = Authorised.async {
