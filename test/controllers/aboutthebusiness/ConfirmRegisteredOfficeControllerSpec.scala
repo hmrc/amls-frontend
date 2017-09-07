@@ -60,7 +60,12 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
 
       "load register Office" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+        when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))
+          (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+        when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
@@ -77,6 +82,19 @@ class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with Mocki
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
 
+      }
+
+      "load Registered office or main place of business when there is already a registered address in AboutTheBusiness" in new Fixture {
+
+        when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))
+          (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+        when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
       }
     }
 
