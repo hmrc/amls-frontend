@@ -48,16 +48,10 @@
          
     </div>
 
-    <div class="grid-layout grid-layout--stacked submit-application">
-        <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
-            @CSRF.formField
-            <fieldset>
-                @include.forms2.legend("amendment.sidebar.heading", false, true, "", false)
-                <p>
-                    @Messages("amendment.sidebar.text")
-                </p>
-                <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("amendment.sidebar.button.text")</button>
-            </fieldset>
-        </form>
-    </div>
+    @if(declarationAvailable){
+        @submit_application("progress.submit.updates", "progress.updates.made", controllers.routes.RegistrationProgressController.post.url)
+    } else {
+        @submit_application("progress.view.status", "progress.updates.not.made", controllers.routes.StatusController.get().url, "GET")
+    }
+
 }
