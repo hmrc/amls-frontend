@@ -19,8 +19,9 @@ package models.asp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 trait AspValues {
@@ -46,7 +47,8 @@ trait AspValues {
     "otherBusinessTaxMatters" -> Json.obj(
       "otherBusinessTaxMatters" -> true
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
   val completeJsonWithReg = Json.obj(
     "services" -> Json.obj(
@@ -56,16 +58,21 @@ trait AspValues {
       "otherBusinessTaxMatters" -> true,
       "agentRegNo" -> "123456789"
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
   val completeModel = Asp(
     Some(DefaultValues.DefaultServices),
-    Some(DefaultValues.DefaultOtherBusinessTax)
+    Some(DefaultValues.DefaultOtherBusinessTax),
+    hasAccepted = true
   )
 
 }
 
-class AspSpec extends PlaySpec with MockitoSugar with AspValues {
+class AspSpec extends PlaySpec with MockitoSugar with AspValues with OneAppPerSuite{
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+
 
   "None" when {
     val initial: Option[Asp] = None
