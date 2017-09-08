@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthService @Inject() (authConnector: AuthConnector) {
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised).absoluteUrl, "utf-8")
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")
   def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   def validateCredentialRole(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =

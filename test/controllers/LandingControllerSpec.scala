@@ -137,9 +137,12 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           controller.authService.validateCredentialRole(any(), any(), any())
         } thenReturn Future.successful(false)
 
+        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+          URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
+
         val result = controller.get()(request)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controller.authService.signoutUrl)
+        redirectLocation(result) mustBe Some(expectedLocation)
       }
 
 
