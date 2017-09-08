@@ -152,80 +152,174 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
       }
 
       "all sections are complete and" when {
-        "a section has changed" must {
-          "enable the submission button" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+        "a section has changed" when {
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", Completed, false, mock[Call]),
-                Section("TESTSECTION2", Completed, true, mock[Call])
-              ))
+          "application is pre-submission" must {
+            "enable the submission button" in new Fixture {
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(false)
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(false)
+            }
           }
+
+          "application is post-submission" must {
+            "show Submit Updates form" in new Fixture {
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
+              submitForm.text() must include(Messages("progress.submit.updates"))
+              submitForm.attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
+              submitForm.select("button").text() must be(Messages("button.continue"))
+            }
+          }
+
         }
 
+        "no section has changed" when {
 
-        "no section has changed" must {
-          "disable the submission button" in new Fixture {
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(SubmissionReadyForReview))
+          "application is pre-submission" must {
+            "enable the submission button" in new Fixture {
 
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", Completed, false, mock[Call]),
-                Section("TESTSECTION2", Completed, false, mock[Call])
-              ))
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
 
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
-
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(true)
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(false)
+            }
           }
+
+          "application is post-submission" must {
+            "show View Status button" in new Fixture {
+
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
+              submitForm.text() must include(Messages("progress.view.status"))
+              submitForm.attr("action") must be(controllers.routes.StatusController.get().url)
+              submitForm.select("button").text() must be(Messages("button.continue"))
+            }
+          }
+
         }
+
       }
 
       "some sections are not complete and" when {
-        "a section has changed" must {
-          "disable the submission button" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+        "a section has changed" when {
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+          "application is pre-submission" must {
+            "disable the submission button" in new Fixture {
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", NotStarted, false, mock[Call]),
-                Section("TESTSECTION2", Completed, true, mock[Call])
-              ))
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", NotStarted, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
 
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(true)
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(true)
+            }
           }
+
+          "application is post-submission" must {
+            "show View Status button" in new Fixture {
+              
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", NotStarted, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
+              submitForm.text() must include(Messages("progress.view.status"))
+              submitForm.attr("action") must be(controllers.routes.StatusController.get().url)
+              submitForm.select("button").text() must be(Messages("button.continue"))
+            }
+          }
+
         }
 
         "no section has changed" must {
