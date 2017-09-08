@@ -47,17 +47,5 @@
         @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
          
     </div>
-
-    <div class="grid-layout grid-layout--stacked submit-application">
-        <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
-            @CSRF.formField
-            <fieldset>
-                @include.forms2.legend("amendment.sidebar.heading", false, true, "", false)
-                <p>
-                    @Messages("amendment.sidebar.text")
-                </p>
-                <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("amendment.sidebar.button.text")</button>
-            </fieldset>
-        </form>
-    </div>
+    @submit_application(declarationAvailable)
 }

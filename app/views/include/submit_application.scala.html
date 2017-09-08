@@ -1,0 +1,49 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import views.html.helper.CSRF
+@import utils.Strings._
+
+@(declarationAvailable: Boolean)(implicit messages: Messages, request: Request[_])
+
+<div class="grid-layout grid-layout--stacked submit-application">
+    @if(declarationAvailable){
+        <form method="POST" action="@controllers.routes.RegistrationProgressController.post.url">
+            @CSRF.formField
+            <fieldset>
+                @legend(
+                    legend = "progress.submit.updates",
+                    jsHidden = false,
+                    bold = true
+                )
+                <p>@Messages("progress.updates.made")</p>
+                <button type="submit" name="submit" class="button">@Messages("button.continue")</button>
+            </fieldset>
+        </form>
+    } else {
+        <h3>@Messages("progress.view.status")</h3>
+        <p>@Messages("progress.updates.not.made")</p>
+        <p>@anchor(
+            attrRole = true,
+            attrHref = controllers.routes.StatusController.get().url,
+            linkText = Messages("button.continue"),
+            visuallyhidden = Messages("progress.view.status")
+        )</p>
+    }
+</div>
