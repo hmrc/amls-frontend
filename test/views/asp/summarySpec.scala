@@ -16,13 +16,15 @@
 
 package views.asp
 
+import forms.EmptyForm
 import models.asp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
+
 import scala.collection.JavaConversions._
 
 
@@ -41,13 +43,13 @@ class summarySpec extends GenericTestHelper
     "have correct title" in new ViewFixture {
 
 
-      def view = views.html.asp.summary(Asp())
+      def view = views.html.asp.summary(EmptyForm, Asp())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.asp"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.asp.summary(Asp())
+      def view = views.html.asp.summary(EmptyForm, Asp())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.asp"))
@@ -70,7 +72,7 @@ class summarySpec extends GenericTestHelper
           Some(OtherBusinessTaxMattersYes)
         )
 
-        views.html.asp.summary(testdata)
+        views.html.asp.summary(EmptyForm, testdata)
       }
 
       forAll(sectionChecks) { (key, check) => {

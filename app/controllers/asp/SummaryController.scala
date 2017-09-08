@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.asp.Asp
 import views.html.asp.summary
+import forms._
 
 trait SummaryController extends BaseController {
 
@@ -30,9 +31,21 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[Asp](Asp.key) map {
         case Some(data) =>
-          Ok(summary(data))
+          Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      for {
+        asp <- dataCache.fetch[Asp](Asp.key)
+        _ <- dataCache.save[Asp](Asp.key,
+          asp.copy(hasAccepted = true)
+        )
+      } yield {
+        Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }
