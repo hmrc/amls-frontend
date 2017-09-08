@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package models.payments
+package models
 
 import config.ApplicationConfig
+import play.api.libs.json.{JsString, Writes}
 import play.api.mvc.Call
 
 case class ReturnLocation(url: String, absoluteUrl: String)
@@ -30,4 +31,9 @@ object ReturnLocation {
     new ReturnLocation(call.url, publicRedirectUrl(call.url))
 
   private def publicRedirectUrl(url: String) = s"${ApplicationConfig.frontendBaseUrl}$url"
+
+  implicit val locationWrites = new Writes[ReturnLocation] {
+    override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
+  }
+
 }

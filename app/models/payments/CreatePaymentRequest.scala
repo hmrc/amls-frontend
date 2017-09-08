@@ -16,15 +16,11 @@
 
 package models.payments
 
+import models.ReturnLocation
 import play.api.libs.json.{JsString, Json, Writes}
 
 case class CreatePaymentRequest(taxType: String, reference: String, description: String, amountInPence: Int, returnUrl: ReturnLocation)
 
 object CreatePaymentRequest {
-
-  implicit val locationWrites = new Writes[ReturnLocation] {
-    override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
-  }
-
   implicit val format = Json.writes[CreatePaymentRequest]
 }

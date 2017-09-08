@@ -32,7 +32,8 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 import uk.gov.hmrc.play.http.HttpResponse
 import models.ReadStatusResponse
-import models.payments.{WaysToPay, ReturnLocation, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks, CreateBacsPaymentRequest}
+import models.payments.{WaysToPay, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks, CreateBacsPaymentRequest}
+import models.ReturnLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 

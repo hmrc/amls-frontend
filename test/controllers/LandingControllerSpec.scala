@@ -56,7 +56,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
-import models.payments.ReturnLocation
+import models.ReturnLocation
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import services.AuthService

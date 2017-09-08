@@ -16,6 +16,7 @@
 
 package models.payments
 
+import models.ReturnLocation
 import play.api.libs.json.Writes
 
 case class PaymentRedirectRequest(reference: String, amount: Double, redirectUrl: ReturnLocation)

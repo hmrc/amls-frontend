@@ -18,20 +18,20 @@ package services
 
 import javax.inject.Inject
 
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.{AmlsConnector, PayApiConnector}
+import models.ReturnLocation
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
-import models.status.SubmissionReadyForReview
-import play.api.{Logger, Play}
+import play.api.Logger
+import play.api.http.Status._
 import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import play.api.http.Status._
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class PaymentsService @Inject()(

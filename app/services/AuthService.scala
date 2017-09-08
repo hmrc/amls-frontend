@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 import config.ApplicationConfig
 import models.auth.{CredentialRole, UserDetailsResponse}
-import models.payments.ReturnLocation
+import models.ReturnLocation
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.play.frontend.auth.AuthContext

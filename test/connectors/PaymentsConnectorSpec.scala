@@ -16,7 +16,8 @@
 
 package connectors
 
-import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect, ReturnLocation}
+import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
+import models.ReturnLocation
 import org.apache.http.client.HttpResponseException
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
