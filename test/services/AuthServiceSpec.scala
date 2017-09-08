@@ -16,22 +16,18 @@
 
 package services
 
-import java.net.URLEncoder
-
 import generators.auth.UserDetailsGenerator
 import models.auth.{CredentialRole, UserDetailsResponse}
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.mvc.Results.{Ok, Redirect}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito._
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application, Environment}
-import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -61,20 +57,17 @@ class AuthServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with 
 
   "The auth service" when {
     "the user has a credential role of User" must {
-      "execute the specified block normally" in new Fixture {
+      "return true" in new Fixture {
         setupUserDetails(CredentialRole.User)
-        whenReady(service.validateCredentialRole()(Future.successful(Ok))) { _ mustBe Ok }
+        whenReady(service.validateCredentialRole) { _ mustBe true }
       }
     }
 
     "the user has a credential role of Assistant" must {
-      "return a redirect result to the sign out page, with a continue url" in new Fixture {
+      "return false" in new Fixture {
         setupUserDetails(CredentialRole.Assistant)
-        whenReady(service.validateCredentialRole()(Future.successful(Ok))) { result =>
-          result mustBe Redirect(s"http://logout?continue=${URLEncoder.encode("http://localhost:9222/anti-money-laundering/unauthorised", "utf-8")}")
-        }
+        whenReady(service.validateCredentialRole) { _ mustBe false }
       }
     }
   }
-
 }

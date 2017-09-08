@@ -32,17 +32,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthService @Inject() (authConnector: AuthConnector) {
 
-  private val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised).absoluteUrl, "utf-8")
-  private val signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised).absoluteUrl, "utf-8")
+  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
-  def validateCredentialRole()(block: => Future[Result])
-                            (implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Result] =
-    authConnector.getUserDetails[UserDetailsResponse](authContext) flatMap { result =>
+  def validateCredentialRole(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    authConnector.getUserDetails[UserDetailsResponse](authContext) map { result =>
       result.credentialRole match {
-        case CredentialRole.User => block
-        case _ => Future.successful(Redirect(signoutUrl))
+        case CredentialRole.User => true
+        case _ => false
       }
     }
-
-
 }

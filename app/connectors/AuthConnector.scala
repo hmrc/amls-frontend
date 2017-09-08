@@ -21,8 +21,9 @@ import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.controllers.RestFormats
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpResponse, Upstream4xxResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
