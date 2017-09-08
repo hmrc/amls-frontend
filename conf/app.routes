@@ -14,6 +14,7 @@ GET         /registration-progress                                              
 POST        /registration-progress                                                    controllers.RegistrationProgressController.post()
 
 GET         /application-status                                                       controllers.StatusController.get(fromDuplicateSubmission: Boolean ?= false)
+POST        /application-status                                                       controllers.StatusController.post()
 
 GET         /your-registration/your-messages/:id/:contactType/:amlsRegNo              controllers.NotificationController.messageDetails(id : String, contactType:models.notifications.ContactType, amlsRegNo: String)
 GET         /your-registration/your-messages                                          controllers.NotificationController.getMessages()

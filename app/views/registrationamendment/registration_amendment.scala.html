@@ -51,7 +51,7 @@
     @if(declarationAvailable){
         @submit_application("progress.submit.updates", "progress.updates.made", controllers.routes.RegistrationProgressController.post.url)
     } else {
-        @submit_application("progress.view.status", "progress.updates.not.made", controllers.routes.StatusController.get().url, "GET")
+        @submit_application("progress.view.status", "progress.updates.not.made", controllers.routes.StatusController.post().url)
     }
 
 }

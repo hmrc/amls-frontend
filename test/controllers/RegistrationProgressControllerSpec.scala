@@ -294,7 +294,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
           "application is post-submission" must {
             "show View Status button" in new Fixture {
-              
+
               when(controller.statusService.getStatus(any(), any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
