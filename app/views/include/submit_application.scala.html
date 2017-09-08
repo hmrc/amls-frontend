@@ -20,19 +20,30 @@
 @import views.html.helper.CSRF
 @import utils.Strings._
 
-@(title: String, text: String, nextUrl: String)(implicit messages: Messages, request: Request[_])
+@(declarationAvailable: Boolean)(implicit messages: Messages, request: Request[_])
 
 <div class="grid-layout grid-layout--stacked submit-application">
-    <form method="POST" action="@nextUrl">
-        @CSRF.formField
-        <fieldset>
-            @legend(
-                legend = title,
-                jsHidden = false,
-                bold = true
-            )
-            <p>@Messages(text)</p>
-            <button type="submit" name="submit" class="button">@Messages("button.continue")</button>
-        </fieldset>
-    </form>
+    @if(declarationAvailable){
+        <form method="POST" action="@controllers.routes.RegistrationProgressController.post.url">
+            @CSRF.formField
+            <fieldset>
+                @legend(
+                    legend = "progress.submit.updates",
+                    jsHidden = false,
+                    bold = true
+                )
+                <p>@Messages("progress.updates.made")</p>
+                <button type="submit" name="submit" class="button">@Messages("button.continue")</button>
+            </fieldset>
+        </form>
+    } else {
+        <h3>@Messages("progress.view.status")</h3>
+        <p>@Messages("progress.updates.not.made")</p>
+        <p>@anchor(
+            attrRole = true,
+            attrHref = controllers.routes.StatusController.get().url,
+            linkText = Messages("button.continue"),
+            visuallyhidden = Messages("progress.view.status")
+        )</p>
+    }
 </div>

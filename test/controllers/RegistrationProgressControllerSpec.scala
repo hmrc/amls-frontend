@@ -255,10 +255,12 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
-              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
-              submitForm.text() must include(Messages("progress.view.status"))
-              submitForm.attr("action") must be(controllers.routes.StatusController.get().url)
-              submitForm.select("button").text() must be(Messages("button.continue"))
+              val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
+              val submitAnchor = submitDiv.select("a")
+
+              submitDiv.text() must include(Messages("progress.view.status"))
+              submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
+              submitAnchor.text() must include(Messages("button.continue"))
             }
           }
 
@@ -313,10 +315,12 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
-              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
-              submitForm.text() must include(Messages("progress.view.status"))
-              submitForm.attr("action") must be(controllers.routes.StatusController.get().url)
-              submitForm.select("button").text() must be(Messages("button.continue"))
+              val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
+              val submitAnchor = submitDiv.select("a")
+
+              submitDiv.text() must include(Messages("progress.view.status"))
+              submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
+              submitAnchor.text() must include(Messages("button.continue"))
             }
           }
 

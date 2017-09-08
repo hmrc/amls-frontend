@@ -69,12 +69,6 @@ trait StatusController extends BaseController {
         } yield page
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-      Future.successful(Redirect(controllers.routes.StatusController.get()))
-  }
-
   def withdraw = Authorised.async {
     implicit authContext => implicit request => ???
   }
