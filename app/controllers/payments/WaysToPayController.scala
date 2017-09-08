@@ -29,6 +29,8 @@ import services.{AuthEnrolmentsService, PaymentsService, StatusService, Submissi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import models.payments.CreateBacsPaymentRequest
 import models.confirmation.Currency
+import models.status.NotCompleted
+import utils.AmlsRefNumberBroker
 
 import scala.concurrent.Future
 
@@ -39,7 +41,8 @@ class WaysToPayController @Inject()(
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val submissionResponseService: SubmissionResponseService,
-                                     val authEnrolmentsService: AuthEnrolmentsService
+                                     val authEnrolmentsService: AuthEnrolmentsService,
+                                     val amlsRefBroker: AmlsRefNumberBroker
                                    ) extends BaseController {
 
   def get() = Authorised.async {
@@ -49,21 +52,13 @@ class WaysToPayController @Inject()(
   }
 
   def post() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-
+    implicit authContext => implicit request =>
         val submissionDetails = for {
-          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          amlsRefNo <- amlsRefBroker.get
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
-          amlsRefNo <- {
-            e match {
-              case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
-              case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
-            }
-          }
           payRef <- OptionT.fromOption[Future](paymentReference)
         } yield (amlsRefNo, payRef, data, detailedStatus.fold[String]("")(_.safeId.getOrElse("")))
-
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {

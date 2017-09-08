@@ -32,7 +32,7 @@ import play.api.{Logger, Play}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.BusinessName
+import utils.{AmlsRefNumberBroker, BusinessName}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,9 +55,11 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
 
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
+  private[controllers] val statusService: StatusService
 
-  val statusService: StatusService
+  private[controllers] val amlsRefBroker: AmlsRefNumberBroker
+
+  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -108,13 +110,14 @@ trait ConfirmationController extends BaseController {
   }
 
   def bacsConfirmation() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
-        statusService.getReadStatus flatMap { readStatus =>
-          BusinessName.getName(readStatus.safeId).value map {
-            case Some(name) => Ok(views.html.confirmation.confirmation_bacs(name))
-          }
-        }
+    implicit request => implicit authContext =>
+      val okResult = for {
+        refNo <- amlsRefBroker.get
+        status <- OptionT.liftF(statusService.getReadStatus(refNo))
+        name <- BusinessName.getName(status.safeId)
+      } yield Ok(views.html.confirmation.confirmation_bacs(name))
+
+      okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }
 
   def retryPayment = Authorised.async {
@@ -197,4 +200,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val dataCacheConnector = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
   override private[controllers] val authEnrolmentsService = AuthEnrolmentsService
+  override private[controllers] val amlsRefBroker = AmlsRefNumberBroker
 }

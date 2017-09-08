@@ -97,6 +97,9 @@ trait StatusService {
     }
   }
 
+  def getDetailedStatus(mlrRegNumber: String)
+                       (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
+
   def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -104,6 +107,9 @@ trait StatusService {
       case _ => throw new RuntimeException("ETMP returned no read status")
     }
   }
+
+  def getReadStatus(mlrRefNo: String)
+                   (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpReadStatus(mlrRefNo)
 
   private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = {
 
