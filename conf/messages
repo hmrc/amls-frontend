@@ -649,6 +649,11 @@ progress.visuallyhidden.view.amend = View and amend your information
 progress.preapplication.canedit = change
 progress.preapplication.readonly = view details
 
+progress.submit.updates = Submit Updates
+progress.updates.made = Updates made: you can continue making updates, or submit your changes
+progress.updates.not.made = You haven’t made any updates
+progress.view.status = View Your Status
+
 #### Amendment page ####
 amendment.title = Update or view your information
 amendment.section-heading = Your registration

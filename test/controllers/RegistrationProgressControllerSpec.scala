@@ -17,36 +17,41 @@
 package controllers
 
 import connectors.DataCacheConnector
-import models.businesscustomer.{Address, ReviewDetails}
+import generators.AmlsReferenceNumberGenerator
+import generators.businesscustomer.ReviewDetailsGenerator
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
+import play.api.http.Status.OK
+import play.api.i18n.Messages
 import play.api.mvc.Call
-import play.api.test.FakeApplication
+import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.test.Helpers._
-import play.api.http.Status.OK
-import org.mockito.Mockito._
-import org.mockito.Matchers.any
-import uk.gov.hmrc.http.cache.client.CacheMap
-import play.api.i18n.Messages
-import generators.businesscustomer.ReviewDetailsGenerator
-import scala.concurrent.{ExecutionContext, Future}
-import org.mockito.Matchers.{eq => eqTo, _}
 
-class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar with ReviewDetailsGenerator {
+import scala.concurrent.{ExecutionContext, Future}
+
+class RegistrationProgressControllerSpec extends GenericTestHelper
+  with MustMatchers
+  with MockitoSugar
+  with ReviewDetailsGenerator
+  with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture {self =>
     val request = addToken(authRequest)
+
+    val mockBusinessMatching = mock[BusinessMatching]
+    val mockCacheMap = mock[CacheMap]
+
     val controller = new RegistrationProgressController {
       override val authConnector = self.authConnector
       override protected[controllers] val progressService: ProgressService = mock[ProgressService]
@@ -55,31 +60,23 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       override protected[controllers] val statusService : StatusService = mock[StatusService]
     }
 
-    protected val mockCacheMap = mock[CacheMap]
-
-    when(controller.statusService.getStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionReady))
-
-    when(controller.dataCache.fetch[Renewal](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    val completeBusinessMatching = mock[BusinessMatching]
-    when(completeBusinessMatching.isComplete) thenReturn true
-    when(completeBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
+    when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionReady)
+    when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())) thenReturn Future.successful(None)
+    when(mockBusinessMatching.isComplete) thenReturn true
+    when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
     when {
-      completeBusinessMatching.activities
+      mockBusinessMatching.activities
     } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
+    when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
-    when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(completeBusinessMatching))
   }
-
 
   "RegistrationProgressController" when {
     "get is called" when {
       "the user is enrolled into the AMLS Account" must {
         "show the update your information page" in new Fixture {
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some("AMLSREFNO")))
+            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -113,9 +110,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
           }
         }
-      }
-
-      "redirect to renewal registration progress" when {
         "status is ready for renewal submitted" must {
           "renewal data exists in save4later" in new Fixture {
             when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
@@ -147,6 +141,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
+
             val pageTitle = Messages("progress.title") + " - " +
               Messages("title.yapp") + " - " +
               Messages("title.amls") + " - " + Messages("title.gov")
@@ -157,83 +152,184 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
 
       "all sections are complete and" when {
-        "a section has changed" must {
-          "enable the submission button" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some("AMLSREFNO")))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+        "a section has changed" when {
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", Completed, false, mock[Call]),
-                Section("TESTSECTION2", Completed, true, mock[Call])
-              ))
+          "application is pre-submission" must {
+            "enable the submission button" in new Fixture {
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(false)
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(false)
+            }
           }
+
+          "application is post-submission" must {
+            "show Submit Updates form" in new Fixture {
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
+              submitForm.text() must include(Messages("progress.submit.updates"))
+              submitForm.attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
+              submitForm.select("button").text() must be(Messages("button.continue"))
+            }
+          }
+
         }
 
+        "no section has changed" when {
 
-        "no section has changed" must {
-          "disable the submission button" in new Fixture {
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(SubmissionReadyForReview))
+          "application is pre-submission" must {
+            "enable the submission button" in new Fixture {
 
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some("AMLSREFNO")))
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", Completed, false, mock[Call]),
-                Section("TESTSECTION2", Completed, false, mock[Call])
-              ))
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
 
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(true)
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(false)
+            }
           }
+
+          "application is post-submission" must {
+            "show View Status button" in new Fixture {
+
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
+              val submitAnchor = submitDiv.select("a")
+
+              submitDiv.text() must include(Messages("progress.view.status"))
+              submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
+              submitAnchor.text() must include(Messages("button.continue"))
+            }
+          }
+
         }
+
       }
 
       "some sections are not complete and" when {
-        "a section has changed" must {
-          "disable the submission button" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some("AMLSREFNO")))
+        "a section has changed" when {
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+          "application is pre-submission" must {
+            "disable the submission button" in new Fixture {
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.progressService.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", NotStarted, false, mock[Call]),
-                Section("TESTSECTION2", Completed, true, mock[Call])
-              ))
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
-            val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
-            submitButtons.size() must be(1)
-            submitButtons.first().hasAttr("disabled") must be(true)
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", NotStarted, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+              submitButtons.size() must be(1)
+              submitButtons.first().hasAttr("disabled") must be(true)
+            }
           }
+
+          "application is post-submission" must {
+            "show View Status button" in new Fixture {
+
+              when(controller.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(controller.progressService.sections(mockCacheMap))
+                .thenReturn(Seq(
+                  Section("TESTSECTION1", NotStarted, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              val responseF = controller.get()(request)
+              status(responseF) must be(OK)
+
+              val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
+              val submitAnchor = submitDiv.select("a")
+
+              submitDiv.text() must include(Messages("progress.view.status"))
+              submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
+              submitAnchor.text() must include(Messages("button.continue"))
+            }
+          }
+
         }
 
         "no section has changed" must {
           "disable the submission button" in new Fixture {
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some("AMLSREFNO")))
+              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
             when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -246,6 +342,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
+
             val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
             submitButtons.size() must be(1)
             submitButtons.first().hasAttr("disabled") must be(true)
@@ -257,7 +354,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
         "show the business activities and hide the business matching section" in new Fixture {
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some("AMLSREFNO")))
+              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
             when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -276,7 +373,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
-            contentAsString(responseF) must not include(Messages(s"progress.${BusinessMatching.messageKey}.name"))
+            contentAsString(responseF) must not include Messages(s"progress.${BusinessMatching.messageKey}.name")
 
             Seq(
               "businessmatching.registerservices.servicename.lbl.01",
@@ -292,7 +389,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       "in the approved status" must {
         "show the correct text on the screen" in new Fixture {
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some("AMLSREFNO")))
+            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -334,6 +431,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
+
           val pageTitle = Messages("progress.title") + " - " +
             Messages("title.yapp") + " - " +
             Messages("title.amls") + " - " + Messages("title.gov")
@@ -343,13 +441,12 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
 
       "pre application must redirect to the landing controller" when {
         "the business matching is incomplete" in new Fixture {
-          val businessMatching = mock[BusinessMatching]
 
           when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(businessMatching.isComplete) thenReturn false
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
+          when(mockBusinessMatching.isComplete) thenReturn false
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -361,4 +458,5 @@ class RegistrationProgressControllerSpec extends GenericTestHelper with MustMatc
       }
     }
   }
+
 }
