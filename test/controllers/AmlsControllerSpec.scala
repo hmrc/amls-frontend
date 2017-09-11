@@ -46,7 +46,7 @@ class AmlsControllerSpec extends GenericTestHelper {
 
       "load the unauthorised role with an unauthenticated request" in new UnauthenticatedFixture {
         val result = controller.unauthorised_role(request)
-        status(result) mustBe OK
+        status(result) mustBe UNAUTHORIZED
         contentAsString(result) must include(Messages("unauthorised.title"))
       }
     }

@@ -30,7 +30,7 @@ trait AmlsController extends Actions {
 
   val unauthorised_role = Action {
     implicit request =>
-      Ok(views.html.unauthorised_role())
+      Unauthorized(views.html.unauthorised_role())
   }
 }
 
