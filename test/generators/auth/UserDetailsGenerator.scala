@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package models.payments
+package generators.auth
 
-import config.ApplicationConfig
-import play.api.mvc.Call
+import generators.BaseGenerator
+import models.auth.{CredentialRole, UserDetailsResponse}
+import org.scalacheck.Gen
 
-case class ReturnLocation(url: String, absoluteUrl: String)
+//noinspection ScalaStyle
+trait UserDetailsGenerator extends BaseGenerator {
 
-object ReturnLocation {
+  val userDetailsGen: Gen[UserDetailsResponse] = for {
+    name <- stringOfLengthGen(10)
+    group <- stringOfLengthGen(20)
+    credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
+  } yield UserDetailsResponse(name, None, group, credentialRole)
 
-  def apply(url: String) =
-    new ReturnLocation(url, publicRedirectUrl(url))
-
-  def apply(call: Call) =
-    new ReturnLocation(call.url, publicRedirectUrl(call.url))
-
-  private def publicRedirectUrl(url: String) = s"${ApplicationConfig.frontendBaseUrl}$url"
 }

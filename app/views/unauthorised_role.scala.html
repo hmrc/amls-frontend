@@ -22,12 +22,13 @@
 @import config.{ApplicationConfig => appConfig}
 @import uk.gov.hmrc.play.views.html._
 @import include.main
+@import utils.Strings._
+
 @main(title = Messages("unauthorised.title")) {
 
 <h1 class="heading-xlarge">@Messages("unauthorised.title")</h1>
 
-<p>@Messages("unauthorised.text1")</p>
-<p>@Messages("unauthorised.text2") <a href="/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">@Messages("unauthorised.register.link.text")</a></p>
+ @Messages("unauthorised.role.content").paragraphizeH
 
 <!-- This should log you out and then take you back to the sign in page for Gov Gateway -->
 <p><a class="button" href="@{appConfig.logoutUrl}?continue=@{appConfig.loginContinue}">@Messages("button.backtosignin")</a></p>

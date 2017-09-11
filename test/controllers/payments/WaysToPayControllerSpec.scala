@@ -32,7 +32,8 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
 import uk.gov.hmrc.play.http.HttpResponse
 import models.ReadStatusResponse
-import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, ReturnLocation, UpdateBacsRequest, WaysToPay}
+import models.payments.{WaysToPay, UpdateBacsRequest, CreatePaymentResponse, PayApiLinks, CreateBacsPaymentRequest}
+import models.ReturnLocation
 import cats.data.OptionT
 import cats.implicits._
 

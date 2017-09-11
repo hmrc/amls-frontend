@@ -9,6 +9,7 @@ GET         /start                                                              
 POST        /subscribe                                                                controllers.SubmissionController.post()
 
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
+GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role
 
 GET         /registration-progress                                                    controllers.RegistrationProgressController.get()
 POST        /registration-progress                                                    controllers.RegistrationProgressController.post()

@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package models.auth
 
-import config.AMLSAuthConnector
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import play.api.libs.json.Json
 
-trait AmlsController extends Actions {
+case class UserDetailsResponse(name: String, email: Option[String], affinityGroup: String, credentialRole: String)
 
-  val unauthorised = Action {
-    implicit request =>
-      Ok(views.html.unauthorised())
-  }
-
-  val unauthorised_role = Action {
-    implicit request =>
-      Unauthorized(views.html.unauthorised_role())
-  }
-}
-
-object AmlsController extends AmlsController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
+object UserDetailsResponse {
+  implicit val format = Json.format[UserDetailsResponse]
 }

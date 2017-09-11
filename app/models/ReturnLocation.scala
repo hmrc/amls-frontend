@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package controllers
+package models
 
-import config.AMLSAuthConnector
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import config.ApplicationConfig
+import play.api.libs.json.{JsString, Writes}
+import play.api.mvc.Call
 
-trait AmlsController extends Actions {
+case class ReturnLocation(url: String, absoluteUrl: String)
 
-  val unauthorised = Action {
-    implicit request =>
-      Ok(views.html.unauthorised())
+object ReturnLocation {
+
+  def apply(url: String) =
+    new ReturnLocation(url, publicRedirectUrl(url))
+
+  def apply(call: Call) =
+    new ReturnLocation(call.url, publicRedirectUrl(call.url))
+
+  private def publicRedirectUrl(url: String) = s"${ApplicationConfig.frontendBaseUrl}$url"
+
+  implicit val locationWrites = new Writes[ReturnLocation] {
+    override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
   }
 
-  val unauthorised_role = Action {
-    implicit request =>
-      Unauthorized(views.html.unauthorised_role())
-  }
-}
-
-object AmlsController extends AmlsController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

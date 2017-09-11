@@ -472,7 +472,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-
+unauthorised.role.content = Your account doesn’t have enough access rights to register.\n\
+  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision

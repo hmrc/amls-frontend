@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-package controllers
+package models.auth
 
-import config.AMLSAuthConnector
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-trait AmlsController extends Actions {
-
-  val unauthorised = Action {
-    implicit request =>
-      Ok(views.html.unauthorised())
-  }
-
-  val unauthorised_role = Action {
-    implicit request =>
-      Unauthorized(views.html.unauthorised_role())
-  }
-}
-
-object AmlsController extends AmlsController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
+object CredentialRole {
+  val User = "User"
+  val Assistant = "Assistant"
 }

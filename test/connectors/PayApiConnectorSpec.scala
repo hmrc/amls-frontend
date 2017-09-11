@@ -17,20 +17,21 @@
 package connectors
 
 import config.ApplicationConfig
-import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks, ReturnLocation}
+import models.ReturnLocation
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.http.Status._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
-import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

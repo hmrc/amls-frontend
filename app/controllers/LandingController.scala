@@ -21,6 +21,7 @@ import cats.data.Validated.{Invalid, Valid}
 import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
+import models.auth.{CredentialRole, UserDetailsResponse}
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
@@ -33,13 +34,14 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
-import play.api.Logger
-import play.api.mvc.{Action, Call, Request}
+import play.api.{Logger, Play}
+import play.api.mvc.{Action, Call, DiscardingCookie, Request}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import services.AuthService
 
 import scala.concurrent.Future
 
@@ -50,6 +52,8 @@ trait LandingController extends BaseController {
   private[controllers] def enrolmentsService: AuthEnrolmentsService
 
   private[controllers] def auditConnector: AuditConnector
+
+  private[controllers] def authService: AuthService
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
@@ -66,12 +70,16 @@ trait LandingController extends BaseController {
   }
 
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        if (AmendmentsToggle.feature) {
-          getWithAmendments
-        } else {
-          getWithoutAmendments
+    implicit authContext => implicit request =>
+        authService.validateCredentialRole flatMap {
+          case true =>
+            if (AmendmentsToggle.feature) {
+              getWithAmendments
+            } else {
+              getWithoutAmendments
+            }
+          case _ =>
+            Future.successful(Redirect(authService.signoutUrl))
         }
   }
 
@@ -90,10 +98,10 @@ trait LandingController extends BaseController {
               auditConnector.sendEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse("")))
 
               FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
-                  case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                  case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
-                }
+                case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
               }
+            }
             }
           case (None, None) =>
             Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
@@ -126,7 +134,9 @@ trait LandingController extends BaseController {
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
         val fromDuplicate = cacheMap match {
-          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {_.previouslySubmitted.contains(true)}
+          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
+            _.previouslySubmitted.contains(true)
+          }
           case _ => false
         }
 
@@ -211,5 +221,8 @@ object LandingController extends LandingController {
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+
   override private[controllers] def auditConnector = AMLSAuditConnector
+
+  override private[controllers] lazy val authService = Play.current.injector.instanceOf[AuthService]
 }
