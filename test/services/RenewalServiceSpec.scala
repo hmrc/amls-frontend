@@ -27,6 +27,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
+import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -1406,6 +1407,69 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
 
             await(service.isRenewalComplete(model)) mustBe false
 
+        }
+      }
+    }
+  }
+
+  "canSubmit" must {
+    "return true" when {
+      "renewal has not started" when {
+        "sections are completed and changed" in new Fixture {
+
+          val renewal = Section("renewal", NotStarted, false, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(true)
+        }
+      }
+      "renewal has started" when {
+        "renewal section is complete and changed, sections are completed and changed" in new Fixture {
+
+          val renewal = Section("renewal", Completed, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(true)
+        }
+        "renewal section is complete and changed, sections are completed and not changed" in new Fixture {
+
+          val renewal = Section("renewal", Completed, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(true)
+        }
+      }
+    }
+    "return false" when {
+      "renewal has started" when {
+        "sections are completed and not changed" in new Fixture {
+
+          val renewal = Section("renewal", Started, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+        "sections are completed and changed" in new Fixture {
+
+          val renewal = Section("renewal", Started, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
         }
       }
     }

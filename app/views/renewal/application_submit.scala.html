@@ -21,36 +21,40 @@
 
 @(canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
 
-<h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
+<div class="application-submit">
 
-@if(canSubmit){
-    <p>@messages("renewal.progress.submit.completed.intro")</p>
-    <p>@messages("renewal.progress.submit.completed.continue")</p>
-} else {
-    <p>@messages("renewal.progress.submit.intro")</p>
-}
+    <h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
 
-<form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
-    @CSRF.formField
-    <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
-        @messages("progress.submit")
-    </button>
-</form>
+    @if(canSubmit){
+        <p>@messages("renewal.progress.submit.completed.intro")</p>
+        <p>@messages("renewal.progress.submit.completed.continue")</p>
+    } else {
+        <p>@messages("renewal.progress.submit.intro")</p>
+    }
 
-@if(canSubmit){
-    <p>
-        @anchor(
-            attrHref = controllers.renewal.routes.SummaryController.get().url,
-            linkText = Messages("link.renewal.progress.change.answers"),
-            visuallyhidden = Messages("link.renewal.progress.change.answers")
-        )
-    </p>
-} else {
-    <p>
-        @anchor(
-            attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
-            linkText = Messages("link.renewal.progress.change.answers"),
-            visuallyhidden = Messages("link.renewal.progress.change.answers")
-        )
-    </p>
-}
+    <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
+        @CSRF.formField
+        <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
+            @messages("progress.submit")
+        </button>
+    </form>
+
+    @if(canSubmit){
+        <p>
+            @anchor(
+                attrHref = controllers.renewal.routes.SummaryController.get().url,
+                linkText = Messages("link.renewal.progress.change.answers"),
+                visuallyhidden = Messages("link.renewal.progress.change.answers")
+            )
+        </p>
+    } else {
+        <p>
+            @anchor(
+                attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+                linkText = Messages("link.renewal.progress.change.answers"),
+                visuallyhidden = Messages("link.renewal.progress.change.answers")
+            )
+        </p>
+    }
+
+</div>

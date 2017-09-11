@@ -229,7 +229,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   }
 
   def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
-    (renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections)
+    !renewalSection.status.equals(Started) && ((renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections))
   }
 
 }

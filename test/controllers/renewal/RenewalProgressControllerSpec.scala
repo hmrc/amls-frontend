@@ -18,28 +18,25 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.ReadStatusResponse
-import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section}
-import models.responsiblepeople._
-import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview}
+import models.registrationprogress._
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
@@ -140,6 +137,73 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       html.select(".page-header").text() must include(Messages("renewal.progress.title"))
 
+    }
+
+    "block the continue button and direct to the beginning of renewals" when {
+      "sections are unchanged and renewals is incomplete" in new Fixture {
+
+        when {
+          renewalService.getSection(any(), any(), any())
+        } thenReturn Future.successful(renewalSection.copy(status = Started))
+
+        when {
+          statusService.getDetailedStatus(any(), any(), any())
+        } thenReturn Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse)))
+
+        when(controller.renewals.canSubmit(any(),any()))
+          .thenReturn(false)
+
+        val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
+        val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(bmWithoutTCSPOrMSB)
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        val html = Jsoup.parse(contentAsString(result))
+
+        val submitDiv = html.getElementsByClass("application-submit").first()
+
+        submitDiv.select("button[type=\"submit\"]").first().hasAttr("disabled") must be(true)
+
+      }
+      "sections are changed and renewals is incomplete" in new Fixture {
+
+        when {
+          progressService.sections(eqTo(cacheMap))
+        } thenReturn Seq(defaultSection.copy(status = Completed))
+
+        when {
+          renewalService.getSection(any(), any(), any())
+        } thenReturn Future.successful(renewalSection.copy(status = Started))
+
+        when(controller.renewals.canSubmit(any(),any()))
+          .thenReturn(false)
+
+        when {
+          statusService.getDetailedStatus(any(), any(), any())
+        } thenReturn Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse)))
+
+        val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
+        val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(bmWithoutTCSPOrMSB)
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        val html = Jsoup.parse(contentAsString(result))
+
+        val submitDiv = html.getElementsByClass("application-submit").first()
+
+        submitDiv.select("button[type=\"submit\"]").first().hasAttr("disabled") must be(true)
+
+      }
     }
 
     "load the page when status is renewal submitted and one of the section is modified" in new Fixture  {
