@@ -16,6 +16,7 @@
 
 package views.renewal
 
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -30,13 +31,16 @@ class renewal_progressSpec extends GenericTestHelper with MustMatchers{
 
     val renewalDate = LocalDate.now().plusDays(15)
 
+    val readyForRenewal = ReadyForRenewal(Some(renewalDate))
+    val renewalSubmitted = RenewalSubmitted(Some(renewalDate))
+
   }
 
   "The renewal progress view" must {
 
     "Have the correct title and headings " in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, readyForRenewal)
 
       doc.title must startWith(Messages("renewal.progress.title"))
 
@@ -50,7 +54,7 @@ class renewal_progressSpec extends GenericTestHelper with MustMatchers{
 
     "enable the submit registration button" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, readyForRenewal)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
@@ -63,7 +67,7 @@ class renewal_progressSpec extends GenericTestHelper with MustMatchers{
 
     "disable the submit registration button" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true,Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
 
@@ -75,14 +79,14 @@ class renewal_progressSpec extends GenericTestHelper with MustMatchers{
 
     "show intro for MSB and TCSP businesses" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
 
       html must include (Messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
     "show intro for non MSB and TCSP businesses" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, false, Some(renewalDate))
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, false, readyForRenewal)
 
       html must include (Messages("renewal.progress.tponly.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }

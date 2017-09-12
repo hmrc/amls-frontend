@@ -45,7 +45,6 @@ class RenewalProgressController @Inject()
     implicit authContext =>
       implicit request =>
         renewals.getSection flatMap { renewalSection =>
-
           val block = for {
             cache <- OptionT(dataCacheConnector.fetchAll)
             statusInfo <- OptionT.liftF(statusService.getDetailedStatus)
@@ -56,8 +55,8 @@ class RenewalProgressController @Inject()
             val canSubmit = renewals.canSubmit(renewalSection, variationSections)
 
             statusInfo match {
-              case (ReadyForRenewal(renewalDate), _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, renewalDate))
-              case (RenewalSubmitted(renewalDate), _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, renewalDate))
+              case (r:ReadyForRenewal, _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
+              case (r:RenewalSubmitted, _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
               case _ => throw new Exception("Cannot get renewal date")
             }
           }

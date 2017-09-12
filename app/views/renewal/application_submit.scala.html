@@ -18,8 +18,9 @@
 @import forms2._
 @import utils.Strings._
 @import views.html.helper.CSRF
+@import models.status.{Renewal, ReadyForRenewal, RenewalSubmitted}
 
-@(canSubmit: Boolean)(implicit messages: Messages, request: Request[_])
+@(canSubmit: Boolean, renewal: Renewal)(implicit messages: Messages, request: Request[_])
 
 <div class="application-submit">
 
@@ -49,11 +50,22 @@
         </p>
     } else {
         <p>
-            @anchor(
-                attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
-                linkText = Messages("link.renewal.progress.change.answers"),
-                visuallyhidden = Messages("link.renewal.progress.change.answers")
-            )
+            @{renewal match {
+                case _:RenewalSubmitted => {
+                    anchor(
+                        attrHref = controllers.renewal.routes.SummaryController.get().url,
+                        linkText = Messages("link.renewal.progress.change.answers"),
+                        visuallyhidden = Messages("link.renewal.progress.change.answers")
+                    )
+                }
+                case _ => {
+                    anchor(
+                        attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+                        linkText = Messages("link.renewal.progress.change.answers"),
+                        visuallyhidden = Messages("link.renewal.progress.change.answers")
+                    )
+                }
+            }}
         </p>
     }
 
