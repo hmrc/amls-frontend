@@ -426,6 +426,7 @@ GET         /trust-company-service-provider/other-trust-provider                
 POST        /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 
 GET         /trust-company-service-provider/check-your-answers                        controllers.tcsp.SummaryController.get()
+POST        /trust-company-service-provider/check-your-answers                       controllers.tcsp.SummaryController.post()
 
 GET         /supervision/what-you-need                                                controllers.supervision.WhatYouNeedController.get()
 

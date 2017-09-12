@@ -22,6 +22,8 @@ import controllers.BaseController
 import models.tcsp.Tcsp
 import views.html.tcsp.summary
 
+import scala.concurrent.Future
+
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
@@ -32,6 +34,12 @@ trait SummaryController extends BaseController {
         case Some(data) => Ok(summary(data))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
+  }
+
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
 }
 

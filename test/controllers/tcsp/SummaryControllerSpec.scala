@@ -72,4 +72,17 @@ class SummaryControllerSpec extends GenericTestHelper {
       status(result) must be(SEE_OTHER)
     }
   }
+
+  "POST" must {
+
+    "redirect to RegistrationProgressController" when {
+
+      "the model has been updated with hasAccepted" in new Fixture {
+        val result = controller.post()(request)
+
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
+    }
+
+  }
 }
