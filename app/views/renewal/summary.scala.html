@@ -19,7 +19,7 @@
 @import models.renewal._
 @import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
 
-@(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
+@(model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[MsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -65,7 +65,7 @@
             editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
         ) {
             <ul class="list list-bullet">
-                @bmBusinessActivities.map { ba =>
+                @activities.map { ba =>
                     @ba.businessActivities.map {activity =>
                         <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
                     }
@@ -256,11 +256,20 @@
         }
     }
 
-    @anchor(
-        attrHref = controllers.renewal.routes.UpdateAnyInformationController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcontinue")
-    )
+    @if(canSubmit){
+        @anchor(
+            attrHref = controllers.renewal.routes.UpdateAnyInformationController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcontinue")
+        )
+    } else {
+        @anchor(
+            attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcontinue")
+        )
+    }
+
 }
 
 @whoUsesCurrencies(wc: WhichCurrencies) = {

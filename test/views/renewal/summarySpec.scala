@@ -39,13 +39,13 @@ class summarySpec extends GenericTestHelper
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.renewal.summary(Renewal(), None, None)
+      def view = views.html.renewal.summary(Renewal(), None, None, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.renewal.summary(Renewal(), None, None)
+      def view = views.html.renewal.summary(Renewal(), None, None, true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -121,7 +121,7 @@ class summarySpec extends GenericTestHelper
           )
         )
 
-        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel), msbServices)
+        views.html.renewal.summary(renewalModel, Some(businessActivitiesModel), msbServices, true)
       }
 
       forAll(sectionChecks) { (key, check, editLink) => {
