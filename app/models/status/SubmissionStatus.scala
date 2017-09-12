@@ -20,6 +20,10 @@ import org.joda.time.LocalDate
 
 sealed trait SubmissionStatus
 
+abstract class Renewal extends SubmissionStatus {
+  val renewalDate: Option[LocalDate]
+}
+
 object NotCompleted extends SubmissionStatus
 object SubmissionReady extends SubmissionStatus
 object SubmissionReadyForReview extends SubmissionStatus
@@ -29,6 +33,6 @@ object SubmissionDecisionRevoked extends SubmissionStatus
 object SubmissionDecisionExpired extends SubmissionStatus
 object SubmissionWithdrawn extends SubmissionStatus
 object DeRegistered extends SubmissionStatus
-case class ReadyForRenewal(renewalDate: Option[LocalDate]) extends SubmissionStatus
-case class RenewalSubmitted(renewalDate: Option[LocalDate])  extends SubmissionStatus
+case class ReadyForRenewal(renewalDate: Option[LocalDate]) extends Renewal
+case class RenewalSubmitted(renewalDate: Option[LocalDate])  extends Renewal
 
