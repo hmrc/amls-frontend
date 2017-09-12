@@ -16,7 +16,8 @@
 
 package models.tcsp
 
-import models.registrationprogress.{Started, Completed, NotStarted, Section}
+import config.ApplicationConfig
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -25,7 +26,8 @@ import scala.collection.Seq
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  providedServices: Option[ProvidedServices] = None,
                  servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None,
-                 hasChanged:Boolean = false) {
+                 hasChanged:Boolean = false,
+                 hasAccepted:Boolean = false) {
 
   def tcspTypes(trust: TcspTypes): Tcsp =
     this.copy(tcspTypes = Some(trust), hasChanged = hasChanged || !this.tcspTypes.contains(trust))
@@ -36,10 +38,20 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
   def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p))
 
-  def isComplete: Boolean = this match {
-    case Tcsp(Some(_), Some(_), Some(_), _) => true
-    case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _) if !serviceProviders.contains(RegisteredOfficeEtc) => true
-    case _ => false
+  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+    this match {
+      case Tcsp(Some(_), Some(_), Some(_), _, true) => true
+      case Tcsp(Some(_), Some(_), Some(_), _, false) => false
+      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, false) if !serviceProviders.contains(RegisteredOfficeEtc) => false
+      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, true) if !serviceProviders.contains(RegisteredOfficeEtc) => true
+      case _ => false
+    }
+  } else {
+    this match {
+      case Tcsp(Some(_), Some(_), Some(_), _, _) => true
+      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, _) if !serviceProviders.contains(RegisteredOfficeEtc) => true
+      case _ => false
+    }
   }
 }
 
@@ -75,7 +87,8 @@ object Tcsp {
     (__ \ "tcspTypes").readNullable[TcspTypes] and
       (__ \ "providedServices").readNullable[ProvidedServices] and
       (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(Tcsp.apply _)
   implicit def default(tcsp: Option[Tcsp]): Tcsp =
     tcsp.getOrElse(Tcsp())

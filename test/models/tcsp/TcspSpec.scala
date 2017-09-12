@@ -19,8 +19,9 @@ package models.tcsp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
@@ -66,7 +67,8 @@ trait TcspValues {
       "servicesOfAnotherTCSP" -> true,
       "mlrRefNumber" -> "12345678"
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> false
   )
 
   val completeModel = Tcsp(
@@ -76,7 +78,9 @@ trait TcspValues {
   )
 }
 
-class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
+class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> false))
 
   "Tcsp" must {
 
@@ -233,5 +237,25 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         }
       }
     }
+  }
+}
+
+class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+
+  "Tcsp" must {
+
+    "isComplete" must {
+      "return true if the model is accepted" in {
+        completeModel.copy(hasAccepted = true).isComplete must be(true)
+      }
+      val initial: Option[Tcsp] = None
+
+      "return false if the model is accepted" in {
+        completeModel.isComplete must be(false)
+      }
+    }
+
   }
 }
