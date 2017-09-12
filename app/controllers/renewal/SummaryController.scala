@@ -18,11 +18,13 @@ package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
 
+import cats.implicits._
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.renewal.Renewal
-import services.RenewalService
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.summary
 
@@ -34,24 +36,25 @@ class SummaryController @Inject()
 (
   val dataCacheConnector: DataCacheConnector,
   val authConnector: AuthConnector,
-  val renewalService: RenewalService
+  val renewalService: RenewalService,
+  val progressService: ProgressService
 ) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-
         dataCacheConnector.fetchAll flatMap {
           optionalCache =>
             (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              renewal <- cache.getEntry[Renewal](Renewal.key)
+              cache <- OptionT.fromOption[Future](optionalCache)
+              businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+              renewal <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
+              renewalSection <- OptionT.liftF(renewalService.getSection)
             } yield {
-              Future.successful(Ok(summary(renewal, businessMatching.activities, businessMatching.msbServices)))
-            }) getOrElse {
-              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-            }
+              val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
+              val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
+              Ok(summary(renewal, businessMatching.activities, businessMatching.msbServices, canSubmit))
+            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }
 }

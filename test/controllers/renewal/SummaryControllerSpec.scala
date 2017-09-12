@@ -19,13 +19,15 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.registrationprogress.{Completed, Section}
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.RenewalService
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -43,12 +45,22 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
+    lazy val mockProgressService = mock[ProgressService]
 
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService,
+      progressService = mockProgressService
     )
+
+    when {
+      mockProgressService.sections(any())
+    } thenReturn Seq.empty[Section]
+
+    when {
+      mockRenewalService.getSection(any(),any(),any())
+    } thenReturn Future.successful(Section("", Completed, false, mock[Call]))
 
   }
 
