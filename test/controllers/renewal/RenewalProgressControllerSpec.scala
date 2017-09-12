@@ -18,28 +18,25 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.ReadStatusResponse
-import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section}
-import models.responsiblepeople._
-import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview}
+import models.registrationprogress._
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
