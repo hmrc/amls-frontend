@@ -48,6 +48,8 @@ object ContactType {
 
   case object Others extends ContactType
 
+  case object NoSubject extends ContactType
+
   implicit val jsonReads: Reads[ContactType] =
     Reads {
       case JsString("REJR") => JsSuccess(RejectionReasons)
@@ -112,6 +114,7 @@ object ContactType {
         case "RegistrationVariationApproval" => ContactType.RegistrationVariationApproval
         case "ApplicationAutorejectionForFailureToPay" => ContactType.ApplicationAutorejectionForFailureToPay
         case "DeRegistrationEffectiveDateChange" => ContactType.DeRegistrationEffectiveDateChange
+        case "NoSubject" => ContactType.NoSubject
         case _ => throw new RuntimeException("No correct contact type")
       }
     }

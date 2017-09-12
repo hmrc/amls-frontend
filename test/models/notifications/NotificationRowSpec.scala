@@ -16,6 +16,7 @@
 
 package models.notifications
 
+import models.notifications.ContactType.NoSubject
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -285,7 +286,7 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
 
     }
 
-    "throw an error when ContactType not determined" in {
+    "return NoSubject when ContactType not determined" in {
       val model = NotificationRow(
         Some(
           Status(
@@ -300,9 +301,8 @@ class NotificationRowSpec extends PlaySpec with GenericTestHelper {
         new IDType("5832e38e01000001005ca3ff"
         ))
 
-      intercept[RuntimeException] {
-        model.getContactType
-      }
+      model.getContactType mustBe NoSubject
+      model.subject mustBe "notifications.subject.NoSubject"
 
     }
   }
