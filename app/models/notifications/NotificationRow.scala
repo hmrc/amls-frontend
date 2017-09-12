@@ -51,7 +51,7 @@ case class NotificationRow(
         case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
         case (_, Some(_), _) => ApplicationAutorejectionForFailureToPay
         case (_, _, true) => RegistrationVariationApproval
-        case _ => throw new RuntimeException("No matching ContactType found for id " + _id)
+        case _ => NoSubject
       }
     )
 
