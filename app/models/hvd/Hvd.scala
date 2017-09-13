@@ -17,6 +17,7 @@
 package models.hvd
 
 
+import config.ApplicationConfig
 import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.Logger
@@ -32,7 +33,8 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 receiveCashPayments: Option[ReceiveCashPayments] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
                 dateOfChange: Option[DateOfChange] = None,
-                hasChanged: Boolean = false) {
+                hasChanged: Boolean = false,
+                hasAccepted: Boolean = false) {
 
   def cashPayment(p: CashPayment): Hvd =
     this.copy(cashPayment = Some(p), hasChanged = hasChanged || !this.cashPayment.contains(p))
@@ -60,11 +62,20 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
   def isComplete: Boolean = {
     Logger.debug(s"[Hvd][isComplete] $this")
-    this match {
-      case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_),_, _)
-        if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-      case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _,_) => true
-      case _ => false
+    if (ApplicationConfig.hasAcceptedToggle) {
+      this match {
+        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _, _, true)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
+        case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) => true
+        case _ => false
+      }
+    } else {
+      this match {
+        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _, _, _)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
+        case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
+        case _ => false
+      }
     }
   }
 }
@@ -99,7 +110,8 @@ object Hvd {
         (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "dateOfChange").readNullable[DateOfChange] and
-        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}
       ) apply Hvd.apply _
   }
 
