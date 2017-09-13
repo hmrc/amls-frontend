@@ -19,6 +19,8 @@
 @import models.moneyservicebusiness._
 @import models.businessmatching._
 @import models.Country
+@import forms.EmptyForm
+@import config.ApplicationConfig
 
 @(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -202,11 +204,17 @@
         }
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @if(ApplicationConfig.hasAcceptedToggle) {
+        @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
+        }
+    } else {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcomplete")
+        )
+    }
 }
 
 @whoUsesCurrencies(wc: WhichCurrencies) = {

@@ -40,37 +40,37 @@ case class MoneyServiceBusiness(
                                ) {
 
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
-    this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p), hasAccepted = false)
+    this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p), hasAccepted = this.throughput.contains(p))
 
   def whichCurrencies(p: WhichCurrencies): MoneyServiceBusiness =
-    this.copy(whichCurrencies = Some(p), hasChanged = hasChanged || !this.whichCurrencies.contains(p), hasAccepted = false)
+    this.copy(whichCurrencies = Some(p), hasChanged = hasChanged || !this.whichCurrencies.contains(p), hasAccepted = this.whichCurrencies.contains(p))
 
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
-    this.copy(businessUseAnIPSP = Some(p), hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p), hasAccepted = false)
+    this.copy(businessUseAnIPSP = Some(p), hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p), hasAccepted = this.businessUseAnIPSP.contains(p))
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
-    this.copy(identifyLinkedTransactions = Some(p), hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p), hasAccepted = false)
+    this.copy(identifyLinkedTransactions = Some(p), hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p), hasAccepted = this.identifyLinkedTransactions.contains(p))
 
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
-    this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p), hasAccepted = false)
+    this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p), hasAccepted = this.fundsTransfer.contains(p))
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
-    this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p), hasAccepted = false)
+    this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p), hasAccepted = this.branchesOrAgents.contains(p))
 
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
-    this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p), hasAccepted = false)
+    this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p), hasAccepted = this.sendMoneyToOtherCountry.contains(p))
 
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
-    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p), hasAccepted = false)
+    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p), hasAccepted = this.sendTheLargestAmountsOfMoney.contains(p))
 
   def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
-    this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p), hasAccepted = false)
+    this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p), hasAccepted = this.mostTransactions.contains(p))
 
   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p), hasAccepted = false)
+    this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p), hasAccepted = this.transactionsInNext12Months.contains(p))
 
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = false)
+    this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = this.ceTransactionsInNext12Months.contains(p))
 
   private def allComplete: Boolean =
     this.throughput.isDefined &&
