@@ -86,32 +86,33 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       document.select(".amls-error-summary").size mustBe 0
     }
 
-
-    "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      val result = controller.post(50)(newRequest)
-      status(result) must be(NOT_FOUND)
-    }
-
     "respond with NOT_FOUND" when {
-      "there is no data at all at that index" in new Fixture {
+
+      "the index is out of bounds" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01"
+        )
+
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get(1, false)(request)
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
+        val result = controller.post(50)(newRequest)
         status(result) must be(NOT_FOUND)
       }
+
+      "there is no data at all at that index" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(NOT_FOUND)
+        }
+
     }
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
@@ -127,121 +128,250 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
     }
 
-    "return a redirect to the 'How much Throughput' page on valid submission" in new Fixture {
+    "redirect to PremisesRegisteredController" when {
 
-      val model = TradingPremises(
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney)
-        ))
-      )
+      "on valid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01"
-      )
+        val model = TradingPremises(
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
 
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01"
+        )
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
-      val result = controller.post(1, edit = false)(newRequest)
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
+        val result = controller.post(1, edit = false)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
+      }
+
     }
 
-    "return a redirect to the 'detailed answers' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
+    "redirect to Detailed Answers" when {
 
-      val currentModel = TradingPremises(
-        msbServices = Some(MsbServices(
-          Set(ChequeCashingNotScrapMetal)
-        ))
-      )
+      "adding 'Transmitting Money' as a service during edit" in new Fixture {
 
-      val newModel = currentModel.copy(
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
-      )
+        val currentModel = TradingPremises(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01",
-        "msbServices[1]" -> "02",
-        "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04"
-      )
+        val newModel = currentModel.copy(
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
+          ))
+        )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02",
+          "msbServices[2]" -> "03",
+          "msbServices[3]" -> "04"
+        )
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      val result = controller.post(1, edit = true)(newRequest)
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        val result = controller.post(1, edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+      }
+
+      "adding 'CurrencyExchange' as a service during edit" in new Fixture {
+
+        val currentModel = TradingPremises(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newModel = currentModel.copy(
+          msbServices = Some(MsbServices(
+            Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[1]" -> "02",
+          "msbServices[2]" -> "03",
+          "msbServices[3]" -> "04"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1, edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+      }
+
     }
 
-    "return a redirect to the 'detailed answers' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
+    "redirect to Check Your Answers" when {
 
-      val currentModel = TradingPremises(
-        msbServices = Some(MsbServices(
-          Set(ChequeCashingNotScrapMetal)
-        ))
-      )
+      "adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-      val newModel = currentModel.copy(
-        msbServices = Some(MsbServices(
-          Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
-      )
+        Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
+          case (model, id) =>
+            val currentModel = TradingPremises(
+              msbServices = Some(MsbServices(
+                Set(TransmittingMoney, CurrencyExchange)
+              ))
+            )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[1]" -> "02",
-        "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04"
-      )
+            val newRequest = request.withFormUrlEncodedBody(
+              "msbServices[1]" -> "01",
+              "msbServices[2]" -> "02",
+              "msbServices[3]" -> id
+            )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+            when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(msbServices = None)))))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+            when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(1, edit = true)(newRequest)
+            val result = controller.post(1, edit = true)(newRequest)
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        }
+      }
+
     }
 
-    "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
+    "redirect to the dateOfChange page" when {
 
-      Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
-        case (model, id) =>
-          val currentModel = TradingPremises(
-            msbServices = Some(MsbServices(
-              Set(TransmittingMoney, CurrencyExchange)
-            ))
-          )
+      "services have changed for a variation" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "msbServices[1]" -> "01",
-            "msbServices[2]" -> "02",
-            "msbServices[3]" -> id
-          )
+        val model = TradingPremises(
+          lineId = Some(1),
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(msbServices = None)))))
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02"
+        )
 
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val result = controller.post(1, edit = true)(newRequest)
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1, edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
+      }
+
+      "the services have changed for a ready for renewal status" in new Fixture {
+
+        val model = TradingPremises(
+          lineId = Some(1),
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02"
+        )
+
+        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
+
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1, edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
+      }
+
+      "the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
+
+        val model = TradingPremises(
+          lineId = Some(1),
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01"
+        )
+
+        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1, edit = true, changed = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
+      }
+
+    }
+
+    "redirect to the SummaryController" when {
+      "editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
+
+        val model = TradingPremises(
+          lineId = None,                    // record hasn't been submitted
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02"
+        )
+
+        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1, edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
       }
     }
 
@@ -270,120 +400,6 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           hasChanged = true,
           msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))
         ))))(any(), any(), any())
-    }
-
-    "redirect to the dateOfChange page when the services have changed for a variation" in new Fixture {
-
-      val model = TradingPremises(
-        lineId = Some(1),
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney)
-        ))
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01",
-        "msbServices[1]" -> "02"
-      )
-
-      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
-
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      val result = controller.post(1, edit = true)(newRequest)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
-    }
-
-
-    "redirect to the dateOfChange page when the services have changed for a ready for renewal status" in new Fixture {
-
-      val model = TradingPremises(
-        lineId = Some(1),
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney)
-        ))
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01",
-        "msbServices[1]" -> "02"
-      )
-
-      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
-
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      val result = controller.post(1, edit = true)(newRequest)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
-    }
-
-
-    "redirect to the dateOfChange page when the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
-
-      val model = TradingPremises(
-        lineId = Some(1),
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney)
-        ))
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01"
-      )
-
-      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
-
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      val result = controller.post(1, edit = true, changed = true)(newRequest)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
-    }
-
-
-    "redirect to the summary controller when editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
-
-      val model = TradingPremises(
-        lineId = None,                    // record hasn't been submitted
-        msbServices = Some(MsbServices(
-          Set(TransmittingMoney)
-        ))
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "01",
-        "msbServices[1]" -> "02"
-      )
-
-      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
-
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-      val result = controller.post(1, edit = true)(newRequest)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
     }
 
   }
