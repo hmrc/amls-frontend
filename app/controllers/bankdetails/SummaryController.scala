@@ -16,10 +16,12 @@
 
 package controllers.bankdetails
 
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.bankdetails.BankDetails
+import forms.EmptyForm
+import models.bankdetails.{BankAccount, BankDetails}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -42,9 +44,21 @@ trait SummaryController extends BaseController {
             case _ => false
           }
           val bankDetails = data.filterNot(_.status.contains(StatusConstants.Deleted))
-          Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDetails), canEdit, status))
+          Ok(views.html.bankdetails.summary(EmptyForm, data, complete, hasBankAccount(bankDetails), canEdit, status))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      for {
+        bd <- dataCache.fetch[BankDetails](BankDetails.key)
+        _ <- dataCache.save[BankDetails](BankDetails.key,
+          bd.hasAccepted(true)
+        )
+      } yield {
+        Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
