@@ -19,8 +19,9 @@
 @import models.hvd._
 @import models.hvd.PercentageOfCashPaymentOver15000._
 @import utils.DateHelper
+@import config.ApplicationConfig
 
-@(model: Hvd, isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: Hvd, isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.hvd")
@@ -168,9 +169,15 @@
         }
     }
 
-    @anchor(
+    @*@anchor(
         attrHref = controllers.routes.RegistrationProgressController.get().toString,
         attrRole = true,
         linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    )*@
+
+    @form(f, controllers.bankdetails.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+    }
+
+
 }
