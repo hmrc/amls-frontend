@@ -35,7 +35,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false)
+  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false, "hasAccepted" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "00-00-00"))
@@ -46,10 +46,12 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     "accountNumber" -> "111111",
     "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
-    "refreshedFromServer" -> false)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> false)
+
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "00-00-00"))
 
-  val completeModel = BankDetails(Some(accountType), Some(bankAccount))
+  val completeModel = BankDetails(Some(accountType), Some(bankAccount), hasAccepted = true)
   val incompleteModel = BankDetails(Some(accountType), None)
   val completeJson = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
@@ -58,8 +60,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
-    "refreshedFromServer" -> false)
-  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
+  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true, hasAccepted = true)
   val completeJsonChanged = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
     "bankAccount" -> Json.obj("accountName" -> "My Account",
@@ -67,7 +70,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
     "hasChanged" -> true,
-    "refreshedFromServer" -> false)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
 
 
   "BankDetails with complete model" must {

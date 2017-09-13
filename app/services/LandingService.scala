@@ -169,7 +169,7 @@ trait LandingService {
     val empty = Seq.empty[BankDetails]
     bankDetailsSeq match {
       case `empty` => {
-        Seq(BankDetails(None, None, false, true, None))
+        Seq(BankDetails(None, None, false, true, None, true))
       }
       case _ => bankDetailsSeq
     }
