@@ -142,7 +142,7 @@ trait LandingService {
                   _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
                     _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
                       _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
-                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection) flatMap {
+                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))) flatMap {
                           _ => cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))) flatMap {
                             _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
                               _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {

@@ -17,6 +17,8 @@
 @import include._
 @import forms2._
 @import models.tcsp._
+@import forms.EmptyForm
+@import config.ApplicationConfig
 
 @(model: Tcsp)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -102,9 +104,15 @@
         }</p>
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @if(ApplicationConfig.hasAcceptedToggle) {
+        @form(EmptyForm, controllers.tcsp.routes.SummaryController.post()) {
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+        }
+    } else {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcomplete")
+        )
+    }
 }
