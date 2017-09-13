@@ -136,7 +136,9 @@ trait MoneyServiceBusinessTestData {
     sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
     mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
-    ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
+    ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+    false,
+    true
   )
 
   val emptyModel = MoneyServiceBusiness(None)
@@ -167,7 +169,8 @@ trait MoneyServiceBusinessTestData {
     "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB"),
     "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

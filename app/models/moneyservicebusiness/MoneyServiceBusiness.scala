@@ -16,7 +16,8 @@
 
 package models.moneyservicebusiness
 
-import models.businessmatching.{CurrencyExchange, TransmittingMoney, BusinessMatching}
+import config.ApplicationConfig
+import models.businessmatching.{BusinessMatching, CurrencyExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,41 +35,42 @@ case class MoneyServiceBusiness(
                                  mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
                                  ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
-                                 hasChanged: Boolean = false
+                                 hasChanged: Boolean = false,
+                                 hasAccepted: Boolean = false
                                ) {
 
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
-    this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p))
+    this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p), hasAccepted = false)
 
   def whichCurrencies(p: WhichCurrencies): MoneyServiceBusiness =
-    this.copy(whichCurrencies = Some(p), hasChanged = hasChanged || !this.whichCurrencies.contains(p))
+    this.copy(whichCurrencies = Some(p), hasChanged = hasChanged || !this.whichCurrencies.contains(p), hasAccepted = false)
 
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
-    this.copy(businessUseAnIPSP = Some(p), hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p))
+    this.copy(businessUseAnIPSP = Some(p), hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p), hasAccepted = false)
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
-    this.copy(identifyLinkedTransactions = Some(p), hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p))
+    this.copy(identifyLinkedTransactions = Some(p), hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p), hasAccepted = false)
 
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
-    this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p))
+    this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p), hasAccepted = false)
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
-    this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p))
+    this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p), hasAccepted = false)
 
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
-    this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p))
+    this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p), hasAccepted = false)
 
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
-    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
+    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p), hasAccepted = false)
 
   def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
-    this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p))
+    this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p), hasAccepted = false)
 
   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p))
+    this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p), hasAccepted = false)
 
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p))
+    this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = false)
 
   private def allComplete: Boolean =
     this.throughput.isDefined &&
@@ -100,8 +102,11 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean): Boolean =
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && this.hasAccepted
+  } else {
     allComplete && mtComplete(mtFlag) && ceComplete(ceFlag)
+  }
 }
 
 object MoneyServiceBusiness {
@@ -141,6 +146,9 @@ object MoneyServiceBusiness {
         (__ \ "transactionsInNext12Months").readNullable[TransactionsInNext12Months] and
         (__ \ "ceTransactionsInNext12Months").readNullable[CETransactionsInNext12Months] and
         (__ \ "hasChanged").readNullable[Boolean].map {
+          _.getOrElse(false)
+        } and
+        (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
       ) apply MoneyServiceBusiness.apply _
