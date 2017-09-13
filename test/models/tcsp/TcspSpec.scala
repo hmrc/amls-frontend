@@ -68,13 +68,14 @@ trait TcspValues {
       "mlrRefNumber" -> "12345678"
     ),
     "hasChanged" -> false,
-    "hasAccepted" -> false
+    "hasAccepted" -> true
   )
 
   val completeModel = Tcsp(
     Some(DefaultValues.DefaultCompanyServiceProviders),
     Some(DefaultValues.DefaultProvidedServices),
-    Some(DefaultValues.DefaultServicesOfAnotherTCSP)
+    Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+    hasAccepted = true
   )
 }
 

@@ -106,7 +106,7 @@
 
     @if(ApplicationConfig.hasAcceptedToggle) {
         @form(EmptyForm, controllers.tcsp.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
         }
     } else {
         @anchor(

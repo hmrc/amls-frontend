@@ -30,13 +30,13 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  hasAccepted:Boolean = false) {
 
   def tcspTypes(trust: TcspTypes): Tcsp =
-    this.copy(tcspTypes = Some(trust), hasChanged = hasChanged || !this.tcspTypes.contains(trust), hasAccepted = false)
+    this.copy(tcspTypes = Some(trust), hasChanged = hasChanged || !this.tcspTypes.contains(trust), hasAccepted = this.tcspTypes.contains(trust))
 
   def providedServices(ps: ProvidedServices): Tcsp =
-    this.copy(providedServices = Some(ps), hasChanged = hasChanged || !this.providedServices.contains(ps), hasAccepted = false)
+    this.copy(providedServices = Some(ps), hasChanged = hasChanged || !this.providedServices.contains(ps), hasAccepted = this.providedServices.contains(ps))
 
   def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
-    this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = false)
+    this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = this.servicesOfAnotherTCSP.contains(p))
 
   def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
     this match {
