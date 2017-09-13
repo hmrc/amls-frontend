@@ -249,12 +249,11 @@ class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues
 
     "isComplete" must {
       "return true if the model is accepted" in {
-        completeModel.copy(hasAccepted = true).isComplete must be(true)
+        completeModel.isComplete must be(true)
       }
-      val initial: Option[Tcsp] = None
 
-      "return false if the model is accepted" in {
-        completeModel.isComplete must be(false)
+      "return false if the model is not accepted" in {
+        completeModel.copy(hasAccepted = false).isComplete must be(false)
       }
     }
 
