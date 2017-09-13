@@ -67,7 +67,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "load the summary page with the correct link text when the section is complete" in new Fixture {
 
-      val model = BankDetails(None, None)
+      val model = BankDetails(None, None, hasAccepted = true)
 
       when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
@@ -77,8 +77,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get(true)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("Confirm and continue")
-      contentAsString(result) mustNot include("Accept and complete section")
+      contentAsString(result) must include("Accept and complete section")
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
@@ -255,6 +254,30 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         }
 
         status(result) must be(OK)
+      }
+
+    }
+  }
+
+  "post is called" must {
+    "respond with OK and redirect to the bank account details page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.dataCache.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
     }

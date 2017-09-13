@@ -16,6 +16,7 @@
 
 package views.bankdetails
 
+import forms.EmptyForm
 import models.bankdetails._
 import models.status._
 import org.jsoup.nodes.Element
@@ -41,20 +42,20 @@ class summarySpec extends GenericTestHelper
     "section is incomplete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
 
         doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
 
         heading.html must be(Messages("title.cya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), false, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
 
         doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
       }
@@ -63,22 +64,22 @@ class summarySpec extends GenericTestHelper
     "section is complete" must {
       "have correct title" in new ViewFixture {
 
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
 
         doc.title must startWith(Messages("title.ya") + " - " + Messages("summary.bankdetails"))
       }
 
       "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
 
         heading.html must be(Messages("title.ya"))
         subHeading.html must include(Messages("summary.bankdetails"))
       }
 
       "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(Seq(BankDetails()), true, true, true, SubmissionReady)
+        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
 
-        doc.getElementsByClass("button").html must include(Messages("button.confirmandcontinue"))
+        doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
       }
     }
   }
@@ -114,7 +115,7 @@ class summarySpec extends GenericTestHelper
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
+        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (_, check) => {
@@ -151,7 +152,7 @@ class summarySpec extends GenericTestHelper
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
+        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -187,7 +188,7 @@ class summarySpec extends GenericTestHelper
       def view = {
         val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("000000000")))))
 
-        views.html.bankdetails.summary(testdata, true, true, true, SubmissionReady)
+        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
 
       forAll(sectionCheckstestUKBankDetails) { (key, check) => {
@@ -227,7 +228,7 @@ class summarySpec extends GenericTestHelper
                   val bankAccount = BankAccount(accountName, uk)
                   val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
 
-                  def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionReadyForReview)
+                  def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReadyForReview)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
@@ -248,7 +249,7 @@ class summarySpec extends GenericTestHelper
                   val bankAccount = BankAccount(accountName, uk)
                   val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
 
-                  def view = views.html.bankdetails.summary(testdata, true, true, true, SubmissionDecisionApproved)
+                  def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionDecisionApproved)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
@@ -274,7 +275,7 @@ class summarySpec extends GenericTestHelper
                   val bankAccount = BankAccount(accountName, uk)
                   val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount), status = Some(StatusConstants.Updated)))
 
-                  def view = views.html.bankdetails.summary(testdata, false, true, true, SubmissionReadyForReview)
+                  def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionReadyForReview)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
@@ -295,7 +296,7 @@ class summarySpec extends GenericTestHelper
                   val bankAccount = BankAccount(accountName, uk)
                   val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount), status = Some(StatusConstants.Updated)))
 
-                  def view = views.html.bankdetails.summary(testdata, false, true, true, SubmissionDecisionApproved)
+                  def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionDecisionApproved)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
