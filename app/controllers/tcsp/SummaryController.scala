@@ -16,31 +16,42 @@
 
 package controllers.tcsp
 
+import cats.implicits._
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.tcsp.Tcsp
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.tcsp.summary
-
-import scala.concurrent.Future
 
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetch[Tcsp](Tcsp.key) map {
-        case Some(data) => Ok(summary(data))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+    implicit authContext =>
+      implicit request =>
+        fetchModel map {
+          case Some(data) => Ok(summary(data))
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
   }
-
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+    implicit authContext =>
+      implicit request =>
+        (for {
+          model <- OptionT(fetchModel)
+          _ <- OptionT.liftF(dataCache.save[Tcsp](Tcsp.key, model.copy(hasAccepted = true)))
+        } yield {
+          Redirect(controllers.routes.RegistrationProgressController.get())
+        }) getOrElse InternalServerError("Cannot update Tcsp")
   }
+
+  private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) = dataCache.fetch[Tcsp](Tcsp.key)
+
 }
 
 object SummaryController extends SummaryController {
