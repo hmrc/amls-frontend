@@ -1743,6 +1743,8 @@ notifications.subject.RegistrationVariationApproval = Registration Variation App
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
 notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
 
+notifications.subject.NoSubject = <no subject>
+
 notifications.header = Your Messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = View your messages
