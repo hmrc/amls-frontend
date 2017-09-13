@@ -194,6 +194,14 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to RegistrationProgressController" when {
       "model has been saved with hasAccepted set to true" in new Fixture {
 
+        when {
+          controller.dataCache.fetch[MoneyServiceBusiness](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(completeModel))
+
+        when {
+          controller.dataCache.save[MoneyServiceBusiness](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(mockCacheMap)
+
         val result = controller.post()(request)
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
