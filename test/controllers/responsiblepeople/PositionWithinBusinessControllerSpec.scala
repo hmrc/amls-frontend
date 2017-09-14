@@ -59,10 +59,15 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
+    val responsiblePerson = ResponsiblePeople(
+      hasAlreadyPassedFitAndProper = Some(true),
+      lineId = Some(1),
+      status = Some("")
+    )
+    val noNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))
+    val hasNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions))
+    val hasNominatedOfficerButDeleted = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions))
 
-    val noNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -425,17 +430,17 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
     "return true" when {
       "this responsible person is the nominated officer" in new Fixture {
 
-        val responsiblePerson = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
+        val rp = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
 
-        controller.displayNominatedOfficer(responsiblePerson, true) mustBe true
+        controller.displayNominatedOfficer(rp, true) mustBe true
 
       }
       "this responsible person is not the nominated" when {
         "hasNominatedOfficer is false" in new Fixture {
 
-          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+          val rp = responsiblePersonWithPositionsGen(None).sample.get
 
-          controller.displayNominatedOfficer(responsiblePerson, false) mustBe true
+          controller.displayNominatedOfficer(rp, false) mustBe true
 
         }
       }
@@ -444,9 +449,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "this responsible person is not the nominated officer" when {
         "hasNominatedOfficer is true" in new Fixture {
 
-          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+          val rp = responsiblePersonWithPositionsGen(None).sample.get
 
-          controller.displayNominatedOfficer(responsiblePerson, true) mustBe false
+          controller.displayNominatedOfficer(rp, true) mustBe false
         }
       }
     }

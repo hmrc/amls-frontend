@@ -51,8 +51,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {rp =>
           Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, flow, ControllerHelper.rpTitleName(rp)))
