@@ -16,9 +16,10 @@
 
 package views.estateagentbusiness
 
+import forms.EmptyForm
 import models.estateagentbusiness._
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -38,14 +39,14 @@ class summarySpec extends GenericTestHelper with MustMatchers  {
   "summary view" must {
     "have correct title" in new TestFixture {
 
-      def view = views.html.estateagentbusiness.summary(validBusiness)
+      def view = views.html.estateagentbusiness.summary(EmptyForm, validBusiness)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.estateagentbusiness"))
     }
 
     "have correct headings" in new TestFixture {
 
-      def view = views.html.estateagentbusiness.summary(validBusiness)
+      def view = views.html.estateagentbusiness.summary(EmptyForm, validBusiness)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.estateagentbusiness"))
@@ -54,7 +55,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  {
 
     "display the results of the form" in new TestFixture {
 
-      def view = views.html.estateagentbusiness.summary(validBusiness)
+      def view = views.html.estateagentbusiness.summary(EmptyForm, validBusiness)
 
       val checkYourAnswersSection = doc.select("section.check-your-answers")
 
@@ -78,7 +79,7 @@ class summarySpec extends GenericTestHelper with MustMatchers  {
 
       val business = validBusiness.copy(services = Some(Services(Set(Commercial))))
 
-      def view = views.html.estateagentbusiness.summary(business)
+      def view = views.html.estateagentbusiness.summary(EmptyForm, business)
 
       val section = doc.select("section.check-your-answers")
 

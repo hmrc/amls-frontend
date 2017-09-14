@@ -19,6 +19,7 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.estateagentbusiness.EstateAgentBusiness
 import views.html.estateagentbusiness._
 
@@ -30,9 +31,21 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         case Some(data) =>
-          Ok(summary(data))
+          Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      for {
+        eab <- dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
+        _ <- dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key,
+          eab.copy(hasAccepted = true)
+        )
+      } yield {
+        Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }
