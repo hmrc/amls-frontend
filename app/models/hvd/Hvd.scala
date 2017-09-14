@@ -37,26 +37,38 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 hasAccepted: Boolean = false) {
 
   def cashPayment(p: CashPayment): Hvd =
-    this.copy(cashPayment = Some(p), hasChanged = hasChanged || !this.cashPayment.contains(p))
+    this.copy(cashPayment = Some(p), hasChanged = hasChanged || !this.cashPayment.contains(p), hasAccepted = hasAccepted && this.cashPayment.contains(p))
 
   def products(p: Products): Hvd =
-    this.copy(products = Some(p), hasChanged = hasChanged || !this.products.contains(p))
+    this.copy(products = Some(p), hasChanged = hasChanged || !this.products.contains(p), hasAccepted = hasAccepted && this.products.contains(p))
 
   def receiveCashPayments(p: ReceiveCashPayments): Hvd =
-    this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p))
+    this.copy(
+      receiveCashPayments = Some(p),
+      hasChanged = hasChanged || !this.receiveCashPayments.contains(p),
+      hasAccepted = hasAccepted && this.receiveCashPayments.contains(p))
 
   def exciseGoods(p: ExciseGoods): Hvd =
-    this.copy(exciseGoods = Some(p), hasChanged = hasChanged || !this.exciseGoods.contains(p))
+    this.copy(exciseGoods = Some(p),
+      hasChanged = hasChanged || !this.exciseGoods.contains(p),
+      hasAccepted = hasAccepted && this.exciseGoods.contains(p))
 
   def linkedCashPayment(p: LinkedCashPayments): Hvd =
-    this.copy(linkedCashPayment = Some(p), hasChanged = hasChanged || !this.linkedCashPayment.contains(p))
+    this.copy(linkedCashPayment = Some(p),
+      hasChanged = hasChanged || !this.linkedCashPayment.contains(p),
+      hasAccepted = hasAccepted && this.linkedCashPayment.contains(p))
 
   def howWillYouSellGoods(p: HowWillYouSellGoods)  : Hvd = {
-    copy(howWillYouSellGoods = Some(p), hasChanged = hasChanged || !this.howWillYouSellGoods.contains(p))
+    copy(howWillYouSellGoods = Some(p),
+      hasChanged = hasChanged || !this.howWillYouSellGoods.contains(p),
+      hasAccepted = hasAccepted && this.howWillYouSellGoods.contains(p))
   }
 
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
-    this.copy(percentageOfCashPaymentOver15000 = Some(v))
+    this.copy(
+      percentageOfCashPaymentOver15000 = Some(v),
+      hasChanged = hasChanged || this.percentageOfCashPaymentOver15000.contains(v),
+      hasAccepted = hasAccepted && this.percentageOfCashPaymentOver15000.contains(v))
 
   def dateOfChange(v: DateOfChange): Hvd = this.copy(dateOfChange = Some(v))
 

@@ -167,5 +167,26 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
         completeModel.copy(hasAccepted = false).isComplete mustBe false
       }
     }
+
+    "a field is changed" must {
+
+      val tests = Seq[(Hvd => Hvd, String)](
+        (_.cashPayment(CashPaymentNo), "cashPayment"),
+        (_.products(Products(Set(ScrapMetals))), "products"),
+        (_.receiveCashPayments(ReceiveCashPayments(Some(PaymentMethods(false, false, None)))), "receiveCashPayments"),
+        (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
+        (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
+        (_.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))), "howWillYouSellGoods"),
+        (_.percentageOfCashPaymentOver15000(PercentageOfCashPaymentOver15000.Second), "percentageOfCashPaymentOver15000")
+      )
+
+      "reset hasAccepted back to false" when {
+        tests foreach { test =>
+          s"${test._2} is changed" in new HvdTestFixture {
+            test._1(completeModel.copy(hasAccepted = true)).hasAccepted mustBe false
+          }
+        }
+      }
+    }
   }
 }
