@@ -87,7 +87,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
   "refreshCache" must {
 
-
     val cacheMap = CacheMap("", Map.empty)
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -146,7 +145,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
   "refreshCache when status is renewalSubmitted" must {
 
-
     val businessActivitiesSection = BusinessActivities(expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
       involvedInOther = Some(BAInvolvedInOtherYes("test")),
       customersOutsideUK = Some(BACustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
@@ -158,7 +156,8 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
       mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
-      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None, None, None))
+      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None, None, None)),
+      hasAccepted = true
     )
     val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
     val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
