@@ -35,29 +35,29 @@ case class AboutTheBusiness(
                            ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness = {
-    this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || !this.previouslyRegistered.contains(v), hasAccepted = this.previouslyRegistered contains v)
+    this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || !this.previouslyRegistered.contains(v), hasAccepted = hasAccepted && this.previouslyRegistered.contains(v))
   }
 
   def activityStartDate(v: ActivityStartDate): AboutTheBusiness =
-    this.copy(activityStartDate = Some(v), hasChanged = hasChanged || !this.activityStartDate.contains(v), hasAccepted = this.activityStartDate contains v)
+    this.copy(activityStartDate = Some(v), hasChanged = hasChanged || !this.activityStartDate.contains(v), hasAccepted = hasAccepted && this.activityStartDate.contains(v))
 
   def vatRegistered(v: VATRegistered): AboutTheBusiness =
-    this.copy(vatRegistered = Some(v), hasChanged = hasChanged || !this.vatRegistered.contains(v), hasAccepted = this.vatRegistered contains v)
+    this.copy(vatRegistered = Some(v), hasChanged = hasChanged || !this.vatRegistered.contains(v), hasAccepted = hasAccepted && this.vatRegistered.contains(v))
 
   def corporationTaxRegistered(c: CorporationTaxRegistered): AboutTheBusiness =
-    this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c), hasAccepted = this.corporationTaxRegistered contains c)
+    this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c), hasAccepted = hasAccepted && this.corporationTaxRegistered.contains(c))
 
   def registeredOffice(v: RegisteredOffice): AboutTheBusiness =
-    this.copy(registeredOffice = Some(v), hasChanged = hasChanged || !this.registeredOffice.contains(v), hasAccepted = this.registeredOffice contains v)
+    this.copy(registeredOffice = Some(v), hasChanged = hasChanged || !this.registeredOffice.contains(v), hasAccepted = hasAccepted && this.registeredOffice.contains(v))
 
   def contactingYou(v: ContactingYou): AboutTheBusiness =
-    this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = this.contactingYou contains v)
+    this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = hasAccepted && this.contactingYou.contains(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
-    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = this.correspondenceAddress contains v)
+    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
 
   def correspondenceAddress(v: Option[CorrespondenceAddress]): AboutTheBusiness =
-    this.copy(correspondenceAddress = v, hasChanged = hasChanged || this.correspondenceAddress != v, hasAccepted = this.correspondenceAddress equals v)
+    this.copy(correspondenceAddress = v, hasChanged = hasChanged || this.correspondenceAddress != v, hasAccepted = hasAccepted && this.correspondenceAddress.equals(v))
 
   def isComplete: Boolean =
     this match {
