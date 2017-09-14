@@ -16,6 +16,8 @@
 
 package controllers.msb
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -45,6 +47,16 @@ trait SummaryController extends BaseController {
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
+
+
+  def post() = Authorised.async{
+    implicit authContext => implicit request =>
+      (for {
+        model <- OptionT(dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key))
+        _ <- OptionT.liftF(dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key, model.copy(hasAccepted = true)))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
+  }
+
 }
 
 object SummaryController extends SummaryController {

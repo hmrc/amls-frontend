@@ -18,19 +18,18 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching.{MoneyServiceBusiness=> BMMoneyServiceBusiness, _}
+import models.businessmatching.{MoneyServiceBusiness => BMMoneyServiceBusiness, _}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -44,10 +43,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
     }
-  }
-  val mockCacheMap = mock[CacheMap]
-
-  "Get" must {
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -67,6 +62,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
     )
+
+  }
+
+  val mockCacheMap = mock[CacheMap]
+
+  "Get" must {
 
     "load the summary page when section data is available" in new Fixture {
 
@@ -186,5 +187,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         }
       }
     }
+  }
+
+  "Post" must {
+
+    "redirect to RegistrationProgressController" when {
+      "model has been saved with hasAccepted set to true" in new Fixture {
+
+        when {
+          controller.dataCache.fetch[MoneyServiceBusiness](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(completeModel))
+
+        when {
+          controller.dataCache.save[MoneyServiceBusiness](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(mockCacheMap)
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+        verify(controller.dataCache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any(),any())
+
+      }
+    }
+
   }
 }
