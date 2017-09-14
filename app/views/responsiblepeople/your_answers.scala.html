@@ -18,6 +18,8 @@
 @import include.forms2._
 @import models.responsiblepeople.ResponsiblePeople
 @import utils.StatusConstants
+@import forms.EmptyForm
+@import config.ApplicationConfig
 
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_],m:Messages)
 
@@ -52,5 +54,15 @@
         }
     </ul>
 
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+    @if(ApplicationConfig.hasAcceptedToggle){
+        @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post()) {
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
+        }
+    } else {
+        @anchor{
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcomplete")
+        }
+    }
 }
