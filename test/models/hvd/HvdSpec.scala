@@ -187,6 +187,14 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
           }
         }
       }
+
+      "leave hasAccepted as false when something has changed and hasAccepted is already false" when {
+        tests foreach { test =>
+          s"${test._2} is changed" in new HvdTestFixture {
+            test._1(completeModel.copy(hasAccepted = false)).hasAccepted mustBe false
+          }
+        }
+      }
     }
   }
 }
