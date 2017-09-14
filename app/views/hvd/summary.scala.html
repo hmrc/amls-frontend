@@ -169,12 +169,6 @@
         }
     }
 
-    @*@anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )*@
-
     @form(f, controllers.bankdetails.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
