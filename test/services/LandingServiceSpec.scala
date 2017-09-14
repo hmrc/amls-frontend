@@ -123,7 +123,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(200)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection)
