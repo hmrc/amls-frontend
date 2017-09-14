@@ -17,8 +17,9 @@
 @import include._
 @import forms2._
 @import models.estateagentbusiness._
+@import config.ApplicationConfig
 
-@(model: EstateAgentBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: EstateAgentBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.estateagentbusiness")
@@ -91,9 +92,15 @@
         }</p>
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @if(ApplicationConfig.hasAcceptedToggle) {
+        @form(f, controllers.estateagentbusiness.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+        }
+    } else {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.checkyouranswers.acceptandcomplete")
+        )
+    }
 }
