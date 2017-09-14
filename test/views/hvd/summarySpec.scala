@@ -16,6 +16,7 @@
 
 package views.hvd
 
+import forms.EmptyForm
 import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd._
 import org.joda.time.LocalDate
@@ -40,15 +41,13 @@ class summarySpec extends GenericTestHelper
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-
-
-      def view = views.html.hvd.summary(Hvd(), true)
+      def view = views.html.hvd.summary(EmptyForm, Hvd(), true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.hvd.summary(Hvd(), true)
+      def view = views.html.hvd.summary(EmptyForm, Hvd(), true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -92,7 +91,7 @@ class summarySpec extends GenericTestHelper
           linkedCashPayment = Some(LinkedCashPayments(true))
         )
 
-        views.html.hvd.summary(testdata, true)
+        views.html.hvd.summary(EmptyForm, testdata, true)
       }
 
       forAll(sectionChecks) { (key, check) => {

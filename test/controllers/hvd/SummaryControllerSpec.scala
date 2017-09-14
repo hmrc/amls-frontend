@@ -21,32 +21,39 @@ import models.hvd._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import utils.AuthorisedFixture
+import org.mockito.ArgumentCaptor
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
+
+    implicit val authContext = mock[AuthContext]
+    implicit val headerCarrier = HeaderCarrier()
 
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService: StatusService = mock[StatusService]
     }
-  }
 
-  "Get" must {
-
-    val day=15
+    val day = 15
     val month = 2
     val year = 1956
 
@@ -56,8 +63,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       Some(HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))),
       Some(PercentageOfCashPaymentOver15000.Fifth),
       Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))))),
-        Some(LinkedCashPayments(true))
+      Some(LinkedCashPayments(true))
     )
+  }
+
+  "Get" must {
 
     "load the summary page when section data is available" in new Fixture {
 
@@ -70,7 +80,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("summary.checkyouranswers.title"))
+      contentAsString(result) must include(Messages("summary.checkyouranswers.title"))
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
@@ -120,10 +130,33 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         val elements = document.getElementsByTag("section").iterator
-        while(elements.hasNext){
+        while (elements.hasNext) {
           elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
         }
       }
+    }
+  }
+
+  "POST" must {
+    "update the hasAccepted flag on the model" in new Fixture {
+      val cache = mock[CacheMap]
+
+      when {
+        controller.dataCache.fetch[Hvd](any())(any(), any(), any())
+      } thenReturn Future.successful(Some(completeModel.copy(hasAccepted = false)))
+
+      when {
+        controller.dataCache.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+      } thenReturn Future.successful(cache)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+
+      val captor = ArgumentCaptor.forClass(classOf[Hvd])
+      verify(controller.dataCache).save[Hvd](eqTo(Hvd.key), captor.capture())(any(), any(), any())
+      captor.getValue.hasAccepted mustBe true
     }
   }
 }
