@@ -29,10 +29,10 @@ case class Asp(
               ) {
 
   def services(p: ServicesOfBusiness): Asp =
-    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p), hasAccepted = hasAccepted && this.services.contains(p))
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
-    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p))
+    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p), hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
     case Asp(Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
