@@ -156,6 +156,7 @@ GET         /estate-agents/redress-scheme                                       
 POST        /estate-agents/redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
 GET         /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.get()
+GET         /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.post()
 
 GET         /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.post()
