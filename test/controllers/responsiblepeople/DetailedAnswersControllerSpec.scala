@@ -22,13 +22,14 @@ import models.responsiblepeople.{BeneficialOwner, PersonName, Positions, Respons
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -39,21 +40,24 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     self => val request = addToken(authRequest)
 
     val controller = new DetailedAnswersController {
-      override val dataCache = mock[DataCacheConnector]
+      override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
     }
-    when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+
+    val model = ResponsiblePeople(None, None)
+
+    when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(Seq(model))))
+
+    when(controller.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
   }
 
   "DetailedAnswersController" when {
 
     "get is called - from the yourAnswers controller" must {
       "respond with OK and show the detailed answers page with a 'confirm and continue' link to the YourAnswersController" in new Fixture {
-
-        val model = ResponsiblePeople(None, None)
-        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
 
         val result = controller.get(1, true)(request)
         status(result) must be(OK)
@@ -67,14 +71,18 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "load yourAnswers page when the status is approved" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
-      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+
+      override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1, true)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
       val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
@@ -82,14 +90,18 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "load yourAnswers page when the status is renewal submitted" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
-      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+
+      override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(RenewalSubmitted(None)))
 
       val result = controller.get(1, true)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
       val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
@@ -97,14 +109,18 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "load yourAnswers page when the status is approved and has no lineId" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), None, lineId = None)
-      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+
+      override val model = ResponsiblePeople(Some(personName), None, lineId = None)
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1, true)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
       val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(false)
@@ -112,14 +128,18 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     "load yourAnswers page when the status is ready for renewal" in new Fixture {
       val personName = PersonName("first name", None, "last name", None, None)
-      val model = ResponsiblePeople(Some(personName), lineId = Some(121212))
-      when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+
+      override val model = ResponsiblePeople(Some(personName), lineId = Some(121212))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(ReadyForRenewal(None)))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(ReadyForRenewal(None)))
 
       val result = controller.get(1, true)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
       val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
@@ -128,8 +148,9 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     "get is called - NOT from the yourAnswers controller" must {
       "respond with OK and show the detailed answers page with a 'confirm and continue' link to the YourAnswersController" in new Fixture {
 
-        val model = ResponsiblePeople(None, None)
-        when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        override val model = ResponsiblePeople(None, None)
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
 
         val result = controller.get(1, false)(request)
@@ -146,10 +167,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
       "section data is available" must {
         "respond with OK and show the detailed answers page with the correct title" in new Fixture {
 
-          val model = ResponsiblePeople(None, None)
-          when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(model))))
-
           val result = controller.get(1, false)(request)
           status(result) must be(OK)
 
@@ -161,8 +178,9 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
           private val testStartDate = new LocalDate(1999,1,1)
 
-          val model = ResponsiblePeople(positions = Some(Positions(Set(BeneficialOwner),Some(testStartDate))))
-          when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          override val model = ResponsiblePeople(positions = Some(Positions(Set(BeneficialOwner),Some(testStartDate))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(model))))
 
           val result = controller.get(1, false)(request)
@@ -175,7 +193,7 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
       "respond with SEE_OTHER and show the registration progress page" when {
         "section data is unavailable" in new Fixture {
-          when(controller.dataCache.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
             (any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get(1, false)(request)
           status(result) must be(SEE_OTHER)
@@ -184,12 +202,29 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
       }
     }
+
+    "post is called" must {
+      "redirect to RegistrationProgressController" when {
+        "hasAccepted has been updated" in new Fixture {
+
+          when {
+            controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          val result = controller.post(1)(request)
+
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+          verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+        }
+      }
+    }
   }
 
   it must {
     "use the correct services" in new Fixture {
       DetailedAnswersController.authConnector must be(AMLSAuthConnector)
-      DetailedAnswersController.dataCache must be(DataCacheConnector)
+      DetailedAnswersController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }
