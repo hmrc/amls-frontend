@@ -136,9 +136,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
 
-      whenReady(TestLandingService.refreshCache("regNo")){
-        _ mustEqual cacheMap
-      }
+      await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
     }
 
   }
@@ -163,7 +161,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
 
     val hvdSection  = Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-    receiveCashPayments = Some(ReceiveCashPayments(Some(paymentMethods))))
+    receiveCashPayments = Some(ReceiveCashPayments(Some(paymentMethods))), hasAccepted = true)
 
     val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
