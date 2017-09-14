@@ -166,7 +166,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Started)
         }
       }
-      
+
       "has a completed model, an empty one and an incomplete one" when {
         "return the correct index" in {
           val mockCacheMap = mock[CacheMap]

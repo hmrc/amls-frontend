@@ -55,7 +55,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
         Form2[Positions](request.body) match {
@@ -90,7 +89,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
               }
             }
-          }.recoverWith {
+          } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
