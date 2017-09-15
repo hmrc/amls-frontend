@@ -391,7 +391,7 @@
 
     }
 
-    if(ApplicationConfig.hasAcceptedToggle) {
+    @if(ApplicationConfig.hasAcceptedToggle) {
         @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, fromYourAnswers, flow)) {
             @submit(false, Some(Messages("button.confirmandcontinue")), false)
         }

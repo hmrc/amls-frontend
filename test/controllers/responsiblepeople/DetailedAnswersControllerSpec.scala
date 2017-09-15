@@ -57,14 +57,13 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
   "DetailedAnswersController" when {
 
     "get is called - from the yourAnswers controller" must {
-      "respond with OK and show the detailed answers page with a 'confirm and continue' link to the YourAnswersController" in new Fixture {
+      "respond with OK and show the detailed answers page with a 'confirm and continue'" in new Fixture {
 
         val result = controller.get(1, true)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
-        contentAsString(result) must include("/anti-money-laundering/responsible-people/your-answers")
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/check-your-answers"
       }
     }
@@ -146,7 +145,7 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "get is called - NOT from the yourAnswers controller" must {
-      "respond with OK and show the detailed answers page with a 'confirm and continue' link to the YourAnswersController" in new Fixture {
+      "respond with OK and show the detailed answers page with a 'confirm and continue'" in new Fixture {
 
         override val model = ResponsiblePeople(None, None)
 
@@ -159,7 +158,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
         val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/your-answers"
-        contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
     }
 
