@@ -123,7 +123,7 @@
 
     @if(ApplicationConfig.hasAcceptedToggle) {
         @form(f, controllers.aboutthebusiness.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")))
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
         }
     } else {
         @anchor(

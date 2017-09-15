@@ -21,10 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails._
-import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future

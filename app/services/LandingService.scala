@@ -169,9 +169,13 @@ trait LandingService {
     val empty = Seq.empty[BankDetails]
     bankDetailsSeq match {
       case `empty` => {
-        Seq(BankDetails(None, None, false, true, None, true))
+        Seq(BankDetails(None, None, false, true, None, false))
       }
-      case _ => bankDetailsSeq
+      case _ => {
+        bankDetailsSeq map {
+          bank => bank.copy(hasAccepted = true)
+        }
+      }
     }
   }
 
