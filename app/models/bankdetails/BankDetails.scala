@@ -17,12 +17,13 @@
 package models.bankdetails
 
 import config.ApplicationConfig
-import models.asp.Asp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logger
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
+
+import scala.concurrent.Future
 
 case class BankDetails(
                         bankAccountType: Option[BankAccountType] = None,
@@ -35,29 +36,36 @@ case class BankDetails(
 
   def bankAccountType(v: Option[BankAccountType]): BankDetails = {
     v match {
-      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty)
-      case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v))
+      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty,
+        hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
+      case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
+        hasAccepted = hasAccepted && this.bankAccountType.equals(v))
     }
   }
 
   def bankAccount(value: Option[BankAccount]): BankDetails = {
-    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value))
+    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
+      hasAccepted = hasAccepted && this.bankAccount != value)
   }
 
-  def hasAccepted(value: Boolean): BankDetails = {
-    this.copy(hasAccepted = value, hasChanged = hasChanged || (this.hasAccepted != value))
-  }
-
-
-  def isComplete: Boolean =
+  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
     this match {
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, true) if ApplicationConfig.hasAcceptedToggle => true
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, false) if ApplicationConfig.hasAcceptedToggle => false
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, true) => true
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, false) => false
+      case BankDetails(Some(_), Some(_), _, _, status, true) => true
+      case BankDetails(Some(_), Some(_), _, _, status, false) => false
+      case BankDetails(None, None, _, _, _, true) => true
+      case BankDetails(None, None, _, _, _, false) => false
+      case _ => false
+    }
+  } else {
+    this match {
       case BankDetails(Some(NoBankAccountUsed), None, _, _, _, _) => true
       case BankDetails(Some(_), Some(_), _, _, status, _) => true
       case BankDetails(None, None, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
+  }
 }
 
 object BankDetails {

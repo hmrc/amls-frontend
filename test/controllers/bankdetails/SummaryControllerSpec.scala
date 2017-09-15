@@ -77,7 +77,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val result = controller.get(true)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("Accept and complete section")
+      contentAsString(result) must include("Confirm and continue")
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
