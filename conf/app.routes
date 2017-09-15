@@ -198,7 +198,6 @@ GET         /bank-details/account-details/:index                                
 POST        /bank-details/account-details/:index                                      controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/your-answers                                                controllers.bankdetails.SummaryController.get(complete: Boolean = true)
-POST        /bank-details/your-answers                                                controllers.bankdetails.SummaryController.post()
 
 GET         /bank-details/check-your-answers                                          controllers.bankdetails.SummaryController.get(complete: Boolean = false)
 POST        /bank-details/check-your-answers                                          controllers.bankdetails.SummaryController.post()

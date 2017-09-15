@@ -79,7 +79,7 @@ class summarySpec extends GenericTestHelper
       "have correct button text" in new ViewFixture {
         def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
 
-        doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
+        doc.getElementsByClass("button").html must include(Messages("button.confirmandcontinue"))
       }
     }
   }
