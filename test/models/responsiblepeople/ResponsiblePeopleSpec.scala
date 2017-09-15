@@ -41,14 +41,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     }
 
     "deserialise old format json successfully" when {
-      "given complete json" when {
-        "residence and passport type is in old format for a UK responsible person" in {
-          CompleteJsonPastUk.as[ResponsiblePeople] must be(completeModelUkResident)
-        }
-        "residence and passport type is in old format for a non-uk responsible person" in {
-          CompleteJsonPastNonUk.as[ResponsiblePeople] must be(completeModelNonUkResidentNonUkPassport)
-        }
-      }
       "given incomplete json" when {
         incompleteJsonPastUk.as[ResponsiblePeople] must be(
           ResponsiblePeople(Some(DefaultValues.personName))
