@@ -23,8 +23,6 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
-import scala.concurrent.Future
-
 case class BankDetails(
                         bankAccountType: Option[BankAccountType] = None,
                         bankAccount: Option[BankAccount] = None,
@@ -38,14 +36,16 @@ case class BankDetails(
     v match {
       case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty,
         hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
-      case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
-        hasAccepted = hasAccepted && this.bankAccountType.equals(v))
+      case _ => {
+        this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
+          hasAccepted = hasAccepted && this.bankAccountType.equals(v))
+      }
     }
   }
 
   def bankAccount(value: Option[BankAccount]): BankDetails = {
     this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
-      hasAccepted = hasAccepted && this.bankAccount != value)
+      hasAccepted = hasAccepted && this.bankAccount == value)
   }
 
   def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {

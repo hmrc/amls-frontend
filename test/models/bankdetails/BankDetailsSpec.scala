@@ -229,7 +229,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
           .thenReturn(Some(Seq(completeModel, BankDetails(), incompleteModel)))
 
-        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(3).url)
+        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(2).url)
       }
     }
     
