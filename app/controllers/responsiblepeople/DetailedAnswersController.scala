@@ -55,12 +55,15 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
         }
     }
 
-  def post(index: Int) = Authorised.async{
+  def post(index: Int, fromYourAnswers: Boolean, flow: Option[String] = None) = Authorised.async{
     implicit authContext => implicit request =>
       updateDataStrict[ResponsiblePeople](index){ rp =>
         rp.copy(hasAccepted = true)
       } map { _ =>
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        Redirect((fromYourAnswers, flow) match {
+          case (true, None) => controllers.responsiblepeople.routes.YourAnswersController.get()
+          case _ => controllers.responsiblepeople.routes.SummaryController.get(flow)
+        })
       }
   }
 

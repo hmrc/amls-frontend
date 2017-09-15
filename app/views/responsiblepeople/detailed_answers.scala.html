@@ -19,6 +19,8 @@
 @import models.responsiblepeople._
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
+@import forms.EmptyForm
+@import config.ApplicationConfig
 
 @(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -27,7 +29,7 @@
     editUrl: String = "",
     dataItem: Option[T]
 )(content: T => Html)(implicit lang: Lang) = {
-<section class="check-your-answers">
+    <section class="check-your-answers">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
     <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
     @dataItem match {
@@ -389,21 +391,26 @@
 
     }
 
-    @(fromYourAnswers, flow) match {
-        case (true, None) => {
-            @anchor(
-                attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
-                attrRole = true,
-                linkText = Messages("button.confirmandcontinue")
-            )
+    if(ApplicationConfig.hasAcceptedToggle) {
+        @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, fromYourAnswers, flow)) {
+            @submit(false, Some(Messages("button.confirmandcontinue")), false)
         }
-        case (_,_) => {
-            @anchor(
-                attrHref = controllers.responsiblepeople.routes.SummaryController.get(flow).toString,
-                attrRole = true,
-                linkText = Messages("button.confirmandcontinue")
-            )
+    } else {
+        @(fromYourAnswers, flow) match {
+            case (true, None) => {
+                @anchor(
+                    attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
+                    attrRole = true,
+                    linkText = Messages("button.confirmandcontinue")
+                )
+            }
+            case (_,_) => {
+                @anchor(
+                    attrHref = controllers.responsiblepeople.routes.SummaryController.get(flow).toString,
+                    attrRole = true,
+                    linkText = Messages("button.confirmandcontinue")
+                )
+            }
         }
     }
-
 }

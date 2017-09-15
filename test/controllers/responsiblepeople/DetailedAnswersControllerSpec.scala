@@ -204,18 +204,39 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "post is called" must {
-      "redirect to RegistrationProgressController" when {
-        "hasAccepted has been updated" in new Fixture {
+      "redirect to YourAnswersController" when {
+        "fromYourAnswers is true and flow is not defined" which {
+          "updates hasAccepted" in new Fixture {
 
-          when {
-            controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+            when {
+              controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+            } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          val result = controller.post(1)(request)
+            val result = controller.post(1, true, None)(request)
 
-          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
 
-          verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+            verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+          }
+        }
+      }
+      "redirect to SummaryController" when {
+        "for any other case" which {
+          "updates hasAccepted" in new Fixture {
+
+            val flow = None
+
+            when {
+              controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+            } thenReturn Future.successful(CacheMap("", Map.empty))
+
+            val result = controller.post(1, false, flow)(request)
+
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get(flow).url))
+
+            verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+
+          }
         }
       }
     }
