@@ -500,6 +500,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(training),
     Some(true),
     false,
+    false,
     Some(1),
     Some("test")
   )
@@ -518,6 +519,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(training),
     Some(true),
     false,
+    false,
     Some(1),
     Some("test")
   )
@@ -535,6 +537,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(experienceTraining),
     Some(training),
     Some(true),
+    false,
     false,
     Some(1),
     Some("test")

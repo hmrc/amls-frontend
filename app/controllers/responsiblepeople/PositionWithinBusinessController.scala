@@ -31,8 +31,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext =>
         implicit request =>
           dataCacheConnector.fetchAll map { optionalCache =>
@@ -44,9 +43,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               val data = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
 
               getResponsiblePersonFromData(data,index) match {
-                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _, _))
+                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, Some(positions), _, _, _, _, _, _, _, _, _, _, _))
                 => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
-                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+                case Some(rp@ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
                 => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
                 case _
                 => NotFound(notFoundView)
@@ -56,7 +55,6 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
         Form2[Positions](request.body) match {
@@ -91,7 +89,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
               }
             }
-          }.recoverWith {
+          } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }

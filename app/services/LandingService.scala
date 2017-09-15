@@ -141,12 +141,12 @@ trait LandingService {
                 _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
                   _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
                     _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
-                      _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
-                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))) flatMap {
-                          _ => cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))) flatMap {
-                            _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))) flatMap {
-                              _ => cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))) flatMap {
-                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
+                      _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))) flatMap {
+                        _ => cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))) flatMap {
+                          _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))) flatMap {
+                            _ => cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))) flatMap {
+                              _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection) flatMap {
+                                _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection)) flatMap {
                                   cacheMap => saveRenewalData(viewResponse, cacheMap)
                                 }
                               }
@@ -164,6 +164,9 @@ trait LandingService {
       }
     }
   }
+
+  def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
+    viewResponse.map(seq => seq.map(rp => rp.copy(hasAccepted = true)))
 
   def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]

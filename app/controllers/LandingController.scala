@@ -146,7 +146,6 @@ trait LandingController extends BaseController {
 
   }
 
-
   private def dataHasChanged(cacheMap: CacheMap) = {
     Seq(
       cacheMap.getEntry[Asp](Asp.key).fold(false) {

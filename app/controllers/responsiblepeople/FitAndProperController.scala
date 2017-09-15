@@ -32,13 +32,12 @@ trait FitAndProperController extends RepeatingSection with BaseController {
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-      Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_))
               => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
               => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
             case _
               => NotFound(notFoundView)
