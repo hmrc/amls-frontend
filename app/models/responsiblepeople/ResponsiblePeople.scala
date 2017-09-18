@@ -214,15 +214,70 @@ object ResponsiblePeople {
     override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
+  def ifPersonResidenceType[A](oldreader: Reads[Option[A]]): Reads[Option[A]] = {
+    (__ \ "personResidenceType").readNullable[JsObject] flatMap {
+      case Some(_) => oldreader
+      case _ => constant[Option[A]](None)
+    }
+  }
+
   implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
+
+  def oldNonUkPassportReader: Reads[Option[NonUKPassport]] = {
+    val ppReader: Reads[Option[NonUKPassport]] = (__ \ "personResidenceType" \ "nonUKPassportNumber").readNullable[String] map {
+      case Some(p) => Some(NonUKPassportYes(p))
+      case _ => Some(NoPassport)
+    }
+
+    ifPersonResidenceType(ppReader)
+  }
+
+  val nonUkPassportReader: Reads[Option[NonUKPassport]] = {
+    (__ \ "nonUKPassport").readNullable[NonUKPassport] flatMap {
+      case None => oldNonUkPassportReader
+      case p => constant(p)
+    }
+  }
+
+  def oldUkPassportReader: Reads[Option[UKPassport]] = {
+    val oppReader: Reads[Option[UKPassport]] = (__ \ "personResidenceType" \ "ukPassportNumber").readNullable[String] map {
+      case Some(p) => Some(UKPassportYes(p))
+      case _ => Some(UKPassportNo)
+    }
+
+    ifPersonResidenceType(oppReader)
+  }
+
+  val UkPassportReader: Reads[Option[UKPassport]] = {
+    (__ \ "ukPassport").readNullable[UKPassport] flatMap {
+      case None => oldUkPassportReader
+      case p => constant(p)
+    }
+  }
+
+  def oldDateOfBirthReader: Reads[Option[DateOfBirth]] = {
+    val dobReader = (__ \ "personResidenceType" \ "dateOfBirth").readNullable[LocalDate] map {
+      case Some(p) => Some(DateOfBirth(p))
+      case _ => None
+    }
+
+    ifPersonResidenceType(dobReader)
+  }
+
+  val UkDateOfBirthReader: Reads[Option[DateOfBirth]] = {
+    (__ \ "dateOfBirth").readNullable[DateOfBirth] flatMap {
+      case None => oldDateOfBirthReader
+      case p => constant(p)
+    }
+  }
 
   implicit val reads: Reads[ResponsiblePeople] = {
     (
       (__ \ "personName").readNullable[PersonName] and
         (__ \ "personResidenceType").readNullable[PersonResidenceType] and
-        (__ \ "ukPassport").readNullable[UKPassport] and
-        (__ \ "nonUKPassport").readNullable[NonUKPassport] and
-        (__ \ "dateOfBirth").readNullable[DateOfBirth] and
+        __.read(UkPassportReader) and
+        __.read(nonUkPassportReader) and
+        __.read(UkDateOfBirthReader) and
         (__ \ "contactDetails").readNullable[ContactDetails] and
         (__ \ "addressHistory").readNullable[ResponsiblePersonAddressHistory] and
         (__ \ "positions").readNullable[Positions] and
