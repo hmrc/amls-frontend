@@ -19,7 +19,7 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness.EstateAgentBusiness
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
@@ -38,6 +38,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val model = EstateAgentBusiness(None, None)
   }
 
   "Get" must {
@@ -48,8 +50,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "load the summary page when section data is available" in new Fixture {
-
-      val model = EstateAgentBusiness(None, None)
 
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -78,9 +78,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[EstateAgentBusiness](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[EstateAgentBusiness](any(), any())(any(), any(), any()))
+        when(controller.dataCache.save[EstateAgentBusiness](meq(EstateAgentBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
