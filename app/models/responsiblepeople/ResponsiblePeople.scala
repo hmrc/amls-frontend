@@ -189,9 +189,18 @@ object ResponsiblePeople {
 
   }
 
+  def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePeople]): Option[(ResponsiblePeople, Int)] = {
+    responsiblePeople.zipWithIndex.filter {
+      case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
+    } find {
+      case (p, _) => p.personName.fold(false)(_.fullNameWithoutSpace equals name)
+    }
+  }
+
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
+  val flowSummary = "summary"
   val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"
 

@@ -16,12 +16,13 @@
 
 package controllers.responsiblepeople
 
+import cats.implicits._
+import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.{BaseController, declaration}
 import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
-import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
+import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration, flowSummary}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -38,7 +39,7 @@ trait SummaryController extends BaseController {
 
   def get(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+      fetchModel map {
         case Some(data) =>
           val hasNonUKResident = ControllerHelper.hasNonUkResident(Some(data))
           Ok(check_your_answers(data, flow, hasNonUKResident))
@@ -52,6 +53,13 @@ trait SummaryController extends BaseController {
         case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
         case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
+        case Some(`flowSummary`) => {
+          (for {
+            model <- OptionT(fetchModel)
+            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model map (_.copy(hasAccepted = true))))
+          } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update ResponsiblePeople")
+        }
+        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
     }
 
@@ -84,6 +92,9 @@ trait SummaryController extends BaseController {
       case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
     }
   }
+
+  private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
+    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
 }
 
 object SummaryController extends SummaryController {
