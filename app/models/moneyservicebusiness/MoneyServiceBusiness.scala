@@ -87,8 +87,7 @@ case class MoneyServiceBusiness(
             this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(true)) &&
               this.sendTheLargestAmountsOfMoney.isDefined &&
               this.mostTransactions.isDefined
-            ) ||
-            this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(false))
+            ) || this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(false))
           )
     } else {
       true
@@ -96,8 +95,7 @@ case class MoneyServiceBusiness(
 
   private def ceComplete(ceFlag: Boolean): Boolean =
     if (ceFlag) {
-      this.ceTransactionsInNext12Months.isDefined &&
-        this.whichCurrencies.isDefined
+      this.ceTransactionsInNext12Months.isDefined && this.whichCurrencies.isDefined
     } else {
       true
     }
