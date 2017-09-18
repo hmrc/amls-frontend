@@ -50,6 +50,7 @@ trait SummaryController extends BaseController {
       _ <- OptionT.liftF(dataCache.save[Hvd](Hvd.key, hvd.copy(hasAccepted = true)))
     } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
   }
+
 }
 
 object SummaryController extends SummaryController {
