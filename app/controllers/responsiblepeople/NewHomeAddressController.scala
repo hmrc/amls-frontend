@@ -37,12 +37,11 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
-  def get(index: Int) =
-    Authorised.async {
+  def get(index: Int) = Authorised.async {
       implicit authContext =>
         implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(new_home_address(Form2(DefaultAddressHistory), index, personName.titleName))
             case _
             => NotFound(notFoundView)

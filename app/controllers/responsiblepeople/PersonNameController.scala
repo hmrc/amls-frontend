@@ -32,14 +32,13 @@ trait PersonNameController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(person_name(Form2[PersonName](name), edit, index, flow))
-          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(person_name(EmptyForm, edit, index, flow))
           case _
           => NotFound(notFoundView)

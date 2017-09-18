@@ -30,13 +30,12 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(Form2[ContactDetails](name), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }

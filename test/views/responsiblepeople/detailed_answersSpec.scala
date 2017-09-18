@@ -17,9 +17,9 @@
 package views.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
-import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
+import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
@@ -32,46 +32,13 @@ import views.{Fixture, HtmlAssertions}
 import scala.collection.JavaConversions._
 
 class detailed_answersSpec extends GenericTestHelper
-  with MustMatchers
   with TableDrivenPropertyChecks
   with HtmlAssertions
-  with NinoUtil {
+  with MustMatchers
+  with ResponsiblePeopleValues {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-  }
-
-  "summary view" must {
-
-    val nino = nextNino
-
-    "have correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
-
-      doc.title must startWith(Messages("responsiblepeople.detailed_answers.title") + " - " + Messages("summary.responsiblepeople"))
-    }
-
-    "have correct headings" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
-
-      heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
-      subHeading.html must include(Messages("summary.responsiblepeople"))
-    }
-
-    val previousName = PreviousName(
-      Some("firstName"),
-      Some("middleName"),
-      Some("lastName"),
-      new LocalDate(1990, 2, 24)
-    )
-
-    val personName = PersonName(
-      "firstName",
-      Some("middleName"),
-      "lastName",
-      Some(previousName),
-      Some("otherName")
-    )
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
@@ -98,74 +65,22 @@ class detailed_answersSpec extends GenericTestHelper
       (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
     )
 
-    val residenceType = PersonResidenceType(
-      UKResidence(nino),
-      Some(Country("Uganda", "UG")),
-      Some(Country("United Kingdom", "GB"))
-    )
+  }
 
-    val personAddress1 = PersonAddressUK(
-      "addressLine1",
-      "addressLine2",
-      Some("addressLine3"),
-      Some("addressLine4"),
-      "postCode1"
-    )
-    val personAddress2 = PersonAddressUK(
-      "addressLine5",
-      "addressLine6",
-      Some("addressLine7"),
-      Some("addressLine8"),
-      "postCode2"
-    )
-    val personAddress3 = PersonAddressUK(
-      "addressLine9",
-      "addressLine10",
-      Some("addressLine11"),
-      Some("addressLine12"),
-      "postCode3"
-    )
+  "summary view" must {
 
-    val currentAddress = ResponsiblePersonCurrentAddress(
-      personAddress = personAddress1,
-      timeAtAddress = Some(ZeroToFiveMonths),
-      dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
-    )
+    "have correct title" in new ViewFixture {
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
 
-    val additionalAddress = ResponsiblePersonAddress(
-      personAddress = personAddress2,
-      timeAtAddress = Some(SixToElevenMonths)
-    )
+      doc.title must startWith(Messages("responsiblepeople.detailed_answers.title") + " - " + Messages("summary.responsiblepeople"))
+    }
 
-    val additionalExtraAddress = ResponsiblePersonAddress(
-      personAddress = personAddress3,
-      timeAtAddress = Some(OneToThreeYears)
-    )
+    "have correct headings" in new ViewFixture {
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
 
-    val addressHistory = ResponsiblePersonAddressHistory(
-      currentAddress = Some(currentAddress),
-      additionalAddress = Some(additionalAddress),
-      additionalExtraAddress = Some(additionalExtraAddress)
-    )
-
-    val positions = Positions(
-      positions = Set(BeneficialOwner, NominatedOfficer),
-      startDate = Some(new LocalDate(1990, 2, 24))
-    )
-
-    val responsiblePeopleModel = ResponsiblePeople(
-      personName = Some(personName),
-      personResidenceType = Some(residenceType),
-      contactDetails = Some(ContactDetails("098765", "e@mail.com")),
-      addressHistory = Some(addressHistory),
-      positions = Some(positions),
-      vatRegistered = Some(VATRegisteredNo),
-      saRegistered = Some(SaRegisteredYes("sa")),
-      experienceTraining = Some(ExperienceTrainingYes("experience")),
-      training = Some(TrainingYes("training")),
-      hasAlreadyPassedFitAndProper = Some(true),
-      soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
-    )
+      heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
+      subHeading.html must include(Messages("summary.responsiblepeople"))
+    }
 
     "include the provided data" when {
 
@@ -205,7 +120,7 @@ class detailed_answersSpec extends GenericTestHelper
           )
         )
 
-        val sectionChecks = Table[String, Element => Boolean](
+        override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
           (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
           (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
@@ -248,7 +163,7 @@ class detailed_answersSpec extends GenericTestHelper
           nonUKPassport = Some(NonUKPassportYes("0000000000"))
         )
 
-        val sectionChecks = Table[String, Element => Boolean](
+        override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
           (Messages("responsiblepeople.person.a.resident.heading", personName.fullName), checkElementTextIncludes(_, "No")),
           (Messages("responsiblepeople.non.uk.passport.heading", personName.fullName), checkElementTextIncludes(_, "0000000000"))
@@ -282,7 +197,7 @@ class detailed_answersSpec extends GenericTestHelper
           ukPassport = Some(UKPassportYes("0000000000"))
         )
 
-        val sectionChecks = Table[String, Element => Boolean](
+        override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
           (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
           (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "Passport Number: 0000000000")))
@@ -316,7 +231,7 @@ class detailed_answersSpec extends GenericTestHelper
           nonUKPassport = Some(NoPassport)
         )
 
-        val sectionChecks = Table[String, Element => Boolean](
+        override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
           (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
           (Messages("responsiblepeople.detailed_answers.non.uk.passport", personName.fullName), checkElementTextIncludes(_, "No"))
@@ -341,10 +256,8 @@ class detailed_answersSpec extends GenericTestHelper
 
     }
 
-    "display address on separate lines" in new Fixture {
-      def view = {
-        views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(addressHistory = Some(addressHistory))), 1, true)
-      }
+    "display address on separate lines" in new ViewFixture {
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(addressHistory = Some(addressHistory))), 1, true)
 
       def checkElementHasAttribute(el: Element, keys: String*) = {
         val t = el.text()
@@ -354,8 +267,7 @@ class detailed_answersSpec extends GenericTestHelper
         el.getElementsByTag("ul").first().hasClass("list--comma")
       }
 
-
-      val sectionChecks = Table[String, Element => Boolean](
+      override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
         (Messages("responsiblepeople.detailed_answers.address"), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
         (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementHasAttribute(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
@@ -373,13 +285,11 @@ class detailed_answersSpec extends GenericTestHelper
       }
     }
 
-    "display timeAtAddress for corresponding addresses" in new Fixture {
+    "display timeAtAddress for corresponding addresses" in new ViewFixture {
 
       val responsiblePeople = ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))
 
-      def view = {
-        views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, true, false, personName.fullName)
-      }
+      def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, true, false, personName.fullName)
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
 
@@ -389,12 +299,12 @@ class detailed_answersSpec extends GenericTestHelper
 
     }
 
-    "have the correct href" in new Fixture {
+    "have the correct href" in new ViewFixture {
       def view = {
         views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
       }
 
-      val sectionChecks = Table[String, Element => Boolean](
+      override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
         (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "/anti-money-laundering/responsible-people/moved-address/1"))
       )
@@ -417,5 +327,96 @@ class detailed_answersSpec extends GenericTestHelper
       }
       }
     }
+
   }
+}
+
+trait ResponsiblePeopleValues extends NinoUtil {
+
+  val nino = nextNino
+
+  val previousName = PreviousName(
+    Some("firstName"),
+    Some("middleName"),
+    Some("lastName"),
+    new LocalDate(1990, 2, 24)
+  )
+
+  val personName = PersonName(
+    "firstName",
+    Some("middleName"),
+    "lastName",
+    Some(previousName),
+    Some("otherName")
+  )
+
+  val residenceType = PersonResidenceType(
+    UKResidence(nino),
+    Some(Country("Uganda", "UG")),
+    Some(Country("United Kingdom", "GB"))
+  )
+
+  val personAddress1 = PersonAddressUK(
+    "addressLine1",
+    "addressLine2",
+    Some("addressLine3"),
+    Some("addressLine4"),
+    "postCode1"
+  )
+  val personAddress2 = PersonAddressUK(
+    "addressLine5",
+    "addressLine6",
+    Some("addressLine7"),
+    Some("addressLine8"),
+    "postCode2"
+  )
+  val personAddress3 = PersonAddressUK(
+    "addressLine9",
+    "addressLine10",
+    Some("addressLine11"),
+    Some("addressLine12"),
+    "postCode3"
+  )
+
+  val currentAddress = ResponsiblePersonCurrentAddress(
+    personAddress = personAddress1,
+    timeAtAddress = Some(ZeroToFiveMonths),
+    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+  )
+
+  val additionalAddress = ResponsiblePersonAddress(
+    personAddress = personAddress2,
+    timeAtAddress = Some(SixToElevenMonths)
+  )
+
+  val additionalExtraAddress = ResponsiblePersonAddress(
+    personAddress = personAddress3,
+    timeAtAddress = Some(OneToThreeYears)
+  )
+
+  val addressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(currentAddress),
+    additionalAddress = Some(additionalAddress),
+    additionalExtraAddress = Some(additionalExtraAddress)
+  )
+
+  val positions = Positions(
+    positions = Set(BeneficialOwner, NominatedOfficer),
+    startDate = Some(new LocalDate(1990, 2, 24))
+  )
+
+  val responsiblePeopleModel = ResponsiblePeople(
+    personName = Some(personName),
+    personResidenceType = Some(residenceType),
+    contactDetails = Some(ContactDetails("098765", "e@mail.com")),
+    addressHistory = Some(addressHistory),
+    positions = Some(positions),
+    vatRegistered = Some(VATRegisteredNo),
+    saRegistered = Some(SaRegisteredYes("sa")),
+    experienceTraining = Some(ExperienceTrainingYes("experience")),
+    training = Some(TrainingYes("training")),
+    hasAlreadyPassedFitAndProper = Some(true),
+    soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
+  )
+
 }

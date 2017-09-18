@@ -35,8 +35,7 @@ import scala.concurrent.Future
 
 class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector)
-  extends RepeatingSection with BaseController {
+                                       val authConnector: AuthConnector) extends RepeatingSection with BaseController {
 
 
   def get(index: Int) = Authorised.async {

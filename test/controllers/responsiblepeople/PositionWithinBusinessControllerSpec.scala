@@ -59,10 +59,14 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
+    val responsiblePerson = ResponsiblePeople(
+      hasAlreadyPassedFitAndProper = Some(true),
+      lineId = Some(1)
+    )
+    val noNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))
+    val hasNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions))
+    val hasNominatedOfficerButDeleted = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions), status = Some(StatusConstants.Deleted))
 
-    val noNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.noNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficerButDeleted = ResponsiblePeople(None, None, None, None, None, None, None, Some(DefaultValues.hasNominatedOfficerPositions), None, None, None, None, Some(true), false, Some(1), Some(StatusConstants.Deleted))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -274,81 +278,92 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       }
 
       "when edit is false" must {
-        "redirect to the sole proprietor another business Controller when Nominated Officer is selected" in new Fixture {
+        "redirect to the sole proprietor another business Controller" when {
+          "Nominated Officer is selected" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "positions" -> "04",
-            "startDate.day" -> "24",
-            "startDate.month" -> "2",
-            "startDate.year" -> "1990")
+            val newRequest = request.withFormUrlEncodedBody(
+              "positions" -> "04",
+              "startDate.day" -> "24",
+              "startDate.month" -> "2",
+              "startDate.year" -> "1990")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
-          val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[CacheMap]
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-          val result = controller.post(RecordId)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
+            val result = controller.post(RecordId)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
+          }
+
+          "another position is selected in addition to the nomindated Officer" in new Fixture {
+
+            val positions = Positions(Set(Director, NominatedOfficer), startDate)
+            val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "positions" -> "06",
+              "positions" -> "01",
+              "startDate.day" -> "24",
+              "startDate.month" -> "2",
+              "startDate.year" -> "1990"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            val mockCacheMap = mock[CacheMap]
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post(RecordId)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
+
+          }
+
         }
 
-        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected" in new Fixture {
+        "redirect to the AreTheyNominatedOfficerController" when {
 
-          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-            "startDate.day" -> "24",
-            "startDate.month" -> "2",
-            "startDate.year" -> "1990")
+          "Nominated Officer is NOT selected" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-          val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+              "startDate.day" -> "24",
+              "startDate.month" -> "2",
+              "startDate.year" -> "1990")
 
-          val result = controller.post(RecordId)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-        }
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            val mockCacheMap = mock[CacheMap]
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected and status is Deleted" in new Fixture {
+            val result = controller.post(RecordId)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+          }
 
-          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-            "startDate.day" -> "24",
-            "startDate.month" -> "2",
-            "startDate.year" -> "1990")
+          "Nominated Officer is NOT selected and status is Deleted" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficerButDeleted))))
-          val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            val mockCacheMap = mock[CacheMap]
 
-          val result = controller.post(RecordId)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-        }
+            val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+              "startDate.day" -> "24",
+              "startDate.month" -> "2",
+              "startDate.year" -> "1990"
+            )
 
-        "redirect to sole proprietor another business controller when another position is selected in addition to the nomindated Officer" in new Fixture {
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(hasNominatedOfficerButDeleted))))
 
-          val positions = Positions(Set(Director, NominatedOfficer), startDate)
-          val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "positions" -> "06",
-            "positions" -> "01",
-            "startDate.day" -> "24",
-            "startDate.month" -> "2",
-            "startDate.year" -> "1990"
-          )
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-          val result = controller.post(RecordId)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
+            val result = controller.post(RecordId)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+          }
 
         }
       }
@@ -390,7 +405,6 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
         }
       }
 
-
     }
   }
 
@@ -425,17 +439,17 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
     "return true" when {
       "this responsible person is the nominated officer" in new Fixture {
 
-        val responsiblePerson = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
+        val rp = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
 
-        controller.displayNominatedOfficer(responsiblePerson, true) mustBe true
+        controller.displayNominatedOfficer(rp, true) mustBe true
 
       }
       "this responsible person is not the nominated" when {
         "hasNominatedOfficer is false" in new Fixture {
 
-          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+          val rp = responsiblePersonWithPositionsGen(None).sample.get
 
-          controller.displayNominatedOfficer(responsiblePerson, false) mustBe true
+          controller.displayNominatedOfficer(rp, false) mustBe true
 
         }
       }
@@ -444,9 +458,9 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
       "this responsible person is not the nominated officer" when {
         "hasNominatedOfficer is true" in new Fixture {
 
-          val responsiblePerson = responsiblePersonWithPositionsGen(None).sample.get
+          val rp = responsiblePersonWithPositionsGen(None).sample.get
 
-          controller.displayNominatedOfficer(responsiblePerson, true) mustBe false
+          controller.displayNominatedOfficer(rp, true) mustBe false
         }
       }
     }

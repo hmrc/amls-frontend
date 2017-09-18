@@ -16,15 +16,15 @@
 
 package models.responsiblepeople
 
+import config.ApplicationConfig
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.Logger
 import play.api.libs.json.Reads
 import typeclasses.MongoKey
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-import cats.implicits.none
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 
 import scala.collection.Seq
 
@@ -42,6 +42,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              training: Option[Training] = None,
                              hasAlreadyPassedFitAndProper: Option[Boolean] = None,
                              hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false,
                              lineId: Option[Int] = None,
                              status: Option[String] = None,
                              endDate:Option[ResponsiblePersonEndDate] = None,
@@ -49,52 +50,52 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                             ) {
 
   def personName(p: PersonName): ResponsiblePeople =
-    this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p))
+    this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p), hasAccepted = hasAccepted && this.personName.contains(p))
 
   def personResidenceType(p: PersonResidenceType): ResponsiblePeople =
-    this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p))
+    this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p), hasAccepted = hasAccepted && this.personResidenceType.contains(p))
 
   def personResidenceType(p: Option[PersonResidenceType]): ResponsiblePeople =
-    this.copy(personResidenceType = p, hasChanged = hasChanged || this.personResidenceType != p)
+    this.copy(personResidenceType = p, hasChanged = hasChanged || this.personResidenceType != p, hasAccepted = hasAccepted && this.personResidenceType.equals(p))
 
   def contactDetails(p: ContactDetails): ResponsiblePeople =
-    this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p))
+    this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p), hasAccepted = hasAccepted && this.contactDetails.contains(p))
 
   def saRegistered(p: SaRegistered): ResponsiblePeople =
-    this.copy(saRegistered = Some(p), hasChanged = hasChanged || !this.saRegistered.contains(p))
+    this.copy(saRegistered = Some(p), hasChanged = hasChanged || !this.saRegistered.contains(p), hasAccepted = hasAccepted && this.saRegistered.contains(p))
 
   def addressHistory(p: ResponsiblePersonAddressHistory): ResponsiblePeople =
-    this.copy(addressHistory = Some(p), hasChanged = hasChanged || !this.addressHistory.contains(p))
+    this.copy(addressHistory = Some(p), hasChanged = hasChanged || !this.addressHistory.contains(p), hasAccepted = hasAccepted && this.addressHistory.contains(p))
 
   def positions(p: Positions): ResponsiblePeople =
-    this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p))
+    this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p), hasAccepted = hasAccepted && this.positions.contains(p))
 
   def soleProprietorOfAnotherBusiness(p: SoleProprietorOfAnotherBusiness): ResponsiblePeople =
-    this.copy(soleProprietorOfAnotherBusiness = Some(p), hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p))
+    this.copy(soleProprietorOfAnotherBusiness = Some(p), hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p), hasAccepted = hasAccepted && this.soleProprietorOfAnotherBusiness.contains(p))
 
   def vatRegistered(p: VATRegistered): ResponsiblePeople =
-    this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p))
+    this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p), hasAccepted = hasAccepted && this.vatRegistered.contains(p))
 
   def experienceTraining(p: ExperienceTraining): ResponsiblePeople =
-    this.copy(experienceTraining = Some(p), hasChanged = hasChanged || !this.experienceTraining.contains(p))
+    this.copy(experienceTraining = Some(p), hasChanged = hasChanged || !this.experienceTraining.contains(p), hasAccepted = hasAccepted && this.experienceTraining.contains(p))
 
   def training(p: Training): ResponsiblePeople =
-    this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p))
+    this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p), hasAccepted = hasAccepted && this.training.contains(p))
 
   def hasAlreadyPassedFitAndProper(p: Boolean): ResponsiblePeople =
-    this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p))
+    this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p), hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.contains(p))
 
   def ukPassport(p: UKPassport): ResponsiblePeople =
-    this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p))
+    this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p), hasAccepted = hasAccepted && this.ukPassport.contains(p))
 
   def nonUKPassport(p: NonUKPassport): ResponsiblePeople =
-    this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p))
+    this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p), hasAccepted = hasAccepted && this.nonUKPassport.contains(p))
 
   def dateOfBirth(p: DateOfBirth): ResponsiblePeople =
-    this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p))
+    this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p), hasAccepted = hasAccepted && this.dateOfBirth.contains(p))
 
   def status(p: String): ResponsiblePeople =
-    this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
+    this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p), hasAccepted = hasAccepted && this.status.contains(p))
 
   def checkVatField(otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]): Boolean = {
     otherBusinessSP.fold(true) { x =>
@@ -108,11 +109,23 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
-    this match {
-      case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
-      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, None) => true
-      case _ => false
+    if(ApplicationConfig.hasAcceptedToggle) {
+      this match {
+        case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, true, _, _, _, otherBusinessSP)
+          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
+        case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, false, _, _, _, otherBusinessSP)
+          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => false
+        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, true, _, _, _, None) => true
+        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, false, _, _, _, None) => false
+        case _ => false
+      }
+    } else {
+      this match {
+        case ResponsiblePeople(Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, _, _, _, _, otherBusinessSP)
+          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
+        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, None) => true
+        case _ => false
+      }
     }
 
   }
@@ -267,6 +280,9 @@ object ResponsiblePeople {
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
         } and
+        (__ \ "hasAccepted").readNullable[Boolean].map {
+          _.getOrElse(false)
+        } and
         (__ \ "lineId").readNullable[Int] and
         (__ \ "status").readNullable[String] and
         (__ \ "endDate").readNullable[ResponsiblePersonEndDate] and
@@ -276,9 +292,11 @@ object ResponsiblePeople {
 
         if (hasUkPassportNumber(r)) {
           r.copy(nonUKPassport = None)
-        } else if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasDateOfBirth(r)) {
-          r.copy(ukPassport = None, nonUKPassport = None)
-        } else r
+        } else {
+          if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasDateOfBirth(r)) {
+            r.copy(ukPassport = None, nonUKPassport = None)
+          } else {r}
+        }
       }
   }
 
