@@ -69,7 +69,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "post is called" must {
-    "respond with OK and redirect to the bank account details page" when {
+    "redirect to the bank account details page" when {
 
       "all questions are complete" in new Fixture {
 
@@ -78,7 +78,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[EstateAgentBusiness](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(EstateAgentBusiness())))
 
         when(controller.dataCache.save[EstateAgentBusiness](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
