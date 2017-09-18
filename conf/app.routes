@@ -244,6 +244,7 @@ GET         /business-activities/tax-matters                                    
 POST        /business-activities/tax-matters                                          controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
 
 GET         /business-activities/check-your-answers                                   controllers.businessactivities.SummaryController.get()
+GET         /business-activities/check-your-answers                                   controllers.businessactivities.SummaryController.post()
 
 GET         /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
 POST        /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.post()

@@ -16,11 +16,12 @@
 
 package views.businessactivities
 
+import forms.EmptyForm
 import models.businessactivities._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
 
@@ -39,14 +40,14 @@ class summarySpec extends GenericTestHelper
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessactivities.summary(BusinessActivities(), None, true)
+      def view = views.html.businessactivities.summary(EmptyForm, BusinessActivities(), None, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessactivities"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.businessactivities.summary(BusinessActivities(), None, true)
+      def view = views.html.businessactivities.summary(EmptyForm, BusinessActivities(), None, true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -75,6 +76,7 @@ class summarySpec extends GenericTestHelper
     "include the provided data" in new ViewFixture {
 
       def view = views.html.businessactivities.summary(
+        EmptyForm,
         BusinessActivities(
           Some(InvolvedInOtherYes("OtherActivities")),
           Some(ExpectedBusinessTurnover.First),
