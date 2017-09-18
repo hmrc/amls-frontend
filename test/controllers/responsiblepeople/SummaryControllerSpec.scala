@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration, flowSummary}
+import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -27,11 +27,10 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import utils.GenericTestHelper
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -109,28 +108,20 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to 'registration progress page'" when {
-      "'flow flag set to Some('flowSummary')" which {
+      "'flow flag is not defined" which {
         "will update hasAccepted flag" in new Fixture {
 
           when {
             controller.dataCacheConnector.save(any(),any())(any(),any(),any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          val result = controller.post(Some(flowSummary))(request)
+          val result = controller.post()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
 
         }
-      }
-      "'flow flag set to None'" in new Fixture {
-        val result = controller.post(None)(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
-
-        verifyZeroInteractions(controller.dataCacheConnector)
-
       }
     }
 
