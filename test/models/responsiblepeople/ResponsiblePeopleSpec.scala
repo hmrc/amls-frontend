@@ -19,13 +19,14 @@ package models.responsiblepeople
 import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started}
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
@@ -594,6 +595,56 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
   }
+}
+
+class ResponsiblePeopleWithoutHasAcceptedSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> false))
+
+  "Successfully validate if the model is complete" when {
+
+    "the model is fully complete" in {
+      completeModelNonUkResidentNonUkPassport.isComplete must be(true)
+    }
+
+    "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
+      completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
+    }
+
+    "the model partially complete with vat registration model is empty" in {
+      completeModelNonUkResidentNonUkPassport.copy(vatRegistered = None).isComplete must be(false)
+    }
+
+    "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
+      completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+        vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
+    }
+
+    "the model is not complete" in {
+      val initial = ResponsiblePeople(Some(DefaultValues.personName))
+      initial.isComplete must be(false)
+    }
+
+    "the model is has no data" in {
+      val initial = ResponsiblePeople()
+      initial.isComplete must be(true)
+    }
+
+  }
+
+  "the section" when {
+    "consists of a complete model followed by an empty one" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport, ResponsiblePeople())))
+
+        ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+      }
+    }
+  }
+
 }
 
 trait ResponsiblePeopleValues extends NinoUtil {

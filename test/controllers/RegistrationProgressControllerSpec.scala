@@ -457,6 +457,30 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
         }
       }
     }
+    "post is called" must {
+      "redirect to the url provided by progressService" in new Fixture {
+
+        val call = controllers.routes.RegistrationProgressController.get()
+
+        when {
+          controller.progressService.getSubmitRedirect(any(),any(),any())
+        } thenReturn Future.successful(Some(call))
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) must be(Some(call.url))
+      }
+      "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
+
+        when {
+          controller.progressService.getSubmitRedirect(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.post()(request)
+
+        status(result) must be(INTERNAL_SERVER_ERROR)
+      }
+    }
   }
 
 }
