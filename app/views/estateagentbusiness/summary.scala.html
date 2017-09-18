@@ -92,15 +92,9 @@
         }</p>
     }
 
-    @if(ApplicationConfig.hasAcceptedToggle) {
-        @form(f, controllers.estateagentbusiness.routes.SummaryController.post()) {
+
+    @form(f, controllers.estateagentbusiness.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
-        }
-    } else {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.checkyouranswers.acceptandcomplete")
-        )
     }
+
 }
