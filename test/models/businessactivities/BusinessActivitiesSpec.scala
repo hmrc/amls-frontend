@@ -18,10 +18,13 @@ package models.businessactivities
 
 import models.Country
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
+import play.api.test.FakeApplication
 
-class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
+class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
   val DefaultSoftwareName = "DEFAULT SOFTWARE"
@@ -78,7 +81,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
-    hasChanged = false
+    hasChanged = false,
+    hasAccepted = true
   )
   val completeModelWithoutCustUK = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
@@ -94,7 +98,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
-    hasChanged = false
+    hasChanged = false,
+    hasAccepted = true
   )
 
   val completeJson = Json.obj(
@@ -125,7 +130,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "accountantsAddressPostCode" -> "POSTCODE",
     "manageYourTaxAffairs" -> false,
     "hasWrittenGuidance" -> true,
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 
   val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
@@ -169,7 +175,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     val partialJson = Json.obj(
       "businessFranchise" -> true,
       "franchiseName" -> DefaultFranchiseName,
-      "hasChanged" -> false
+      "hasChanged" -> false,
+      "hasAccepted" -> false
     )
 
     "Serialise as expected" in {

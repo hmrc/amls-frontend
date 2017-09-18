@@ -16,6 +16,7 @@
 
 package models.businessactivities
 
+import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -33,58 +34,84 @@ case class BusinessActivities(
                                howManyEmployees: Option[HowManyEmployees] = None,
                                whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
                                taxMatters: Option[TaxMatters] = None,
-                               hasChanged: Boolean = false
+                               hasChanged: Boolean = false,
+                               hasAccepted: Boolean = false
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
-    this.copy(businessFranchise = Some(p), hasChanged = hasChanged || !this.businessFranchise.contains(p))
+    this.copy(businessFranchise = Some(p), hasChanged = hasChanged || !this.businessFranchise.contains(p),
+      hasAccepted = hasAccepted && this.businessFranchise.contains(p))
 
   def expectedAMLSTurnover(p: ExpectedAMLSTurnover): BusinessActivities =
-    this.copy(expectedAMLSTurnover = Some(p), hasChanged = hasChanged || !this.expectedAMLSTurnover.contains(p))
+    this.copy(expectedAMLSTurnover = Some(p), hasChanged = hasChanged || !this.expectedAMLSTurnover.contains(p),
+      hasAccepted = hasAccepted && this.expectedAMLSTurnover.contains(p))
 
   def expectedBusinessTurnover(p: ExpectedBusinessTurnover): BusinessActivities =
-    this.copy(expectedBusinessTurnover = Some(p), hasChanged = hasChanged || !this.expectedBusinessTurnover.contains(p))
+    this.copy(expectedBusinessTurnover = Some(p), hasChanged = hasChanged || !this.expectedBusinessTurnover.contains(p),
+      hasAccepted = hasAccepted && this.expectedBusinessTurnover.contains(p))
 
   def involvedInOther(p: InvolvedInOther): BusinessActivities =
-    this.copy(involvedInOther = Some(p), hasChanged = hasChanged || !this.involvedInOther.contains(p))
+    this.copy(involvedInOther = Some(p), hasChanged = hasChanged || !this.involvedInOther.contains(p),
+      hasAccepted = hasAccepted && this.involvedInOther.contains(p))
 
   def identifySuspiciousActivity(p: IdentifySuspiciousActivity): BusinessActivities =
-    this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p))
+    this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p),
+      hasAccepted = hasAccepted && this.identifySuspiciousActivity.contains(p))
 
   def transactionRecord(p: TransactionRecord): BusinessActivities =
-    this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p))
+    this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p),
+      hasAccepted = hasAccepted && this.transactionRecord.contains(p))
 
   def customersOutsideUK(p: CustomersOutsideUK): BusinessActivities =
-    this.copy(customersOutsideUK = Some(p), hasChanged = hasChanged || !this.customersOutsideUK.contains(p))
+    this.copy(customersOutsideUK = Some(p), hasChanged = hasChanged || !this.customersOutsideUK.contains(p),
+      hasAccepted = hasAccepted && this.customersOutsideUK.contains(p))
 
   def ncaRegistered(p: NCARegistered): BusinessActivities =
-    this.copy(ncaRegistered = Some(p), hasChanged = hasChanged || !this.ncaRegistered.contains(p))
+    this.copy(ncaRegistered = Some(p), hasChanged = hasChanged || !this.ncaRegistered.contains(p),
+      hasAccepted = hasAccepted && this.ncaRegistered.contains(p))
 
   def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
-    this.copy(accountantForAMLSRegulations = Some(p), hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p))
+    this.copy(accountantForAMLSRegulations = Some(p), hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p),
+      hasAccepted = hasAccepted && this.accountantForAMLSRegulations.contains(p))
 
   def riskAssessmentPolicy(p: RiskAssessmentPolicy): BusinessActivities =
-    this.copy(riskAssessmentPolicy = Some(p), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p))
+    this.copy(riskAssessmentPolicy = Some(p), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p),
+      hasAccepted = hasAccepted && this.riskAssessmentPolicy.contains(p))
 
   def howManyEmployees(p: HowManyEmployees): BusinessActivities =
-    this.copy(howManyEmployees = Some(p), hasChanged = hasChanged || !this.howManyEmployees.contains(p))
+    this.copy(howManyEmployees = Some(p), hasChanged = hasChanged || !this.howManyEmployees.contains(p),
+      hasAccepted = hasAccepted && this.howManyEmployees.contains(p))
 
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
-    this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p))
+    this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p),
+      hasAccepted = hasAccepted && this.whoIsYourAccountant.contains(p))
 
   def taxMatters(p: TaxMatters): BusinessActivities =
-    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p))
+    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p),
+      hasAccepted = hasAccepted && this.taxMatters.contains(p))
 
 
   def isComplete: Boolean = {
-    this match {
-      case BusinessActivities(
-      Some(_), _, Some(_), Some(_), Some(_), _,
-      Some(_), _, Some(_), Some(_), Some(_), _, _, _
-      ) => true
-      case _ => false
+    if (ApplicationConfig.hasAcceptedToggle) {
+      this match {
+        case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, true) => true
+        case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, false) => false
+        case _ => false
+      }
+  } else {
+      this match {
+        case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _) => true
+        case _ => false
+      }
     }
-  }
+
+    }
 }
 
 object BusinessActivities {
@@ -121,7 +148,8 @@ object BusinessActivities {
       __.read(Reads.optionNoError[HowManyEmployees]) and
       __.read(Reads.optionNoError[WhoIsYourAccountant]) and
       __.read(Reads.optionNoError[TaxMatters]) and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -142,7 +170,7 @@ object BusinessActivities {
         Json.toJson(model.taxMatters).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
-      } + ("hasChanged" -> JsBoolean(model.hasChanged))
+      } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
   }
 
   implicit def default(businessActivities: Option[BusinessActivities]): BusinessActivities =
