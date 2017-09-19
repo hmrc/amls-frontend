@@ -368,7 +368,75 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb))(any(), any(), any())
 
       }
+
+      "Transmitting Money or Currency Exchange remains in updated MSB services" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02",
+          "msbServices[2]" -> "04"
+        )
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb))(any(), any(), any())
+
+      }
     }
+
+    "carry on to redirect" when {
+      "MSB data does not exist" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(None)
+
+        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+      }
+    }
+
   }
 
 }
