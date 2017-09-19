@@ -177,7 +177,7 @@ object TradingPremises {
         (__ \ "endDate").readNullable[ActivityEndDate] and
         (__ \ "removalReason").readNullable[String] and
         (__ \ "removalReasonOther").readNullable[String] and
-        (__ \ "hasAcceptedz").readNullable[Boolean].map {
+        (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
       ) apply TradingPremises.apply _

@@ -125,13 +125,13 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
-  def post: Action[AnyContent] = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
         progressService.getSubmitRedirect map {
-            case Some(url) => Redirect(url)
-            case _ => InternalServerError("Could not get data for redirect")
-          }
+          case Some(url) => Redirect(url)
+          case _ => InternalServerError("Could not get data for redirect")
+        }
   }
 }
 

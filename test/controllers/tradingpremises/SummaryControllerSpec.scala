@@ -22,8 +22,9 @@ import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
-import org.mockito.Matchers._
+import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
@@ -36,7 +37,6 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq}
-
 
 import scala.concurrent.Future
 
@@ -57,6 +57,10 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     when(summaryController.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+    val model = TradingPremises()
+
+    val models = Seq(TradingPremises())
   }
 
   "SummaryController" must {
@@ -64,7 +68,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "load the summary page when the model is present" in new Fixture {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      val model = TradingPremises()
+
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -80,7 +84,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      val model = TradingPremises()
+
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -123,7 +127,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "direct to your answers when the model is present" in new Fixture {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-      val model = TradingPremises()
+
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -139,18 +143,21 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "post is called" must {
-    "respond with OK and redirect to the bank account details page" when {
+    "respond with OK and redirect to the progress page" when {
 
       "all questions are complete" in new Fixture {
+
+        val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+        val ytp = Some(ytpModel)
 
         val emptyCache = CacheMap("", Map.empty)
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(summaryController.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-        when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+        when(summaryController.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = summaryController.post()(newRequest)

@@ -59,12 +59,4 @@ object Helpers {
     } yield nominatedOfficer
   }
 
-  def matchOfficerWithResponsiblePerson(newOfficer: NewOfficer, responsiblePeople: Seq[ResponsiblePeople]) = {
-    responsiblePeople.zipWithIndex.filter {
-      case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
-    } find {
-      case (p, _) => p.personName.fold(false)(_.fullNameWithoutSpace equals newOfficer.name)
-    }
-  }
-
 }

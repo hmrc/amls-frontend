@@ -69,9 +69,9 @@ trait SummaryController extends RepeatingSection with BaseController {
   def post = Authorised.async {
     implicit authContext => implicit request =>
       (for {
-        tp <- DataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key)
+        tp <- dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key)
         tpNew <- updateTradingPremises(tp)
-        _ <- DataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, tpNew.getOrElse(Seq.empty))
+        _ <- dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, tpNew.getOrElse(Seq.empty))
       } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }

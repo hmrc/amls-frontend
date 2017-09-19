@@ -52,7 +52,7 @@ class FurtherUpdatesController @Inject()(
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
             oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
-            (_, index) <- OptionT.fromOption[Future](matchOfficerWithResponsiblePerson(newOfficer, responsiblePeople))
+            (_, index) <- OptionT.fromOption[Future](ResponsiblePeople.findResponsiblePersonByName(newOfficer.name, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
               updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
             }))
@@ -72,6 +72,7 @@ class FurtherUpdatesController @Inject()(
     removeNominatedOfficers(responsiblePeople)
       .patch(oldOfficer._2 - 1, Seq(updateRoles(oldOfficer._1, roles)), 1)
       .patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
+      .map(_.copy(hasAccepted = true))
   }
 
   private def updateRoles(oldOfficer: ResponsiblePeople, rolesInBusiness: RoleInBusiness): ResponsiblePeople = {

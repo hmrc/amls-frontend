@@ -494,6 +494,7 @@ GET         /high-value-dealer/cash-payments                                    
 POST        /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.get()
+POST        /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.post()
 
 GET         /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
