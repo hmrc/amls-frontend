@@ -68,7 +68,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(new LocalDate(1999, 1, 1))),
+    hasAccepted = true
 
   )
 
@@ -91,7 +92,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     "hasChanged" -> false,
     "lineId" -> 123456,
     "status" -> "Added",
-    "endDate" -> Json.obj("endDate" -> "1999-01-01")
+    "endDate" -> Json.obj("endDate" -> "1999-01-01"),
+    "hasAccepted" -> true
   )
 
   "TradingPremises" must {

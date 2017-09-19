@@ -47,7 +47,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-        case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _)) =>
+        case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
           Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case Some(_) =>
           Ok(where_are_trading_premises(EmptyForm, edit, index))

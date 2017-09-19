@@ -138,6 +138,30 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   }
 
+  "post is called" must {
+    "respond with OK and redirect to the bank account details page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = summaryController.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
+
+    }
+  }
+
   "ModelHelpers" must {
 
     import controllers.tradingpremises.ModelHelpers._

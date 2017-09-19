@@ -30,11 +30,24 @@ import views.html.tradingpremises._
 
 import scala.concurrent.Future
 import cats.implicits._
+import forms.EmptyForm
 
 trait SummaryController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
   def statusService: StatusService
+
+  private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
+    tradingPremises match {
+      case Some(tpSeq) => {
+        val updatedList = tpSeq.map { premises =>
+          premises.copy(hasAccepted = true)
+        }
+        Future.successful(Some(updatedList))
+      }
+      case _ => Future.successful(tradingPremises)
+    }
+  }
 
   def get(edit:Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -48,8 +61,19 @@ trait SummaryController extends RepeatingSection with BaseController {
             } yield tp
         }
       } yield (tp, status)) map {
-        case (Some(data), status) => Ok(summary(data, edit, status))
+        case (Some(data), status) => Ok(summary(EmptyForm, data, edit, status))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      (for {
+        tp <- DataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key)
+        tpNew <- updateTradingPremises(tp)
+        _ <- DataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, tpNew.getOrElse(Seq.empty))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+        case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
 
