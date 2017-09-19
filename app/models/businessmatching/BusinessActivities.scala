@@ -63,7 +63,6 @@ case object MoneyServiceBusiness extends BusinessActivity
 case object TrustAndCompanyServices extends BusinessActivity
 case object TelephonePaymentService extends BusinessActivity
 
-
 object BusinessActivity {
 
   implicit val activityFormRead = Rule[String, BusinessActivity] {
@@ -127,5 +126,3 @@ object BusinessActivities {
   implicit val formats = Json.format[BusinessActivities]
 
 }
-
-
