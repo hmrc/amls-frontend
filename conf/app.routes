@@ -120,6 +120,9 @@ GET         /trading-premises/agent/:index                                      
 POST        /trading-premises/agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+POST        /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.post()
+
+
 GET         /trading-premises/your-answers                                            controllers.tradingpremises.SummaryController.answers()
 GET         /trading-premises/trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 

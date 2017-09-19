@@ -21,7 +21,7 @@
 @import controllers.tradingpremises.ModelHelpers._
 @import models.status._
 
-@(model: Seq[TradingPremises], add: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: Seq[TradingPremises], add: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading(if(add) "title.ya" else "title.cya", "summary.tradingpremises")
@@ -71,9 +71,7 @@
     }
     </ul>
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @form(f, controllers.tradingpremises.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+    }
 }
