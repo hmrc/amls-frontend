@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.moneyservicebusiness.{MoneyServiceBusiness => _, _}
+import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -31,7 +31,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar {
+class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -39,9 +39,16 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
     val controller = new ServicesController {
-      override def cache: DataCacheConnector = self.cache
+      override def dataCacheConnector: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
     }
+
+    val mockCacheMap = mock[CacheMap]
+
+    when {
+      controller.dataCacheConnector.fetchAll(any(),any())
+    } thenReturn Future.successful(Some(mockCacheMap))
+
   }
 
   "ServicesController" must {
@@ -112,16 +119,16 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         "msbServices[0]" -> "01"
       )
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching()))
 
       when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(edit = false)(newRequest)
+      val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(false).url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
     }
 
     "redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" which {
@@ -138,7 +145,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
             Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
           )), hasChanged = true
         )
-        
 
         val newRequest = request.withFormUrlEncodedBody(
           "msbServices[0]" -> "01",
@@ -147,8 +153,8 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[3]" -> "04"
         )
 
-        when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(currentModel)))
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
 
         when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -161,7 +167,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
 
-        verify(controller.cache).save[MoneyServiceBusiness](any(),eqTo(MoneyServiceBusiness()))(any(),any(),any())
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(),eqTo(MoneyServiceBusiness()))(any(),any(),any())
 
       }
     }
@@ -187,8 +193,8 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[3]" -> "04"
         )
 
-        when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(currentModel)))
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
 
         when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -201,7 +207,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
 
-        verify(controller.cache).save[MoneyServiceBusiness](any(),eqTo(MoneyServiceBusiness()))(any(),any(),any())
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(),eqTo(MoneyServiceBusiness()))(any(),any(),any())
 
       }
     }
@@ -209,7 +215,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
     "redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
       Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
-        case (model, id) =>
+        case (_, id) =>
           val currentModel = BusinessMatching(
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange)
@@ -222,8 +228,8 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
             "msbServices[3]" -> id
           )
 
-          when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(currentModel)))
+          when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+            .thenReturn(Some(currentModel))
 
           when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
