@@ -72,19 +72,20 @@ class FurtherUpdatesController @Inject()(
     removeNominatedOfficers(responsiblePeople)
       .patch(oldOfficer._2 - 1, Seq(updateRoles(oldOfficer._1, roles)), 1)
       .patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
+      .map(_.copy(hasAccepted = true))
   }
 
   private def updateRoles(oldOfficer: ResponsiblePeople, rolesInBusiness: RoleInBusiness): ResponsiblePeople = {
     import models.changeofficer.RoleInBusiness._
     val positions = oldOfficer.positions.fold(Positions(Set.empty, None))(p => p)
-    oldOfficer.positions(Positions(rolesInBusiness.roles, positions.startDate)).copy(hasAccepted = true)
+    oldOfficer.positions(Positions(rolesInBusiness.roles, positions.startDate))
   }
 
   private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
     val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
     responsiblePerson.positions(
       Positions(positions.positions + NominatedOfficer, positions.startDate)
-    ).copy(hasAccepted = true)
+    )
   }
 
   private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
@@ -92,7 +93,7 @@ class FurtherUpdatesController @Inject()(
       val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
       responsiblePerson.positions(
         Positions(positions.positions - NominatedOfficer, positions.startDate)
-      ).copy(hasAccepted = true)
+      )
     }
   }
 
