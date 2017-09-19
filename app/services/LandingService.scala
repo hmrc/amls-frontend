@@ -136,7 +136,7 @@ trait LandingService {
       cacheConnector.remove(authContext.user.oid) flatMap {
         _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
           _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true))) flatMap {
-            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
+            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection)) flatMap {
               _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)) flatMap {
                 _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
                   _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
@@ -167,6 +167,9 @@ trait LandingService {
 
   def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
     viewResponse.map(seq => seq.map(rp => rp.copy(hasAccepted = true)))
+
+  def tradingPremisesSection(viewResponse: Option[Seq[TradingPremises]]): Option[Seq[TradingPremises]] =
+    viewResponse.map(seq => seq.map(tp => tp.copy(hasAccepted = true)))
 
   def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]
