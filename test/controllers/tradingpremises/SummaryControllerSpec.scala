@@ -143,7 +143,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 
   "post is called" must {
-    "respond with OK and redirect to the progress page" when {
+    "redirect to the progress page" when {
 
       "all questions are complete" in new Fixture {
 
