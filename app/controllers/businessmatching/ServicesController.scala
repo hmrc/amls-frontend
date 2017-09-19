@@ -16,22 +16,28 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{TransmittingMoney, MsbServices, BusinessMatching}
+import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 trait ServicesController extends BaseController {
 
-  def cache: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      cache.fetch[BusinessMatching](BusinessMatching.key) map {
+      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
         response =>
           val form = (for {
             bm <- response
@@ -49,24 +55,67 @@ trait ServicesController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            bm <- cache.fetch[BusinessMatching](BusinessMatching.key)
-             _ <- cache.save[BusinessMatching](BusinessMatching.key,
+          (for {
+            cache <- OptionT(dataCacheConnector.fetchAll)
+            bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+            _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
                data.msbServices.contains(TransmittingMoney) match {
                  case true => bm.msbServices(data)
                  case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
                }
-             )
+             ))
+            _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache: CacheMap))
           } yield data.msbServices.contains(TransmittingMoney) match {
             case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
             case false => Redirect(routes.SummaryController.get())
-          }
+          }) getOrElse InternalServerError("Could not update services")
       }
   }
+
+  private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], cache: CacheMap)
+                       (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key) match {
+      case Some(msb) =>
+        existingServices match {
+          case Some(msbServices) => {
+
+            def updateCurrencyExchange = {
+              if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
+                msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
+              } else {
+                msb
+              }
+            }
+
+            def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
+              if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
+                msb.copy(
+                  businessUseAnIPSP = None,
+                  fundsTransfer = None,
+                  transactionsInNext12Months = None,
+                  sendMoneyToOtherCountry = None,
+                  sendTheLargestAmountsOfMoney = None,
+                  mostTransactions = None
+                )
+              } else {
+                msb
+              }
+            }
+
+            dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
+
+          }
+          case _ => Future.successful(cache)
+        }
+      case _ => Future.successful(cache)
+    }
+  }
+
 }
 
 object ServicesController extends ServicesController {
   // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val cache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
 }
