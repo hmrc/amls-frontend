@@ -66,8 +66,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   "Get" must {
 
-
-
     val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
     "load the summary page when section data is available" in new Fixture {
@@ -90,6 +88,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
+
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
@@ -101,7 +100,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
         .thenReturn(None)
-
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)

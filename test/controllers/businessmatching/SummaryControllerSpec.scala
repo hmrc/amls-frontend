@@ -96,7 +96,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.select("a.change-answer").size mustBe 0
+      html.select("a.change-answer").size mustBe 1
 
     }
   }
