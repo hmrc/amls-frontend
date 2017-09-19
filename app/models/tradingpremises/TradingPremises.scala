@@ -16,6 +16,7 @@
 
 package models.tradingpremises
 
+import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,42 +38,61 @@ case class TradingPremises(
                             status: Option[String] = None,
                             endDate: Option[ActivityEndDate] = None,
                             removalReason: Option[String] = None,
-                            removalReasonOther: Option[String] = None
+                            removalReasonOther: Option[String] = None,
+                            hasAccepted: Boolean = false
                           ) {
 
   def businessStructure(p: BusinessStructure): TradingPremises =
-    this.copy(businessStructure = Some(p), hasChanged = hasChanged || !this.businessStructure.contains(p))
+    this.copy(businessStructure = Some(p), hasChanged = hasChanged || !this.businessStructure.contains(p),
+      hasAccepted = hasAccepted && this.businessStructure.contains(p))
 
   def agentName(p: AgentName): TradingPremises =
-    this.copy(agentName = Some(p), hasChanged = hasChanged || !this.agentName.contains(p))
+    this.copy(agentName = Some(p), hasChanged = hasChanged || !this.agentName.contains(p),
+      hasAccepted = hasAccepted && this.agentName.contains(p))
 
   def agentCompanyDetails(p: AgentCompanyDetails): TradingPremises =
-    this.copy(agentCompanyDetails = Some(p), hasChanged = hasChanged || !this.agentCompanyDetails.contains(p))
+    this.copy(agentCompanyDetails = Some(p), hasChanged = hasChanged || !this.agentCompanyDetails.contains(p),
+      hasAccepted = hasAccepted && this.agentCompanyDetails.contains(p))
 
   def agentPartnership(p: AgentPartnership): TradingPremises =
-    this.copy(agentPartnership = Some(p), hasChanged = hasChanged || !this.agentPartnership.contains(p))
+    this.copy(agentPartnership = Some(p), hasChanged = hasChanged || !this.agentPartnership.contains(p),
+      hasAccepted = hasAccepted && this.agentPartnership.contains(p))
 
   def yourTradingPremises(p: YourTradingPremises): TradingPremises =
-    this.copy(yourTradingPremises = Some(p), hasChanged = hasChanged || !this.yourTradingPremises.contains(p))
+    this.copy(yourTradingPremises = Some(p), hasChanged = hasChanged || !this.yourTradingPremises.contains(p),
+      hasAccepted = hasAccepted && this.yourTradingPremises.contains(p))
 
   def whatDoesYourBusinessDoAtThisAddress(p: WhatDoesYourBusinessDo): TradingPremises =
-    this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p))
+    this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),
+      hasAccepted = hasAccepted && this.whatDoesYourBusinessDoAtThisAddress.contains(p))
 
   def msbServices(p: MsbServices): TradingPremises =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p))
+    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
+      hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def registeringAgentPremises(p: RegisteringAgentPremises): TradingPremises =
-    this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p))
+    this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
+      hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
-  def status(p: String): TradingPremises =
-    this.copy(status = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p))
 
   def isComplete: Boolean =
-    this match {
-      case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _) => true
-      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _) => true
-      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
-      case _ => false
+    if(ApplicationConfig.hasAcceptedToggle) {
+      this match {
+        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, true) => true
+        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, true) => true
+        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, true) => true //This code part of fix for the issue AMLS-1549 back button issue
+        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, false) => false
+        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, false) => false
+        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, false) => false
+        case _ => false
+      }
+    } else {
+      this match {
+        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, _) => true
+        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _) => true
+        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
+        case _ => false
+      }
     }
 }
 
@@ -156,7 +176,10 @@ object TradingPremises {
         (__ \ "status").readNullable[String] and
         (__ \ "endDate").readNullable[ActivityEndDate] and
         (__ \ "removalReason").readNullable[String] and
-        (__ \ "removalReasonOther").readNullable[String]
+        (__ \ "removalReasonOther").readNullable[String] and
+        (__ \ "hasAccepted").readNullable[Boolean].map {
+          _.getOrElse(false)
+        }
       ) apply TradingPremises.apply _
   }
 

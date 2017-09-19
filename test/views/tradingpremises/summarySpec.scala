@@ -16,6 +16,7 @@
 
 package views.tradingpremises
 
+import forms.EmptyForm
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
@@ -47,7 +48,7 @@ class summarySpec extends ViewTestHelper {
 
     "redirect to the 'remove trading premises' page when 'delete' is clicked" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary(tradingPremises, add = true, SubmissionDecisionApproved)
+      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionDecisionApproved)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1, complete = true).url
@@ -67,7 +68,7 @@ class summarySpecRelease7 extends ViewTestHelper {
 
     "redirect to the 'remove agent premises reasons' page when 'delete' is clicked" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary(tradingPremises, add = true, SubmissionDecisionApproved)
+      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionDecisionApproved)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1, complete = true).url
@@ -75,7 +76,7 @@ class summarySpecRelease7 extends ViewTestHelper {
     }
 
     "redirect to the 'remove trading premises' page when 'delete' is clicked and it's an agent premises and it's an amendment" in new ViewFixture {
-      def view = views.html.tradingpremises.summary(tradingPremises, add = true, SubmissionReadyForReview)
+      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionReadyForReview)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be (
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1, complete = true).url
