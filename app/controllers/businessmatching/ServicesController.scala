@@ -36,79 +36,78 @@ trait ServicesController extends BaseController {
   def dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-        response =>
-          val form = (for {
-            bm <- response
-            services <- bm.msbServices
-          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+          response =>
+            val form = (for {
+              bm <- response
+              services <- bm.msbServices
+            } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-          Ok(views.html.businessmatching.services(form, edit))
-      }
+            Ok(views.html.businessmatching.services(form, edit))
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     import jto.validation.forms.Rules._
-    implicit authContext => implicit request =>
-      Form2[MsbServices](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
-        case ValidForm(_, data) =>
-          (for {
-            cache <- OptionT(dataCacheConnector.fetchAll)
-            bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-            _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-               data.msbServices.contains(TransmittingMoney) match {
-                 case true => bm.msbServices(data)
-                 case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
-               }
-             ))
-            _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache: CacheMap))
-          } yield data.msbServices.contains(TransmittingMoney) match {
-            case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
-            case false => Redirect(routes.SummaryController.get())
-          }) getOrElse InternalServerError("Could not update services")
-      }
+    implicit authContext =>
+      implicit request =>
+        Form2[MsbServices](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
+          case ValidForm(_, data) =>
+            (for {
+              cache <- OptionT(dataCacheConnector.fetchAll)
+              bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+              _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+                data.msbServices.contains(TransmittingMoney) match {
+                  case true => bm.msbServices(data)
+                  case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
+                }
+              ))
+              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache: CacheMap))
+            } yield data.msbServices.contains(TransmittingMoney) match {
+              case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+              case false => Redirect(routes.SummaryController.get())
+            }) getOrElse InternalServerError("Could not update services")
+        }
   }
 
   private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], cache: CacheMap)
                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
 
-    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key) match {
-      case Some(msb) =>
-        existingServices match {
-          case Some(msbServices) => {
+    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
 
-            def updateCurrencyExchange = {
-              if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
-                msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
-              } else {
-                msb
-              }
-            }
+      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { msbServices =>
 
-            def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
-              if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
-                msb.copy(
-                  businessUseAnIPSP = None,
-                  fundsTransfer = None,
-                  transactionsInNext12Months = None,
-                  sendMoneyToOtherCountry = None,
-                  sendTheLargestAmountsOfMoney = None,
-                  mostTransactions = None
-                )
-              } else {
-                msb
-              }
-            }
-
-            dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
-
+        def updateCurrencyExchange = {
+          if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
+            msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
+          } else {
+            msb
           }
-          case _ => Future.successful(cache)
         }
-      case _ => Future.successful(cache)
+
+        def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
+          if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
+            msb.copy(
+              businessUseAnIPSP = None,
+              fundsTransfer = None,
+              transactionsInNext12Months = None,
+              sendMoneyToOtherCountry = None,
+              sendTheLargestAmountsOfMoney = None,
+              mostTransactions = None
+            )
+          } else {
+            msb
+          }
+        }
+
+        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
+
+      }
+
     }
   }
 
