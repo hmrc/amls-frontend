@@ -46,144 +46,134 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisterServicesController" must {
+  "RegisterServicesController" when {
 
     val activityData1:Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
     val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
-    val activityData3:Set[BusinessActivity] = Set(TrustAndCompanyServices, TelephonePaymentService)
 
     val businessActivities1 = BusinessActivities(activityData1)
-    val businessActivities2 = BusinessActivities(activityData2)
 
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
+    "get is called" must {
 
-    "on get display who is your agent page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      "display who is your agent page" which {
+        "shows empty fields" in new Fixture {
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include("   ")
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+          contentAsString(result) must include("   ")
+        }
+
+        "populates fields" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          private val checkbox = document.select("input[id=businessActivities-01]")
+          checkbox.attr("checked") must be("checked")
+        }
+      }
     }
 
-    "on get() display the who is your agent page with pre populated data" in new Fixture {
+    "post is called" when {
+      "request data is valid" must {
+        "redirect to SummaryController" when {
+          "edit is false" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+            val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities" -> "01",
+              "businessActivities" -> "02",
+              "businessActivities" -> "03")
 
-      val document = Jsoup.parse(contentAsString(result))
-      private val checkbox = document.select("input[id=businessActivities-01]")
-      checkbox.attr("checked") must be("checked")
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
+
+          "edit is true" in new Fixture {
+
+            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
+            val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities" -> "01",
+              "businessActivities" -> "02",
+              "businessActivities" -> "03")
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+
+            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
+        }
+
+        "redirect to ServicesController" when {
+          "msb is selected" in new Fixture {
+
+            val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
+            val bm = BusinessMatching(None, Some(businessActivities))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities[0]" -> "04",
+              "businessActivities[1]" -> "05")
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
+          }
+        }
+      }
+
+      "request data is invalid" must {
+        "return BAD_REQUEST" in new Fixture {
+
+          val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+          val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "11")
+
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+
+          when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
     }
-
-    "on post with valid data" in new Fixture {
-
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "01",
-        "businessActivities" -> "02",
-        "businessActivities" -> "03")
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-    "on post with invalid data" in new Fixture {
-
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "11")
-
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-    }
-
-    // to be valid after summary edit page is ready
-    "on post with valid data in edit mode" in new Fixture {
-
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
-
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "01",
-        "businessActivities" -> "02",
-        "businessActivities" -> "03")
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-    "on post with valid data when option msb selected navigate to msb services page" in new Fixture {
-
-      val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
-      val bm = BusinessMatching(None, Some(businessActivities))
-
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities[0]" -> "04",
-        "businessActivities[1]" -> "05")
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
-    }
-
-
-    "fail submission when no check boxes were selected" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#businessActivities]").html() must include(Messages("error.required.bm.register.service"))
-    }
-
   }
-}
 
+}

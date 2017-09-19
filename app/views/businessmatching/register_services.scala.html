@@ -36,54 +36,53 @@
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
         <div class="form-group">
-        @fieldset(
-            f = f("businessActivities-fieldset"),
-            legend = "businessmatching.registerservices.title",
-            legendHidden = true,
-            panel = false
-        ) {
-            @errorGroup(
-                field = f("businessActivities")
+            @fieldset(
+                f = f("businessActivities-fieldset"),
+                legend = "businessmatching.registerservices.title",
+                legendHidden = true,
+                panel = false
             ) {
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.02",
-                    value = "02"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.03",
-                    value = "03"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.04",
-                    value = "04"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.05",
-                    value = "05"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.06",
-                    value = "06"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.07",
-                    value = "07"
-                )
+                @errorGroup(
+                    field = f("businessActivities")
+                ) {
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.01",
+                        value = "01"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.02",
+                        value = "02"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.03",
+                        value = "03"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.04",
+                        value = "04"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.05",
+                        value = "05"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.06",
+                        value = "06"
+                    )
+                    @checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = "businessmatching.registerservices.servicename.lbl.07",
+                        value = "07"
+                    )
+                }
             }
-        }
         </div>
-
 
         @detailsSummary(
             summary = Messages("businessmatching.registerservices.details")

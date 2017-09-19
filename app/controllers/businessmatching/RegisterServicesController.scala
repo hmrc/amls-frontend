@@ -35,7 +35,8 @@ trait RegisterServicesController extends BaseController {
           val form: Form2[BusinessActivities] = (for {
             businessMatching <- response
             businessActivities <- businessMatching.activities
-          } yield Form2[BusinessActivities](businessActivities)).getOrElse(EmptyForm)
+          } yield Form2[BusinessActivities](businessActivities)) getOrElse EmptyForm
+
           Ok(register_services(form, edit))
       }
   }
