@@ -41,14 +41,13 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Writes
-import play.api.mvc.{AnyContent, Request}
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.http.Status.OK
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
 
@@ -121,14 +120,14 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       val user = mock[LoggedInUser]
       when(ac.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(200)))
+      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, AddPerson.key, viewResponse.aboutYouSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection.copy(hasAccepted = true))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
@@ -146,7 +145,8 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     val businessActivitiesSection = BusinessActivities(expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
       involvedInOther = Some(BAInvolvedInOtherYes("test")),
       customersOutsideUK = Some(BACustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-      expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)
+      expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First),
+      hasAccepted = true
     )
     val msbSection = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -173,7 +173,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       Some(CETransactionsInLast12Months("12345678963")),
       false)
 
-
     val cacheMap = CacheMap("", Map.empty)
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -192,7 +191,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       supervisionSection = None
     )
 
-
     def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
       when {
         mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
@@ -209,7 +207,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       val user = mock[LoggedInUser]
       when(ac.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(200)))
+      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
