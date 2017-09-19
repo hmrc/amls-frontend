@@ -170,11 +170,13 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
         result must equal(Seq(
           newOfficer.copy(
             positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
-            hasChanged = true
+            hasChanged = true,
+            hasAccepted = true
           ),
           oldOfficer.copy(
             positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
-            hasChanged = true
+            hasChanged = true,
+            hasAccepted = true
           )
         ))
       }
@@ -194,7 +196,6 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
         cacheMap.getEntry[ChangeOfficer](meq(ChangeOfficer.key))(any())
       } thenReturn Some(changeOfficer)
 
-
       val result = controller.post()(request.withFormUrlEncodedBody("furtherUpdates" -> "false"))
 
       status(result) mustBe SEE_OTHER
@@ -202,14 +203,16 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
       verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
         newOfficer.copy(
           positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
-          hasChanged = true
+          hasChanged = true,
+          hasAccepted = true
         ),
         oldOfficer.copy(
           positions = Some(Positions(
             oldOfficer.positions.get.positions - NominatedOfficer + Director,
             oldOfficer.positions.get.startDate)
           ),
-          hasChanged = true
+          hasChanged = true,
+          hasAccepted = true
         )
       )))(any(), any(), any())
 
