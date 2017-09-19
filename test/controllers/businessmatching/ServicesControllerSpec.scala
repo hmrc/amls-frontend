@@ -296,43 +296,79 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
       }
     }
-  }
 
-  "remove existing MSB Currency Exchange data" when {
-    "Currency Exchange is no longer present in selection" in new Fixture {
+    "remove existing MSB Currency Exchange data" when {
+      "Currency Exchange is no longer present in selection" in new Fixture {
 
-      val currentModel = BusinessMatching(
-        msbServices = Some(MsbServices(
-          Set(CurrencyExchange, ChequeCashingNotScrapMetal)
-        ))
-      )
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(CurrencyExchange, ChequeCashingNotScrapMetal)
+          ))
+        )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[0]" -> "03",
-        "msbServices[1]" -> "04"
-      )
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
 
-      when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(currentModel))
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
 
-      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(completeMsb))
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
+        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
-      val result = controller.post(edit = true)(newRequest)
+        val result = controller.post(edit = true)(newRequest)
 
-      status(result) mustBe SEE_OTHER
+        status(result) mustBe SEE_OTHER
 
-      verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb.copy(
-        ceTransactionsInNext12Months = None,
-        whichCurrencies = None
-      )))(any(), any(), any())
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb.copy(
+          ceTransactionsInNext12Months = None,
+          whichCurrencies = None
+        )))(any(), any(), any())
 
+      }
+    }
+
+    "save same MSB data as fetched" when {
+      "Transmitting Money or Currency Exchange was not in existing MSB services" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb))(any(), any(), any())
+
+      }
     }
   }
+
 }
