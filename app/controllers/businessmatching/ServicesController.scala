@@ -22,7 +22,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, MsbServices, TransmittingMoney}
+import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -54,18 +55,59 @@ trait ServicesController extends BaseController {
           (for {
             cache <- OptionT(dataCacheConnector.fetchAll)
             bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+            msb <- OptionT.fromOption[Future](cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
              _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
                data.msbServices.contains(TransmittingMoney) match {
                  case true => bm.msbServices(data)
                  case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
                }
              ))
+            _ <- OptionT.liftF(dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+              updateMsb(bm.msbServices, data.msbServices, msb)
+            ))
           } yield data.msbServices.contains(TransmittingMoney) match {
             case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
             case false => Redirect(routes.SummaryController.get())
           }) getOrElse InternalServerError("Could not update services")
       }
   }
+
+  private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], msb: MoneyServiceBusiness): MoneyServiceBusiness = {
+
+    existingServices match {
+      case Some(msbServices) => {
+
+        def updateCurrencyExchange = {
+          if(msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)){
+            msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
+          } else {
+            msb
+          }
+        }
+
+        def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
+          if(msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)){
+            msb.copy(
+              businessUseAnIPSP = None,
+              fundsTransfer = None,
+              transactionsInNext12Months = None,
+              sendMoneyToOtherCountry = None,
+              sendTheLargestAmountsOfMoney = None,
+              mostTransactions = None
+            )
+          } else {
+            msb
+          }
+        }
+
+        updateTransmittingMoney(updateCurrencyExchange)
+
+      }
+      case _ => msb
+    }
+
+  }
+
 }
 
 object ServicesController extends ServicesController {
