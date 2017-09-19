@@ -200,7 +200,6 @@ object ResponsiblePeople {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  val flowSummary = "summary"
   val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"
 

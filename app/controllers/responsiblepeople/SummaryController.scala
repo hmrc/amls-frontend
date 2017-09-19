@@ -16,13 +16,13 @@
 
 package controllers.responsiblepeople
 
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.{BaseController, declaration}
+import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration, flowSummary}
+import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -50,16 +50,14 @@ trait SummaryController extends BaseController {
   def post(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       flow match {
-        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
         case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
-        case Some(`flowSummary`) => {
+        case None => {
           (for {
             model <- OptionT(fetchModel)
             _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model map (_.copy(hasAccepted = true))))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update ResponsiblePeople")
         }
-        case None => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
     }
 
