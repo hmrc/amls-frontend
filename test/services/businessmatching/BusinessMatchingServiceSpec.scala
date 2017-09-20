@@ -43,6 +43,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
     mockCacheFetch(Some(primaryModel), Some(BusinessMatching.key))
     mockCacheFetch(Some(variationModel), Some(BusinessMatching.variationKey))
+    mockCacheSave[BusinessMatching]
+
   }
 
   "getModel" when {
@@ -106,12 +108,22 @@ class BusinessMatchingServiceSpec extends PlaySpec
       "copy the variation data over the primary data" in new Fixture {
 
         mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
-        mockCacheSave[BusinessMatching]
 
         whenReady(service.commitVariationData.value) { _ =>
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
         }
 
+      }
+    }
+  }
+
+  "clear" when {
+    "called" must {
+      "reset the variation model back to nothing" in new Fixture {
+        whenReady(service.clearVariation.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
       }
     }
   }

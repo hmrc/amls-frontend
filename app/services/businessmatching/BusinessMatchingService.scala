@@ -56,6 +56,10 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = for {
     cacheMap <- OptionT(cache.fetchAll)
     variation <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey))
-    result <- OptionT.liftF(cache.save(BusinessMatching.key, variation))
+    _ <- OptionT.liftF(cache.save(BusinessMatching.key, variation))
+    result <- clearVariation
   } yield result
+
+  def clearVariation(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
+    OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
 }
