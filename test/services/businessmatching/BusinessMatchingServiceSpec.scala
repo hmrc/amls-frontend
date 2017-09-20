@@ -19,7 +19,7 @@ package services.businessmatching
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.concurrent.ScalaFutures
@@ -105,8 +105,14 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
   "commitVariationData" when {
     "called" must {
-      "copy the variation data over the primary data" in new Fixture {
+      "simply return the cachemap when in pre-application status" in new Fixture {
+        mockApplicationStatus(SubmissionReady)
+        service.commitVariationData returnsSome mockCacheMap
+      }
 
+      "copy the variation data over the primary data when not in pre-application status" in new Fixture {
+
+        mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
 
         whenReady(service.commitVariationData.value) { _ =>
