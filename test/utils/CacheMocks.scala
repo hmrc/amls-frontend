@@ -17,12 +17,15 @@
 package utils
 
 import connectors.DataCacheConnector
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
+import org.scalatest.mock.MockitoSugar
 
 import scala.concurrent.Future
 
-trait CacheMocks {
+trait CacheMocks extends MockitoSugar {
+
+  implicit val mockCacheConnector = mock[DataCacheConnector]
 
   def mockCacheFetch[T](item: Option[T], key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
     case Some(k) => when {

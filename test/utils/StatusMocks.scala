@@ -19,11 +19,14 @@ package utils
 import models.status.SubmissionStatus
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.mock.MockitoSugar
 import services.StatusService
 
 import scala.concurrent.Future
 
-trait StatusMocks {
+trait StatusMocks extends MockitoSugar {
+
+  implicit val mockStatusService = mock[StatusService]
 
   def mockApplicationStatus(status: SubmissionStatus)(implicit service: StatusService) = when {
     service.getStatus(any(), any(), any())
