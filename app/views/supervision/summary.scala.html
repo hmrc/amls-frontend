@@ -18,8 +18,9 @@
 @import forms2._
 @import models.supervision._
 @import utils._
+@import config.ApplicationConfig
 
-@(model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.supervision")
@@ -103,9 +104,8 @@
         }</p>
     }
 
-    @anchor(
-        attrHref = controllers.routes.RegistrationProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @form(f, controllers.supervision.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+    }
+
 }
