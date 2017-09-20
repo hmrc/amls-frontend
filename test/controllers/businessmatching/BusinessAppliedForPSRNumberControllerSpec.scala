@@ -60,6 +60,10 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
+    when {
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -108,6 +112,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        verify(controller.businessMatchingService).commitVariationData(any(), any(), any())
       }
 
       "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is true" in new Fixture {

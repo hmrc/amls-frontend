@@ -56,6 +56,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
             bm <- businessMatchingService.getModel
             _ <- businessMatchingService.updateModel(
               bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x)))
+            _ <- businessMatchingService.commitVariationData
           } yield {
             Redirect(routes.SummaryController.get())
           }) getOrElse InternalServerError("Could not update psr number")
