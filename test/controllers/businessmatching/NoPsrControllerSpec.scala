@@ -16,29 +16,54 @@
 
 package controllers.businessmatching
 
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.time.{Millis, Seconds, Span}
+import play.api.http.Status
+import play.api.i18n.Messages
+import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import play.api.mvc.Results.Ok
 
+//noinspection ScalaStyle
 class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  implicit val defaultPatience =
+    PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     val request = addToken(authRequest)
 
     lazy val controller = new NoPsrController {
       override protected def authConnector = self.authConnector
+
+      override protected[businessmatching] lazy val statusService = self.mockStatusService
     }
 
   }
 
   "get" when {
     "called" must {
-      "return an OK status" in new Fixture {
-        val result = controller.get()(request)
+      "return an OK status" when {
+        "application status is pre-application" in new Fixture {
+          mockApplicationStatus(NotCompleted)
 
-        status(result) mustBe OK
+          val result = controller.get()(request)
+
+          status(result) mustBe OK
+          contentAsString(result) must include(Messages("businessmatching.cannotcontinuewiththeapplication.title"))
+        }
+
+        "application status is beyond pre-application" in new Fixture {
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+          contentAsString(result) must include(Messages("businessmatching.cannotchangeservices.title"))
+        }
       }
     }
   }
-
 }

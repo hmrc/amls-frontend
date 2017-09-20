@@ -16,20 +16,25 @@
 
 package controllers.businessmatching
 
-
 import config.AMLSAuthConnector
 import controllers.BaseController
-import scala.concurrent.Future
+import models.status.{NotCompleted, SubmissionReady}
+import services.StatusService
 
 trait NoPsrController extends BaseController {
+  protected[businessmatching] val statusService: StatusService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.businessmatching.cannot_continue_with_the_application()))
+      statusService.getStatus map {
+        case NotCompleted | SubmissionReady => Ok(views.html.businessmatching.cannot_continue_with_the_application())
+        case _ => Ok(views.html.businessmatching.cannot_add_services())
+      }
   }
 }
 
 object NoPsrController extends NoPsrController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
+  override lazy val statusService = StatusService
 }
