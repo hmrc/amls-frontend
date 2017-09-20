@@ -18,18 +18,40 @@
 @import include._
 @import include.forms2._
 @import config.ApplicationConfig
+@import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 
-@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
-@header = {
-    @errorSummary(f)
-    @heading("businessmatching.registerservices.title", "summary.businessmatching")
-}
+@header = { @status match {
+    case SubmissionReady | NotCompleted => {
+        @errorSummary(f)
+        @heading("businessmatching.registerservices.title", "summary.businessmatching")
+    }
+    case _ => {
+        @errorSummary(f)
+        @heading("businessmatching.registerservices.other.title", "summary.businessmatching")
+    }
+}}
 
 @main(
     title = Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
+
+    @status match {
+        case SubmissionReady | NotCompleted => {}
+        case _ => {
+            @panel(
+                jsHidden = false,
+                wide = true,
+                gutter = true
+            ){
+                <p>@Messages("businessmatching.registerservices.existing")</p> @{existing map{ value =>
+                    Messages(s"businessmatching.registerservices.servicename.lbl.$value")
+                } mkString(", ")}
+            }
+        }
+    }
 
     <p>@Messages("lbl.select.all")</p>
 

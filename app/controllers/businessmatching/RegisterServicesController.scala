@@ -44,10 +44,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               } yield {
                 val form = Form2[BusinessActivities](businessActivities)
                 val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
-                Ok(register_services(form, edit, newActivities, existing))
+                Ok(register_services(form, edit, newActivities, existing, status))
               }) getOrElse {
                 val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
-                Ok(register_services(EmptyForm, edit, newActivities, existing))
+                Ok(register_services(EmptyForm, edit, newActivities, existing, status))
               }
           }
         }
@@ -61,7 +61,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
           case invalidForm: InvalidForm =>
             statusService.getStatus map { status =>
               val (newActivities, existing) = getActivityValues(invalidForm, status, None)
-              BadRequest(register_services(invalidForm, edit, newActivities, existing))
+              BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
             }
           case ValidForm(_, data) =>
             for {

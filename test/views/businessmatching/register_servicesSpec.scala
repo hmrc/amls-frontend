@@ -16,12 +16,12 @@
 
 package views.businessmatching
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{AccountancyServices, BusinessActivities}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import utils.GenericTestHelper
 import views.Fixture
 
@@ -33,16 +33,39 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
   }
 
   "register_services view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title" when {
+      "pre-submission" in new ViewFixture {
 
-      val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
+        val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty)
+        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, NotCompleted)
 
-      doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
-      heading.html must be(Messages("businessmatching.registerservices.title"))
-      subHeading.html must include(Messages("summary.businessmatching"))
+        doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
+        heading.html must be(Messages("businessmatching.registerservices.title"))
+        subHeading.html must include(Messages("summary.businessmatching"))
 
+      }
+      "post-submission" in new ViewFixture {
+
+        val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
+
+        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, SubmissionDecisionApproved)
+
+        doc.title must startWith(Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching"))
+        heading.html must be(Messages("businessmatching.registerservices.other.title"))
+        subHeading.html must include(Messages("summary.businessmatching"))
+
+      }
+    }
+
+    "notify of services already selected" when {
+      "status is post submission" in new ViewFixture {
+
+        def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, SubmissionDecisionApproved)
+
+        html must include(Messages("businessmatching.registerservices.existing"))
+
+      }
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -52,7 +75,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty)
+      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, NotCompleted)
 
       errorSummary.html() must include("not a message Key")
 
