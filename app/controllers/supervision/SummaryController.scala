@@ -16,9 +16,12 @@
 
 package controllers.supervision
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.supervision.Supervision
 import views.html.supervision.summary
 
@@ -30,10 +33,17 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[Supervision](Supervision.key) map {
         case Some(data) =>
-          Ok(summary(data))
+          Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
       }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request => (for {
+      supervision <- OptionT(dataCache.fetch[Supervision](Supervision.key))
+      _ <- OptionT.liftF(dataCache.save[Supervision](Supervision.key, supervision.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update supervision")
   }
 }
 
