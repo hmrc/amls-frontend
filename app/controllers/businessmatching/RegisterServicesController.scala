@@ -16,55 +16,88 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessmatching.{MoneyServiceBusiness, BusinessMatching, BusinessActivities}
-import scala.concurrent.Future
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessActivities, _}
+import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
 
-trait RegisterServicesController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class RegisterServicesController @Inject()(val authConnector: AuthConnector,
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val statusService: StatusService)() extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-        response =>
-          val form: Form2[BusinessActivities] = (for {
-            businessMatching <- response
-            businessActivities <- businessMatching.activities
-          } yield Form2[BusinessActivities](businessActivities)).getOrElse(EmptyForm)
-          Ok(register_services(form, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        statusService.getStatus flatMap { status =>
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+            response =>
+              (for {
+                businessMatching <- response
+                businessActivities <- businessMatching.activities
+              } yield {
+                val form = Form2[BusinessActivities](businessActivities)
+                val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
+                Ok(register_services(form, edit, newActivities, existing, status))
+              }) getOrElse {
+                val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
+                Ok(register_services(EmptyForm, edit, newActivities, existing, status))
+              }
+          }
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      import jto.validation.forms.Rules._
-      Form2[BusinessActivities](request.body) match {
-        case invalidForm: InvalidForm =>
-          Future.successful(BadRequest(register_services(invalidForm, edit)))
-        case ValidForm(_, data) =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-              data.businessActivities.contains(MoneyServiceBusiness) match {
-                case false => businessMatching.copy(activities = Some(data), msbServices = None)
-                case true =>businessMatching.activities(data)
-              }
-            )
-          } yield data.businessActivities.contains(MoneyServiceBusiness) match {
-            case true => Redirect(routes.ServicesController.get(false))
-            case false => Redirect(routes.SummaryController.get())
-          }
-      }
+    implicit authContext =>
+      implicit request =>
+        import jto.validation.forms.Rules._
+        Form2[BusinessActivities](request.body) match {
+          case invalidForm: InvalidForm =>
+            statusService.getStatus map { status =>
+              val (newActivities, existing) = getActivityValues(invalidForm, status, None)
+              BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
+            }
+          case ValidForm(_, data) =>
+            for {
+              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+                data.businessActivities.contains(MoneyServiceBusiness) match {
+                  case false => businessMatching.copy(activities = Some(data), msbServices = None)
+                  case true => businessMatching.activities(data)
+                }
+              )
+            } yield data.businessActivities.contains(MoneyServiceBusiness) match {
+              case true => Redirect(routes.ServicesController.get(false))
+              case false => Redirect(routes.SummaryController.get())
+            }
+        }
   }
-}
 
-object RegisterServicesController extends RegisterServicesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
+  private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
+
+    val activities: Set[String] = Set(
+      AccountancyServices,
+      BillPaymentServices,
+      EstateAgentBusinessService,
+      HighValueDealing,
+      MoneyServiceBusiness,
+      TrustAndCompanyServices,
+      TelephonePaymentService
+    ) map BusinessActivities.getValue
+
+    existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)){ ea =>
+      status match {
+        case SubmissionReady | NotCompleted => (activities, Set.empty)
+        case _ => (activities diff(ea map BusinessActivities.getValue), activities intersect(ea map BusinessActivities.getValue))
+      }
+    }
+
+  }
+
 }

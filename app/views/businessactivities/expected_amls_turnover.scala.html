@@ -38,7 +38,7 @@
             <ul class="list list--comma">
                 @bmBusinessActivities.map { ba =>
                     @ba.businessActivities.map {activity =>
-                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(activity))</li>
                     }
                 }
             </ul>

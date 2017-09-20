@@ -89,12 +89,12 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
     "get the value for each activity type" in {
       val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, HighValueDealing,
         MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      ba.getValue(EstateAgentBusinessService) must be("03")
-      ba.getValue(AccountancyServices) must be("01")
-      ba.getValue(HighValueDealing) must be("04")
-      ba.getValue(MoneyServiceBusiness) must be("05")
-      ba.getValue(TrustAndCompanyServices) must be("06")
-      ba.getValue(TelephonePaymentService) must be("07")
+      BusinessActivities.getValue(EstateAgentBusinessService) must be("03")
+      BusinessActivities.getValue(AccountancyServices) must be("01")
+      BusinessActivities.getValue(HighValueDealing) must be("04")
+      BusinessActivities.getValue(MoneyServiceBusiness) must be("05")
+      BusinessActivities.getValue(TrustAndCompanyServices) must be("06")
+      BusinessActivities.getValue(TelephonePaymentService) must be("07")
 
     }
 
