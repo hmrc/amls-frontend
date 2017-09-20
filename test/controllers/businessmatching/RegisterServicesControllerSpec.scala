@@ -23,8 +23,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -34,10 +37,16 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisterServicesController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val dataCacheConnector = mock[DataCacheConnector]
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[RegisterServicesController]
+
   }
 
   val emptyCache = CacheMap("", Map.empty)

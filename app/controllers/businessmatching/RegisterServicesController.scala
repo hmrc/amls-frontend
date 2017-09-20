@@ -16,20 +16,21 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
 import views.html.include.forms2.checkbox
 
 import scala.concurrent.Future
 
-trait RegisterServicesController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class RegisterServicesController @Inject()(val authConnector: AuthConnector,
+                                           val dataCacheConnector: DataCacheConnector)() extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -41,8 +42,8 @@ trait RegisterServicesController extends BaseController {
               businessActivities <- businessMatching.activities
             } yield {
               val form = Form2[BusinessActivities](businessActivities)
-              Ok(register_services(form, edit, inc(form, Some(businessActivities.businessActivities))))
-            }) getOrElse Ok(register_services(EmptyForm, edit, inc(EmptyForm, None)))
+              Ok(register_services(form, edit, checkboxPartial(form, Some(businessActivities.businessActivities))))
+            }) getOrElse Ok(register_services(EmptyForm, edit, checkboxPartial(EmptyForm, None)))
         }
   }
 
@@ -52,7 +53,7 @@ trait RegisterServicesController extends BaseController {
         import jto.validation.forms.Rules._
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
-            Future.successful(BadRequest(register_services(invalidForm, edit, inc(invalidForm, None))))
+            Future.successful(BadRequest(register_services(invalidForm, edit, checkboxPartial(invalidForm, None))))
           case ValidForm(_, data) =>
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
@@ -69,7 +70,7 @@ trait RegisterServicesController extends BaseController {
         }
   }
 
-  def inc(f: Form2[_], existingActivities: Option[Set[BusinessActivity]]) = {
+  def checkboxPartial(f: Form2[_], existingActivities: Option[Set[BusinessActivity]]) = {
 
     val activities: Set[BusinessActivity] = Set(
       AccountancyServices,
@@ -84,7 +85,7 @@ trait RegisterServicesController extends BaseController {
     existingActivities.fold[Set[BusinessActivity]](activities){ ea =>
       activities.intersect(ea)
     } map { ba =>
-      val value = "02"//businessActivities.getValue(ba)
+      val value = BusinessActivities.getValue(ba)
       checkbox(
         f = f("businessActivities[]"),
         labelText = s"businessmatching.registerservices.servicename.lbl.$value",
@@ -94,10 +95,4 @@ trait RegisterServicesController extends BaseController {
 
   }
 
-}
-
-object RegisterServicesController extends RegisterServicesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }
