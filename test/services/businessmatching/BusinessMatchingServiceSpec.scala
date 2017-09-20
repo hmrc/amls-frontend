@@ -16,18 +16,15 @@
 
 package services.businessmatching
 
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.mockito.Mockito.{verify, never}
-import org.mockito.Matchers.{eq => eqTo, any}
-import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,11 +38,11 @@ class BusinessMatchingServiceSpec extends PlaySpec
   trait Fixture extends DependencyMocks {
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
 
-    val primaryModel = businessMatchingGen.sample
-    val variationModel = businessMatchingGen.sample
+    val primaryModel = businessMatchingGen.sample.get
+    val variationModel = businessMatchingGen.sample.get
 
-    mockCacheFetch(primaryModel, Some(BusinessMatching.key))
-    mockCacheFetch(variationModel, Some(BusinessMatching.variationKey))
+    mockCacheFetch(Some(primaryModel), Some(BusinessMatching.key))
+    mockCacheFetch(Some(variationModel), Some(BusinessMatching.variationKey))
   }
 
   "getModel" when {
@@ -75,6 +72,31 @@ class BusinessMatchingServiceSpec extends PlaySpec
         mockApplicationStatus(SubmissionReadyForReview)
         service.getModel returnsSome variationModel
         verify(mockCacheConnector, never).fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      }
+    }
+  }
+
+  "updateModel" when {
+    "called" must {
+      "update the original model" when {
+        "in pre-application status" in new Fixture {
+          mockApplicationStatus(NotCompleted)
+          mockCacheSave(primaryModel)
+
+          service.updateModel(primaryModel) returnsSome mockCacheMap
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        }
+      }
+
+      "update the variation model" when {
+        "not in pre-application status" in new Fixture {
+          mockApplicationStatus(SubmissionReadyForReview)
+          mockCacheSave(primaryModel)
+
+          whenReady(service.updateModel(primaryModel).value) { _ =>
+            verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), any())(any(), any(), any())
+          }
+        }
       }
     }
   }

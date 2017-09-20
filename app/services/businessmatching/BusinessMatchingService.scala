@@ -24,6 +24,7 @@ import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -40,5 +41,15 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
         case x if !x.equals(BusinessMatching()) => x
       } orElse originalModel
     }
+  }
+
+  def updateModel(model: BusinessMatching)
+                 (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
+
+    OptionT.liftF(statusService.getStatus) flatMap {
+      case NotCompleted | SubmissionReady => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, model))
+      case _ => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, model))
+    }
+
   }
 }
