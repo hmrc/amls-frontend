@@ -19,10 +19,12 @@ package services.businessmatching
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import org.mockito.Mockito.{verify, never}
+import org.mockito.Matchers.{eq => eqTo, any}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -33,11 +35,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class BusinessMatchingServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
-  with DependencyMocks
   with FutureAssertions
   with BusinessMatchingGenerator {
 
-  trait Fixture {
+  trait Fixture extends DependencyMocks {
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
 
     val primaryModel = businessMatchingGen.sample
@@ -68,6 +69,12 @@ class BusinessMatchingServiceSpec extends PlaySpec
           mockApplicationStatus(SubmissionDecisionApproved)
           service.getModel returnsSome variationModel
         }
+      }
+
+      "not query for the original model when the variation model exists" in new Fixture {
+        mockApplicationStatus(SubmissionReadyForReview)
+        service.getModel returnsSome variationModel
+        verify(mockCacheConnector, never).fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
       }
     }
   }
