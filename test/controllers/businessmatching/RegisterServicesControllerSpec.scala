@@ -249,7 +249,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
 
               newActivities must not contain BusinessActivities.getValue(act)
-//              existing must contain(BusinessActivities.getValue(act))
+              existing must be(Set(BusinessActivities.getValue(act)))
 
             }
 

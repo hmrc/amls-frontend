@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching._
+import models.businessmatching.{BusinessActivities, _}
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -76,7 +76,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
 
-    val activities: Set[BusinessActivity] = Set(
+    val activities: Set[String] = Set(
       AccountancyServices,
       BillPaymentServices,
       EstateAgentBusinessService,
@@ -84,14 +84,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       MoneyServiceBusiness,
       TrustAndCompanyServices,
       TelephonePaymentService
-    )
+    ) map BusinessActivities.getValue
 
-    (existingActivities.fold[Set[BusinessActivity]](activities){ ea =>
+    existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)){ ea =>
       status match {
-        case SubmissionReady | NotCompleted => activities
-        case _ => activities diff ea
+        case SubmissionReady | NotCompleted => (activities, Set.empty)
+        case _ => (activities diff(ea map BusinessActivities.getValue), activities intersect(ea map BusinessActivities.getValue))
       }
-    } map BusinessActivities.getValue, Set.empty)
+    }
 
   }
 
