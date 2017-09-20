@@ -109,6 +109,19 @@ class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar wit
       redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
+    "redirect to register services controller when sole proprietor" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be (Some(routes.RegisterServicesController.get().url))
+    }
+
 
     "post with updated business matching data" in new Fixture {
 
