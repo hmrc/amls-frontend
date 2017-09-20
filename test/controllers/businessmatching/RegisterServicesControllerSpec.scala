@@ -17,48 +17,69 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
+import forms.{EmptyForm, Form2}
 import models.businessmatching._
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester {
+
+  val activities: Set[BusinessActivity] = Set(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  )
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
+    val statusService = mock[StatusService]
+
+    val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
+    val activityData2: Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
+
+    val businessActivities1 = BusinessActivities(activityData1)
+
+    val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())
+    } thenReturn Future.successful(NotCompleted)
 
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "RegisterServicesController" when {
-
-    val activityData1:Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
-    val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
-
-    val businessActivities1 = BusinessActivities(activityData1)
-
-    val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
     "get is called" must {
 
@@ -75,13 +96,15 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         "populates fields" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+          when {
+            controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())
+          } thenReturn Future.successful(Some(businessMatching1))
 
           val result = controller.get()(request)
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
+
           private val checkbox = document.select("input[id=businessActivities-01]")
           checkbox.attr("checked") must be("checked")
         }
@@ -175,6 +198,57 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
+
+        }
+      }
+    }
+
+    "getActivityValues is called" must {
+      "return values for all services" when {
+        "status is pre-submission" when {
+          "activities have not yet been selected" in new Fixture {
+
+            val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+
+            val result = controller invokePrivate getActivityValues(EmptyForm, NotCompleted, None)
+
+            activities foreach { act =>
+              result must contain(BusinessActivities.getValue(act))
+            }
+
+          }
+          "activities have already been selected" in new Fixture {
+
+            val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+
+            val result = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), NotCompleted, Some(activityData1))
+
+            activities foreach { act =>
+              result must contain(BusinessActivities.getValue(act))
+            }
+
+          }
+        }
+      }
+      "return values for services excluding those provided" when {
+        "status is post-submission" when {
+
+          activities.foreach { act =>
+
+            s"$act is contained in existing activities" in new Fixture {
+
+              val activityData: Set[BusinessActivity] = Set(act)
+              val businessActivities = businessActivities1.copy(businessActivities = activityData)
+
+              val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+
+              val result = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
+
+              result must not contain BusinessActivities.getValue(act)
+
+            }
+
+          }
 
         }
       }

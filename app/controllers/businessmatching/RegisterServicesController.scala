@@ -22,28 +22,30 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
+import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
-import views.html.include.forms2.checkbox
-
-import scala.concurrent.Future
 
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
-                                           val dataCacheConnector: DataCacheConnector)() extends BaseController {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val statusService: StatusService)() extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-          response =>
-            (for {
-              businessMatching <- response
-              businessActivities <- businessMatching.activities
-            } yield {
-              val form = Form2[BusinessActivities](businessActivities)
-              Ok(register_services(form, edit, checkboxPartial(form, Some(businessActivities.businessActivities))))
-            }) getOrElse Ok(register_services(EmptyForm, edit, checkboxPartial(EmptyForm, None)))
+        statusService.getStatus flatMap { status =>
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+            response =>
+              (for {
+                businessMatching <- response
+                businessActivities <- businessMatching.activities
+              } yield {
+                val form = Form2[BusinessActivities](businessActivities)
+                Ok(register_services(form, edit, getActivityValues(form, status, Some(businessActivities.businessActivities))))
+              }) getOrElse Ok(register_services(EmptyForm, edit, getActivityValues(EmptyForm, status, None)))
+          }
         }
   }
 
@@ -53,7 +55,9 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         import jto.validation.forms.Rules._
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
-            Future.successful(BadRequest(register_services(invalidForm, edit, checkboxPartial(invalidForm, None))))
+            statusService.getStatus map { status =>
+              BadRequest(register_services(invalidForm, edit, getActivityValues(invalidForm, status, None)))
+            }
           case ValidForm(_, data) =>
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
@@ -70,7 +74,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def checkboxPartial(f: Form2[_], existingActivities: Option[Set[BusinessActivity]]) = {
+  private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): Set[String] = {
 
     val activities: Set[BusinessActivity] = Set(
       AccountancyServices,
@@ -83,15 +87,11 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     )
 
     existingActivities.fold[Set[BusinessActivity]](activities){ ea =>
-      activities.intersect(ea)
-    } map { ba =>
-      val value = BusinessActivities.getValue(ba)
-      checkbox(
-        f = f("businessActivities[]"),
-        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
-        value = value
-      )
-    }
+      status match {
+        case SubmissionReady | NotCompleted => activities
+        case _ => activities diff ea
+      }
+    } map BusinessActivities.getValue
 
   }
 
