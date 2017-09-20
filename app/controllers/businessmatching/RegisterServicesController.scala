@@ -43,8 +43,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 businessActivities <- businessMatching.activities
               } yield {
                 val form = Form2[BusinessActivities](businessActivities)
-                Ok(register_services(form, edit, getActivityValues(form, status, Some(businessActivities.businessActivities))))
-              }) getOrElse Ok(register_services(EmptyForm, edit, getActivityValues(EmptyForm, status, None)))
+                Ok(register_services(form, edit, getActivityValues(form, status, Some(businessActivities.businessActivities))._1))
+              }) getOrElse Ok(register_services(EmptyForm, edit, getActivityValues(EmptyForm, status, None)._1))
           }
         }
   }
@@ -56,7 +56,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
             statusService.getStatus map { status =>
-              BadRequest(register_services(invalidForm, edit, getActivityValues(invalidForm, status, None)))
+              BadRequest(register_services(invalidForm, edit, getActivityValues(invalidForm, status, None)._1))
             }
           case ValidForm(_, data) =>
             for {
@@ -74,7 +74,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): Set[String] = {
+  private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
 
     val activities: Set[BusinessActivity] = Set(
       AccountancyServices,
@@ -86,12 +86,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       TelephonePaymentService
     )
 
-    existingActivities.fold[Set[BusinessActivity]](activities){ ea =>
+    (existingActivities.fold[Set[BusinessActivity]](activities){ ea =>
       status match {
         case SubmissionReady | NotCompleted => activities
         case _ => activities diff ea
       }
-    } map BusinessActivities.getValue
+    } map BusinessActivities.getValue, Set.empty)
 
   }
 

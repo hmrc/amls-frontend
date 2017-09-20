@@ -208,24 +208,28 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "status is pre-submission" when {
           "activities have not yet been selected" in new Fixture {
 
-            val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+            val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-            val result = controller invokePrivate getActivityValues(EmptyForm, NotCompleted, None)
+            val (newActivities, existing) = controller invokePrivate getActivityValues(EmptyForm, NotCompleted, None)
 
             activities foreach { act =>
-              result must contain(BusinessActivities.getValue(act))
+              newActivities must contain(BusinessActivities.getValue(act))
             }
+
+            existing must be(empty)
 
           }
           "activities have already been selected" in new Fixture {
 
-            val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+            val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-            val result = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), NotCompleted, Some(activityData1))
+            val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), NotCompleted, Some(activityData1))
 
             activities foreach { act =>
-              result must contain(BusinessActivities.getValue(act))
+              newActivities must contain(BusinessActivities.getValue(act))
             }
+
+            existing must be(empty)
 
           }
         }
@@ -240,11 +244,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               val activityData: Set[BusinessActivity] = Set(act)
               val businessActivities = businessActivities1.copy(businessActivities = activityData)
 
-              val getActivityValues = PrivateMethod[Set[String]]('getActivityValues)
+              val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-              val result = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
+              val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
 
-              result must not contain BusinessActivities.getValue(act)
+              newActivities must not contain BusinessActivities.getValue(act)
+//              existing must contain(BusinessActivities.getValue(act))
 
             }
 
