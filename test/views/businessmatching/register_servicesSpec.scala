@@ -37,7 +37,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"))
+      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty)
 
       doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.registerservices.title"))
@@ -52,7 +52,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"))
+      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty)
 
       errorSummary.html() must include("not a message Key")
 

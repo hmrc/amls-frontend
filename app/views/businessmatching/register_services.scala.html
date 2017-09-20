@@ -19,7 +19,7 @@
 @import include.forms2._
 @import config.ApplicationConfig
 
-@(f: Form2[_], edit: Boolean, activities: Set[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -45,7 +45,7 @@
                 @errorGroup(
                     field = f("businessActivities")
                 ) {
-                    @{activities map( value => checkbox(
+                    @{newActivities map( value => checkbox(
                         f = f("businessActivities[]"),
                         labelText = s"businessmatching.registerservices.servicename.lbl.$value",
                         value = value

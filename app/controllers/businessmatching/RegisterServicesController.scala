@@ -43,8 +43,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 businessActivities <- businessMatching.activities
               } yield {
                 val form = Form2[BusinessActivities](businessActivities)
-                Ok(register_services(form, edit, getActivityValues(form, status, Some(businessActivities.businessActivities))._1))
-              }) getOrElse Ok(register_services(EmptyForm, edit, getActivityValues(EmptyForm, status, None)._1))
+                val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
+                Ok(register_services(form, edit, newActivities, existing))
+              }) getOrElse {
+                val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
+                Ok(register_services(EmptyForm, edit, newActivities, existing))
+              }
           }
         }
   }
@@ -56,7 +60,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
             statusService.getStatus map { status =>
-              BadRequest(register_services(invalidForm, edit, getActivityValues(invalidForm, status, None)._1))
+              val (newActivities, existing) = getActivityValues(invalidForm, status, None)
+              BadRequest(register_services(invalidForm, edit, newActivities, existing))
             }
           case ValidForm(_, data) =>
             for {
