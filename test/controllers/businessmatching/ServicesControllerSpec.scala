@@ -25,6 +25,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -41,7 +42,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
     val controller = new ServicesController {
       override def dataCacheConnector: DataCacheConnector = self.cache
-
+      override lazy val businessMatchingService = mock[BusinessMatchingService]
       override protected def authConnector: AuthConnector = self.authConnector
     }
 

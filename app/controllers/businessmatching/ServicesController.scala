@@ -24,6 +24,8 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.Play
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -34,11 +36,12 @@ import scala.concurrent.Future
 trait ServicesController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
+  def businessMatchingService: BusinessMatchingService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+        businessMatchingService.getModel.value map {
           response =>
             val form = (for {
               bm <- response
@@ -58,15 +61,13 @@ trait ServicesController extends BaseController {
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
           case ValidForm(_, data) =>
             (for {
-              cache <- OptionT(dataCacheConnector.fetchAll)
-              bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-                data.msbServices.contains(TransmittingMoney) match {
+              bm <- businessMatchingService.getModel
+              cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
                   case true => bm.msbServices(data)
                   case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
                 }
-              ))
-              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache: CacheMap))
+              )
+              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield data.msbServices.contains(TransmittingMoney) match {
               case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
               case false => Redirect(routes.SummaryController.get())
@@ -117,4 +118,5 @@ object ServicesController extends ServicesController {
   // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override lazy val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }
