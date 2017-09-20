@@ -99,6 +99,7 @@ object BusinessMatching {
   import play.api.libs.json._
 
   val key = "business-matching"
+  val variationKey = s"$key-variation"
 
   implicit val reads: Reads[BusinessMatching] = (
     __.read(Reads.optionNoError[ReviewDetails]) and
