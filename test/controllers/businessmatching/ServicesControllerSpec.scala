@@ -16,7 +16,10 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import org.jsoup.Jsoup
@@ -29,10 +32,11 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData {
+class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -52,14 +56,24 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
       controller.dataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(mockCacheMap))
 
+    when {
+      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    def setupModel(model: Option[BusinessMatching]) = when {
+      controller.businessMatchingService.getModel(any(), any(), any())
+    } thenReturn (model match {
+      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
+      case _ => OptionT.none[Future, BusinessMatching]
+    })
+
   }
 
   "ServicesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      setupModel(None)
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -79,8 +93,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         )
       )
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(model)))
+      setupModel(Some(model))
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -122,14 +135,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         "msbServices[0]" -> "01"
       )
 
-      when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching()))
+      setupModel(Some(model))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(completeMsb))
-
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
@@ -161,14 +170,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         "msbServices[3]" -> "04"
       )
 
-      when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(currentModel))
+      setupModel(Some(currentModel))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(completeMsb))
-
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
@@ -194,14 +199,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[3]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
@@ -229,14 +230,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
             "msbServices[1]" -> id
           )
 
-          when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(currentModel))
+          setupModel(Some(currentModel))
 
           when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
             .thenReturn(Some(completeMsb))
-
-          when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
 
           when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
@@ -270,14 +267,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[1]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
@@ -312,14 +305,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[1]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
@@ -350,14 +339,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[1]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
@@ -384,14 +369,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[2]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
@@ -419,14 +400,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
           "msbServices[1]" -> "04"
         )
 
-        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(currentModel))
+        setupModel(Some(currentModel))
 
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(None)
-
-        when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
 
         when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
