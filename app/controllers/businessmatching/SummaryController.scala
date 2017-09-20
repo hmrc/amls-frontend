@@ -16,7 +16,7 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
@@ -24,7 +24,7 @@ import views.html.businessmatching._
 import _root_.services.StatusService
 import cats.implicits._
 import cats.data.OptionT
-import models.status.{SubmissionReady, SubmissionReadyForReview, SubmissionStatus, NotCompleted}
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 
 trait SummaryController extends BaseController {
 
@@ -39,7 +39,7 @@ trait SummaryController extends BaseController {
         val okResult = for {
           bm <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
           status <- OptionT.liftF(statusService.getStatus)
-        } yield Ok(summary(bm, isPreApprovedStatus(status)))
+        } yield Ok(summary(bm, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }

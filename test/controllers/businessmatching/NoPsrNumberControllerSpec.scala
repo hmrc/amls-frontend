@@ -17,9 +17,8 @@
 package controllers.businessmatching
 
 import org.scalatest.concurrent.ScalaFutures
-import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
-import play.api.mvc.Results.Ok
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 class NoPsrNumberControllerSpec extends GenericTestHelper with ScalaFutures {
 
