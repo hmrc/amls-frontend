@@ -26,7 +26,7 @@ import org.scalatestplus.play.PlaySpec
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.DependencyMocks
+import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -34,16 +34,12 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with DependencyMocks
+  with FutureAssertions
   with BusinessMatchingGenerator {
 
   trait Fixture {
-    implicit val authContext = mock[AuthContext]
-    implicit val headerCarrier = HeaderCarrier()
+    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
 
-    implicit val statusService = mock[StatusService]
-    implicit val cacheConnector = mock[DataCacheConnector]
-
-    val service = new BusinessMatchingService(statusService, cacheConnector)
     val primaryModel = businessMatchingGen.sample
     val variationModel = businessMatchingGen.sample
 
@@ -56,21 +52,21 @@ class BusinessMatchingServiceSpec extends PlaySpec
       "return the primary model" when {
         "in a pre-application status" in new Fixture {
           mockApplicationStatus(NotCompleted)
-          whenReady(service.getModel) { _ mustBe primaryModel }
+          service.getModel returnsSome primaryModel
         }
 
         "the variation model is empty and status is post-preapp" in new Fixture {
           mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheFetch(Some(BusinessMatching()), Some(BusinessMatching.variationKey))
 
-          whenReady(service.getModel) { _ mustBe primaryModel }
+          service.getModel returnsSome primaryModel
         }
       }
 
       "return the variation model" when {
         "in a amendment or variation status" in new Fixture {
           mockApplicationStatus(SubmissionDecisionApproved)
-          whenReady(service.getModel) { _ mustBe variationModel }
+          service.getModel returnsSome variationModel
         }
       }
     }
