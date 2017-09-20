@@ -34,7 +34,14 @@
 }}
 
 @main(
-    title = Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"),
+    title = { status match {
+        case SubmissionReady | NotCompleted => {
+            Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching")
+        }
+        case _ => {
+            Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching")
+        }
+    }},
     heading = header
 ) {
 
