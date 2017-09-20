@@ -146,7 +146,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.CannotContinueWithTheApplicationController.get().url))
+        redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
         verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
       }
 

@@ -16,20 +16,29 @@
 
 package controllers.businessmatching
 
+import org.scalatest.concurrent.ScalaFutures
+import play.api.test.Helpers._
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import config.AMLSAuthConnector
-import controllers.BaseController
-import scala.concurrent.Future
+class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
 
-trait CannotContinueWithTheApplicationController extends BaseController {
+  trait Fixture extends AuthorisedFixture { self =>
+    val request = addToken(authRequest)
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.businessmatching.cannot_continue_with_the_application()))
+    lazy val controller = new NoPsrController {
+      override protected def authConnector = self.authConnector
+    }
+
   }
-}
 
-object CannotContinueWithTheApplicationController extends CannotContinueWithTheApplicationController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
+  "get" when {
+    "called" must {
+      "return an OK status" in new Fixture {
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+      }
+    }
+  }
+
 }

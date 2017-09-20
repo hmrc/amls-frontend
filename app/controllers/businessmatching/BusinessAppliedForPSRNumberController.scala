@@ -63,7 +63,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
         }
         case ValidForm(_, data) => {
           businessMatchingService.clearVariation map { _ =>
-            Redirect(routes.CannotContinueWithTheApplicationController.get())
+            Redirect(routes.NoPsrController.get())
           } getOrElse InternalServerError("Could not clear the variation data")
         }
       }
