@@ -16,15 +16,15 @@
 
 package services.businessmatching
 
+import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -97,6 +97,21 @@ class BusinessMatchingServiceSpec extends PlaySpec
             verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), any())(any(), any(), any())
           }
         }
+      }
+    }
+  }
+
+  "commitVariationData" when {
+    "called" must {
+      "copy the variation data over the primary data" in new Fixture {
+
+        mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
+        mockCacheSave[BusinessMatching]
+
+        whenReady(service.commitVariationData.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel))(any(), any(), any())
+        }
+
       }
     }
   }

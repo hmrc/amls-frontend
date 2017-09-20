@@ -17,6 +17,7 @@
 package utils
 
 import connectors.DataCacheConnector
+import models.businessmatching.BusinessMatching
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -27,7 +28,9 @@ import scala.concurrent.Future
 trait CacheMocks extends MockitoSugar {
 
   implicit val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  implicit val mockCacheMap = mock[CacheMap]
+
+  mockCacheFetchAll
 
   def mockCacheFetch[T](item: Option[T], key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
     case Some(k) => when {
@@ -38,6 +41,18 @@ trait CacheMocks extends MockitoSugar {
       cache.fetch[T](any())(any(), any(), any())
     } thenReturn Future.successful(item)
   }
+
+  def mockCacheGetEntry[T](item: Option[T], key: String)(implicit cache: CacheMap) = when {
+    mockCacheMap.getEntry[T](eqTo(key))(any())
+  } thenReturn item
+
+  def mockCacheFetchAll(implicit cache: DataCacheConnector) = when {
+    cache.fetchAll(any(), any())
+  } thenReturn Future.successful(Some(mockCacheMap))
+
+  def mockCacheSave[T](implicit cache: DataCacheConnector) = when {
+    cache.save[T](any(), any())(any(), any(), any())
+  } thenReturn Future.successful(mockCacheMap)
 
   def mockCacheSave[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
     case Some(k) => when {
