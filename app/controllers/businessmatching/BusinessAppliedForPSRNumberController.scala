@@ -21,17 +21,22 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching}
+import play.api.Play
+import services.businessmatching.BusinessMatchingService
 import views.html.businessmatching.business_applied_for_psr_number
+import cats.data.OptionT
+import cats.implicits._
 
 import scala.concurrent.Future
 
 trait BusinessAppliedForPSRNumberController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val businessMatchingService: BusinessMatchingService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+      businessMatchingService.getModel.value map {
         response =>
           val form: Form2[BusinessAppliedForPSRNumber] = (for {
             bm <- response
@@ -47,19 +52,18 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
         case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
-          for {
-            bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-              bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
-            )
+          (for {
+            bm <- businessMatchingService.getModel
+            _ <- businessMatchingService.updateModel(
+              bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x)))
           } yield {
             Redirect(routes.SummaryController.get())
-          }
+          }) getOrElse InternalServerError("Could not update psr number")
         }
         case ValidForm(_, data) => {
-          dataCacheConnector.save[BusinessMatching](BusinessMatching.key, None) map { _ =>
+          businessMatchingService.clearVariation map { _ =>
             Redirect(routes.CannotContinueWithTheApplicationController.get())
-          }
+          } getOrElse InternalServerError("Could not clear the variation data")
         }
       }
     }
@@ -70,4 +74,5 @@ object BusinessAppliedForPSRNumberController extends BusinessAppliedForPSRNumber
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override lazy val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }
