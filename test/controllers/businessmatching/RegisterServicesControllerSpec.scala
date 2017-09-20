@@ -16,6 +16,7 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import models.businessmatching._
@@ -30,6 +31,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -52,8 +54,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
+    val businessMatchingService = mock[BusinessMatchingService]
 
     val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
     val activityData2: Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
@@ -64,7 +66,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
@@ -83,11 +85,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     "get is called" must {
 
-      "display who is your agent page" which {
+      "display the view" which {
         "shows empty fields" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.businessMatchingService.getModel(any(),any(),any()))
+            .thenReturn(OptionT.liftF(Future.successful(BusinessMatching())))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -97,8 +99,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "populates fields" in new Fixture {
 
           when {
-            controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())
-          } thenReturn Future.successful(Some(businessMatching1))
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.liftF(Future.successful(businessMatching1))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -124,11 +126,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "02",
               "businessActivities" -> "03")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -145,11 +147,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "02",
               "businessActivities" -> "03")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
-            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -167,11 +169,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities[0]" -> "04",
               "businessActivities[1]" -> "05")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(bm)))
 
-            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)

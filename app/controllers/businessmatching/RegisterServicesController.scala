@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
 
-import connectors.DataCacheConnector
+import _root_.services.businessmatching.BusinessMatchingService
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
@@ -29,14 +29,14 @@ import views.html.businessmatching._
 
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService)() extends BaseController {
+                                           val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         statusService.getStatus flatMap { status =>
-          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+          businessMatchingService.getModel.value map {
             response =>
               (for {
                 businessMatching <- response
@@ -65,8 +65,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             }
           case ValidForm(_, data) =>
             for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-              _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+              businessMatching <- businessMatchingService.getModel.value
+              _ <- businessMatchingService.updateModel(
                 data.businessActivities.contains(MoneyServiceBusiness) match {
                   case false => businessMatching.copy(activities = Some(data), msbServices = None)
                   case true => businessMatching.activities(data)
