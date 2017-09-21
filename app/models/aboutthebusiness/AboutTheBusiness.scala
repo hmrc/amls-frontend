@@ -29,6 +29,7 @@ case class AboutTheBusiness(
                              corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
                              contactingYou: Option[ContactingYou] = None,
                              registeredOffice: Option[RegisteredOffice] = None,
+                             altCorrespondenceAddress: Option[Boolean] = None,
                              correspondenceAddress: Option[CorrespondenceAddress] = None,
                              hasChanged: Boolean = false
                            ) {
@@ -52,6 +53,9 @@ case class AboutTheBusiness(
   def contactingYou(v: ContactingYou): AboutTheBusiness =
     this.copy(contactingYou = Some(v), hasChanged = hasChanged || this.contactingYou != Some(v))
 
+  def altCorrespondenceAddress(v: Boolean): AboutTheBusiness =
+    this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || this.altCorrespondenceAddress != Some(v))
+
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
     this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || this.correspondenceAddress != Some(v))
 
@@ -61,7 +65,7 @@ case class AboutTheBusiness(
   def isComplete: Boolean =
     this match {
       case AboutTheBusiness(
-      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, _
+      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _
       ) => true
       case _ => false
     }
@@ -75,7 +79,7 @@ object AboutTheBusiness {
     cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
       case model if model.isComplete =>
         Section(messageKey, Completed, model.hasChanged, controllers.aboutthebusiness.routes.SummaryController.get())
-      case AboutTheBusiness(None, None, None, None, None, _, None, _) =>
+      case AboutTheBusiness(None, None, None, None, None, _, None, None, _) =>
         notStarted
       case model =>
         Section(messageKey, Started, model.hasChanged, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
@@ -98,6 +102,7 @@ object AboutTheBusiness {
         (__ \ "corporationTaxRegistered").readNullable[CorporationTaxRegistered] and
         (__ \ "contactingYou").readNullable[ContactingYou] and
         (__ \ "registeredOffice").readNullable[RegisteredOffice] and
+        (__ \ "altCorrespondenceAddress").readNullable[Boolean] and
         (__ \ "correspondenceAddress").readNullable[CorrespondenceAddress] and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
