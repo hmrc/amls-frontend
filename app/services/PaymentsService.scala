@@ -70,7 +70,9 @@ class PaymentsService @Inject()(
     paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
       case Some(response) => savePaymentBeforeResponse(response, amlsRefNo, safeId)
       case _ =>
+        // $COVERAGE-OFF$
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
+        // $COVERAGE-ON$
         Future.successful(CreatePaymentResponse.default)
     }
 

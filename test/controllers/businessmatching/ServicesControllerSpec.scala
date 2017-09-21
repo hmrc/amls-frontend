@@ -51,6 +51,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
     }
 
     val mockCacheMap = mock[CacheMap]
+    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
       controller.dataCacheConnector.fetchAll(any(), any())
@@ -58,7 +59,11 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+    } thenReturn cacheMapT
+
+    when {
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
+    } thenReturn cacheMapT
 
     def setupModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -149,7 +154,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
       redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
     }
 
-    "redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
+    "redirect to the Psr Number page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
       val currentModel = BusinessMatching(
         msbServices = Some(MsbServices(
@@ -182,10 +187,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
-
+      verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
     }
 
-    "redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
+    "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
         val currentModel = BusinessMatching(
           msbServices = Some(MsbServices(
@@ -212,9 +217,10 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
 
+        verify(controller.businessMatchingService).commitVariationData(any(), any(), any())
       }
 
-    "redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
+    "redirect to the 'Psr Number' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
       Seq[String]("03", "04") foreach {
         case (id) =>
@@ -242,6 +248,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+          verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
       }
     }
   }
