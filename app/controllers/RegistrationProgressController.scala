@@ -63,13 +63,15 @@ trait RegistrationProgressController extends BaseController {
               (for {
                 reviewDetails <- businessMatching.reviewDetails
               } yield {
-                val sections = progressService.sections(cacheMap).filter(s => s.name != BusinessMatching.messageKey)
+                val sections = progressService.sections(cacheMap)
+                val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey)
+
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
                 val canEditPreApp = Set(NotCompleted, SubmissionReady).contains(status)
 
                 completePreApp match {
-                    case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
-                    case _ => Ok(registration_progress(sections, declarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
+                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
+                    case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
                 }
               }) getOrElse InternalServerError("Unable to retrieve the business details")
 
