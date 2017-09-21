@@ -202,4 +202,18 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
   }
 
+  "POST" must {
+    "redirect to correct page" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody()
+
+      when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+        .thenReturn(Future.successful(Some(controllers.routes.FeeGuidanceController.get())))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
+    }
+  }
+
 }
