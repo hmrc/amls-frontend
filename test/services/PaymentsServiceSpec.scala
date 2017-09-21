@@ -19,7 +19,7 @@ package services
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import models.payments.{CreateBacsPaymentRequest, Payment, UpdateBacsRequest}
+import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, Payment, UpdateBacsRequest}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -91,7 +91,24 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
         }
       }
     }
+  }
 
+  "paymentsUrlOrDefault" when {
+    "called" must {
+      "return the default url" when {
+        "no response was returned from the connector" in new Fixture {
+          when {
+            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+          } thenReturn Future.successful(None)
+
+          //noinspection ScalaStyle
+          whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid")) { result =>
+            result mustBe CreatePaymentResponse.default
+          }
+
+        }
+      }
+    }
   }
 
 }
