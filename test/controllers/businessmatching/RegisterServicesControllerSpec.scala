@@ -17,7 +17,7 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import connectors.DataCacheConnector
+import cats.implicits._
 import forms.{EmptyForm, Form2}
 import models.businessmatching._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -89,7 +89,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "shows empty fields" in new Fixture {
 
           when(controller.businessMatchingService.getModel(any(),any(),any()))
-            .thenReturn(OptionT.liftF(Future.successful(BusinessMatching())))
+            .thenReturn(OptionT.some[Future, BusinessMatching](BusinessMatching()))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -100,7 +100,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
           when {
             controller.businessMatchingService.getModel(any(), any(), any())
-          } thenReturn OptionT.liftF(Future.successful(businessMatching1))
+          } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -127,10 +127,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "03")
 
             when(controller.businessMatchingService.getModel(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
             when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -148,10 +148,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "03")
 
             when(controller.businessMatchingService.getModel(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
             when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -170,10 +170,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities[1]" -> "05")
 
             when(controller.businessMatchingService.getModel(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(bm)))
+              .thenReturn(OptionT.some[Future, BusinessMatching](bm))
 
             when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.liftF(Future.successful(emptyCache)))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -191,12 +191,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "11")
 
+          when(controller.businessMatchingService.getModel(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-          when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

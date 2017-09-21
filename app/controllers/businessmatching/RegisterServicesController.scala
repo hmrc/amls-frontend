@@ -18,7 +18,8 @@ package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
 
-import _root_.services.businessmatching.BusinessMatchingService
+import cats.implicits._
+import services.businessmatching.BusinessMatchingService
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
@@ -71,7 +72,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   case false => businessMatching.copy(activities = Some(data), msbServices = None)
                   case true => businessMatching.activities(data)
                 }
-              )
+              ).value
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
