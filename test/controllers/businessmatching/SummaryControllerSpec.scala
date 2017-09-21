@@ -35,12 +35,17 @@ import utils.AuthorisedFixture
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessType.LPrLLP
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
+    .build()
+
+  sealed trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController {

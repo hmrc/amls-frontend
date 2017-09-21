@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching
+package generators.businessmatching
 
+import generators.BaseGenerator
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import org.scalacheck.Gen
 
-import config.AMLSAuthConnector
-import controllers.BaseController
-import scala.concurrent.Future
+trait PsrNumberGen extends BaseGenerator {
 
-trait CannotContinueWithTheApplicationController extends BaseController {
+  val psrNumberGen: Gen[BusinessAppliedForPSRNumber] = for {
+    num <- numSequence(6)
+  } yield BusinessAppliedForPSRNumberYes(num)
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.businessmatching.cannot_continue_with_the_application()))
-  }
-}
-
-object CannotContinueWithTheApplicationController extends CannotContinueWithTheApplicationController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
 }

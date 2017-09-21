@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import play.api.mvc.Result
 
 import scala.concurrent.Future
 
@@ -60,18 +61,24 @@ trait ServicesController extends BaseController {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
           case ValidForm(_, data) =>
-            (for {
+
+            lazy val updateModel = for {
               bm <- businessMatchingService.getModel
               cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
-                  case true => bm.msbServices(data)
-                  case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
-                }
-              )
-              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
-            } yield data.msbServices.contains(TransmittingMoney) match {
-              case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
-              case false => Redirect(routes.SummaryController.get())
-            }) getOrElse InternalServerError("Could not update services")
+                case true => bm.msbServices(data)
+                case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
+              })
+              result <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
+            } yield cache
+
+            lazy val redirectResult = data.msbServices.contains(TransmittingMoney) match {
+              case true => OptionT.some[Future, Result](Redirect(routes.BusinessAppliedForPSRNumberController.get(edit)))
+              case false => businessMatchingService.commitVariationData map { _ =>
+                Redirect(routes.SummaryController.get())
+              }
+            }
+
+            updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
         }
   }
 

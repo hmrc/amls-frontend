@@ -184,7 +184,7 @@ POST        /business-matching/psr-registration                                 
 
 GET         /business-matching/check-your-answers                                     controllers.businessmatching.SummaryController.get()
 
-GET         /business-matching/no-psr                                                 controllers.businessmatching.CannotContinueWithTheApplicationController.get()
+GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
