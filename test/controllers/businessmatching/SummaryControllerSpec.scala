@@ -26,7 +26,7 @@ import models.businessmatching.BusinessType.Partnership
 import models.businesscustomer.{Address, ReviewDetails}
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
@@ -92,7 +92,24 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
       val html = Jsoup.parse(contentAsString(result))
       html.select("a.change-answer").size mustBe 0
+    }
+  }
 
+  "Post" when {
+    "called" must {
+      "update the hasAccepted flag on the model" in new Fixture {
+        val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockCacheFetch[BusinessMatching](Some(model))
+        mockCacheSave[BusinessMatching]
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
+      }
     }
   }
 }

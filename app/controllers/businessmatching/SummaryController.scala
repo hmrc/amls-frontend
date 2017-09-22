@@ -43,6 +43,16 @@ trait SummaryController extends BaseController {
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
+
+  def post() = Authorised.async {
+    implicit authContext => implicit request =>
+      val result = for {
+        bm <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
+        _ <- OptionT.liftF(dataCache.save[BusinessMatching](BusinessMatching.key, bm.copy(hasAccepted = true)))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())
+
+      result getOrElse InternalServerError("Unable to update business matching")
+  }
 }
 
 object SummaryController extends SummaryController {

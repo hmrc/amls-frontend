@@ -28,7 +28,8 @@ case class BusinessMatching(
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
                              businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                             hasChanged: Boolean = false
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =
@@ -71,7 +72,7 @@ case class BusinessMatching(
 
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _)
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _)
         if {
           isbusinessTypeComplete(x.businessType) && msbComplete(activity)
         } => true
@@ -108,7 +109,8 @@ object BusinessMatching {
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
       __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessMatching.apply _)
 
 
@@ -124,7 +126,7 @@ object BusinessMatching {
           Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
-        } + ("hasChanged" -> JsBoolean(model.hasChanged))
+        } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
     }
 
   implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =
