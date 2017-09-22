@@ -22,7 +22,7 @@ import forms.{EmptyForm, Form2}
 import models.businessmatching._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
@@ -265,32 +265,69 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       "add data to the existing services" when {
         "status is post-submission" in new Fixture {
 
-          val existingServices = Set(HighValueDealing, AccountancyServices)
-          val addedServices = Set(MoneyServiceBusiness, TelephonePaymentService)
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
           val status = SubmissionDecisionApproved
 
-          val updateModel = PrivateMethod[Set[BusinessActivity]]('updateModel)
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
 
-          val services = controller invokePrivate updateModel(existingServices, addedServices, status)
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
 
-          services must be(existingServices ++ addedServices)
+          services must be(BusinessActivities(existingServices.businessActivities ++ addedServices.businessActivities))
 
         }
       }
       "replace existing services" when {
         "status is pre-submission" in new Fixture {
 
-          val existingServices = Set(HighValueDealing, AccountancyServices)
-          val addedServices = Set(MoneyServiceBusiness, TelephonePaymentService)
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
           val status = NotCompleted
 
-          val updateModel = PrivateMethod[Set[BusinessActivity]]('updateModel)
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
 
-          val services = controller invokePrivate updateModel(existingServices, addedServices, status)
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
 
           services must be(addedServices)
 
         }
+      }
+    }
+  }
+
+  it must {
+    "save additional services to existing services" when {
+      "status is post-submission" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(SubmissionDecisionApproved)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+            BusinessActivities(activityData1 + HighValueDealing + TelephonePaymentService)
+          )
+        ))(any(),any(),any())
+
+      }
+    }
+    "save only services from request" when {
+      "status is pre-submisson" in new Fixture {
+
       }
     }
   }

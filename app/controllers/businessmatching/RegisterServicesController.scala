@@ -67,11 +67,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             }
           case ValidForm(_, data) =>
             for {
+              status <- statusService.getStatus
               businessMatching <- businessMatchingService.getModel.value
               _ <- businessMatchingService.updateModel(
                 data.businessActivities.contains(MoneyServiceBusiness) match {
-                  case false => businessMatching.copy(activities = Some(data), msbServices = None)
-                  case true => businessMatching.activities(data)
+                  case false => businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
+                  case true => businessMatching.activities(updateModel(businessMatching.activities, data, status))
                 }
               ).value
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
@@ -102,12 +103,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(existingServices: Set[BusinessActivity], addedServices: Set[BusinessActivity], status: SubmissionStatus): Set[BusinessActivity] = {
+  private def updateModel(existingServices: Option[BusinessActivities], addedServices: BusinessActivities, status: SubmissionStatus): BusinessActivities = {
 
-    status match {
-      case NotCompleted | SubmissionReady => addedServices
-      case _ => existingServices ++ addedServices
+    existingServices.fold[BusinessActivities](addedServices){ existing =>
+      status match {
+        case NotCompleted | SubmissionReady => addedServices
+        case _ => BusinessActivities(existing.businessActivities ++ addedServices.businessActivities)
+      }
     }
+
   }
 
 }
