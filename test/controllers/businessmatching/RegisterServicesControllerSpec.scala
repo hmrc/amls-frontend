@@ -260,6 +260,39 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
     }
+
+    "updateModel" must {
+      "add data to the existing services" when {
+        "status is post-submission" in new Fixture {
+
+          val existingServices = Set(HighValueDealing, AccountancyServices)
+          val addedServices = Set(MoneyServiceBusiness, TelephonePaymentService)
+          val status = SubmissionDecisionApproved
+
+          val updateModel = PrivateMethod[Set[BusinessActivity]]('updateModel)
+
+          val services = controller invokePrivate updateModel(existingServices, addedServices, status)
+
+          services must be(existingServices ++ addedServices)
+
+        }
+      }
+      "replace existing services" when {
+        "status is pre-submission" in new Fixture {
+
+          val existingServices = Set(HighValueDealing, AccountancyServices)
+          val addedServices = Set(MoneyServiceBusiness, TelephonePaymentService)
+          val status = NotCompleted
+
+          val updateModel = PrivateMethod[Set[BusinessActivity]]('updateModel)
+
+          val services = controller invokePrivate updateModel(existingServices, addedServices, status)
+
+          services must be(addedServices)
+
+        }
+      }
+    }
   }
 
 }

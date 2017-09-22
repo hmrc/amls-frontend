@@ -101,4 +101,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
+  private def updateModel(existingServices: Set[BusinessActivity], addedServices: Set[BusinessActivity], status: SubmissionStatus): Set[BusinessActivity] = {
+
+    status match {
+      case NotCompleted | SubmissionReady => addedServices
+      case _ => existingServices ++ addedServices
+    }
+  }
+
 }
