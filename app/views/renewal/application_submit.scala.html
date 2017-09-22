@@ -33,7 +33,8 @@
         <p>@messages("renewal.progress.submit.intro")</p>
     }
 
-    <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter"> @CSRF.formField
+    <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
+        @CSRF.formField
         <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
             @messages("progress.submit")
         </button>
