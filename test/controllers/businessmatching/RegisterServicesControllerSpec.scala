@@ -320,13 +320,35 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
             BusinessActivities(activityData1 + HighValueDealing + TelephonePaymentService)
-          )
-        ))(any(),any(),any())
+        )))(any(),any(),any())
 
       }
     }
     "save only services from request" when {
       "status is pre-submisson" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(NotCompleted)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+          BusinessActivities(Set(HighValueDealing, TelephonePaymentService))
+        )))(any(),any(),any())
 
       }
     }
