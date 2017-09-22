@@ -43,7 +43,10 @@ trait ContactingYouController extends BaseController {
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
         case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _, _)) if details.email.isDefined =>
-          Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(Some(details.email.getOrElse("")),"")), edit))
+          Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(
+            Some(details.email.getOrElse("")),
+            Some(details.confirmEmail.getOrElse("")))),
+            edit))
         case _ =>
           Ok(contacting_you(EmptyForm, edit))
       }
