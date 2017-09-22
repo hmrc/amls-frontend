@@ -80,7 +80,8 @@
     @model.activities.map { activity =>
         @checkYourAnswers(
             question = Messages("businessmatching.registerservices.title"),
-            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString,
+            allowEdit = allowEdit
         ) {
             <ul class="list list--comma">
                 @activity.businessActivities.map { line =>
