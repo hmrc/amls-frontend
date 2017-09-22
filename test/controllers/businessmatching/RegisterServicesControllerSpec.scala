@@ -259,6 +259,14 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
     }
+
+    "updateModel is called" must {
+      "add data to the existing services" when {
+        "status is post-submission" in new Fixture {
+
+        }
+      }
+    }
   }
 
 }
