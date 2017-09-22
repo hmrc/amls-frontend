@@ -162,6 +162,35 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
         val document: Document = Jsoup.parse(contentAsString(result))
         document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
       }
+
+      "return 500" when {
+        "'Yes' was given but there is no model" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "appliedFor" -> "true",
+            "regNumber" -> "123456"
+          )
+
+          when {
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.none[Future, BusinessMatching]
+
+          val result = controller.post()(newRequest)
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+
+        "'No' was given but there is no model" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "appliedFor" -> "false"
+          )
+
+          when {
+            controller.businessMatchingService.clearVariation(any(), any(), any())
+          } thenReturn OptionT.none[Future, CacheMap]
+
+          val result = controller.post()(newRequest)
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+      }
     }
   }
 }

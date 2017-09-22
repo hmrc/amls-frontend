@@ -20,6 +20,7 @@ import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.concurrent.ScalaFutures
@@ -113,14 +114,29 @@ class BusinessMatchingServiceSpec extends PlaySpec
       "copy the variation data over the primary data when not in pre-application status" in new Fixture {
 
         mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
         mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
 
         whenReady(service.commitVariationData.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel.copy(hasChanged = true)))(any(), any(), any())
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
         }
-
       }
+
+      "copy the variation data over the primary data, setting hasChanged to false when the models are the same" in new Fixture {
+
+        val newModel = businessMatchingGen.sample
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(newModel, BusinessMatching.key)
+        mockCacheGetEntry(newModel, BusinessMatching.variationKey)
+
+        whenReady(service.commitVariationData.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel.copy(hasChanged = false)))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+
     }
   }
 
@@ -133,5 +149,4 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
   }
-
 }

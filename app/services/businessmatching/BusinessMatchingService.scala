@@ -59,8 +59,9 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
       case _ =>
         for {
           cacheMap <- OptionT(cache.fetchAll)
-          variation <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey))
-          _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, variation))
+          primaryModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey))
+          _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, variationModel.copy(hasChanged = primaryModel != variationModel)))
           result <- clearVariation
         } yield result
     }
