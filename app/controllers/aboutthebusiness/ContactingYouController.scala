@@ -45,7 +45,7 @@ trait ContactingYouController extends BaseController {
         case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _, _)) if details.email.isDefined =>
           Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(
             Some(details.email.getOrElse("")),
-            Some(details.confirmEmail.getOrElse("")))),
+            Some(details.email.getOrElse("")))),
             edit))
         case _ =>
           Ok(contacting_you(EmptyForm, edit))
