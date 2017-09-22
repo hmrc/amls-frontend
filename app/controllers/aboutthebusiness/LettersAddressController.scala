@@ -19,11 +19,11 @@ package controllers.aboutthebusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms._
-import models.aboutthebusiness.{RegisteredOffice, AboutTheBusiness, LettersAddress}
+import models.aboutthebusiness.{AboutTheBusiness, LettersAddress, RegisteredOffice}
 import views.html.aboutthebusiness._
+import play.api.mvc.Result
+import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 
-import scala.concurrent.Future
 
 trait LettersAddressController extends BaseController {
 
@@ -31,14 +31,17 @@ trait LettersAddressController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      for {
-        aboutTheBusiness <-
-        dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-      } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, _, Some(registeredOffice), None, _)) =>
-          Ok(letters_address(EmptyForm, registeredOffice, edit))
-        case _ =>
-          Redirect(routes.CorrespondenceAddressController.get(edit))
+      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+        response =>
+          (for {
+            atb <- response
+            registeredOffice <- atb.registeredOffice
+          } yield {
+            (for {
+              altCorrespondenceAddress <- atb.altCorrespondenceAddress
+            } yield Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit)))
+              .getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
+          }) getOrElse Redirect(routes.CorrespondenceAddressController.get(edit))
       }
 
   }
@@ -59,11 +62,30 @@ trait LettersAddressController extends BaseController {
               }
           }
         case ValidForm(_, data) =>
-          data.lettersAddress match {
-            case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case false => Future.successful(Redirect(routes.CorrespondenceAddressController.get(edit)))
+          dataCache.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+              } yield {
+                dataCache.save[AboutTheBusiness](AboutTheBusiness.key, data.lettersAddress match {
+                  case true =>
+                    aboutTheBusiness.altCorrespondenceAddress(false).copy(correspondenceAddress = None)
+                  case false =>
+                    aboutTheBusiness.altCorrespondenceAddress(true)
+                })
+
+                getRouting(data.lettersAddress, edit)
+              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
       }
+  }
+
+  private def getRouting(altCorrespondenceAddress: Boolean, edit: Boolean): Result = {
+    altCorrespondenceAddress match {
+      case true => Redirect(routes.SummaryController.get())
+      case false => Redirect(routes.CorrespondenceAddressController.get(edit))
+    }
   }
 }
 

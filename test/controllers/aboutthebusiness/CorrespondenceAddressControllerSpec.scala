@@ -64,7 +64,7 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-        val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, Some(correspondenceAddress))
+        val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
@@ -107,7 +107,7 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
 
         val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, None, Some(address))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -145,7 +145,7 @@ class CorrespondenceAddressControllerSpec extends GenericTestHelper with Mockito
 
         val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(AboutTheBusiness(None,None, None, None, None, None, None, Some(address))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",

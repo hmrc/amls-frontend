@@ -82,6 +82,7 @@ class summarySpec extends GenericTestHelper
           Some(CorporationTaxRegisteredYes("3456")),
           Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
+          Some(true),
           Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           false
         ),true, BusinessType.LimitedCompany
