@@ -16,12 +16,13 @@
 
 package controllers.businessmatching
 
-import connectors.DataCacheConnector
+import cats.data.OptionT
+import cats.implicits._
 import forms.{EmptyForm, Form2}
 import models.businessmatching._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
@@ -30,11 +31,13 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester {
 
@@ -52,8 +55,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
+    val businessMatchingService = mock[BusinessMatchingService]
 
     val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
     val activityData2: Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
@@ -64,7 +67,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
@@ -83,11 +86,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     "get is called" must {
 
-      "display who is your agent page" which {
+      "display the view" which {
         "shows empty fields" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.businessMatchingService.getModel(any(),any(),any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](BusinessMatching()))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -97,8 +100,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "populates fields" in new Fixture {
 
           when {
-            controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())
-          } thenReturn Future.successful(Some(businessMatching1))
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -124,11 +127,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "02",
               "businessActivities" -> "03")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -145,11 +148,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities" -> "02",
               "businessActivities" -> "03")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -167,11 +170,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
               "businessActivities[0]" -> "04",
               "businessActivities[1]" -> "05")
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](bm))
 
-            when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -189,12 +192,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "11")
 
+          when(controller.businessMatchingService.getModel(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-          when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -256,6 +258,98 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
           }
 
         }
+      }
+    }
+
+    "updateModel" must {
+      "add data to the existing services" when {
+        "status is post-submission" in new Fixture {
+
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+          val status = SubmissionDecisionApproved
+
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
+
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
+
+          services must be(BusinessActivities(existingServices.businessActivities ++ addedServices.businessActivities))
+
+        }
+      }
+      "replace existing services" when {
+        "status is pre-submission" in new Fixture {
+
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+          val status = NotCompleted
+
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
+
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
+
+          services must be(addedServices)
+
+        }
+      }
+    }
+  }
+
+  it must {
+    "save additional services to existing services" when {
+      "status is post-submission" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(SubmissionDecisionApproved)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+            BusinessActivities(activityData1 + HighValueDealing + TelephonePaymentService)
+        )))(any(),any(),any())
+
+      }
+    }
+    "save only services from request" when {
+      "status is pre-submisson" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(NotCompleted)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+          BusinessActivities(Set(HighValueDealing, TelephonePaymentService))
+        )))(any(),any(),any())
+
       }
     }
   }

@@ -18,7 +18,9 @@ package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
 
-import connectors.DataCacheConnector
+import cats.data.OptionT
+import cats.implicits._
+import services.businessmatching.BusinessMatchingService
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
@@ -29,14 +31,14 @@ import views.html.businessmatching._
 
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService)() extends BaseController {
+                                           val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         statusService.getStatus flatMap { status =>
-          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+          businessMatchingService.getModel.value map {
             response =>
               (for {
                 businessMatching <- response
@@ -65,13 +67,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             }
           case ValidForm(_, data) =>
             for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-              _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+              status <- statusService.getStatus
+              businessMatching <- businessMatchingService.getModel.value
+              _ <- businessMatchingService.updateModel(
                 data.businessActivities.contains(MoneyServiceBusiness) match {
-                  case false => businessMatching.copy(activities = Some(data), msbServices = None)
-                  case true => businessMatching.activities(data)
+                  case false => businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
+                  case true => businessMatching.activities(updateModel(businessMatching.activities, data, status))
                 }
-              )
+              ).value
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
@@ -95,6 +98,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       status match {
         case SubmissionReady | NotCompleted => (activities, Set.empty)
         case _ => (activities diff(ea map BusinessActivities.getValue), activities intersect(ea map BusinessActivities.getValue))
+      }
+    }
+
+  }
+
+  private def updateModel(existingServices: Option[BusinessActivities], addedServices: BusinessActivities, status: SubmissionStatus): BusinessActivities = {
+
+    existingServices.fold[BusinessActivities](addedServices){ existing =>
+      status match {
+        case NotCompleted | SubmissionReady => addedServices
+        case _ => BusinessActivities(existing.businessActivities ++ addedServices.businessActivities)
       }
     }
 
