@@ -70,7 +70,8 @@ class ContactingYouEmailSpec extends PlaySpec with MockitoSugar {
 
       ContactingYouEmail.formWrites.writes(model) must
         be(Map(
-          "email" -> Seq("test@test.com")
+          "email" -> Seq("test@test.com"),
+          "confirmEmail" -> Seq("test@test.com")
         ))
     }
   }

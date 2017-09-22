@@ -36,7 +36,10 @@ object ContactingYouEmail {
 
   implicit val formWrites: Write[ContactingYouEmail, UrlFormEncoded] =
     Write {
-      case ContactingYouEmail(b,_) =>
-        Map("email" -> Seq(b.toString))
+      case ContactingYouEmail(email, confirmEmail) =>
+        Map(
+          "email" -> Seq(email),
+          "confirmEmail" -> Seq(confirmEmail)
+        )
     }
 }
