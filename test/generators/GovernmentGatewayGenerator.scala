@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching
+package generators
 
+import models.governmentgateway.EnrolmentRequest
+import org.scalacheck.Gen
 
-import config.AMLSAuthConnector
-import controllers.BaseController
-import scala.concurrent.Future
+trait GovernmentGatewayGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
 
-trait CannotContinueWithTheApplicationController extends BaseController {
+  val enrolmentRequestGen: Gen[EnrolmentRequest] = for {
+    amlsRef <- amlsRefNoGen
+    safeId <- safeIdGen
+    postcode <- postcodeGen
+  } yield EnrolmentRequest(amlsRef, safeId, postcode)
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.businessmatching.cannot_continue_with_the_application()))
-  }
-}
-
-object CannotContinueWithTheApplicationController extends CannotContinueWithTheApplicationController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
 }

@@ -184,7 +184,7 @@ POST        /business-matching/psr-registration                                 
 
 GET         /business-matching/check-your-answers                                     controllers.businessmatching.SummaryController.get()
 
-GET         /business-matching/no-psr                                                 controllers.businessmatching.CannotContinueWithTheApplicationController.get()
+GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
@@ -564,6 +564,7 @@ GET         /renewal/receiving                                                  
 POST        /renewal/receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                               @controllers.renewal.SummaryController.get()
+POST        /renewal/check-your-answers                                               @controllers.renewal.SummaryController.post()
 
 GET         /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.get()
 POST        /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.post()

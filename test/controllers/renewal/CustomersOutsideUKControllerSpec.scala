@@ -247,7 +247,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
               customersOutsideUK = Some(CustomersOutsideUK(None)),
               sendTheLargestAmountsOfMoney = None,
               mostTransactions = None,
-              hasChanged = true
+              hasChanged = true,
+              hasAccepted = false
             )))(any(), any(), any())
         }
 
@@ -268,7 +269,8 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
               customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United States","US"))))),
               sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
               mostTransactions = Some(mostTransactions),
-              hasChanged = true
+              hasChanged = true,
+              hasAccepted = false
             )))(any(), any(), any())
         }
 

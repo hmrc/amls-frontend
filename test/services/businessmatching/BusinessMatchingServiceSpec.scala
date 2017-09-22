@@ -16,15 +16,16 @@
 
 package services.businessmatching
 
+import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,6 +44,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
     mockCacheFetch(Some(primaryModel), Some(BusinessMatching.key))
     mockCacheFetch(Some(variationModel), Some(BusinessMatching.variationKey))
+    mockCacheSave[BusinessMatching]
+
   }
 
   "getModel" when {
@@ -101,4 +104,49 @@ class BusinessMatchingServiceSpec extends PlaySpec
     }
   }
 
+  "commitVariationData" when {
+    "called" must {
+      "simply return the cachemap when in pre-application status" in new Fixture {
+        mockApplicationStatus(SubmissionReady)
+        service.commitVariationData returnsSome mockCacheMap
+      }
+
+      "copy the variation data over the primary data when not in pre-application status" in new Fixture {
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
+        mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
+
+        whenReady(service.commitVariationData.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel.copy(hasChanged = true)))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+
+      "copy the variation data over the primary data, setting hasChanged to false when the models are the same" in new Fixture {
+
+        val newModel = businessMatchingGen.sample
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(newModel, BusinessMatching.key)
+        mockCacheGetEntry(newModel, BusinessMatching.variationKey)
+
+        whenReady(service.commitVariationData.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel.copy(hasChanged = false)))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+
+    }
+  }
+
+  "clear" when {
+    "called" must {
+      "reset the variation model back to nothing" in new Fixture {
+        whenReady(service.clearVariation.value) { _ =>
+          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+    }
+  }
 }

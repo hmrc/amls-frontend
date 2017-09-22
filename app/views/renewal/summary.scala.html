@@ -18,8 +18,9 @@
 @import forms2._
 @import models.renewal._
 @import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
+@import config.ApplicationConfig
 
-@(model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[MsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
+@(f: forms.Form2[_], model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[MsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -256,18 +257,8 @@
         }
     }
 
-    @if(canSubmit){
-        @anchor(
-            attrHref = controllers.renewal.routes.UpdateAnyInformationController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.checkyouranswers.acceptandcontinue")
-        )
-    } else {
-        @anchor(
-            attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.checkyouranswers.acceptandcontinue")
-        )
+    @form(f, controllers.renewal.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 
 }
