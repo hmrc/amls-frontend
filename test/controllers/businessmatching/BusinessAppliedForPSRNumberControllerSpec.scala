@@ -16,7 +16,10 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,23 +27,43 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
+  with MockitoSugar
+  with ScalaFutures
+  with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new BusinessAppliedForPSRNumberController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+      override val dataCacheConnector = mockCacheConnector
       override val authConnector = self.authConnector
+      override val businessMatchingService = mock[BusinessMatchingService]
     }
+
+    val businessMatching = businessMatchingGen.sample.get
+
+    when {
+      controller.businessMatchingService.getModel(any(), any(), any())
+    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+
+    when {
+      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    when {
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -49,41 +72,47 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with M
 
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.none[Future, BusinessMatching]
+
         val result = controller.get()(request)
         status(result) must be(OK)
       }
 
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(
-          Some(BusinessMatching(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456"))))))
+        override val businessMatching = businessMatchingWithPsrGen.sample.get
+
+        var psr = businessMatching.businessAppliedForPSRNumber match {
+          case Some(BusinessAppliedForPSRNumberYes(num)) => num
+          case _ => "invalid"
+        }
+
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=regNumber]").`val` must be("123456")
+        document.select("input[name=regNumber]").`val` mustBe psr
       }
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false"in new Fixture {
+      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> "123789"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
         val result = controller.post(false)(newRequest)
+
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        verify(controller.businessMatchingService).commitVariationData(any(), any(), any())
       }
 
       "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is true" in new Fixture {
@@ -110,16 +139,15 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with M
           "appliedFor" -> "false"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when {
+          controller.businessMatchingService.clearVariation(any(), any(), any())
+        } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
         val result = controller.post(true)(newRequest)
+
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.CannotContinueWithTheApplicationController.get().url))
-        verify(controller.dataCacheConnector, times(1)).save(any(), any())(any(), any(), any())
+        redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
+        verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
@@ -133,6 +161,35 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with M
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
+      }
+
+      "return 500" when {
+        "'Yes' was given but there is no model" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "appliedFor" -> "true",
+            "regNumber" -> "123456"
+          )
+
+          when {
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.none[Future, BusinessMatching]
+
+          val result = controller.post()(newRequest)
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+
+        "'No' was given but there is no model" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "appliedFor" -> "false"
+          )
+
+          when {
+            controller.businessMatchingService.clearVariation(any(), any(), any())
+          } thenReturn OptionT.none[Future, CacheMap]
+
+          val result = controller.post()(newRequest)
+          status(result) mustBe INTERNAL_SERVER_ERROR
+        }
       }
     }
   }

@@ -24,10 +24,13 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.mvc.Call
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -1475,3 +1478,1299 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
     }
   }
 }
+
+class RenewalServiceSpecNoToggleSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
+
+  implicit val hc = HeaderCarrier()
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true) )
+
+  trait Fixture extends AuthorisedFixture { self =>
+    val dataCache = mock[DataCacheConnector]
+    implicit val authContext = mock[AuthContext]
+
+    val injector = new GuiceInjectorBuilder()
+      .overrides(bind[DataCacheConnector].to(dataCache))
+      .build()
+
+    val service = injector.instanceOf[RenewalService]
+
+    val completeModel = Renewal(
+      Some(InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+      Some(TotalThroughput("01")),
+      Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+      Some(TransactionsInLast12Months("1500")),
+      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("123")),
+      true,
+      Some(SendMoneyToOtherCountry(true))
+    )
+
+    val mockCacheMap = mock[CacheMap]
+
+  }
+
+  "isRenewalComplete" must {
+    "be true" when {
+      "it is an MSB" when {
+        "it is an HVD" when {
+          "it is a CurrencyExchange" when {
+            "it is a TransmittingMoney" when {
+              "there are customers outside the UK" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true)),
+                    hasAccepted = true
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+              "they do not send money to other countries" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+            }
+            "it is NOT a TransmittingMoney" when {
+              "involvedInOther is true" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness,
+                      HighValueDealing
+                    ))),
+                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherYes("test")),
+                  Some(BusinessTurnover.First),
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  Some(PercentageOfCashPaymentOver15000.First),
+                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                  Some(TotalThroughput("01")),
+                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                  None,
+                  None,
+                  None,
+                  Some(CETransactionsInLast12Months("123")),
+                  hasChanged = true,
+                  Some(SendMoneyToOtherCountry(false))
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+              "involvedInOther is false" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness,
+                      HighValueDealing
+                    ))),
+                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherNo),
+                  None,
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  Some(PercentageOfCashPaymentOver15000.First),
+                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                  Some(TotalThroughput("01")),
+                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                  None,
+                  None,
+                  None,
+                  Some(CETransactionsInLast12Months("123")),
+                  hasChanged = true,
+                  Some(SendMoneyToOtherCountry(false))
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+            }
+          }
+          "it is NOT a CurrencyExchange" when {
+            "it is a TransmittingMoney" when {
+              "there are customers outside the UK" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+              "they do not send money to other countries" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness,
+                        HighValueDealing
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    Some(PercentageOfCashPaymentOver15000.First),
+                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+            }
+            "it is NOT a TransmittingMoney" when {
+              "involvedInOther is true" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness,
+                      HighValueDealing
+                    ))),
+                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherYes("test")),
+                  Some(BusinessTurnover.First),
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  Some(PercentageOfCashPaymentOver15000.First),
+                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                  Some(TotalThroughput("01")),
+                  None,
+                  None,
+                  None,
+                  None,
+                  None,
+                  hasChanged = true,
+                  Some(SendMoneyToOtherCountry(false))
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+              "involvedInOther is false" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness,
+                      HighValueDealing
+                    ))),
+                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherNo),
+                  None,
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  Some(PercentageOfCashPaymentOver15000.First),
+                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                  Some(TotalThroughput("01")),
+                  None,
+                  None,
+                  None,
+                  None,
+                  None,
+                  hasChanged = true,
+                  Some(SendMoneyToOtherCountry(false))
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+            }
+
+          }
+        }
+
+        "it is NOT an HVD" when {
+          "it is a CurrencyExchange" when {
+            "it is a TransmittingMoney" when {
+              "there are customers outside the UK" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+              "they do not send money to other countries" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    Some(CETransactionsInLast12Months("123")),
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+            }
+            "it is NOT a TransmittingMoney" when {
+              "involvedInOther is true" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness
+                    ))),
+                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherYes("test")),
+                  Some(BusinessTurnover.First),
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  None,
+                  None,
+                  Some(TotalThroughput("01")),
+                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                  None,
+                  None,
+                  None,
+                  Some(CETransactionsInLast12Months("123")),
+                  hasChanged = true,
+                  None
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+              "involvedInOther is false" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness
+                    ))),
+                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherNo),
+                  None,
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  None,
+                  None,
+                  Some(TotalThroughput("01")),
+                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                  None,
+                  None,
+                  None,
+                  Some(CETransactionsInLast12Months("123")),
+                  hasChanged = true,
+                  None
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+            }
+          }
+
+          "it is NOT a CurrencyExchange" when {
+            "it is a TransmittingMoney" when {
+              "there are customers outside the UK" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(true))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+              "they do not send money to other countries" when {
+                "involvedInOther is true" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherYes("test")),
+                    Some(BusinessTurnover.First),
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+                "involvedInOther is false" in new Fixture {
+
+                  when(dataCache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                    .thenReturn(Some(BusinessMatching(
+                      activities = Some(BusinessActivities(Set(
+                        MoneyServiceBusiness
+                      ))),
+                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                    )))
+
+                  val model = Renewal(
+                    Some(InvolvedInOtherNo),
+                    None,
+                    Some(AMLSTurnover.First),
+                    Some(CustomersOutsideUK(None)),
+                    None,
+                    None,
+                    Some(TotalThroughput("01")),
+                    None,
+                    Some(TransactionsInLast12Months("1500")),
+                    None,
+                    None,
+                    None,
+                    hasChanged = true,
+                    Some(SendMoneyToOtherCountry(false))
+                  )
+
+                  await(service.isRenewalComplete(model)) mustBe true
+                }
+              }
+            }
+
+            "it is NOT a TransmittingMoney" when {
+              "involvedInOther is true" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness
+                    ))),
+                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherYes("test")),
+                  Some(BusinessTurnover.First),
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  None,
+                  None,
+                  Some(TotalThroughput("01")),
+                  None,
+                  None,
+                  None,
+                  None,
+                  hasChanged = true,
+                  sendMoneyToOtherCountry = None
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+              "involvedInOther is false" in new Fixture {
+
+                when(dataCache.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(mockCacheMap)))
+
+                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                  .thenReturn(Some(BusinessMatching(
+                    activities = Some(BusinessActivities(Set(
+                      MoneyServiceBusiness
+                    ))),
+                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                  )))
+
+                val model = Renewal(
+                  Some(InvolvedInOtherNo),
+                  None,
+                  Some(AMLSTurnover.First),
+                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                  None,
+                  None,
+                  Some(TotalThroughput("01")),
+                  None,
+                  None,
+                  None,
+                  None,
+                  None,
+                  hasChanged = true,
+                  None
+                )
+
+                await(service.isRenewalComplete(model)) mustBe true
+              }
+            }
+          }
+
+        }
+      }
+
+      "it is NOT an MSB" when {
+        "it is an HVD" when {
+          "involvedInOther is true" in new Fixture {
+
+            when(dataCache.fetchAll(any(),any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+              .thenReturn(Some(BusinessMatching(
+                activities = Some(BusinessActivities(Set(
+                  HighValueDealing
+                )))
+              )))
+
+            val model = Renewal(
+              Some(InvolvedInOtherYes("test")),
+              Some(BusinessTurnover.First),
+              Some(AMLSTurnover.First),
+              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              Some(PercentageOfCashPaymentOver15000.First),
+              Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              hasChanged = true,
+              None
+            )
+
+            await(service.isRenewalComplete(model)) mustBe true
+          }
+          "involvedInOther is false" in new Fixture {
+
+            when(dataCache.fetchAll(any(),any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+              .thenReturn(Some(BusinessMatching(
+                activities = Some(BusinessActivities(Set(
+                  HighValueDealing
+                )))
+              )))
+
+            val model = Renewal(
+              Some(InvolvedInOtherNo),
+              None,
+              Some(AMLSTurnover.First),
+              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              Some(PercentageOfCashPaymentOver15000.First),
+              Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              hasChanged = true,
+              None
+            )
+
+            await(service.isRenewalComplete(model)) mustBe true
+          }
+        }
+        "it is NOT an HVD" when {
+          "involvedInOther is true" in new Fixture {
+
+            when(dataCache.fetchAll(any(),any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+              .thenReturn(Some(BusinessMatching(
+                activities = Some(BusinessActivities(Set(
+                  TelephonePaymentService
+                )))
+              )))
+
+            val model = Renewal(
+              Some(InvolvedInOtherYes("test")),
+              Some(BusinessTurnover.First),
+              Some(AMLSTurnover.First),
+              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              hasChanged = true,
+              None
+            )
+
+            await(service.isRenewalComplete(model)) mustBe true
+          }
+          "involvedInOther is false" in new Fixture {
+
+            when(dataCache.fetchAll(any(),any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+
+            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+              .thenReturn(Some(BusinessMatching(
+                activities = Some(BusinessActivities(Set(
+                  TelephonePaymentService
+                )))
+              )))
+
+            val model = Renewal(
+              Some(InvolvedInOtherNo),
+              None,
+              Some(AMLSTurnover.First),
+              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              hasChanged = true,
+              None
+            )
+
+            await(service.isRenewalComplete(model)) mustBe true
+          }
+        }
+      }
+    }
+
+    "be false" when {
+      "it is an MSB" when {
+        "it is an HVD" when {
+          "it is a CurrencyExchange" when {
+            "it is TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness,
+                    HighValueDealing
+                  ))),
+                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                )))
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                Some(PercentageOfCashPaymentOver15000.First),
+                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                Some(TotalThroughput("01")),
+                Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                Some(TransactionsInLast12Months("1500")),
+                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                None,
+                hasChanged = true,
+                Some(SendMoneyToOtherCountry(true))
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+            "it is NOT TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness,
+                    HighValueDealing
+                  ))),
+                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                )))
+
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                Some(PercentageOfCashPaymentOver15000.First),
+                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                Some(TotalThroughput("01")),
+                Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                None,
+                None,
+                None,
+                None,
+                hasChanged = true,
+                None
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+          }
+          "it is not a CurrencyExchange" when {
+            "it is TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness,
+                    HighValueDealing
+                  ))),
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                )))
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                Some(PercentageOfCashPaymentOver15000.First),
+                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+                Some(TotalThroughput("01")),
+                None,
+                None,
+                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                None,
+                hasChanged = true,
+                Some(SendMoneyToOtherCountry(true))
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+          }
+        }
+        "it is NOT an HVD" when {
+          "it is a CurrencyExchange" when {
+            "it is TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness
+                  ))),
+                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                )))
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                None,
+                None,
+                Some(TotalThroughput("01")),
+                None,
+                Some(TransactionsInLast12Months("1500")),
+                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                None,
+                hasChanged = true,
+                Some(SendMoneyToOtherCountry(true))
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+            "it is NOT TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness
+                  ))),
+                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                )))
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                None,
+                None,
+                Some(TotalThroughput("01")),
+                None,
+                None,
+                None,
+                None,
+                None,
+                hasChanged = true,
+                None
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+          }
+          "it is NOT a CurrencyExchange" when {
+            "it is TransmittingMoney" in new Fixture {
+
+              when(dataCache.fetchAll(any(),any()))
+                .thenReturn(Future.successful(Some(mockCacheMap)))
+
+              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(
+                    MoneyServiceBusiness
+                  ))),
+                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                )))
+
+              val model = Renewal(
+                Some(InvolvedInOtherYes("test")),
+                Some(BusinessTurnover.First),
+                Some(AMLSTurnover.First),
+                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+                None,
+                None,
+                Some(TotalThroughput("01")),
+                None,
+                Some(TransactionsInLast12Months("1500")),
+                None,
+                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                None,
+                hasChanged = true,
+                Some(SendMoneyToOtherCountry(true))
+              )
+
+              await(service.isRenewalComplete(model)) mustBe false
+
+            }
+          }
+        }
+      }
+      "It is not an MSB" when {
+        "it is an HVD" in new Fixture {
+
+          when(dataCache.fetchAll(any(),any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(
+                MoneyServiceBusiness,
+                HighValueDealing
+              )))
+            )))
+
+          val model = Renewal(
+            Some(InvolvedInOtherYes("test")),
+            Some(BusinessTurnover.First),
+            Some(AMLSTurnover.First),
+            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            Some(PercentageOfCashPaymentOver15000.First),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            hasChanged = true,
+            None
+          )
+
+          await(service.isRenewalComplete(model)) mustBe false
+
+        }
+        "it is NOT an HVD" in new Fixture {
+
+          when(dataCache.fetchAll(any(),any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(
+                MoneyServiceBusiness
+              )))
+            )))
+
+          val model = Renewal(
+            Some(InvolvedInOtherYes("test")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            hasChanged = true,
+            None
+          )
+
+          await(service.isRenewalComplete(model)) mustBe false
+
+        }
+      }
+    }
+  }
+
+}
+

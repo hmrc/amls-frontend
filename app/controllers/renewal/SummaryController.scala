@@ -22,6 +22,7 @@ import cats.implicits._
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.businessmatching.BusinessMatching
 import models.renewal.Renewal
 import services.{ProgressService, RenewalService}
@@ -53,8 +54,15 @@ class SummaryController @Inject()
             } yield {
               val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
-              Ok(summary(renewal, businessMatching.activities, businessMatching.msbServices, canSubmit))
+              Ok(summary(EmptyForm, renewal, businessMatching.activities, businessMatching.msbServices, canSubmit))
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request => (for {
+      renewal <- OptionT(dataCacheConnector.fetch[Renewal](Renewal.key))
+      _ <- OptionT.liftF(dataCacheConnector.save[Renewal](Renewal.key, renewal.copy(hasAccepted = true)))
+    } yield Redirect(controllers.renewal.routes.UpdateAnyInformationController.get)) getOrElse InternalServerError("Could not update renewal")
   }
 }
