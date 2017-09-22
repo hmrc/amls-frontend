@@ -28,7 +28,6 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
     val name = "firstName lastName"
   }
 
@@ -46,64 +45,6 @@ class position_within_businessSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "positions[]") must not be empty
-
-    }
-
-    "have the correct fields" when {
-
-      def assertLabelIncluded(i: Int = 1)(implicit positions: List[Int], formText: String): Unit = {
-        if (i <= 9) {
-          if (positions contains i) {
-            formText must include(Messages(s"responsiblepeople.position_within_business.lbl.0$i"))
-            assertLabelIncluded(i + 1)
-          } else {
-            formText must not include Messages(s"responsiblepeople.position_within_business.lbl.0$i")
-            assertLabelIncluded(i + 1)
-          }
-        }
-      }
-
-      val testCases = List(
-        BusinessType.SoleProprietor -> List(4, 6),
-        BusinessType.Partnership -> List(4, 5),
-        BusinessType.LimitedCompany -> List(1, 2, 4),
-        BusinessType.UnincorporatedBody -> List(1, 2, 4),
-        BusinessType.LPrLLP -> List(4, 5, 7)
-      )
-
-      "nominated officer has not been selected previously" when {
-        testCases foreach {
-          case (businessType, positionsToDisplay) => {
-            s"$businessType" in new ViewFixture {
-
-              def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, true, None)
-
-              implicit val positions = positionsToDisplay
-              implicit val formText = form.text()
-
-              assertLabelIncluded()
-
-            }
-          }
-        }
-      }
-
-      "nominated officer has been selected previously" when {
-        testCases foreach {
-          case (businessType, positionsToDisplay) => {
-            s"$businessType" in new ViewFixture {
-
-              def view = views.html.responsiblepeople.position_within_business(EmptyForm, true, 1, businessType, name, false, None)
-
-              implicit val positions = positionsToDisplay.filterNot(_.equals(4))
-              implicit val formText = form.text()
-
-              assertLabelIncluded()
-
-            }
-          }
-        }
-      }
     }
 
     "show errors in the correct locations" in new ViewFixture {

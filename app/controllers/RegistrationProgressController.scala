@@ -51,25 +51,32 @@ trait RegistrationProgressController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ => {
-            dataCache.fetchAll.flatMap {
-              _.map { cacheMap =>
+            (for {
+              status <- OptionT.liftF(statusService.getStatus)
+              cacheMap <- OptionT(dataCache.fetchAll)
+              completePreApp <- OptionT(preApplicationComplete(cacheMap))
+              businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            } yield {
+              (for {
+                reviewDetails <- businessMatching.reviewDetails
+              } yield {
                 val sections = progressService.sections(cacheMap)
+                val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey)
 
-                preApplicationComplete(cacheMap) map {
-                  case Some(x) => x match {
-                    case true => Ok(registration_amendment(sections.filter(_.name != BusinessMatching.messageKey), amendmentDeclarationAvailable(sections)))
-                    case _ => Ok(registration_progress(sections, declarationAvailable(sections)))
-                  }
-                  case None => Redirect(controllers.routes.LandingController.get())
+                val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
+                val canEditPreApp = Set(NotCompleted, SubmissionReady).contains(status)
+
+                completePreApp match {
+                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
+                    case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
                 }
+              }) getOrElse InternalServerError("Unable to retrieve the business details")
 
-              }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
-            }
-          }
+            }) getOrElse Redirect(controllers.routes.LandingController.get())
+         }
         }
   }
 
@@ -120,13 +127,13 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
-  def post: Action[AnyContent] = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
         progressService.getSubmitRedirect map {
-            case Some(url) => Redirect(url)
-            case _ => InternalServerError("Could not get data for redirect")
-          }
+          case Some(url) => Redirect(url)
+          case _ => InternalServerError("Could not get data for redirect")
+        }
   }
 }
 

@@ -20,6 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
 import models.aboutthebusiness.AboutTheBusiness
+import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status.SubmissionReady
@@ -30,6 +31,7 @@ import utils.GenericTestHelper
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -56,6 +58,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     val testBusinessMatch = BusinessMatching(
       reviewDetails = Some(testReviewDetails)
     )
+
+    val model = AboutTheBusiness(None, None, None, None)
   }
 
   "Get" must {
@@ -66,8 +70,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "load the summary page when section data is available" in new Fixture {
-
-      val model = AboutTheBusiness(None, None, None, None)
 
       when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -97,5 +99,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       status(result) must be(SEE_OTHER)
     }
 
+  }
+
+  "post is called" must {
+    "respond with OK and redirect to the registration progress page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
+
+        when(controller.dataCache.save[AboutTheBusiness](meq(AboutTheBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
+
+    }
   }
 }

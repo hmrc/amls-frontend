@@ -19,13 +19,16 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.registrationprogress.{Completed, Section}
 import models.renewal._
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.RenewalService
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -43,12 +46,38 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
+    lazy val mockProgressService = mock[ProgressService]
 
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService,
+      progressService = mockProgressService
     )
+
+    when {
+      mockProgressService.sections(any())
+    } thenReturn Seq.empty[Section]
+
+    when {
+      mockRenewalService.getSection(any(),any(),any())
+    } thenReturn Future.successful(Section("", Completed, false, mock[Call]))
+
+    val renewalModel = Renewal(
+      Some(models.renewal.InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+      Some(TotalThroughput("01")),
+      Some(WhichCurrencies(Seq("EUR"),None,None,None,None)),
+      Some(TransactionsInLast12Months("1500")),
+      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("123")),
+      false,
+      hasAccepted = true)
 
   }
 
@@ -86,21 +115,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
       when(mockCacheMap.getEntry[Renewal](Renewal.key))
-        .thenReturn(Some(
-          Renewal(
-            Some(models.renewal.InvolvedInOtherYes("test")),
-            Some(BusinessTurnover.First),
-            Some(AMLSTurnover.First),
-            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-            Some(PercentageOfCashPaymentOver15000.First),
-            Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
-            Some(TotalThroughput("01")),
-            Some(WhichCurrencies(Seq("EUR"),None,None,None,None)),
-            Some(TransactionsInLast12Months("1500")),
-            Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-            Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            Some(CETransactionsInLast12Months("123")),
-            false)))
+        .thenReturn(Some(renewalModel))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -108,6 +123,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
       listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
 
+    }
+  }
+
+  "POST" must {
+    "update the hasAccepted flag on the model" in new Fixture {
+      val cache = mock[CacheMap]
+
+      when {
+        controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any())
+      } thenReturn Future.successful(Some(renewalModel.copy(hasAccepted = false)))
+
+      when {
+        controller.dataCacheConnector.save[Renewal](eqTo(Renewal.key), any())(any(), any(), any())
+      } thenReturn Future.successful(cache)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.renewal.routes.UpdateAnyInformationController.get.url)
+
+      val captor = ArgumentCaptor.forClass(classOf[Renewal])
+      verify(controller.dataCacheConnector).save[Renewal](eqTo(Renewal.key), captor.capture())(any(), any(), any())
+      captor.getValue.hasAccepted mustBe true
     }
   }
 }

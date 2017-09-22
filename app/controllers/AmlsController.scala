@@ -23,10 +23,14 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 trait AmlsController extends Actions {
 
-  //TODO needs mor information
   val unauthorised = Action {
-    request =>
-      Ok(views.html.unauthorised(request))
+    implicit request =>
+      Ok(views.html.unauthorised())
+  }
+
+  val unauthorised_role = Action {
+    implicit request =>
+      Unauthorized(views.html.unauthorised_role())
   }
 }
 

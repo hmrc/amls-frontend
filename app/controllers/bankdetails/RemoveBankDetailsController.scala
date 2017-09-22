@@ -30,7 +30,7 @@ trait RemoveBankDetailsController extends RepeatingSection with BaseController {
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(bankAcct), _,_,_)) =>
+        case Some(BankDetails(_, Some(bankAcct), _,_,_, _)) =>
         Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, bankAcct.accountName, complete))
         case _ => NotFound(notFoundView)
       }

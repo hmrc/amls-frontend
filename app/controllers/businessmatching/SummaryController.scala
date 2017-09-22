@@ -16,22 +16,32 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import views.html.businessmatching._
+import _root_.services.StatusService
+import cats.implicits._
+import cats.data.OptionT
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
+  protected def statusService: StatusService
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
-        case Some(data) => Ok(summary(data))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+        def isPreApprovedStatus(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
+
+        val okResult = for {
+          bm <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
+          status <- OptionT.liftF(statusService.getStatus)
+        } yield Ok(summary(bm, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
+
+        okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }
 
@@ -39,4 +49,5 @@ object SummaryController extends SummaryController {
   // $COVERAGE-OFF$
   override val dataCache = DataCacheConnector
   override val authConnector = AMLSAuthConnector
+  override val statusService = StatusService
 }

@@ -36,9 +36,9 @@ trait TrainingController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -70,7 +70,7 @@ trait TrainingController extends RepeatingSection with BaseController {
     cacheMapOpt match {
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-          case (true, _) => Redirect(routes.DetailedAnswersController.get(index))
+          case (true, _) => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts)),_,_,_,_, _)))
             if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
           => Redirect(routes.FitAndProperController.get(index, false, flow))

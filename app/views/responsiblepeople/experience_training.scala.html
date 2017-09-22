@@ -35,7 +35,7 @@
     <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
     <ul class="list list-bullet">
         @bamodel.businessActivities.map { ba =>
-        <li>@Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))</li>
+            <li>@Messages("businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba))</li>
         }
     </ul>
 

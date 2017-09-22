@@ -21,10 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails._
-import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
@@ -44,7 +41,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
           count <- getData[BankDetails].map(details => details.filterNot(filter).size)
           allowedToEdit <- ControllerHelper.allowedToEdit(edit)
         } yield bankDetail match {
-          case Some(BankDetails(Some(data), _, _, _, _)) if allowedToEdit =>
+          case Some(BankDetails(Some(data), _, _, _, _, _)) if allowedToEdit =>
             Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
           case Some(_) if allowedToEdit =>
             Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))

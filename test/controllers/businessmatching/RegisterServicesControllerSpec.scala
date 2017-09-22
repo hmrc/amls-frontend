@@ -16,174 +16,342 @@
 
 package controllers.businessmatching
 
-import connectors.DataCacheConnector
+import cats.data.OptionT
+import cats.implicits._
+import forms.{EmptyForm, Form2}
 import models.businessmatching._
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
-import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester {
+
+  val activities: Set[BusinessActivity] = Set(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  )
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new RegisterServicesController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val statusService = mock[StatusService]
+    val businessMatchingService = mock[BusinessMatchingService]
+
+    val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
+    val activityData2: Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
+
+    val businessActivities1 = BusinessActivities(activityData1)
+
+    val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(businessMatchingService))
+      .overrides(bind[StatusService].to(statusService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[RegisterServicesController]
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())
+    } thenReturn Future.successful(NotCompleted)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisterServicesController" must {
+  "RegisterServicesController" when {
 
-    val activityData1:Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
-    val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
-    val activityData3:Set[BusinessActivity] = Set(TrustAndCompanyServices, TelephonePaymentService)
+    "get is called" must {
 
-    val businessActivities1 = BusinessActivities(activityData1)
-    val businessActivities2 = BusinessActivities(activityData2)
+      "display the view" which {
+        "shows empty fields" in new Fixture {
 
-    val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
+          when(controller.businessMatchingService.getModel(any(),any(),any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](BusinessMatching()))
 
+          val result = controller.get()(request)
+          status(result) must be(OK)
+          contentAsString(result) must include("   ")
+        }
 
-    "on get display who is your agent page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        "populates fields" in new Fixture {
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include("   ")
+          when {
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+
+          private val checkbox = document.select("input[id=businessActivities-01]")
+          checkbox.attr("checked") must be("checked")
+        }
+      }
     }
 
-    "on get() display the who is your agent page with pre populated data" in new Fixture {
+    "post is called" when {
+      "request data is valid" must {
+        "redirect to SummaryController" when {
+          "edit is false" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+            val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities" -> "01",
+              "businessActivities" -> "02",
+              "businessActivities" -> "03")
 
-      val document = Jsoup.parse(contentAsString(result))
-      private val checkbox = document.select("input[id=businessActivities-01]")
-      checkbox.attr("checked") must be("checked")
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
+
+          "edit is true" in new Fixture {
+
+            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
+            val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities" -> "01",
+              "businessActivities" -> "02",
+              "businessActivities" -> "03")
+
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
+        }
+
+        "redirect to ServicesController" when {
+          "msb is selected" in new Fixture {
+
+            val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
+            val bm = BusinessMatching(None, Some(businessActivities))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessActivities[0]" -> "04",
+              "businessActivities[1]" -> "05")
+
+            when(controller.businessMatchingService.getModel(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, BusinessMatching](bm))
+
+            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
+          }
+        }
+      }
+
+      "request data is invalid" must {
+        "return BAD_REQUEST" in new Fixture {
+
+          val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+          val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "11")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
     }
 
-    "on post with valid data" in new Fixture {
+    "getActivityValues is called" must {
+      "return values for all services" when {
+        "status is pre-submission" when {
+          "activities have not yet been selected" in new Fixture {
 
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+            val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "01",
-        "businessActivities" -> "02",
-        "businessActivities" -> "03")
+            val (newActivities, existing) = controller invokePrivate getActivityValues(EmptyForm, NotCompleted, None)
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+            activities foreach { act =>
+              newActivities must contain(BusinessActivities.getValue(act))
+            }
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            existing must be(empty)
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
+          "activities have already been selected" in new Fixture {
+
+            val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
+
+            val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), NotCompleted, Some(activityData1))
+
+            activities foreach { act =>
+              newActivities must contain(BusinessActivities.getValue(act))
+            }
+
+            existing must be(empty)
+
+          }
+        }
+      }
+      "return values for services excluding those provided" when {
+        "status is post-submission" when {
+
+          activities.foreach { act =>
+
+            s"$act is contained in existing activities" in new Fixture {
+
+              val activityData: Set[BusinessActivity] = Set(act)
+              val businessActivities = businessActivities1.copy(businessActivities = activityData)
+
+              val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
+
+              val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
+
+              newActivities must not contain BusinessActivities.getValue(act)
+              existing must be(Set(BusinessActivities.getValue(act)))
+
+            }
+
+          }
+
+        }
+      }
     }
 
-    "on post with invalid data" in new Fixture {
+    "updateModel" must {
+      "add data to the existing services" when {
+        "status is post-submission" in new Fixture {
 
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+          val status = SubmissionDecisionApproved
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "11")
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
 
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+          services must be(BusinessActivities(existingServices.businessActivities ++ addedServices.businessActivities))
 
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        }
+      }
+      "replace existing services" when {
+        "status is pre-submission" in new Fixture {
 
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
+          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+          val status = NotCompleted
 
+          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
+
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
+
+          services must be(addedServices)
+
+        }
+      }
     }
-
-    // to be valid after summary edit page is ready
-    "on post with valid data in edit mode" in new Fixture {
-
-      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
-      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
-
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities" -> "01",
-        "businessActivities" -> "02",
-        "businessActivities" -> "03")
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-    "on post with valid data when option msb selected navigate to msb services page" in new Fixture {
-
-      val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
-      val bm = BusinessMatching(None, Some(businessActivities))
-
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessActivities[0]" -> "04",
-        "businessActivities[1]" -> "05")
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
-    }
-
-
-    "fail submission when no check boxes were selected" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#businessActivities]").html() must include(Messages("error.required.bm.register.service"))
-    }
-
   }
-}
 
+  it must {
+    "save additional services to existing services" when {
+      "status is post-submission" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(SubmissionDecisionApproved)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+            BusinessActivities(activityData1 + HighValueDealing + TelephonePaymentService)
+        )))(any(),any(),any())
+
+      }
+    }
+    "save only services from request" when {
+      "status is pre-submisson" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+        when {
+          controller.businessMatchingService.updateModel(any())(any(), any(),any())
+        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
+        when {
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(NotCompleted)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+          BusinessActivities(Set(HighValueDealing, TelephonePaymentService))
+        )))(any(),any(),any())
+
+      }
+    }
+  }
+
+}

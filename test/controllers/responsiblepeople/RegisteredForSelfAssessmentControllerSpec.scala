@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.{PersonName, ResponsiblePeople, SaRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -145,9 +146,9 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
           when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(recordId, true)(newRequest)
+          val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, true, Some(flowFromDeclaration)).url))
         }
       }
     }

@@ -16,9 +16,12 @@
 
 package controllers.businessactivities
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import services.StatusService
@@ -26,6 +29,7 @@ import utils.ControllerHelper
 import views.html.businessactivities.summary
 
 import scala.concurrent.Future
+
 
 trait SummaryController extends BaseController {
 
@@ -42,9 +46,19 @@ trait SummaryController extends BaseController {
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
           } yield {
-            ControllerHelper.allowedToEdit map(isEditable => Ok(summary(businessActivity, businessMatching.activities, isEditable)))
+            ControllerHelper.allowedToEdit map(isEditable => Ok(summary(EmptyForm, businessActivity, businessMatching.activities, isEditable)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      (for {
+        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](BusinessActivities.key))
+        _ <- OptionT.liftF(dataCache.save[BusinessActivities](BusinessActivities.key,
+          businessActivity.copy(hasAccepted = true))
+        )
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
   }
 }
 

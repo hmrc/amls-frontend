@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -27,6 +28,7 @@ import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+
 import scala.collection.JavaConversions._
 import utils.GenericTestHelper
 import play.api.i18n.Messages
@@ -136,9 +138,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
           when(timeAtAdditionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          val result = timeAtAdditionalExtraAddressController.post(RecordId, true)(requestWithParams)
+          val result = timeAtAdditionalExtraAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
         }
       }
 

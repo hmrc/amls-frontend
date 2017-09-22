@@ -16,13 +16,14 @@
 
 package models.supervision
 
-import models.registrationprogress.{Started, Completed, NotStarted, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.tcsp.Tcsp
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
@@ -51,7 +52,9 @@ trait SupervisionValues {
   val completeModel = Supervision(
     Some(DefaultValues.DefaultAnotherBody),
     Some(DefaultValues.DefaultProfessionalBodyMember),
-    Some(DefaultValues.DefaultProfessionalBody))
+    Some(DefaultValues.DefaultProfessionalBody),
+    hasAccepted = true)
+
   val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
@@ -71,11 +74,14 @@ trait SupervisionValues {
       "penalised" -> true,
       "professionalBody" -> "details"
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 }
 
-class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues {
+class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues with OneAppPerSuite{
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   "Supervision" must {
 
@@ -166,15 +172,15 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
       "return Supervision with anotherBody set and indicating changes have been made" in {
         val result = initial.anotherBody(DefaultValues.DefaultAnotherBody)
-        result must be(Supervision(Some(DefaultValues.DefaultAnotherBody), None, hasChanged = true))
+        result must be(Supervision(Some(DefaultValues.DefaultAnotherBody), None, hasChanged = true, hasAccepted = false))
       }
       "return Supervision with professionalBody set and indicating changes have been made" in {
         val result = initial.professionalBody(DefaultValues.DefaultProfessionalBody)
-        result must be(Supervision(professionalBody = Some(DefaultValues.DefaultProfessionalBody), hasChanged = true))
+        result must be(Supervision(professionalBody = Some(DefaultValues.DefaultProfessionalBody), hasChanged = true, hasAccepted = false))
       }
       "return Supervision with professionalBodyMember set and indicating changes have been made" in {
         val result = initial.professionalBodyMember(DefaultValues.DefaultProfessionalBodyMember)
-        result must be(Supervision(professionalBodyMember = Some(DefaultValues.DefaultProfessionalBodyMember), hasChanged = true))
+        result must be(Supervision(professionalBodyMember = Some(DefaultValues.DefaultProfessionalBodyMember), hasChanged = true, hasAccepted = false))
       }
 
     }
@@ -183,15 +189,15 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
       "return Supervision with anotherBody set and indicating changes have been made" in {
         val result = initial.anotherBody(NewValues.NewAnotherBody)
-        result must be(completeModel.copy(Some(NewValues.NewAnotherBody), hasChanged = true))
+        result must be(completeModel.copy(Some(NewValues.NewAnotherBody), hasChanged = true, hasAccepted = false))
       }
       "return Supervision with professionalBody set and indicating changes have been made" in {
         val result = initial.professionalBody(NewValues.NewProfessionalBody)
-        result must be(completeModel.copy(professionalBody = Some(NewValues.NewProfessionalBody), hasChanged = true))
+        result must be(completeModel.copy(professionalBody = Some(NewValues.NewProfessionalBody), hasChanged = true, hasAccepted = false))
       }
       "return Supervision with professionalBodyMember set and indicating changes have been made" in {
         val result = initial.professionalBodyMember(NewValues.ProfessionalBodyMemberYes)
-        result must be(completeModel.copy(professionalBodyMember = Some(NewValues.ProfessionalBodyMemberYes), hasChanged = true))
+        result must be(completeModel.copy(professionalBodyMember = Some(NewValues.ProfessionalBodyMemberYes), hasChanged = true, hasAccepted = false))
       }
     }
 

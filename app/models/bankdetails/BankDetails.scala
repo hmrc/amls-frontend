@@ -16,38 +16,56 @@
 
 package models.bankdetails
 
+import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logger
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
-case class BankDetails (
-                         bankAccountType: Option[BankAccountType] = None,
-                         bankAccount: Option[BankAccount] = None,
-                         hasChanged: Boolean = false,
-                         refreshedFromServer: Boolean = false,
-                         status:Option[String] = None
-                        ){
+case class BankDetails(
+                        bankAccountType: Option[BankAccountType] = None,
+                        bankAccount: Option[BankAccount] = None,
+                        hasChanged: Boolean = false,
+                        refreshedFromServer: Boolean = false,
+                        status: Option[String] = None,
+                        hasAccepted: Boolean = false
+                      ) {
 
   def bankAccountType(v: Option[BankAccountType]): BankDetails = {
     v match {
-      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty)
-      case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v))
+      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty,
+        hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
+      case _ => {
+        this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
+          hasAccepted = hasAccepted && this.bankAccountType.equals(v))
+      }
     }
   }
 
   def bankAccount(value: Option[BankAccount]): BankDetails = {
-    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value))
+    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
+      hasAccepted = hasAccepted && this.bankAccount == value)
   }
 
-  def isComplete: Boolean =
+  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
     this match {
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _) => true
-      case BankDetails(Some(_), Some(_), _, _, status) => true
-      case BankDetails(None, None, _,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, true) => true
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, false) => false
+      case BankDetails(Some(_), Some(_), _, _, status, true) => true
+      case BankDetails(Some(_), Some(_), _, _, status, false) => false
+      case BankDetails(None, None, _, _, _, true) => true
+      case BankDetails(None, None, _, _, _, false) => false
       case _ => false
     }
+  } else {
+    this match {
+      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, _) => true
+      case BankDetails(Some(_), Some(_), _, _, status, _) => true
+      case BankDetails(None, None, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case _ => false
+    }
+  }
 }
 
 object BankDetails {
@@ -57,7 +75,7 @@ object BankDetails {
 
   implicit def maybeBankAccount(account: BankAccount): Option[BankAccount] = Some(account)
 
-  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists {x => x.hasChanged || x.status.contains(StatusConstants.Deleted)}
+  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged || x.status.contains(StatusConstants.Deleted) }
 
   def section(implicit cache: CacheMap): Section = {
     Logger.debug(s"[BankDetails][section] $cache")
@@ -67,8 +85,8 @@ object BankDetails {
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())
 
-    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection){ bds =>
-      if(filter(bds).equals(Nil)){
+    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection) { bds =>
+      if (filter(bds).equals(Nil)) {
         Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
       } else {
         bds match {
@@ -96,12 +114,13 @@ object BankDetails {
   }
 
   implicit val reads: Reads[BankDetails] = (
-      ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
+    ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
       ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount])) ~
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
-      (__ \ "status").readNullable[String]
-    )(BankDetails.apply _)
+      (__ \ "status").readNullable[String] ~
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
+    ) (BankDetails.apply _)
 
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]

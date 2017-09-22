@@ -16,19 +16,36 @@
 
 package controllers.bankdetails
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.bankdetails.BankDetails
+import forms.EmptyForm
+import models.bankdetails.{BankAccount, BankDetails}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
+import scala.concurrent.Future
+
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
   val statusService: StatusService
+
+  private def updateBankDetails(bankDetails: Option[Seq[BankDetails]]) : Future[Option[Seq[BankDetails]]] = {
+    bankDetails match {
+      case Some(bdSeq) => {
+        val updatedList = bdSeq.map { bank =>
+          bank.copy(hasAccepted = true)
+        }
+        Future.successful(Some(updatedList))
+      }
+      case _ => Future.successful(bankDetails)
+    }
+  }
 
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -42,9 +59,20 @@ trait SummaryController extends BaseController {
             case _ => false
           }
           val bankDetails = data.filterNot(_.status.contains(StatusConstants.Deleted))
-          Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDetails), canEdit, status))
+          Ok(views.html.bankdetails.summary(EmptyForm, data, complete, hasBankAccount(bankDetails), canEdit, status))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      (for {
+        bd <- dataCache.fetch[Seq[BankDetails]](BankDetails.key)
+        bdnew <- updateBankDetails(bd)
+        _ <- dataCache.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+        case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
 

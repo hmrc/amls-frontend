@@ -28,5 +28,4 @@ trait AmlsReferenceNumberGenerator {
   }
 
   lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
-
 }

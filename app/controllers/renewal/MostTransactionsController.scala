@@ -48,7 +48,9 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
   }
 
   private def redirectTo(services: Set[MsbService], businessActivities: BusinessActivities, edit: Boolean): Result =
-    if ((services contains CurrencyExchange) && !edit) {
+    if (edit) {
+      Redirect(routes.SummaryController.get())
+    } else if ((services contains CurrencyExchange) && !edit) {
       Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
     } else if(businessActivities.businessActivities contains HighValueDealing) {
       Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))

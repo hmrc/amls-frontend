@@ -16,6 +16,8 @@
 
 package controllers.hvd
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -23,6 +25,7 @@ import models.hvd.Hvd
 import services.StatusService
 import utils.ControllerHelper
 import views.html.hvd.summary
+import forms.EmptyForm
 
 trait SummaryController extends BaseController {
 
@@ -36,10 +39,18 @@ trait SummaryController extends BaseController {
         hvd <- dataCache.fetch[Hvd](Hvd.key)
         isEditable <- ControllerHelper.allowedToEdit
       } yield hvd match {
-        case Some(data) => Ok(summary(data, isEditable))
+        case Some(data) => Ok(summary(EmptyForm, data, isEditable))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request => (for {
+      hvd <- OptionT(dataCache.fetch[Hvd](Hvd.key))
+      _ <- OptionT.liftF(dataCache.save[Hvd](Hvd.key, hvd.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
+  }
+
 }
 
 object SummaryController extends SummaryController {

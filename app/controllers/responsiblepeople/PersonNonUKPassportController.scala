@@ -43,9 +43,9 @@ class PersonNonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,Some(nonUKPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,Some(nonUKPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_non_uk_passport(Form2[NonUKPassport](nonUKPassport), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_non_uk_passport(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -57,7 +57,7 @@ class PersonNonUKPassportController @Inject()(
       cache <- result
       rp <- getData[ResponsiblePeople](cache, index)
     } yield rp.dateOfBirth.isDefined && edit match {
-      case true => Redirect(routes.DetailedAnswersController.get(index))
+      case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case false => Redirect(routes.DateOfBirthController.get(index, edit, flow))
     }).getOrElse(NotFound(notFoundView))
   }

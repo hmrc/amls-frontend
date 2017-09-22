@@ -18,72 +18,70 @@
 @import include._
 @import include.forms2._
 @import config.ApplicationConfig
+@import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
-@header = {
-    @errorSummary(f)
-    @heading("businessmatching.registerservices.title", "summary.businessmatching")
-}
+@header = { @status match {
+    case SubmissionReady | NotCompleted => {
+        @errorSummary(f)
+        @heading("businessmatching.registerservices.title", "summary.businessmatching")
+    }
+    case _ => {
+        @errorSummary(f)
+        @heading("businessmatching.registerservices.other.title", "summary.businessmatching")
+    }
+}}
 
 @main(
-    title = Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"),
+    title = { status match {
+        case SubmissionReady | NotCompleted => {
+            Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching")
+        }
+        case _ => {
+            Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching")
+        }
+    }},
     heading = header
 ) {
+
+    @status match {
+        case SubmissionReady | NotCompleted => {}
+        case _ => {
+            @panel(
+                jsHidden = false,
+                wide = true,
+                gutter = true
+            ){
+                <p>@Messages("businessmatching.registerservices.existing")</p> @{existing map{ value =>
+                    Messages(s"businessmatching.registerservices.servicename.lbl.$value")
+                } mkString(", ")}
+            }
+        }
+    }
 
     <p>@Messages("lbl.select.all")</p>
 
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
         <div class="form-group">
-        @fieldset(
-            f = f("businessActivities-fieldset"),
-            legend = "businessmatching.registerservices.title",
-            legendHidden = true,
-            panel = false
-        ) {
-            @errorGroup(
-                field = f("businessActivities")
+            @fieldset(
+                f = f("businessActivities-fieldset"),
+                legend = "businessmatching.registerservices.title",
+                legendHidden = true,
+                panel = false
             ) {
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.02",
-                    value = "02"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.03",
-                    value = "03"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.04",
-                    value = "04"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.05",
-                    value = "05"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.06",
-                    value = "06"
-                )
-                @checkbox(
-                    f = f("businessActivities[]"),
-                    labelText = "businessmatching.registerservices.servicename.lbl.07",
-                    value = "07"
-                )
+                @errorGroup(
+                    field = f("businessActivities")
+                ) {
+                    @{newActivities map( value => checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
+                        value = value
+                    ))}
+                }
             }
-        }
         </div>
-
 
         @detailsSummary(
             summary = Messages("businessmatching.registerservices.details")
@@ -91,15 +89,15 @@
             @panel(
                 jsHidden = false
             ) {
-            <ul class="list">
-                <li>@Messages("businessmatching.registerservices.servicename.details.01")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.02")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.03")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.04")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.05")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.06")</li>
-                <li>@Messages("businessmatching.registerservices.servicename.details.07")</li>
-            </ul>
+                <ul class="list">
+                    <li>@Messages("businessmatching.registerservices.servicename.details.01")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.02")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.03")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.04")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.05")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.06")</li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.07")</li>
+                </ul>
             }
         }
 

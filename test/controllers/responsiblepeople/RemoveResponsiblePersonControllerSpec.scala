@@ -17,25 +17,23 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import forms.EmptyForm
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{MustMatchers, WordSpecLike}
-import org.scalatestplus.play.OneAppPerSuite
+import play.api.i18n.Messages
+import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
-import play.api.test.Helpers._
-import org.mockito.Matchers.{eq => meq, _}
-import play.api.i18n.Messages
 
 import scala.concurrent.Future
 
@@ -502,6 +500,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(training),
     Some(true),
     false,
+    false,
     Some(1),
     Some("test")
   )
@@ -520,6 +519,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(training),
     Some(true),
     false,
+    false,
     Some(1),
     Some("test")
   )
@@ -537,6 +537,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     Some(experienceTraining),
     Some(training),
     Some(true),
+    false,
     false,
     Some(1),
     Some("test")

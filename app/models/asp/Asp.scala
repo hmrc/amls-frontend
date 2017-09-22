@@ -16,25 +16,29 @@
 
 package models.asp
 
-import models.registrationprogress.{Started, Completed, NotStarted, Section}
+import config.ApplicationConfig
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Asp(
-              services: Option[ServicesOfBusiness] = None,
-              otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
-              hasChanged : Boolean = false
+                services: Option[ServicesOfBusiness] = None,
+                otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
+                hasChanged: Boolean = false,
+                hasAccepted: Boolean = false
               ) {
 
   def services(p: ServicesOfBusiness): Asp =
-    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p), hasAccepted = hasAccepted && this.services.contains(p))
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
-    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p))
+    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p), hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
-      case Asp(Some(_), Some(_), _) => true
-      case _ => false
+    case Asp(Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
+    case Asp(Some(_), Some(_), _, false) if ApplicationConfig.hasAcceptedToggle => false
+    case Asp(Some(_), Some(_), _, _) => true
+    case _ => false
   }
 }
 
@@ -66,10 +70,11 @@ object Asp {
 
   implicit val jsonWrites = Json.writes[Asp]
 
-  implicit val jsonReads : Reads[Asp] = {
+  implicit val jsonReads: Reads[Asp] = {
     (__ \ "services").readNullable[ServicesOfBusiness] and
-    (__ \ "otherBusinessTaxMatters").readNullable[OtherBusinessTaxMatters] and
-    (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "otherBusinessTaxMatters").readNullable[OtherBusinessTaxMatters] and
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(Asp.apply _)
 
   implicit def default(details: Option[Asp]): Asp =

@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package models.payments
+package generators
 
-import config.ApplicationConfig
-import play.api.mvc.Call
+import models.governmentgateway.EnrolmentRequest
+import org.scalacheck.Gen
 
-case class ReturnLocation(url: String, absoluteUrl: String)
+trait GovernmentGatewayGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
 
-object ReturnLocation {
+  val enrolmentRequestGen: Gen[EnrolmentRequest] = for {
+    amlsRef <- amlsRefNoGen
+    safeId <- safeIdGen
+    postcode <- postcodeGen
+  } yield EnrolmentRequest(amlsRef, safeId, postcode)
 
-  def apply(url: String) =
-    new ReturnLocation(url, publicRedirectUrl(url))
-
-  def apply(call: Call) =
-    new ReturnLocation(call.url, publicRedirectUrl(call.url))
-
-  private def publicRedirectUrl(url: String) = s"${ApplicationConfig.frontendBaseUrl}$url"
 }

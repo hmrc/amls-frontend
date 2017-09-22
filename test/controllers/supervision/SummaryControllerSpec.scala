@@ -18,12 +18,15 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import models.asp.Asp
+import models.hvd.Hvd
 import models.supervision.Supervision
-import org.mockito.Matchers._
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -37,13 +40,15 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val model = Supervision(None)
   }
 
   "Get" must {
 
     "load the summary page when section data is available" in new Fixture {
 
-      val model = Supervision(None)
+
 
       when(controller.dataCache.fetch[Supervision](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -59,6 +64,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
+    }
+  }
+
+  "POST" must {
+    "update the hasAccepted flag on the model" in new Fixture {
+      val cache = mock[CacheMap]
+
+      when {
+        controller.dataCache.fetch[Supervision](any())(any(), any(), any())
+      } thenReturn Future.successful(Some(model.copy(hasAccepted = false)))
+
+      when {
+        controller.dataCache.save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
+      } thenReturn Future.successful(cache)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+
+      val captor = ArgumentCaptor.forClass(classOf[Supervision])
+      verify(controller.dataCache).save[Supervision](eqTo(Supervision.key), captor.capture())(any(), any(), any())
+      captor.getValue.hasAccepted mustBe true
     }
   }
 }

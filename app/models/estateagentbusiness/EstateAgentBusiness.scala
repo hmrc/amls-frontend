@@ -18,30 +18,40 @@ package models.estateagentbusiness
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import config.ApplicationConfig
 
 case class EstateAgentBusiness(
                                 services: Option[Services] = None,
                                 redressScheme: Option[RedressScheme] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None,
-                                hasChanged : Boolean = false
+                                hasChanged : Boolean = false,
+                                hasAccepted : Boolean = false
                               ) {
+
   def services(p: Services): EstateAgentBusiness =
-    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p),
+      hasAccepted = hasAccepted && this.services.contains(p))
 
   def redressScheme(p: RedressScheme): EstateAgentBusiness =
-    this.copy(redressScheme = Some(p), hasChanged = hasChanged || !this.redressScheme.contains(p))
+    this.copy(redressScheme = Some(p), hasChanged = hasChanged || !this.redressScheme.contains(p),
+      hasAccepted = hasAccepted && this.redressScheme.contains(p))
 
   def professionalBody(p: ProfessionalBody): EstateAgentBusiness =
-    this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p))
+    this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p),
+      hasAccepted = hasAccepted && this.professionalBody.contains(p))
 
   def penalisedUnderEstateAgentsAct(p: PenalisedUnderEstateAgentsAct): EstateAgentBusiness =
-    this.copy(penalisedUnderEstateAgentsAct = Some(p), hasChanged = hasChanged || !this.penalisedUnderEstateAgentsAct.contains(p))
+    this.copy(penalisedUnderEstateAgentsAct = Some(p), hasChanged = hasChanged || !this.penalisedUnderEstateAgentsAct.contains(p),
+      hasAccepted = hasAccepted && this.penalisedUnderEstateAgentsAct.contains(p))
 
   def isComplete: Boolean =
     this match {
-      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _) if !x.services.contains(Residential) => true
-      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _) => true
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, true) if !x.services.contains(Residential) && ApplicationConfig.hasAcceptedToggle => true
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
+      case EstateAgentBusiness(_, _, _, _, _, false) if ApplicationConfig.hasAcceptedToggle => false
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, _) if !x.services.contains(Residential) => true
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, _) => true
       case _ => false
     }
 }
@@ -74,7 +84,8 @@ object EstateAgentBusiness {
       __.read(Reads.optionNoError[RedressScheme]) and
       __.read(Reads.optionNoError[ProfessionalBody]) and
       __.read(Reads.optionNoError[PenalisedUnderEstateAgentsAct]) and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (EstateAgentBusiness.apply _)
 
   implicit val writes: Writes[EstateAgentBusiness] =
@@ -87,7 +98,7 @@ object EstateAgentBusiness {
           Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
-        } + ("hasChanged" -> JsBoolean(model.hasChanged))
+        } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
     }
 
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =

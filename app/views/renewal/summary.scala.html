@@ -18,8 +18,9 @@
 @import forms2._
 @import models.renewal._
 @import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
+@import config.ApplicationConfig
 
-@(model: Renewal, bmBusinessActivities: Option[BusinessActivities], bmMsbServices: Option[MsbServices])(implicit request: Request[_], messages: Messages, lang: Lang)
+@(f: forms.Form2[_], model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[MsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")
@@ -65,9 +66,9 @@
             editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
         ) {
             <ul class="list list-bullet">
-                @bmBusinessActivities.map { ba =>
+                @activities.map { ba =>
                     @ba.businessActivities.map {activity =>
-                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(activity))</li>
                     }
                 }
 
@@ -123,20 +124,35 @@
         }
 
 
-        @model.sendTheLargestAmountsOfMoney.map { lom =>
-            @checkYourAnswers(
-                question = Messages("renewal.msb.largest.amounts.title"),
-                editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
-            ) {
+
+
+        @if(services.msbServices.contains(TransmittingMoney)) {
+
+            @model.sendMoneyToOtherCountry.map { oc =>
+                @checkYourAnswers(
+                question = Messages("renewal.msb.send.money.title"),
+                editUrl = controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url
+            )   {
+                    <p>@oc.money match {
+                        case true => { @Messages("lbl.yes") }
+                        case false => { @Messages("lbl.no") }
+                    }</p>
+                }
+            }
+
+            @model.sendTheLargestAmountsOfMoney.map { lom =>
+                @checkYourAnswers(
+                    question = Messages("renewal.msb.largest.amounts.title"),
+                    editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
+                ) {
                 <ul class="list list--comma">
                     @lom.countryList.map { country =>
                         <li>@country.name</li>
                     }
                 </ul>
+                }
             }
-        }
 
-        @if(services.msbServices.contains(TransmittingMoney)) {
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
@@ -149,6 +165,7 @@
                     </ul>
                 }
             }
+
         }
 
         @if(services.msbServices.contains(CurrencyExchange)) {
@@ -240,11 +257,10 @@
         }
     }
 
-    @anchor(
-        attrHref = controllers.renewal.routes.RenewalProgressController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.checkyouranswers.acceptandcomplete")
-    )
+    @form(f, controllers.renewal.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+    }
+
 }
 
 @whoUsesCurrencies(wc: WhichCurrencies) = {

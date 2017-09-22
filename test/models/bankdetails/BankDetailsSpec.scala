@@ -22,20 +22,23 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 import models.bankdetails.BankDetails._
+import play.api.test.FakeApplication
 
-class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
+class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with OneAppPerSuite  {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val cache = mock[CacheMap]
   val emptyBankDetails: Option[BankDetails] = None
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false)
+  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false, "hasAccepted" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "00-00-00"))
@@ -46,10 +49,12 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     "accountNumber" -> "111111",
     "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
-    "refreshedFromServer" -> false)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> false)
+
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "00-00-00"))
 
-  val completeModel = BankDetails(Some(accountType), Some(bankAccount))
+  val completeModel = BankDetails(Some(accountType), Some(bankAccount), hasAccepted = true)
   val incompleteModel = BankDetails(Some(accountType), None)
   val completeJson = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
@@ -58,8 +63,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
     "hasChanged" -> false,
-    "refreshedFromServer" -> false)
-  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
+  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true, hasAccepted = true)
   val completeJsonChanged = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
     "bankAccount" -> Json.obj("accountName" -> "My Account",
@@ -67,7 +73,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
     "hasChanged" -> true,
-    "refreshedFromServer" -> false)
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
 
 
   "BankDetails with complete model" must {
@@ -114,7 +121,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
   "isComplete" must {
     "return true when BankDetails contains complete data" in {
       val bankAccount = BankAccount("My Account", UKAccount("123456", "00-00-00"))
-      val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
+      val bankDetails = BankDetails(Some(accountType), Some(bankAccount), hasAccepted = true)
 
       bankDetails.isComplete must be(true)
     }
@@ -126,7 +133,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     }
 
     "return false when BankDetails no data" in {
-      val bankDetails = BankDetails(None, None)
+      val bankDetails = BankDetails(None, None, hasAccepted = true)
 
       bankDetails.isComplete must be(true)
     }
@@ -152,7 +159,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     }
 
     "return a Completed Section when model is complete and has changed" in {
-      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount), true)
+      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount), true, hasAccepted = true)
 
       val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
@@ -162,7 +169,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
     }
 
     "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAccount = Seq(BankDetails(None, None, true, false, None))
+      val noBankAccount = Seq(BankDetails(None, None, true, false, None, true))
       val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAccount)
@@ -209,7 +216,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(completeModel, BankDetails())))
+          .thenReturn(Some(Seq(completeModel, BankDetails(hasAccepted = true))))
 
         BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
@@ -222,7 +229,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
           .thenReturn(Some(Seq(completeModel, BankDetails(), incompleteModel)))
 
-        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(3).url)
+        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(2).url)
       }
     }
     
@@ -246,7 +253,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-            .thenReturn(Some(Seq(BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true), completeModel)))
+            .thenReturn(Some(Seq(BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true), completeModel)))
           val section = BankDetails.section(mockCacheMap)
 
           section.hasChanged must be(true)

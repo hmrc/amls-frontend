@@ -54,17 +54,22 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
     }
 
     "pre-populate the fields correctly" in new ViewFixture {
-      val role = RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder, models.declaration.release7.ExternalAccountant))
+
+      val role = RoleWithinBusinessRelease7(Set(
+        models.declaration.release7.ExternalAccountant
+      ))
+
       val person = AddPerson("Forename", Some("Middlename"), "Surname", role)
+
       val f = Form2[AddPerson](AddPerson.formWrites.writes(person) ++ RoleWithinBusinessRelease7.formWrites.writes(role))
 
-      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.LPrLLP), f)
+      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.UnincorporatedBody), f)
 
       doc.getElementById("firstName").`val` mustBe "Forename"
       doc.getElementById("middleName").`val` mustBe "Middlename"
       doc.getElementById("lastName").`val` mustBe "Surname"
-      doc.select("#roleWithinBusiness input[checked]").get(0).`val` mustBe "BeneficialShareholder"
-      doc.select("#roleWithinBusiness input[checked]").get(1).`val` mustBe "ExternalAccountant"
+
+      doc.select("#positions input[checked]").get(0).`val` mustBe "08"
     }
 
     "pre-populate the 'other' field correctly" in new ViewFixture {
@@ -72,7 +77,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.LPrLLP), f)
 
-      doc.getElementById("roleWithinBusinessOther").`val` mustBe "Other details"
+      doc.getElementById("otherPosition").`val` mustBe "Other details"
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -81,8 +86,8 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
         Seq(
           (Path \ "firstName") -> Seq(ValidationError("not a message Key")),
           (Path \ "middleName") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "roleWithinBusiness") -> Seq(ValidationError("third not a message Key")),
-          (Path \ "roleWithinBusinessOther") -> Seq(ValidationError("fourth not a message Key"))
+          (Path \ "positions") -> Seq(ValidationError("third not a message Key")),
+          (Path \ "otherPosition") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
       def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
@@ -100,10 +105,10 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
         .parent()
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
-      doc.getElementById("roleWithinBusiness")
+      doc.getElementById("positions")
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
-      doc.getElementById("roleWithinBusinessOther")
+      doc.getElementById("otherPosition")
         .parent()
         .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
 

@@ -45,13 +45,13 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName), Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             personResidenceType.countryOfBirth match {
               case Some(country) => Ok (country_of_birth (Form2[CountryOfBirth] (getCountryOfBirth(country)),
                 edit, index, flow, personName.titleName))
               case _ => Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
             }
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -79,7 +79,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                 rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
               }
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
+              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
               case false => Redirect(routes.NationalityController.get(index, edit, flow))
             }
           }.recoverWith {

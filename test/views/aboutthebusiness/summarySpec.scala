@@ -25,6 +25,7 @@ import org.scalatest.MustMatchers
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
+import forms.EmptyForm
 
 import scala.collection.JavaConversions._
 
@@ -41,20 +42,20 @@ class summarySpec extends GenericTestHelper
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true, BusinessType.LimitedCompany)
+      def view = views.html.aboutthebusiness.summary(EmptyForm, AboutTheBusiness(), true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), true, BusinessType.LimitedCompany)
+      def view = views.html.aboutthebusiness.summary(EmptyForm, AboutTheBusiness(), true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
     }
 
     "does not show registered for mlr question when approved" in new ViewFixture {
-      def view = views.html.aboutthebusiness.summary(AboutTheBusiness(), false, BusinessType.LimitedCompany)
+      def view = views.html.aboutthebusiness.summary(EmptyForm, AboutTheBusiness(), false)
 
       html must not include Messages("aboutthebusiness.registeredformlr.title")
     }
@@ -75,6 +76,7 @@ class summarySpec extends GenericTestHelper
     "include the provided data" in new ViewFixture {
 
       def view = views.html.aboutthebusiness.summary(
+        EmptyForm,
         AboutTheBusiness(
           Some(PreviouslyRegisteredYes("1234")),
           Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
@@ -85,7 +87,7 @@ class summarySpec extends GenericTestHelper
           Some(true),
           Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           false
-        ),true, BusinessType.LimitedCompany
+        ),true
       )
 
       forAll(sectionChecks) { (key, check) => {

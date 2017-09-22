@@ -30,8 +30,7 @@ trait PersonRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, flow: Option[String] = None) =
-    Authorised.async {
+  def get(index: Int, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
           case Some(data) =>

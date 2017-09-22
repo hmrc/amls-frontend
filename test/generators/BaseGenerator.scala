@@ -29,6 +29,10 @@ trait BaseGenerator {
   }
 
   //noinspection ScalaStyle
+  def numSequence(maxLength: Int) =
+    Gen.listOfN(maxLength, Gen.chooseNum(1, 9)) map {_.mkString}
+
+  //noinspection ScalaStyle
   def numGen = Gen.chooseNum(0,1000)
 
   //noinspection ScalaStyle
@@ -37,5 +41,12 @@ trait BaseGenerator {
   def safeIdGen = for {
     ref <- alphaNumOfLengthGen(9)
   } yield s"X${ref.toUpperCase}"
+
+  val postcodeGen: Gen[String] = for {
+    a <- stringOfLengthGen(2)
+    num1 <- Gen.chooseNum(1, 99)
+    num2 <- Gen.chooseNum(1, 9)
+    b <- stringOfLengthGen(2)
+  } yield s"$a$num1 $num2$b"
 
 }

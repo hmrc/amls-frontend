@@ -18,14 +18,11 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import models.tcsp._
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import  utils.GenericTestHelper
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -33,6 +30,17 @@ class SummaryControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+
+    val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
+      CompanyFormationAgent(true, false)))
+    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+
+    val model = Tcsp(
+      Some(defaultCompanyServiceProviders),
+      Some(defaultProvidedServices),
+      Some(defaultServicesOfAnotherTCSP)
+    )
 
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
@@ -42,18 +50,7 @@ class SummaryControllerSpec extends GenericTestHelper {
 
   "Get" must {
 
-    val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-    val DefaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
-      CompanyFormationAgent(true, false)))
-    val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
-
     "load the summary page when section data is available" in new Fixture {
-
-      val model = Tcsp(
-        Some(DefaultCompanyServiceProviders),
-        Some(DefaultProvidedServices),
-        Some(DefaultServicesOfAnotherTCSP)
-      )
 
       when(controller.dataCache.fetch[Tcsp](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -71,5 +68,30 @@ class SummaryControllerSpec extends GenericTestHelper {
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
     }
+  }
+
+  "POST" must {
+
+    "redirect to RegistrationProgressController" when {
+
+      "the model has been updated with hasAccepted" in new Fixture {
+
+        when {
+          controller.dataCache.fetch[Tcsp](any())(any(), any(), any())
+        } thenReturn Future.successful(Some(model))
+
+        when {
+          controller.dataCache.save[Tcsp](any(),any())(any(),any(),any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+        verify(controller.dataCache).save[Tcsp](any(), eqTo(model.copy(hasAccepted = true)))(any(),any(),any())
+
+      }
+    }
+
   }
 }

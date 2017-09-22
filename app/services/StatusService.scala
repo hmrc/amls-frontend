@@ -22,6 +22,7 @@ import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
+import play.api.{Mode, Play}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -64,6 +65,7 @@ trait StatusService {
       case `Expired` => SubmissionDecisionExpired
       case `Withdrawal` => SubmissionWithdrawn
       case `DeRegistered` => models.status.DeRegistered
+      case _ if Play.current.mode == Mode.Dev => models.status.NotCompleted
       case _ => throw new RuntimeException("ETMP returned status is inconsistent")
     }
   }
@@ -97,6 +99,9 @@ trait StatusService {
     }
   }
 
+  def getDetailedStatus(mlrRegNumber: String)
+                       (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
+
   def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -104,6 +109,9 @@ trait StatusService {
       case _ => throw new RuntimeException("ETMP returned no read status")
     }
   }
+
+  def getReadStatus(mlrRefNo: String)
+                   (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpReadStatus(mlrRefNo)
 
   private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = {
 

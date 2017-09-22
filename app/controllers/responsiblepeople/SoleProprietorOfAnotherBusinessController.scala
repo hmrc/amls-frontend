@@ -35,9 +35,9 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
           => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -65,7 +65,7 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
             Redirect(routes.VATRegisteredController.get(index, edit, flow))
           } else {
             edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
+              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
               case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
             }
           }

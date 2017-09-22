@@ -97,9 +97,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
 
       val html = Jsoup.parse(contentAsString(result))
 
-      import utils.Strings._
-
-      html.select("input[type=checkbox][value=soleprop]").hasAttr("checked") mustBe true
+      html.select("input[type=checkbox][value=06]").hasAttr("checked") mustBe true
     }
 
     "when post is called" must {
@@ -109,7 +107,7 @@ class RoleInBusinessControllerSpec extends GenericTestHelper {
           when(cache.save(any(), any())(any(),any(), any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "soleprop"))
+          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "06"))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.NewOfficerController.get().url)

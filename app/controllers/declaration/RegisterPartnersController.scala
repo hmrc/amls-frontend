@@ -24,17 +24,16 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
-import models.responsiblepeople.{Partner, Positions, ResponsiblePeople}
 import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.{Partner, Positions, ResponsiblePeople}
 import models.status.{RenewalSubmitted, _}
-import play.api.mvc.{AnyContent, Call, Request, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DeclarationHelper._
 import utils.StatusConstants
 import views.html.declaration.register_partners
-import controllers.declaration
 
 import scala.concurrent.Future
 
@@ -95,8 +94,6 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
   def getNonPartners(people: Seq[ResponsiblePeople]) = {
     people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
   }
-
-
 
   def get() = Authorised.async {
     implicit authContext => implicit request => {

@@ -16,40 +16,69 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import org.scalatest.mock.MockitoSugar
-import utils.{GenericTestHelper, AuthorisedFixture}
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
-import play.api.test.Helpers._
+import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
+import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, GenericTestHelper}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar {
+class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
     val controller = new ServicesController {
-      override def cache: DataCacheConnector = self.cache
+      override def dataCacheConnector: DataCacheConnector = self.cache
+      override lazy val businessMatchingService = mock[BusinessMatchingService]
       override protected def authConnector: AuthConnector = self.authConnector
     }
+
+    val mockCacheMap = mock[CacheMap]
+    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
+
+    when {
+      controller.dataCacheConnector.fetchAll(any(), any())
+    } thenReturn Future.successful(Some(mockCacheMap))
+
+    when {
+      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+    } thenReturn cacheMapT
+
+    when {
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
+    } thenReturn cacheMapT
+
+    def setupModel(model: Option[BusinessMatching]) = when {
+      controller.businessMatchingService.getModel(any(), any(), any())
+    } thenReturn (model match {
+      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
+      case _ => OptionT.none[Future, BusinessMatching]
+    })
+
   }
 
   "ServicesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      setupModel(None)
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -69,8 +98,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         )
       )
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(model)))
+      setupModel(Some(model))
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -98,7 +126,7 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
       document.select("input[type=checkbox][checked]").size mustBe 0
     }
 
-    "return a redirect to the 'How much Throughput' page on valid submission" in new Fixture {
+    "redirect to the 'How much Throughput' page on valid submission" in new Fixture {
 
       val model = BusinessMatching(
         msbServices = Some(MsbServices(
@@ -112,19 +140,21 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         "msbServices[0]" -> "01"
       )
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      setupModel(Some(model))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(completeMsb))
 
-      val result = controller.post(edit = false)(newRequest)
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
+      val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(false).url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
     }
 
-    "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
+    "redirect to the Psr Number page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
       val currentModel = BusinessMatching(
         msbServices = Some(MsbServices(
@@ -145,83 +175,253 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         "msbServices[3]" -> "04"
       )
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(currentModel)))
+      setupModel(Some(currentModel))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(completeMsb))
+
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+      verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
     }
 
-    "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
+    "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
-      val currentModel = BusinessMatching(
-        msbServices = Some(MsbServices(
-          Set(ChequeCashingNotScrapMetal)
-        ))
-      )
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
 
-      val newModel = currentModel.copy(
-        msbServices = Some(MsbServices(
-          Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        )), hasChanged = true
-      )
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[1]" -> "02",
+          "msbServices[2]" -> "03",
+          "msbServices[3]" -> "04"
+        )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "msbServices[1]" -> "02",
-        "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04"
-      )
+        setupModel(Some(currentModel))
 
-      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(currentModel)))
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
-      val result = controller.post(edit = true)(newRequest)
+        val result = controller.post(edit = true)(newRequest)
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
-    }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
 
-    "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
+        verify(controller.businessMatchingService).commitVariationData(any(), any(), any())
+      }
 
-      Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
-        case (model, id) =>
+    "redirect to the 'Psr Number' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
+
+      Seq[String]("03", "04") foreach {
+        case (id) =>
+
           val currentModel = BusinessMatching(
             msbServices = Some(MsbServices(
-              Set(TransmittingMoney, CurrencyExchange)
+              Set(TransmittingMoney)
             ))
           )
 
-          val newModel = currentModel.copy(
-            msbServices = Some(MsbServices(
-              Set(TransmittingMoney, CurrencyExchange, model)
-            )), hasChanged = true
-          )
-
           val newRequest = request.withFormUrlEncodedBody(
-            "msbServices[1]" -> "01",
-            "msbServices[2]" -> "02",
-            "msbServices[3]" -> id
+            "msbServices[0]" -> "01",
+            "msbServices[1]" -> id
           )
 
-          when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-            .thenReturn(Future.successful(Some(currentModel)))
+          setupModel(Some(currentModel))
 
-          when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
-            .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+          when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+            .thenReturn(Some(completeMsb))
+
+          when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+          verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
       }
     }
   }
+
+  it must {
+    "remove existing MSB Transmitting Money data" when {
+      "Transmitting Money is no longer present in selection" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal, TransmittingMoney)
+          ))
+        )
+
+        val newModel = currentModel.copy(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
+          )), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        setupModel(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb.copy(
+          businessUseAnIPSP = None,
+          fundsTransfer = None,
+          transactionsInNext12Months = None,
+          sendMoneyToOtherCountry = None,
+          sendTheLargestAmountsOfMoney = None,
+          mostTransactions = None
+        )))(any(), any(), any())
+
+      }
+    }
+
+    "remove existing MSB Currency Exchange data" when {
+      "Currency Exchange is no longer present in selection" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(CurrencyExchange, ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        setupModel(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb.copy(
+          ceTransactionsInNext12Months = None,
+          whichCurrencies = None
+        )))(any(), any(), any())
+
+      }
+    }
+
+    "save same MSB data as fetched" when {
+      "Transmitting Money or Currency Exchange was not in existing MSB services" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        setupModel(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb))(any(), any(), any())
+
+      }
+
+      "Transmitting Money or Currency Exchange remains in updated MSB services" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "01",
+          "msbServices[1]" -> "02",
+          "msbServices[2]" -> "04"
+        )
+
+        setupModel(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeMsb))
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(completeMsb))(any(), any(), any())
+
+      }
+    }
+
+    "carry on to redirect" when {
+      "MSB data does not exist" in new Fixture {
+
+        val currentModel = BusinessMatching(
+          msbServices = Some(MsbServices(
+            Set(ChequeCashingNotScrapMetal)
+          ))
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "msbServices[0]" -> "03",
+          "msbServices[1]" -> "04"
+        )
+
+        setupModel(Some(currentModel))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(None)
+
+        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+      }
+    }
+
+  }
+
 }

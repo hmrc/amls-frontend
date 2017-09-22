@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -27,14 +28,13 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
-
 
 import scala.concurrent.Future
 
@@ -52,10 +52,15 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
-    val noNominatedOfficer = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.noNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
-    val hasNominatedOfficer = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.hasNominatedOfficerPositions), None,None, None,None, Some(true), false, Some(1), Some("test"))
-    val withPartnerShip = ResponsiblePeople(personName, None,None, None,None,None, None, Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)), None,None, None,None, Some(true), false, Some(1), Some("test"))
+    val responsiblePerson = ResponsiblePeople(
+      hasAlreadyPassedFitAndProper = Some(true),
+      lineId = Some(1),
+      status = Some("")
+    )
+    val personName = PersonName("firstname", None, "lastname", None, None)
+    val noNominatedOfficer = responsiblePerson.copy(Some(personName), positions = Some(DefaultValues.noNominatedOfficerPositions))
+    val hasNominatedOfficer = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions))
+    val withPartnerShip = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -63,6 +68,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
   val RecordId = 1
 
   private val startDate: Option[LocalDate] = Some(new LocalDate())
+
   "AreTheyNominatedOfficerController" when {
 
     val pageTitle = Messages("responsiblepeople.aretheynominatedofficer.title", "firstname lastname") + " - " +
@@ -73,7 +79,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
 
       "display nominated officer fields" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName))))))
         val result = controller.get(RecordId)(request)
 
         status(result) must be(OK)
@@ -98,9 +104,9 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-          val result = controller.post(RecordId,true)(newRequest)
+          val result = controller.post(RecordId,true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
         }
       }
       "when edit is false" must {
@@ -131,8 +137,6 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
         }
-
-
       }
 
       "respond with BAD_REQUEST" when {
@@ -141,7 +145,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName))))))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)

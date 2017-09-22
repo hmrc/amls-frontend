@@ -17,7 +17,7 @@
 package services
 
 import cats.data.OptionT
-import config.ApplicationConfig
+import cats.implicits._
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -25,20 +25,19 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessType.Partnership
 import models.businessmatching.{BusinessActivities => _, _}
+import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.estateagentbusiness.EstateAgentBusiness
-import models.registrationprogress.{NotStarted, Section}
+import models.registrationprogress.Section
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.mvc.Call
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, DeclarationHelper}
-import play.api.mvc.{Action, AnyContent, Call, Request}
-import cats.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -110,7 +109,7 @@ trait ProgressService {
     } yield {
 
       businessType match {
-        case Partnership if (DeclarationHelper.numberOfPartners(responsiblePeople) < 2) => {
+        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
           Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
         case _ =>

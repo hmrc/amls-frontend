@@ -18,14 +18,17 @@ package models.estateagentbusiness
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
+import play.api.test.FakeApplication
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
+class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
@@ -46,20 +49,25 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
     "professionalBody" -> "details",
     "penalisedUnderEstateAgentsAct" -> true,
     "penalisedUnderEstateAgentsActDetails" -> "test",
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 
   val completeModel = EstateAgentBusiness(
     services = Some(services),
     redressScheme =  Some(redressSchemeOther),
     professionalBody = Some(professionalBody),
-    penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct))
+    penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct),
+    hasAccepted = true
+  )
 
   val incompleteModel = EstateAgentBusiness(
     services = None,
     redressScheme = None,
     professionalBody = None,
-    penalisedUnderEstateAgentsAct = None)
+    penalisedUnderEstateAgentsAct = None
+  )
+
 
   "EstateAgentBusiness" must {
     "validate complete json" must {
@@ -92,7 +100,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
     "return EstateAgentBusiness with correct business services when set and indicate changes have been made" in {
       val result = initial.services(services)
-      result must be (EstateAgentBusiness(Some(services), None, hasChanged = true))
+      result must be (EstateAgentBusiness(Some(services), None, hasChanged = true, hasAccepted = false))
     }
 
     "return EstateAgentBusiness with correct redressScheme when set and indicate changes have been made" in {
@@ -147,7 +155,8 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         services = Some(Services(Set.empty)),
         redressScheme = None,
         professionalBody = Some(ProfessionalBodyNo),
-        penalisedUnderEstateAgentsAct = Some(PenalisedUnderEstateAgentsActNo)
+        penalisedUnderEstateAgentsAct = Some(PenalisedUnderEstateAgentsActNo),
+        hasAccepted = true
       )
 
       model.isComplete mustEqual true

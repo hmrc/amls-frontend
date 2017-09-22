@@ -63,32 +63,22 @@ class TransactionsInLast12MonthsController @Inject()(
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
-                  activities <- bm.activities
-                  msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
                 } yield {
                   renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
-                    redirectTo(
-                      msb.sendMoneyToOtherCountry.get.money,
-                      services.msbServices,
-                      activities.businessActivities, edit
-                    )
+                    redirectTo(services.msbServices, edit)
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
   }
 
-  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
-    if (edit) {
-      Redirect(routes.SummaryController.get())
-    } else if (sendMoneyToOtherCountry) {
-      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-    } else if ((services contains CurrencyExchange) && !edit) {
-      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
-    } else if ((activities contains HighValueDealing) && !edit) {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
-    } else {
-      Redirect(routes.SummaryController.get())
-    }
+   private def redirectTo(services: Set[MsbService], edit: Boolean) =
+     if (edit) {
+       Redirect(routes.SummaryController.get())
+     } else if (services contains TransmittingMoney) {
+       Redirect(routes.SendMoneyToOtherCountryController.get())
+     } else {
+       Redirect(routes.SummaryController.get())
+     }
 
 }

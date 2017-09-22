@@ -18,24 +18,25 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import models.asp.Asp
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
+      override val dataCache = mockCacheConnector
       override val authConnector = self.authConnector
     }
+
+    mockCacheSave[Asp]
   }
 
   "Get" must {
@@ -44,8 +45,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = Asp(None, None)
 
-      when(controller.dataCache.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      mockCacheFetch[Asp](Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -53,11 +53,24 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      mockCacheFetch[Asp](None)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
+    }
+  }
+
+  "Post" must {
+    "load the Asp model and set hasAccepted to true" in new Fixture {
+      val postRequest = request.withFormUrlEncodedBody()
+
+      val model = Asp(None, None)
+      mockCacheFetch(Some(model))
+
+      val result = controller.post()(postRequest)
+      status(result) mustBe SEE_OTHER
+
+      verify(mockCacheConnector).save[Asp](eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
     }
   }
 }

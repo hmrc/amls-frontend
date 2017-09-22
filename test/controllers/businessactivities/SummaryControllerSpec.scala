@@ -43,9 +43,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val authConnector = self.authConnector
       override val statusService: StatusService = mock[StatusService]
     }
-  }
-
-  "Get" must {
 
     val mockCacheMap = mock[CacheMap]
 
@@ -65,6 +62,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       taxMatters = Some(BusinessActivitiesValues.DefaultTaxMatters),
       hasChanged = false
     )
+  }
+
+  "Get" must {
 
     val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
@@ -88,6 +88,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
+
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
@@ -99,7 +100,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
         .thenReturn(None)
-
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -174,6 +174,30 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val document = Jsoup.parse(contentAsString(result))
       val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
       listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+
+    }
+  }
+
+  "post is called" must {
+    "respond with OK and redirect to the registration progress page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(controller.dataCache.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
+
+        when(controller.dataCache.save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
 
     }
   }

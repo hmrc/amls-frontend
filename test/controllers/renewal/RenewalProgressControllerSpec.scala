@@ -18,28 +18,25 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.ReadStatusResponse
-import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section}
-import models.responsiblepeople._
-import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview}
+import models.registrationprogress._
+import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
-import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends GenericTestHelper {
@@ -142,7 +139,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "load the page when status is renewal submitted and one of the section is modified" in new Fixture {
+    "load the page when status is renewal submitted and one of the section is modified" in new Fixture  {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
@@ -153,12 +150,16 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
 
-      val sections = Seq(Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
-          Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
+      val sections = Seq(
+        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
+        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
       )
 
       when(controller.progressService.sections(cacheMap))
         .thenReturn(sections)
+
+      when(controller.renewals.canSubmit(any(),any()))
+        .thenReturn(true)
 
       val result = controller.get()(request)
 
@@ -170,7 +171,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
       val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
-      elements.size() must be(2)
+      elements.size() must be(1)
 
     }
 
@@ -183,19 +184,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       val element = html.select(".progress-step--details")
       element.text must include("A new section")
-      element.size mustBe 2
+      element.size mustBe 1
     }
-
-    "display the renewal section" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-      val result = controller.get()(request)
-      val html = Jsoup.parse(contentAsString(result))
-
-      html.select(".renewal-progress-section").text() must include(Messages("progress.renewal.name"))
-    }
-
+    
     "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -209,6 +200,20 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
+  }
+
+  "POST" must {
+    "redirect to correct page" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody()
+
+      when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+        .thenReturn(Future.successful(Some(controllers.routes.FeeGuidanceController.get())))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
+    }
   }
 
 }

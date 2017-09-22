@@ -37,9 +37,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName), Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -86,10 +86,10 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     val existingPassport = rp(index - 1).ukPassport
 
     isUKResidence match {
-      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
       case NonUKResidence if existingPassport.isEmpty => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
-      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
     }
 

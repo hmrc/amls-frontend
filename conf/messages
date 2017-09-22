@@ -342,6 +342,8 @@ error.required.withdrawal.reason.other = You haven’t specified the reason for 
 error.required.deregistration.reason = You must select a reason for de-registering the business
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
+error.renewal.updateanyInformation.validationerror = Select yes if you want to update any other information
+
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
 error.required.declaration.who.is.registering = Select one option to show who is registering the business
@@ -462,6 +464,7 @@ lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
 link.return.registration.progress = Return to application progress
 link.return.renewal.progress = Return to renewal progress
+link.renewal.progress.change.answers = Change your answers
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -469,7 +472,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-
+unauthorised.role.content = Your account doesn’t have enough access rights to register.\n\
+  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision
@@ -642,6 +646,13 @@ progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
+progress.preapplication.canedit = change
+progress.preapplication.readonly = view details
+
+progress.submit.updates = Submit Updates
+progress.updates.made = Updates made: you can continue making updates, or submit your changes
+progress.updates.not.made = You haven’t made any updates
+progress.view.status = View Your Status
 
 #### Amendment page ####
 amendment.title = Update or view your information
@@ -820,6 +831,7 @@ summary.checkyouranswers.agentspremises.section1 = Premises
 summary.checkyouranswers.agentspremises.section2 = Trading activities
 summary.checkyouranswers.agentspremises.section3 = Agents’ details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
+button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
 
@@ -1040,7 +1052,9 @@ businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.registerservices.title = What do you need to register?
+businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = More information about these categories
+businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy services
 businessmatching.registerservices.servicename.lbl.02 = Bill payment services
 businessmatching.registerservices.servicename.lbl.03 = Estate agency services
@@ -1070,6 +1084,7 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
+businessmatching.summary.noedit.anchortext = Return to update or view your information
 businessmatching.services.title = Which services does your business provide?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
@@ -1080,6 +1095,13 @@ businessmatching.cannotcontinuewiththeapplication.title = You can’t continue w
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = Your business must have a Payment Services Regulations (PSR) reference number in order to apply for anti-money laundering supervision from HM Revenue and Customs.
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
+
+businessmatching.cannotchangeservices.title = You can’t continue with your change
+businessmatching.cannotchangeservices.requiredinfo = Your business must have a Payment Services Regulations (PSR) reference number in order\
+  to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.\n\
+  You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
+
+businessmatching.cannotchangeservices.button.text = Return to update information
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
@@ -1204,6 +1226,13 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 submit.registration = Submit registration
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
+
+renewal.updateanyinformation.title = Do you want to update any other information?
+renewal.updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
+renewal.updateanyinformation.example = For example, you’ll need to update if:
+renewal.updateanyinformation.example.item1 = a responsible person leaves your business
+renewal.updateanyinformation.example.item2 = you start trading from a new premises
+renewal.updateanyinformation.example.item3 = your main contact number changes
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1343,6 +1372,8 @@ responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member
 responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.position_within_business.lbl.09 = Other
+responsiblepeople.position_within_business.other_position.lbl = Please specify
+responsiblepeople.position_within_business.other_position.othermissing = You haven’t specified their role in the business. Enter their role in the business
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
@@ -1721,6 +1752,8 @@ notifications.subject.RegistrationVariationApproval = Registration Variation App
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
 notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
 
+notifications.subject.NoSubject = <no subject>
+
 notifications.header = Your Messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = View your messages
@@ -1752,11 +1785,19 @@ renewal.progress.tponly.intro = You need to complete the renewal section before 
   Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
+renewal.progress.submit.completed.intro = You have completed the renewal questions.
+renewal.progress.submit.completed.continue = You can continue making updates to your information, or submit your renewal.
 progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
+renewal.involvedinother.example = For example, you‘d answer ‘yes’ if you‘re:
+renewal.involvedinother.listline1 = a Money Service Business that’s also a newsagents shop
+renewal.involvedinother.listline2 = a Trust or Company Service Provider that’s also an recruitment agency
+renewal.involvedinother.listline3 = an Accountancy Service Provider that also sells software packages
+
+
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
@@ -1780,6 +1821,8 @@ renewal.msb.throughput.selection.7 = More than £1 billion
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
 renewal.msb.which_currencies.foreign_currencies_question =  Did you deal in physical foreign currencies in the last 12 months?
 renewals.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
+
+renewal.msb.send.money.title = Did you send money to other countries in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 

@@ -19,15 +19,17 @@
 @import models.responsiblepeople._
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
+@import forms.EmptyForm
+@import config.ApplicationConfig
 
-@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "")(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
     editUrl: String = "",
     dataItem: Option[T]
 )(content: T => Html)(implicit lang: Lang) = {
-<section class="check-your-answers">
+    <section class="check-your-answers">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
     <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
     @dataItem match {
@@ -89,7 +91,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.previous_names"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
             dataItem = person.personName
         ) { pn =>
                 @pn.previousName match {
@@ -105,7 +107,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.other_names"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
             dataItem = person.personName
         ) { pn =>
             <p>@pn.otherNames match {
@@ -116,7 +118,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
-            editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             @prt.isUKResidence match {
@@ -134,7 +136,7 @@
 
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
-                editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
                 dataItem = Some(ukPassport)
             ) { pp =>
                 @pp match {
@@ -154,7 +156,7 @@
 
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
-                editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
                 dataItem = Some(nonUKPassport)
             ) { pp =>
                 @pp match {
@@ -174,7 +176,7 @@
 
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
                 dataItem = Some(dateOfBirth)
             ) { dob =>
                 <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
@@ -184,7 +186,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
-            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             <p>@prt.countryOfBirth</p>
@@ -192,7 +194,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.nationality"),
-            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             <p>@prt.nationality</p>
@@ -200,7 +202,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.phone_number"),
-            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
             dataItem = person.contactDetails
         ) { cd =>
             <p>@cd.phoneNumber</p>
@@ -208,7 +210,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.email"),
-            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
             dataItem = person.contactDetails
         ) { cd =>
             <p>@cd.emailAddress</p>
@@ -223,7 +225,7 @@
                             controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
                         }
                         case _ => {
-                            controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true).toString()
+                            controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true, flow).toString()
                         }
                     }
                 },
@@ -236,7 +238,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true).toString,
+            editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
             dataItem = person.addressHistory.flatMap(_.currentAddress)
         ){ a =>
             @timeAtAddress(a.timeAtAddress)
@@ -245,7 +247,7 @@
         @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.previous_address"),
-                editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString(),
                 dataItem = Some(pa)
             ) { a =>
                 <ul class="list">
@@ -255,7 +257,7 @@
 
             @detailedAnswers(
                 question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true).toString,
+                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
                 dataItem = Some(pa)
             ){ a =>
                 @timeAtAddress(a.timeAtAddress)
@@ -266,7 +268,7 @@
         @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
-                editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString(),
                 dataItem = Some(pa)
             ) { a =>
                 <ul class="list">
@@ -276,7 +278,7 @@
 
             @detailedAnswers(
                 question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true).toString,
+                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
                 dataItem = Some(pa)
             ){ a =>
                 @timeAtAddress(a.timeAtAddress)
@@ -285,7 +287,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.position"),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
             <ul class="list list--comma">
@@ -298,14 +300,16 @@
                     case Partner => {@Messages("responsiblepeople.position_within_business.lbl.05")}
                     case SoleProprietor => {@Messages("responsiblepeople.position_within_business.lbl.06")}
                     case DesignatedMember => {@Messages("responsiblepeople.position_within_business.lbl.07")}
+                    case Other(value) => {@value}
                 }</li>
+
             }
             </ul>
         }
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.position_start"),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
             <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
@@ -314,7 +318,7 @@
         @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
             @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
-            editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString(),
             dataItem = Some(anotherBusiness)
             ) { vr2 =>
             <p>@vr2.soleProprietorOfAnotherBusiness match {
@@ -327,7 +331,7 @@
         @person.vatRegistered.map { vr =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
-                editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString(),
                 dataItem = Some(vr)
             ) { vr2 =>
                 <p>@vr2 match {
@@ -340,7 +344,7 @@
         @person.saRegistered.map { sar =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
-                editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString(),
                 dataItem = Some(sar)
             ) { sa =>
                 <p>@sa match {
@@ -352,7 +356,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.previous_experience"),
-            editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
             dataItem = person.experienceTraining
         ) { ex =>
             <p>@ex match {
@@ -363,7 +367,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
-            editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString(),
             dataItem = person.training
         ) { tra =>
             <p>@tra match {
@@ -375,7 +379,7 @@
         @person.hasAlreadyPassedFitAndProper.map { fp =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
-                editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true).toString(),
+                editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString(),
                 dataItem = person.hasAlreadyPassedFitAndProper
             ) { fp2 =>
                 <p>@fp match {
@@ -387,21 +391,26 @@
 
     }
 
-    @fromYourAnswers match {
-        case true => {
-            @anchor(
-                attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
-                attrRole = true,
-                linkText = Messages("button.confirmandcontinue")
-            )
+    @if(ApplicationConfig.hasAcceptedToggle) {
+        @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, fromYourAnswers, flow)) {
+            @submit(false, Some(Messages("button.confirmandcontinue")), false)
         }
-        case false => {
-            @anchor(
-                attrHref = controllers.responsiblepeople.routes.SummaryController.get().toString,
-                attrRole = true,
-                linkText = Messages("button.confirmandcontinue")
-            )
+    } else {
+        @(fromYourAnswers, flow) match {
+            case (true, None) => {
+                @anchor(
+                    attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
+                    attrRole = true,
+                    linkText = Messages("button.confirmandcontinue")
+                )
+            }
+            case (_,_) => {
+                @anchor(
+                    attrHref = controllers.responsiblepeople.routes.SummaryController.get(flow).toString,
+                    attrRole = true,
+                    linkText = Messages("button.confirmandcontinue")
+                )
+            }
         }
     }
-
 }

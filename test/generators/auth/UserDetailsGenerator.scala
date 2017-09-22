@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching
+package generators.auth
 
+import generators.BaseGenerator
+import models.auth.{CredentialRole, UserDetailsResponse}
+import org.scalacheck.Gen
 
-import config.AMLSAuthConnector
-import controllers.BaseController
-import scala.concurrent.Future
+//noinspection ScalaStyle
+trait UserDetailsGenerator extends BaseGenerator {
 
-trait CannotContinueWithTheApplicationController extends BaseController {
+  val userDetailsGen: Gen[UserDetailsResponse] = for {
+    name <- stringOfLengthGen(10)
+    group <- stringOfLengthGen(20)
+    credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
+  } yield UserDetailsResponse(name, None, group, credentialRole)
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.businessmatching.cannot_continue_with_the_application()))
-  }
-}
-
-object CannotContinueWithTheApplicationController extends CannotContinueWithTheApplicationController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
 }

@@ -24,13 +24,12 @@ import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionAppro
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.ControllerHelper
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait DetailedAnswersController extends BaseController {
+trait DetailedAnswersController extends BaseController with RepeatingSection {
 
-  protected def dataCache: DataCacheConnector
   protected def statusService: StatusService
 
   private def showHideAddressMove(lineId: Option[Int])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
@@ -40,14 +39,14 @@ trait DetailedAnswersController extends BaseController {
     }
   }
 
-  def get(index: Int, fromYourAnswers: Boolean) =
+  def get(index: Int, fromYourAnswers: Boolean, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
-        dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+        fetchModel flatMap {
           case Some(data) => {
             data.lift(index - 1) match {
               case Some(x) => showHideAddressMove(x.lineId) map {showHide =>
-                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide, ControllerHelper.rpTitleName(Some(x))))
+                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, fromYourAnswers, showHide, ControllerHelper.rpTitleName(Some(x)), flow))
               }
               case _ => Future.successful(NotFound(notFoundView))
             }
@@ -55,11 +54,27 @@ trait DetailedAnswersController extends BaseController {
           case _ => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
     }
+
+  def post(index: Int, fromYourAnswers: Boolean, flow: Option[String] = None) = Authorised.async{
+    implicit authContext => implicit request =>
+      updateDataStrict[ResponsiblePeople](index){ rp =>
+        rp.copy(hasAccepted = true)
+      } map { _ =>
+        Redirect((fromYourAnswers, flow) match {
+          case (true, None) => controllers.responsiblepeople.routes.YourAnswersController.get()
+          case _ => controllers.responsiblepeople.routes.SummaryController.get(flow)
+        })
+      }
+  }
+
+  private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
+    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+
 }
 
 object DetailedAnswersController extends DetailedAnswersController {
   // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
   override protected def statusService: StatusService = StatusService
 }

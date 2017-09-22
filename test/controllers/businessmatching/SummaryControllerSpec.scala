@@ -18,24 +18,45 @@ package controllers.businessmatching
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
+import generators.AmlsReferenceNumberGenerator
+import generators.businesscustomer.ReviewDetailsGenerator
+import generators.businessmatching.{BusinessActivitiesGenerator, BusinessMatchingGenerator}
+import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessType.Partnership
+import models.businesscustomer.{Address, ReviewDetails}
+import models.status.{SubmissionDecisionApproved, SubmissionReady}
+import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
+import services.StatusService
 import utils.AuthorisedFixture
+import models.Country
+import models.businessmatching._
+import models.businessmatching.BusinessType.LPrLLP
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper {
+class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
+    .build()
+
+  sealed trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())
+    } thenReturn Future.successful(SubmissionReady)
   }
 
   "Get" must {
@@ -47,7 +68,7 @@ class SummaryControllerSpec extends GenericTestHelper {
 
     "load the summary page when section data is available" in new Fixture {
 
-      val model = BusinessMatching(None, None)
+      val model = BusinessMatching()
 
       when(controller.dataCache.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -63,6 +84,25 @@ class SummaryControllerSpec extends GenericTestHelper {
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
+    }
+
+    "hide the edit links when not in pre-approved status" in new Fixture {
+      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
+
+      when {
+        controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())
+      } thenReturn Future.successful(Some(model))
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionDecisionApproved)
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.select("a.change-answer").size mustBe 1
+
     }
   }
 }

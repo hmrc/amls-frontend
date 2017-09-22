@@ -31,46 +31,63 @@ case class Renewal(
                     sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                     mostTransactions: Option[MostTransactions] = None,
                     ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
-                    hasChanged: Boolean = false
+                    hasChanged: Boolean = false,
+                    sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                    hasAccepted: Boolean = true
 ) {
   def involvedInOtherActivities(model: InvolvedInOther): Renewal =
-    this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model))
+    this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model),
+      hasAccepted = hasAccepted && this.involvedInOtherActivities.contains(model))
 
   def businessTurnover(model: BusinessTurnover): Renewal =
-    this.copy(businessTurnover = Some(model), hasChanged = hasChanged || !this.businessTurnover.contains(model))
+    this.copy(businessTurnover = Some(model), hasChanged = hasChanged || !this.businessTurnover.contains(model),
+      hasAccepted = hasAccepted && this.businessTurnover.contains(model))
 
   def resetBusinessTurnover: Renewal =
     this.copy(businessTurnover = None, hasChanged = hasChanged || !this.businessTurnover.isEmpty)
 
   def turnover(model: AMLSTurnover): Renewal =
-    this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model))
+    this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model),
+      hasAccepted = hasAccepted && this.turnover.contains(model))
 
   def customersOutsideUK(model: CustomersOutsideUK): Renewal =
-    this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model))
+    this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model),
+      hasAccepted = hasAccepted && this.customersOutsideUK.contains(model))
 
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
   def receiveCashPayments(p: ReceiveCashPayments): Renewal =
-    this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p))
+    this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p),
+      hasAccepted = hasAccepted && this.receiveCashPayments.contains(p))
 
   def totalThroughput(model: TotalThroughput): Renewal =
-    this.copy(totalThroughput = Some(model), hasChanged = hasChanged || !this.totalThroughput.contains(model))
+    this.copy(totalThroughput = Some(model), hasChanged = hasChanged || !this.totalThroughput.contains(model),
+      hasAccepted = hasAccepted && this.totalThroughput.contains(model))
 
   def whichCurrencies(model: WhichCurrencies): Renewal =
-    this.copy(whichCurrencies = Some(model), hasChanged = hasChanged || !this.whichCurrencies.contains(model))
+    this.copy(whichCurrencies = Some(model), hasChanged = hasChanged || !this.whichCurrencies.contains(model),
+      hasAccepted = hasAccepted && this.whichCurrencies.contains(model))
 
   def transactionsInLast12Months(model: TransactionsInLast12Months): Renewal =
-    this.copy(transactionsInLast12Months = Some(model), hasChanged = hasChanged || !this.transactionsInLast12Months.contains(model))
+    this.copy(transactionsInLast12Months = Some(model), hasChanged = hasChanged || !this.transactionsInLast12Months.contains(model),
+      hasAccepted = hasAccepted && this.transactionsInLast12Months.contains(model))
+
+  def sendMoneyToOtherCountry(model: SendMoneyToOtherCountry): Renewal =
+    this.copy(sendMoneyToOtherCountry = Some(model), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(model),
+      hasAccepted = hasAccepted && this.sendMoneyToOtherCountry.contains(model))
 
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): Renewal =
-    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p))
+    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p),
+      hasAccepted = hasAccepted && this.sendTheLargestAmountsOfMoney.contains(p))
 
   def ceTransactionsInLast12Months(p: CETransactionsInLast12Months): Renewal =
-    this.copy(ceTransactionsInLast12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInLast12Months.contains(p))
+    this.copy(ceTransactionsInLast12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInLast12Months.contains(p),
+      hasAccepted = hasAccepted && this.ceTransactionsInLast12Months.contains(p))
 
   def mostTransactions(model: MostTransactions): Renewal =
-    this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model))
+    this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model),
+      hasAccepted = hasAccepted && this.mostTransactions.contains(model))
 }
 
 object Renewal {

@@ -34,8 +34,8 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
     "validate model with few check box selected" in {
 
       val model = Map(
-        "roleWithinBusiness[]" -> Seq("BeneficialShareholder", "Director" ,"Other"),
-        "roleWithinBusinessOther" -> Seq("test")
+        "positions[]" -> Seq("01", "02" ,"other"),
+        "otherPosition" -> Seq("test")
       )
 
       RoleWithinBusinessRelease7.formRule.validate(model) must
@@ -49,72 +49,72 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
 
     "fail validation when 'Other' is selected but no details are provided" when {
       "represented by an empty string" in {
-        val model = Map("roleWithinBusiness[]" -> Seq("Other"),
-          "roleWithinBusinessOther" -> Seq(""))
+        val model = Map("positions[]" -> Seq("other"),
+          "otherPosition" -> Seq(""))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.declaration.specify.role"))))))
+          be(Invalid(List((Path \ "otherPosition", Seq(ValidationError("error.required.declaration.specify.role"))))))
       }
 
       "represented by a sequence of whitespace" in {
-        val model = Map("roleWithinBusiness[]" -> Seq("Other"),
-          "roleWithinBusinessOther" -> Seq("  \t"))
+        val model = Map("positions[]" -> Seq("other"),
+          "otherPosition" -> Seq("  \t"))
 
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required.declaration.specify.role"))))))
+          be(Invalid(List((Path \ "otherPosition", Seq(ValidationError("error.required.declaration.specify.role"))))))
       }
 
       "represented by a missing field" in {
-        val model = Map("roleWithinBusiness[]" -> Seq("Other"))
+        val model = Map("positions[]" -> Seq("other"))
         RoleWithinBusinessRelease7.formRule.validate(model) must
-          be(Invalid(List((Path \ "roleWithinBusinessOther", Seq(ValidationError("error.required"))))))
+          be(Invalid(List((Path \ "otherPosition", Seq(ValidationError("error.required"))))))
       }
     }
 
     "fail validation when field otherDetails exceeds maximum length" in {
 
       val model = Map(
-        "roleWithinBusiness[]" -> Seq(
-          "BeneficialShareholder",
-          "Director",
-          "Partner",
-          "InternalAccountant",
-          "SoleProprietor",
-          "Other"),
-        "roleWithinBusinessOther" -> Seq("t"*256)
+        "positions[]" -> Seq(
+          "01",
+          "02",
+          "05",
+          "03",
+          "06",
+          "other"
+        ), "otherPosition" -> Seq("t"*256)
       )
       RoleWithinBusinessRelease7.formRule.validate(model) must
-        be(Invalid(List(( Path \ "roleWithinBusinessOther", Seq(ValidationError("error.invalid.maxlength.255"))))))
+        be(Invalid(List(( Path \ "otherPosition", Seq(ValidationError("error.invalid.maxlength.255"))))))
     }
 
 
     "fail validation when none of the check boxes are selected" when {
       List(
-        "empty list" -> Map("roleWithinBusiness[]" -> Seq(),"roleWithinBusinessOther" -> Seq("test")),
+        "empty list" -> Map("positions[]" -> Seq(),"otherPosition" -> Seq("test")),
         "missing field" -> Map.empty[String, Seq[String]]
       ).foreach { x =>
         val (rep, model) = x
         s"represented by $rep" in {
           RoleWithinBusinessRelease7.formRule.validate(model) must
-            be(Invalid(List((Path \ "roleWithinBusiness", List(ValidationError("error.required"))))))
+            be(Invalid(List((Path \ "positions", List(ValidationError("error.required"))))))
         }
       }
     }
 
     "fail to validate invalid data" in {
       val model = Map(
-        "roleWithinBusiness[]" -> Seq("BeneficialShareholder, dfdfdfdf")
+        "positions[]" -> Seq("01, dfdfdfdf")
       )
       RoleWithinBusinessRelease7.formRule.validate(model) must
-        be(Invalid(Seq((Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid")))))
+        be(Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid")))))
 
     }
 
     "validate form write for valid transaction record" in {
 
       val map = Map(
-        "roleWithinBusiness[]" -> Seq("Other","Director"),
-        "roleWithinBusinessOther" -> Seq("test")
+        "positions[]" -> Seq("other","02"),
+        "otherPosition" -> Seq("test")
       )
 
       val model = RoleWithinBusinessRelease7(Set(Other("test"), Director))
@@ -124,7 +124,7 @@ class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with One
     "validate form write for multiple options" in {
 
       val map = Map(
-        "roleWithinBusiness[]" -> Seq("Partner", "SoleProprietor","DesignatedMember","BeneficialShareholder","ExternalAccountant")
+        "positions[]" -> List("08","05","06","07","01")
       )
 
       val model = RoleWithinBusinessRelease7(Set(BeneficialShareholder, SoleProprietor, Partner, DesignatedMember, ExternalAccountant))

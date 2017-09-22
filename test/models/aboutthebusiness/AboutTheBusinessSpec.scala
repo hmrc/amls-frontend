@@ -18,10 +18,13 @@ package models.aboutthebusiness
 
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
+import play.api.test.FakeApplication
 
-class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
+class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
 
@@ -53,7 +56,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     corporationTaxRegistered = Some(regForCorpTax),
     contactingYou = Some(contactingYou),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
-    correspondenceAddress = Some(uKCorrespondenceAddress)
+    altCorrespondenceAddress = Some(true),
+    correspondenceAddress = Some(uKCorrespondenceAddress),
+    hasAccepted = true
   )
 
   val completeJson = Json.obj(
@@ -75,6 +80,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "addressLine4" -> JsNull,
       "postCode" -> "AA1 1AA",
       "dateOfChange" -> JsNull),
+    "altCorrespondenceAddress" -> true,
     "correspondenceAddress" -> Json.obj(
       "yourName" -> "Name",
       "businessName" -> "Business Name",
@@ -84,7 +90,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "correspondenceAddressLine4" -> "address 4",
       "correspondencePostCode" -> "AA11 1AA"
     ),
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "hasAccepted" -> true
   )
 
   "AboutTheBusiness Serialisation" must {
@@ -96,6 +103,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Deserialise as expected" in {
       completeJson.as[AboutTheBusiness] must
         be(completeModel)
+    }
+
+    "isComplete must return true" in {
+      completeModel.isComplete must be(true)
     }
   }
 
@@ -114,7 +125,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
       "prevMLRRegNo" -> "12345678"
       ),
-      "hasChanged" -> false
+      "hasChanged" -> false,
+      "hasAccepted" -> false
     )
 
     val partialModel = AboutTheBusiness(Some(previouslyRegistered), None)
@@ -127,6 +139,10 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Deserialise as expected" in {
       partialJson.as[AboutTheBusiness] must
         be(partialModel)
+    }
+
+    "isComplete must return false" in {
+      partialModel.isComplete must be(false)
     }
   }
 

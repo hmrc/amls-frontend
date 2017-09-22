@@ -16,6 +16,8 @@
 
 package controllers
 
+import java.net.URLEncoder
+
 import config.ApplicationConfig
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -36,11 +38,13 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.mockito.Mockito._
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
-import play.api.mvc.Request
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
@@ -52,7 +56,10 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
+import models.ReturnLocation
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,6 +78,17 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
       override val authConnector = self.authConnector
       override val shortLivedCache = mock[ShortLivedCache]
       override val auditConnector = mock[AuditConnector]
+      override val authService = mock[AuthService]
+    }
+
+    when {
+      controller.authService.validateCredentialRole(any(), any(), any())
+    } thenReturn Future.successful(true)
+
+    when {
+      controller.authService.signoutUrl
+    } thenAnswer new Answer[String] {
+      override def answer(invocation: InvocationOnMock): String = invocation.callRealMethod().asInstanceOf[String]
     }
   }
 
@@ -112,6 +130,19 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
         }
+      }
+
+      "redirect to the sign-out page when the user fails role validation" in new Fixture {
+        when {
+          controller.authService.validateCredentialRole(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+          URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
+
+        val result = controller.get()(request)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(expectedLocation)
       }
 
 
@@ -269,11 +300,15 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override def auditConnector = mock[AuditConnector]
+      override lazy val authService = mock[AuthService]
     }
+
+    when {
+      controller.authService.validateCredentialRole(any(), any(), any())
+    } thenReturn Future.successful(true)
 
     when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
   }
-
 
   def setUpMocksForNoEnrolment(controller: LandingController) = {
     when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))

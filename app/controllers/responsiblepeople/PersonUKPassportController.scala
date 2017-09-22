@@ -42,9 +42,9 @@ class PersonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePeople(Some(personName),_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -79,9 +79,9 @@ class PersonUKPassportController @Inject()(
     val responsiblePerson = rp(index - 1)
     data match {
       case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index))
+      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case UKPassportYes(_) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportNo if responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index))
+      case UKPassportNo if edit && responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, flow))
     }
   }

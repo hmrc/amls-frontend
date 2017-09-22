@@ -25,8 +25,9 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
+import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 
 class RemoveResponsiblePersonController @Inject()(
                                                    val authConnector: AuthConnector,
@@ -49,11 +50,10 @@ class RemoveResponsiblePersonController @Inject()(
           }) getOrElse InternalServerError("No responsible people found")
           case ValidForm(_, data) => {
             (for {
-              name <- getNominatedOfficerName
-              _ <- OptionT.liftF(dataCacheConnector.save[ChangeOfficer](ChangeOfficer.key, ChangeOfficer(
-                roleInBusiness = RoleInBusiness(Set.empty[Role]),
-                oldOfficer = Some(OldOfficer(name, data.date))
-              )))
+              (_, index) <- getNominatedOfficerWithIndex
+              _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index){ responsiblePerson =>
+                responsiblePerson.status(StatusConstants.Deleted).copy(endDate = Some(ResponsiblePersonEndDate(data.date)))
+              })
             } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")
           }
         }

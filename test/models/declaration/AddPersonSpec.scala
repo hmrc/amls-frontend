@@ -212,7 +212,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           "firstName" -> Seq("first"),
           "middleName" -> Seq("middle"),
           "lastName" -> Seq("last"),
-          "roleWithinBusiness" -> Seq("BeneficialShareholder")
+          "positions" -> Seq("01")
         )
         AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("first", Some("middle"), "last", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
       }
@@ -221,7 +221,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
         val urlFormEncoded = Map(
           "firstName" -> Seq("first"),
           "lastName" -> Seq("last"),
-          "roleWithinBusiness" -> Seq("BeneficialShareholder")
+          "positions" -> Seq("01")
         )
         AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("first", None, "last", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)))))
       }
@@ -234,7 +234,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
             (Path \ "lastName") -> Seq(ValidationError("error.required")),
-            (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.required"))
           )))
       }
 
@@ -244,13 +244,13 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           "firstName" -> Seq(""),
           "middleName" -> Seq(""),
           "lastName" -> Seq(""),
-          "roleWithinBusiness" -> Seq("")
+          "positions" -> Seq("")
         )
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required.declaration.first_name")),
             (Path \ "lastName") -> Seq(ValidationError("error.required.declaration.last_name")),
-            (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
 
@@ -258,7 +258,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         val urlFormEncoded = Map(
           "lastName" -> Seq("last"),
-          "roleWithinBusiness" -> Seq("BeneficialShareholder")
+          "positions" -> Seq("01")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
@@ -271,7 +271,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         val urlFormEncoded = Map(
           "firstName" -> Seq("first"),
-          "roleWithinBusiness" -> Seq("BeneficialShareholder")
+          "positions" -> Seq("01")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
@@ -289,7 +289,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.required"))
           )))
       }
 
@@ -299,7 +299,7 @@ class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSui
           "firstName" -> Seq("a" * 36),
           "lastName" -> Seq("b" * 36),
           "middleName" -> Seq("c" * 36),
-          "roleWithinBusiness" -> Seq("BeneficialShareholder")
+          "positions" -> Seq("01")
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must

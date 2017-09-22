@@ -19,11 +19,12 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness.EstateAgentBusiness
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -37,6 +38,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val model = EstateAgentBusiness(None, None)
   }
 
   "Get" must {
@@ -47,8 +50,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "load the summary page when section data is available" in new Fixture {
-
-      val model = EstateAgentBusiness(None, None)
 
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -64,6 +65,30 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
+    }
+  }
+
+  "post is called" must {
+    "redirect to the bank account details page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(controller.dataCache.fetch[EstateAgentBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
+
+        when(controller.dataCache.save[EstateAgentBusiness](meq(EstateAgentBusiness.key), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
+
     }
   }
 }

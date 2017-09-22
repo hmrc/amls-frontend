@@ -32,12 +32,14 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
 
         val model = Map(
           "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("01", "02", "14"),
+          "businessType[]" -> Seq("01", "02", "04","05","06","07","08","09","10","11","12","13","14"),
           "specifyOtherBusiness" -> Seq("test")
         )
 
         ProfessionalBodyMember.formRule.validate(model) must
-          be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
+          be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, TaxationTechnicians, ManagementAccountants,
+            InstituteOfTaxation, Bookkeepers, AccountantsIreland, AccountantsScotland, AccountantsEnglandandWales, FinancialAccountants,
+            AssociationOfBookkeepers, LawSociety, Other("test")))))
 
       }
 

@@ -19,11 +19,13 @@
 @import include.forms2._
 @import models.registrationprogress.Section
 @import views.html.helper.CSRF
+@import models.businesscustomer.Address
 
-@(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_],m:Messages)
+@(sections: Seq[Section], declarationAvailable: Boolean, address: Address, serviceNames: Seq[String], canEditPreApplication: Boolean)(implicit request: Request[_],m:Messages)
 
 @main2(
-    title = Messages("amendment.title") + " - " + Messages("title.yapp")
+    title = Messages("amendment.title") + " - " + Messages("title.yapp"),
+    bodyClasses = Some("registration-amendment")
 ) {
     @* Heading *@
     <div class="grid-layout">
@@ -42,20 +44,8 @@
         @section_list(sections)
 
         @* Sidebar *@
-        <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
-            <div class="application-submit">
-                <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
-                    @CSRF.formField
-                    <fieldset>
-                        @include.forms2.legend("amendment.sidebar.heading", false, true, "", false)
-                        <p>
-                            @Messages("amendment.sidebar.text")
-                        </p>
-                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("amendment.sidebar.button.text")</button>
-                    </fieldset>
-                </form>
-            </div>
-        </div>
-
+        @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+         
     </div>
+    @submit_application(declarationAvailable)
 }

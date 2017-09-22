@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
+import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionReadyForReview
@@ -216,10 +217,10 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
             when(timeAtAdditionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val result = timeAtAdditionalAddressController.post(RecordId, true)(requestWithParams)
+            val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
           }
         }
         "time at address is ThreeYearsPlus" must {
@@ -238,10 +239,10 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
             when(timeAtAdditionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
-            val result = timeAtAdditionalAddressController.post(RecordId, true)(requestWithParams)
+            val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
           }
         }
       }

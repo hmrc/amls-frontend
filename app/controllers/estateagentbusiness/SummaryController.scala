@@ -16,9 +16,12 @@
 
 package controllers.estateagentbusiness
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.estateagentbusiness.EstateAgentBusiness
 import views.html.estateagentbusiness._
 
@@ -30,10 +33,23 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         case Some(data) =>
-          Ok(summary(data))
+          Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
       }
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      (for {
+        eab <- OptionT(dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key))
+        _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key,
+          eab.copy(hasAccepted = true))
+        )
+      } yield {
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      }) getOrElse InternalServerError("Could not update EstateAgentBusiness")
+
   }
 }
 

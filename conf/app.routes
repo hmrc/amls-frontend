@@ -9,6 +9,7 @@ GET         /start                                                              
 POST        /subscribe                                                                controllers.SubmissionController.post()
 
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
+GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role
 
 GET         /registration-progress                                                    controllers.RegistrationProgressController.get()
 POST        /registration-progress                                                    controllers.RegistrationProgressController.post()
@@ -71,6 +72,7 @@ POST        /about-the-business/letters-address                                 
 GET         /about-the-business/what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /about-the-business/check-your-answers                                    controllers.aboutthebusiness.SummaryController.get()
+POST        /about-the-business/check-your-answers                                    controllers.aboutthebusiness.SummaryController.post()
 
 GET         /trading-premises/what-you-need/:index                                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
@@ -118,6 +120,9 @@ GET         /trading-premises/agent/:index                                      
 POST        /trading-premises/agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+POST        /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.post()
+
+
 GET         /trading-premises/your-answers                                            controllers.tradingpremises.SummaryController.answers()
 GET         /trading-premises/trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
@@ -154,6 +159,7 @@ GET         /estate-agents/redress-scheme                                       
 POST        /estate-agents/redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
 GET         /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.get()
+POST        /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.post()
 
 GET         /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.post()
@@ -164,8 +170,8 @@ POST        /business-matching/postcode                                         
 GET         /business-matching/type-of-business                                       controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
 POST        /business-matching/type-of-business                                       controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
-GET         /business-matching/activities                                             controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-POST        /business-matching/activities                                             controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+GET         /business-matching/activities                                             @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities                                             @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
 GET         /business-matching/registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
 POST        /business-matching/registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
@@ -178,7 +184,7 @@ POST        /business-matching/psr-registration                                 
 
 GET         /business-matching/check-your-answers                                     controllers.businessmatching.SummaryController.get()
 
-GET         /business-matching/no-psr                                                 controllers.businessmatching.CannotContinueWithTheApplicationController.get()
+GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
@@ -195,7 +201,9 @@ GET         /bank-details/account-details/:index                                
 POST        /bank-details/account-details/:index                                      controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/your-answers                                                controllers.bankdetails.SummaryController.get(complete: Boolean = true)
+
 GET         /bank-details/check-your-answers                                          controllers.bankdetails.SummaryController.get(complete: Boolean = false)
+POST        /bank-details/check-your-answers                                          controllers.bankdetails.SummaryController.post()
 
 GET         /bank-details/remove/:index                                               controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
 POST        /bank-details/remove/:index                                               controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)
@@ -239,6 +247,7 @@ GET         /business-activities/tax-matters                                    
 POST        /business-activities/tax-matters                                          controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
 
 GET         /business-activities/check-your-answers                                   controllers.businessactivities.SummaryController.get()
+POST        /business-activities/check-your-answers                                   controllers.businessactivities.SummaryController.post()
 
 GET         /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
 POST        /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.post()
@@ -340,7 +349,9 @@ POST        /responsible-people/nationality/:index                              
 
 GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
 POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
-GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false)
+
+GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -390,8 +401,8 @@ POST        /responsible-people/contacting-you/:index                           
 GET         /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.get(index:Int, flow: Option[String] ?= None)
 POST        /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, flow: Option[String] ?= None)
 
-GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
-POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String)
+GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean, flow: Option[String] ?= None)
+POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String, flow: Option[String] ?= None)
 
 GET         /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -410,6 +421,7 @@ GET         /accountancy-service-provider/date-change                           
 POST        /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
 GET         /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.get()
+POST        /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.post()
 
 GET         /trust-company-service-provider/what-you-need                             controllers.tcsp.WhatYouNeedController.get()
 
@@ -423,6 +435,7 @@ GET         /trust-company-service-provider/other-trust-provider                
 POST        /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 
 GET         /trust-company-service-provider/check-your-answers                        controllers.tcsp.SummaryController.get()
+POST        /trust-company-service-provider/check-your-answers                       controllers.tcsp.SummaryController.post()
 
 GET         /supervision/what-you-need                                                controllers.supervision.WhatYouNeedController.get()
 
@@ -436,10 +449,12 @@ GET         /supervision/penalised                                              
 POST        /supervision/penalised                                                    controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
 GET         /supervision/check-your-answers                                           controllers.supervision.SummaryController.get()
+POST        /supervision/check-your-answers                                           controllers.supervision.SummaryController.post()
 
 GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
 
 GET         /money-service-business/check-your-answers                                controllers.msb.SummaryController.get()
+POST        /money-service-business/check-your-answers                                controllers.msb.SummaryController.post()
 
 GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
 POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
@@ -480,6 +495,7 @@ GET         /high-value-dealer/cash-payments                                    
 POST        /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.get()
+POST        /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.post()
 
 GET         /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
@@ -526,6 +542,9 @@ POST        /renewal/anticipated-totals                                         
 GET         /renewal/transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /renewal/transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
+GET         /renewal/send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
+POST        /renewal/send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
+
 GET         /renewal/largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
 POST        /renewal/largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
@@ -545,3 +564,7 @@ GET         /renewal/receiving                                                  
 POST        /renewal/receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /renewal/check-your-answers                                               @controllers.renewal.SummaryController.get()
+POST        /renewal/check-your-answers                                               @controllers.renewal.SummaryController.post()
+
+GET         /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.get()
+POST        /renewal/update-any-information                                           @controllers.renewal.UpdateAnyInformationController.post()

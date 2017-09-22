@@ -177,7 +177,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "Director"
+            "positions" -> "02"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -198,7 +198,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "ExternalAccountant"
+            "positions" -> "08"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -217,7 +217,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "ExternalAccountant"
+            "positions" -> "08"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -237,7 +237,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val firstNameMissingInRequest = request.withFormUrlEncodedBody(
             "lastName" -> "lastName",
-            "roleWithinBusiness" -> "ExternalAccountant"
+            "positions" -> "08"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -257,7 +257,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val lastNameNissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
-            "roleWithinBusiness" -> "ExternalAccountant"
+            "positions" -> "08"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -273,7 +273,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           document.select("a[href=#lastName]").html() must include("This field is required")
         }
 
-        "roleWithinBusiness not supplied" in new Fixture {
+        "positions not supplied" in new Fixture {
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -290,14 +290,13 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#roleWithinBusiness]").html() must include("This field is required")
+          document.select("a[href=#positions]").html() must include("This field is required")
 
         }
       }
     }
   }
 }
-
 
 class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with MockitoSugar {
 
@@ -514,7 +513,6 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
 
 }
 
-
 class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
@@ -616,7 +614,7 @@ class AddPersonControllerWithoutAmendmentSpecRelease7 extends GenericTestHelper 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "ExternalAccountant"
+            "positions[]" -> "08"
           )
 
           when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())

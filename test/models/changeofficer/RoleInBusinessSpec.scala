@@ -26,21 +26,20 @@ class RoleInBusinessSpec  extends PlaySpec with MustMatchers {
   "RoleInBusiness" must {
 
     "validate a role" in {
-      RoleInBusiness.roleFormReads.validate((Seq("soleprop"), None)) mustBe Valid(Set(SoleProprietor))
-      RoleInBusiness.roleFormReads.validate((Seq("bensharehold"), None)) mustBe Valid(Set(BeneficialShareholder))
-      RoleInBusiness.roleFormReads.validate((Seq("director"), None)) mustBe Valid(Set(Director))
-      RoleInBusiness.roleFormReads.validate((Seq("extAccountant"), None)) mustBe Valid(Set(ExternalAccountant))
-      RoleInBusiness.roleFormReads.validate((Seq("intAccountant"), None)) mustBe Valid(Set(InternalAccountant))
-      RoleInBusiness.roleFormReads.validate((Seq("partner"), None)) mustBe Valid(Set(Partner))
-      RoleInBusiness.roleFormReads.validate((Seq("desigmemb"), None)) mustBe Valid(Set(DesignatedMember))
+      RoleInBusiness.roleFormReads.validate((Seq("06"), None)) mustBe Valid(Set(SoleProprietor))
+      RoleInBusiness.roleFormReads.validate((Seq("01"), None)) mustBe Valid(Set(BeneficialOwner))
+      RoleInBusiness.roleFormReads.validate((Seq("02"), None)) mustBe Valid(Set(Director))
+      RoleInBusiness.roleFormReads.validate((Seq("03"), None)) mustBe Valid(Set(InternalAccountant))
+      RoleInBusiness.roleFormReads.validate((Seq("05"), None)) mustBe Valid(Set(Partner))
+      RoleInBusiness.roleFormReads.validate((Seq("07"), None)) mustBe Valid(Set(DesignatedMember))
       RoleInBusiness.roleFormReads.validate((Seq("other"), Some("another role"))) mustBe Valid(Set(Other("another role")))
       RoleInBusiness.roleFormReads.validate((Seq(""), None)) mustBe Valid(Set.empty[Role])
     }
 
     "convert valid form into the model" in {
       val formData = Map(
-        "positions[0]" -> Seq("soleprop"),
-        "positions[1]" -> Seq("director")
+        "positions[0]" -> Seq("06"),
+        "positions[1]" -> Seq("02")
       )
 
       val result = RoleInBusiness.formReads.validate(formData)

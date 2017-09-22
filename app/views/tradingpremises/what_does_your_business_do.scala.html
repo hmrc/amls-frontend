@@ -48,8 +48,8 @@
                 @model.businessActivities.map { ba =>
                     @checkbox(
                         f = f("activities[]"),
-                        labelText = "businessmatching.registerservices.servicename.lbl."+model.getValue(ba),
-                        value = model.getValue(ba))
+                        labelText = "businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba),
+                        value = BusinessActivities.getValue(ba))
                 }
             }
         }

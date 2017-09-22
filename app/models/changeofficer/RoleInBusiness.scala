@@ -25,70 +25,81 @@ import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
 import jto.validation.forms.Rules._
+import models.responsiblepeople.PositionWithinBusiness
 
 case class RoleInBusiness(roles: Set[Role])
 
 sealed trait Role
 
 case object SoleProprietor extends Role
-case object InternalAccountant extends Role
-case object BeneficialShareholder extends Role
+case object BeneficialOwner extends Role
 case object Director extends Role
-case object ExternalAccountant extends Role
+case object InternalAccountant extends Role
 case object Partner extends Role
 case object DesignatedMember extends Role
 
 case class Other(text: String) extends Role
 
 object RoleInBusiness {
+
   val key = "changeofficerRoleinbusiness"
   private val validationErrorKey = "changeofficer.roleinbusiness.validationerror"
 
-  //noinspection ScalaStyle
-  def stringToRole(role: String, other: Option[String]): Role = role match {
-    case "soleprop" => SoleProprietor
-    case "director" => Director
-    case "bensharehold" => BeneficialShareholder
-    case "extAccountant" => ExternalAccountant
-    case "intAccountant" => InternalAccountant
-    case "partner" => Partner
-    case "desigmemb" => DesignatedMember
-    case "other" if other.isDefined => Other(other.get)
-  }
+  implicit val jsonWrites: Writes[RoleInBusiness] = {
 
-  def setRoles(roles: Seq[String], other: Option[String]) = if(roles.contains("")){
-    Set.empty[Role]
-  } else {
-    roles.map(v => stringToRole(v, other)).toSet
-  }
-
-  def roleToString(r: Role): String = r match {
+    def roleToString(r: Role): String = r match {
       case SoleProprietor => "soleprop"
       case Director => "director"
-      case BeneficialShareholder => "bensharehold"
-      case ExternalAccountant => "extAccountant"
+      case BeneficialOwner => "benown"
       case InternalAccountant => "intAccountant"
       case Partner => "partner"
       case DesignatedMember => "desigmemb"
       case Other(_) => "other"
     }
 
-  implicit val jsonWrites: Writes[RoleInBusiness] = {
     ((__ \ "positions").write[Seq[String]] ~
       (__ \ "otherPosition").writeNullable[String]) { r =>
-        val roleSet = r.roles.map(roleToString).toSeq
-        val other = r.roles.collect { case Other(o) => o }.headOption
-        (roleSet, other)
-      }
+      val roleSet = r.roles.map(roleToString).toSeq
+      val other = r.roles.collect { case Other(o) => o }.headOption
+      (roleSet, other)
+    }
   }
 
   implicit val jsonReads: Reads[RoleInBusiness] = {
     import play.api.libs.json.Reads._
+
+    def stringToRole(role: String, other: Option[String]): Role = role match {
+      case "soleprop" => SoleProprietor
+      case "benown" => BeneficialOwner
+      case "director" => Director
+      case "intAccountant" => InternalAccountant
+      case "partner" => Partner
+      case "desigmemb" => DesignatedMember
+      case "other" if other.isDefined => Other(other.get)
+    }
+
     ((__ \ "positions").read[Seq[String]] and
       (__ \ "otherPosition").readNullable[String]).tupled.flatMap {
-        case (roles, other) => RoleInBusiness(roles.map(v => stringToRole(v, other)).toSet)
-        case _ => Reads { _ => JsError(JsPath \ "positions", validationErrorKey) }
+      case (roles, other) => RoleInBusiness(roles.map(v => stringToRole(v, other)).toSet)
+      case _ => Reads { _ => JsError(JsPath \ "positions", validationErrorKey) }
     }
+  }
+
+  def setRoles(roles: Seq[String], other: Option[String]) = if(roles.contains("")){
+    Set.empty[Role]
+  } else {
+
+    def stringToRole(role: String, other: Option[String]): Role = role match {
+      case "06" => SoleProprietor
+      case "01" => BeneficialOwner
+      case "02" => Director
+      case "03" => InternalAccountant
+      case "05" => Partner
+      case "07" => DesignatedMember
+      case "other" if other.isDefined => Other(other.get)
+    }
+
+    roles.map(v => stringToRole(v, other)).toSet
   }
 
   val roleFormReads = Rule.fromMapping[(Seq[String], Option[String]), Set[Role]] {
@@ -119,13 +130,42 @@ object RoleInBusiness {
   }
 
   implicit def formWrites: Write[RoleInBusiness, UrlFormEncoded] = Write[RoleInBusiness, UrlFormEncoded] { data =>
-        val roleSet = data.roles.map(roleToString).toSeq
-        val otherRole = data.roles.collect {
-          case Other(o) => o
-        }.toSeq
-        Map(
-          "positions[]" -> roleSet,
-          "otherPosition" -> otherRole
-        )
+
+    def roleToString(r: Role): String = r match {
+      case SoleProprietor => "06"
+      case Director => "02"
+      case BeneficialOwner => "01"
+      case InternalAccountant => "03"
+      case Partner => "05"
+      case DesignatedMember => "07"
+      case Other(_) => "other"
+    }
+
+    val roleSet = data.roles.map(roleToString).toSeq
+    val otherRole = data.roles.collect {
+      case Other(o) => o
+    }.toSeq
+    Map(
+      "positions[]" -> roleSet,
+      "otherPosition" -> otherRole
+    )
   }
+
+  implicit def conv(roles: Set[Role]): Set[PositionWithinBusiness] = roles map conv
+
+  implicit def conv(role: Role): PositionWithinBusiness = {
+    import models.responsiblepeople.{SoleProprietor => SoleProprietor$, Director => Director$, BeneficialOwner => BeneficialOwner$, InternalAccountant => InternalAccountant$, Partner => Partner$, DesignatedMember => DesignatedMember$, Other => Other$}
+
+    role match {
+      case SoleProprietor => SoleProprietor$
+      case Director => Director$
+      case BeneficialOwner => BeneficialOwner$
+      case InternalAccountant => InternalAccountant$
+      case Partner => Partner$
+      case DesignatedMember => DesignatedMember$
+      case Other(s) => Other$(s)
+    }
+
+  }
+
 }

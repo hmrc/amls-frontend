@@ -30,12 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait GovernmentGatewayConnector {
 
-  protected def http: HttpPost
+  protected[connectors] def http: HttpPost
   protected def enrolUrl: String
   private[connectors] def audit: Audit
-
-  private val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
-  private val invalidCredentialsMessage = "The credential has the wrong type of role"
 
   private def msg(msg: String) = s"[GovernmentGatewayConnector][enrol] - $msg"
 
@@ -55,10 +52,10 @@ trait GovernmentGatewayConnector {
         debug(msg(s"Successful Response: ${response.json}"))
         response
     } recoverWith {
-      case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>
+      case e: Throwable if e.getMessage.contains(GovernmentGatewayConnector.duplicateEnrolmentMessage) =>
         warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(DuplicateEnrolmentException(e.getMessage, e))
-      case e: Throwable if e.getMessage.contains(invalidCredentialsMessage) =>
+      case e: Throwable if e.getMessage.contains(GovernmentGatewayConnector.invalidCredentialsMessage) =>
         warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(InvalidEnrolmentCredentialsException(e.getMessage, e))
       case e =>
@@ -72,4 +69,6 @@ object GovernmentGatewayConnector extends GovernmentGatewayConnector {
   override val http: HttpPost = WSHttp
   override val enrolUrl: String = ApplicationConfig.enrolUrl
   override private[connectors] val audit = new Audit(AppName.appName, AMLSAuditConnector)
+  private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
+  private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"
 }

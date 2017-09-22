@@ -19,8 +19,9 @@
 @import models.bankdetails._
 @import utils.StatusConstants
 @import models.status._
+@import config.ApplicationConfig
 
-@(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading(if(complete) "title.ya" else "title.cya", "summary.bankdetails")
@@ -130,17 +131,16 @@
     }
     </ul>
 
-    @if(complete) {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.confirmandcontinue")
-        )
-    } else {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.summary.acceptandcomplete")
-        )
-    }
+
+        @if(complete) {
+            @form(f, controllers.bankdetails.routes.SummaryController.post()) {
+                @submit(false, Some(Messages("button.confirmandcontinue")), returnLink = false)
+            }
+        } else {
+            @form(f, controllers.bankdetails.routes.SummaryController.post()) {
+                @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+            }
+        }
+
+
 }
