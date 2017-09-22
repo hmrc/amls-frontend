@@ -110,6 +110,16 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
       }
+
+      "return Internal Server Error if the business matching model can't be updated" in new Fixture {
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockCacheFetch[BusinessMatching](None)
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
     }
   }
 }
