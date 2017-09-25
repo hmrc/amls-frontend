@@ -66,7 +66,7 @@ trait ServicesController extends BaseController {
               bm <- businessMatchingService.getModel
               cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
                 case true => bm.msbServices(data)
-                case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
+                case false => bm.msbServices(data).clearPSRNumber
               })
               result <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield cache
