@@ -105,9 +105,10 @@ object BusinessActivities {
      (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) map (BusinessActivities(_))
    }
 
-  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
-    Map("businessActivities[]" -> data.businessActivities.toSeq.map(w.writes))
-  }
+  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter(_))
+
+  private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
+    Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))
 
   implicit val format = Json.writes[BusinessActivities]
 
@@ -140,7 +141,7 @@ object BusinessActivities {
     })((a, b) => BusinessActivities(a,b))
   }
 
-  def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {
+  private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {
     values map {
       case "01" => Reads(_ => JsSuccess(AccountancyServices)) map identity[BusinessActivity]
       case "02" => Reads(_ => JsSuccess(BillPaymentServices)) map identity[BusinessActivity]

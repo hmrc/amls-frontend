@@ -19,6 +19,7 @@ package controllers.businessmatching
 import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
+import cats.implicits._
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
@@ -27,6 +28,8 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
+
+import scala.concurrent.Future
 
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
@@ -60,12 +63,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
             statusService.getStatus flatMap { status =>
-              ((for {
+              (for {
                 bm <- businessMatchingService.getModel
-                businessActivities <- bm.activities
+                businessActivities <- OptionT.fromOption[Future](bm.activities)
               } yield {
-                Some(businessActivities.businessActivities)
-              }) getOrElse None) map { activities =>
+                businessActivities.businessActivities
+              }).value map { activities =>
                 val (newActivities, existing) = getActivityValues(invalidForm, status, activities)
                 BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
               }

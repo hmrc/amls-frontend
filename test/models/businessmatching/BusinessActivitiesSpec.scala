@@ -70,15 +70,35 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
 
     "write correct data for businessActivities value" when {
 
-      "single activities selected" in {
+      "additionalActivities are not present" when {
 
-        BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
-          be(Map("businessActivities[]" -> Seq("01")))
+        "single activities selected" in {
+
+          BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
+            be(Map("businessActivities[]" -> Seq("01")))
+        }
+
+        "multiple activities selected" in {
+          BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
+            be(Map("businessActivities[]" -> Seq("07", "06", "04")))
+        }
+
       }
+      "additionalActivities are present" when {
 
-      "multiple activities selected" in {
-        BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
-          be(Map("businessActivities[]" -> Seq("07", "06", "04")))
+        "single activities selected" in {
+
+          BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices), Some(Set(HighValueDealing)))) must
+            be(Map("businessActivities[]" -> Seq("04")))
+        }
+
+        "multiple activities selected" in {
+          BusinessActivities.formWrites.writes(BusinessActivities(
+            Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing),
+            Some(Set(AccountancyServices, TelephonePaymentService))
+          )) must be(Map("businessActivities[]" -> Seq("01", "07")))
+        }
+
       }
     }
 
