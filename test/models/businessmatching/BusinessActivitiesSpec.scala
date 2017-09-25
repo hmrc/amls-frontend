@@ -162,9 +162,18 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
 
     }
 
-    "validate json write" in {
-      Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))) must
-        be(Json.obj("businessActivities" -> Seq("04", "03")))
+    "validate json write" when {
+
+      "additionalActivities are not present" in {
+        Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))) must
+          be(Json.obj("businessActivities" -> Seq("04", "03")))
+      }
+
+      "additionalActivities are present" in {
+        Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), Some(Set(AccountancyServices, BillPaymentServices)))) must
+          be(Json.obj("businessActivities" -> Seq("04", "03"), "additionalActivities" -> Seq("01", "02")))
+      }
+
     }
 
     "throw error for invalid data" in {
