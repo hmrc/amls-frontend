@@ -21,13 +21,18 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import play.api.inject.guice.GuiceApplicationBuilder
 
-class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatchingGenerator {
+class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatchingGenerator with OneAppPerSuite {
+
+  override lazy val app = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.has-accepted" -> true)
+    .build()
 
   "BusinessMatchingSpec" must {
     import play.api.libs.json._
