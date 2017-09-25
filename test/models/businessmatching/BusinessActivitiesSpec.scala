@@ -68,22 +68,18 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
       }
     }
 
-    "write correct data for businessActivities value" in {
+    "write correct data for businessActivities value" when {
 
-      BusinessActivities.formWrites.writes(BusinessActivities(Set(EstateAgentBusinessService, BillPaymentServices, MoneyServiceBusiness))) must
-        be(Map("businessActivities[]" -> Seq("03", "02", "05")))
-    }
+      "single activities selected" in {
 
-    "write correct data for businessActivities value on checkbox selected" in {
+        BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
+          be(Map("businessActivities[]" -> Seq("01")))
+      }
 
-      BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
-        be(Map("businessActivities[]" -> Seq("01")))
-    }
-
-    "write correct data for businessActivities value when 3 checkbox selected" in {
-
-      BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
-        be(Map("businessActivities[]" -> Seq("07", "06", "04")))
+      "multiple activities selected" in {
+        BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
+          be(Map("businessActivities[]" -> Seq("07", "06", "04")))
+      }
     }
 
     "get the value for each activity type" in {
@@ -109,26 +105,61 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
 
     }
 
-    "JSON validation" must {
+    "JSON validation" when {
 
-      "successfully validate given an enum value" in {
-        val json = Json.obj("businessActivities" -> Seq("05", "06", "07"))
+      "additionalActivities are not present" must {
 
-        Json.fromJson[BusinessActivities](json) must
-          be(JsSuccess(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)), JsPath \ "businessActivities"))
+        "successfully validate given an enum value" in {
+          val json = Json.obj("businessActivities" -> Seq("05", "06", "07"))
 
-        Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"))) must
-          be(JsSuccess(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)), JsPath \ "businessActivities"))
+          Json.fromJson[BusinessActivities](json) must
+            be(JsSuccess(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))))
 
-        Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"))) must
-          be(JsSuccess(BusinessActivities(Set(HighValueDealing)), JsPath \ "businessActivities"))
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"))) must
+            be(JsSuccess(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))))
 
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"))) must
+            be(JsSuccess(BusinessActivities(Set(HighValueDealing))))
+
+        }
+
+        "fail when on invalid data" in {
+          Json.fromJson[BusinessActivities](Json.obj("businessActivity" -> "01")) must
+            be(JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.path.missing")))
+        }
       }
 
-      "fail when on invalid data" in {
-        Json.fromJson[BusinessActivities](Json.obj("businessActivity" -> "01")) must
-          be(JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.path.missing")))
+      "additionalActivities are present" must {
+
+        "successfully validate given an enum value" in {
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("05", "06", "07"), "additionalActivities" -> Seq("01", "02"))) must
+            be(JsSuccess(
+              BusinessActivities(
+                Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+                Some(Set(AccountancyServices, BillPaymentServices))
+              )
+            ))
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"), "additionalActivities" -> Seq("04", "05", "06"))) must
+            be(JsSuccess(
+              BusinessActivities(
+                Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
+                Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+              )
+            ))
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"), "additionalActivities" -> Seq("07"))) must
+            be(JsSuccess(BusinessActivities(Set(HighValueDealing), Some(Set(TelephonePaymentService)))))
+
+        }
+
+        "fail when on invalid data" in {
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "additionalActivities" -> Seq("11"))) must
+            be(JsError((JsPath \ "additionalActivities") -> play.api.data.validation.ValidationError("error.invalid")))
+        }
       }
+
     }
 
     "validate json write" in {
@@ -136,15 +167,9 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
         be(Json.obj("businessActivities" -> Seq("04", "03")))
     }
 
-    "successfully validate json write" in {
-      val json = Json.obj("businessActivities" -> Seq("02", "07", "01"))
-      Json.toJson(BusinessActivities(Set(BillPaymentServices, TelephonePaymentService, AccountancyServices))) must be(json)
-
-    }
-
     "throw error for invalid data" in {
       Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq(JsString("20")))) must
-        be(JsError((JsPath \ "businessActivities") (0) \ "businessActivities", play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath \ "businessActivities", play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

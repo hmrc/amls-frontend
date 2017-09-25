@@ -17,15 +17,15 @@
 package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
-import play.api.i18n.{Lang, Messages}
+import jto.validation.{From, Rule, ValidationError, _}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
-import play.api.libs.json._
+import play.api.i18n.{Lang, Messages}
+import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
+import play.api.libs.functional.syntax._
 
-case class BusinessActivities(businessActivities: Set[BusinessActivity])
+case class BusinessActivities(businessActivities: Set[BusinessActivity], additionalActivities: Option[Set[BusinessActivity]] = None)
 
 sealed trait BusinessActivity {
 
@@ -100,18 +100,59 @@ object BusinessActivities {
 
   import utils.MappingUtils.Implicits._
 
-  implicit def formReads
-  (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
+  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     From[UrlFormEncoded] { __ =>
-     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) map BusinessActivities.apply
+     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) map (BusinessActivities(_))
    }
 
-  implicit def formWrites
-  (implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
+  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
     Map("businessActivities[]" -> data.businessActivities.toSeq.map(w.writes))
   }
 
-  implicit val formats = Json.format[BusinessActivities]
+  implicit val format = Json.writes[BusinessActivities]
+
+  implicit val jsonReads: Reads[BusinessActivities] = {
+    import play.api.libs.json.Reads.StringReads
+    ((__ \ "businessActivities").read[Set[String]].flatMap[Set[BusinessActivity]]{ ba =>
+      val activities = activitiesReader(ba, "businessActivities")
+
+      activities.foldLeft[Reads[Set[BusinessActivity]]](Reads[Set[BusinessActivity]](_ => JsSuccess(Set.empty))) { (result, data) =>
+        data flatMap { r =>
+          result.map{_ + r}
+        }
+      }
+
+    } and (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
+      case Some(a) => {
+        val activities = activitiesReader(a, "additionalActivities")
+
+        activities.foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))) { (result, data) =>
+          data flatMap { r =>
+            result.map {
+              case Some(n) => Some(n + r)
+              case _ => Some(Set(r))
+            }
+          }
+        }
+
+      }
+      case _ => None
+    })((a, b) => BusinessActivities(a,b))
+  }
+
+  def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {
+    values map {
+      case "01" => Reads(_ => JsSuccess(AccountancyServices)) map identity[BusinessActivity]
+      case "02" => Reads(_ => JsSuccess(BillPaymentServices)) map identity[BusinessActivity]
+      case "03" => Reads(_ => JsSuccess(EstateAgentBusinessService)) map identity[BusinessActivity]
+      case "04" => Reads(_ => JsSuccess(HighValueDealing)) map identity[BusinessActivity]
+      case "05" => Reads(_ => JsSuccess(MoneyServiceBusiness)) map identity[BusinessActivity]
+      case "06" => Reads(_ => JsSuccess(TrustAndCompanyServices)) map identity[BusinessActivity]
+      case "07" => Reads(_ => JsSuccess(TelephonePaymentService)) map identity[BusinessActivity]
+      case _ =>
+        Reads(_ => JsError((JsPath \ path) -> play.api.data.validation.ValidationError("error.invalid")))
+    }
+  }
 
   def getValue(ba:BusinessActivity): String =
     ba match {
