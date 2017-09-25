@@ -58,6 +58,12 @@ case class BusinessMatching(
     )
   }
 
+  def clearPSRNumber: BusinessMatching = {
+    this.copy(businessAppliedForPSRNumber = None,
+      hasChanged = hasChanged || this.businessAppliedForPSRNumber.isDefined,
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.isDefined)
+  }
+
   def msbComplete(activities: BusinessActivities): Boolean = {
     if (activities.businessActivities.contains(MoneyServiceBusiness)) {
       this.msbServices.isDefined && this.msbServices.fold(false)(_.msbServices.contains(TransmittingMoney) match {
