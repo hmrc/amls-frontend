@@ -29,8 +29,8 @@ import org.mockito.Mockito._
 class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
   "BusinessMatchingSpec" must {
-
     import play.api.libs.json._
+
     val msbServices = MsbServices(
       Set(
         TransmittingMoney,
@@ -39,6 +39,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         ChequeCashingScrapMetal
       )
     )
+
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val businessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
     val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
@@ -49,7 +50,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     val jsonBusinessMatching = Json.obj(
       "businessActivities" -> Seq("05", "06", "07"),
-      "msbServices"-> Seq("01","02","03","04"),
+      "msbServices" -> Seq("01", "02", "03", "04"),
       "businessName" -> "BusinessName",
       "businessType" -> "Sole Trader",
       "businessAddress" -> Json.obj(
@@ -66,9 +67,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "appliedFor" -> true,
       "regNumber" -> "123456"
       ,
-      "hasChanged" -> false
+      "hasChanged" -> false,
+      "hasAccepted" -> false
     )
-
 
     val businessMatching = BusinessMatching(
       Some(reviewDetailsModel),
@@ -76,57 +77,50 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       Some(msbServices),
       Some(typeOfBusinessModel),
       Some(companyRegistrationNumberModel),
-      Some(businessAppliedForPSRNumberModel),
-      hasChanged = false)
+      Some(businessAppliedForPSRNumberModel))
 
-    "JSON validation" must {
+    "READ the JSON successfully and return the domain Object" in {
+      Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
+    }
 
-      "READ the JSON successfully and return the domain Object" in {
-        Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
-      }
+    "WRITE the JSON successfully from the domain Object" in {
+      Json.toJson(businessMatching) must be(jsonBusinessMatching)
+    }
 
-      "WRITE the JSON successfully from the domain Object" in {
-        Json.toJson(businessMatching) must be(jsonBusinessMatching)
+    val initial: Option[BusinessMatching] = None
+
+    "Merged with BusinessActivities" must {
+      "return BusinessMatching with correct BusinessActivities" in {
+        val result = initial.activities(businessActivitiesModel)
+        result must be(BusinessMatching(None, Some(businessActivitiesModel), None, hasChanged = true))
       }
     }
 
-    "None" when {
-
-      val initial: Option[BusinessMatching] = None
-
-      "Merged with BusinessActivities" must {
-        "return BusinessMatching with correct BusinessActivities" in {
-          val result = initial.activities(businessActivitiesModel)
-          result must be(BusinessMatching(None, Some(businessActivitiesModel), None, hasChanged = true))
-        }
+    "Merged with ReviewDetails" must {
+      "return BusinessMatching with correct reviewDetails" in {
+        val result = initial.reviewDetails(reviewDetailsModel)
+        result must be(BusinessMatching(Some(reviewDetailsModel), None, None, hasChanged = true))
       }
+    }
 
-      "Merged with ReviewDetails" must {
-        "return BusinessMatching with correct reviewDetails" in {
-          val result = initial.reviewDetails(reviewDetailsModel)
-          result must be(BusinessMatching(Some(reviewDetailsModel), None, None, hasChanged = true))
-        }
+    "Merged with TypeOfBusiness" must {
+      "return BusinessMatching with correct TypeOfBusiness" in {
+        val result = initial.typeOfBusiness(typeOfBusinessModel)
+        result must be(BusinessMatching(None, None, None, Some(typeOfBusinessModel), None, hasChanged = true))
       }
+    }
 
-      "Merged with TypeOfBusiness" must {
-        "return BusinessMatching with correct TypeOfBusiness" in {
-          val result = initial.typeOfBusiness(typeOfBusinessModel)
-          result must be(BusinessMatching(None, None, None, Some(typeOfBusinessModel), None, hasChanged = true))
-        }
+    "Merged with CompanyRegistrationNumberModel" must {
+      "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
+        val result = initial.companyRegistrationNumber(companyRegistrationNumberModel)
+        result must be(BusinessMatching(None, None, None, None, Some(companyRegistrationNumberModel), hasChanged = true))
       }
+    }
 
-      "Merged with CompanyRegistrationNumberModel" must {
-        "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
-          val result = initial.companyRegistrationNumber(companyRegistrationNumberModel)
-          result must be(BusinessMatching(None, None, None, None, Some(companyRegistrationNumberModel), hasChanged = true))
-        }
-      }
-
-      "Merged with BusinessAppliedForPSRNumberModel" must {
-        "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
-          val result = initial.businessAppliedForPSRNumber(businessAppliedForPSRNumberModel)
-          result must be(BusinessMatching(None, None, None, None, None,Some(businessAppliedForPSRNumberModel), hasChanged = true))
-        }
+    "Merged with BusinessAppliedForPSRNumberModel" must {
+      "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
+        val result = initial.businessAppliedForPSRNumber(businessAppliedForPSRNumberModel)
+        result must be(BusinessMatching(None, None, None, None, None, Some(businessAppliedForPSRNumberModel), hasChanged = true))
       }
     }
 
@@ -147,6 +141,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
           businessMatching.isComplete mustBe true
         }
+
         "reviewDetails, activites and typeOfBusiness are set and BusinessType contains UnincorporatedBody" in {
 
           val businessMatching = BusinessMatching(
@@ -161,6 +156,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
           businessMatching.isComplete mustBe true
         }
+
         "reviewDetails, activites and crn are set and BusinessType contains LimitedCompany" in {
           val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
 
@@ -175,6 +171,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
           businessMatching.isComplete mustBe true
         }
+
         "reviewDetails, activites and crn are set and BusinessType contains LPrLLP" in {
           val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")
 
@@ -201,7 +198,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false)
 
-          businessMatching.isComplete must be (true)
+          businessMatching.isComplete must be(true)
         }
 
         "business activity selected as option other then MSB" in {
@@ -215,7 +212,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             None,
             hasChanged = false)
 
-          businessMatching.isComplete must be (true)
+          businessMatching.isComplete must be(true)
         }
       }
 
@@ -223,15 +220,19 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         "no properties are set" in {
           BusinessMatching().isComplete mustBe false
         }
+
         "reviewDetails and activites are not set" in {
           businessMatching.copy(reviewDetails = None, activities = None).isComplete mustBe false
         }
+
         "reviewDetails is not set and activites is set" in {
           businessMatching.copy(reviewDetails = None).isComplete mustBe false
         }
+
         "reviewDetails is set and activites is not" in {
           businessMatching.copy(activities = None).isComplete mustBe false
         }
+
         "reviewDetails and activites are set, type is set and UnincorporatedBody is not set" in {
           val testModel = businessMatching.copy(
             reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")),
@@ -239,6 +240,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           )
           testModel.isComplete mustBe false
         }
+
         "reviewDetails and activites are set, crn is set, LimitedCompany and UnincorporatedBody are not set" in {
           val testModel = businessMatching.copy(
             reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")),
@@ -258,7 +260,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false)
 
-          businessMatching.isComplete must be (false)
+          businessMatching.isComplete must be(false)
         }
 
         "business activity selected as MSB and msb services model is defined and psr is not defined" in {
@@ -272,7 +274,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             None,
             hasChanged = false)
 
-          businessMatching.isComplete must be (false)
+          businessMatching.isComplete must be(false)
         }
       }
     }
