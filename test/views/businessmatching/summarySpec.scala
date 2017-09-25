@@ -25,6 +25,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import forms.EmptyForm
 
 import scala.collection.JavaConversions._
 
@@ -40,7 +41,7 @@ class summarySpec extends GenericTestHelper
   "businessmatching view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(BusinessMatching())
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("title.cya"))
@@ -81,7 +82,7 @@ class summarySpec extends GenericTestHelper
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(testBusinessMatching)
+      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -147,7 +148,7 @@ class summarySpec extends GenericTestHelper
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(testBusinessMatching)
+      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
