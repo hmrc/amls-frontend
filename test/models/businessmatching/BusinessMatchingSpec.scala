@@ -16,6 +16,7 @@
 
 package models.businessmatching
 
+import generators.businessmatching.BusinessMatchingGenerator
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -26,7 +27,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 
-class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
+class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatchingGenerator {
 
   "BusinessMatchingSpec" must {
     import play.api.libs.json._
@@ -68,7 +69,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "regNumber" -> "123456"
       ,
       "hasChanged" -> false,
-      "hasAccepted" -> false
+      "hasAccepted" -> true
     )
 
     val businessMatching = BusinessMatching(
@@ -77,7 +78,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       Some(msbServices),
       Some(typeOfBusinessModel),
       Some(companyRegistrationNumberModel),
-      Some(businessAppliedForPSRNumberModel))
+      Some(businessAppliedForPSRNumberModel),
+      hasAccepted = true)
 
     "READ the JSON successfully and return the domain Object" in {
       Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
@@ -136,7 +138,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             None,
             None,
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false
+            hasChanged = false,
+            hasAccepted = true
           )
 
           businessMatching.isComplete mustBe true
@@ -151,7 +154,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             Some(typeOfBusinessModel),
             None,
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false
+            hasChanged = false,
+            hasAccepted = true
           )
 
           businessMatching.isComplete mustBe true
@@ -167,7 +171,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             None,
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false)
+            hasChanged = false,
+            hasAccepted = true
+          )
 
           businessMatching.isComplete mustBe true
         }
@@ -182,7 +188,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             None,
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false)
+            hasChanged = false,
+            hasAccepted = true
+          )
 
           businessMatching.isComplete mustBe true
         }
@@ -196,7 +204,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false)
+            hasChanged = false,
+            hasAccepted = true
+          )
 
           businessMatching.isComplete must be(true)
         }
@@ -210,7 +220,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
             None,
-            hasChanged = false)
+            hasChanged = false,
+            hasAccepted = true
+          )
 
           businessMatching.isComplete must be(true)
         }
@@ -233,11 +245,27 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           businessMatching.copy(activities = None).isComplete mustBe false
         }
 
+        "hasAccepted is not set" in {
+          val model = BusinessMatching(
+            Some(reviewDetailsModel),
+            Some(businessActivitiesModel),
+            Some(msbServices),
+            None,
+            None,
+            Some(businessAppliedForPSRNumberModel),
+            hasChanged = false,
+            hasAccepted = false
+          )
+
+          model.isComplete mustBe false
+        }
+
         "reviewDetails and activites are set, type is set and UnincorporatedBody is not set" in {
           val testModel = businessMatching.copy(
             reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")),
             companyRegistrationNumber = None
           )
+
           testModel.isComplete mustBe false
         }
 
@@ -246,6 +274,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
             reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")),
             typeOfBusiness = None
           )
+
           testModel.isComplete mustBe false
         }
 
@@ -298,9 +327,11 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "return `Completed` section when there is a section which is completed" in {
         implicit val cache = mock[CacheMap]
         implicit val ac = mock[AuthContext]
+
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(businessMatching)
+
         BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get())
       }
     }

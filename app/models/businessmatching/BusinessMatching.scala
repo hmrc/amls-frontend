@@ -72,7 +72,7 @@ case class BusinessMatching(
 
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _)
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true)
         if {
           isbusinessTypeComplete(x.businessType) && msbComplete(activity)
         } => true
