@@ -25,6 +25,7 @@ import _root_.services.StatusService
 import cats.implicits._
 import cats.data.OptionT
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
+import forms.EmptyForm
 
 trait SummaryController extends BaseController {
 
@@ -39,7 +40,7 @@ trait SummaryController extends BaseController {
         val okResult = for {
           bm <- OptionT(dataCache.fetch[BusinessMatching](BusinessMatching.key))
           status <- OptionT.liftF(statusService.getStatus)
-        } yield Ok(summary(bm, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
+        } yield Ok(summary(EmptyForm, bm, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
