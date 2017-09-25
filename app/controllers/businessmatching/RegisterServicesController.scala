@@ -108,7 +108,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     existingServices.fold[BusinessActivities](addedServices){ existing =>
       status match {
         case NotCompleted | SubmissionReady => addedServices
-        case _ => BusinessActivities(existing.businessActivities ++ addedServices.businessActivities)
+        case _ => BusinessActivities(existing.businessActivities, Some(addedServices.businessActivities))
       }
     }
 
