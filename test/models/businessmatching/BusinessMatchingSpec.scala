@@ -308,6 +308,27 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
       }
     }
 
+    "hasAccepted" must {
+      "reset to false" when {
+
+        val tests = Seq[(BusinessMatching => BusinessMatching, String)](
+          (_.activities(BusinessActivities(Set(MoneyServiceBusiness))), "activities"),
+          (_.msbServices(MsbServices(Set(CurrencyExchange))), "msbServices"),
+          (_.reviewDetails(reviewDetailsGen.sample.get), "reviewDetails"),
+          (_.typeOfBusiness(TypeOfBusiness("type of business")), "typeOfBusiness"),
+          (_.companyRegistrationNumber(CompanyRegistrationNumber("987654321")), "companyRegistrationNumber"),
+          (_.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberNo), "businessAppliedForPSRNumber")
+        )
+
+        tests.foreach { test =>
+          s"${test._2} was changed" in {
+            val model = test._1(businessMatching.copy(hasAccepted = true))
+            model.hasAccepted mustBe false
+          }
+        }
+      }
+    }
+
     "section" must {
 
       "return `NotStarted` section when there is no section in Save4Later" in {

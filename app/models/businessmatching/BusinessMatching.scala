@@ -33,22 +33,28 @@ case class BusinessMatching(
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =
-    this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p))
+    this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p), hasAccepted = hasAccepted && this.activities.contains(p))
 
   def msbServices(p: MsbServices): BusinessMatching =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p))
+    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p), hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def reviewDetails(p: ReviewDetails): BusinessMatching =
-    this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p))
+    this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p), hasAccepted = hasAccepted && this.reviewDetails.contains(p))
 
   def typeOfBusiness(p: TypeOfBusiness): BusinessMatching =
-    this.copy(typeOfBusiness = Some(p), hasChanged = hasChanged || !this.typeOfBusiness.contains(p))
+    this.copy(typeOfBusiness = Some(p), hasChanged = hasChanged || !this.typeOfBusiness.contains(p), hasAccepted = hasAccepted && this.typeOfBusiness.contains(p))
 
   def companyRegistrationNumber(p: CompanyRegistrationNumber): BusinessMatching =
-    this.copy(companyRegistrationNumber = Some(p), hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p))
+    this.copy(companyRegistrationNumber = Some(p),
+      hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p),
+      hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
+    )
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
-    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
+    this.copy(businessAppliedForPSRNumber = Some(p),
+      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+    )
   }
 
   def msbComplete(activities: BusinessActivities): Boolean = {

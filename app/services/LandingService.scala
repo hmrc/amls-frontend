@@ -134,7 +134,7 @@ trait LandingService {
                   ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
       cacheConnector.remove(authContext.user.oid) flatMap {
-        _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
+        _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(viewResponse.businessMatchingSection.copy(hasAccepted = true))) flatMap {
           _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true))) flatMap {
             _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection)) flatMap {
               _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)) flatMap {
