@@ -65,6 +65,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
+    val emptyCache = CacheMap("", Map.empty)
+
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
@@ -78,9 +80,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       controller.statusService.getStatus(any(), any(), any())
     } thenReturn Future.successful(NotCompleted)
 
+    when {
+      controller.businessMatchingService.commitVariationData(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
   }
 
-  val emptyCache = CacheMap("", Map.empty)
 
   "RegisterServicesController" when {
 

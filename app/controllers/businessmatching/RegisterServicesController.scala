@@ -74,18 +74,26 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            for {
+            (for {
               status <- statusService.getStatus
               businessMatching <- businessMatchingService.getModel.value
-              _ <- businessMatchingService.updateModel(
-                data.businessActivities.contains(MoneyServiceBusiness) match {
-                  case false => businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
-                  case true => businessMatching.activities(updateModel(businessMatching.activities, data, status))
+              _ <- isMsb(data, businessMatching.activities) match {
+                case true => {
+                  businessMatchingService.updateModel(
+                    businessMatching.activities(updateModel(businessMatching.activities, data, status))
+                  ).value
                 }
-              ).value
-            } yield data.businessActivities.contains(MoneyServiceBusiness) match {
-              case true => Redirect(routes.ServicesController.get(false))
-              case false => Redirect(routes.SummaryController.get())
+                case false => {
+                  businessMatchingService.updateModel(
+                    businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
+                  ).value
+                }
+              }
+            } yield data.businessActivities.contains(MoneyServiceBusiness)) flatMap {
+              case true => Future.successful(Redirect(routes.ServicesController.get(false)))
+              case false => businessMatchingService.commitVariationData.value.map { _ =>
+                Redirect(routes.SummaryController.get())
+              }
             }
         }
   }
@@ -111,15 +119,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(existingServices: Option[BusinessActivities], addedServices: BusinessActivities, status: SubmissionStatus): BusinessActivities = {
-
-    existingServices.fold[BusinessActivities](addedServices) { existing =>
+  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, status: SubmissionStatus): BusinessActivities =
+    existing.fold[BusinessActivities](added) { existing =>
       status match {
-        case NotCompleted | SubmissionReady => addedServices
-        case _ => BusinessActivities(existing.businessActivities, Some(addedServices.businessActivities))
+        case NotCompleted | SubmissionReady => added
+        case _ => BusinessActivities(existing.businessActivities, Some(added.businessActivities))
       }
     }
 
-  }
+  private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
+    added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
 }
