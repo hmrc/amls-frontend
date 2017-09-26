@@ -55,7 +55,7 @@ class WaysToPayController @Inject()(
     implicit authContext => implicit request =>
         val submissionDetails = for {
           amlsRefNo <- amlsRefBroker.get
-          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
           payRef <- OptionT.fromOption[Future](paymentReference)
         } yield (amlsRefNo, payRef, data, detailedStatus.fold[String]("")(_.safeId.getOrElse("")))
