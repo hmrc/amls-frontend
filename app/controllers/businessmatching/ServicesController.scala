@@ -68,7 +68,7 @@ trait ServicesController extends BaseController {
                 case true => bm.msbServices(data)
                 case false => bm.msbServices(data).clearPSRNumber
               })
-              result <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
+              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield cache
 
             lazy val redirectResult = data.msbServices.contains(TransmittingMoney) match {

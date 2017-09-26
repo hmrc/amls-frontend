@@ -30,6 +30,6 @@ trait BusinessActivitiesGenerator extends BaseGenerator {
     MoneyServiceBusiness,
     TrustAndCompanyServices,
     TelephonePaymentService
-  ) map { a => BusinessActivities(a.toSet) }
+  ) map { a => BusinessActivities(a.toSet, None) }
   
 }

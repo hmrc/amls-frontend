@@ -65,6 +65,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
+    val emptyCache = CacheMap("", Map.empty)
+
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
@@ -78,9 +80,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       controller.statusService.getStatus(any(), any(), any())
     } thenReturn Future.successful(NotCompleted)
 
+    when {
+      controller.businessMatchingService.commitVariationData(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+
   }
 
-  val emptyCache = CacheMap("", Map.empty)
 
   "RegisterServicesController" when {
 
@@ -273,7 +278,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
           val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
 
-          services must be(BusinessActivities(existingServices.businessActivities ++ addedServices.businessActivities))
+          services must be(BusinessActivities(existingServices.businessActivities, Some(addedServices.businessActivities)))
 
         }
       }
@@ -296,7 +301,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
   }
 
   it must {
-    "save additional services to existing services" when {
+    "save additional services as additionalActivities" when {
       "status is post-submission" in new Fixture {
 
         when {
@@ -319,12 +324,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         status(result) must be(SEE_OTHER)
 
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
-            BusinessActivities(activityData1 + HighValueDealing + TelephonePaymentService)
+            BusinessActivities(activityData1, Some(Set(HighValueDealing, TelephonePaymentService)))
         )))(any(),any(),any())
 
       }
     }
-    "save only services from request" when {
+    "save only services from request to businessActivties" when {
       "status is pre-submisson" in new Fixture {
 
         when {
