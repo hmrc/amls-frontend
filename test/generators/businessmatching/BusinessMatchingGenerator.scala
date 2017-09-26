@@ -31,7 +31,7 @@ trait BusinessMatchingGenerator extends BaseGenerator
   val businessMatchingGen: Gen[BusinessMatching] = for {
     reviewDetails <- reviewDetailsGen
     activities <- businessActivitiesGen
-  } yield BusinessMatching(reviewDetails.some, activities.some)
+  } yield BusinessMatching(Some(reviewDetails), Some(activities))
 
   val businessMatchingWithPsrGen: Gen[BusinessMatching] = for {
     bm <- businessMatchingGen
