@@ -17,24 +17,21 @@
 package controllers
 
 import cats.data.OptionT
-import config.{ApplicationConfig, AMLSAuthConnector}
+import cats.implicits._
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.Partnership
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
 import models.status._
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{AnyContent, Request}
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
-import cats.implicits._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -60,23 +57,21 @@ trait RegistrationProgressController extends BaseController {
               completePreApp <- OptionT(preApplicationComplete(cacheMap, status))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
-              (for {
-                reviewDetails <- businessMatching.reviewDetails
-              } yield {
+              businessMatching.reviewDetails map { reviewDetails =>
+
                 val sections = progressService.sections(cacheMap)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey)
+                val preSubmission = Set(NotCompleted, SubmissionReady).contains(status)
 
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
-                val canEditPreApp = Set(NotCompleted, SubmissionReady).contains(status)
 
                 completePreApp match {
-                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
-                    case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, canEditPreApp))
+                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
+                    case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
                 }
-              }) getOrElse InternalServerError("Unable to retrieve the business details")
-
+              } getOrElse InternalServerError("Unable to retrieve the business details")
             }) getOrElse Redirect(controllers.routes.LandingController.get())
-         }
+          }
         }
   }
 

@@ -71,12 +71,10 @@ trait ServicesController extends BaseController {
               _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield cache
 
-            lazy val redirectResult = data.msbServices.contains(TransmittingMoney) match {
-              case true => OptionT.some[Future, Result](Redirect(routes.BusinessAppliedForPSRNumberController.get(edit)))
-              case false => businessMatchingService.commitVariationData map { _ =>
-                Redirect(routes.SummaryController.get())
-              }
-            }
+            lazy val redirectResult = OptionT.some[Future, Result](data.msbServices.contains(TransmittingMoney) match {
+              case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+              case false => Redirect(routes.SummaryController.get())
+            })
 
             updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
         }

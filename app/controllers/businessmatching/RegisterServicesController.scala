@@ -74,7 +74,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            (for {
+            for {
               status <- statusService.getStatus
               businessMatching <- businessMatchingService.getModel.value
               _ <- isMsb(data, businessMatching.activities) match {
@@ -89,11 +89,9 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   ).value
                 }
               }
-            } yield data.businessActivities.contains(MoneyServiceBusiness)) flatMap {
-              case true => Future.successful(Redirect(routes.ServicesController.get(false)))
-              case false => businessMatchingService.commitVariationData.value.map { _ =>
-                Redirect(routes.SummaryController.get())
-              }
+            } yield data.businessActivities.contains(MoneyServiceBusiness) match {
+              case true => Redirect(routes.ServicesController.get(false))
+              case false => Redirect(routes.SummaryController.get())
             }
         }
   }
