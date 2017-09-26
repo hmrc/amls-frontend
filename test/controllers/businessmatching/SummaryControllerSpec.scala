@@ -18,24 +18,17 @@ package controllers.businessmatching
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import generators.AmlsReferenceNumberGenerator
-import generators.businesscustomer.ReviewDetailsGenerator
-import generators.businessmatching.{BusinessActivitiesGenerator, BusinessMatchingGenerator}
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching}
-import models.businessmatching.BusinessType.Partnership
-import models.businesscustomer.{Address, ReviewDetails}
+import generators.businessmatching.BusinessMatchingGenerator
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.LPrLLP
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-import play.api.test.Helpers._
-import services.StatusService
-import models.Country
-import models.businessmatching._
-import models.businessmatching.BusinessType.LPrLLP
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 

@@ -61,10 +61,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
 
-    when {
-      controller.businessMatchingService.commitVariationData(any(), any(), any())
-    } thenReturn cacheMapT
-
     def setupModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn (model match {
@@ -187,7 +183,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
-      verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
     }
 
     "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -217,7 +212,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
 
-        verify(controller.businessMatchingService).commitVariationData(any(), any(), any())
       }
 
     "redirect to the 'Psr Number' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
@@ -248,7 +242,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
-          verify(controller.businessMatchingService, never).commitVariationData(any(), any(), any())
       }
     }
   }
