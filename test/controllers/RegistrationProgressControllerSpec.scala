@@ -36,7 +36,7 @@ import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,18 +46,18 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture {self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
-    val mockCacheMap = mock[CacheMap]
 
     val controller = new RegistrationProgressController {
       override val authConnector = self.authConnector
       override protected[controllers] val progressService: ProgressService = mock[ProgressService]
-      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
-      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override protected[controllers] val statusService : StatusService = mock[StatusService]
+      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
+      override protected[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override protected[controllers] val statusService: StatusService = mockStatusService
     }
 
     when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionReady)
@@ -81,15 +81,12 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
-          
+
           val pageTitle = Messages("amendment.title") + " - " +
             Messages("title.yapp") + " - " +
             Messages("title.amls") + " - " + Messages("title.gov")
@@ -102,6 +99,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
         "status is ready for renewal and" must {
           "renewal data exists in save4later" in new Fixture {
             when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
+
             when(controller.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(ReadyForRenewal(None)))
 
@@ -130,9 +128,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
             when(controller.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
             when(controller.progressService.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
 
@@ -160,9 +155,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
@@ -183,9 +175,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
 
               when(controller.statusService.getStatus(any(), any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -216,9 +205,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
@@ -242,9 +228,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
 
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -276,9 +259,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", NotStarted, false, mock[Call]),
@@ -302,9 +282,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-              when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
 
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -331,9 +308,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
             when(controller.progressService.sections(mockCacheMap))
               .thenReturn(Seq(
                 Section("TESTSECTION1", NotStarted, false, mock[Call]),
@@ -355,9 +329,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-            when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(controller.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(subStatus))
@@ -391,9 +362,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
@@ -420,9 +388,6 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
@@ -440,13 +405,9 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
       }
 
       "pre application must redirect to the landing controller" when {
-        "the business matching is incomplete" in new Fixture {
-
-          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
+        "the business matching is incomplete and status is pre-application" in new Fixture {
           when(mockBusinessMatching.isComplete) thenReturn false
-          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
+          mockCacheFetch(Some(mockBusinessMatching))
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -456,24 +417,43 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
         }
       }
+
+      "pre-application must return 200 OK" when {
+        "business matching is incomplete and status is not pre-application" in new Fixture {
+          when(mockBusinessMatching.isComplete) thenReturn false
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
+          when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+        }
+      }
     }
+
     "post is called" must {
       "redirect to the url provided by progressService" in new Fixture {
-
         val call = controllers.routes.RegistrationProgressController.get()
 
         when {
-          controller.progressService.getSubmitRedirect(any(),any(),any())
+          controller.progressService.getSubmitRedirect(any(), any(), any())
         } thenReturn Future.successful(Some(call))
 
         val result = controller.post()(request)
 
         redirectLocation(result) must be(Some(call.url))
       }
+
       "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
 
         when {
-          controller.progressService.getSubmitRedirect(any(),any(),any())
+          controller.progressService.getSubmitRedirect(any(), any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.post()(request)
