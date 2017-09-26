@@ -26,7 +26,7 @@ import models.businessmatching.BusinessType.Partnership
 import models.businesscustomer.{Address, ReviewDetails}
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
@@ -35,6 +35,7 @@ import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessType.LPrLLP
 import play.api.inject.guice.GuiceApplicationBuilder
+import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
 
@@ -47,10 +48,13 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
     val controller = new SummaryController {
       override val dataCache = mockCacheConnector
       override val authConnector = self.authConnector
       override val statusService = mockStatusService
+      override val businessMatchingService = mockBusinessMatchingService
     }
 
     when {
