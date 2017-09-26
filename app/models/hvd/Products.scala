@@ -134,7 +134,7 @@ object Products{
 
   implicit val jsonReads: Reads[Products] =
     (__ \ "products").read[Set[String]].flatMap { x: Set[String] =>
-      val xx = x.map {
+      x.map {
         case "01" => Reads(_ => JsSuccess(Alcohol)) map identity[ItemType]
         case "02" => Reads(_ => JsSuccess(Tobacco)) map identity[ItemType]
         case "03" => Reads(_ => JsSuccess(Antiques)) map identity[ItemType]
@@ -147,12 +147,10 @@ object Products{
         case "10" => Reads(_ => JsSuccess(MobilePhones)) map identity[ItemType]
         case "11" => Reads(_ => JsSuccess(Clothing)) map identity[ItemType]
         case "12" =>
-          (JsPath \ "otherDetails").read[String].map(Other.apply) map identity[ItemType]
+          (JsPath \ "otherDetails").read[String].map(Other.apply _) map identity[ItemType]
         case _ =>
           Reads(_ => JsError((JsPath \ "products") -> play.api.data.validation.ValidationError("error.invalid")))
-      }
-
-        xx.foldLeft[Reads[Set[ItemType]]](
+      }.foldLeft[Reads[Set[ItemType]]](
         Reads[Set[ItemType]](_ => JsSuccess(Set.empty))
       ) {
         (result, data) =>
