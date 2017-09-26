@@ -57,7 +57,7 @@ trait RegistrationProgressController extends BaseController {
             (for {
               status <- OptionT.liftF(statusService.getStatus)
               cacheMap <- OptionT(dataCache.fetchAll)
-              completePreApp <- OptionT(preApplicationComplete(cacheMap))
+              completePreApp <- OptionT(preApplicationComplete(cacheMap, status))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
               (for {
@@ -110,19 +110,21 @@ trait RegistrationProgressController extends BaseController {
     }
   }
 
-  private def preApplicationComplete(cache: CacheMap)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
+  private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
+
+    val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)
+
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-    } yield bm.isComplete match {
-      case (true) => {
-        enrolmentsService.amlsRegistrationNumber flatMap {
-          case Some(_) => statusService.getStatus map {
+    } yield (preAppStatus(status), bm.isComplete) match {
+      case (_, true) | (false, _) =>
+        enrolmentsService.amlsRegistrationNumber map {
+          case Some(_) => status match {
             case  NotCompleted | SubmissionReady => Some(false)
             case _ => Some(true)
           }
-          case None => Future.successful(Some(false))
+          case None => Some(false)
         }
-      }
       case _ => Future.successful(None)
     }).getOrElse(Future.successful(None))
   }

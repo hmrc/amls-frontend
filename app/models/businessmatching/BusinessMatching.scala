@@ -16,6 +16,7 @@
 
 package models.businessmatching
 
+import config.ApplicationConfig
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -28,26 +29,39 @@ case class BusinessMatching(
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
                              businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                             hasChanged: Boolean = false
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =
-    this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p))
+    this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p), hasAccepted = hasAccepted && this.activities.contains(p))
 
   def msbServices(p: MsbServices): BusinessMatching =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p))
+    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p), hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def reviewDetails(p: ReviewDetails): BusinessMatching =
-    this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p))
+    this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p), hasAccepted = hasAccepted && this.reviewDetails.contains(p))
 
   def typeOfBusiness(p: TypeOfBusiness): BusinessMatching =
-    this.copy(typeOfBusiness = Some(p), hasChanged = hasChanged || !this.typeOfBusiness.contains(p))
+    this.copy(typeOfBusiness = Some(p), hasChanged = hasChanged || !this.typeOfBusiness.contains(p), hasAccepted = hasAccepted && this.typeOfBusiness.contains(p))
 
   def companyRegistrationNumber(p: CompanyRegistrationNumber): BusinessMatching =
-    this.copy(companyRegistrationNumber = Some(p), hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p))
+    this.copy(companyRegistrationNumber = Some(p),
+      hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p),
+      hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
+    )
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
-    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
+    this.copy(businessAppliedForPSRNumber = Some(p),
+      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+    )
+  }
+
+  def clearPSRNumber: BusinessMatching = {
+    this.copy(businessAppliedForPSRNumber = None,
+      hasChanged = hasChanged || this.businessAppliedForPSRNumber.isDefined,
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.isDefined)
   }
 
   def msbComplete(activities: BusinessActivities): Boolean = {
@@ -71,10 +85,10 @@ case class BusinessMatching(
 
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _)
-        if {
-          isbusinessTypeComplete(x.businessType) && msbComplete(activity)
-        } => true
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _) if !ApplicationConfig.hasAcceptedToggle
+        && isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true)
+        if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
       case _ => false
     }
 }
@@ -108,7 +122,8 @@ object BusinessMatching {
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
       __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessMatching.apply _)
 
 
@@ -124,7 +139,7 @@ object BusinessMatching {
           Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
-        } + ("hasChanged" -> JsBoolean(model.hasChanged))
+        } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
     }
 
   implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =

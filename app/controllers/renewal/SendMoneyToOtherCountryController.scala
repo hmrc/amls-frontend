@@ -63,8 +63,11 @@ class SendMoneyToOtherCountryController @Inject()(
                   activities <- bm.activities
                 } yield {
 
-                  renewalService.updateRenewal(renewal.sendMoneyToOtherCountry(model).copy(
-                    mostTransactions = None, sendTheLargestAmountsOfMoney = None)) map { _ =>
+                  renewalService.updateRenewal(model.money match {
+                    case false => renewal.sendMoneyToOtherCountry(model).copy(
+                      mostTransactions = None, sendTheLargestAmountsOfMoney = None)
+                    case true => renewal.sendMoneyToOtherCountry(model)
+                  }) map { _ =>
 
                     redirectTo(
                       model.money,

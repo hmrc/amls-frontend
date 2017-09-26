@@ -26,12 +26,11 @@ import models.businessmatching.BusinessType.Partnership
 import models.businesscustomer.{Address, ReviewDetails}
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
 import services.StatusService
-import utils.AuthorisedFixture
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessType.LPrLLP
@@ -45,13 +44,13 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
     .build()
 
-  sealed trait Fixture extends AuthorisedFixture {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
+      override val dataCache = mockCacheConnector
       override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
+      override val statusService = mockStatusService
     }
 
     when {
@@ -67,20 +66,16 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     }
 
     "load the summary page when section data is available" in new Fixture {
-
       val model = BusinessMatching()
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      mockCacheFetch[BusinessMatching](Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-
-      when(controller.dataCache.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      mockCacheFetch[BusinessMatching](None)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -89,20 +84,42 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     "hide the edit links when not in pre-approved status" in new Fixture {
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
-      when {
-        controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      when {
-        controller.statusService.getStatus(any(), any(), any())
-      } thenReturn Future.successful(SubmissionDecisionApproved)
+      mockCacheFetch[BusinessMatching](Some(model))
+      mockApplicationStatus(SubmissionDecisionApproved)
 
       val result = controller.get()(request)
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.select("a.change-answer").size mustBe 1
+      html.select("a.change-answer").size mustBe 0
+    }
+  }
 
+  "Post" when {
+    "called" must {
+      "update the hasAccepted flag on the model" in new Fixture {
+        val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockCacheFetch[BusinessMatching](Some(model))
+        mockCacheSave[BusinessMatching]
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
+      }
+
+      "return Internal Server Error if the business matching model can't be updated" in new Fixture {
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockCacheFetch[BusinessMatching](None)
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
     }
   }
 }
