@@ -182,17 +182,13 @@ object BankAccount {
     import play.api.libs.functional.syntax.unlift
     ((__ \ "accountName").write[String] ~
       __.write[Account]
-      ) (unlift(BankAccount.unapply _))
+      ) (unlift(BankAccount.unapply))
   }
 
   implicit val jsonReads: Reads[BankAccount] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
-
-    (
-      (__ \ "accountName").read[String] and
-        (__).read[Account]
-      ) (BankAccount.apply _)
+    ((__ \ "accountName").read[String] and __.read[Account]) (BankAccount.apply _)
   }
 
   implicit val jsonWrites: Writes[BankAccount] = {
@@ -200,8 +196,8 @@ object BankAccount {
 
     (
       (__ \ "accountName").write[String] and
-        (__).write[Account]
-      ) (unlift(BankAccount.unapply _))
+        __.write[Account]
+      ) (unlift(BankAccount.unapply))
 
   }
 

@@ -81,7 +81,7 @@ object AccountantsAddress {
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "country").read[Country]
-          ) (NonUkAccountantsAddress.apply _)
+          ) (NonUkAccountantsAddress.apply)
     }
   }
 

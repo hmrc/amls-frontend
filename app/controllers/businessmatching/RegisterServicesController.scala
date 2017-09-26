@@ -20,14 +20,16 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
-import services.businessmatching.BusinessMatchingService
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
+
+import scala.concurrent.Future
 
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
@@ -38,19 +40,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         statusService.getStatus flatMap { status =>
-          businessMatchingService.getModel.value map {
-            response =>
-              (for {
-                businessMatching <- response
-                businessActivities <- businessMatching.activities
-              } yield {
-                val form = Form2[BusinessActivities](businessActivities)
-                val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
-                Ok(register_services(form, edit, newActivities, existing, status))
-              }) getOrElse {
-                val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
-                Ok(register_services(EmptyForm, edit, newActivities, existing, status))
-              }
+          businessMatchingService.getModel.value map { bm =>
+            (for {
+              businessMatching <- bm
+              businessActivities <- businessMatching.activities
+            } yield {
+              val form = Form2[BusinessActivities](businessActivities)
+              val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
+              Ok(register_services(form, edit, newActivities, existing, status))
+            }) getOrElse {
+              val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
+              Ok(register_services(EmptyForm, edit, newActivities, existing, status))
+            }
           }
         }
   }
@@ -61,9 +62,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         import jto.validation.forms.Rules._
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
-            statusService.getStatus map { status =>
-              val (newActivities, existing) = getActivityValues(invalidForm, status, None)
-              BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
+            statusService.getStatus flatMap { status =>
+              (for {
+                bm <- businessMatchingService.getModel
+                businessActivities <- OptionT.fromOption[Future](bm.activities)
+              } yield {
+                businessActivities.businessActivities
+              }).value map { activities =>
+                val (newActivities, existing) = getActivityValues(invalidForm, status, activities)
+                BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
+              }
             }
           case ValidForm(_, data) =>
             for {
@@ -94,10 +102,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       TelephonePaymentService
     ) map BusinessActivities.getValue
 
-    existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)){ ea =>
+    existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)) { ea =>
       status match {
         case SubmissionReady | NotCompleted => (activities, Set.empty)
-        case _ => (activities diff(ea map BusinessActivities.getValue), activities intersect(ea map BusinessActivities.getValue))
+        case _ => (activities diff (ea map BusinessActivities.getValue), activities intersect (ea map BusinessActivities.getValue))
       }
     }
 
@@ -105,10 +113,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def updateModel(existingServices: Option[BusinessActivities], addedServices: BusinessActivities, status: SubmissionStatus): BusinessActivities = {
 
-    existingServices.fold[BusinessActivities](addedServices){ existing =>
+    existingServices.fold[BusinessActivities](addedServices) { existing =>
       status match {
         case NotCompleted | SubmissionReady => addedServices
-        case _ => BusinessActivities(existing.businessActivities ++ addedServices.businessActivities)
+        case _ => BusinessActivities(existing.businessActivities, Some(addedServices.businessActivities))
       }
     }
 

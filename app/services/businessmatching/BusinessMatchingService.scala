@@ -21,7 +21,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessMatching, BusinessActivities}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingService @Inject()(statusService: StatusService, cache: DataCacheConnector) {
+
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     lazy val originalModel = OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
     lazy val variationModel = OptionT(cache.fetch[BusinessMatching](BusinessMatching.variationKey))
@@ -61,7 +62,7 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
           cacheMap <- OptionT(cache.fetchAll)
           primaryModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey))
-          _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, variationModel.copy(hasChanged = primaryModel != variationModel)))
+          _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, updateBusinessMatching(primaryModel, variationModel)))
           result <- clearVariation
         } yield result
     }
@@ -69,4 +70,11 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
 
   def clearVariation(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
     OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
+
+  private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
+    variationModel.activities match {
+      case Some(BusinessActivities(existing, Some(additional))) => variationModel.activities(BusinessActivities(existing ++ additional, None))
+      case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
+    }
+
 }
