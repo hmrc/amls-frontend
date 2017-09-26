@@ -47,7 +47,8 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
                  (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
 
     OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, model))
+      case NotCompleted | SubmissionReady => OptionT.liftF(cache.save
+        [BusinessMatching](BusinessMatching.key, model))
       case _ => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, model))
     }
 

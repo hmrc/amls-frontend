@@ -95,7 +95,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     } thenReturn Future.successful(paymentGen.sample.get)
 
     when {
-      controller.statusService.getDetailedStatus(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      controller.statusService.getDetailedStatus(any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {
