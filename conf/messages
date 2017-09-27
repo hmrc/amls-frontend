@@ -115,6 +115,8 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
+error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
+
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
 error.bankdetails.accountname = Enter a name for this account
