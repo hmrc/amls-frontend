@@ -23,6 +23,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -36,6 +39,10 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val emptyCache = CacheMap("", Map.empty)
+
+    val mockCacheMap = mock[CacheMap]
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
@@ -72,8 +79,15 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
           "lettersAddress" -> "true"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(aboutTheBusiness))
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -85,8 +99,14 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
           "lettersAddress" -> "false"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(aboutTheBusiness))
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -100,6 +120,8 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
 
@@ -111,6 +133,8 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         )
         when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -124,6 +148,8 @@ class LettersAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

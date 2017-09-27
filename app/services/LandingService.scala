@@ -125,6 +125,20 @@ trait LandingService {
 
   }
 
+  def setAlCorrespondenceAddress (amlsRefNumber: String)
+                                 (implicit
+                                  authContext: AuthContext,
+                                  hc: HeaderCarrier,
+                                  ec: ExecutionContext
+                                 ): Future[CacheMap] = {
+    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
+      cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
+        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true))
+        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
+      })
+    }
+  }
+
 
   def refreshCache(amlsRefNumber: String)
                   (implicit
