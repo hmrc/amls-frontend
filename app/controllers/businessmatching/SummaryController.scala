@@ -40,7 +40,7 @@ trait SummaryController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-        def isPreApprovedStatus(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
+        def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 
         val okResult = for {
           bm <- businessMatchingService.getModel
@@ -52,7 +52,7 @@ trait SummaryController extends BaseController {
               ba.businessActivities ++ ba.additionalActivities.fold[Set[BusinessActivity]](Set.empty)(act => act)
             ))
           )
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
+          Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
         }
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
@@ -62,10 +62,15 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
+        businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData map { _ => true } orElse OptionT.some(false)
       } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        if(businessActivities.additionalActivities.isDefined){
+          Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get())
+        } else {
+          Redirect(controllers.routes.RegistrationProgressController.get())
+        }
       }) getOrElse InternalServerError("Unable to update business matching")
   }
 }

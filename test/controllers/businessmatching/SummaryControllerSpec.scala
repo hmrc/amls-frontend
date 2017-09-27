@@ -21,8 +21,8 @@ import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.businessmatching.BusinessType.LPrLLP
+import models.businessmatching._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -120,18 +120,47 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
   "Post" when {
     "called" must {
-      "update the hasAccepted flag on the model" in new Fixture {
-        val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
-        val postRequest = request.withFormUrlEncodedBody()
 
-        mockGetModel(Some(model))
-        mockUpdateModel
-        mockCommit
+      "redirect to RegistrationProgressController" which {
 
-        val result = controller.post()(postRequest)
+        "updates the hasAccepted flag on the model" in new Fixture {
+          val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
+          val postRequest = request.withFormUrlEncodedBody()
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+          mockGetModel(Some(model))
+          mockUpdateModel
+          mockCommit
+
+          val result = controller.post()(postRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        }
+
+      }
+
+      "redirect to TradingPremisesController" when {
+        "business activities have been updated" which {
+          "updates the hasAccepted flag on the model" in new Fixture {
+            val model = businessMatchingGen.sample.get.activities(
+              BusinessActivities(
+                Set(HighValueDealing),
+                Some(Set(BillPaymentServices))
+              )
+            )
+            val postRequest = request.withFormUrlEncodedBody()
+
+            mockGetModel(Some(model))
+            mockUpdateModel
+            mockCommit
+
+            val result = controller.post()(postRequest)
+
+            status(result) mustBe SEE_OTHER
+
+            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get().url)
+          }
+        }
       }
 
       "return Internal Server Error if the business matching model can't be updated" in new Fixture {
