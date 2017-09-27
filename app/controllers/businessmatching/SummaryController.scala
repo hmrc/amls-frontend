@@ -61,7 +61,7 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
-        _ <- OptionT.liftF(dataCache.save[BusinessMatching](BusinessMatching.key, businessMatching.copy(hasAccepted = true)))
+        _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData
       } yield {
         Redirect(controllers.routes.RegistrationProgressController.get())

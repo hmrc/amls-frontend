@@ -16,10 +16,12 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.businessmatching.BusinessType.LPrLLP
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
@@ -28,8 +30,10 @@ import org.mockito.Mockito._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
@@ -38,7 +42,8 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
     .build()
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks{
+
     self => val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
@@ -53,6 +58,24 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     when {
       controller.statusService.getStatus(any(), any(), any())
     } thenReturn Future.successful(SubmissionReady)
+
+    def mockGetModel(model: Option[BusinessMatching]) = when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn {
+      if(model.isDefined){
+        OptionT.some[Future,BusinessMatching](model)
+      } else {
+        OptionT.none[Future, BusinessMatching]
+      }
+    }
+
+    def mockUpdateModel = when {
+      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    def mockCommit = when {
+      controller.businessMatchingService.commitVariationData(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   "Get" must {
@@ -63,16 +86,19 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     }
 
     "load the summary page when section data is available" in new Fixture {
-      val model = BusinessMatching()
+      val model = BusinessMatching(
+        activities = Some(BusinessActivities(Set.empty[BusinessActivity]))
+      )
 
-      mockCacheFetch[BusinessMatching](Some(model))
+      mockGetModel(Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-      mockCacheFetch[BusinessMatching](None)
+
+      mockGetModel(None)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -81,7 +107,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     "hide the edit links when not in pre-approved status" in new Fixture {
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
-      mockCacheFetch[BusinessMatching](Some(model))
+      mockGetModel(Some(model))
       mockApplicationStatus(SubmissionDecisionApproved)
 
       val result = controller.get()(request)
@@ -98,20 +124,20 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
         val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
         val postRequest = request.withFormUrlEncodedBody()
 
-        mockCacheFetch[BusinessMatching](Some(model))
-        mockCacheSave[BusinessMatching]
+        mockGetModel(Some(model))
+        mockUpdateModel
+        mockCommit
 
         val result = controller.post()(postRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
-        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
       }
 
       "return Internal Server Error if the business matching model can't be updated" in new Fixture {
         val postRequest = request.withFormUrlEncodedBody()
 
-        mockCacheFetch[BusinessMatching](None)
+        mockGetModel(None)
 
         val result = controller.post()(postRequest)
 
