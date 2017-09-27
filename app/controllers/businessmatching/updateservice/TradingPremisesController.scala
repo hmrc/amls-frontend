@@ -18,6 +18,8 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.BaseController
 import forms.EmptyForm
 import services.businessmatching.BusinessMatchingService
@@ -34,7 +36,12 @@ class TradingPremisesController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm)))
+        (for {
+          businessMatching <- businessMatchingService.getModel
+          businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+        } yield {
+          Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm))
+        }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
 
   def post() = Authorised.async {
