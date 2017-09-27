@@ -124,7 +124,6 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
 
       "copy the variation data over the primary data, setting hasChanged to false when the models are the same" in new Fixture {
-
         val newModel = businessMatchingGen.sample
 
         mockApplicationStatus(SubmissionDecisionApproved)
@@ -134,6 +133,28 @@ class BusinessMatchingServiceSpec extends PlaySpec
         whenReady(service.commitVariationData.value) { _ =>
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel.copy(hasChanged = false)))(any(), any(), any())
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+
+      "return None if the variation data is not available" in new Fixture {
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
+        mockCacheGetEntry(None, BusinessMatching.variationKey)
+
+        whenReady(service.commitVariationData.value) { result =>
+          verify(mockCacheConnector, never).save[BusinessMatching](any(), any())(any(), any(), any())
+          result mustBe None
+        }
+      }
+
+      "return None if the variation data is empty" in new Fixture {
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
+        mockCacheGetEntry(BusinessMatching().some, BusinessMatching.variationKey)
+
+        whenReady(service.commitVariationData.value) { result =>
+          verify(mockCacheConnector, never).save[BusinessMatching](any(), any())(any(), any(), any())
+          result mustBe None
         }
       }
 

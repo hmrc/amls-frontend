@@ -28,6 +28,7 @@ import play.api.Play
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import views.html.businessmatching.summary
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -62,7 +63,7 @@ trait SummaryController extends BaseController {
       (for {
         businessMatching <- businessMatchingService.getModel
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
-        _ <- businessMatchingService.commitVariationData
+        _ <- businessMatchingService.commitVariationData map { _ => true } orElse OptionT.some(false)
       } yield {
         Redirect(controllers.routes.RegistrationProgressController.get())
       }) getOrElse InternalServerError("Unable to update business matching")
