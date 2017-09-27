@@ -18,11 +18,15 @@ package services.businessmatching
 
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
+import models.ViewResponse
+import models.aboutthebusiness.AboutTheBusiness
+import models.businessactivities.BusinessActivities
+import models.businessmatching.{BillPaymentServices, BusinessMatching, HighValueDealing, BusinessActivities => BMActivities}
+import models.declaration.AddPerson
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -101,6 +105,77 @@ class BusinessMatchingServiceSpec extends PlaySpec
           }
         }
       }
+    }
+  }
+
+  "getAdditionalBusinessActivities" must {
+    "return saved activities not found in view response" in new Fixture {
+
+      mockCacheFetch[ViewResponse](Some(ViewResponse(
+        "",
+        businessMatchingSection = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(BillPaymentServices)
+          ))
+        ),
+        aboutTheBusinessSection = AboutTheBusiness(),
+        bankDetailsSection = Seq.empty,
+        businessActivitiesSection = BusinessActivities(),
+        eabSection = None,
+        aspSection = None,
+        tcspSection = None,
+        responsiblePeopleSection = None,
+        tradingPremisesSection = None,
+        msbSection = None,
+        hvdSection = None,
+        supervisionSection = None,
+        aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+      )), Some(ViewResponse.key))
+
+      mockCacheFetch(Some(BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices, HighValueDealing)
+        ))
+      )), Some(BusinessMatching.key))
+
+      whenReady(service.getAdditionalBusinessActivities){ result =>
+        result must be(Some(Set(HighValueDealing)))
+      }
+
+    }
+    "return none if saved business activities are the same as view response" in new Fixture {
+
+      mockCacheFetch[ViewResponse](Some(ViewResponse(
+        "",
+        businessMatchingSection = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(BillPaymentServices)
+          ))
+        ),
+        aboutTheBusinessSection = AboutTheBusiness(),
+        bankDetailsSection = Seq.empty,
+        businessActivitiesSection = BusinessActivities(),
+        eabSection = None,
+        aspSection = None,
+        tcspSection = None,
+        responsiblePeopleSection = None,
+        tradingPremisesSection = None,
+        msbSection = None,
+        hvdSection = None,
+        supervisionSection = None,
+        aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+      )), Some(ViewResponse.key))
+
+      mockCacheFetch(Some(BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices)
+        ))
+      )), Some(BusinessMatching.key ))
+
+      whenReady(service.getAdditionalBusinessActivities){ result =>
+        result must be(HighValueDealing)
+      }
+
     }
   }
 
