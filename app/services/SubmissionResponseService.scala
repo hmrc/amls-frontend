@@ -72,7 +72,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
    ac: AuthContext
   ): Future[Option[SubmissionData]] = {
     cacheConnector.fetchAll flatMap {
-      getDataForAmendment(_) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+      getDataForAmendment(_) getOrElse OptionT.liftF(getSubscription).value// Future.failed(new Exception("Cannot get amendment response"))
     }
   }
 
