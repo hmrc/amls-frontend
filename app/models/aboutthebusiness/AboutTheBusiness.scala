@@ -60,9 +60,6 @@ case class AboutTheBusiness(
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
     this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
 
-  def correspondenceAddress(v: Option[CorrespondenceAddress]): AboutTheBusiness =
-    this.copy(correspondenceAddress = v, hasChanged = hasChanged || this.correspondenceAddress != v, hasAccepted = hasAccepted && this.correspondenceAddress.equals(v))
-
   def isComplete: Boolean =
     this match {
       case AboutTheBusiness(
