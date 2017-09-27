@@ -19,18 +19,22 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.EmptyForm
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-@Singleton
-class TradingPremisesController @Inject()(val authConnector: AuthConnector,
-                                          val businessMatchingService: BusinessMatchingService)() extends BaseController {
+import scala.concurrent.Future
 
+@Singleton
+class TradingPremisesController @Inject()(
+                                           val authConnector: AuthConnector,
+                                           val businessMatchingService: BusinessMatchingService
+                                         ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ???
+        Future.successful(Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm)))
   }
 
   def post() = Authorised.async {
@@ -39,4 +43,5 @@ class TradingPremisesController @Inject()(val authConnector: AuthConnector,
         ???
       }
   }
+
 }
