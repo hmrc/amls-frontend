@@ -467,7 +467,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
           "there is no subscription response" should {
             "redirect to status controller without refreshing API5" in new Fixture {
               val testCacheMap = buildTestCacheMap(true, false)
-              when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
+              //when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
 
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)

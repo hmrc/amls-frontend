@@ -56,6 +56,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSui
     corporationTaxRegistered = Some(regForCorpTax),
     contactingYou = Some(contactingYou),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
+    altCorrespondenceAddress = Some(true),
     correspondenceAddress = Some(uKCorrespondenceAddress),
     hasAccepted = true
   )
@@ -79,6 +80,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSui
       "addressLine4" -> JsNull,
       "postCode" -> "AA1 1AA",
       "dateOfChange" -> JsNull),
+    "altCorrespondenceAddress" -> true,
     "correspondenceAddress" -> Json.obj(
       "yourName" -> "Name",
       "businessName" -> "Business Name",
@@ -151,35 +153,35 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSui
     "Merged with previously registered with MLR" must {
       "return AboutTheBusiness with correct previously registered for MLR option" in {
         val result = initial.previouslyRegistered(previouslyRegistered)
-        result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, None, None, true))
+        result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredForVAT" must {
       "return AboutTheBusiness with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (AboutTheBusiness(None, None, Some(regForVAT), None, None, None, None, true))
+        result must be (AboutTheBusiness(None, None, Some(regForVAT), None, None, None, None, None, true))
       }
     }
 
     "Merged with CorporationTaxRegistered" must {
       "return AboutTheBusiness with correct corporation tax registered option" in {
         val result = initial.corporationTaxRegistered(regForCorpTax)
-        result must be (AboutTheBusiness(None, None, None, Some(regForCorpTax), None, None, None, true))
+        result must be (AboutTheBusiness(None, None, None, Some(regForCorpTax), None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
       "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (AboutTheBusiness(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, true))
+        result must be (AboutTheBusiness(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
       }
     }
 
     "Merged with UKCorrespondenceAddress" must {
       "return AboutTheBusiness with correct UKCorrespondenceAddress" in {
         val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (AboutTheBusiness(None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
+        result must be (AboutTheBusiness(None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
       }
     }
   }
