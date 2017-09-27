@@ -61,7 +61,7 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
         for {
           cacheMap <- OptionT(cache.fetchAll)
           primaryModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey))
+          variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey)) if variationModel != BusinessMatching()
           _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, updateBusinessMatching(primaryModel, variationModel)))
           result <- clearVariation
         } yield result
