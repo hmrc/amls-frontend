@@ -17,7 +17,7 @@
 package services
 
 import connectors._
-import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, NonUKCorrespondenceAddress}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
@@ -91,12 +91,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
     val cacheMap = CacheMap("", Map.empty)
 
-    val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
-    val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
 
+    "return a cachmap with the saved alternative correspondence address - true" in {
+      val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
+      val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
-
-    "return a cachmap of the saved alternative correspondence addres" in {
       implicit val r = FakeRequest()
 
       when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
@@ -108,10 +107,31 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
         } thenReturn Future.successful(result)
       }
 
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusinessWithData.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(true)))
 
 
-      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusinessWithData)) mustEqual cacheMap
+      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
+
+    }
+
+    "return a cachmap with the saved alternative correspondence address - false" in {
+      implicit val r = FakeRequest()
+
+      val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, None, None)
+
+      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+
+      def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
+        when {
+          mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
+        } thenReturn Future.successful(result)
+      }
+
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(false)))
+
+
+      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
 
     }
   }
