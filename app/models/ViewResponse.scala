@@ -29,7 +29,8 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.Json
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class ViewResponse(
                          etmpFormBundleNumber:String,
@@ -46,11 +47,32 @@ case class ViewResponse(
                          msbSection: Option[MoneyServiceBusiness],
                          hvdSection: Option[Hvd],
                          supervisionSection: Option[Supervision]
-                               )
+                       )
 
 object ViewResponse {
 
   val key = "Subscription"
 
-  implicit val format = Json.format[ViewResponse]
+  implicit val jsonWrites = Json.writes[ViewResponse]
+
+  implicit val formatOption = Reads.optionWithNull[ViewResponse]
+
+  implicit val jsonReads: Reads[ViewResponse] = {
+    (__ \ "etmpFormBundleNumber").read[String] and
+      (__ \ "businessMatchingSection").read[BusinessMatching] and
+      (__ \ "eabSection").readNullable[EstateAgentBusiness] and
+      (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
+      (__ \ "aboutTheBusinessSection").read[AboutTheBusiness] and
+      (__ \ "bankDetailsSection").read[Seq[BankDetails]] and
+      (__ \ "aboutYouSection").read[AddPerson] and
+      (__ \ "businessActivitiesSection").read[BusinessActivities] and
+      (__ \ "responsiblePeopleSection").readNullable[Seq[ResponsiblePeople]] and
+      (__ \ "tcspSection").readNullable[Tcsp] and
+      (__ \ "aspSection").readNullable[Asp] and
+      (__ \ "msbSection").readNullable[MoneyServiceBusiness] and
+      (__ \ "hvdSection").readNullable[Hvd] and
+      (__ \ "supervisionSection").readNullable[Supervision]
+  }.apply(ViewResponse.apply _)
+
+
 }

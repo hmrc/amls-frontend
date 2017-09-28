@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.ViewResponse
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -31,7 +31,10 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessMatchingService @Inject()(statusService: StatusService, cache: DataCacheConnector) {
+class BusinessMatchingService @Inject()(
+                                         statusService: StatusService,
+                                         cache: DataCacheConnector
+                                       ) {
 
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     lazy val originalModel = OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
@@ -55,22 +58,13 @@ class BusinessMatchingService @Inject()(statusService: StatusService, cache: Dat
 
   }
 
-  def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
-    (for {
+  def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] = {
+    for {
       viewResponse <- OptionT(cache.fetch[ViewResponse](ViewResponse.key))
       existing <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
-    } yield {
-
-      val difference = existing.businessActivities diff current.businessActivities
-
-      difference.toList match {
-        case _::_ => Some(difference)
-        case _ => None
-      }
-
-    }) getOrElse None
+    } yield current.businessActivities diff existing.businessActivities
   }
 
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
