@@ -107,6 +107,25 @@
                 <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
             </ul>
         }
+    }
+
+    @model.altCorrespondenceAddress.map { aca =>
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.lettersaddress.title"),
+            editUrl = controllers.aboutthebusiness.routes.LettersAddressController.get(true).toString
+        ) {
+            @model.registeredOffice.map { a =>
+            <p>@a.toLines.map { line =>
+                @line<br />
+                }</p>
+            }
+
+            <p>@aca match {
+                case true => { @Messages("lbl.no") }
+                case false => { @Messages("lbl.yes") }
+                }</p>
+        }
+    }
 
     @model.correspondenceAddress.map { ca =>
         @checkYourAnswers(
@@ -119,7 +138,6 @@
                 }
             }</p>
         }
-    }
 
     @if(ApplicationConfig.hasAcceptedToggle) {
         @form(f, controllers.aboutthebusiness.routes.SummaryController.post()) {

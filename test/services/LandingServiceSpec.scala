@@ -125,6 +125,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
 
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection.copy(hasAccepted = true))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
@@ -232,6 +233,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, Renewal.key, renewalModel)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
 
       whenReady(TestLandingService.refreshCache("regNo")){
         _ mustEqual cacheMap

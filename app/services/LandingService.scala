@@ -125,6 +125,20 @@ trait LandingService {
 
   }
 
+  def setAlCorrespondenceAddress (amlsRefNumber: String)
+                                 (implicit
+                                  authContext: AuthContext,
+                                  hc: HeaderCarrier,
+                                  ec: ExecutionContext
+                                 ): Future[CacheMap] = {
+    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
+      cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
+        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true))
+        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
+      })
+    }
+  }
+
 
   def refreshCache(amlsRefNumber: String)
                   (implicit
@@ -134,6 +148,7 @@ trait LandingService {
                   ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
       cacheConnector.remove(authContext.user.oid) flatMap {
+        _ => cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse)) flatMap {
         _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(viewResponse.businessMatchingSection.copy(hasAccepted = true))) flatMap {
           _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true))) flatMap {
             _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection)) flatMap {
@@ -143,13 +158,18 @@ trait LandingService {
                     _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true))) flatMap {
                       _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))) flatMap {
                         _ => cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))) flatMap {
-                          _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))) flatMap {
-                            _ => cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))) flatMap {
-                              _ => cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true))) flatMap {
-                                _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection)) flatMap {
-                                  cacheMap => saveRenewalData(viewResponse, cacheMap)
+                          _ =>
+                            cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))) flatMap {
+                              _ =>
+                                cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))) flatMap {
+                                  _ =>
+                                    cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true))) flatMap {
+                                      _ =>
+                                        cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection)) flatMap {
+                                          cacheMap => saveRenewalData(viewResponse, cacheMap)
+                                        }
+                                    }
                                 }
-                              }
                             }
                           }
                         }
