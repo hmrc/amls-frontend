@@ -51,7 +51,7 @@ case class ViewResponse(
 
 object ViewResponse {
 
-  val key = "Subscription"
+  val key = "View"
 
   implicit val jsonWrites = Json.writes[ViewResponse]
 
