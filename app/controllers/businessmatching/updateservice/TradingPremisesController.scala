@@ -22,6 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
 import forms.EmptyForm
+import models.businessmatching.BusinessActivities
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -33,18 +34,18 @@ class TradingPremisesController @Inject()(
                                            val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
 
-  def get() = Authorised.async {
+  def get(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
-          businessMatching <- businessMatchingService.getModel
-          businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
         } yield {
-          Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm))
+          val activity = additionalActivities.toList(index)
+          Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
         }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
 
-  def post() = Authorised.async {
+  def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request => {
         ???

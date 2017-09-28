@@ -18,11 +18,14 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_])(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], activity: String, index: Int)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", "summary.businessmatching")
+    @headingWithPlaceholder((
+        "businessmatching.updateservice.tradingpremises.header",
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+    ), "summary.businessmatching")
 }
 
 @main(
@@ -30,7 +33,7 @@
     heading = header
 )  {
 
-    @form(f, controllers.businessmatching.updateservice.routes.TradingPremisesController.post()) {
+    @form(f, controllers.businessmatching.updateservice.routes.TradingPremisesController.post(index)) {
     
     }
 

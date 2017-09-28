@@ -158,7 +158,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
             status(result) mustBe SEE_OTHER
 
-            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get().url)
+            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
           }
         }
       }

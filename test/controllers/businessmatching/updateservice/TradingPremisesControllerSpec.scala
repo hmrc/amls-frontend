@@ -17,23 +17,20 @@
 package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
-import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.{BillPaymentServices, BusinessActivities, BusinessMatching, HighValueDealing}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import models.businessmatching._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import org.mockito.Mockito._
+import org.mockito.Matchers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -52,23 +49,6 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
     val controller = app.injector.instanceOf[TradingPremisesController]
 
-    def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(),any(),any())
-    } thenReturn {
-      if(model.isDefined){
-        OptionT.some[Future,BusinessMatching](model)
-      } else {
-        OptionT.none[Future, BusinessMatching]
-      }
-    }
-
-    def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any())(any(),any(),any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(),any(),any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   "TradingPremisesController" when {
@@ -82,14 +62,16 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
           )
         )
 
-        mockGetModel(Some(model))
+        when {
+          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-        val result = controller.get()(request)
+        val result = controller.get(0)(request)
         status(result) must be(OK)
 
         contentAsString(result) must include(
           Messages(
-            "businessmatching.updateservice.tradingpremises.title",
+            "businessmatching.updateservice.tradingpremises.header",
             Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
           ))
       }
