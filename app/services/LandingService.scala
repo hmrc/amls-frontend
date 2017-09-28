@@ -125,7 +125,7 @@ trait LandingService {
 
   }
 
-  def setAlCorrespondenceAddress (amlsRefNumber: String)
+  def setAlCorrespondenceAddressWithRegNo (amlsRefNumber: String)
                                  (implicit
                                   authContext: AuthContext,
                                   hc: HeaderCarrier,
@@ -137,6 +137,17 @@ trait LandingService {
         case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
       })
     }
+  }
+
+  def setAltCorrespondenceAddress (aboutTheBusiness: AboutTheBusiness)(implicit
+                                                                       authContext: AuthContext,
+                                                                       hc: HeaderCarrier,
+                                                                       ec: ExecutionContext
+  ): Future[CacheMap] = {
+    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
+      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true))
+      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false))
+    })
   }
 
 

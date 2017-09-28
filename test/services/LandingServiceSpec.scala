@@ -17,7 +17,7 @@
 package services
 
 import connectors._
-import models.aboutthebusiness.AboutTheBusiness
+import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
@@ -45,6 +45,7 @@ import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.http.Status.OK
@@ -84,6 +85,78 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
         _ mustEqual false
       }
     }
+  }
+
+  "setAltCorrespondenceAddress" must {
+
+    val cacheMap = CacheMap("", Map.empty)
+
+    val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
+    val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
+
+
+
+    "return a cachmap of the saved alternative correspondence addres" in {
+      implicit val r = FakeRequest()
+
+      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+
+      def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
+        when {
+          mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
+        } thenReturn Future.successful(result)
+      }
+
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusinessWithData.copy(altCorrespondenceAddress = Some(true)))
+
+
+      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusinessWithData)) mustEqual cacheMap
+
+    }
+  }
+
+  "setAlCorrespondenceAddressWithRegNo" must {
+
+    val cacheMap = CacheMap("", Map.empty)
+
+    val viewResponse = ViewResponse(
+      etmpFormBundleNumber = "FORMBUNDLENUMBER",
+      businessMatchingSection = BusinessMatching(),
+      eabSection = None,
+      tradingPremisesSection = None,
+      aboutTheBusinessSection = None,
+      bankDetailsSection = Seq(None),
+      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
+      businessActivitiesSection = None,
+      responsiblePeopleSection = None,
+      tcspSection = None,
+      aspSection = None,
+      msbSection = None,
+      hvdSection = None,
+      supervisionSection = None
+    )
+
+    def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
+      when {
+        mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
+      } thenReturn Future.successful(result)
+    }
+
+    "return a cachmap of the saved alternative correspondence addres" in {
+
+      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+
+      when {
+        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+      } thenReturn Future.successful(viewResponse)
+
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+
+      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo")) mustEqual cacheMap
+    }
+
   }
 
   "refreshCache" must {
