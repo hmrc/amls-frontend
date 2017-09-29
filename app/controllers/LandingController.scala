@@ -115,8 +115,12 @@ trait LandingController extends BaseController {
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      abt <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
     } yield bm.isComplete match {
-      case (true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+      case (true) => {
+        landingService.setAltCorrespondenceAddress(abt)
+        Future.successful(Redirect(controllers.routes.StatusController.get()))
+      }
       case _ => {
         shortLivedCache.remove(authContext.user.oid).map { http =>
           http.status match {
@@ -149,7 +153,7 @@ trait LandingController extends BaseController {
   private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
                                 (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    landingService.setAlCorrespondenceAddress(amlsRegistrationNumber) map {
+    landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber) map {
       _ => Redirect(controllers.routes.StatusController.get())
       }
     }

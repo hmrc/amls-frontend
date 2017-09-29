@@ -22,15 +22,16 @@ import controllers.BaseController
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.Future
+
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                  val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
-
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ???
+        Future.successful(Ok)
   }
 
   def post() = Authorised.async {
