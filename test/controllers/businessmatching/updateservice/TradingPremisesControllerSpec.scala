@@ -213,6 +213,25 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
         }
       }
 
+      "return INTERNAL_SERVER_ERROR" when {
+
+        "activities cannot be retrieved" in new Fixture {
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.none[Future, Set[BusinessActivity]]
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "tradingPremisesNewActivities" -> "false"
+          ))
+
+          status(result) must be(INTERNAL_SERVER_ERROR)
+
+        }
+
+      }
+
     }
   }
 }
