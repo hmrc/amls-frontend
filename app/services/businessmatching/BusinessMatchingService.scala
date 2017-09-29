@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,

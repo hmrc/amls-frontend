@@ -22,13 +22,12 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import play.api.Play
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import views.html.businessmatching.summary
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -40,7 +39,7 @@ trait SummaryController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-        def isPreApprovedStatus(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
+        def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 
         val okResult = for {
           bm <- businessMatchingService.getModel
@@ -52,7 +51,7 @@ trait SummaryController extends BaseController {
               ba.businessActivities ++ ba.additionalActivities.fold[Set[BusinessActivity]](Set.empty)(act => act)
             ))
           )
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreApprovedStatus(status) || ApplicationConfig.businessMatchingVariationToggle))
+          Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
         }
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
@@ -62,10 +61,15 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
+        businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
-        _ <- businessMatchingService.commitVariationData map { _ => true } orElse OptionT.some(false)
+        _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        if(businessActivities.additionalActivities.isDefined & ApplicationConfig.businessMatchingVariationToggle){
+          Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
+        } else {
+          Redirect(controllers.routes.RegistrationProgressController.get())
+        }
       }) getOrElse InternalServerError("Unable to update business matching")
   }
 }

@@ -115,6 +115,8 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
+error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
+
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
 error.bankdetails.accountname = Enter a name for this account
@@ -654,6 +656,8 @@ progress.updates.made = Updates made: you can continue making updates, or submit
 progress.updates.not.made = You haven’t made any updates
 progress.view.status = View Your Status
 
+progress.update.registration = Update registration
+
 #### Amendment page ####
 amendment.title = Update or view your information
 amendment.section-heading = Your registration
@@ -1102,6 +1106,9 @@ businessmatching.cannotchangeservices.requiredinfo = Your business must have a P
   You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 
 businessmatching.cannotchangeservices.button.text = Return to update information
+
+businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need

@@ -1,0 +1,68 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import utils.HtmlElementHelpers._
+
+@(f: forms.Form2[_], activity: String, index: Int)(implicit request: Request[_], m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @headingWithPlaceholder((
+        "businessmatching.updateservice.tradingpremises.header",
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+    ), "progress.update.registration")
+}
+
+@main(
+    title = Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("progress.update.registration"),
+    heading = header
+)  {
+
+    @form(f, controllers.businessmatching.updateservice.routes.TradingPremisesController.post(index)) {
+
+        @fieldset(
+            f = f("tradingPremisesNewActivities-fieldset"),
+            legend = "businessmatching.updateservice.tradingpremises.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("tradingPremisesNewActivities")
+            ) {
+                @radio(
+                    f = f("tradingPremisesNewActivities"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("tradingPremisesNewActivities"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+
+        }
+
+        @submit(returnLink = false)
+
+}
+
+}
