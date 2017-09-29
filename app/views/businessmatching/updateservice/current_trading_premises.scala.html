@@ -17,12 +17,13 @@
 @import include._
 @import forms2._
 @import utils.HtmlElementHelpers._
+@import models.businessmatching.BusinessActivity
 
-@(f: forms.Form2[_], activity: String)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], activity: BusinessActivity)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("businessmatching.updateservice.currenttradingpremises.header", activity), "progress.update.registration")
+    @headingWithPlaceholder((Messages("businessmatching.updateservice.currenttradingpremises.header", activity.getMessage), "progress.update.registration"))
 }
 
 @main(

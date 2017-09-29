@@ -37,7 +37,8 @@ import scala.concurrent.Future
 
 class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     val request = addToken(authRequest)
 
     val businessMatchingService = mock[BusinessMatchingService]
@@ -50,14 +51,19 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
       .build()
 
     val controller = injector.instanceOf[CurrentTradingPremisesController]
+
+    def mockActivities(activities: Option[Set[BusinessActivity]]) = when {
+      businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+    } thenReturn (activities match {
+      case Some(act) => OptionT.some[Future, Set[BusinessActivity]](act)
+      case _ => OptionT.none[Future, Set[BusinessActivity]]
+    })
   }
 
   "get" when {
     "called" must {
       "return the page with correct service being edited" in new Fixture {
-        when {
-          businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness, AccountancyServices))
+        mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
 
         val result = controller.get()(request)
 
@@ -69,18 +75,19 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
     }
   }
 
-//  "post" when {
-//    "called" must {
-//      "return the page if there was a validation error" in new Fixture {
-//
-//        val result = controller.post()(request.withFormUrlEncodedBody())
-//
-//        status(result) mustBe BAD_REQUEST
-//
-//        val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities", MoneyServiceBusiness.getMessage)
-//        contentAsString(result) must include(expectedError)
-//      }
-//    }
-//  }
+  "post" when {
+    "called" must {
+      "return the page if there was a validation error" in new Fixture {
+        mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
+
+        val result = controller.post()(request.withFormUrlEncodedBody())
+
+        status(result) mustBe BAD_REQUEST
+
+        val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities")
+        contentAsString(result) must include(expectedError)
+      }
+    }
+  }
 
 }

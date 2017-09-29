@@ -18,35 +18,43 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.current_trading_premises
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm}
+import models.businessmatching.updateservice.TradingPremisesSubmittedActivities
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                  val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
+  private def failure(msg: String = "Unable to get business activities") = InternalServerError(msg)
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
+      val result = getActivity map { activity =>
+        Ok(current_trading_premises(EmptyForm, activity))
+      }
 
-      val result = for {
-        services <- businessMatchingService.getSubmittedBusinessActivities
-        serviceName <- OptionT.fromOption[Future](services.collectFirst { case s => s.getMessage })
-      } yield Ok(current_trading_premises(EmptyForm, serviceName))
-
-      result getOrElse InternalServerError("Unable to get business services")
+      result getOrElse failure()
   }
 
   def post() = Authorised.async {
-    implicit authContext =>
-      implicit request => {
-        ???
+    implicit authContext => implicit request => {
+        Form2[TradingPremisesSubmittedActivities](request.body) match {
+          case f: InvalidForm => getActivity map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
+        }
       }
   }
+
+  private def getActivity(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    services <- businessMatchingService.getSubmittedBusinessActivities
+  } yield services.head
+
 }
