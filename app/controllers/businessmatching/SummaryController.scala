@@ -22,13 +22,12 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import play.api.Play
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import views.html.businessmatching.summary
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -64,9 +63,9 @@ trait SummaryController extends BaseController {
         businessMatching <- businessMatchingService.getModel
         businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
-        _ <- businessMatchingService.commitVariationData map { _ => true } orElse OptionT.some(false)
+        _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
-        if(businessActivities.additionalActivities.isDefined){
+        if(businessActivities.additionalActivities.isDefined & ApplicationConfig.businessMatchingVariationToggle){
           Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
         } else {
           Redirect(controllers.routes.RegistrationProgressController.get())

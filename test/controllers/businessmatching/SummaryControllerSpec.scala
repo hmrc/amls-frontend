@@ -139,30 +139,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
       }
 
-      "redirect to TradingPremisesController" when {
-        "business activities have been updated" which {
-          "updates the hasAccepted flag on the model" in new Fixture {
-            val model = businessMatchingGen.sample.get.activities(
-              BusinessActivities(
-                Set(HighValueDealing),
-                Some(Set(BillPaymentServices))
-              )
-            )
-            val postRequest = request.withFormUrlEncodedBody()
-
-            mockGetModel(Some(model))
-            mockUpdateModel
-            mockCommit
-
-            val result = controller.post()(postRequest)
-
-            status(result) mustBe SEE_OTHER
-
-            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
-          }
-        }
-      }
-
       "return Internal Server Error if the business matching model can't be updated" in new Fixture {
         val postRequest = request.withFormUrlEncodedBody()
 
@@ -174,4 +150,89 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       }
     }
   }
+}
+
+class SummaryControllerWithVariationSpec extends GenericTestHelper with BusinessMatchingGenerator {
+
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.business-matching-variation" -> true)
+    .build()
+
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks{
+
+    self => val request = addToken(authRequest)
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    val controller = new SummaryController {
+      override val dataCache = mockCacheConnector
+      override val authConnector = self.authConnector
+      override val statusService = mockStatusService
+      override val businessMatchingService = mockBusinessMatchingService
+    }
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())
+    } thenReturn Future.successful(SubmissionReady)
+
+    def mockGetModel(model: Option[BusinessMatching]) = when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn {
+      if(model.isDefined){
+        OptionT.some[Future,BusinessMatching](model)
+      } else {
+        OptionT.none[Future, BusinessMatching]
+      }
+    }
+
+    def mockUpdateModel = when {
+      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    def mockCommit = when {
+      controller.businessMatchingService.commitVariationData(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+  }
+
+
+  "Get" must {
+
+    "show the edit links when not in pre-submission status" in new Fixture {
+      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
+
+      mockGetModel(Some(model))
+      mockApplicationStatus(SubmissionDecisionApproved)
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.select("a.change-answer").size mustBe 2
+    }
+  }
+
+  "redirect to TradingPremisesController" when {
+    "business activities have been updated" which {
+      "updates the hasAccepted flag on the model" in new Fixture {
+        val model = businessMatchingGen.sample.get.activities(
+          BusinessActivities(
+            Set(HighValueDealing),
+            Some(Set(BillPaymentServices))
+          )
+        )
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockGetModel(Some(model))
+        mockUpdateModel
+        mockCommit
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+      }
+    }
+  }
+
 }
