@@ -17,8 +17,10 @@
 package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
+import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -27,10 +29,13 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -39,6 +44,10 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     self => val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val authContext: AuthContext = mock[AuthContext]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -55,6 +64,8 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     "get is called" must {
       "return OK with trading_premises view" in new Fixture {
 
+        mockApplicationStatus(SubmissionDecisionApproved)
+
         val model = businessMatchingGen.sample.get.activities(
           BusinessActivities(
             businessActivities = Set(BillPaymentServices),
@@ -66,7 +77,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
           controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-        val result = controller.get(0)(request)
+        val result = controller.get()(request)
         status(result) must be(OK)
 
         contentAsString(result) must include(
@@ -74,6 +85,25 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             "businessmatching.updateservice.tradingpremises.header",
             Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
           ))
+      }
+      "return NOT_FOUND if pre-submission" in new Fixture {
+
+        mockApplicationStatus(NotCompleted)
+
+        val model = businessMatchingGen.sample.get.activities(
+          BusinessActivities(
+            businessActivities = Set(BillPaymentServices),
+            additionalActivities = Some(Set(HighValueDealing))
+          )
+        )
+
+        when {
+          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+
       }
     }
   }

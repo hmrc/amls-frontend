@@ -23,14 +23,17 @@ import cats.implicits._
 import controllers.BaseController
 import forms.EmptyForm
 import models.businessmatching.BusinessActivities
+import models.status.{NotCompleted, SubmissionReady}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
+                                           val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
 
@@ -38,10 +41,16 @@ class TradingPremisesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
+          status <- OptionT.liftF(statusService.getStatus)
           additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
         } yield {
-          val activity = additionalActivities.toList(index)
-          Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
+          status match {
+            case NotCompleted | SubmissionReady => NotFound(notFoundView)
+            case _ => {
+              val activity = additionalActivities.toList(index)
+              Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
+            }
+          }
         }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
 
