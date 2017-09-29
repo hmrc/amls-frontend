@@ -69,4 +69,18 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
     }
   }
 
+//  "post" when {
+//    "called" must {
+//      "return the page if there was a validation error" in new Fixture {
+//
+//        val result = controller.post()(request.withFormUrlEncodedBody())
+//
+//        status(result) mustBe BAD_REQUEST
+//
+//        val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities", MoneyServiceBusiness.getMessage)
+//        contentAsString(result) must include(expectedError)
+//      }
+//    }
+//  }
+
 }
