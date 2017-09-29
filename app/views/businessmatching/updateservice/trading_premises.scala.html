@@ -25,16 +25,44 @@
     @headingWithPlaceholder((
         "businessmatching.updateservice.tradingpremises.header",
         Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
-    ), "summary.businessmatching")
+    ), "progress.update.registration")
 }
 
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("progress.update.registration"),
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.updateservice.routes.TradingPremisesController.post(index)) {
-    
-    }
+
+        @fieldset(
+            f = f("tradingPremisesNewActivities-fieldset"),
+            legend = "businessmatching.updateservice.tradingpremises.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("tradingPremisesNewActivities")
+            ) {
+                @radio(
+                    f = f("tradingPremisesNewActivities"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("tradingPremisesNewActivities"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+
+        }
+
+        @submit(returnLink = false)
+
+}
 
 }
