@@ -23,7 +23,7 @@
 @(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @rpErrorSummary(f)
+    @errorSummaryWithPlaceholder(f)
     @heading("aboutthebusiness.lettersaddress.title", "summary.aboutbusiness")
 }
 
@@ -43,7 +43,7 @@
             panel = false
         ) {
 
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("lettersAddress")
             ) {
                 @radio(

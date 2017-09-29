@@ -23,7 +23,7 @@
 @(f: Form2[_], model: Address, index: Int, personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.confirmaddress.heading", personName), "summary.responsiblepeople")
 }
 
@@ -43,9 +43,9 @@
             panel = false
         ) {
 
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("confirmAddress"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("confirmAddress"),

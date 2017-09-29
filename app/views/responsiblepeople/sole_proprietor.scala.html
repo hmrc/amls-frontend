@@ -20,7 +20,7 @@
 @(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.sole.proprietor.another.business.heading", personName), "summary.responsiblepeople")
 }
 
@@ -37,9 +37,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("soleProprietorOfAnotherBusiness"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("soleProprietorOfAnotherBusiness"),

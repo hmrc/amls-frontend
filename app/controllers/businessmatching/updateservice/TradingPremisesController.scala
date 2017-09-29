@@ -21,8 +21,9 @@ import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessActivities
+import models.businessmatching.updateservice.{TradingPremisesNewActivities, TradingPremisesNewActivitiesNo, TradingPremisesNewActivitiesYes}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -59,9 +60,31 @@ class TradingPremisesController @Inject()(
 
   def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
-      implicit request => {
-        ???
-      }
+      implicit request =>
+        (for {
+          status <- OptionT.liftF(statusService.getStatus)
+          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
+        } yield {
+          try {
+            status match {
+              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+                val activity = additionalActivities.toList(index)
+                val extraFields = Map(
+                  "activity" -> BusinessActivities.getValue(activity)
+                )
+                Form2[TradingPremisesNewActivities](request.body) match {
+                  case ValidForm(_, data) => data match {
+                    case TradingPremisesNewActivitiesYes => Redirect(routes.WhichTradingPremisesController.get())
+                    case TradingPremisesNewActivitiesNo => Redirect(routes.CurrentTradingPremisesController.get())
+                  }
+                  case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
+                }
+              }
+            }
+          } catch {
+            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
+          }
+        }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
 
 }

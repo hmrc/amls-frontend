@@ -24,7 +24,7 @@
 }
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.non.uk.passport.heading", personName), "summary.responsiblepeople")
 }
 
@@ -41,9 +41,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("nonUKPassport"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("nonUKPassport"),

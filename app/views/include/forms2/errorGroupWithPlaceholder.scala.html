@@ -18,13 +18,13 @@
 
 @(
   field: Field,
-  personName: String ="",
+  placeholder: String ="",
   classes: Seq[String] = Seq.empty
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @if(field.hasErrors) {
     <div id="@field.id" class="display-block @classes.mkString(" ") form-field--error">
-        <span class="error-notification">@Messages(field.rpError, personName)</span>
+        <span class="error-notification">@Messages(field.rpError, placeholder)</span>
         @content
     </div>
 } else {
