@@ -61,6 +61,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
   }
 
   "TradingPremisesController" when {
+
     "get is called" must {
       "return OK with trading_premises view" in new Fixture {
 
@@ -92,7 +93,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
           status(result) must be(NOT_FOUND)
 
         }
-        "there are no additionl services" in new Fixture {
+        "there are no additional services" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -117,6 +118,83 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
         status(result) must be(INTERNAL_SERVER_ERROR)
 
       }
+    }
+
+    "post is called" must {
+
+      "on valid request" must {
+
+        "redirect to WhichTradingPremises" when {
+          "request equals Yes" in new Fixture {
+
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            when {
+              controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+            } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "tradingPremisesNewActivities" -> "true"
+            ))
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get().url))
+
+          }
+        }
+        "redirect to CurrentTradingPremises" when {
+          "request equals No" in new Fixture {
+
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            when {
+              controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+            } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "tradingPremisesNewActivities" -> "false"
+            ))
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
+          }
+        }
+      }
+
+      "return NOT_FOUND" when {
+        "status is pre-submission" in new Fixture {
+
+          mockApplicationStatus(NotCompleted)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "tradingPremisesNewActivities" -> "false"
+          ))
+
+          status(result) must be(NOT_FOUND)
+
+        }
+        "status is there are no additional business activities" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = controller.post(3)(request.withFormUrlEncodedBody(
+            "tradingPremisesNewActivities" -> "false"
+          ))
+
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+
     }
   }
 }
