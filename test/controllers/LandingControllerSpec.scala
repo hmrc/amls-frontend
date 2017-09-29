@@ -90,6 +90,8 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
     } thenAnswer new Answer[String] {
       override def answer(invocation: InvocationOnMock): String = invocation.callRealMethod().asInstanceOf[String]
     }
+
+    val completeATB = mock[AboutTheBusiness]
   }
 
   "LandingController" must {
@@ -107,6 +109,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
           when(complete.isComplete) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -120,6 +123,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           when(complete.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, 1.0, None, 1.0)))))
@@ -211,7 +215,6 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
-          //when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -251,6 +254,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
           when(complete.isComplete) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(cachmap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -308,6 +312,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     } thenReturn Future.successful(true)
 
     when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+    val completeATB = mock[AboutTheBusiness]
   }
 
   def setUpMocksForNoEnrolment(controller: LandingController) = {
@@ -536,6 +542,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
           when(complete.isComplete) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           val result = controller.get()(request)
 
