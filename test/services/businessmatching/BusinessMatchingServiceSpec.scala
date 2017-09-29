@@ -155,8 +155,8 @@ with GenericTestHelper
       whenReady(service.getAdditionalBusinessActivities.value){ result =>
         result must be(Some(Set(HighValueDealing)))
       }
-
     }
+
     "return an empty set if saved business activities are the same as view response" in new Fixture {
 
       val businessMatching = BusinessMatching(
@@ -215,6 +215,72 @@ with GenericTestHelper
         result must be(None)
       }
 
+    }
+  }
+
+  "getOriginalBusinessActivities" must {
+    "return the activities that are present only in the view response" in new Fixture {
+      val existing = BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices)
+        ))
+      )
+
+      val current = BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices, HighValueDealing)
+        ))
+      )
+
+      val viewResponse = ViewResponse(
+        "",
+        businessMatchingSection = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(BillPaymentServices)
+          ))
+        ),
+        aboutTheBusinessSection = AboutTheBusiness(),
+        bankDetailsSection = Seq.empty,
+        businessActivitiesSection = BusinessActivities(),
+        eabSection = None,
+        aspSection = None,
+        tcspSection = None,
+        responsiblePeopleSection = None,
+        tradingPremisesSection = None,
+        msbSection = None,
+        hvdSection = None,
+        supervisionSection = None,
+        aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+      )
+
+      mockApplicationStatus(SubmissionDecisionApproved)
+
+      mockCacheFetch(Some(existing), Some(BusinessMatching.key))
+      mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+      mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+      whenReady(service.getSubmittedBusinessActivities.value){ result =>
+        result must be(Some(Set(BillPaymentServices)))
+      }
+    }
+
+    "return none if all business activities cannot be retrieved" in new Fixture {
+
+      val businessMatching = BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices)
+        ))
+      )
+
+      mockApplicationStatus(SubmissionDecisionApproved)
+
+      mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
+      mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
+      mockCacheFetch[ViewResponse](None, Some(ViewResponse.key))
+
+      whenReady(service.getSubmittedBusinessActivities.value){ result =>
+        result must be(None)
+      }
     }
   }
 
