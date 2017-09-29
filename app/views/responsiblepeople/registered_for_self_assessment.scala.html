@@ -40,9 +40,9 @@ s"""${f("utrNumber").id}-fieldset"""
             panel=false,
             legendHidden = true
         ) {
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("saRegistered"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("saRegistered"),

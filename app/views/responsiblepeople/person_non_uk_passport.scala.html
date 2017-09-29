@@ -41,9 +41,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("nonUKPassport"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("nonUKPassport"),

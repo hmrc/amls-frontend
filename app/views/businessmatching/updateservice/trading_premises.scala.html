@@ -42,8 +42,9 @@
             panel = false
         ) {
 
-            @errorGroup(
-                field = f("tradingPremisesNewActivities")
+            @errorGroupWithPlaceholder(
+                field = f("tradingPremisesNewActivities"),
+                placeholder = activity
             ) {
                 @radio(
                     f = f("tradingPremisesNewActivities"),

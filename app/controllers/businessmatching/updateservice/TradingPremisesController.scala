@@ -30,7 +30,6 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 @Singleton
 class TradingPremisesController @Inject()(
@@ -70,12 +69,15 @@ class TradingPremisesController @Inject()(
             status match {
               case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
                 val activity = additionalActivities.toList(index)
+                val extraFields = Map(
+                  "activity" -> BusinessActivities.getValue(activity)
+                )
                 Form2[TradingPremisesNewActivities](request.body) match {
                   case ValidForm(_, data) => data match {
                     case TradingPremisesNewActivitiesYes => Redirect(routes.WhichTradingPremisesController.get())
                     case TradingPremisesNewActivitiesNo => Redirect(routes.CurrentTradingPremisesController.get())
                   }
-                  case f:InvalidForm => BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
+                  case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
                 }
               }
             }
