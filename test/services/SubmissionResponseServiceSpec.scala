@@ -393,6 +393,30 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         }
       }
+
+      "fall back to getting the subcription response, if the amendment response isn't available" in new Fixture {
+        when {
+          cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+        } thenReturn None
+
+        when {
+          cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+        } thenReturn Some(subscriptionResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        val result = await(TestSubmissionResponseService.getAmendment)
+
+        result mustBe defined
+
+        verify(cache).getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+      }
     }
 
     "getVariation is called" must {
