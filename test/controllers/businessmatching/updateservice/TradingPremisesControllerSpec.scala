@@ -66,13 +66,6 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        val model = businessMatchingGen.sample.get.activities(
-          BusinessActivities(
-            businessActivities = Set(BillPaymentServices),
-            additionalActivities = Some(Set(HighValueDealing))
-          )
-        )
-
         when {
           controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
@@ -90,19 +83,24 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
         mockApplicationStatus(NotCompleted)
 
-        val model = businessMatchingGen.sample.get.activities(
-          BusinessActivities(
-            businessActivities = Set(BillPaymentServices),
-            additionalActivities = Some(Set(HighValueDealing))
-          )
-        )
-
         when {
           controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
         val result = controller.get()(request)
         status(result) must be(NOT_FOUND)
+
+      }
+      "return INTERNAL_SERVER_ERROR if activites cannot be retrieved" in new Fixture {
+
+        mockApplicationStatus(NotCompleted)
+
+        when {
+          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+        } thenReturn OptionT.none[Future, Set[BusinessActivity]]
+
+        val result = controller.get()(request)
+        status(result) must be(INTERNAL_SERVER_ERROR)
 
       }
     }
