@@ -20,7 +20,7 @@
 @(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName : String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.person.a.resident.heading", personName), "summary.responsiblepeople")
 }
 

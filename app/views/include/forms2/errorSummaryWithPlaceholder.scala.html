@@ -16,7 +16,7 @@
 
 @import forms._
 
-@(form: Form2[_], personName:String ="")(implicit lang:Lang,  m: Messages)
+@(form: Form2[_], placeholder:String = "")(implicit lang:Lang,  m: Messages)
 
 @if(form.errors.nonEmpty) {
     <div class="flash amls-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">
@@ -25,7 +25,7 @@
             @form.errors.map { case (path, errors) =>
                 <li>
                     <a href="#@form(path).id">
-                        @errors.headOption.map(x => Messages(x.message, personName))
+                        @errors.headOption.map(x => Messages(x.message, placeholder))
                     </a>
                 </li>
             }

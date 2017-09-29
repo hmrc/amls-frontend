@@ -24,7 +24,7 @@ s"""${f("utrNumber").id}-fieldset"""
 }
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.heading", personName), "summary.responsiblepeople")
 }
 
