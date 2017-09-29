@@ -79,17 +79,31 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
           ))
       }
-      "return NOT_FOUND if pre-submission" in new Fixture {
+      "return NOT_FOUND" when {
+        "pre-submission" in new Fixture {
 
-        mockApplicationStatus(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
-        when {
-          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
+          val result = controller.get()(request)
+          status(result) must be(NOT_FOUND)
 
+        }
+        "there are no additionl services" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = controller.get()(request)
+          status(result) must be(NOT_FOUND)
+
+        }
       }
       "return INTERNAL_SERVER_ERROR if activites cannot be retrieved" in new Fixture {
 

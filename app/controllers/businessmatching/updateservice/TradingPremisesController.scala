@@ -44,12 +44,15 @@ class TradingPremisesController @Inject()(
           status <- OptionT.liftF(statusService.getStatus)
           additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
         } yield {
-          status match {
-            case NotCompleted | SubmissionReady => NotFound(notFoundView)
-            case _ => {
-              val activity = additionalActivities.toList(index)
-              Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
+          try {
+            status match {
+              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+                val activity = additionalActivities.toList(index)
+                Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
+              }
             }
+          } catch {
+            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
           }
         }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
