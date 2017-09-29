@@ -162,6 +162,24 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
         }
       }
 
+      "on invalid request" must {
+
+        "return badRequest" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+
       "return NOT_FOUND" when {
         "status is pre-submission" in new Fixture {
 
