@@ -18,9 +18,13 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.BaseController
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.current_trading_premises
+import forms.EmptyForm
 
 import scala.concurrent.Future
 
@@ -29,9 +33,14 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
                                                  val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Future.successful(Ok)
+    implicit authContext => implicit request =>
+
+      val result = for {
+        services <- businessMatchingService.getSubmittedBusinessActivities
+        serviceName <- OptionT.fromOption[Future](services.collectFirst { case s => s.getMessage })
+      } yield Ok(current_trading_premises(EmptyForm, serviceName))
+
+      result getOrElse InternalServerError("Unable to get business services")
   }
 
   def post() = Authorised.async {

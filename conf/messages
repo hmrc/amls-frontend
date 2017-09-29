@@ -1110,6 +1110,8 @@ businessmatching.cannotchangeservices.button.text = Return to update information
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.header = Will you still do {0} from all of your registered trading premises?
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?

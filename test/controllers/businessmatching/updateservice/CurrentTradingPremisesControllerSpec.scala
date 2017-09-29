@@ -19,8 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
-import org.scalatest.MustMatchers
+import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, MoneyServiceBusiness}
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.guice.GuiceInjectorBuilder
 import services.businessmatching.BusinessMatchingService
@@ -30,9 +29,10 @@ import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import models.businessmatching.BusinessMatching
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalatest.MustMatchers
+import play.api.i18n.Messages
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMatchers with MockitoSugar with BusinessMatchingGenerator {
@@ -55,9 +55,16 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
   "get" when {
     "called" must {
       "return the page with correct service being edited" in new Fixture {
+        when {
+          businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness, AccountancyServices))
+
         val result = controller.get()(request)
 
         status(result) mustBe OK
+
+        val expectedMessage = Messages("businessmatching.updateservice.currenttradingpremises.header", MoneyServiceBusiness.getMessage)
+        contentAsString(result) must include(expectedMessage)
       }
     }
   }
