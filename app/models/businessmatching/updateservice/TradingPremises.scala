@@ -28,7 +28,7 @@ object TradingPremises {
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[String]]): Rule[UrlFormEncoded, TradingPremises] = From[UrlFormEncoded] { __ =>
       (__ \ "tradingPremises")
         .read[Set[String]]
-        .withMessage("error.businessmatching.updateservice.tradingpremisesnewactivities")
+        .withMessage("error.businessmatching.updateservice.tradingpremises")
         .flatMap(TradingPremises.apply)
     }
 
