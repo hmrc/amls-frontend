@@ -18,14 +18,17 @@ package models.businessmatching.updateservice
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, RuleLike, Write}
+import jto.validation.Rule._
+
 
 case class TradingPremises(index: Set[String])
 
 object TradingPremises {
 
   import utils.MappingUtils.Implicits._
+  import jto.validation.forms.Rules._
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[String]]): Rule[UrlFormEncoded, TradingPremises] = From[UrlFormEncoded] { __ =>
+  implicit def formReads: Rule[UrlFormEncoded, TradingPremises] = From[UrlFormEncoded] { __ =>
       (__ \ "tradingPremises")
         .read[Set[String]]
         .withMessage("error.businessmatching.updateservice.tradingpremises")
