@@ -36,6 +36,7 @@
                 @tradingpremises.zipWithIndex.map{ case (tp, index) =>
                     @checkbox(f = f("tradingPremises[]"), labelText = tp.label.getOrElse(index.toString), value = index.toString)
                 }
+                @submit()
             }
         }
     }
