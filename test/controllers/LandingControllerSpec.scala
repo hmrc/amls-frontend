@@ -480,9 +480,10 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
               val result = controller.get()(request)
 
-              verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
               status(result) must be(SEE_OTHER)
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+              verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
           }
         }
