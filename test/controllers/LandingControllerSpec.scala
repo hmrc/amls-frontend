@@ -295,7 +295,6 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     "microservice.services.feature-toggle.amendments" -> true
   ))
 
-
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
@@ -472,8 +471,16 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
           "there is no subscription response" should {
             "redirect to status controller without refreshing API5" in new Fixture {
+
               val testCacheMap = buildTestCacheMap(true, false)
-              //when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
+
+              when {
+                testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())
+              } thenReturn None
+
+              when {
+                controller.landingService.setAlCorrespondenceAddressWithRegNo(any())(any(),any(),any())
+              } thenReturn Future.successful(testCacheMap)
 
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
@@ -484,6 +491,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
               verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+
             }
           }
         }
