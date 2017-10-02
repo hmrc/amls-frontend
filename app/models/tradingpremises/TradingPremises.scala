@@ -74,7 +74,6 @@ case class TradingPremises(
     this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
-
   def isComplete: Boolean =
     if(ApplicationConfig.hasAcceptedToggle) {
       this match {
@@ -94,6 +93,12 @@ case class TradingPremises(
         case _ => false
       }
     }
+
+  def label: Option[String] = {
+   this.yourTradingPremises.map{ tradingpremises =>
+     (Seq(tradingpremises.tradingName) ++ tradingpremises.tradingPremisesAddress.toLines).mkString(", ")
+   }
+  }
 }
 
 object TradingPremises {
