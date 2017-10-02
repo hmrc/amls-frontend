@@ -58,13 +58,13 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
       case Some(act) => OptionT.some[Future, Set[BusinessActivity]](act)
       case _ => OptionT.none[Future, Set[BusinessActivity]]
     })
+
+    mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
   }
 
   "get" when {
     "called" must {
       "return the page with correct service being edited" in new Fixture {
-        mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
-
         val result = controller.get()(request)
 
         status(result) mustBe OK
@@ -78,14 +78,26 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
   "post" when {
     "called" must {
       "return the page if there was a validation error" in new Fixture {
-        mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
-
         val result = controller.post()(request.withFormUrlEncodedBody())
 
         status(result) mustBe BAD_REQUEST
 
         val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities")
         contentAsString(result) must include(expectedError)
+      }
+
+      "progress to the 'registration progress' page if the user chooses 'yes'" in new Fixture {
+        val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      }
+
+      "progress to the 'which trading premises' page if the user chooses 'no'" in new Fixture {
+        val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "false"))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
       }
     }
   }

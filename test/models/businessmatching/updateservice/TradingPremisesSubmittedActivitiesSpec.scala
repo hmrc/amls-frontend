@@ -27,7 +27,7 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
   "the form reader" when {
     "called" must {
       "convert the input form to the 'yes' model instance" in {
-        val form = Map("allPremises" -> Seq("true"))
+        val form = Map("submittedActivities" -> Seq("true"))
 
         TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
           Valid(TradingPremisesSubmittedActivitiesYes)
@@ -35,7 +35,7 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
 
       "convert the input form to the 'no' model instance" in {
         val form = Map(
-          "allPremises" -> Seq("false"))
+          "submittedActivities" -> Seq("false"))
 
         TradingPremisesSubmittedActivities.formRule.validate(form) mustBe Valid(TradingPremisesSubmittedActivitiesNo)
       }
@@ -45,7 +45,7 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
 
         TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
           Invalid(Seq(
-            Path \ "allPremises" -> Seq(ValidationError("error.businessmatching.updateservice.tradingpremisessubmittedactivities"))
+            Path \ "submittedActivities" -> Seq(ValidationError("error.businessmatching.updateservice.tradingpremisessubmittedactivities"))
           ))
       }
     }
@@ -56,12 +56,12 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
       "return the correct form" when {
         "yes was selected" in {
           TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesYes) mustBe
-            Map("allPremises" -> Seq("true"))
+            Map("submittedActivities" -> Seq("true"))
         }
 
         "no was selected" in {
           TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesNo) mustBe
-            Map("allPremises" -> Seq("false"))
+            Map("submittedActivities" -> Seq("false"))
         }
       }
     }

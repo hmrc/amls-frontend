@@ -28,14 +28,14 @@ object TradingPremisesSubmittedActivities {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, TradingPremisesSubmittedActivities] = From[UrlFormEncoded] { __ =>
-    (__ \ "allPremises").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") map {
+    (__ \ "submittedActivities").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") map {
       case true => TradingPremisesSubmittedActivitiesYes
       case _ => TradingPremisesSubmittedActivitiesNo
     }
   }
 
   implicit val formWriter = Write[TradingPremisesSubmittedActivities, UrlFormEncoded] { m =>
-    Map("allPremises" -> Seq(m match {
+    Map("submittedActivities" -> Seq(m match {
       case TradingPremisesSubmittedActivitiesYes => "true"
       case _ => "false"
     }))
