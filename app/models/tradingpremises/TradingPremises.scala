@@ -74,8 +74,7 @@ case class TradingPremises(
     this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
-  def isComplete: Boolean =
-    if(ApplicationConfig.hasAcceptedToggle) {
+  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
       this match {
         case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, true) => true
         case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, true) => true
