@@ -16,11 +16,11 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.{From, Rule, To}
 import jto.validation.forms.UrlFormEncoded
-import models.businessmatching.BusinessActivity
 
-case class TradingPremisesSubmittedActivities(allPremises: Boolean, activity: BusinessActivity)
+sealed trait TradingPremisesSubmittedActivities
+case object TradingPremisesSubmittedActivitiesYes extends TradingPremisesSubmittedActivities
+case object TradingPremisesSubmittedActivitiesNo extends TradingPremisesSubmittedActivities
 
 object TradingPremisesSubmittedActivities {
   import jto.validation._
@@ -28,19 +28,17 @@ object TradingPremisesSubmittedActivities {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, TradingPremisesSubmittedActivities] = From[UrlFormEncoded] { __ =>
-    (
-      (__ \ "allPremises").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") ~
-        (__ \ "activity").read[BusinessActivity]
-    )(TradingPremisesSubmittedActivities.apply)
+    (__ \ "allPremises").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") map {
+      case true => TradingPremisesSubmittedActivitiesYes
+      case _ => TradingPremisesSubmittedActivitiesNo
+    }
   }
 
-  implicit val formWriter: Write[TradingPremisesSubmittedActivities, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "allPremises").write[Boolean] ~
-        (__ \ "activity").write[BusinessActivity]
-    )(unlift(TradingPremisesSubmittedActivities.unapply))
+  implicit val formWriter = Write[TradingPremisesSubmittedActivities, UrlFormEncoded] { m =>
+    Map("allPremises" -> Seq(m match {
+      case TradingPremisesSubmittedActivitiesYes => "true"
+      case _ => "false"
+    }))
   }
 
 }

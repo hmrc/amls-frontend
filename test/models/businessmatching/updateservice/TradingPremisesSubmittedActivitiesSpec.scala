@@ -27,21 +27,17 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
   "the form reader" when {
     "called" must {
       "convert the input form to the 'yes' model instance" in {
-        val form = Map(
-          "allPremises" -> Seq("true"),
-          "activity" -> Seq("05"))
+        val form = Map("allPremises" -> Seq("true"))
 
         TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
-          Valid(TradingPremisesSubmittedActivities(allPremises = true, MoneyServiceBusiness))
+          Valid(TradingPremisesSubmittedActivitiesYes)
       }
 
       "convert the input form to the 'no' model instance" in {
         val form = Map(
-          "allPremises" -> Seq("false"),
-          "activity" -> Seq("05"))
+          "allPremises" -> Seq("false"))
 
-        TradingPremisesSubmittedActivities.formRule.validate(form) mustBe Valid(
-          TradingPremisesSubmittedActivities(allPremises = false, MoneyServiceBusiness))
+        TradingPremisesSubmittedActivities.formRule.validate(form) mustBe Valid(TradingPremisesSubmittedActivitiesNo)
       }
 
       "produce a validation error if nothing was selected" in {
@@ -49,8 +45,7 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
 
         TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
           Invalid(Seq(
-            Path \ "allPremises" -> Seq(ValidationError("error.businessmatching.updateservice.tradingpremisessubmittedactivities")),
-            Path \ "activity" -> Seq(ValidationError("error.required"))
+            Path \ "allPremises" -> Seq(ValidationError("error.businessmatching.updateservice.tradingpremisessubmittedactivities"))
           ))
       }
     }
@@ -60,15 +55,13 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
     "called" must {
       "return the correct form" when {
         "yes was selected" in {
-          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivities(true, MoneyServiceBusiness)) mustBe
-            Map("allPremises" -> Seq("true"),
-              "activity" -> Seq("05"))
+          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesYes) mustBe
+            Map("allPremises" -> Seq("true"))
         }
 
         "no was selected" in {
-          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivities(false, BillPaymentServices)) mustBe
-            Map("allPremises" -> Seq("false"),
-              "activity" -> Seq("02"))
+          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesNo) mustBe
+            Map("allPremises" -> Seq("false"))
         }
       }
     }
