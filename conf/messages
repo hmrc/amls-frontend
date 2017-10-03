@@ -116,6 +116,7 @@ error.required.atb.lettersaddress = Select yes if this is the right address to s
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
+error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
