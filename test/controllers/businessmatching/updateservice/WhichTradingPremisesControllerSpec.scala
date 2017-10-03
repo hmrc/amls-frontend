@@ -136,6 +136,145 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
       }
     }
 
+
+    "post is called" must {
+
+      "on valid request" must {
+
+        "redirect to TradingPremises" when {
+          "trading premises are selected and there are more activities through which to iterate" which {
+            "will save activity to trading premises" in new Fixture {
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+              mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
+
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "tradingPremises[]" -> "01"
+              ))
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
+
+            }
+          }
+        }
+        "redirect to CurrentTradingPremises" when {
+          "trading premises are selected and there is only one activity through which to iterate" in new Fixture {
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+              mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "tradingPremises[]" -> "01"
+              ))
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
+            }
+          "trading premises are selected and it is the last activity through which to iterate" in new Fixture {
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+              mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
+
+              val result = controller.post(1)(request.withFormUrlEncodedBody(
+                "tradingPremises[]" -> "01"
+              ))
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
+            }
+        }
+      }
+
+      "on invalid request" must {
+
+        "return BAD_REQUEST" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+
+      "return NOT_FOUND" when {
+        "status is pre-submission" in new Fixture {
+
+          mockApplicationStatus(NotCompleted)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "tradingPremises[]" -> "01"
+          ))
+
+          status(result) must be(NOT_FOUND)
+
+        }
+        "there are no additional business activities" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = controller.post(3)(request.withFormUrlEncodedBody(
+            "tradingPremises[]" -> "01"
+          ))
+
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+
+      "return INTERNAL_SERVER_ERROR" when {
+
+        "activities cannot be retrieved" in new Fixture {
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.none[Future, Set[BusinessActivity]]
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "tradingPremises[]" -> "01"
+          ))
+
+          status(result) must be(INTERNAL_SERVER_ERROR)
+
+        }
+
+      }
+
+    }
+
   }
 
 }

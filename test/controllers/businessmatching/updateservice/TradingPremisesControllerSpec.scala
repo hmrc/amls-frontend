@@ -196,7 +196,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
           status(result) must be(NOT_FOUND)
 
         }
-        "status is there are no additional business activities" in new Fixture {
+        "there are no additional business activities" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
