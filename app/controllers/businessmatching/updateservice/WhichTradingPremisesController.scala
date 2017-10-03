@@ -23,7 +23,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessActivities
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
@@ -83,10 +83,10 @@ class WhichTradingPremisesController @Inject()(
                 val activity = additionalActivities.toList(index)
                 Form2[BMTradingPremises](request.body) match {
                   case ValidForm(_, data) => {
-                    if(index + 2 > additionalActivities.size){
-                      Redirect(routes.CurrentTradingPremisesController.get())
-                    } else {
+                    if(activitiesToIterate(index, additionalActivities)){
                       Redirect(routes.TradingPremisesController.get(index + 1))
+                    } else {
+                      Redirect(routes.CurrentTradingPremisesController.get())
                     }
                   }
                   case f: InvalidForm =>
@@ -105,4 +105,8 @@ class WhichTradingPremisesController @Inject()(
         }) getOrElse InternalServerError("Cannot retrieve business activities")
       }
   }
+
+  private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
+    additionalActivities.size > index + 1
+
 }

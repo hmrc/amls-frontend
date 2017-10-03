@@ -25,6 +25,7 @@ import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -39,7 +40,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class WhichTradingPremisesControllerSpec extends GenericTestHelper {
+class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateMethodTester {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
 
@@ -136,11 +137,9 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
       }
     }
 
-
     "post is called" must {
 
       "on valid request" must {
-
         "redirect to TradingPremises" when {
           "trading premises are selected and there are more activities through which to iterate" which {
             "will save activity to trading premises" in new Fixture {
@@ -163,7 +162,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
           }
         }
         "redirect to CurrentTradingPremises" when {
-          "trading premises are selected and there is only one activity through which to iterate" in new Fixture {
+          "trading premises are selected and there is an activity through which to iterate" in new Fixture {
 
               mockApplicationStatus(SubmissionDecisionApproved)
               mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
@@ -173,23 +172,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
               } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
               val result = controller.post()(request.withFormUrlEncodedBody(
-                "tradingPremises[]" -> "01"
-              ))
-
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
-
-            }
-          "trading premises are selected and it is the last activity through which to iterate" in new Fixture {
-
-              mockApplicationStatus(SubmissionDecisionApproved)
-              mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-
-              when {
-                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
-
-              val result = controller.post(1)(request.withFormUrlEncodedBody(
                 "tradingPremises[]" -> "01"
               ))
 
@@ -273,6 +255,34 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
 
       }
 
+    }
+
+    "activitiesToIterate" must {
+      "return true" when {
+        "index is at first of many" in new Fixture {
+
+          val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
+
+          controller invokePrivate activitiesToIterate(0, Set(HighValueDealing, MoneyServiceBusiness)) must be(true)
+
+        }
+      }
+      "return false" when {
+        "there is a single additional activity" in new Fixture {
+
+          val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
+
+          controller invokePrivate activitiesToIterate(0, Set(HighValueDealing)) must be(false)
+
+        }
+        "index is at the last activity" in new Fixture {
+
+          val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
+
+          controller invokePrivate activitiesToIterate(1, Set(HighValueDealing, MoneyServiceBusiness)) must be(false)
+
+        }
+      }
     }
 
   }
