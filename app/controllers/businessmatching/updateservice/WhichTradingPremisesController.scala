@@ -22,8 +22,9 @@ import cats.implicits._
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessActivities
+import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
 import services.StatusService
@@ -71,7 +72,37 @@ class WhichTradingPremisesController @Inject()(
   def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        ???
+        (for {
+          status <- OptionT.liftF(statusService.getStatus)
+          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
+          tradingPremises <- OptionT.liftF(getData[TradingPremises])
+        } yield {
+          try {
+            status match {
+              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+                val activity = additionalActivities.toList(index)
+                Form2[BMTradingPremises](request.body) match {
+                  case ValidForm(_, data) => {
+                    if(index + 2 > additionalActivities.size){
+                      Redirect(routes.CurrentTradingPremisesController.get())
+                    } else {
+                      Redirect(routes.TradingPremisesController.get(index + 1))
+                    }
+                  }
+                  case f: InvalidForm =>
+                    BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
+                      f,
+                      tradingPremises,
+                      BusinessActivities.getValue(activity),
+                      index
+                    ))
+                }
+              }
+            }
+          } catch {
+            case _:IndexOutOfBoundsException | _:MatchError => NotFound(notFoundView)
+          }
+        }) getOrElse InternalServerError("Cannot retrieve business activities")
       }
   }
 }
