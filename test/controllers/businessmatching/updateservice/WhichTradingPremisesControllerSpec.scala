@@ -19,12 +19,13 @@ package controllers.businessmatching.updateservice
 import cats.implicits._
 import cats.data.OptionT
 import connectors.DataCacheConnector
+import models.DateOfChange
 import models.businessmatching._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -60,11 +61,16 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
       Some(new LocalDate(1990, 2, 24))
     )
 
+    val activities = WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(new LocalDate(2012,10,19))))
+
     val tradingPremises = Seq(
       TradingPremises(
-        yourTradingPremises = Some(ytp)
+        yourTradingPremises = Some(ytp),
+        whatDoesYourBusinessDoAtThisAddress = Some(activities)
       )
     )
+
+    mockCacheSave[Seq[TradingPremises]]
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
@@ -141,8 +147,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
       "on valid request" must {
         "redirect to TradingPremises" when {
-          "trading premises are selected and there are more activities through which to iterate" which {
-            "will save activity to trading premises" in new Fixture {
+          "trading premises are selected and there are more activities through which to iterate" in new Fixture {
 
               mockApplicationStatus(SubmissionDecisionApproved)
               mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
@@ -159,7 +164,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
               redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
 
             }
-          }
         }
         "redirect to CurrentTradingPremises" when {
           "trading premises are selected and there is an activity through which to iterate" in new Fixture {
@@ -282,6 +286,58 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           controller invokePrivate activitiesToIterate(1, Set(HighValueDealing, MoneyServiceBusiness)) must be(false)
 
         }
+      }
+    }
+
+  }
+
+  it must {
+
+    "save activity to trading premises in request" when {
+
+      "a single trading premises is selected" in new Fixture {
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+        when {
+          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "tradingPremises[]" -> "01"
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(
+          controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(
+            Seq(
+              tradingPremises.head.copy(
+                whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
+                  activities.activities + HighValueDealing
+                ))
+              ))
+          ))(any(),any(),any())
+
+      }
+
+      "multiple trading premises are selected" in new Fixture {
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+        when {
+          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "tradingPremises[]" -> "01"
+        ))
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
       }
     }
 

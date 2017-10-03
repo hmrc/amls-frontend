@@ -26,13 +26,16 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
 import models.status.{NotCompleted, SubmissionReady}
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class WhichTradingPremisesController @Inject()(
@@ -64,7 +67,7 @@ class WhichTradingPremisesController @Inject()(
               }
             }
           } catch {
-            case _:IndexOutOfBoundsException | _:MatchError => NotFound(notFoundView)
+            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
           }
         }) getOrElse InternalServerError("Cannot retrieve business activities")
   }
@@ -72,41 +75,54 @@ class WhichTradingPremisesController @Inject()(
   def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        (for {
-          status <- OptionT.liftF(statusService.getStatus)
-          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-          tradingPremises <- OptionT.liftF(getData[TradingPremises])
-        } yield {
-          try {
-            status match {
-              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
-                val activity = additionalActivities.toList(index)
-                Form2[BMTradingPremises](request.body) match {
-                  case ValidForm(_, data) => {
-                    if(activitiesToIterate(index, additionalActivities)){
-                      Redirect(routes.TradingPremisesController.get(index + 1))
-                    } else {
-                      Redirect(routes.CurrentTradingPremisesController.get())
+          statusService.getStatus flatMap {
+            case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+              businessMatchingService.getAdditionalBusinessActivities.value flatMap {
+                case Some(additionalActivities) => {
+                  val activity = additionalActivities.toList(index)
+                  Form2[BMTradingPremises](request.body) match {
+                    case ValidForm(_, data) => {
+                      if (activitiesToIterate(index, additionalActivities)) {
+                        Future.successful(Redirect(routes.TradingPremisesController.get(index + 1)))
+                      } else {
+                        Future.successful(Redirect(routes.CurrentTradingPremisesController.get()))
+                      }
                     }
+                    case f: InvalidForm =>
+                      getData[TradingPremises] map { tradingPremises =>
+                        BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
+                          f,
+                          tradingPremises,
+                          BusinessActivities.getValue(activity),
+                          index
+                        ))
+                      }
                   }
-                  case f: InvalidForm =>
-                    BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
-                      f,
-                      tradingPremises,
-                      BusinessActivities.getValue(activity),
-                      index
-                    ))
                 }
+                case None => Future.successful(InternalServerError("Cannot retrieve activities"))
               }
             }
-          } catch {
-            case _:IndexOutOfBoundsException | _:MatchError => NotFound(notFoundView)
           }
-        }) getOrElse InternalServerError("Cannot retrieve business activities")
+        } recoverWith {
+          case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
+        }
       }
-  }
 
   private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
     additionalActivities.size > index + 1
+
+  private def updateTradingPremises(data: Seq[Int], activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    data.map { tp =>
+      updateDataStrict[TradingPremises](tp) { tradingPremises =>
+        tradingPremises.whatDoesYourBusinessDoAtThisAddress(
+          tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
+            wdybd.copy(
+              wdybd.activities + activity
+            )
+          }
+        )
+      }
+    }
+  }
 
 }
