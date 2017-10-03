@@ -307,6 +307,7 @@ GET         /update-service/current-trading-premises                            
 POST        /update-service/current-trading-premises                                  @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post()
 
 GET         /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get()
+POST        /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 

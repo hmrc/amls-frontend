@@ -18,13 +18,39 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
+import models.businessmatching.BusinessActivities
+import models.tradingpremises.TradingPremises
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+import views.html.businessmatching.updateservice.which_current_trading_premises
 
-class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector) extends BaseController {
+import scala.concurrent.ExecutionContext
+
+class WhichCurrentTradingPremisesController @Inject()
+  (val authConnector: AuthConnector, cacheConnector: DataCacheConnector, businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get() = Authorised.async {
+    implicit authContext => implicit request =>
+      {
+        for {
+          tp <- getTradingPremises
+          activities <- businessMatchingService.getSubmittedBusinessActivities
+        } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(activities.head)))
+      } getOrElse InternalServerError("Unable to get the trading premises")
+  }
+
+  def post() = Authorised.async {
     implicit authContext => implicit request => ???
   }
+
+  private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
+    OptionT(cacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key))
 
 }
