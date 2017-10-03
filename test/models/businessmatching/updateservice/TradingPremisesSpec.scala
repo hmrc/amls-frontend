@@ -24,14 +24,25 @@ class TradingPremisesSpec extends PlaySpec with MustMatchers {
 
   "The TradingPremises model" when {
     "given a valid form" when {
-      "return a valid form model" in {
-        val formData = Map(
-          "tradingPremises[]" -> Seq("01")
-        )
+      "return a valid form model" when {
+        "single selection is made" in {
+          val formData = Map(
+            "tradingPremises[]" -> Seq("01")
+          )
 
-        val result = TradingPremises.formReads.validate(formData)
+          val result = TradingPremises.formReads.validate(formData)
 
-        result mustBe Valid(TradingPremises(Set("01")))
+          result mustBe Valid(TradingPremises(Set("01")))
+        }
+        "multiple selections are made" in {
+          val formData = Map(
+            "tradingPremises[]" -> Seq("01", "02")
+          )
+
+          val result = TradingPremises.formReads.validate(formData)
+
+          result mustBe Valid(TradingPremises(Set("01", "02")))
+        }
       }
 
       "nothing is selected" must {
