@@ -63,7 +63,7 @@ class WhichTradingPremisesController @Inject()(
               }
             }
           } catch {
-            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
+            case _:IndexOutOfBoundsException | _:MatchError => NotFound(notFoundView)
           }
         }) getOrElse InternalServerError("Cannot retrieve business activities")
   }

@@ -120,19 +120,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper {
         }
       }
       "return INTERNAL_SERVER_ERROR" when {
-        "trading premises cannot be retrieved" in new Fixture {
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-          mockCacheFetch[Seq[TradingPremises]](None, Some(TradingPremises.key))
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-          val result = controller.get()(request)
-          status(result) must be(INTERNAL_SERVER_ERROR)
-
-        }
         "activities cannot be retrieved" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
