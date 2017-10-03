@@ -18,6 +18,7 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BusinessMatching, MsbServices, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -28,6 +29,8 @@ class msb_servicesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val bmModel = BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney))))
   }
 
   "msb_services view" must {
@@ -35,17 +38,19 @@ class msb_servicesSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
+
+
       val pageTitle = Messages("tradingpremises.msb.services.title") + " - " +
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.msb_services(form2, 1, false, false)
+      def view = views.html.tradingpremises.msb_services(form2, 1, false, false, bmModel)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.msb.services.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
-      doc.select("input[type=checkbox]").size mustBe 4
+      doc.select("input[type=checkbox]").size mustBe 1
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -55,7 +60,7 @@ class msb_servicesSpec extends GenericTestHelper with MustMatchers {
           (Path \ "msbServices[0]") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.msb_services(form2, 1, true, false)
+      def view = views.html.tradingpremises.msb_services(form2, 1, true, false, bmModel)
 
       errorSummary.html() must include("not a message Key")
     }

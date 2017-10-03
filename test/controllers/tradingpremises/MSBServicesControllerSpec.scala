@@ -17,9 +17,11 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.TradingPremisesSection
+import models.{TradingPremisesSection}
+import models.businessmatching.{BusinessMatching, MsbServices, TransmittingMoney, CurrencyExchange}
+import models.tradingpremises.{MsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
+CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, MsbService}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
-import models.tradingpremises._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -28,7 +30,9 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -46,7 +50,11 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       override protected def authConnector: AuthConnector = self.authConnector
 
       override val statusService = mock[StatusService]
+
+
     }
+    val mockCacheMap = mock[CacheMap]
+
 
     when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
@@ -55,8 +63,18 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
   "MSBServicesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+      val model = TradingPremises()
+
+      when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney))))))
+
+
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -67,13 +85,16 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
     "show a prefilled form when there is data in the store" in new Fixture {
 
-      val model = TradingPremises(
-        msbServices = Some(
-          MsbServices(Set(TransmittingMoney, CurrencyExchange))
-        )
-      )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(TradingPremises(
+          msbServices = Some(TPMsbServices(Set(TPTransmittingMoney, TPCurrencyExchange)))
+        ))))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -105,8 +126,14 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       }
 
       "there is no data at all at that index" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+        when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(None)
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
           val result = controller.get(1, false)(request)
 
@@ -121,6 +148,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         "msbServices[0]" -> "invalid"
       )
 
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(None))
+
       val result = controller.post(1)(newRequest)
       val document = Jsoup.parse(contentAsString(result))
 
@@ -132,18 +161,14 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "on valid submission" in new Fixture {
 
-        val model = TradingPremises(
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
-          ))
-        )
-
         val newRequest = request.withFormUrlEncodedBody(
           "msbServices[0]" -> "01"
         )
 
         when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(
+          msbServices = Some(TPMsbServices(Set(TPTransmittingMoney, TPCurrencyExchange)))
+        )))))
 
         when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -161,14 +186,14 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "adding 'Transmitting Money' as a service during edit" in new Fixture {
 
         val currentModel = TradingPremises(
-          msbServices = Some(MsbServices(
+          msbServices = Some(TPMsbServices(
             Set(ChequeCashingNotScrapMetal)
           ))
         )
 
         val newModel = currentModel.copy(
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
+          msbServices = Some(TPMsbServices(
+            Set(TPTransmittingMoney, TPCurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
           ))
         )
 
@@ -194,14 +219,14 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
         val currentModel = TradingPremises(
-          msbServices = Some(MsbServices(
+          msbServices = Some(TPMsbServices(
             Set(ChequeCashingNotScrapMetal)
           ))
         )
 
         val newModel = currentModel.copy(
-          msbServices = Some(MsbServices(
-            Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
+          msbServices = Some(TPMsbServices(
+            Set(TPCurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
           ))
         )
 
@@ -232,8 +257,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
           case (model, id) =>
             val currentModel = TradingPremises(
-              msbServices = Some(MsbServices(
-                Set(TransmittingMoney, CurrencyExchange)
+              msbServices = Some(TPMsbServices(
+                Set(TPTransmittingMoney, TPCurrencyExchange)
               ))
             )
 
@@ -264,8 +289,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
         val model = TradingPremises(
           lineId = Some(1),
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
+          msbServices = Some(TPMsbServices(
+            Set(TPTransmittingMoney)
           ))
         )
 
@@ -292,8 +317,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
         val model = TradingPremises(
           lineId = Some(1),
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
+          msbServices = Some(TPMsbServices(
+            Set(TPTransmittingMoney)
           ))
         )
 
@@ -320,8 +345,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
         val model = TradingPremises(
           lineId = Some(1),
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
+          msbServices = Some(TPMsbServices(
+            Set(TPTransmittingMoney)
           ))
         )
 
@@ -350,8 +375,8 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
         val model = TradingPremises(
           lineId = None,                    // record hasn't been submitted
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
+          msbServices = Some(TPMsbServices(
+            Set(TPTransmittingMoney)
           ))
         )
 
@@ -398,7 +423,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         any(),
         meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
           hasChanged = true,
-          msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))
+          msbServices = Some(TPMsbServices(Set(TPTransmittingMoney, TPCurrencyExchange, ChequeCashingNotScrapMetal)))
         ))))(any(), any(), any())
     }
 

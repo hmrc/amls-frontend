@@ -16,10 +16,13 @@
 
 package controllers.tradingpremises
 
+import cats.data.OptionT
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms._
+import forms.{Form2, _}
+import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
+import models.businessmatching.BusinessMatching
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.{MsbServices, TradingPremises}
 import services.StatusService
@@ -35,15 +38,22 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
-        case Some(tp) => {
-          val form = tp.msbServices match {
-            case Some(service) => Form2[MsbServices](service)
-            case None => EmptyForm
-          }
-          Ok(views.html.tradingpremises.msb_services(form, index, edit, changed))
-        }
-        case None => NotFound(notFoundView)
+      dataCacheConnector.fetchAll map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
+            (for {
+              tp <- getData[TradingPremises](cache, index)
+            } yield {
+              (for {
+                tps <- tp.msbServices
+              } yield {
+                Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
+              }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
+            }) getOrElse NotFound(notFoundView)
+          }) getOrElse NotFound(notFoundView)
       }
   }
 
@@ -67,8 +77,16 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
   def post(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[MsbServices](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.msb_services(f, index, edit, changed)))
+        case f: InvalidForm => {
+          for {
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+          } yield {
+            BadRequest(views.html.tradingpremises.msb_services(f, index, edit, changed, businessMatching))
+          }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
+
         case ValidForm(_, data) => {
           for {
             tradingPremises <- getData[TradingPremises](index)

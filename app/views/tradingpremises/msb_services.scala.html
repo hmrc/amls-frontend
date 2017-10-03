@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import models.businessmatching._
 
-@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean, model: BusinessMatching)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -43,10 +44,17 @@
             @errorGroup(
                 field = f("msbServices")
             ) {
-                @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
-                @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
-                @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
-                @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
+
+                @model.msbServices.map { services =>
+                    @services.msbServices.map { svc =>
+                        @svc match {
+                            case TransmittingMoney => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")}
+                            case CurrencyExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")}
+                            case ChequeCashingNotScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")}
+                            case ChequeCashingScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")}
+                        }
+                    }
+                }
             }
         }
 
