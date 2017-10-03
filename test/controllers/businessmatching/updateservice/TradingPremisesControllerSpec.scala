@@ -138,7 +138,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             ))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get(0).url))
 
           }
         }

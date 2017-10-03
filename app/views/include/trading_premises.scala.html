@@ -23,21 +23,25 @@
 <p>@Messages("lbl.select.all")</p>
 
 <div class="form-group">
-    @fieldset(
-        f = f("tradingPremises-fieldset"),
-        legend = legend,
-        legendHidden = true,
-        panel = false
-    ) {
-        @errorGroup(
-          field = f("tradingPremises")
+
+    @form(f, call) {
+
+        @fieldset(
+            f = f("tradingPremises-fieldset"),
+            legend = legend,
+            legendHidden = true,
+            panel = false
         ) {
-            @form(f, call) {
+            @errorGroup(
+              field = f("tradingPremises")
+            ) {
                 @tradingpremises.zipWithIndex.map{ case (tp, index) =>
                     @checkbox(f = f("tradingPremises[]"), labelText = tp.label.getOrElse(index.toString), value = index.toString)
                 }
-                @submit()
             }
         }
+
+        @submit(returnLink = false)
+
     }
 </div>

@@ -300,8 +300,8 @@ POST        /update-information/remove-responsible-person                       
 GET         /update-service/trading-premises/:index                                   @controllers.businessmatching.updateservice.TradingPremisesController.get(index: Int)
 POST        /update-service/trading-premises/:index                                   @controllers.businessmatching.updateservice.TradingPremisesController.post(index: Int)
 
-GET         /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.WhichTradingPremisesController.get()
-POST        /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.WhichTradingPremisesController.post()
+GET         /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.get(index: Int)
+POST        /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.post(index: Int)
 
 GET         /update-service/current-trading-premises                                  @controllers.businessmatching.updateservice.CurrentTradingPremisesController.get()
 POST        /update-service/current-trading-premises                                  @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post()
