@@ -16,46 +16,54 @@
 
 @import include._
 @import forms2._
+@import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], activity: String, index: Int)(implicit request: Request[_], m:Messages)
 
 @header = {
-    @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.sole.proprietor.another.business.heading", personName), "summary.responsiblepeople")
+    @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
+    @headingWithPlaceholder((
+        "businessmatching.updateservice.tradingpremises.header",
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+    ), "progress.update.registration")
 }
 
 @main(
-    title = Messages("responsiblepeople.sole.proprietor.another.business.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("progress.update.registration"),
     heading = header
-) {
+)  {
 
-    @form(f, controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.post(index, edit, flow)) {
+    @form(f, controllers.businessmatching.updateservice.routes.TradingPremisesController.post(index)) {
 
         @fieldset(
-            f = f("soleProprietorOfAnotherBusiness-fieldset"),
-            legend = "responsiblepeople.sole.proprietor.another.business.title",
+            f = f("tradingPremisesNewActivities-fieldset"),
+            legend = "businessmatching.updateservice.tradingpremises.title",
             legendHidden = true,
             panel = false
         ) {
+
             @errorGroupWithPlaceholder(
-                field = f("soleProprietorOfAnotherBusiness"),
-                placeholder = personName
+                field = f("tradingPremisesNewActivities"),
+                placeholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
             ) {
                 @radio(
-                    f = f("soleProprietorOfAnotherBusiness"),
+                    f = f("tradingPremisesNewActivities"),
                     labelText = "lbl.yes",
                     value = "true",
                     inline = true
                 )
                 @radio(
-                    f = f("soleProprietorOfAnotherBusiness"),
+                    f = f("tradingPremisesNewActivities"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
                 )
             }
+
         }
 
-        @submit()
-    }
+        @submit(returnLink = false)
+
+}
+
 }

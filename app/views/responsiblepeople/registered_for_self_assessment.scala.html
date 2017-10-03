@@ -24,7 +24,7 @@ s"""${f("utrNumber").id}-fieldset"""
 }
 
 @header = {
-    @rpErrorSummary(f, personName)
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.heading", personName), "summary.responsiblepeople")
 }
 
@@ -40,9 +40,9 @@ s"""${f("utrNumber").id}-fieldset"""
             panel=false,
             legendHidden = true
         ) {
-            @rpErrorGroup(
+            @errorGroupWithPlaceholder(
                 field = f("saRegistered"),
-                personName = personName
+                placeholder = personName
             ) {
                 @radio(
                     f = f("saRegistered"),

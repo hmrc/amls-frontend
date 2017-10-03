@@ -16,17 +16,24 @@
 
 package models.aboutthebusiness
 
+import models.bankdetails.BankDetails
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
+import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
 import play.api.test.FakeApplication
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
+
+  val cache = mock[CacheMap]
 
   val regForVAT = VATRegisteredYes("123456789")
 
@@ -313,5 +320,33 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSui
       }
     }
 
+  }
+
+  "Section" must {
+    "return a NotStarted Section when there is no data at all" in {
+      val notStartedSection = Section("aboutthebusiness", NotStarted, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+
+      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn None
+
+      AboutTheBusiness.section(cache) must be(notStartedSection)
+    }
+
+    "return a Completed Section when model is complete and has not changed" in {
+      val complete = completeModel
+      val completedSection = Section("aboutthebusiness", Completed, false, controllers.aboutthebusiness.routes.SummaryController.get())
+
+      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn Some(complete)
+
+      AboutTheBusiness.section(cache) must be(completedSection)
+    }
+
+    "return a Started Section when model is incomplete" in {
+      val incomplete = AboutTheBusiness(Some(previouslyRegistered), None)
+      val startedSection = Section("aboutthebusiness", Started, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+
+      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn Some(incomplete)
+
+      AboutTheBusiness.section(cache) must be(startedSection)
+    }
   }
 }

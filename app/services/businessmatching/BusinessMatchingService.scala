@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
@@ -58,14 +59,21 @@ class BusinessMatchingService @Inject()(
 
   }
 
-  def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] = {
+  private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
+                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] = {
     for {
       viewResponse <- OptionT(cache.fetch[ViewResponse](ViewResponse.key))
-      existing <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
+      submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
-    } yield current.businessActivities diff existing.businessActivities
+    } yield fn(current.businessActivities, submitted.businessActivities)
   }
+
+  def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    getActivitySet(_ diff _)
+
+  def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    getActivitySet(_ intersect _)
 
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
     OptionT.liftF(statusService.getStatus) flatMap {

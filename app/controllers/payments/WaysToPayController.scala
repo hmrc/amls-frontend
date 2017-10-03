@@ -55,10 +55,10 @@ class WaysToPayController @Inject()(
     implicit authContext => implicit request =>
         val submissionDetails = for {
           amlsRefNo <- amlsRefBroker.get
-          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
           data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
           payRef <- OptionT.fromOption[Future](paymentReference)
-        } yield (amlsRefNo, payRef, data, detailedStatus.fold[String]("")(_.safeId.getOrElse("")))
+        } yield (amlsRefNo, payRef, data, detailedStatus.fold[String](throw new Exception("No safeID available"))(_.safeId.getOrElse(throw new Exception("No safeID available"))))
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
