@@ -18,26 +18,50 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.implicits._
 import controllers.BaseController
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.current_trading_premises
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.updateservice.{TradingPremisesSubmittedActivities, TradingPremisesSubmittedActivitiesNo, TradingPremisesSubmittedActivitiesYes}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                  val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
+  private def failure(msg: String = "Unable to get business activities") = InternalServerError(msg)
+
   def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Future.successful(Ok)
+    implicit authContext => implicit request =>
+      val result = getActivity map { activity =>
+        Ok(current_trading_premises(EmptyForm, activity))
+      }
+
+      result getOrElse failure()
   }
 
   def post() = Authorised.async {
-    implicit authContext =>
-      implicit request => {
-        ???
+    implicit authContext => implicit request => {
+        Form2[TradingPremisesSubmittedActivities](request.body) match {
+          case f: InvalidForm => getActivity map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
+          case ValidForm(_, data) => data match {
+            case TradingPremisesSubmittedActivitiesYes =>
+              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+
+            case TradingPremisesSubmittedActivitiesNo =>
+              Future.successful(Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get()))
+          }
+        }
       }
   }
+
+  private def getActivity(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    services <- businessMatchingService.getSubmittedBusinessActivities
+  } yield services.head
+
 }

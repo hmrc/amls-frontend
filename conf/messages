@@ -116,6 +116,7 @@ error.required.atb.lettersaddress = Select yes if this is the right address to s
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
+error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
 
 ###############################  Bank Details ###############################
@@ -1110,6 +1111,8 @@ businessmatching.cannotchangeservices.button.text = Return to update information
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.header = Will you still do {0} from all of your registered trading premises?
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?
