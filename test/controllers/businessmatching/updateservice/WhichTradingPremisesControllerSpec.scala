@@ -316,7 +316,9 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
               tradingPremises.head.copy(
                 whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
                   activities.activities + HighValueDealing
-                ))
+                )),
+                hasAccepted = true,
+                hasChanged = true
               ))
           ))(any(),any(),any())
 
