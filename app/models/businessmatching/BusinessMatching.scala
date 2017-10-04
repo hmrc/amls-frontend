@@ -21,6 +21,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import models.tradingpremises.{MsbServices => TPMsbServices}
 
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,

@@ -87,9 +87,11 @@ trait SummaryController extends RepeatingSection with BaseController {
         tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
         bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
         activities <- OptionT.fromOption[Future](bm.activities)
+        services <- OptionT.fromOption[Future](bm.msbServices)
       } yield {
         val hasOneService = activities.businessActivities.size == 1
-        Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService))
+        val hasOneMsbService = services.msbServices.size == 1
+        Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
       }).getOrElse(NotFound(notFoundView))
   }
 }

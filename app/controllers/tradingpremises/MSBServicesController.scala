@@ -22,12 +22,17 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessActivity, BusinessMatching, MsbService => BMMsbServices}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.{MsbServices, TradingPremises}
+import play.api.mvc.Result
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{DateOfChangeHelper, RepeatingSection}
+import models.tradingpremises.MsbServices._
 
 import scala.concurrent.Future
 
@@ -43,19 +48,35 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
           (for {
             cache <- optionalCache
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+            msbServices <- businessMatching.msbServices flatMap {
+              _.msbServices match {
+                case set if set.isEmpty => None
+                case set => Some(set)
+              }
+            }
           } yield {
             (for {
               tp <- getData[TradingPremises](cache, index)
             } yield {
-              (for {
-                tps <- tp.msbServices
-              } yield {
-                Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
-              }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
+                if (msbServices.size == 1) {
+                  updateDataStrict[TradingPremises](index) { utp =>
+                    Some(utp.msbServices(MsbServices(msbServices)))
+                  }
+                  Redirect(routes.PremisesRegisteredController.get(index))
+                } else {
+                  (for {
+                    tps <- tp.msbServices
+                  } yield {
+                    Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
+                  }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
+
+                }
             }) getOrElse NotFound(notFoundView)
           }) getOrElse NotFound(notFoundView)
       }
   }
+
+
 
   private def redirectBasedOnStatus(status: SubmissionStatus,
                             tradingPremises: Option[TradingPremises],

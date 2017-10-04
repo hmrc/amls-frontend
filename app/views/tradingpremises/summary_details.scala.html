@@ -20,7 +20,7 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("summary.detailedanswers.title", "summary.tradingpremises")
@@ -78,7 +78,7 @@
         @model.msbServices.map { msb =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.msb.services.title"),
-                editUrl = controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString
+                editUrl = if(!hasOneMsbService){controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString} else ""
             ) {
 
                 <ul class="list list--comma">
