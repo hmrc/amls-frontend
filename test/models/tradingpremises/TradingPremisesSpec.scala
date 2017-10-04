@@ -29,7 +29,6 @@ import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
-
 class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite {
 
   val ytp = YourTradingPremises(
@@ -44,7 +43,6 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     Some(true),
     Some(new LocalDate(1990, 2, 24))
   )
-
   val businessStructure = SoleProprietor
   val agentName = AgentName("test")
   val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
@@ -179,6 +177,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
           tradingPremises.isComplete must be(true)
         }
       }
+
+    }
+
+    "return label based on address details" in {
+
+      completeModel.label must be(Some("foo, 1, 2, asdfasdf"))
 
     }
   }

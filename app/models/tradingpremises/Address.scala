@@ -58,7 +58,7 @@ object Address {
           (__ \ "addressLine3").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "addressLine4").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "postcode").read(notEmptyStrip andThen postcodeType)
-        )(Address.applyWithoutDateOfChange _)
+        )(Address.applyWithoutDateOfChange)
     }
 
   implicit val formW: Write[Address, UrlFormEncoded] =
