@@ -19,8 +19,8 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import models.businessmatching.{AccountancyServices, BusinessActivity}
-import models.tradingpremises.TradingPremises
+import models.businessmatching.{AccountancyServices, BusinessActivity, HighValueDealing, MoneyServiceBusiness}
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -29,11 +29,11 @@ import play.api.test.Helpers._
 import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{when, verify}
 import play.api.i18n.Messages
 import services.businessmatching.BusinessMatchingService
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
@@ -54,20 +54,54 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
     lazy val controller = injector.instanceOf[WhichCurrentTradingPremisesController]
 
     mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises())))
+
+    when {
+      bmService.getSubmittedBusinessActivities(any(), any(), any())
+    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
+
   }
 
   "get" when {
     "called" must {
       "return the correct view" in new Fixture {
-        when {
-          bmService.getSubmittedBusinessActivities(any(), any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
-
         val result = controller.get()(request)
 
         status(result) mustBe OK
 
         contentAsString(result) must include(Messages("businessmatching.updateservice.whichtradingpremises.header", AccountancyServices.getMessage))
+      }
+    }
+  }
+
+  "post" when {
+    "called" must {
+      "produce a validation error if no trading premises were selected" in new Fixture {
+        val result = controller.post()(request.withFormUrlEncodedBody())
+
+        status(result) mustBe BAD_REQUEST
+      }
+
+      "update the trading premises with the selected services" in new Fixture {
+
+        mockCacheFetch[Seq[TradingPremises]](Some(Seq(
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing)))),
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
+        )))
+
+        mockCacheSave[Seq[TradingPremises]]
+
+        val form = "tradingPremises[]" -> "0"
+        val result = controller.post()(request.withFormUrlEncodedBody(form))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+
+        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), eqTo(
+          Seq(
+            TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing)))),
+            TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))))
+          )
+        ))(any(), any(), any())
       }
     }
   }

@@ -22,35 +22,63 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
-import models.businessmatching.BusinessActivities
-import models.tradingpremises.TradingPremises
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.businessmatching.updateservice.{TradingPremises => TradingPremisesForm}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.businessmatching.updateservice.which_current_trading_premises
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class WhichCurrentTradingPremisesController @Inject()
   (val authConnector: AuthConnector, cacheConnector: DataCacheConnector, businessMatchingService: BusinessMatchingService) extends BaseController {
+
+  private val failure = InternalServerError("Could not get form data")
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       {
         for {
-          tp <- getTradingPremises
-          activities <- businessMatchingService.getSubmittedBusinessActivities
-        } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(activities.head)))
-      } getOrElse InternalServerError("Unable to get the trading premises")
+          (tp, activities, act) <- formData
+        } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
+      } getOrElse failure
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request => ???
+    implicit authContext => implicit request =>
+      Form2[TradingPremisesForm](request.body) match {
+        case f: InvalidForm => {
+          for {
+            (tradingPremises, activities, act) <- formData
+          } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act)))
+        } getOrElse failure
+
+        case ValidForm(_, data) => {
+          for {
+            (tp, activities, act) <- formData
+            _ <- OptionT.liftF(cacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp, data.index, act)))
+          } yield Redirect(controllers.routes.RegistrationProgressController.get())
+        } getOrElse failure
+      }
   }
 
-  private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
+  private def fixActivities(tp: Seq[TradingPremises], selected: Set[String], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
+    case (m, i) if !selected.map(_.toInt).contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
+      val newActivities = m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity
+      m.copy(whatDoesYourBusinessDoAtThisAddress = m.whatDoesYourBusinessDoAtThisAddress.map(_.copy(activities = newActivities)))
+    case (m, _) => m
+  }
+
+  private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    tp <- getTradingPremises
+    activities <- businessMatchingService.getSubmittedBusinessActivities
+  } yield (tp, activities, activities.head)
+
+  private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext) =
     OptionT(cacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key))
 
 }
