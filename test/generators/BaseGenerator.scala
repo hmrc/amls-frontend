@@ -16,8 +16,10 @@
 
 package generators
 
+import org.joda.time.LocalDate
 import org.scalacheck.Gen
 
+//noinspection ScalaStyle
 trait BaseGenerator {
 
   def stringOfLengthGen(maxLength: Int) = {
@@ -28,15 +30,18 @@ trait BaseGenerator {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
-  //noinspection ScalaStyle
   def numSequence(maxLength: Int) =
     Gen.listOfN(maxLength, Gen.chooseNum(1, 9)) map {_.mkString}
 
-  //noinspection ScalaStyle
   def numGen = Gen.chooseNum(0,1000)
 
-  //noinspection ScalaStyle
   val paymentAmountGen = Gen.chooseNum[Double](100, 200)
+
+  val localDateGen: Gen[LocalDate] = for {
+    day <- Gen.chooseNum(1, 27)
+    month <- Gen.chooseNum(1, 12)
+    year <- Gen.chooseNum(1990, 2016)
+  } yield new LocalDate(year, month, day)
 
   def safeIdGen = for {
     ref <- alphaNumOfLengthGen(9)
