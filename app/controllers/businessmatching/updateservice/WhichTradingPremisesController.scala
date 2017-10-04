@@ -18,16 +18,15 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.Logger
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -57,7 +56,7 @@ class WhichTradingPremisesController @Inject()(
         } yield {
           try {
             status match {
-              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
                 val activity = additionalActivities.toList(index)
                 Ok(views.html.businessmatching.updateservice.which_trading_premises(
                   EmptyForm,
@@ -65,7 +64,6 @@ class WhichTradingPremisesController @Inject()(
                   BusinessActivities.getValue(activity),
                   index
                 ))
-              }
             }
           } catch {
             case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
@@ -77,12 +75,12 @@ class WhichTradingPremisesController @Inject()(
     implicit authContext =>
       implicit request => {
         statusService.getStatus flatMap {
-          case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
+          case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
             businessMatchingService.getAdditionalBusinessActivities.value flatMap {
-              case Some(additionalActivities) => {
+              case Some(additionalActivities) =>
                 val activity = additionalActivities.toList(index)
                 Form2[BMTradingPremises](request.body) match {
-                  case ValidForm(_, data) => {
+                  case ValidForm(_, data) =>
                     updateTradingPremises(data, activity) map { _ =>
                       if (activitiesToIterate(index, additionalActivities)) {
                         Redirect(routes.TradingPremisesController.get(index + 1))
@@ -90,7 +88,6 @@ class WhichTradingPremisesController @Inject()(
                         Redirect(routes.CurrentTradingPremisesController.get())
                       }
                     }
-                  }
                   case f: InvalidForm =>
                     getData[TradingPremises] map { tradingPremises =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
@@ -101,10 +98,8 @@ class WhichTradingPremisesController @Inject()(
                       ))
                     }
                 }
-              }
               case None => Future.successful(InternalServerError("Cannot retrieve activities"))
             }
-          }
         }
       } recoverWith {
         case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
@@ -114,17 +109,35 @@ class WhichTradingPremisesController @Inject()(
   private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
     additionalActivities.size > index + 1
 
-  private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
-    println(">>>>" + data)
-    updateDataStrict[TradingPremises](data.index.head) { tradingPremises =>
-      tradingPremises.whatDoesYourBusinessDoAtThisAddress(
-        tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
+  private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)
+                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
+
+    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
+      patchTradingPremises(data.index.toSeq, tradingPremises, activity)
+    }
+
+  }
+
+  private def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity): Seq[TradingPremises] = {
+
+    val index = indices.head
+
+    val patched = tradingPremises.patch(index, Seq({
+      tradingPremises(index).whatDoesYourBusinessDoAtThisAddress(
+        tradingPremises(index).whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
           wdybd.copy(
             wdybd.activities + activity
           )
         }
       ).copy(hasAccepted = true)
+    }), 1)
+
+    try {
+      patchTradingPremises(indices.tail, patched, activity)
+    } catch {
+      case _: NoSuchElementException => patched
     }
+
   }
 
 }

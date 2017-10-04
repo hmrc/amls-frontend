@@ -341,17 +341,18 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
             whatDoesYourBusinessDoAtThisAddress = Some(activities)
           ),
           TradingPremises(
-            yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1","add4Line2",None,None,"ps44de")))
+            yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1","add4Line2",None,None,"ps44de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1","add5Line2",None,None,"ps55de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
           ).copy(
             whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
               activities.activities + HighValueDealing
             )),
             hasAccepted = true,
             hasChanged = true
-          ),
-          TradingPremises(
-            yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1","add5Line2",None,None,"ps55de"))),
-            whatDoesYourBusinessDoAtThisAddress = Some(activities)
           ))
         ))(any(),any(),any())
 
