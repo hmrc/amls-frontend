@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.{AccountancyServices, BusinessActivity, HighValueDealing, MoneyServiceBusiness}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.scalatest.MustMatchers
@@ -29,7 +30,7 @@ import play.api.test.Helpers._
 import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{when, verify}
+import org.mockito.Mockito.{verify, when}
 import org.mockito.ArgumentCaptor
 import play.api.i18n.Messages
 import services.businessmatching.BusinessMatchingService
@@ -38,10 +39,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
+  with TradingPremisesGenerator
   with MustMatchers
   with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     implicit val request = addToken(authRequest)
 
     val bmService = mock[BusinessMatchingService]
@@ -106,12 +109,12 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
       }
 
       "mark the trading premises as incomplete if there are no activities left" in new Fixture {
+        val models = Seq(
+          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
+        )
 
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices)))),
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
-        )))
-
+        mockCacheFetch[Seq[TradingPremises]](Some(models))
         mockCacheSave[Seq[TradingPremises]]
 
         val form = "tradingPremises[]" -> "1"
@@ -123,16 +126,11 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
         verify(mockCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
 
-        captor.getValue mustBe Seq(
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set()))),
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
-        )
+        captor.getValue.lift(0).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
+        captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
 
         captor.getValue.head.isComplete mustBe false
-
       }
-
     }
   }
-
 }

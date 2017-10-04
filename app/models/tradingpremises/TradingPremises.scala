@@ -76,18 +76,18 @@ case class TradingPremises(
 
   def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
       this match {
-        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, true) => true
-        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, true) => true
+        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, true)
+          if w.activities.nonEmpty => true
+        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true)
+          if w.activities.nonEmpty => true
         case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, true) => true //This code part of fix for the issue AMLS-1549 back button issue
-        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, false) => false
-        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, false) => false
-        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, false) => false
+        case tp if !tp.hasAccepted => false
         case _ => false
       }
     } else {
       this match {
-        case TradingPremises(_, Some(x), _, _, _, _, Some(_), _, _, _, _, _, _, _, _) => true
-        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _) => true
+        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, _) => true
+        case TradingPremises(_, _, Some(_), Some(_), Some(w), Some(_), Some(_), _, _, _, _, _, _, _, _) => true
         case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
         case _ => false
       }
