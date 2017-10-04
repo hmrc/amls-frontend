@@ -196,6 +196,21 @@ trait RepeatingSection {
       }
     }
 
+  protected def updateDataStrict[T]
+  (fn: Seq[T] => Seq[T])
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[_] =
+    getData[T] flatMap {
+      data => {
+        putData(fn(data))
+      }
+    }
+
   protected def removeDataStrict[T]
   (index: Int)
   (implicit

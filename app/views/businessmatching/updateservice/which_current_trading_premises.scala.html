@@ -38,7 +38,8 @@
         f,
         tradingPremises,
         Messages("businessmatching.updateservice.whichtradingpremises.title"),
-        controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.post()
+        controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.post(),
+        Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
     )
 
 }

@@ -21,7 +21,7 @@ import jto.validation.{From, Rule, Write}
 import utils.TraversableValidators.minLengthR
 
 
-case class TradingPremises(index: Set[String])
+case class TradingPremises(index: Set[Int])
 
 object TradingPremises {
 
@@ -30,12 +30,12 @@ object TradingPremises {
 
   implicit def formReads: Rule[UrlFormEncoded, TradingPremises] = From[UrlFormEncoded] { __ =>
       (__ \ "tradingPremises")
-        .read(minLengthR[Set[String]](1).withMessage("error.businessmatching.updateservice.tradingpremises"))
+        .read(minLengthR[Set[Int]](1).withMessage("error.businessmatching.updateservice.tradingpremises"))
         .flatMap(TradingPremises.apply)
     }
 
   implicit def formWrites(implicit w: Write[String, String]) = Write[TradingPremises, UrlFormEncoded] { data =>
-    Map("tradingPremises[]" -> data.index.toSeq.map(w.writes))
+    Map("tradingPremises[]" -> data.index.toSeq.map(x => w.writes(x.toString)))
   }
 
 }
