@@ -30,6 +30,7 @@ import play.api.inject.bind
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{when, verify}
+import org.mockito.ArgumentCaptor
 import play.api.i18n.Messages
 import services.businessmatching.BusinessMatchingService
 
@@ -103,6 +104,34 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
           )
         ))(any(), any(), any())
       }
+
+      "mark the trading premises as incomplete if there are no activities left" in new Fixture {
+
+        mockCacheFetch[Seq[TradingPremises]](Some(Seq(
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices)))),
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
+        )))
+
+        mockCacheSave[Seq[TradingPremises]]
+
+        val form = "tradingPremises[]" -> "1"
+        val result = controller.post()(request.withFormUrlEncodedBody(form))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+
+        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
+
+        captor.getValue mustBe Seq(
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set()))),
+          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
+        )
+
+        captor.getValue.head.isComplete mustBe false
+
+      }
+
     }
   }
 
