@@ -71,7 +71,7 @@ class TradingPremisesController @Inject()(
                 val activity = additionalActivities.toList(index)
                 Form2[TradingPremisesNewActivities](request.body) match {
                   case ValidForm(_, data) => data match {
-                    case TradingPremisesNewActivitiesYes => Redirect(routes.WhichTradingPremisesController.get(index))
+                    case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
                     case TradingPremisesNewActivitiesNo => Redirect(routes.CurrentTradingPremisesController.get())
                   }
                   case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))

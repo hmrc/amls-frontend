@@ -134,7 +134,8 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
             val result = controller.post()(request.withFormUrlEncodedBody(
-              "tradingPremisesNewActivities" -> "true"
+              "tradingPremisesNewActivities" -> "true",
+              "businessActivities" -> "04"
             ))
 
             status(result) must be(SEE_OTHER)

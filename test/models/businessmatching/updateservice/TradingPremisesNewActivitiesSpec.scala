@@ -18,6 +18,7 @@ package models.businessmatching.updateservice
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BillPaymentServices, HighValueDealing}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
@@ -28,12 +29,13 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
       "'yes' is selected" must {
         "return a valid form model" in {
           val formData = Map(
-            "tradingPremisesNewActivities" -> Seq("true")
+            "tradingPremisesNewActivities" -> Seq("true"),
+            "businessActivities" -> Seq("04")
           )
 
           val result = TradingPremisesNewActivities.formReads.validate(formData)
 
-          result mustBe Valid(TradingPremisesNewActivitiesYes)
+          result mustBe Valid(TradingPremisesNewActivitiesYes(HighValueDealing))
         }
       }
 
@@ -67,7 +69,7 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
     "given a valid model" must {
       "return the form values" when {
         "TradingPremisesNewActivities is 'yes'" in {
-          val model = TradingPremisesNewActivitiesYes
+          val model = TradingPremisesNewActivitiesYes(BillPaymentServices)
           val result = TradingPremisesNewActivities.formWrites.writes(model)
 
           result mustBe Map("tradingPremisesNewActivities" -> Seq("true"))
