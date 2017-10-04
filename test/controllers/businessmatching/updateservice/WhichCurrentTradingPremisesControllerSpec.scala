@@ -88,14 +88,19 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
       "update the trading premises with the selected services" in new Fixture {
         val models = Seq(
           tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
+          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+          tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
         )
 
         mockCacheFetch[Seq[TradingPremises]](Some(models))
         mockCacheSave[Seq[TradingPremises]]
 
-        val form = "tradingPremises[]" -> "0"
-        val result = controller.post()(request.withFormUrlEncodedBody(form))
+        val form = Seq(
+          "tradingPremises[]" -> "0",
+          "tradingPremises[]" -> "2"
+        )
+
+        val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
@@ -105,6 +110,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
 
         captor.getValue.lift(0).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
         captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
+        captor.getValue.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
 
         captor.getValue.head.isComplete mustBe true
         captor.getValue.head.hasChanged mustBe true

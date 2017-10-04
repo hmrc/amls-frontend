@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.businessmatching.updateservice.which_current_trading_premises
+import models.DateOfChange
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -68,10 +69,14 @@ class WhichCurrentTradingPremisesController @Inject()
 
   private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
     case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
-      val newActivities = m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity
-      m.copy(whatDoesYourBusinessDoAtThisAddress = m.whatDoesYourBusinessDoAtThisAddress.map(_.copy(activities = newActivities)))
+      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity)
+    case (m, i) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
+      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities + activity)
     case (m, _) => m
   }
+
+  private def updateActivities(tp: TradingPremises, activities: Set[BusinessActivity]) =
+    tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities, tp.whatDoesYourBusinessDoAtThisAddress.fold(none[DateOfChange])(_.dateOfChange)))
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises
