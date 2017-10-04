@@ -67,6 +67,22 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
       TradingPremises(
         yourTradingPremises = Some(ytp),
         whatDoesYourBusinessDoAtThisAddress = Some(activities)
+      ),
+      TradingPremises(
+        yourTradingPremises = Some(ytp.copy("name2", Address("add2Line1","add2Line2",None,None,"ps22de"))),
+        whatDoesYourBusinessDoAtThisAddress = Some(activities)
+      ),
+      TradingPremises(
+        yourTradingPremises = Some(ytp.copy("name3", Address("add3Line1","add3Line2",None,None,"ps33de"))),
+        whatDoesYourBusinessDoAtThisAddress = Some(activities)
+      ),
+      TradingPremises(
+        yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1","add4Line2",None,None,"ps44de"))),
+        whatDoesYourBusinessDoAtThisAddress = Some(activities)
+      ),
+      TradingPremises(
+        yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1","add5Line2",None,None,"ps55de"))),
+        whatDoesYourBusinessDoAtThisAddress = Some(activities)
       )
     )
 
@@ -305,22 +321,39 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "tradingPremises[]" -> "01"
+          "tradingPremises[]" -> "4"
         ))
 
         status(result) must be(SEE_OTHER)
 
         verify(
-          controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(
-            Seq(
-              tradingPremises.head.copy(
-                whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
-                  activities.activities + HighValueDealing
-                )),
-                hasAccepted = true,
-                hasChanged = true
-              ))
-          ))(any(),any(),any())
+          controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(Seq(
+          TradingPremises(
+            yourTradingPremises = Some(ytp),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name2", Address("add2Line1","add2Line2",None,None,"ps22de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name3", Address("add3Line1","add3Line2",None,None,"ps33de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1","add4Line2",None,None,"ps44de")))
+          ).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
+              activities.activities + HighValueDealing
+            )),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1","add5Line2",None,None,"ps55de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ))
+        ))(any(),any(),any())
 
       }
 
@@ -334,12 +367,54 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "tradingPremises[]" -> "01"
+          "tradingPremises[]" -> "0",
+          "tradingPremises[]" -> "2",
+          "tradingPremises[]" -> "3"
         ))
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
 
+        verify(
+          controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(Seq(
+          TradingPremises(
+            yourTradingPremises = Some(ytp),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
+              activities.activities + HighValueDealing
+            )),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name2", Address("add2Line1","add2Line2",None,None,"ps22de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name3", Address("add3Line1","add3Line2",None,None,"ps33de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
+              activities.activities + HighValueDealing
+            )),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1","add4Line2",None,None,"ps44de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
+              activities.activities + HighValueDealing
+            )),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          TradingPremises(
+            yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1","add5Line2",None,None,"ps55de"))),
+            whatDoesYourBusinessDoAtThisAddress = Some(activities)
+          ))
+        ))(any(),any(),any())
       }
     }
 

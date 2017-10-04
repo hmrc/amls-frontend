@@ -27,6 +27,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import play.api.Logger
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -114,6 +115,7 @@ class WhichTradingPremisesController @Inject()(
     additionalActivities.size > index + 1
 
   private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
+    println(">>>>" + data)
     updateDataStrict[TradingPremises](data.index.head) { tradingPremises =>
       tradingPremises.whatDoesYourBusinessDoAtThisAddress(
         tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>

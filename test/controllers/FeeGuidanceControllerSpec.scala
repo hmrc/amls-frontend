@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
@@ -63,9 +64,9 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
 
     val nonEmptyTradingPremises = TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))
 
-    val submissionFee = getInt(s"$rootServices.amounts.registration")
-    val premisesFee = getInt(s"$rootServices.amounts.premises")
-    val peopleFee = getInt(s"$rootServices.amounts.people")
+    val submissionFee = ApplicationConfig.regFee
+    val premisesFee = ApplicationConfig.premisesFee
+    val peopleFee = ApplicationConfig.peopleFee
 
     val breakdownRows = Seq(
       BreakdownRow(Messages("confirmation.submission"), 1, Currency(submissionFee), Currency(submissionFee)),

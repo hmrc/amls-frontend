@@ -18,6 +18,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
@@ -46,9 +47,9 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
 
   private def getBreakdownRows()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Seq[BreakdownRow]] = {
 
-    val submissionFee = getInt(s"$rootServices.amounts.registration")
-    val premisesFee = getInt(s"$rootServices.amounts.premises")
-    val peopleFee = getInt(s"$rootServices.amounts.people")
+    val submissionFee = ApplicationConfig.regFee
+    val premisesFee = ApplicationConfig.premisesFee
+    val peopleFee = ApplicationConfig.peopleFee
 
     dataCacheConnector.fetchAll map { optCacheMap =>
       (for {
