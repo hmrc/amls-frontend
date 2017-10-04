@@ -18,6 +18,8 @@ package models.businessmatching.updateservice
 
 import jto.validation.forms.UrlFormEncoded
 import models.businessmatching.BusinessActivity
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 sealed trait TradingPremisesNewActivities
 
@@ -42,5 +44,19 @@ object TradingPremisesNewActivities {
   implicit val formWrites: Write[TradingPremisesNewActivities, UrlFormEncoded] = Write {
     case TradingPremisesNewActivitiesYes(_) => "tradingPremisesNewActivities" -> "true"
     case TradingPremisesNewActivitiesNo => "tradingPremisesNewActivities" -> "false"
+  }
+
+  implicit val jsonReads: Reads[TradingPremisesNewActivities] =
+    (__ \ "tradingPremisesNewActivities").read[Boolean] flatMap {
+      case true => (__ \ "businessActivities").read[BusinessActivity] map TradingPremisesNewActivitiesYes.apply
+      case false => Reads(_ => JsSuccess(TradingPremisesNewActivitiesNo))
+    }
+
+  implicit val jsonWrites = Writes[TradingPremisesNewActivities] {
+    case TradingPremisesNewActivitiesYes(value) => Json.obj(
+      "tradingPremisesNewActivities" -> true,
+      "businessActivities" -> value
+    )
+    case TradingPremisesNewActivitiesNo => Json.obj("tradingPremisesNewActivities" -> false)
   }
 }
