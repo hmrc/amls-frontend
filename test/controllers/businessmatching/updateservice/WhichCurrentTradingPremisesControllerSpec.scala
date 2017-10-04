@@ -86,12 +86,12 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
       }
 
       "update the trading premises with the selected services" in new Fixture {
+        val models = Seq(
+          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
+        )
 
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing)))),
-          TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))))
-        )))
-
+        mockCacheFetch[Seq[TradingPremises]](Some(models))
         mockCacheSave[Seq[TradingPremises]]
 
         val form = "tradingPremises[]" -> "0"
@@ -100,12 +100,14 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
-        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), eqTo(
-          Seq(
-            TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing)))),
-            TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))))
-          )
-        ))(any(), any(), any())
+        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
+
+        captor.getValue.lift(0).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+        captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
+
+        captor.getValue.head.isComplete mustBe true
+        captor.getValue.head.hasChanged mustBe true
       }
 
       "mark the trading premises as incomplete if there are no activities left" in new Fixture {
@@ -130,6 +132,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
 
         captor.getValue.head.isComplete mustBe false
+        captor.getValue.head.hasChanged mustBe true
       }
     }
   }
