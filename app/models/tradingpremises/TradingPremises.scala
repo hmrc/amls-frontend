@@ -86,8 +86,10 @@ case class TradingPremises(
       }
     } else {
       this match {
-        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, _) => true
-        case TradingPremises(_, _, Some(_), Some(_), Some(w), Some(_), Some(_), _, _, _, _, _, _, _, _) => true
+        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, _)
+          if w.activities.nonEmpty => true
+        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, _)
+          if w.activities.nonEmpty => true
         case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
         case _ => false
       }

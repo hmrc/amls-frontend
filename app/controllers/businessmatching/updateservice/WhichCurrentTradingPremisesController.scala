@@ -66,8 +66,8 @@ class WhichCurrentTradingPremisesController @Inject()
       }
   }
 
-  private def fixActivities(tp: Seq[TradingPremises], selected: Set[String], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
-    case (m, i) if !selected.map(_.toInt).contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
+  private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
+    case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
       val newActivities = m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity
       m.copy(whatDoesYourBusinessDoAtThisAddress = m.whatDoesYourBusinessDoAtThisAddress.map(_.copy(activities = newActivities)))
     case (m, _) => m
