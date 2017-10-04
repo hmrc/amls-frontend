@@ -26,6 +26,8 @@ import utils.TraversableValidators
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import cats.data.Validated.{Invalid, Valid}
+import models.businessmatching.{TransmittingMoney => BMTransmittingMoney, CurrencyExchange => BMCurrencyExchange,
+ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal}
 
 sealed trait MsbService
 
@@ -137,5 +139,16 @@ object MsbServices {
 
   implicit val formR: Rule[UrlFormEncoded, MsbServices] = Cache.formR
   implicit val formW: Write[MsbServices, UrlFormEncoded] = Cache.formW
+
+  implicit def convert(msbService: Set[models.businessmatching.MsbService]): Set[MsbService] = msbService map convert
+
+  implicit def convert(msbService: models.businessmatching.MsbService) : MsbService = {
+    msbService match {
+      case BMTransmittingMoney => TransmittingMoney
+      case BMCurrencyExchange => CurrencyExchange
+      case BMChequeCashingNotScrapMetal => ChequeCashingNotScrapMetal
+      case BMChequeCashingScrapMetal => ChequeCashingScrapMetal
+    }
+  }
 }
 
