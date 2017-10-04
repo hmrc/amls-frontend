@@ -54,7 +54,15 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
     }
     val mockCacheMap = mock[CacheMap]
+    val emptyCache = CacheMap("", Map.empty)
+    val model = TradingPremises()
 
+    val tp = TradingPremises(
+      lineId = Some(1),
+      msbServices = Some(TPMsbServices(
+        Set(TPTransmittingMoney)
+      ))
+    )
 
     when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
@@ -63,7 +71,6 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
   "MSBServicesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
-      val model = TradingPremises()
 
       when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -72,9 +79,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         .thenReturn(Some(Seq(model)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney))))))
-
-
+        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -287,13 +292,6 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "services have changed for a variation" in new Fixture {
 
-        val model = TradingPremises(
-          lineId = Some(1),
-          msbServices = Some(TPMsbServices(
-            Set(TPTransmittingMoney)
-          ))
-        )
-
         val newRequest = request.withFormUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02"
@@ -302,7 +300,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
         when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -315,13 +313,6 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "the services have changed for a ready for renewal status" in new Fixture {
 
-        val model = TradingPremises(
-          lineId = Some(1),
-          msbServices = Some(TPMsbServices(
-            Set(TPTransmittingMoney)
-          ))
-        )
-
         val newRequest = request.withFormUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02"
@@ -330,7 +321,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
 
         when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
         when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -343,13 +334,6 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
 
-        val model = TradingPremises(
-          lineId = Some(1),
-          msbServices = Some(TPMsbServices(
-            Set(TPTransmittingMoney)
-          ))
-        )
-
         val newRequest = request.withFormUrlEncodedBody(
           "msbServices[0]" -> "01"
         )
@@ -357,7 +341,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
         when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -373,7 +357,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     "redirect to the SummaryController" when {
       "editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
 
-        val model = TradingPremises(
+        val tpNone = TradingPremises(
           lineId = None,                    // record hasn't been submitted
           msbServices = Some(TPMsbServices(
             Set(TPTransmittingMoney)
@@ -388,7 +372,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tpNone))))
 
         when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))

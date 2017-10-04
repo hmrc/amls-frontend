@@ -58,23 +58,25 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             (for {
               tp <- getData[TradingPremises](cache, index)
             } yield {
-              (for {
-                tps <- tp.msbServices
-              } yield {
                 if (msbServices.size == 1) {
                   updateDataStrict[TradingPremises](index) { utp =>
                     Some(utp.msbServices(MsbServices(msbServices)))
                   }
                   Redirect(routes.PremisesRegisteredController.get(index))
                 } else {
-                  Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
-                }
+                  (for {
+                    tps <- tp.msbServices
+                  } yield {
+                    Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
+                  }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
 
-              }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
+                }
             }) getOrElse NotFound(notFoundView)
           }) getOrElse NotFound(notFoundView)
       }
   }
+
+
 
   private def redirectBasedOnStatus(status: SubmissionStatus,
                             tradingPremises: Option[TradingPremises],

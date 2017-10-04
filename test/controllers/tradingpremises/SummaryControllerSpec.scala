@@ -105,8 +105,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
 
+      val businessMatchingMsbServices = MsbServices(
+        Set(TransmittingMoney, CurrencyExchange))
+
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices))))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
         (any())).thenReturn(Some(Seq(TradingPremises())))
