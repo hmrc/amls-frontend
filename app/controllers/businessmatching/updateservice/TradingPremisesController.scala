@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremisesNewActivities, TradingPremisesNewActivitiesNo, TradingPremisesNewActivitiesYes}
+import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, NewActivitiesAtTradingPremisesYes}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.{Request, Result}
@@ -51,7 +51,7 @@ class TradingPremisesController @Inject()(
     implicit authContext =>
       implicit request =>
         additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
-          Form2[TradingPremisesNewActivities](request.body) match {
+          Form2[AreNewActivitiesAtTradingPremises](request.body) match {
             case ValidForm(_, data) => Future.successful(redirectTo(data, activities, index))
             case f: InvalidForm => Future.successful(
               BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
@@ -60,9 +60,9 @@ class TradingPremisesController @Inject()(
         }
   }
 
-  private def redirectTo(data: TradingPremisesNewActivities, additionalActivities: Set[BusinessActivity], index: Int) = data match {
-    case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
-    case TradingPremisesNewActivitiesNo => {
+  private def redirectTo(data: AreNewActivitiesAtTradingPremises, additionalActivities: Set[BusinessActivity], index: Int) = data match {
+    case NewActivitiesAtTradingPremisesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
+    case NewActivitiesAtTradingPremisesNo => {
       if (activitiesToIterate(index, additionalActivities)) {
         Redirect(routes.TradingPremisesController.get(index + 1))
       } else {
