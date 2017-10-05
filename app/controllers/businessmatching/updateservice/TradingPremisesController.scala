@@ -35,8 +35,8 @@ import scala.concurrent.Future
 @Singleton
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
-                                           implicit val statusService: StatusService,
-                                           implicit val businessMatchingService: BusinessMatchingService
+                                           val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
 
   def get(index: Int = 0) = Authorised.async {
