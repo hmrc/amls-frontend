@@ -18,70 +18,76 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
-import cats.implicits._
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.{TradingPremisesNewActivities, TradingPremisesNewActivitiesNo, TradingPremisesNewActivitiesYes}
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
+import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
-                                           val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService
+                                           implicit val statusService: StatusService,
+                                           implicit val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
 
   def get(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        (for {
-          status <- OptionT.liftF(statusService.getStatus)
-          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-        } yield {
-          try {
-            status match {
-              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
-                val activity = additionalActivities.toList(index)
-                Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index))
-              }
-            }
-          } catch {
-            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
-          }
-        }) getOrElse InternalServerError("Cannot retrieve business activities")
+        additionalActivityForTradingPremises(index){ (_, activity: BusinessActivity) =>
+          Future.successful(Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index)))
+        }
   }
 
   def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        (for {
-          status <- OptionT.liftF(statusService.getStatus)
-          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-        } yield {
-          try {
-            status match {
-              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) => {
-                val activity = additionalActivities.toList(index)
-                Form2[TradingPremisesNewActivities](request.body) match {
-                  case ValidForm(_, data) => data match {
-                    case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
-                    case TradingPremisesNewActivitiesNo => Redirect(routes.CurrentTradingPremisesController.get())
-                  }
-                  case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
-                }
-              }
-            }
-          } catch {
-            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
+        additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
+          Form2[TradingPremisesNewActivities](request.body) match {
+            case ValidForm(_, data) => Future.successful(redirectTo(data, activities, index))
+            case f: InvalidForm => Future.successful(
+              BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
+            )
           }
-        }) getOrElse InternalServerError("Cannot retrieve business activities")
+        }
+  }
+
+  private def redirectTo(data: TradingPremisesNewActivities, additionalActivities: Set[BusinessActivity], index: Int) = data match {
+    case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
+    case TradingPremisesNewActivitiesNo => {
+      if (activitiesToIterate(index, additionalActivities)) {
+        Redirect(routes.TradingPremisesController.get(index + 1))
+      } else {
+        Redirect(routes.CurrentTradingPremisesController.get())
+      }
+    }
+  }
+
+  private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
+    additionalActivities.size > index + 1
+
+  def additionalActivityForTradingPremises(index: Int)
+                                          (fn: ((Set[BusinessActivity], BusinessActivity) => Future[Result]))
+                                          (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[_]) = {
+    statusService.getStatus flatMap {
+      case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
+        businessMatchingService.getAdditionalBusinessActivities.value flatMap {
+          case Some(additionalActivities) =>
+            val activity = additionalActivities.toList(index)
+            fn(additionalActivities, activity)
+          case None => Future.successful(InternalServerError("Cannot retrieve activities"))
+        }
+    } recoverWith {
+      case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
+    }
   }
 
 }
