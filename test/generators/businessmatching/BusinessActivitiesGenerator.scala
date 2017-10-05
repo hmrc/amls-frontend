@@ -22,7 +22,7 @@ import org.scalacheck.Gen
 
 trait BusinessActivitiesGenerator extends BaseGenerator {
 
-  val businessActivitiesGen: Gen[BusinessActivities] = Gen.someOf(
+  val businessActivitiesListGen: Gen[Seq[BusinessActivity]] = Gen.someOf(
     AccountancyServices,
     BillPaymentServices,
     EstateAgentBusinessService,
@@ -30,6 +30,11 @@ trait BusinessActivitiesGenerator extends BaseGenerator {
     MoneyServiceBusiness,
     TrustAndCompanyServices,
     TelephonePaymentService
-  ) map { a => BusinessActivities(a.toSet, None) }
+  )
+
+  val businessActivitiesGen: Gen[BusinessActivities] =
+    businessActivitiesListGen map { a =>
+      BusinessActivities(a.toSet, None)
+    }
   
 }

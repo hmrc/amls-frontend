@@ -17,6 +17,8 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
+import generators.tradingpremises.TradingPremisesGenerator
 import models.Country
 import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -29,51 +31,65 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{AuthorisedFixture, GenericTestHelper, RepeatingSection}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
+class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
-class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
-
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val dataCache: DataCacheConnector = mock[DataCacheConnector]
+    val dataCache: DataCacheConnector = mockCacheConnector
     val controller = new ConfirmAddressController(messagesApi, self.dataCache, self.authConnector)
 
+    mockCacheFetchAll
   }
 
   "ConfirmTradingPremisesAddress" must {
 
-    val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-      BCAddress("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
-    val bm = BusinessMatching(Some(reviewDtls))
-
+    val bm = businessMatchingGen.sample.get
 
     "Get Option:" must {
 
-      "Load Confirm trading premises address page successfully" in new Fixture {
+      "Load Confirm trading premises address page successfully" when {
+        "YourTradingPremises is not set" in new Fixture {
+          val tp = tradingPremisesGen.sample.get.copy(yourTradingPremises = None)
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(Some(bm)))
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-        contentAsString(result) must include(Messages("line1"))
+          mockCacheGetEntry(Some(bm), BusinessMatching.key)
+          mockCacheGetEntry(Some(Seq(tp)), TradingPremises.key)
+
+          val result = controller.get(1)(request)
+
+          status(result) must be(OK)
+          contentAsString(result) must include(Messages(bm.reviewDetails.get.businessAddress.line_1))
+        }
       }
 
       "redirect to where is your trading premises page" when {
         "business matching model does not exist" in new Fixture {
+          mockCacheGetEntry(None, BusinessMatching.key)
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
 
-        "business matching ->review details is empty" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = None))))
+        "business matching -> review details is empty" in new Fixture {
+          mockCacheGetEntry(Some(bm.copy(reviewDetails = None)), BusinessMatching.key)
+
           val result = controller.get(1)(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
+        }
+
+        "the trading premises already has a 'your trading premises' model set" in new Fixture {
+          mockCacheGetEntry(Some(bm), BusinessMatching.key)
+          mockCacheGetEntry(Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)
+
+          val result = controller.get(1)(request)
+
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
@@ -82,16 +98,18 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "Post" must {
 
-      val ytp = YourTradingPremises(
-        "BusinessName",
-        Address(
-          "line1",
-          "line2",
-          Some("line3"),
-          Some("line4"),
-          "AA1 1AA"
+      val ytp = (bm.reviewDetails map { rd =>
+        YourTradingPremises(
+          rd.businessName,
+          Address(
+            rd.businessAddress.line_1,
+            rd.businessAddress.line_2,
+            rd.businessAddress.line_3,
+            rd.businessAddress.line_4,
+            rd.businessAddress.postcode.get
+          )
         )
-      )
+      }).get
 
       "successfully redirect to next page" when {
 
@@ -101,18 +119,11 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "confirmAddress" -> "true"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
+          mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
           val result = controller.post(1)(newRequest)
+
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ActivityStartDateController.get(1).url))
 
@@ -127,34 +138,20 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
             "confirmAddress" -> "false"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          mockCacheGetEntry(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))), TradingPremises.key)
+          mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
-
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
-            any(),
-            meq(Seq(TradingPremises(yourTradingPremises = None))))(any(), any(), any())
-
         }
 
       }
 
       "throw error message on not selecting the option" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-        )
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(bm)))
+        val newRequest = request.withFormUrlEncodedBody()
+
+        mockCacheFetch[BusinessMatching](Some(bm))
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)

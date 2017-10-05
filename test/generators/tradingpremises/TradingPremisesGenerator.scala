@@ -16,13 +16,14 @@
 
 package generators.tradingpremises
 
+import generators.businessmatching.BusinessActivitiesGenerator
 import generators.{BaseGenerator, CountryGenerator}
 import models.businessmatching._
 import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.scalacheck.Gen
 
 //noinspection ScalaStyle
-trait TradingPremisesGenerator extends BaseGenerator {
+trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGenerator {
 
   private val nameLength = 10
 
@@ -39,19 +40,13 @@ trait TradingPremisesGenerator extends BaseGenerator {
     startDate <- localDateGen
   } yield YourTradingPremises(name, address, residential, Some(startDate), None)
 
-  val businessActivitiesGen: Gen[WhatDoesYourBusinessDo] = for {
-    activities <- Gen.someOf(MoneyServiceBusiness,
-      AccountancyServices,
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      HighValueDealing,
-      TrustAndCompanyServices,
-      TelephonePaymentService)
+  val whatBusinessActivitiesGen: Gen[WhatDoesYourBusinessDo] = for {
+    activities <- businessActivitiesListGen
   } yield WhatDoesYourBusinessDo(activities.toSet, None)
 
   val tradingPremisesGen: Gen[TradingPremises] = for {
     ytp <- yourTradingPremisesGen
-    activities <- businessActivitiesGen
+    activities <- whatBusinessActivitiesGen
   } yield TradingPremises(
     yourTradingPremises = Some(ytp),
     whatDoesYourBusinessDoAtThisAddress = Some(activities),
