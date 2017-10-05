@@ -108,7 +108,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
       }
       "return INTERNAL_SERVER_ERROR if activites cannot be retrieved" in new Fixture {
 
-        mockApplicationStatus(NotCompleted)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         when {
           controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
