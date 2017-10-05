@@ -16,34 +16,34 @@
 
 package models.businessactivities
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, To, Write}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 import models.FormTypes._
-
-import jto.validation.forms.Rules._
 import utils.MappingUtils.Implicits._
+import jto.validation.forms.Rules._
 
-case class HowManyEmployees(employeeCount: Option[String] = None,
-                            employeeCountAMLSSupervision: Option[String] = None)
+case class EmployeeCount(employeeCount: String)
 
-
-object HowManyEmployees {
-
-  implicit val formats = Json.format[HowManyEmployees]
+object EmployeeCount {
 
   val employeeCountRegex = "^[0-9]+$".r
   val maxEmployeeCount = 11
   val employeeCountType = notEmptyStrip andThen maxLength(maxEmployeeCount).withMessage("error.max.length.ba.employee.count") andThen
-                          pattern(employeeCountRegex).withMessage("error.invalid.ba.employee.count")
+    pattern(employeeCountRegex).withMessage("error.invalid.ba.employee.count")
 
+  implicit val formats = Json.format[EmployeeCount]
 
-  implicit val formWrites: Write[HowManyEmployees, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "employeeCount").write[Option[String]] ~
-        (__ \ "employeeCountAMLSSupervision").write[Option[String]]
-      ) (unlift(HowManyEmployees.unapply _))
-  }
+  implicit val formRule: Rule[UrlFormEncoded, EmployeeCount] =
+    From[UrlFormEncoded] { __ =>
+        (__ \ "employeeCount").read[String].withMessage("error.required.ba.employee.count1") andThen employeeCountType map EmployeeCount.apply
+    }
+
+  implicit val formWrites: Write[EmployeeCount, UrlFormEncoded] =
+    Write {
+      case EmployeeCount(employeeCount) =>
+        Map(
+          "employeeCount" -> Seq(employeeCount)
+        )
+    }
 }

@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, HowManyEmployees}
+import models.businessactivities.{BusinessActivities, HowManyEmployees, EmployeeCount}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
@@ -29,6 +29,11 @@ import scala.concurrent.Future
 trait HowManyEmployeesController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
+
+  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
+    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
+      x.copy(employeeCount = Some(data.employeeCount)))
+  }
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -46,14 +51,14 @@ trait HowManyEmployeesController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[HowManyEmployees](request.body) match {
+      Form2[EmployeeCount](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_employees(f, edit)))
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-              businessActivities.howManyEmployees(data))
+              businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.TransactionRecordController.get())
