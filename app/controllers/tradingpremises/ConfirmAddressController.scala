@@ -21,12 +21,15 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businesscustomer.{Address => BCAddress}
+import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import cats.implicits._
+import models.DateOfChange
+import org.joda.time.LocalDate
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,15 +56,23 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
         }
   }
 
-  def updateAddressFromBM(bmOpt: Option[BusinessMatching]) : Option[YourTradingPremises] = {
-    bmOpt match {
-      case Some(bm) => bm.reviewDetails.fold[Option[YourTradingPremises]](None)(r => Some(YourTradingPremises(r.businessName,
-        Address(r.businessAddress.line_1,
-          r.businessAddress.line_2,
-          r.businessAddress.line_3,
-          r.businessAddress.line_4,
-          r.businessAddress.postcode.getOrElse("")))))
-      case _ => None
+  def updateAddressFromBM(maybeYtp: Option[YourTradingPremises], maybeBm: Option[BusinessMatching]) : Option[YourTradingPremises] = {
+    val f: ReviewDetails => (String, Address) = { r =>
+      (r.businessName, Address(r.businessAddress.line_1,
+        r.businessAddress.line_2,
+        r.businessAddress.line_3,
+        r.businessAddress.line_4,
+        r.businessAddress.postcode.getOrElse("")))
+    }
+
+    (maybeBm, maybeYtp) match {
+      case (Some(bm), Some(ytp)) => bm.reviewDetails.fold(maybeYtp) { r => f(r) match {
+        case (name, address) => Some(ytp.copy(name, address))
+      }}
+      case (Some(bm), _) => bm.reviewDetails.fold(maybeYtp) { r => f(r) match {
+        case (name, address) => Some(YourTradingPremises(name, address))
+      }}
+      case _ => maybeYtp
     }
   }
 
@@ -79,16 +90,12 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
               case true => {
                   for {
                     _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
-                      tp.copy(yourTradingPremises = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
+                      tp.copy(yourTradingPremises = updateAddressFromBM(tp.yourTradingPremises, cache.getEntry[BusinessMatching](BusinessMatching.key)))
                     }
                   } yield Redirect(routes.ActivityStartDateController.get(index))
               }
               case false => {
-                for {
-                  _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
-                    tp.copy(yourTradingPremises = None)
-                  }
-                } yield Redirect(routes.WhereAreTradingPremisesController.get(index))
+                Future.successful(Redirect(routes.WhereAreTradingPremisesController.get(index)))
               }
             }
         }
