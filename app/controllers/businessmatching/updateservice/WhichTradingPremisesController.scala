@@ -27,13 +27,12 @@ import models.businessmatching.updateservice.{TradingPremises => BMTradingPremis
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -53,7 +52,7 @@ class WhichTradingPremisesController @Inject()(
         (for {
           status <- OptionT.liftF(statusService.getStatus)
           additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-          tradingPremises <- OptionT.liftF(getData[TradingPremises])
+          tradingPremises <- OptionT.liftF(tradingPremises)
         } yield {
           try {
             status match {
@@ -90,10 +89,10 @@ class WhichTradingPremisesController @Inject()(
                       }
                     }
                   case f: InvalidForm =>
-                    getData[TradingPremises] map { tradingPremises =>
+                    tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
                         f,
-                        tradingPremises,
+                        tp,
                         BusinessActivities.getValue(activity),
                         index
                       ))
@@ -140,5 +139,12 @@ class WhichTradingPremisesController @Inject()(
     }
 
   }
+
+  private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
+    getData[TradingPremises].map{ tradingpremises =>
+      tradingpremises.zipWithIndex.filterNot{ case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
 
 }
