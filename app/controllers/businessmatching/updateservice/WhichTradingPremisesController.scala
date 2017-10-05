@@ -27,6 +27,7 @@ import models.businessmatching.updateservice.{TradingPremises => BMTradingPremis
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -112,7 +113,7 @@ class WhichTradingPremisesController @Inject()(
   private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
-    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
+    updateDataStrict[TradingPremises]{ tradingPremises: Seq[TradingPremises] =>
       patchTradingPremises(data.index.toSeq, tradingPremises, activity)
     }
 

@@ -23,16 +23,15 @@ import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
-import play.api.mvc._
+import play.api.mvc.Request
 import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object ControllerHelper extends Results {
+object ControllerHelper {
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
@@ -45,11 +44,11 @@ object ControllerHelper extends Results {
 
   def getMsbServices(matching: Option[BusinessMatching]): Option[Set[MsbService]] = {
     matching flatMap { bm =>
-      bm.msbServices match {
-        case Some(service) => Some(service.msbServices)
-        case _ => None
+        bm.msbServices match {
+          case Some(service) => Some(service.msbServices)
+          case _ => None
+        }
       }
-    }
   }
 
   def getBusinessActivity(matching: Option[BusinessMatching]): Option[BusinessActivities] = {
@@ -93,15 +92,15 @@ object ControllerHelper extends Results {
 
   def allowedToEdit(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
     statusService.getStatus map {
-      case SubmissionReady | NotCompleted | SubmissionReadyForReview => true
+      case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
     }
   }
 
   def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
     eventualMaybePeoples map {
-      case Some(rps) => rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
-      case _ => false
+      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
+      case _ =>  false
     }
   }
 
@@ -111,35 +110,15 @@ object ControllerHelper extends Results {
         case NonUKResidence => true
         case _ => false
       }))
-      case _ => false
+      case _ =>  false
     }
   }
 
-  def rpTitleName(rp: Option[ResponsiblePeople]): String = rp.fold("")(_.personName.fold("")(_.titleName))
+  def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
-  }
-
-  def additionalActivityForTradingPremises(index: Int)
-                                          (fn: (BusinessActivity => Future[Result]))
-                                          (implicit statusService: StatusService,
-                                           businessMatchingService: BusinessMatchingService,
-                                           ac: AuthContext,
-                                           hc: HeaderCarrier,
-                                           request: Request[_]) = {
-    statusService.getStatus flatMap {
-      case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
-        businessMatchingService.getAdditionalBusinessActivities.value flatMap {
-          case Some(additionalActivities) =>
-            val activity = additionalActivities.toList(index)
-            fn(activity)
-          case None => Future.successful(InternalServerError("Cannot retrieve activities"))
-        }
-    } recoverWith {
-      case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
-    }
   }
 }
