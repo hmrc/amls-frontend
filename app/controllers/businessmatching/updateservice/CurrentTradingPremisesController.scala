@@ -24,7 +24,7 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.current_trading_premises
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremisesSubmittedActivities, TradingPremisesSubmittedActivitiesNo, TradingPremisesSubmittedActivitiesYes}
+import models.businessmatching.updateservice.{AreSubmittedActivitiesAtTradingPremises, SubmittedActivitiesAtTradingPremisesNo, SubmittedActivitiesAtTradingPremisesYes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -47,13 +47,13 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
-        Form2[TradingPremisesSubmittedActivities](request.body) match {
+        Form2[AreSubmittedActivitiesAtTradingPremises](request.body) match {
           case f: InvalidForm => getActivity map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
           case ValidForm(_, data) => data match {
-            case TradingPremisesSubmittedActivitiesYes =>
+            case SubmittedActivitiesAtTradingPremisesYes =>
               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
-            case TradingPremisesSubmittedActivitiesNo =>
+            case SubmittedActivitiesAtTradingPremisesNo =>
               Future.successful(Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get()))
           }
         }

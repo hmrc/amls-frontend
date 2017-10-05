@@ -17,10 +17,10 @@
 package models.businessmatching.updateservice
 
 case class UpdateService(
-                          tradingPremisesNewActivities: AreNewActivitiesAtTradingPremises,
-                          tradingPremises: TradingPremises,
-                          tradingPremisesSubmittedActivities: TradingPremisesSubmittedActivities,
-                          tradingPremisesCurrentActivities: TradingPremises
+                          tradingPremisesNewActivities: Option[AreNewActivitiesAtTradingPremises] = None,
+                          tradingPremises: Option[TradingPremisesActivities] = None,
+                          tradingPremisesSubmittedActivities: Option[AreSubmittedActivitiesAtTradingPremises] = None,
+                          tradingPremisesCurrentActivities: Option[TradingPremisesActivities] = None
                         ) {
 
 }

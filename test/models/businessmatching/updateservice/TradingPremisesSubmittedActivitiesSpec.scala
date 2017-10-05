@@ -29,21 +29,21 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
       "convert the input form to the 'yes' model instance" in {
         val form = Map("submittedActivities" -> Seq("true"))
 
-        TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
-          Valid(TradingPremisesSubmittedActivitiesYes)
+        AreSubmittedActivitiesAtTradingPremises.formRule.validate(form) mustBe
+          Valid(SubmittedActivitiesAtTradingPremisesYes)
       }
 
       "convert the input form to the 'no' model instance" in {
         val form = Map(
           "submittedActivities" -> Seq("false"))
 
-        TradingPremisesSubmittedActivities.formRule.validate(form) mustBe Valid(TradingPremisesSubmittedActivitiesNo)
+        AreSubmittedActivitiesAtTradingPremises.formRule.validate(form) mustBe Valid(SubmittedActivitiesAtTradingPremisesNo)
       }
 
       "produce a validation error if nothing was selected" in {
         val form = Map.empty[String, Seq[String]]
 
-        TradingPremisesSubmittedActivities.formRule.validate(form) mustBe
+        AreSubmittedActivitiesAtTradingPremises.formRule.validate(form) mustBe
           Invalid(Seq(
             Path \ "submittedActivities" -> Seq(ValidationError("error.businessmatching.updateservice.tradingpremisessubmittedactivities"))
           ))
@@ -55,12 +55,12 @@ class TradingPremisesSubmittedActivitiesSpec extends PlaySpec with MustMatchers 
     "called" must {
       "return the correct form" when {
         "yes was selected" in {
-          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesYes) mustBe
+          AreSubmittedActivitiesAtTradingPremises.formWriter.writes(SubmittedActivitiesAtTradingPremisesYes) mustBe
             Map("submittedActivities" -> Seq("true"))
         }
 
         "no was selected" in {
-          TradingPremisesSubmittedActivities.formWriter.writes(TradingPremisesSubmittedActivitiesNo) mustBe
+          AreSubmittedActivitiesAtTradingPremises.formWriter.writes(SubmittedActivitiesAtTradingPremisesNo) mustBe
             Map("submittedActivities" -> Seq("false"))
         }
       }

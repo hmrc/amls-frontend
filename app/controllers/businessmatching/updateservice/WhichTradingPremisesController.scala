@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremises => BMTradingPremises}
+import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
@@ -79,7 +79,7 @@ class WhichTradingPremisesController @Inject()(
             businessMatchingService.getAdditionalBusinessActivities.value flatMap {
               case Some(additionalActivities) =>
                 val activity = additionalActivities.toList(index)
-                Form2[BMTradingPremises](request.body) match {
+                Form2[TradingPremises$](request.body) match {
                   case ValidForm(_, data) =>
                     updateTradingPremises(data, activity) map { _ =>
                       if (activitiesToIterate(index, additionalActivities)) {
@@ -109,7 +109,7 @@ class WhichTradingPremisesController @Inject()(
   private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
     additionalActivities.size > index + 1
 
-  private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)
+  private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
     updateDataStrict[TradingPremises]{ tradingPremises: Seq[TradingPremises] =>

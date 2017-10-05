@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessmatching.updateservice.{TradingPremises => TradingPremisesForm}
+import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.businessmatching.BusinessMatchingService
