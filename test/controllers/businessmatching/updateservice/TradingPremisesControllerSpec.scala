@@ -235,4 +235,10 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
     }
   }
+
+  it must {
+    "save result to keystore" in new Fixture {
+
+    }
+  }
 }
