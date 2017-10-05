@@ -42,7 +42,7 @@ class TradingPremisesController @Inject()(
   def get(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        additionalActivityForTradingPremises(index){ activity: BusinessActivity =>
+        additionalActivityForTradingPremises(index){ (_, activity: BusinessActivity) =>
           Future.successful(Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity), index)))
         }
   }
@@ -50,9 +50,9 @@ class TradingPremisesController @Inject()(
   def post(index: Int = 0) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        additionalActivityForTradingPremises(index){ activity: BusinessActivity =>
+        additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
           Form2[TradingPremisesNewActivities](request.body) match {
-            case ValidForm(_, data) => Future.successful(redirectTo(data, index))
+            case ValidForm(_, data) => Future.successful(redirectTo(data, activities, index))
             case f: InvalidForm => Future.successful(
               BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
             )
@@ -60,20 +60,29 @@ class TradingPremisesController @Inject()(
         }
   }
 
-  private def redirectTo(data: TradingPremisesNewActivities, index: Int) = data match {
+  private def redirectTo(data: TradingPremisesNewActivities, additionalActivities: Set[BusinessActivity], index: Int) = data match {
     case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
-    case TradingPremisesNewActivitiesNo => Redirect(routes.CurrentTradingPremisesController.get())
+    case TradingPremisesNewActivitiesNo => {
+      if (activitiesToIterate(index, additionalActivities)) {
+        Redirect(routes.TradingPremisesController.get(index + 1))
+      } else {
+        Redirect(routes.CurrentTradingPremisesController.get())
+      }
+    }
   }
 
+  private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
+    additionalActivities.size > index + 1
+
   def additionalActivityForTradingPremises(index: Int)
-                                          (fn: (BusinessActivity => Future[Result]))
+                                          (fn: ((Set[BusinessActivity], BusinessActivity) => Future[Result]))
                                           (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[_]) = {
     statusService.getStatus flatMap {
       case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
         businessMatchingService.getAdditionalBusinessActivities.value flatMap {
           case Some(additionalActivities) =>
             val activity = additionalActivities.toList(index)
-            fn(activity)
+            fn(additionalActivities, activity)
           case None => Future.successful(InternalServerError("Cannot retrieve activities"))
         }
     } recoverWith {

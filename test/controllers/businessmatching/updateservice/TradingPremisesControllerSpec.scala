@@ -144,21 +144,43 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
           }
         }
         "redirect to CurrentTradingPremises" when {
-          "request equals No" in new Fixture {
+          "request equals No" when {
+            "there are no more activities through which to iterate" in new Fixture {
 
-            mockApplicationStatus(SubmissionDecisionApproved)
+              mockApplicationStatus(SubmissionDecisionApproved)
 
-            when {
-              controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-            } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
-              "tradingPremisesNewActivities" -> "false"
-            ))
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "tradingPremisesNewActivities" -> "false"
+              ))
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
 
+            }
+          }
+        }
+        "redirect to TradingPremises" when {
+          "request equals No" when {
+            "there are more activities through which to iterate" in new Fixture {
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
+
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "tradingPremisesNewActivities" -> "false"
+              ))
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
+
+            }
           }
         }
       }
