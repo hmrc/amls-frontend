@@ -32,11 +32,6 @@ object HowManyEmployees {
 
   implicit val formats = Json.format[HowManyEmployees]
 
-  val employeeCountRegex = "^[0-9]+$".r
-  val maxEmployeeCount = 11
-  val employeeCountType = notEmptyStrip andThen maxLength(maxEmployeeCount).withMessage("error.max.length.ba.employee.count") andThen
-                          pattern(employeeCountRegex).withMessage("error.invalid.ba.employee.count")
-
 
   implicit val formWrites: Write[HowManyEmployees, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
