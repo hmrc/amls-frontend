@@ -38,7 +38,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
   val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
-  val DefaultHowManyEmployees = HowManyEmployees("5","4")
+  val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     "Accountant's name",
     Some("Accountant's trading name"),
@@ -58,7 +58,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
   val NewRiskAssessment = RiskAssessmentPolicyNo
-  val NewHowManyEmployees = HowManyEmployees("2","3")
+  val NewHowManyEmployees = HowManyEmployees(Some("2"),Some("3"))
   val NewIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
     "newName",
@@ -183,9 +183,6 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       Json.toJson(partialModel) mustBe partialJson
     }
 
-    "Deserialise as expected" in {
-      partialJson.as[BusinessActivities] mustBe partialModel
-    }
   }
 
   "BusinessActivities with all values set as None" must {

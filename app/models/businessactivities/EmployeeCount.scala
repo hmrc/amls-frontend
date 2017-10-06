@@ -36,7 +36,7 @@ object EmployeeCount {
 
   implicit val formRule: Rule[UrlFormEncoded, EmployeeCount] =
     From[UrlFormEncoded] { __ =>
-        (__ \ "employeeCount").read[String].withMessage("error.required.ba.employee.count1") andThen employeeCountType map EmployeeCount.apply
+        (__ \ "employeeCount").read(employeeCountType) map EmployeeCount.apply
     }
 
   implicit val formWrites: Write[EmployeeCount, UrlFormEncoded] =

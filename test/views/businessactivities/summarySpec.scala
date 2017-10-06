@@ -60,7 +60,8 @@ class summarySpec extends GenericTestHelper
       ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
       ("businessactivities.turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
       ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
-      ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123", "456")),
+      ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
+      ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
       ("businessactivities.keep.customer.records.title",
         checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03", "SoftwareName")),
       ("businessactivities.identify-suspicious-activity.title",checkElementTextIncludes(_, "lbl.yes")),
@@ -88,7 +89,7 @@ class summarySpec extends GenericTestHelper
           Some(AccountantForAMLSRegulations(true)),
           Some(IdentifySuspiciousActivity(true)),
           Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital))),
-          Some(HowManyEmployees("123", "456")),
+          Some(HowManyEmployees(Some("123"), Some("456"))),
           Some(WhoIsYourAccountant("AccountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",Some("line3"),Some("line4"),"AB12CD"))),
           Some(TaxMatters(true))
         ),
