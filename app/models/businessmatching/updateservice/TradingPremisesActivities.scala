@@ -18,6 +18,7 @@ package models.businessmatching.updateservice
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
+import play.api.libs.json.Json
 import utils.TraversableValidators.minLengthR
 
 
@@ -37,5 +38,7 @@ object TradingPremisesActivities {
   implicit def formWrites(implicit w: Write[String, String]) = Write[TradingPremisesActivities, UrlFormEncoded] { data =>
     Map("tradingPremises[]" -> data.index.toSeq.map(x => w.writes(x.toString)))
   }
+
+  implicit def format = Json.format[TradingPremisesActivities]
 
 }

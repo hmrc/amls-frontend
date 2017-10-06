@@ -16,11 +16,27 @@
 
 package models.businessmatching.updateservice
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 case class UpdateService(
-                          tradingPremisesNewActivities: Option[AreNewActivitiesAtTradingPremises] = None,
-                          tradingPremises: Option[TradingPremisesActivities] = None,
-                          tradingPremisesSubmittedActivities: Option[AreSubmittedActivitiesAtTradingPremises] = None,
-                          tradingPremisesCurrentActivities: Option[TradingPremisesActivities] = None
-                        ) {
+                          areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
+                          tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
+                          areSubmittedActivitiesAtTradingPremises: Option[AreSubmittedActivitiesAtTradingPremises] = None,
+                          tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
+                        )
+
+object UpdateService{
+
+  implicit val formatOption = Reads.optionWithNull[UpdateService]
+
+  implicit val jsonWrites = Json.writes[UpdateService]
+
+  implicit val jsonReads: Reads[UpdateService] = {
+    (__ \ "areNewActivitiesAtTradingPremises").readNullable[AreNewActivitiesAtTradingPremises] and
+      (__ \ "tradingPremisesNewActivities").readNullable[TradingPremisesActivities] and
+      (__ \ "areSubmittedActivitiesAtTradingPremises").readNullable[AreSubmittedActivitiesAtTradingPremises] and
+      (__ \ "tradingPremisesSubmittedActivities").readNullable[TradingPremisesActivities]
+  }.apply(UpdateService.apply _)
 
 }
