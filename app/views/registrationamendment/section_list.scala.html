@@ -14,12 +14,23 @@
  * limitations under the License.
  *@
 
+    
 @import models.registrationprogress.Section
+@import views.html.registrationprogress.{section => submissionSection}
+@import views.html.registrationamendment.section
 
-@(sections: Seq[Section])(implicit request: Request[_], m: Messages)
-
+@(sections: Seq[Section], newSections: Option[Seq[Section]] = None)(implicit request: Request[_], m: Messages)
 @* Main section *@
 <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
+
+    @newSections.map { case seq if seq.nonEmpty =>
+        <div class="progress-new-sections">
+            @seq.map { s =>
+                @submissionSection(s.name, s.status, s.call)
+            }
+        </div>
+    }
+
     @sections.map { case Section(name, status, hasChanged, call) =>
         @section(name, status, hasChanged, call)
     }

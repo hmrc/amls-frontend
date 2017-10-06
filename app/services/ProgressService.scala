@@ -46,11 +46,8 @@ trait ProgressService {
   private[services] def cacheConnector: DataCacheConnector
   private[services] def statusService: StatusService
 
-  private def dependentSections(implicit cache: CacheMap): Set[Section] =
-    (for {
-      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      ba <- bm.activities
-    } yield ba.businessActivities.foldLeft[Set[Section]](Set.empty) {
+  def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[MsbServices])(implicit cache: CacheMap) =
+    activities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>
           m + Asp.section + Supervision.section
@@ -58,14 +55,19 @@ trait ProgressService {
           m + EstateAgentBusiness.section
         case HighValueDealing =>
           m + Hvd.section
-        case MoneyServiceBusiness =>
-          bm.msbServices.fold(m)(x => m + Msb.section)
+        case MoneyServiceBusiness if msbServices.isDefined =>
+          m + Msb.section
         case TrustAndCompanyServices =>
           m + Tcsp.section + Supervision.section
         case _ => m
       }
-        // TODO Error instead of empty map
-    }) getOrElse Set.empty
+    }
+
+  private def dependentSections(implicit cache: CacheMap): Set[Section] =
+    (for {
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      ba <- bm.activities
+    } yield sectionsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Set.empty
 
   private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
     Seq(

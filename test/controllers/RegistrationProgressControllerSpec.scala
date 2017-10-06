@@ -16,6 +16,8 @@
 
 package controllers
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
@@ -32,6 +34,7 @@ import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -39,6 +42,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrationProgressControllerSpec extends GenericTestHelper
   with MustMatchers
@@ -51,6 +55,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new RegistrationProgressController {
       override val authConnector = self.authConnector
@@ -58,17 +63,20 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
       override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
       override protected[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override protected[controllers] val statusService: StatusService = mockStatusService
+      override protected[controllers] val businessMatchingService = mockBusinessMatchingService
     }
 
     when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionReady)
     when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())) thenReturn Future.successful(None)
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
+    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
+
     when {
       mockBusinessMatching.activities
     } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
-    when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
+    when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
   }
 
   "RegistrationProgressController" when {
