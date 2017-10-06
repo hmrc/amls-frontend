@@ -21,14 +21,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.UpdateService
+import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesYes, UpdateService}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import org.mockito.Mockito._
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -265,8 +265,26 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
   }
 
   it must {
-    "save result to keystore" in new Fixture {
+    "save result to s4l" in new Fixture {
 
+      mockApplicationStatus(SubmissionDecisionApproved)
+
+      when {
+        controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+      val result = controller.post()(request.withFormUrlEncodedBody(
+        "tradingPremisesNewActivities" -> "true",
+        "businessActivities" -> "04"
+      ))
+
+      status(result) must be(SEE_OTHER)
+
+      verify(
+        controller.dataCacheConnector
+      ).save[UpdateService](any(), eqTo(
+        UpdateService(Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+      ))(any(),any(),any())
     }
   }
 }
