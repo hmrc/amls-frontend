@@ -241,6 +241,10 @@ POST        /business-activities/risk-assessment                                
 GET         /business-activities/employees                                            controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /business-activities/employees                                            controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 
+GET         /business-activities/amls-supervision                                     controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
+POST        /business-activities/amls-supervision                                     controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
+
+
 GET         /business-activities/accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 

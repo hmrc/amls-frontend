@@ -20,19 +20,19 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, HowManyEmployees, EmployeeCount}
+import models.businessactivities.{BusinessActivities, EmployeeCount, EmployeeCountAMLSSupervision, HowManyEmployees}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait HowManyEmployeesController extends BaseController {
+trait EmployeeCountAMLSSupervisionController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
-    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
-      x.copy(employeeCount = Some(data.employeeCount)))
+  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCountAMLSSupervision): HowManyEmployees = {
+    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))(x =>
+      x.copy(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))
   }
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -44,16 +44,16 @@ trait HowManyEmployeesController extends BaseController {
               businessActivities <- response
               employees <- businessActivities.howManyEmployees
             } yield Form2[HowManyEmployees](employees)).getOrElse(EmptyForm)
-            Ok(business_employees(form, edit))
+            Ok(business_employees_amls_supervision(form, edit))
         }
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[EmployeeCount](request.body) match {
+      Form2[EmployeeCountAMLSSupervision](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(business_employees(f, edit)))
+          Future.successful(BadRequest(business_employees_amls_supervision(f, edit)))
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
@@ -61,14 +61,14 @@ trait HowManyEmployeesController extends BaseController {
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.EmployeeCountAMLSSupervisionController.get())
+            case false => Redirect(routes.TransactionRecordController.get())
           }
       }
     }
   }
 }
 
-object HowManyEmployeesController extends HowManyEmployeesController {
+object EmployeeCountAMLSSupervisionController extends EmployeeCountAMLSSupervisionController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override val authConnector: AuthConnector = AMLSAuthConnector
