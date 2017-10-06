@@ -195,5 +195,4 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-
 }

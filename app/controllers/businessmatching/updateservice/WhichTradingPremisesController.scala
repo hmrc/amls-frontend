@@ -32,7 +32,7 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -52,7 +52,7 @@ class WhichTradingPremisesController @Inject()(
         (for {
           status <- OptionT.liftF(statusService.getStatus)
           additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-          tradingPremises <- OptionT.liftF(getData[TradingPremises])
+          tradingPremises <- OptionT.liftF(tradingPremises)
         } yield {
           try {
             status match {
@@ -89,10 +89,10 @@ class WhichTradingPremisesController @Inject()(
                       }
                     }
                   case f: InvalidForm =>
-                    getData[TradingPremises] map { tradingPremises =>
+                    tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
                         f,
-                        tradingPremises,
+                        tp,
                         BusinessActivities.getValue(activity),
                         index
                       ))
@@ -112,7 +112,7 @@ class WhichTradingPremisesController @Inject()(
   private def updateTradingPremises(data: BMTradingPremises, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
-    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
+    updateDataStrict[TradingPremises]{ tradingPremises: Seq[TradingPremises] =>
       patchTradingPremises(data.index.toSeq, tradingPremises, activity)
     }
 
@@ -139,5 +139,12 @@ class WhichTradingPremisesController @Inject()(
     }
 
   }
+
+  private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
+    getData[TradingPremises].map{ tradingpremises =>
+      tradingpremises.zipWithIndex.filterNot{ case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
 
 }

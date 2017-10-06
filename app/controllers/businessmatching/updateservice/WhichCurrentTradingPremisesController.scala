@@ -23,19 +23,20 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.DateOfChange
+import models.businessmatching.updateservice.{TradingPremises => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import models.businessmatching.updateservice.{TradingPremises => TradingPremisesForm}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class WhichCurrentTradingPremisesController @Inject()
-  (val authConnector: AuthConnector, cacheConnector: DataCacheConnector, businessMatchingService: BusinessMatchingService) extends BaseController {
+class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
+                                                      val dataCacheConnector: DataCacheConnector,
+                                                       businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
 
   private val failure = InternalServerError("Could not get form data")
 
@@ -43,7 +44,7 @@ class WhichCurrentTradingPremisesController @Inject()
     implicit authContext => implicit request =>
       {
         for {
-          (tp, activities, act) <- formData
+          (tp, _, act) <- formData
         } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
       } getOrElse failure
   }
@@ -53,14 +54,14 @@ class WhichCurrentTradingPremisesController @Inject()
       Form2[TradingPremisesForm](request.body) match {
         case f: InvalidForm => {
           for {
-            (tradingPremises, activities, act) <- formData
+            (tradingPremises, _, act) <- formData
           } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act)))
         } getOrElse failure
 
         case ValidForm(_, data) => {
           for {
-            (tp, activities, act) <- formData
-            _ <- OptionT.liftF(cacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp, data.index, act)))
+            (tp, _, act) <- formData
+            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())
         } getOrElse failure
       }
@@ -68,10 +69,14 @@ class WhichCurrentTradingPremisesController @Inject()
 
   private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
     case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
-      val newActivities = m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity
-      m.copy(whatDoesYourBusinessDoAtThisAddress = m.whatDoesYourBusinessDoAtThisAddress.map(_.copy(activities = newActivities)))
+      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity)
+    case (m, i) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
+      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities + activity)
     case (m, _) => m
   }
+
+  private def updateActivities(tp: TradingPremises, activities: Set[BusinessActivity]) =
+    tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities, tp.whatDoesYourBusinessDoAtThisAddress.fold(none[DateOfChange])(_.dateOfChange)))
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises
@@ -79,6 +84,10 @@ class WhichCurrentTradingPremisesController @Inject()
   } yield (tp, activities, activities.head)
 
   private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext) =
-    OptionT(cacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key))
+    OptionT.liftF(getData[TradingPremises].map{ tradingpremises =>
+      tradingpremises.zipWithIndex.filterNot{ case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    })
 
 }

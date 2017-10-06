@@ -29,7 +29,7 @@
 }
 
 @main(
-    title = Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("progress.update.registration"),
+    title = Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("summary.updateinformation"),
     heading = header
 )  {
 
@@ -61,6 +61,8 @@
             }
 
         }
+
+        <input type="hidden" name="businessActivities" id="businessActivities" value="@activity" />
 
         @submit(returnLink = false)
 

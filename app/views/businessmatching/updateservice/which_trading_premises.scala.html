@@ -19,14 +19,14 @@
 @import utils.HtmlElementHelpers._
 @import models.tradingpremises.TradingPremises
 
-@(f: forms.Form2[_], tradingPremises: Seq[TradingPremises], activity: String, index: Int)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], tradingPremises: Seq[(TradingPremises, Int)], activity: String, index: Int)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
     @headingWithPlaceholder((
         "businessmatching.updateservice.whichtradingpremises.header",
         Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
-    ), "progress.update.registration")
+    ), "summary.updateinformation")
 }
 
 @main(
