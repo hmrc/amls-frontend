@@ -17,6 +17,7 @@
 package models.businessmatching.updateservice
 
 import jto.validation.forms.UrlFormEncoded
+import play.api.libs.json._
 
 sealed trait AreSubmittedActivitiesAtTradingPremises
 case object SubmittedActivitiesAtTradingPremisesYes extends AreSubmittedActivitiesAtTradingPremises
@@ -41,4 +42,14 @@ object AreSubmittedActivitiesAtTradingPremises {
     }))
   }
 
+  implicit val jsonReads: Reads[AreSubmittedActivitiesAtTradingPremises] =
+    (__ \ "submittedActivities").read[Boolean] map {
+      case true => SubmittedActivitiesAtTradingPremisesYes
+      case false => SubmittedActivitiesAtTradingPremisesNo
+    }
+
+  implicit val jsonWrites = Writes[AreSubmittedActivitiesAtTradingPremises] {
+    case SubmittedActivitiesAtTradingPremisesYes => Json.obj("submittedActivities" -> true)
+    case SubmittedActivitiesAtTradingPremisesNo => Json.obj("submittedActivities" -> false)
+  }
 }
