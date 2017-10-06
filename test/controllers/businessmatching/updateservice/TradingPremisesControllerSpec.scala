@@ -18,8 +18,10 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.updateservice.UpdateService
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -52,9 +54,13 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
+
+    mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
+    mockCacheSave[UpdateService]
 
     val controller = app.injector.instanceOf[TradingPremisesController]
 

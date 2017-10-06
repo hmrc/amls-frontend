@@ -28,6 +28,8 @@ case class UpdateService(
 
 object UpdateService{
 
+  val key = "updateservice"
+
   implicit val formatOption = Reads.optionWithNull[UpdateService]
 
   implicit val jsonWrites = Json.writes[UpdateService]

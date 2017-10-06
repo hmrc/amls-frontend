@@ -16,7 +16,7 @@
 
 package models.businessmatching.updateservice
 
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
 class UpdateServiceSpec extends GenericTestHelper{
