@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
+import models.businessmatching.updateservice.{UpdateService, TradingPremisesActivities => TradingPremises$}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
@@ -44,7 +44,6 @@ class WhichTradingPremisesController @Inject()(
                                                 val statusService: StatusService,
                                                 val businessMatchingService: BusinessMatchingService
                                               )() extends BaseController with RepeatingSection {
-
 
   def get(index: Int = 0) = Authorised.async {
     implicit authContext =>
@@ -81,13 +80,19 @@ class WhichTradingPremisesController @Inject()(
                 val activity = additionalActivities.toList(index)
                 Form2[TradingPremises$](request.body) match {
                   case ValidForm(_, data) =>
-                    updateTradingPremises(data, activity) map { _ =>
+                    (for {
+                      updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
+                      _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
+                        tradingPremisesNewActivities = Some(data)
+                      )))
+                      _ <- OptionT.liftF(updateTradingPremises(data, activity))
+                    } yield {
                       if (activitiesToIterate(index, additionalActivities)) {
                         Redirect(routes.TradingPremisesController.get(index + 1))
                       } else {
                         Redirect(routes.CurrentTradingPremisesController.get())
                       }
-                    }
+                    }) getOrElse InternalServerError("Cannot update service")
                   case f: InvalidForm =>
                     tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
@@ -112,7 +117,7 @@ class WhichTradingPremisesController @Inject()(
   private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
-    updateDataStrict[TradingPremises]{ tradingPremises: Seq[TradingPremises] =>
+    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
       patchTradingPremises(data.index.toSeq, tradingPremises, activity)
     }
 
@@ -141,8 +146,8 @@ class WhichTradingPremisesController @Inject()(
   }
 
   private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
-    getData[TradingPremises].map{ tradingpremises =>
-      tradingpremises.zipWithIndex.filterNot{ case (tp, _) =>
+    getData[TradingPremises].map { tradingpremises =>
+      tradingpremises.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
       }
     }

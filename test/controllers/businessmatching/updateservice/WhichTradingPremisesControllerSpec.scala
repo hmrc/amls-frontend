@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.DateOfChange
 import models.businessmatching._
+import models.businessmatching.updateservice.UpdateService
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.joda.time.LocalDate
@@ -88,6 +89,11 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
     )
 
     mockCacheSave[Seq[TradingPremises]]
+    mockCacheSave[UpdateService]
+
+    mockCacheFetch[UpdateService](Some(
+      UpdateService(tradingPremisesNewActivities = None)
+    ))
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 

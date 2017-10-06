@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, NewActivitiesAtTradingPremisesYes, UpdateService}
+import models.businessmatching.updateservice._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.{Request, Result}
