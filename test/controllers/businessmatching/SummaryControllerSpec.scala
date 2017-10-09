@@ -23,6 +23,7 @@ import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessType.LPrLLP
 import models.businessmatching._
+import models.businessmatching.updateservice._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -130,6 +131,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
           mockGetModel(Some(model))
           mockUpdateModel
           mockCommit
+          mockCacheFetch[UpdateService](None)
 
           val result = controller.post()(postRequest)
 
@@ -152,7 +154,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
   }
 }
 
-class SummaryControllerWithVariationSpec extends GenericTestHelper with BusinessMatchingGenerator {
+class SummaryControllerWithVariationSpec extends GenericTestHelper with BusinessMatchingGenerator with DependencyMocks {
 
   override lazy val app = GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.business-matching-variation" -> true)
@@ -194,7 +196,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
-
   "Get" must {
 
     "show the edit links when not in pre-submission status" in new Fixture {
@@ -212,8 +213,9 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
   }
 
   "redirect to TradingPremisesController" when {
-    "business activities have been updated" which {
+    "UpdateService is not complete" which {
       "updates the hasAccepted flag on the model" in new Fixture {
+
         val model = businessMatchingGen.sample.get.activities(
           BusinessActivities(
             Set(HighValueDealing),
@@ -225,12 +227,67 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
         mockGetModel(Some(model))
         mockUpdateModel
         mockCommit
+        mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
 
         val result = controller.post()(postRequest)
 
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+      }
+    }
+    "UpdateService is not defined" which {
+      "updates the hasAccepted flag on the model" in new Fixture {
+
+        val model = businessMatchingGen.sample.get.activities(
+          BusinessActivities(
+            Set(HighValueDealing),
+            Some(Set(BillPaymentServices))
+          )
+        )
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockGetModel(Some(model))
+        mockUpdateModel
+        mockCommit
+        mockCacheFetch[UpdateService](None, Some(UpdateService.key))
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+      }
+    }
+  }
+
+  "redirect to RegistrationProgressController" when {
+    "UpdateService is complete" which {
+      "updates the hasAccepted flag on the model" in new Fixture {
+
+        val model = businessMatchingGen.sample.get.activities(
+          BusinessActivities(
+            Set(HighValueDealing),
+            Some(Set(BillPaymentServices))
+          )
+        )
+        val postRequest = request.withFormUrlEncodedBody()
+
+        mockGetModel(Some(model))
+        mockUpdateModel
+        mockCommit
+        mockCacheFetch[UpdateService](Some(UpdateService(
+          Some(NewActivitiesAtTradingPremisesNo),
+          Some(TradingPremisesActivities(Set(1))),
+          Some(SubmittedActivitiesAtTradingPremisesNo),
+          Some(TradingPremisesActivities(Set(1)))
+        )), Some(UpdateService.key))
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
       }
     }
   }

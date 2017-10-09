@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import generators.tradingpremises.TradingPremisesGenerator
+import models.businessmatching.updateservice._
 import models.businessmatching.{AccountancyServices, BusinessActivity, HighValueDealing, MoneyServiceBusiness}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.scalatest.MustMatchers
@@ -57,7 +58,18 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
 
     lazy val controller = injector.instanceOf[WhichCurrentTradingPremisesController]
 
-    mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises())))
+    mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises())), Some(TradingPremises.key))
+
+    mockCacheFetch[UpdateService](Some(
+      UpdateService(
+        Some(NewActivitiesAtTradingPremisesNo),
+        Some(TradingPremisesActivities(Set(1))),
+        Some(SubmittedActivitiesAtTradingPremisesNo)
+      )
+    ), Some(UpdateService.key))
+
+    mockCacheSave[Seq[TradingPremises]]
+    mockCacheSave[UpdateService]
 
     when {
       bmService.getSubmittedBusinessActivities(any(), any(), any())
@@ -92,8 +104,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
           tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
         )
 
-        mockCacheFetch[Seq[TradingPremises]](Some(models))
-        mockCacheSave[Seq[TradingPremises]]
+        mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
 
         val form = Seq(
           "tradingPremises[]" -> "0",
@@ -105,15 +116,26 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
-        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
+        val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
 
-        captor.getValue.lift(0).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-        captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
-        captor.getValue.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
+        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())
 
-        captor.getValue.head.isComplete mustBe true
-        captor.getValue.head.hasChanged mustBe true
+        tpCaptor.getValue.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+        tpCaptor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
+        tpCaptor.getValue.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
+
+        tpCaptor.getValue.head.isComplete mustBe true
+        tpCaptor.getValue.head.hasChanged mustBe true
+
+        val updateCaptor = ArgumentCaptor.forClass(classOf[UpdateService])
+
+        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), updateCaptor.capture())(any(), any(), any())
+
+        updateCaptor.getValue.areNewActivitiesAtTradingPremises mustBe Some(NewActivitiesAtTradingPremisesNo)
+        updateCaptor.getValue.tradingPremisesNewActivities mustBe Some(TradingPremisesActivities(Set(1)))
+        updateCaptor.getValue.areSubmittedActivitiesAtTradingPremises mustBe Some(SubmittedActivitiesAtTradingPremisesNo)
+        updateCaptor.getValue.tradingPremisesSubmittedActivities mustBe Some(TradingPremisesActivities(Set(0,2)))
+
       }
 
       "mark the trading premises as incomplete if there are no activities left" in new Fixture {
@@ -122,8 +144,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
           tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
         )
 
-        mockCacheFetch[Seq[TradingPremises]](Some(models))
-        mockCacheSave[Seq[TradingPremises]]
+        mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
 
         val form = "tradingPremises[]" -> "1"
         val result = controller.post()(request.withFormUrlEncodedBody(form))
@@ -131,14 +152,24 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
-        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), captor.capture())(any(), any(), any())
+        val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())
 
-        captor.getValue.lift(0).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
-        captor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+        tpCaptor.getValue.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
+        tpCaptor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
 
-        captor.getValue.head.isComplete mustBe false
-        captor.getValue.head.hasChanged mustBe true
+        tpCaptor.getValue.head.isComplete mustBe false
+        tpCaptor.getValue.head.hasChanged mustBe true
+
+        val updateCaptor = ArgumentCaptor.forClass(classOf[UpdateService])
+
+        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), updateCaptor.capture())(any(), any(), any())
+
+        updateCaptor.getValue.areNewActivitiesAtTradingPremises mustBe Some(NewActivitiesAtTradingPremisesNo)
+        updateCaptor.getValue.tradingPremisesNewActivities mustBe Some(TradingPremisesActivities(Set(1)))
+        updateCaptor.getValue.areSubmittedActivitiesAtTradingPremises mustBe Some(SubmittedActivitiesAtTradingPremisesNo)
+        updateCaptor.getValue.tradingPremisesSubmittedActivities mustBe Some(TradingPremisesActivities(Set(1)))
+
       }
     }
   }
