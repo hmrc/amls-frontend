@@ -16,17 +16,16 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.businessactivities.HowManyEmployees
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
-import jto.validation.Path
-import jto.validation.ValidationError
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.GenericTestHelper
 import views.Fixture
 
 
-class business_employeesSpec extends GenericTestHelper with MustMatchers  {
+class business_employees_amls_supervisionSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -37,18 +36,18 @@ class business_employeesSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[HowManyEmployees] = Form2(HowManyEmployees(Some("ECount"), Some("SCount")))
 
-      def view = views.html.businessactivities.business_employees(form2, true)
+      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
 
-      doc.title must startWith(Messages("businessactivities.employees.title") + " - " + Messages("summary.businessactivities"))
+      doc.title must startWith(Messages("businessactivities.employees.amls.supervision.title") + " - " + Messages("summary.businessactivities"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[HowManyEmployees] = Form2(HowManyEmployees(Some("ECount"), Some("SCount")))
 
-      def view = views.html.businessactivities.business_employees(form2, true)
+      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
 
-      heading.html must be(Messages("businessactivities.employees.title"))
+      heading.html must be(Messages("businessactivities.employees.amls.supervision.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }
@@ -57,14 +56,15 @@ class business_employeesSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "employeeCount") -> Seq(ValidationError("not a message Key"))
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.business_employees(form2, true)
+      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("employeeCount")
+
+      doc.getElementById("employeeCountAMLSSupervision")
         .parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }

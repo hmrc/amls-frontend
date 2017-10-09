@@ -91,6 +91,10 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
       override def answer(invocation: InvocationOnMock): String = invocation.callRealMethod().asInstanceOf[String]
     }
 
+    when {
+      controller.landingService.setAltCorrespondenceAddress(any())(any(), any(), any())
+    } thenReturn Future.successful(mock[CacheMap])
+
     val completeATB = mock[AboutTheBusiness]
   }
 
@@ -311,6 +315,11 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     } thenReturn Future.successful(true)
 
     when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+    when {
+      controller.landingService.setAltCorrespondenceAddress(any())(any(), any(), any())
+    } thenReturn Future.successful(mock[CacheMap])
+
 
     val completeATB = mock[AboutTheBusiness]
   }
@@ -540,13 +549,12 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
     "an enrolment does not exist" when {
       "there is data in S4L " should {
-        "do not refresh API5 and redirect to status controller" in new Fixture {
+        "not refresh API5 and redirect to status controller" in new Fixture {
 
           val complete = mock[BusinessMatching]
           val emptyCacheMap = mock[CacheMap]
 
           setUpMocksForNoEnrolment(controller)
-
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
           when(complete.isComplete) thenReturn true

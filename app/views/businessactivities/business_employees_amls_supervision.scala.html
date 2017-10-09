@@ -19,25 +19,22 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
-@target = @{
-    s"""${f("franchiseName").id}-fieldset"""
-}
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.employees.title", "summary.businessactivities")
+    @heading("businessactivities.employees.amls.supervision.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.employees.title") + " - " + Messages("summary.businessactivities"),
+    title = Messages("businessactivities.employees.amls.supervision.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 )  {
 
-    @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.post(edit)) {
 
         @fieldset(
             f = f("employees"),
-            legend = "businessactivities.employees.title",
+            legend = "businessactivities.employees.amls.supervision.title",
             legendHidden = true,
             panel = false
         ) {
@@ -47,8 +44,8 @@
                 attrStep = "1",
                 attrType = "number",
                 bold = false,
-                field = f("employeeCount"),
-                hintText = "businessactivities.employees.line1.hint"
+                field = f("employeeCountAMLSSupervision"),
+                hintText = "businessactivities.employees.line2.hint"
             )
         }
 

@@ -216,7 +216,7 @@ object BusinessActivitiesValues {
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
   val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
-  val DefaultHowManyEmployees = HowManyEmployees("5","4")
+  val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     "Accountant's name",
     Some("Accountant's trading name"),

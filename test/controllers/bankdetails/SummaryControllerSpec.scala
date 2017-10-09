@@ -25,12 +25,12 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
@@ -266,7 +266,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -280,6 +280,53 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
+      "when there are bank accounts" when {
+
+        "update the accepted flag" in new Fixture {
+          val accountType1 = PersonalAccount
+          val bankAccount1 = BankAccount("My Account1", UKAccount("111111", "11-11-11"))
+
+          val accountType2 = PersonalAccount
+          val bankAccount2 = BankAccount("My Account2", UKAccount("222222", "22-22-22"))
+
+          val accountType3 = PersonalAccount
+          val bankAccount3 = BankAccount("My Account3", UKAccount("333333", "33-33-33"))
+
+          val accountType4 = PersonalAccount
+          val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
+
+          val Model1 = BankDetails(Some(accountType1), Some(bankAccount1))
+          val Model2 = BankDetails(Some(accountType2), Some(bankAccount2))
+          val Model3 = BankDetails(Some(accountType3), Some(bankAccount3))
+          val Model4 = BankDetails(Some(accountType4), Some(bankAccount4))
+
+          val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), hasAccepted = true)
+          val completeModel2 = BankDetails(Some(accountType2), Some(bankAccount2), hasAccepted = true)
+          val completeModel3 = BankDetails(Some(accountType3), Some(bankAccount3), hasAccepted = true)
+          val completeModel4 = BankDetails(Some(accountType4), Some(bankAccount4), hasAccepted = true)
+
+          val bankAccounts = Seq(Model1,Model2,Model3,Model4)
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
+
+          when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(bankAccounts)))
+
+          when(controller.dataCache.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+          verify(controller.dataCache).save[Seq[BankDetails]](any(),
+            meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
+        }
+
+      }
     }
   }
 }
