@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.DateOfChange
 import models.businessmatching._
-import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, UpdateService}
+import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, TradingPremisesActivities, UpdateService}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.joda.time.LocalDate
@@ -188,9 +188,10 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
           verify(controller.dataCacheConnector).save(any(),eqTo(
             UpdateService(
-
+              Some(NewActivitiesAtTradingPremisesNo),
+              Some(TradingPremisesActivities(Set(1)))
             )
-          ))
+          ))(any(),any(),any())
 
         }
       }
@@ -210,6 +211,13 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
+          verify(controller.dataCacheConnector).save(any(),eqTo(
+            UpdateService(
+              Some(NewActivitiesAtTradingPremisesNo),
+              Some(TradingPremisesActivities(Set(1)))
+            )
+          ))(any(),any(),any())
 
         }
       }
