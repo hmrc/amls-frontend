@@ -15,12 +15,25 @@
  *@
 
 @import models.registrationprogress.Section
+@import views.html.registrationprogress.{section => submissionSection}
+@import views.html.registrationamendment.section
 
-@(sections: Seq[Section])(implicit request: Request[_], m: Messages)
+@(sections: Seq[Section], newSections: Option[Seq[Section]] = None)(implicit request: Request[_], m: Messages)
 
 @* Main section *@
-<ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
-    @sections.map { case Section(name, status, hasChanged, call) =>
-        @section(name, status, hasChanged, call)
+<div class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
+
+    @newSections.collect { case seq if seq.nonEmpty =>
+        <ul class="progress-new-sections">
+            @seq.map { s =>
+                @submissionSection(s.name, s.status, s.call)
+            }
+        </ul>
     }
-</ul>
+
+    <ul class="progress-existing-sections">
+        @sections.map { case Section(name, status, hasChanged, call) =>
+            @section(name, status, hasChanged, call)
+        }
+    </ul>
+</div>

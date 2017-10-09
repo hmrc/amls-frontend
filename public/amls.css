@@ -143,6 +143,12 @@ a.block-link {
     display:none
 }
 
+.progress-new-sections {
+  border-bottom: 10px solid #e2e2e2;
+  margin-bottom: 40px!important;
+  padding-bottom: 30px;
+}
+
 
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */

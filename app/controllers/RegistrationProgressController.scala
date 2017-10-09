@@ -20,11 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal
 import models.status._
+import play.api.Play
 import play.api.mvc.{AnyContent, Request}
+import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -39,12 +41,10 @@ import scala.concurrent.Future
 trait RegistrationProgressController extends BaseController {
 
   protected[controllers] def progressService: ProgressService
-
   protected[controllers] def dataCache: DataCacheConnector
-
   protected[controllers] def enrolmentsService: AuthEnrolmentsService
-
   protected[controllers] def statusService: StatusService
+  protected[controllers] def businessMatchingService: BusinessMatchingService
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -56,17 +56,17 @@ trait RegistrationProgressController extends BaseController {
               cacheMap <- OptionT(dataCache.fetchAll)
               completePreApp <- OptionT(preApplicationComplete(cacheMap, status))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              newActivities <- getNewActivities orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
-
+                val newSections = progressService.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
                 val sections = progressService.sections(cacheMap)
-                val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey)
+                val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val preSubmission = Set(NotCompleted, SubmissionReady).contains(status)
-
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
 
                 completePreApp match {
-                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
+                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission, Some(newSections)))
                     case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
@@ -124,6 +124,9 @@ trait RegistrationProgressController extends BaseController {
     }).getOrElse(Future.successful(None))
   }
 
+  private def getNewActivities(implicit hc: HeaderCarrier, authContext: AuthContext): OptionT[Future, Set[BusinessActivity]] =
+    businessMatchingService.getAdditionalBusinessActivities
+
   def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -141,4 +144,5 @@ object RegistrationProgressController extends RegistrationProgressController {
   override protected[controllers] val dataCache = DataCacheConnector
   override protected[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected[controllers] val statusService = StatusService
+  override protected[controllers] val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }
