@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessmatching.updateservice.{TradingPremises => TradingPremisesForm}
+import models.businessmatching.updateservice.{UpdateService, TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.businessmatching.BusinessMatchingService
@@ -44,7 +44,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
     implicit authContext => implicit request =>
       {
         for {
-          (tp, _, act) <- formData
+          (tp, _, act, _) <- formData
         } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
       } getOrElse failure
   }
@@ -54,14 +54,15 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
       Form2[TradingPremisesForm](request.body) match {
         case f: InvalidForm => {
           for {
-            (tradingPremises, _, act) <- formData
+            (tradingPremises, _, act, _) <- formData
           } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act)))
         } getOrElse failure
 
         case ValidForm(_, data) => {
           for {
-            (tp, _, act) <- formData
+            (tp, _, act, update) <- formData
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
+            _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, update.copy(tradingPremisesSubmittedActivities = Some(data))))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())
         } getOrElse failure
       }
@@ -81,7 +82,8 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises
     activities <- businessMatchingService.getSubmittedBusinessActivities
-  } yield (tp, activities, activities.head)
+    updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
+  } yield (tp, activities, activities.head, updateService)
 
   private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext) =
     OptionT.liftF(getData[TradingPremises].map{ tradingpremises =>

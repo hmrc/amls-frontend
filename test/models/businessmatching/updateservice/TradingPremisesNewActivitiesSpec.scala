@@ -35,9 +35,9 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
             "businessActivities" -> Seq("04")
           )
 
-          val result = TradingPremisesNewActivities.formReads.validate(formData)
+          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
 
-          result mustBe Valid(TradingPremisesNewActivitiesYes(HighValueDealing))
+          result mustBe Valid(NewActivitiesAtTradingPremisesYes(HighValueDealing))
         }
       }
 
@@ -47,9 +47,9 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
             "tradingPremisesNewActivities" -> Seq("false")
           )
 
-          val result = TradingPremisesNewActivities.formReads.validate(formData)
+          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
 
-          result mustBe Valid(TradingPremisesNewActivitiesNo)
+          result mustBe Valid(NewActivitiesAtTradingPremisesNo)
         }
       }
 
@@ -57,7 +57,7 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
         "return the validation errors" in {
           val formData = Map.empty[String, Seq[String]]
 
-          val result = TradingPremisesNewActivities.formReads.validate(formData)
+          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
 
           result mustBe Invalid(
             Seq(
@@ -72,16 +72,16 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
 
         "deserialise to TradingPremisesNewActivitiesNo" in {
 
-          Json.fromJson[TradingPremisesNewActivities](Json.obj("tradingPremisesNewActivities" -> false)) must
-            be(JsSuccess(TradingPremisesNewActivitiesNo, JsPath))
+          Json.fromJson[AreNewActivitiesAtTradingPremises](Json.obj("tradingPremisesNewActivities" -> false)) must
+            be(JsSuccess(NewActivitiesAtTradingPremisesNo, JsPath))
         }
 
         "deserialise to TradingPremisesNewActivitiesYes" in {
 
           val json = Json.obj("tradingPremisesNewActivities" -> true, "businessActivities" -> "04")
 
-          Json.fromJson[TradingPremisesNewActivities](json) must
-            be(JsSuccess(TradingPremisesNewActivitiesYes(HighValueDealing), JsPath \ "businessActivities"))
+          Json.fromJson[AreNewActivitiesAtTradingPremises](json) must
+            be(JsSuccess(NewActivitiesAtTradingPremisesYes(HighValueDealing), JsPath \ "businessActivities"))
         }
 
     }
@@ -89,28 +89,28 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
     "given a valid model" must {
       "return the form values" when {
         "TradingPremisesNewActivitiesYes" in {
-          val model = TradingPremisesNewActivitiesYes(BillPaymentServices)
-          val result = TradingPremisesNewActivities.formWrites.writes(model)
+          val model = NewActivitiesAtTradingPremisesYes(BillPaymentServices)
+          val result = AreNewActivitiesAtTradingPremises.formWrites.writes(model)
 
           result mustBe Map("tradingPremisesNewActivities" -> Seq("true"))
         }
         "TradingPremisesNewActivitiesNo" in {
-          val model = TradingPremisesNewActivitiesNo
-          val result = TradingPremisesNewActivities.formWrites.writes(model)
+          val model = NewActivitiesAtTradingPremisesNo
+          val result = AreNewActivitiesAtTradingPremises.formWrites.writes(model)
 
           result mustBe Map("tradingPremisesNewActivities" -> Seq("false"))
         }
       }
       "write serialise to json" when {
         "TradingPremisesNewActivitiesYes" in {
-          Json.toJson(TradingPremisesNewActivitiesYes(HighValueDealing)) must
+          Json.toJson(NewActivitiesAtTradingPremisesYes(HighValueDealing)) must
             be(Json.obj(
               "tradingPremisesNewActivities" -> true,
               "businessActivities" -> "04"
             ))
         }
         "TradingPremisesNewActivitiesNo" in {
-          Json.toJson(TradingPremisesNewActivitiesNo) must
+          Json.toJson(NewActivitiesAtTradingPremisesNo) must
             be(Json.obj("tradingPremisesNewActivities" -> false))
         }
       }

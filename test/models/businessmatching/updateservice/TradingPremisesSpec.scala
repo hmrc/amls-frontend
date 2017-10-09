@@ -30,18 +30,18 @@ class TradingPremisesSpec extends PlaySpec with MustMatchers {
             "tradingPremises[]" -> Seq("1")
           )
 
-          val result = TradingPremises.formReads.validate(formData)
+          val result = TradingPremisesActivities.formReads.validate(formData)
 
-          result mustBe Valid(TradingPremises(Set(1)))
+          result mustBe Valid(TradingPremisesActivities(Set(1)))
         }
         "multiple selections are made" in {
           val formData = Map(
             "tradingPremises[]" -> Seq("1", "2")
           )
 
-          val result = TradingPremises.formReads.validate(formData)
+          val result = TradingPremisesActivities.formReads.validate(formData)
 
-          result mustBe Valid(TradingPremises(Set(1, 2)))
+          result mustBe Valid(TradingPremisesActivities(Set(1, 2)))
         }
       }
 
@@ -49,7 +49,7 @@ class TradingPremisesSpec extends PlaySpec with MustMatchers {
         "return the validation errors" in {
           val formData = Map.empty[String, Seq[String]]
 
-          val result = TradingPremises.formReads.validate(formData)
+          val result = TradingPremisesActivities.formReads.validate(formData)
 
           result mustBe Invalid(
             Seq(
@@ -64,7 +64,7 @@ class TradingPremisesSpec extends PlaySpec with MustMatchers {
       "return the form values" when {
         "TradingPremises is 'yes'" in {
 
-          val result = TradingPremises.formWrites.writes(TradingPremises(Set(2)))
+          val result = TradingPremisesActivities.formWrites.writes(TradingPremisesActivities(Set(2)))
 
           result mustBe Map("tradingPremises[]" -> Seq("2"))
         }

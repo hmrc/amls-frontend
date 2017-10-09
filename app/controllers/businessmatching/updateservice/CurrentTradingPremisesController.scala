@@ -18,20 +18,21 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
-import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.businessmatching.updateservice.current_trading_premises
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremisesSubmittedActivities, TradingPremisesSubmittedActivitiesNo, TradingPremisesSubmittedActivitiesYes}
+import models.businessmatching.updateservice._
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-
-import scala.concurrent.{ExecutionContext, Future}
+import views.html.businessmatching.updateservice.current_trading_premises
 
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
+                                                 val dataCacheConnector: DataCacheConnector,
                                                  val businessMatchingService: BusinessMatchingService)() extends BaseController {
 
   private def failure(msg: String = "Unable to get business activities") = InternalServerError(msg)
@@ -47,14 +48,22 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
-        Form2[TradingPremisesSubmittedActivities](request.body) match {
+        Form2[AreSubmittedActivitiesAtTradingPremises](request.body) match {
           case f: InvalidForm => getActivity map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
-          case ValidForm(_, data) => data match {
-            case TradingPremisesSubmittedActivitiesYes =>
-              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-
-            case TradingPremisesSubmittedActivitiesNo =>
-              Future.successful(Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get()))
+          case ValidForm(_, data) => {
+            (for {
+              updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
+              _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
+                 areSubmittedActivitiesAtTradingPremises = Some(data)
+              )))
+            } yield {
+              data match {
+                case SubmittedActivitiesAtTradingPremisesYes =>
+                  Redirect(controllers.routes.RegistrationProgressController.get())
+                case SubmittedActivitiesAtTradingPremisesNo =>
+                  Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get())
+              }
+            }) getOrElse InternalServerError("Could not update service")
           }
         }
       }

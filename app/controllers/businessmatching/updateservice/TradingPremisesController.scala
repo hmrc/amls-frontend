@@ -18,9 +18,12 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{TradingPremisesNewActivities, TradingPremisesNewActivitiesNo, TradingPremisesNewActivitiesYes}
+import models.businessmatching.updateservice._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.{Request, Result}
@@ -35,6 +38,7 @@ import scala.concurrent.Future
 @Singleton
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
+                                           val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
@@ -51,8 +55,17 @@ class TradingPremisesController @Inject()(
     implicit authContext =>
       implicit request =>
         additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
-          Form2[TradingPremisesNewActivities](request.body) match {
-            case ValidForm(_, data) => Future.successful(redirectTo(data, activities, index))
+          Form2[AreNewActivitiesAtTradingPremises](request.body) match {
+            case ValidForm(_, data) => {
+              (for {
+                updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
+                _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
+                  areNewActivitiesAtTradingPremises = Some(data)
+                )))
+              } yield {
+                redirectTo(data, activities, index)
+              }) getOrElse InternalServerError("Could not update service")
+            }
             case f: InvalidForm => Future.successful(
               BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
             )
@@ -60,9 +73,9 @@ class TradingPremisesController @Inject()(
         }
   }
 
-  private def redirectTo(data: TradingPremisesNewActivities, additionalActivities: Set[BusinessActivity], index: Int) = data match {
-    case TradingPremisesNewActivitiesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
-    case TradingPremisesNewActivitiesNo => {
+  private def redirectTo(data: AreNewActivitiesAtTradingPremises, additionalActivities: Set[BusinessActivity], index: Int) = data match {
+    case NewActivitiesAtTradingPremisesYes(_) => Redirect(routes.WhichTradingPremisesController.get(index))
+    case NewActivitiesAtTradingPremisesNo => {
       if (activitiesToIterate(index, additionalActivities)) {
         Redirect(routes.TradingPremisesController.get(index + 1))
       } else {
