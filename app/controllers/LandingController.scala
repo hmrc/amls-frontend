@@ -35,7 +35,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
 import play.api.{Logger, Play}
-import play.api.mvc.{Action, Call, DiscardingCookie, Request}
+import play.api.mvc.{Action, Call, DiscardingCookie, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -70,7 +70,8 @@ trait LandingController extends BaseController {
   }
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         authService.validateCredentialRole flatMap {
           case true =>
             if (AmendmentsToggle.feature) {
@@ -112,24 +113,25 @@ trait LandingController extends BaseController {
     }
   }
 
-  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-    (for {
-      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      abt <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-    } yield bm.isComplete match {
-      case (true) => {
-        landingService.setAltCorrespondenceAddress(abt)
-        Future.successful(Redirect(controllers.routes.StatusController.get()))
-      }
-      case _ => {
-        shortLivedCache.remove(authContext.user.oid).map { http =>
-          http.status match {
-            case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
-            case _ => throw new Exception("Cannot remove pre application data")
+  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
+    cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
+      (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
+        case (true, Some(abt)) =>
+          landingService.setAltCorrespondenceAddress(abt) map { _ =>
+            Redirect(controllers.routes.StatusController.get())
           }
-        }
+
+        case (true, _) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+
+        case (false, _) =>
+          shortLivedCache.remove(authContext.user.oid).map { http =>
+            http.status match {
+              case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
+              case _ => throw new Exception("Cannot remove pre application data")
+            }
+          }
       }
-    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+    } getOrElse (Future.successful(Redirect(controllers.routes.LandingController.get())))
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
@@ -151,12 +153,12 @@ trait LandingController extends BaseController {
   }
 
   private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
-                                (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+                                                   (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
     landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber) map {
       _ => Redirect(controllers.routes.StatusController.get())
-      }
     }
+  }
 
   private def dataHasChanged(cacheMap: CacheMap) = {
     Seq(
@@ -204,7 +206,8 @@ trait LandingController extends BaseController {
 
   def getWithAmendments(implicit authContext: AuthContext, request: Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap {
-      case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap { //enrolment exists
+      case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
+        //enrolment exists
         case Some(cacheMap) => {
           //there is data in S4l
           if (dataHasChanged(cacheMap)) {
@@ -215,7 +218,8 @@ trait LandingController extends BaseController {
               case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber, Some(cacheMap))
 
             }
-          } else { //DataHasNotChanged
+          } else {
+            //DataHasNotChanged
             refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
           }
         }
