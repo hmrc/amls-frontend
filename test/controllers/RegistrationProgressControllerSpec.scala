@@ -73,6 +73,10 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
+      controller.progressService.sectionsFromBusinessActivities(any(), any())(any())
+    } thenReturn Set.empty[Section]
+
+    when {
       mockBusinessMatching.activities
     } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
 
@@ -441,6 +445,51 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
 
           val result = controller.get()(request)
           status(result) mustBe OK
+        }
+      }
+
+      "new sections have been added" must {
+        "show the new sections on the page" in new Fixture {
+          when(mockBusinessMatching.isComplete) thenReturn true
+          when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
+
+          when {
+            controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+          val hvd = mock[models.hvd.Hvd]
+          when(hvd.isComplete) thenReturn true
+
+          val msb = mock[models.moneyservicebusiness.MoneyServiceBusiness]
+          when(msb.isComplete(any(), any())) thenReturn true
+
+          mockCacheGetEntry(Some(msb), models.moneyservicebusiness.MoneyServiceBusiness.key)
+          mockCacheGetEntry(Some(hvd), models.hvd.Hvd.key)
+
+          val sections = Seq(models.moneyservicebusiness.MoneyServiceBusiness.section)
+
+          when {
+            controller.progressService.sections(any())
+          } thenReturn sections
+
+          val newSections = Set(
+            models.moneyservicebusiness.MoneyServiceBusiness.section,
+            models.hvd.Hvd.section
+          )
+
+          when {
+            controller.progressService.sectionsFromBusinessActivities(any(), any())(any())
+          } thenReturn newSections
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val html = Jsoup.parse(contentAsString(result))
+
+          html.select(".progress-new-sections").text() must include(Messages("progress.hvd.name"))
+          html.select(".progress-existing-sections").text() must not include Messages("progress.hvd.name")
         }
       }
     }
