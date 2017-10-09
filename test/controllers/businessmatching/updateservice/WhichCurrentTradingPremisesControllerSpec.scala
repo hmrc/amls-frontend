@@ -68,6 +68,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
       )
     ), Some(UpdateService.key))
 
+    mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
 
     when {
@@ -104,8 +105,6 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         )
 
         mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
-        mockCacheSave[Seq[TradingPremises]]
-        mockCacheSave[UpdateService]
 
         val form = Seq(
           "tradingPremises[]" -> "0",
@@ -146,8 +145,6 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         )
 
         mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
-        mockCacheSave[Seq[TradingPremises]]
-        mockCacheSave[UpdateService]
 
         val form = "tradingPremises[]" -> "1"
         val result = controller.post()(request.withFormUrlEncodedBody(form))

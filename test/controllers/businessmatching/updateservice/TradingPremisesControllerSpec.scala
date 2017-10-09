@@ -129,7 +129,6 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     "post is called" must {
 
       "on valid request" must {
-
         "redirect to WhichTradingPremises" when {
           "request equals Yes" in new Fixture {
 

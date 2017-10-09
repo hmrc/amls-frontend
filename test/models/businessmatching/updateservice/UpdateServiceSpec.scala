@@ -16,6 +16,7 @@
 
 package models.businessmatching.updateservice
 
+import models.businessmatching.HighValueDealing
 import play.api.libs.json.{JsSuccess, Json}
 import utils.GenericTestHelper
 
@@ -47,5 +48,86 @@ class UpdateServiceSpec extends GenericTestHelper{
     }
   }
 
+  "isComplete" must {
+
+    "return true" when {
+      "all properties are defined" in {
+        UpdateService(
+          Some(NewActivitiesAtTradingPremisesNo),
+          Some(TradingPremisesActivities(Set(4,5))),
+          Some(SubmittedActivitiesAtTradingPremisesYes),
+          Some(TradingPremisesActivities(Set(2)))
+        ).isComplete must be(true)
+      }
+      "tradingPremisesNewActivities is NewActivitiesAtTradingPremisesNo" when {
+        "areNewActivitiesAtTradingPremises is not defined" in {
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesNo),
+            None,
+            Some(SubmittedActivitiesAtTradingPremisesYes),
+            Some(TradingPremisesActivities(Set(2)))
+          ).isComplete must be(true)
+        }
+      }
+      "tradingPremisesSubmittedActivities is SubmittedActivitiesAtTradingPremisesYes" when {
+        "areSubmittedActivitiesAtTradingPremises is not defined" in {
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesNo),
+            None,
+            Some(SubmittedActivitiesAtTradingPremisesYes),
+            None
+          ).isComplete must be(true)
+        }
+      }
+    }
+
+    "return false" when {
+      "areNewActivitiesAtTradingPremises is not defined" in {
+        UpdateService(
+          None,
+          Some(TradingPremisesActivities(Set(4,5))),
+          Some(SubmittedActivitiesAtTradingPremisesYes),
+          Some(TradingPremisesActivities(Set(2)))
+        ).isComplete must be(false)
+      }
+      "tradingPremisesNewActivities is NewActivitiesAtTradingPremisesYes" when {
+        "areNewActivitiesAtTradingPremises is not defined" in {
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+            None,
+            Some(SubmittedActivitiesAtTradingPremisesYes),
+            Some(TradingPremisesActivities(Set(2)))
+          ).isComplete must be(false)
+        }
+      }
+      "tradingPremisesSubmittedActivities is SubmittedActivitiesAtTradingPremisesNo" when {
+        "areSubmittedActivitiesAtTradingPremises is not defined" in {
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+            Some(TradingPremisesActivities(Set(4,5))),
+            Some(SubmittedActivitiesAtTradingPremisesNo),
+            None
+          ).isComplete must be(false)
+        }
+      }
+      "areSubmittedActivitiesAtTradingPremises is not defined" in {
+        UpdateService(
+          Some(NewActivitiesAtTradingPremisesNo),
+          Some(TradingPremisesActivities(Set(4,5))),
+          None,
+          Some(TradingPremisesActivities(Set(2)))
+        ).isComplete must be(false)
+      }
+      "tradingPremisesSubmittedActivities is not defined" in {
+        UpdateService(
+          Some(NewActivitiesAtTradingPremisesNo),
+          Some(TradingPremisesActivities(Set(4,5))),
+          Some(SubmittedActivitiesAtTradingPremisesNo),
+          None
+        ).isComplete must be(false)
+      }
+    }
+
+  }
 
 }

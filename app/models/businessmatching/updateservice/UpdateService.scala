@@ -24,7 +24,17 @@ case class UpdateService(
                           tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
                           areSubmittedActivitiesAtTradingPremises: Option[AreSubmittedActivitiesAtTradingPremises] = None,
                           tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
-                        )
+                        ) {
+
+  def isComplete: Boolean = this match {
+    case UpdateService(Some(_), Some(_), Some(_), Some(_)) => true
+    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(_), Some(_)) => true
+    case UpdateService(Some(_), Some(_), Some(SubmittedActivitiesAtTradingPremisesYes), _) => true
+    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(SubmittedActivitiesAtTradingPremisesYes), _) => true
+    case _ => false
+  }
+
+}
 
 object UpdateService{
 
