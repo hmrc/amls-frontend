@@ -22,6 +22,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import models.businessmatching.updateservice.UpdateService
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import play.api.Play
@@ -62,17 +63,22 @@ trait SummaryController extends BaseController {
       (for {
         businessMatching <- businessMatchingService.getModel
         businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+        updateService <- OptionT.liftF(dataCache.fetch[UpdateService](UpdateService.key))
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
-        if(businessActivities.additionalActivities.isDefined & ApplicationConfig.businessMatchingVariationToggle){
+        if(ApplicationConfig.businessMatchingVariationToggle & !updateServiceComplete(updateService)){
           Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
         } else {
           Redirect(controllers.routes.RegistrationProgressController.get())
         }
       }) getOrElse InternalServerError("Unable to update business matching")
   }
+
+  private def updateServiceComplete(updateService: Option[UpdateService]): Boolean = updateService.fold(false)(_.isComplete)
+
 }
+
 
 object SummaryController extends SummaryController {
   // $COVERAGE-OFF$
