@@ -23,7 +23,7 @@
 @* Main section *@
 <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
 
-    @newSections.map { case seq if seq.nonEmpty =>
+    @newSections.collect { case seq if seq.nonEmpty =>
         <div class="progress-new-sections">
             @seq.map { s =>
                 @submissionSection(s.name, s.status, s.call)
