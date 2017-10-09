@@ -44,12 +44,11 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
     val request = addToken(authRequest)
 
     val businessMatchingService = mock[BusinessMatchingService]
-    val dataCacheConnector = mockCacheConnector
 
     val injector = new GuiceInjectorBuilder()
       .bindings(
         bind[BusinessMatchingService].to(businessMatchingService),
-        bind[DataCacheConnector].to(dataCacheConnector),
+        bind[DataCacheConnector].to(mockCacheConnector),
         bind[AuthConnector].to(self.authConnector)
       )
       .build()
