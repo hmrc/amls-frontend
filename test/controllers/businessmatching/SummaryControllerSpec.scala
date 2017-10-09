@@ -131,6 +131,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
           mockGetModel(Some(model))
           mockUpdateModel
           mockCommit
+          mockCacheFetch[UpdateService](None)
 
           val result = controller.post()(postRequest)
 
