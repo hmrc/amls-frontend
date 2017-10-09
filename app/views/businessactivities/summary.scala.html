@@ -100,11 +100,13 @@
             editUrl = controllers.businessactivities.routes.HowManyEmployeesController.get(true).toString
         ) {
             <p>@employees.employeeCount</p>
-            @checkYourAnswersExtra(
-                question = Messages("businessactivities.employees.line2.cya")
-            ) {
-                <p>@employees.employeeCountAMLSSupervision</p>
-            }
+        }
+
+        @checkYourAnswers(
+            question = Messages("businessactivities.employees.line2.cya"),
+            editUrl = controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).toString
+        ) {
+            <p>@employees.employeeCountAMLSSupervision</p>
         }
     }
 

@@ -20,25 +20,22 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class EmployeeCountAMLSSupervisionControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new HowManyEmployeesController {
+    val controller = new EmployeeCountAMLSSupervisionController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }
@@ -46,10 +43,10 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "HowManyEmployeesController" when {
+  "EmployeeCountAMLSSupervisionController" when {
 
     "get is called" must {
-      "display the how many employees page with an empty form" in new Fixture {
+      "display the how many employees work on activities covered by AMLS page with an empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -59,10 +56,10 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=employeeCount]").`val` must be("")
+        document.select("input[name=employeeCountAMLSSupervision]").`val` must be("")
       }
 
-      "display the how many employees page with pre populated data" in new Fixture {
+      "display the how many employees work on activities covered by AMLS page with pre populated data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("163"), Some("17")))))))
@@ -72,7 +69,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=employeeCount]").`val` must be("163")
+        document.select("input[name=employeeCountAMLSSupervision]").`val` must be("17")
 
       }
     }
@@ -80,16 +77,16 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> ""
+          "employeeCountAMLSSupervision" -> ""
         )
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
 
-      "redirect to the EmployeeCountAMLSSupervisionController when given valid data and edit is false" in new Fixture {
+      "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "456"
+          "employeeCountAMLSSupervision" -> "123"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -100,13 +97,13 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.EmployeeCountAMLSSupervisionController.get().url))
+        redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
       }
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "employeeCount" -> "54321"
+          "employeeCountAMLSSupervision" -> "12345"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())
