@@ -18,19 +18,21 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, MoneyServiceBusiness}
-import org.scalatest.mock.MockitoSugar
-import play.api.inject.guice.GuiceInjectorBuilder
-import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-import play.api.test.Helpers._
-import play.api.inject.bind
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.businessmatching.updateservice._
+import models.businessmatching.{AccountancyServices, BusinessActivity, MoneyServiceBusiness}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceInjectorBuilder
+import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,10 +44,12 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
     val request = addToken(authRequest)
 
     val businessMatchingService = mock[BusinessMatchingService]
+    val dataCacheConnector = mockCacheConnector
 
     val injector = new GuiceInjectorBuilder()
       .bindings(
         bind[BusinessMatchingService].to(businessMatchingService),
+        bind[DataCacheConnector].to(dataCacheConnector),
         bind[AuthConnector].to(self.authConnector)
       )
       .build()
@@ -58,6 +62,15 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
       case Some(act) => OptionT.some[Future, Set[BusinessActivity]](act)
       case _ => OptionT.none[Future, Set[BusinessActivity]]
     })
+
+    mockCacheFetch[UpdateService](Some(
+      UpdateService(
+        Some(NewActivitiesAtTradingPremisesNo),
+        Some(TradingPremisesActivities(Set(1)))
+      )
+    ), Some(UpdateService.key))
+
+    mockCacheSave[UpdateService]
 
     mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
   }
@@ -91,6 +104,15 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+
+        verify(controller.dataCacheConnector).save(any(),eqTo(
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesNo),
+            Some(TradingPremisesActivities(Set(1))),
+            Some(SubmittedActivitiesAtTradingPremisesYes)
+          )
+        ))(any(),any(),any())
+
       }
 
       "progress to the 'which trading premises' page if the user chooses 'no'" in new Fixture {
@@ -98,6 +120,15 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
+
+        verify(controller.dataCacheConnector).save(any(),eqTo(
+          UpdateService(
+            Some(NewActivitiesAtTradingPremisesNo),
+            Some(TradingPremisesActivities(Set(1))),
+            Some(SubmittedActivitiesAtTradingPremisesNo)
+          )
+        ))(any(),any(),any())
+
       }
     }
   }
