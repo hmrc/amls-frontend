@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.DateOfChange
 import models.businessmatching._
-import models.businessmatching.updateservice.UpdateService
+import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, TradingPremisesActivities, UpdateService}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.joda.time.LocalDate
@@ -92,7 +92,9 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
     mockCacheSave[UpdateService]
 
     mockCacheFetch[UpdateService](Some(
-      UpdateService(tradingPremisesNewActivities = None)
+      UpdateService(
+        Some(NewActivitiesAtTradingPremisesNo)
+      )
     ))
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
@@ -184,6 +186,13 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
 
+          verify(controller.dataCacheConnector).save(any(),eqTo(
+            UpdateService(
+              Some(NewActivitiesAtTradingPremisesNo),
+              Some(TradingPremisesActivities(Set(1)))
+            )
+          ))(any(),any(),any())
+
         }
       }
       "redirect to CurrentTradingPremises" when {
@@ -202,6 +211,13 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+
+          verify(controller.dataCacheConnector).save(any(),eqTo(
+            UpdateService(
+              Some(NewActivitiesAtTradingPremisesNo),
+              Some(TradingPremisesActivities(Set(1)))
+            )
+          ))(any(),any(),any())
 
         }
       }
