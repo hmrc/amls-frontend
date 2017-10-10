@@ -42,11 +42,12 @@ import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import utils.{AuthorisedFixture, GenericTestHelper, AmlsRefNumberBroker}
-import scala.concurrent.ExecutionContext.Implicits.global
+import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
@@ -84,6 +85,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val amlsConnector = mockAmlsConnector
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
       override val amlsRefBroker = mock[AmlsRefNumberBroker]
+      val auditConnector = mock[AuditConnector]
     }
 
     val response = SubscriptionResponse(
@@ -105,6 +107,11 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     setupBusinessMatching(companyName)
 
     reset(paymentsConnector)
+
+    when {
+      controller.auditConnector.sendEvent(any())(any(), any())
+    } thenReturn Future.successful(mock[AuditResult])
+
 
     when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
@@ -130,9 +137,17 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
+    val paymentRef = paymentRefGen.sample.get
+    
     when {
       controller.amlsRefBroker.get(any(), any(), any())
     } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
+
+    val data = (Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Left(amlsRegistrationNumber))
+
+    when {
+      controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
+    } thenReturn Future.successful(Some(data))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
@@ -677,6 +692,7 @@ class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar wit
       override val amlsConnector = mock[AmlsConnector]
       override val authEnrolmentsService = mock[AuthEnrolmentsService]
       override val amlsRefBroker = mock[AmlsRefNumberBroker]
+      val auditConnector = mock[AuditConnector]
     }
 
     val response = SubscriptionResponse(
