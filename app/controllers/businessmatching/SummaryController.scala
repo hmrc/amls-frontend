@@ -62,18 +62,24 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
-        businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         updateService <- OptionT.liftF(dataCache.fetch[UpdateService](UpdateService.key))
+        status <- OptionT.liftF(statusService.getStatus)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
-        if(ApplicationConfig.businessMatchingVariationToggle & !updateServiceComplete(updateService)){
+        if(goToUpdateServices(updateService, status)){
           Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
         } else {
           Redirect(controllers.routes.RegistrationProgressController.get())
         }
       }) getOrElse InternalServerError("Unable to update business matching")
   }
+
+  private def goToUpdateServices(updateService: Option[UpdateService], status: SubmissionStatus): Boolean =
+    status match {
+      case NotCompleted | SubmissionReady => false
+      case _ => ApplicationConfig.businessMatchingVariationToggle & !updateServiceComplete(updateService)
+    }
 
   private def updateServiceComplete(updateService: Option[UpdateService]): Boolean = updateService.fold(false)(_.isComplete)
 
