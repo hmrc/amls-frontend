@@ -194,7 +194,7 @@ trait ConfirmationController extends BaseController {
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
-    (for {
+    for {
       status <- OptionT.liftF(statusService.getStatus)
       subData@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
       amlsRefNo <- {
@@ -205,7 +205,7 @@ trait ConfirmationController extends BaseController {
       }
       payRef <- OptionT.fromOption[Future](paymentReference)
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(amlsRefNo, payRef, paymentStatus)))
-    } yield result)
+    } yield result
   }
 
 
