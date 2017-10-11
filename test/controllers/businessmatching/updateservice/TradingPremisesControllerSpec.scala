@@ -21,14 +21,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesYes, UpdateService}
+import models.businessmatching.updateservice.UpdateService
 import models.status.{NotCompleted, SubmissionDecisionApproved}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -36,8 +36,8 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 

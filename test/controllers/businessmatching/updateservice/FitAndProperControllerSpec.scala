@@ -16,8 +16,12 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
 import connectors.DataCacheConnector
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -30,7 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -54,6 +58,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
 
     val controller = app.injector.instanceOf[FitAndProperController]
 
+    when {
+      controller.statusService.isPreSubmission(any(),any(),any())
+    } thenReturn Future.successful(false)
+
   }
 
   "FitAndProperController" when {
@@ -66,6 +74,18 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.fitandproper.title"))
 
+      }
+      "return NOT_FOUND" when {
+        "pre-submission" in new Fixture {
+
+          when {
+            controller.statusService.isPreSubmission(any(),any(),any())
+          } thenReturn Future.successful(true)
+
+          val result = controller.get()(request)
+          status(result) must be(NOT_FOUND)
+
+        }
       }
     }
 

@@ -21,19 +21,22 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
-import services.businessmatching.BusinessMatchingService
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
-
 @Singleton
-class FitAndProperController @Inject()(val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector,
-                                                 val businessMatchingService: BusinessMatchingService)() extends BaseController {
+class FitAndProperController @Inject()(
+                                        val authConnector: AuthConnector,
+                                        val dataCacheConnector: DataCacheConnector,
+                                        val statusService: StatusService)() extends BaseController {
 
-  def get() = Authorised.async{
-    implicit request => implicit authContext =>
-      Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
+  def get() = Authorised.async {
+    implicit request =>
+      implicit authContext =>
+        statusService.isPreSubmission map {
+          case false => Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm))
+          case true => NotFound(notFoundView)
+        }
   }
 
 

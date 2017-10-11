@@ -144,6 +144,10 @@ trait StatusService {
       amlsConnector.status(amlsRefNumber)
     }
   }
+
+  def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>
+    status.equals(NotCompleted) | status.equals(SubmissionReady)
+  }
 }
 
 object StatusService extends StatusService {
