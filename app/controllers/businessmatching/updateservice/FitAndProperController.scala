@@ -21,8 +21,15 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import play.api.mvc.{Request, Result}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class FitAndProperController @Inject()(
@@ -33,16 +40,24 @@ class FitAndProperController @Inject()(
   def get() = Authorised.async {
     implicit request =>
       implicit authContext =>
-        statusService.isPreSubmission map {
-          case false => Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm))
-          case true => NotFound(notFoundView)
+        filterPreSubmission {
+          Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
         }
   }
 
 
   def post() = Authorised.async{
     implicit request => implicit authContext =>
-      ???
+      filterPreSubmission {
+        Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+      }
+  }
+
+  private def filterPreSubmission(fn: Future[Result])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]) = {
+    statusService.isPreSubmission flatMap {
+      case false => fn
+      case true => Future.successful(NotFound(notFoundView))
+    }
   }
 
 
