@@ -313,6 +313,12 @@ POST        /update-service/current-trading-premises                            
 GET         /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get()
 POST        /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post()
 
+GET         /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.get()
+POST        /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.post()
+
+GET         /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.get()
+POST        /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.post()
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()

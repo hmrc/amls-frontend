@@ -29,7 +29,7 @@ object AreSubmittedActivitiesAtTradingPremises {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, AreSubmittedActivitiesAtTradingPremises] = From[UrlFormEncoded] { __ =>
-    (__ \ "submittedActivities").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") map {
+  (__ \ "submittedActivities").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisessubmittedactivities") map {
       case true => SubmittedActivitiesAtTradingPremisesYes
       case _ => SubmittedActivitiesAtTradingPremisesNo
     }
