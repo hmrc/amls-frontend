@@ -186,13 +186,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
 
-          verify(controller.dataCacheConnector).save(any(),eqTo(
-            UpdateService(
-              Some(NewActivitiesAtTradingPremisesNo),
-              Some(TradingPremisesActivities(Set(1)))
-            )
-          ))(any(),any(),any())
-
         }
       }
       "redirect to CurrentTradingPremises" when {
@@ -211,13 +204,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
-
-          verify(controller.dataCacheConnector).save(any(),eqTo(
-            UpdateService(
-              Some(NewActivitiesAtTradingPremisesNo),
-              Some(TradingPremisesActivities(Set(1)))
-            )
-          ))(any(),any(),any())
 
         }
       }

@@ -62,15 +62,6 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
       case _ => OptionT.none[Future, Set[BusinessActivity]]
     })
 
-    mockCacheFetch[UpdateService](Some(
-      UpdateService(
-        Some(NewActivitiesAtTradingPremisesNo),
-        Some(TradingPremisesActivities(Set(1)))
-      )
-    ), Some(UpdateService.key))
-
-    mockCacheSave[UpdateService]
-
     mockActivities(Some(Set(MoneyServiceBusiness, AccountancyServices)))
   }
 
@@ -104,14 +95,6 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
-        verify(controller.dataCacheConnector).save(any(),eqTo(
-          UpdateService(
-            Some(NewActivitiesAtTradingPremisesNo),
-            Some(TradingPremisesActivities(Set(1))),
-            Some(SubmittedActivitiesAtTradingPremisesYes)
-          )
-        ))(any(),any(),any())
-
       }
 
       "progress to the 'which trading premises' page if the user chooses 'no'" in new Fixture {
@@ -119,14 +102,6 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
-
-        verify(controller.dataCacheConnector).save(any(),eqTo(
-          UpdateService(
-            Some(NewActivitiesAtTradingPremisesNo),
-            Some(TradingPremisesActivities(Set(1))),
-            Some(SubmittedActivitiesAtTradingPremisesNo)
-          )
-        ))(any(),any(),any())
 
       }
     }
