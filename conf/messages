@@ -119,6 +119,8 @@ error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes i
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
 
+error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
 error.bankdetails.accountname = Enter a name for this account
