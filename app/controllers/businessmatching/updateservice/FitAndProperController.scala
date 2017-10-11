@@ -20,8 +20,11 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(val authConnector: AuthConnector,
@@ -30,7 +33,7 @@ class FitAndProperController @Inject()(val authConnector: AuthConnector,
 
   def get() = Authorised.async{
     implicit request => implicit authContext =>
-      ???
+      Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
   }
 
 

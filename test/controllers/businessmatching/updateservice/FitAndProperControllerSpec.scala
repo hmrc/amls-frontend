@@ -16,6 +16,59 @@
 
 package controllers.businessmatching.updateservice
 
-class FitAndProperControllerSpec {
+import connectors.DataCacheConnector
+import org.jsoup.Jsoup
+import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import services.StatusService
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+
+import scala.concurrent.ExecutionContext
+
+class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+
+    val request = addToken(authRequest)
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val authContext: AuthContext = mock[AuthContext]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[FitAndProperController]
+
+  }
+
+  "FitAndProperController" when {
+
+    "get is called" must {
+      "return OK with fit_and_proper view" in new Fixture {
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.fitandproper.title"))
+
+      }
+    }
+
+  }
 
 }
