@@ -80,19 +80,13 @@ class WhichTradingPremisesController @Inject()(
                 val activity = additionalActivities.toList(index)
                 Form2[TradingPremises$](request.body) match {
                   case ValidForm(_, data) =>
-                    (for {
-                      updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
-                      _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
-                        tradingPremisesNewActivities = Some(data)
-                      )))
-                      _ <- OptionT.liftF(updateTradingPremises(data, activity))
-                    } yield {
+                    updateTradingPremises(data, activity) map { _ =>
                       if (activitiesToIterate(index, additionalActivities)) {
                         Redirect(routes.TradingPremisesController.get(index + 1))
                       } else {
                         Redirect(routes.CurrentTradingPremisesController.get())
                       }
-                    }) getOrElse InternalServerError("Cannot update service")
+                    }
                   case f: InvalidForm =>
                     tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(

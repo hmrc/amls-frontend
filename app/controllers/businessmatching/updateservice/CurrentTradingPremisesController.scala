@@ -30,6 +30,8 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.businessmatching.updateservice.current_trading_premises
 
+import scala.concurrent.Future
+
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                  val dataCacheConnector: DataCacheConnector,
@@ -50,24 +52,18 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
     implicit authContext => implicit request => {
         Form2[AreSubmittedActivitiesAtTradingPremises](request.body) match {
           case f: InvalidForm => getActivity map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
-          case ValidForm(_, data) => {
-            (for {
-              updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
-                 areSubmittedActivitiesAtTradingPremises = Some(data)
-              )))
-            } yield {
-              data match {
-                case SubmittedActivitiesAtTradingPremisesYes =>
-                  Redirect(controllers.routes.RegistrationProgressController.get())
-                case SubmittedActivitiesAtTradingPremisesNo =>
-                  Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get())
-              }
-            }) getOrElse InternalServerError("Could not update service")
-          }
+          case ValidForm(_, data) => Future.successful(redirectTo(data))
         }
       }
   }
+
+  private def redirectTo(data: AreSubmittedActivitiesAtTradingPremises) =
+    data match {
+      case SubmittedActivitiesAtTradingPremisesYes =>
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      case SubmittedActivitiesAtTradingPremisesNo =>
+        Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get())
+    }
 
   private def getActivity(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     services <- businessMatchingService.getSubmittedBusinessActivities

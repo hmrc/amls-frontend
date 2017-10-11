@@ -57,14 +57,7 @@ class TradingPremisesController @Inject()(
         additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
           Form2[AreNewActivitiesAtTradingPremises](request.body) match {
             case ValidForm(_, data) => {
-              (for {
-                updateService <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key))
-                _ <- OptionT.liftF(dataCacheConnector.save[UpdateService](UpdateService.key, updateService.copy(
-                  areNewActivitiesAtTradingPremises = Some(data)
-                )))
-              } yield {
-                redirectTo(data, activities, index)
-              }) getOrElse InternalServerError("Could not update service")
+                Future.successful(redirectTo(data, activities, index))
             }
             case f: InvalidForm => Future.successful(
               BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
