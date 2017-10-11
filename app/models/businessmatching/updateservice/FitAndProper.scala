@@ -16,24 +16,29 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.{From, Rule}
+import jto.validation.{From, Rule, Write}
 import jto.validation.forms.UrlFormEncoded
+import jto.validation.forms.Rules._
 
+import utils.MappingUtils.Implicits._
 
 sealed trait PassedFitAndProper
 
 case object PassedFitAndProperYes extends PassedFitAndProper
-
 case object PassedFitAndProperNo extends PassedFitAndProper
 
 object PassedFitAndProper {
+
   implicit val formReads: Rule[UrlFormEncoded, PassedFitAndProper] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    import utils.MappingUtils.Implicits._
     (__ \ "passedFitAndProper").read[Boolean].withMessage("error.businessmatching.updateservice.fitandproper") map {
       case true => PassedFitAndProperYes
-
       case false => PassedFitAndProperNo
     }
   }
+
+  implicit val formWrites: Write[PassedFitAndProper, UrlFormEncoded] = Write {
+    case PassedFitAndProperYes => "passedFitAndProper" -> "true"
+    case PassedFitAndProperNo => "passedFitAndProper" -> "false"
+  }
+
 }

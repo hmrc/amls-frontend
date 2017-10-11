@@ -18,6 +18,8 @@ package models.businessmatching.updateservice
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BillPaymentServices, HighValueDealing}
+import play.api.libs.json.Json
 import utils.GenericTestHelper
 
 class FitAndProperSpec extends GenericTestHelper {
@@ -62,5 +64,23 @@ class FitAndProperSpec extends GenericTestHelper {
         }
       }
     }
+
+    "given a valid model" must {
+      "return the form values" when {
+        "PassedFitAndProperYes" in {
+          val model = PassedFitAndProperYes
+          val result = PassedFitAndProper.formWrites.writes(model)
+
+          result mustBe Map("passedFitAndProper" -> Seq("true"))
+        }
+        "PassedFitAndProperNo" in {
+          val model = PassedFitAndProperNo
+          val result = PassedFitAndProper.formWrites.writes(model)
+
+          result mustBe Map("passedFitAndProper" -> Seq("false"))
+        }
+      }
+    }
+
   }
 }
