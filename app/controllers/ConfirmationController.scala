@@ -16,12 +16,12 @@
 
 package controllers
 
+import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
 import models.businessmatching.BusinessMatching
-import models.confirmation.Currency._
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
@@ -34,6 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AmlsRefNumberBroker, BusinessName}
 import views.html.confirmation._
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,6 +59,9 @@ trait ConfirmationController extends BaseController {
   private[controllers] val statusService: StatusService
 
   private[controllers] val amlsRefBroker: AmlsRefNumberBroker
+
+  val auditConnector: AuditConnector
+
 
   type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
@@ -90,6 +94,7 @@ trait ConfirmationController extends BaseController {
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
+          _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus) match {
           case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
@@ -188,6 +193,21 @@ trait ConfirmationController extends BaseController {
 
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
+  private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
+    for {
+      status <- OptionT.liftF(statusService.getStatus)
+      subData@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+      amlsRefNo <- {
+        e match {
+          case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+          case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
+        }
+      }
+      payRef <- OptionT.fromOption[Future](paymentReference)
+      result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(amlsRefNo, payRef, paymentStatus)))
+    } yield result
+  }
+
 
 }
 
@@ -201,4 +221,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val amlsConnector = AmlsConnector
   override private[controllers] val authEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val amlsRefBroker = AmlsRefNumberBroker
+  override val auditConnector = AMLSAuditConnector
 }
