@@ -263,27 +263,4 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     }
   }
 
-  it must {
-    "save result to s4l" in new Fixture {
-
-      mockApplicationStatus(SubmissionDecisionApproved)
-
-      when {
-        controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-      val result = controller.post()(request.withFormUrlEncodedBody(
-        "tradingPremisesNewActivities" -> "true",
-        "businessActivities" -> "04"
-      ))
-
-      status(result) must be(SEE_OTHER)
-
-      verify(
-        controller.dataCacheConnector
-      ).save[UpdateService](any(), eqTo(
-        UpdateService(Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
-      ))(any(),any(),any())
-    }
-  }
 }

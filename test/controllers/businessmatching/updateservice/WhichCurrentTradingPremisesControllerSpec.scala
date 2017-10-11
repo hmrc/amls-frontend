@@ -127,15 +127,6 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         tpCaptor.getValue.head.isComplete mustBe true
         tpCaptor.getValue.head.hasChanged mustBe true
 
-        val updateCaptor = ArgumentCaptor.forClass(classOf[UpdateService])
-
-        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), updateCaptor.capture())(any(), any(), any())
-
-        updateCaptor.getValue.areNewActivitiesAtTradingPremises mustBe Some(NewActivitiesAtTradingPremisesNo)
-        updateCaptor.getValue.tradingPremisesNewActivities mustBe Some(TradingPremisesActivities(Set(1)))
-        updateCaptor.getValue.areSubmittedActivitiesAtTradingPremises mustBe Some(SubmittedActivitiesAtTradingPremisesNo)
-        updateCaptor.getValue.tradingPremisesSubmittedActivities mustBe Some(TradingPremisesActivities(Set(0,2)))
-
       }
 
       "mark the trading premises as incomplete if there are no activities left" in new Fixture {
@@ -160,15 +151,6 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
 
         tpCaptor.getValue.head.isComplete mustBe false
         tpCaptor.getValue.head.hasChanged mustBe true
-
-        val updateCaptor = ArgumentCaptor.forClass(classOf[UpdateService])
-
-        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), updateCaptor.capture())(any(), any(), any())
-
-        updateCaptor.getValue.areNewActivitiesAtTradingPremises mustBe Some(NewActivitiesAtTradingPremisesNo)
-        updateCaptor.getValue.tradingPremisesNewActivities mustBe Some(TradingPremisesActivities(Set(1)))
-        updateCaptor.getValue.areSubmittedActivitiesAtTradingPremises mustBe Some(SubmittedActivitiesAtTradingPremisesNo)
-        updateCaptor.getValue.tradingPremisesSubmittedActivities mustBe Some(TradingPremisesActivities(Set(1)))
 
       }
     }
