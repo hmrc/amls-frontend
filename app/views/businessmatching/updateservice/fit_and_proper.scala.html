@@ -22,9 +22,10 @@
 
 @header = {
     @errorSummary(f)
-    @heading((
-        "businessmatching.updateservice.fitandproper.header")
-    ), "progress.update.registration")
+    @heading(
+        "businessmatching.updateservice.fitandproper.header",
+        "progress.update.registration"
+    )
 }
 
 @main(
@@ -33,6 +34,28 @@
 )  {
 
     @form(f, controllers.businessmatching.updateservice.routes.WhichFitAndProperController.post()) {
+
+        @panel(
+            jsHidden = false,
+            wide = true,
+            gutter = true
+        ) {
+            <p>@Messages("businessmatching.updateservice.fitandproper.info")</p>
+        }
+
+
+        @detailsSummary(
+            summary = Messages("businessmatching.updateservice.fitandproper.text.info")
+        ) {
+            @panel(
+                jsHidden = false,
+                wide = false
+            ) {
+                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
+                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line2")</p>
+            }
+        }
+
 
         @fieldset(
             f = f("passedFitAndProper-fieldset"),
