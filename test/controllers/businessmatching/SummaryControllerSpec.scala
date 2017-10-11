@@ -213,50 +213,54 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
   }
 
   "redirect to TradingPremisesController" when {
-    "UpdateService is not complete" which {
-      "updates the hasAccepted flag on the model" in new Fixture {
+    "status is post-submission" when {
+      "UpdateService is not complete" which {
+        "updates the hasAccepted flag on the model" in new Fixture {
 
-        val model = businessMatchingGen.sample.get.activities(
-          BusinessActivities(
-            Set(HighValueDealing),
-            Some(Set(BillPaymentServices))
+          val model = businessMatchingGen.sample.get.activities(
+            BusinessActivities(
+              Set(HighValueDealing),
+              Some(Set(BillPaymentServices))
+            )
           )
-        )
-        val postRequest = request.withFormUrlEncodedBody()
+          val postRequest = request.withFormUrlEncodedBody()
 
-        mockGetModel(Some(model))
-        mockUpdateModel
-        mockCommit
-        mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
+          mockGetModel(Some(model))
+          mockUpdateModel
+          mockCommit
+          mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
+          mockApplicationStatus(SubmissionDecisionApproved)
 
-        val result = controller.post()(postRequest)
+          val result = controller.post()(postRequest)
 
-        status(result) mustBe SEE_OTHER
+          status(result) mustBe SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+        }
       }
-    }
-    "UpdateService is not defined" which {
-      "updates the hasAccepted flag on the model" in new Fixture {
+      "UpdateService is not defined" which {
+        "updates the hasAccepted flag on the model" in new Fixture {
 
-        val model = businessMatchingGen.sample.get.activities(
-          BusinessActivities(
-            Set(HighValueDealing),
-            Some(Set(BillPaymentServices))
+          val model = businessMatchingGen.sample.get.activities(
+            BusinessActivities(
+              Set(HighValueDealing),
+              Some(Set(BillPaymentServices))
+            )
           )
-        )
-        val postRequest = request.withFormUrlEncodedBody()
+          val postRequest = request.withFormUrlEncodedBody()
 
-        mockGetModel(Some(model))
-        mockUpdateModel
-        mockCommit
-        mockCacheFetch[UpdateService](None, Some(UpdateService.key))
+          mockGetModel(Some(model))
+          mockUpdateModel
+          mockCommit
+          mockCacheFetch[UpdateService](None, Some(UpdateService.key))
+          mockApplicationStatus(SubmissionDecisionApproved)
 
-        val result = controller.post()(postRequest)
+          val result = controller.post()(postRequest)
 
-        status(result) mustBe SEE_OTHER
+          status(result) mustBe SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+        }
       }
     }
   }
