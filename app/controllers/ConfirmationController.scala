@@ -94,7 +94,7 @@ trait ConfirmationController extends BaseController {
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
-          _ <- OptionT.liftF(doAudit(paymentStatus.currentStatus))
+          _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus) match {
           case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
@@ -205,7 +205,7 @@ trait ConfirmationController extends BaseController {
       }
       payRef <- OptionT.fromOption[Future](paymentReference)
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(amlsRefNo, payRef, paymentStatus)))
-    } yield result).value
+    } yield result)
   }
 
 

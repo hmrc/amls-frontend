@@ -138,7 +138,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     val paymentRef = paymentRefGen.sample.get
-    
+
     when {
       controller.amlsRefBroker.get(any(), any(), any())
     } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
