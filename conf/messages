@@ -1119,6 +1119,9 @@ businessmatching.updateservice.currenttradingpremises.header = Will you still do
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?
 
+businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.fitandproper.header = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn’t the place to pay registration fees.
