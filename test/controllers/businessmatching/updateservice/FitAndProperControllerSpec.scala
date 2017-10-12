@@ -16,8 +16,12 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
+import generators.businessmatching.BusinessMatchingGenerator
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -36,7 +40,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
+class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -62,6 +66,12 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
       controller.statusService.isPreSubmission(any(),any(),any())
     } thenReturn Future.successful(false)
 
+    when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+      activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+    ))
+
     val responsiblePeople = responsiblePeopleGen(5).sample.get
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople))
@@ -85,6 +95,18 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
           when {
             controller.statusService.isPreSubmission(any(),any(),any())
           } thenReturn Future.successful(true)
+
+          val result = controller.get()(request)
+          status(result) must be(NOT_FOUND)
+
+        }
+        "without msb or tcsp" in new Fixture {
+
+          when {
+            controller.businessMatchingService.getModel(any(),any(),any())
+          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          ))
 
           val result = controller.get()(request)
           status(result) must be(NOT_FOUND)
@@ -140,6 +162,18 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
           when {
             controller.statusService.isPreSubmission(any(),any(),any())
           } thenReturn Future.successful(true)
+
+          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
+          status(result) must be(NOT_FOUND)
+
+        }
+        "without msb or tcsp" in new Fixture {
+
+          when {
+            controller.businessMatchingService.getModel(any(),any(),any())
+          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          ))
 
           val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
           status(result) must be(NOT_FOUND)

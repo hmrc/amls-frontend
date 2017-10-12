@@ -18,13 +18,17 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
 import models.businessmatching.updateservice.{PassedFitAndProper, PassedFitAndProperNo, PassedFitAndProperYes}
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -33,17 +37,17 @@ import utils.RepeatingSection
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 @Singleton
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
+                                        val businessMatchingService: BusinessMatchingService,
                                         val statusService: StatusService)() extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        filterPreSubmission {
+        filterRequest {
           Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
         }
   }
@@ -52,7 +56,7 @@ class FitAndProperController @Inject()(
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
-      filterPreSubmission {
+      filterRequest {
         Form2[PassedFitAndProper](request.body) match {
           case ValidForm(_, data) => data match {
             case PassedFitAndProperYes =>
@@ -66,11 +70,16 @@ class FitAndProperController @Inject()(
       }
   }
 
-  private def filterPreSubmission(fn: Future[Result])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]) = {
-    statusService.isPreSubmission flatMap {
-      case false => fn
-      case true => Future.successful(NotFound(notFoundView))
-    }
+  private def filterRequest(fn: Future[Result])
+                                 (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
+    (businessMatchingService.getModel flatMap { bm =>
+      OptionT.fromOption[Future](bm.activities)
+    } flatMap { ba =>
+      OptionT.liftF(statusService.isPreSubmission flatMap {
+        case false if ba.businessActivities.contains(MoneyServiceBusiness) | ba.businessActivities.contains(TrustAndCompanyServices) => fn
+        case _ => Future.successful(NotFound(notFoundView))
+      })
+    }) getOrElse InternalServerError("Cannot retrieve activities")
   }
 
 
