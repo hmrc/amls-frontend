@@ -27,7 +27,7 @@
         fromDuplicateSubmission: Boolean = false,
         showBacsContent: Boolean = false)(implicit request: Request[_],m:Messages)
 
-@main2(title = Messages("status.submissionreadyforreview.heading") + " - Your registration") {
+@main2(title = Messages("status.submissionreadyforreview.heading") + " - Your registration", showURRBanner = true) {
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">

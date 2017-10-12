@@ -22,7 +22,7 @@
 
 @(businessName: Option[String], deregistrationDate: Option[LocalDate])(implicit request: Request[_],m:Messages)
 
-@main2(title = s"${Messages("status.submissionderegistered.title")} - Your registration") {
+@main2(title = s"${Messages("status.submissionderegistered.title")} - Your registration", showURRBanner = true) {
 
  <div class="grid-layout">
   <div class="grid-layout__column grid-layout__column--2-3">
