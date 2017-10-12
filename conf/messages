@@ -1872,6 +1872,12 @@ survey.satisfaction.please = Please
 survey.satisfaction.answer = answer some questions
 survey.satisfaction.helpus = to help us improve the service.
 
+############################### Banners ###############################
+urr.title = Help improve GOV.UK
+urr.bannertext = Get involved in making government services better (opens in a new window)
+urr.nothanks = No thanks
+
+
 ############################### Notifications Text ######################
 
 notification.static.text.ApplicationAutorejectionForFailureToPay = <p>Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p>\

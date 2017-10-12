@@ -22,7 +22,7 @@
 
 @(regNo: String, businessName: Option[String])(implicit request: Request[_],m:Messages)
 
-@main2(title = Messages("status.submissiondecisionexpired.title") + " - Your registration") {
+@main2(title = Messages("status.submissiondecisionexpired.title") + " - Your registration", showURRBanner = true) {
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">

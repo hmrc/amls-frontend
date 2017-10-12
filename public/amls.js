@@ -75,6 +75,18 @@ $(function () {
     }
   });
 
+  var cookieData=GOVUK.getCookie("full-width-banner-cookie");
+
+   if (cookieData == null) {
+       $("#full-width-banner").addClass("full-width-banner--show");
+   }
+
+   $(".full-width-banner__close").on("click", function(e) {
+       e.preventDefault();
+       GOVUK.setCookie("full-width-banner-cookie", 1, 99999999999);
+       $("#full-width-banner").removeClass("full-width-banner--show");
+   });
+
   $('select[data-auto-complete]').auto();
 
   $('*[data-add-btn]').click(function () {
