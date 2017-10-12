@@ -28,7 +28,8 @@
     scriptElem: Option[Html] = None,
     linkElement : Option[Html] = None,
     nameBusiness : Option[String] = None,
-    userLoggedIn : Boolean = true
+    userLoggedIn : Boolean = true,
+    showURRBanner : Boolean = false
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
@@ -83,12 +84,35 @@
     )
 }
 
+@URRBanner = {
+    <div id="full-width-banner" class="full-width-banner">
+        <section class="centered-content visible full-width-banner__container" aria-hidden="false">
+            <div class="full-width-banner__title">
+                @Messages("urr.title")
+            </div>
+            <a href="https://signup.take-part-in-research.service.gov.uk/?utm_campaign=AMLSbanner&utm_source=Other&utm_medium=gov.uk%20survey&t=HMRC&id=63" target="_blank">
+                @Messages("urr.bannertext")
+            </a>
+            <a class="full-width-banner__close" href="#" role="button">
+                <span aria-hidden="true">
+                    @Messages("urr.nothanks")
+                </span>
+            </a>
+        </section>
+    </div>
+}
+
 @getHelpForm = {
     @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
 }
 
+
+
 @content = {
     <main id="wrapper" role="main">
+        @if(showURRBanner) {
+            @URRBanner
+        }
         <div id="content">
             <div class="service-info">
                 @betaBanner
