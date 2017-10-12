@@ -36,10 +36,6 @@ import scala.concurrent.Future
 
 class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite {
 
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
-    .build()
-
   trait TestFixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
@@ -175,30 +171,4 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
   }
 
-}
-
-class WithdrawalReasonControllerToggleOffSpec extends GenericTestHelper with OneAppPerSuite {
-
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture with DependencyMocks {
-    self =>
-
-    val request = addToken(authRequest)
-    val amlsConnector = mock[AmlsConnector]
-    val authService = mock[AuthEnrolmentsService]
-    val statusService = mock[StatusService]
-
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, statusService, mockCacheConnector)
-  }
-
-  "The WithdrawalReasonController" when {
-    "the GET method is called" must {
-      "return 404 not found" in new TestFixture {
-        status(controller.get(request)) mustBe NOT_FOUND
-      }
-    }
-  }
 }

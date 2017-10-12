@@ -139,7 +139,6 @@ trait StatusController extends BaseController {
         Ok(status_submitted(mlrRegNumber.getOrElse(""),
           businessNameOption,
           feeResponse,
-          ApplicationConfig.allowWithdrawalToggle,
           fromDuplicateSubmission,
           showBacsContent = maybeBacs.getOrElse(false)))
       }

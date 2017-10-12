@@ -37,9 +37,9 @@ class WithdrawApplicationController @Inject()(
                                                cache: DataCacheConnector,
                                                statusService: StatusService) extends BaseController {
 
-  def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle){
-    Authorised.async {
-      implicit authContext => implicit request =>
+  def get = Authorised.async {
+    implicit authContext =>
+      implicit request =>
         val maybeProcessingDate = for {
           status <- OptionT.liftF(statusService.getDetailedStatus)
           response <- OptionT.fromOption[Future](status._2)
@@ -50,12 +50,12 @@ class WithdrawApplicationController @Inject()(
           details <- OptionT.fromOption[Future](cache.reviewDetails)
           processingDate <- maybeProcessingDate
         } yield Ok(withdraw_application(details.businessName, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
-    }
   }
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Redirect(routes.WithdrawalReasonController.get()))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Redirect(routes.WithdrawalReasonController.get()))
   }
 
 }

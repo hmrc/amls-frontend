@@ -118,7 +118,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers {
         new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
 
-      def view = views.html.status.status_submitted("XAML0000000000", Some("business name"), Some(feeResponse), false, true)
+      def view = views.html.status.status_submitted("XAML0000000000", Some("business name"), Some(feeResponse), true, true)
 
       val date = DateHelper.formatDate(LocalDate.now())
       doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must be

@@ -40,35 +40,37 @@ class WithdrawalReasonController @Inject()(
                                             statusService: StatusService,
                                             cacheConnector: DataCacheConnector) extends BaseController {
 
-  def get = FeatureToggle(ApplicationConfig.allowWithdrawalToggle) {
-    Authorised.async {
-      implicit authContext => implicit request =>
+  def get = Authorised.async {
+    implicit authContext =>
+      implicit request =>
         Future.successful(Ok(withdrawal_reason(EmptyForm)))
-    }
   }
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[WithdrawalReason](request.body) match {
-        case f:InvalidForm => Future.successful(BadRequest(withdrawal_reason(f)))
-        case ValidForm(_, data) => {
-          val withdrawalReasonOthers = data match {
-            case WithdrawalReason.Other(reason) => reason.some
-            case _ => None
+    implicit authContext =>
+      implicit request =>
+        Form2[WithdrawalReason](request.body) match {
+          case f: InvalidForm => Future.successful(BadRequest(withdrawal_reason(f)))
+          case ValidForm(_, data) => {
+            val withdrawalReasonOthers = data match {
+              case WithdrawalReason.Other(reason) => reason.some
+              case _ => None
+            }
+
+            val withdrawal = WithdrawSubscriptionRequest(
+              AckRefGenerator(),
+              LocalDate.now(),
+              data,
+              withdrawalReasonOthers
+            )
+
+            (for {
+              regNumber <- OptionT(enrolments.amlsRegistrationNumber)
+              _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal))
+              _ <- OptionT.liftF(cacheConnector.save(WithdrawalStatus.key, WithdrawalStatus(withdrawn = true)))
+            } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
           }
-          val withdrawal = WithdrawSubscriptionRequest(
-            AckRefGenerator(),
-            LocalDate.now(),
-            data,
-            withdrawalReasonOthers
-          )
-          (for {
-            regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-            _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal))
-            _ <- OptionT.liftF(cacheConnector.save(WithdrawalStatus.key, WithdrawalStatus(withdrawn = true)))
-          } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
         }
-      }
   }
 
 }
