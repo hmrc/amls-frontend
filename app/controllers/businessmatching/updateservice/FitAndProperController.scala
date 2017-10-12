@@ -55,11 +55,10 @@ class FitAndProperController @Inject()(
       filterPreSubmission {
         Form2[PassedFitAndProper](request.body) match {
           case ValidForm(_, data) => data match {
-            case PassedFitAndProperYes => {
+            case PassedFitAndProperYes =>
               updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-                responsiblePeople.map(_.copy(hasAlreadyPassedFitAndProper = Some(true)))
+                responsiblePeople.map(_.hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true))
               } map { _ => Redirect(routes.NewServiceInformationController.get()) }
-            }
             case PassedFitAndProperNo => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
           }
           case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f)))

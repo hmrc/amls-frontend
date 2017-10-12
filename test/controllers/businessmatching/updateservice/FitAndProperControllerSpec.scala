@@ -114,7 +114,13 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
             verify(
               mockCacheConnector
-            ).save[Seq[ResponsiblePeople]](any(), eqTo(responsiblePeople.map(_.copy(hasAlreadyPassedFitAndProper = Some(true)))))(any(),any(),any())
+            ).save[Seq[ResponsiblePeople]](any(), eqTo(responsiblePeople.map(
+              _.copy(
+                hasAlreadyPassedFitAndProper = Some(true),
+                hasChanged = true,
+                hasAccepted = true
+              )
+            )))(any(),any(),any())
 
           }
         }
