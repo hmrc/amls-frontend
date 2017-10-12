@@ -17,9 +17,11 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
+import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -34,7 +36,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
+class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -60,6 +62,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
       controller.statusService.isPreSubmission(any(),any(),any())
     } thenReturn Future.successful(false)
 
+    val responsiblePeople = responsiblePeopleGen(5).sample.get
+
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople))
+    mockCacheSave[Seq[ResponsiblePeople]]
   }
 
   "FitAndProperController" when {
@@ -98,12 +104,28 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
         }
       }
       "redirect to NewServiceInformationController" when {
-        "request is true" in new Fixture {
+        "request is true" which {
+          "will set hasAlreadyPassedFitAndProper to true for each responsible person" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
+            val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+
+            verify(
+              mockCacheConnector
+            ).save[Seq[ResponsiblePeople]](any(), eqTo(responsiblePeople.map(_.copy(hasAlreadyPassedFitAndProper = Some(true)))))(any(),any(),any())
+
+          }
+        }
+      }
+      "return BAD_REQUEST" when {
+        "request is invalid" in new Fixture {
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
         }
       }
       "return NOT_FOUND" when {

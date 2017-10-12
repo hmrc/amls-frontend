@@ -54,7 +54,7 @@ trait FitAndProperController extends RepeatingSection with BaseController {
               }
             case ValidForm(_, data) =>{
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   rp.hasAlreadyPassedFitAndProper(data)
                 }
               } yield edit match {
