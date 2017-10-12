@@ -26,6 +26,7 @@ import models.registrationdetails.RegistrationDetails
 import models.renewal._
 import models.responsiblepeople.{PersonName, _}
 import models.status._
+import models.withdrawal.WithdrawalStatus
 import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
@@ -41,7 +42,7 @@ import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -55,7 +56,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     .configure("microservice.services.feature-toggle.allow-deregister" -> true)
     .build()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val controller = new StatusController {
@@ -81,6 +82,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     when {
       controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
+
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
   }
 
   val feeResponse = FeeResponse(
@@ -378,6 +381,37 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+      }
+
+      "application status is not SubmissionWithdrawn, but has WithdrawalStatus data" in new Fixture {
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        mockCacheFetch[WithdrawalStatus](Some(WithdrawalStatus(withdrawn = true)), Some(WithdrawalStatus.key))(controller.dataCache)
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(Messages("status.submissiondecisionwithdrawn.status"))
       }
 
       "application status is DeRegistered" in new Fixture {
@@ -743,7 +777,7 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
     .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
     .build()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -784,6 +818,9 @@ class StatusControllerWithoutWithdrawalSpec extends GenericTestHelper with OneAp
     when {
       controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
+
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
+
   }
 
   "The status controller" must {
@@ -802,7 +839,7 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
     .configure("microservice.services.feature-toggle.allow-deregister" -> false)
     .build()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -843,6 +880,8 @@ class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAp
     when {
       controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
+
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
   }
 
   "The status controller" must {
@@ -861,7 +900,7 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
     .configure("microservice.services.feature-toggle.change-officer" -> false)
     .build()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -899,6 +938,8 @@ class StatusControllerWithoutChangeOfficerSpec extends GenericTestHelper with On
     when {
       controller.dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(reviewDetails), None)))
+
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
   }
 
   "The status controller" must {
