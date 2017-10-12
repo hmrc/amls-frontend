@@ -97,6 +97,15 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar {
           redirectLocation(result) must be(Some(routes.WhichFitAndProperController.get().url))
         }
       }
+      "redirect to NewServiceInformationController" when {
+        "request is true" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+        }
+      }
       "return NOT_FOUND" when {
         "pre-submission" in new Fixture {
 

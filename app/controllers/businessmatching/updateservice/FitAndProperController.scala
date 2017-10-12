@@ -20,7 +20,8 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, ValidForm}
+import models.businessmatching.updateservice.{PassedFitAndProper, PassedFitAndProperNo, PassedFitAndProperYes}
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -38,8 +39,8 @@ class FitAndProperController @Inject()(
                                         val statusService: StatusService)() extends BaseController {
 
   def get() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
+    implicit authContext =>
+      implicit request =>
         filterPreSubmission {
           Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
         }
@@ -47,9 +48,15 @@ class FitAndProperController @Inject()(
 
 
   def post() = Authorised.async{
-    implicit request => implicit authContext =>
+    implicit authContext =>
+      implicit request =>
       filterPreSubmission {
-        Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+        Form2[PassedFitAndProper](request.body) match {
+          case ValidForm(_, data) => data match {
+            case PassedFitAndProperYes => Future.successful(Redirect(routes.NewServiceInformationController.get()))
+            case PassedFitAndProperNo => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+          }
+        }
       }
   }
 

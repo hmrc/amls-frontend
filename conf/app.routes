@@ -319,8 +319,8 @@ POST        /update-service/fit-and-proper/                                     
 GET         /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.get()
 POST        /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.post()
 
-GET         /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformation.get()
-POST        /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformation.post()
+GET         /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.get()
+POST        /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 

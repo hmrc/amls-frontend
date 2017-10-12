@@ -23,7 +23,7 @@ import controllers.BaseController
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-class NewServiceInformation @Inject()(
+class NewServiceInformationController @Inject()(
                                        val authConnector: AuthConnector,
                                        val dataCacheConnector: DataCacheConnector,
                                        val statusService: StatusService)() extends BaseController {
