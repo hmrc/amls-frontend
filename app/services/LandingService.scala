@@ -35,6 +35,7 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.withdrawal.WithdrawalStatus
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -150,51 +151,28 @@ trait LandingService {
     })
   }
 
-
   def refreshCache(amlsRefNumber: String)
-                  (implicit
-                   authContext: AuthContext,
-                   hc: HeaderCarrier,
-                   ec: ExecutionContext
-                  ): Future[CacheMap] = {
-    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-      cacheConnector.remove(authContext.user.oid) flatMap {
-        _ => cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse)) flatMap {
-        _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(viewResponse.businessMatchingSection.copy(hasAccepted = true))) flatMap {
-          _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true))) flatMap {
-            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection)) flatMap {
-              _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)) flatMap {
-                _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
-                  _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
-                    _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true))) flatMap {
-                      _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))) flatMap {
-                        _ => cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))) flatMap {
-                          _ =>
-                            cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))) flatMap {
-                              _ =>
-                                cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))) flatMap {
-                                  _ =>
-                                    cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true))) flatMap {
-                                      _ =>
-                                        cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection)) flatMap {
-                                          cacheMap => saveRenewalData(viewResponse, cacheMap)
-                                        }
-                                    }
-                                }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+                  (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = for {
+    viewResponse <- desConnector.view(amlsRefNumber)
+    withdrawalStatus <- cacheConnector.fetch[WithdrawalStatus](WithdrawalStatus.key)
+    _ <- cacheConnector.remove(authContext.user.oid)
+    _ <- cacheConnector.save[WithdrawalStatus](WithdrawalStatus.key, withdrawalStatus getOrElse WithdrawalStatus(false))
+    _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
+    _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(viewResponse.businessMatchingSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection))
+    _ <- cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
+    _ <- cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
+    _ <- cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection)
+    _ <- cacheConnector.save[BusinessActivities](BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+    cache1 <- cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
+    cache2 <- saveRenewalData(viewResponse, cache1)
+  } yield cache2
 
   def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
     viewResponse.map(seq => seq.map(rp => rp.copy(hasAccepted = true)))
