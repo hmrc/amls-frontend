@@ -56,7 +56,6 @@ class FitAndProperController @Inject()(
         }
   }
 
-
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
@@ -85,6 +84,5 @@ class FitAndProperController @Inject()(
       })
     }) getOrElse InternalServerError("Cannot retrieve activities")
   }
-
 
 }
