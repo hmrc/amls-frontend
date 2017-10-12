@@ -21,5 +21,7 @@ import play.api.libs.json.Json
 case class WithdrawalStatus(withdrawn: Boolean)
 
 object WithdrawalStatus {
+  val key = "WithdrawalStatus"
+
   implicit val format = Json.format[WithdrawalStatus]
 }
