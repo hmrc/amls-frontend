@@ -24,7 +24,7 @@ import jto.validation.forms.Rules._
 object BooleanFormReadWrite {
    def formWrites(fieldName:String) : Write[Boolean, UrlFormEncoded] = Write{data : Boolean => Map(fieldName -> Seq(data.toString))}
 
-   def formRule(fieldName:String) : Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
-      (__ \ fieldName).read[Boolean].withMessage("error.required.rp.fit_and_proper")
+   def formRule(fieldName:String, msg: String) : Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
+      (__ \ fieldName).read[Boolean].withMessage(msg)
    }
 }

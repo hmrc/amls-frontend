@@ -30,7 +30,7 @@ trait FitAndProperController extends RepeatingSection with BaseController {
   val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.fit_and_proper")
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
