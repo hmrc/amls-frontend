@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package utils
+package controllers.businessmatching.updateservice
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import utils.MappingUtils.Implicits._
-import jto.validation.forms.Rules._
+import org.scalatest.mock.MockitoSugar
+import utils.GenericTestHelper
 
-object BooleanFormReadWrite {
-   def formWrites(fieldName:String) : Write[Boolean, UrlFormEncoded] = Write{data : Boolean => Map(fieldName -> Seq(data.toString))}
+class NewServiceInformationSpec extends GenericTestHelper with MockitoSugar {
 
-   def formRule(fieldName:String, msg: String) : Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
-      (__ \ fieldName).read[Boolean].withMessage(msg)
-   }
 }

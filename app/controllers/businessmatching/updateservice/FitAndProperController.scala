@@ -20,12 +20,15 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.updateservice.{PassedFitAndProper, PassedFitAndProperNo, PassedFitAndProperYes}
+import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.RepeatingSection
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,11 +38,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
-                                        val statusService: StatusService)() extends BaseController {
+                                        val statusService: StatusService)() extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
+    implicit authContext =>
+      implicit request =>
         filterPreSubmission {
           Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
         }
@@ -47,9 +50,20 @@ class FitAndProperController @Inject()(
 
 
   def post() = Authorised.async{
-    implicit request => implicit authContext =>
+    implicit authContext =>
+      implicit request =>
       filterPreSubmission {
-        Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+        Form2[PassedFitAndProper](request.body) match {
+          case ValidForm(_, data) => data match {
+            case PassedFitAndProperYes => {
+              updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
+                responsiblePeople.map(_.copy(hasAlreadyPassedFitAndProper = Some(true)))
+              } map { _ => Redirect(routes.NewServiceInformationController.get()) }
+            }
+            case PassedFitAndProperNo => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+          }
+          case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f)))
+        }
       }
   }
 

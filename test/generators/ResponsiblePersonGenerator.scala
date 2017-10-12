@@ -52,4 +52,6 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     person <- responsiblePersonGen
   } yield person.copy(positions = positions.fold[Option[Positions]](None)(p => Some(Positions(p, None))))
 
+  def responsiblePeopleGen(i: Int) = Gen.listOfN[ResponsiblePeople](i, responsiblePersonGen)
+
 }
