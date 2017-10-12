@@ -16,9 +16,7 @@
 
 package controllers.businessmatching.updateservice
 
-import cats.data.OptionT
 import connectors.DataCacheConnector
-import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
