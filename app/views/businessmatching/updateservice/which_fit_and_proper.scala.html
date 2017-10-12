@@ -1,0 +1,44 @@
+@import include._
+@import forms2._
+@import utils.HtmlElementHelpers._
+@import models.responsiblepeople.ResponsiblePeople
+
+@(f: forms.Form2[_], responsiblePeople: Seq[(ResponsiblePeople, Int)])(implicit request: Request[_], m:Messages)
+
+    @header = {
+        @errorSummary(f)
+        @heading("businessmatching.updateservice.whichtradingpremises.header", "summary.updateinformation")
+    }
+
+    @main(
+        title = Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("progress.update.registration"),
+        heading = header
+    )  {
+
+        <p>@Messages("lbl.select.all")</p>
+
+        <div class="form-group">
+
+            @form(f, controllers.businessmatching.updateservice.routes.WhichFitAndProperController.post()) {
+
+                @fieldset(
+                    f = f("responsiblePeople-fieldset"),
+                    legend = legend,
+                    legendHidden = true,
+                    panel = false
+                ) {
+                    @errorGroup(
+                        field = f("responsiblePeople")
+                    ) {
+                        @responsiblePeople.map{ case (rp, index) =>
+                            @checkbox(f = f("responsiblePeople[]"), labelText = rp.label.getOrElse(index.toString), value = index.toString)
+                        }
+                    }
+                }
+
+                @submit(returnLink = false)
+
+            }
+        </div>
+
+}
