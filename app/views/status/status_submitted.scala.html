@@ -23,7 +23,6 @@
 @(regNo: String,
         businessName: Option[String],
         feeResponse: Option[FeeResponse],
-        allowWithdrawal: Boolean = false,
         fromDuplicateSubmission: Boolean = false,
         showBacsContent: Boolean = false)(implicit request: Request[_],m:Messages)
 
@@ -49,9 +48,7 @@
                     <p>@bn</p>
                 }
                 <p>
-                @if(allowWithdrawal) {
                     <a href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
-                }
                 </p>
 
             </div>

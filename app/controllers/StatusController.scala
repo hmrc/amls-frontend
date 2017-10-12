@@ -27,6 +27,7 @@ import models.businessmatching.BusinessType.Partnership
 import models.registrationdetails.RegistrationDetails
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
+import models.withdrawal.WithdrawalStatus
 import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Play
 import play.api.mvc.{AnyContent, Call, Request, Result}
@@ -65,7 +66,8 @@ trait StatusController extends BaseController {
           statusResponse <- Future(statusInfo._2)
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission)
+          withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
+          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission, withdrawalStatus)
         } yield page
   }
 
@@ -92,20 +94,26 @@ trait StatusController extends BaseController {
   private def getPageBasedOnStatus(mlrRegNumber: Option[String],
                                    statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                    businessNameOption: Option[String],
-                                   feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)
+                                   feeResponse: Option[FeeResponse],
+                                   fromDuplicateSubmission: Boolean,
+                                   withdrawalStatus: Option[WithdrawalStatus])
                                   (implicit request: Request[AnyContent],
                                    authContext: AuthContext) = {
 
-    statusInfo match {
-      case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
-      case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
-           (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
-           (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
-      case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
-      case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+    if (withdrawalStatus.contains(WithdrawalStatus(true))) {
+      Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption))
+    } else {
+      statusInfo match {
+        case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
+          getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
+        case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
+             (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
+             (SubmissionWithdrawn, _) | (DeRegistered, _) =>
+          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
+        case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
+          getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
+        case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      }
     }
   }
 
@@ -131,7 +139,6 @@ trait StatusController extends BaseController {
         Ok(status_submitted(mlrRegNumber.getOrElse(""),
           businessNameOption,
           feeResponse,
-          ApplicationConfig.allowWithdrawalToggle,
           fromDuplicateSubmission,
           showBacsContent = maybeBacs.getOrElse(false)))
       }
