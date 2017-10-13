@@ -1703,7 +1703,7 @@ hvd.products.option.12 = Other
 hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €10,000 or more?
 hvd.identify.linked.cash.payments.subtitle = If you do not use Euros, please convert to the currency you use.
 
-hvd.receiving.title = Do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
+hvd.receiving.title = Do you expect to receive cash payments over €10,000 from customers you’ve not met in person?
 hvd.receiving.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.receiving.expect.to.receive = How do you expect to receive these payments?
 hvd.receiving.option.01 = By courier
@@ -1714,7 +1714,7 @@ hvd.receiving.give.details.lbl = Please give details
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
-hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €15,000?
+hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €10,000?
 hvd.percentage.text = If you do not use Euros, please convert to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%
