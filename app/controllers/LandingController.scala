@@ -60,9 +60,13 @@ trait LandingController extends BaseController {
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
 
-  def start() = Action.async {
+  /**
+    * allowRedirect allows us to configure whether or not the start page is *always* shown,
+    * regardless of the user's auth status
+    */
+  def start(allowRedirect: Boolean = true) = Action.async {
     implicit request =>
-      if (isAuthorised) {
+      if (isAuthorised && allowRedirect) {
         Future.successful(Redirect(controllers.routes.LandingController.get()))
       } else {
         Future.successful(Ok(views.html.start()))
