@@ -1700,7 +1700,7 @@ hvd.products.option.10 = Mobile phones
 hvd.products.option.11 = Clothing
 hvd.products.option.12 = Other
 
-hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €15,000 or more?
+hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €10,000 or more?
 hvd.identify.linked.cash.payments.subtitle = If you do not use Euros, please convert to the currency you use.
 
 hvd.receiving.title = Do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
