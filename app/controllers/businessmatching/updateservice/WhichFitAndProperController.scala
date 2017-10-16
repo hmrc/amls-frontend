@@ -59,7 +59,9 @@ class WhichFitAndProperController @Inject()(
         implicit request =>
           filterRequest {
             Form2[ResponsiblePeopleFitAndProper](request.body) match {
-              case ValidForm(_, data) => Future.successful(Redirect(routes.NewServiceInformationController.get()))
+              case ValidForm(_, data) => updateResponsiblePeople(data) map { _ =>
+                Redirect(routes.NewServiceInformationController.get())
+              }
               case f: InvalidForm => responsiblePeople map { rp =>
                 BadRequest(views.html.businessmatching.updateservice.which_fit_and_proper(f, rp))
               }
@@ -68,7 +70,7 @@ class WhichFitAndProperController @Inject()(
   }
 
   private def filterRequest(fn: Future[Result])
-                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
+                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] =
     (businessMatchingService.getModel flatMap { bm =>
       OptionT.fromOption[Future](bm.activities)
     } flatMap { ba =>
@@ -77,7 +79,6 @@ class WhichFitAndProperController @Inject()(
         case _ => Future.successful(NotFound(notFoundView))
       })
     }) getOrElse InternalServerError("Cannot retrieve activities")
-  }
 
   private def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
     getData[ResponsiblePeople].map { responsiblePeople =>
@@ -85,5 +86,27 @@ class WhichFitAndProperController @Inject()(
         rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
       }
     }
+
+  private def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
+                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
+      patchResponsiblePeople(data.index.toSeq, responsiblePeople)
+    }
+
+  private def patchResponsiblePeople(indices: Seq[Int], responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+
+    val index = indices.head
+
+    val patched = responsiblePeople.patch(index, Seq({
+      responsiblePeople(index).hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true)
+    }), 1)
+
+    try {
+      patchResponsiblePeople(indices.tail, patched)
+    } catch {
+      case _: NoSuchElementException => patched
+    }
+
+  }
 
 }
