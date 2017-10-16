@@ -117,6 +117,34 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
       }
     }
 
+    "post is called" must {
+
+      "on valid request" must {
+
+        "redirect to NewServiceInformationController" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+
+        }
+
+      }
+
+      "on invalid request" must {
+
+        "return BAD_REQUEST" in new Fixture {
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+    }
+
   }
 
 }
