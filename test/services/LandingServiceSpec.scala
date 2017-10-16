@@ -34,6 +34,7 @@ import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.withdrawal.WithdrawalStatus
 import models.{Country, ViewResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -199,7 +200,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       supervisionSection = None
     )
 
-    def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
+    def setupCacheSave[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
       when {
         mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
       } thenReturn Future.successful(result)
@@ -212,26 +213,31 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
+      when {
+        TestLandingService.cacheConnector.fetch[WithdrawalStatus](eqTo(WithdrawalStatus.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(WithdrawalStatus(true)))
+
       val user = mock[LoggedInUser]
 
       when(ac.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
 
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection.copy(hasAccepted = true))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AddPerson.key, viewResponse.aboutYouSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection.copy(hasAccepted = true))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, WithdrawalStatus.key, Some(WithdrawalStatus(true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection.copy(hasAccepted = true))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, AddPerson.key, viewResponse.aboutYouSection)
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection.copy(hasAccepted = true))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
 
       await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
     }

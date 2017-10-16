@@ -23,6 +23,7 @@ import controllers.BaseController
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+// $COVERAGE-OFF$
 @Singleton
 class WhichFitAndProperController @Inject()(val authConnector: AuthConnector,
                                        val dataCacheConnector: DataCacheConnector,
@@ -39,5 +40,5 @@ class WhichFitAndProperController @Inject()(val authConnector: AuthConnector,
       ???
   }
 
-
 }
+// $COVERAGE-ON$

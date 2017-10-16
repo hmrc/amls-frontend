@@ -18,7 +18,7 @@ package controllers.withdrawal
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason, WithdrawalStatus}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -30,26 +30,21 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
 class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite {
 
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture {
+  trait TestFixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
-    val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, statusService)
+    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, statusService, mockCacheConnector)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -61,6 +56,7 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
       amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
     } thenReturn Future.successful(mock[WithdrawSubscriptionResponse])
 
+    mockCacheSave[WithdrawalStatus]
   }
 
 
@@ -91,7 +87,6 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
         "go to landing controller" which {
           "follows sending a withdrawal to amls" when {
             "withdrawalReason is selection without other reason" in new TestFixture {
-
               val newRequest = request.withFormUrlEncodedBody(
                 "withdrawalReason" -> "01"
               )
@@ -105,8 +100,8 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
               captor.getValue.withdrawalReason mustBe WithdrawalReason.OutOfScope
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
-
             }
+
             "withdrawalReason is selection with other reason" in new TestFixture {
 
               val newRequest = request.withFormUrlEncodedBody(
@@ -127,6 +122,17 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
             }
           }
+        }
+
+        "save the withdrawal status to Save4Later" in new TestFixture {
+          val postRequest = request.withFormUrlEncodedBody(
+            "withdrawalReason" -> "01"
+          )
+
+          val result = controller.post()(postRequest)
+          status(result) mustBe SEE_OTHER
+
+          verify(mockCacheConnector).save[WithdrawalStatus](eqTo(WithdrawalStatus.key), eqTo(WithdrawalStatus(true)))(any(), any(), any())
         }
 
       }
@@ -165,30 +171,4 @@ class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSui
 
   }
 
-}
-
-class WithdrawalReasonControllerToggleOffSpec extends GenericTestHelper with OneAppPerSuite {
-
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture {
-    self =>
-
-    val request = addToken(authRequest)
-    val amlsConnector = mock[AmlsConnector]
-    val authService = mock[AuthEnrolmentsService]
-    val statusService = mock[StatusService]
-
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, statusService)
-  }
-
-  "The WithdrawalReasonController" when {
-    "the GET method is called" must {
-      "return 404 not found" in new TestFixture {
-        status(controller.get(request)) mustBe NOT_FOUND
-      }
-    }
-  }
 }

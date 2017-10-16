@@ -23,6 +23,7 @@ import controllers.BaseController
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+// $COVERAGE-OFF$
 class NewServiceInformationController @Inject()(
                                        val authConnector: AuthConnector,
                                        val dataCacheConnector: DataCacheConnector,
@@ -42,3 +43,4 @@ class NewServiceInformationController @Inject()(
   }
 
 }
+// $COVERAGE-ON$

@@ -36,10 +36,6 @@ import scala.concurrent.Future
 
 class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPerSuite {
 
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
-    .build()
-
   trait TestFixture extends AuthorisedFixture {
     self =>
 
@@ -94,32 +90,6 @@ class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPer
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe routes.WithdrawalReasonController.get().url.some
 
-      }
-    }
-  }
-}
-
-class WithdrawApplicationControllerToggleOffSpec extends GenericTestHelper with OneAppPerSuite {
-
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture {
-    self =>
-
-    val request = addToken(authRequest)
-    val amlsConnector = mock[AmlsConnector]
-    val cacheConnector = mock[DataCacheConnector]
-    val statusService = mock[StatusService]
-
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, cacheConnector, statusService)
-  }
-
-  "The WithdrawApplicationController" when {
-    "the GET method is called" must {
-      "return 404 not found" in new TestFixture {
-        status(controller.get(request)) mustBe NOT_FOUND
       }
     }
   }

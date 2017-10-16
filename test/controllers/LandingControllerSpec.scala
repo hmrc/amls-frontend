@@ -416,10 +416,13 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
   }
 
   "show landing page without authorisation" in new Fixture {
-
     val result = controller.start()(FakeRequest().withSession())
-    status(result) must be(OK)
+    status(result) mustBe OK
+  }
 
+  "show the landing page when authorised, but 'redirect' = false" in new Fixture {
+    val result = controller.start(false)(request)
+    status(result) mustBe OK
   }
 
   "direct to the service when authorised" in new Fixture {
