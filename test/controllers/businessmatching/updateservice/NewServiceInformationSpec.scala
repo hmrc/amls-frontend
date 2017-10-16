@@ -16,9 +16,43 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
+import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.Future
 
 class NewServiceInformationSpec extends GenericTestHelper with MockitoSugar {
 
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
+
+    val bmService = mock[BusinessMatchingService]
+
+    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, mockStatusService, bmService, messagesApi)
+  }
+
+  "GET" when {
+    "called" must {
+      "return OK with the service name" in new Fixture {
+        when {
+          bmService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        contentAsString(result) must include(MoneyServiceBusiness.getMessage)
+
+      }
+    }
+  }
 }

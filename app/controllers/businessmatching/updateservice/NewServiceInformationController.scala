@@ -18,23 +18,30 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.Inject
 
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import play.api.i18n.MessagesApi
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.new_service_information
 
-// $COVERAGE-OFF$
 class NewServiceInformationController @Inject()(
                                        val authConnector: AuthConnector,
                                        val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService)() extends BaseController {
+                                       val statusService: StatusService,
+                                       val businessMatchingService: BusinessMatchingService,
+                                       val messages: MessagesApi) extends BaseController {
 
   def get() = Authorised.async {
     implicit request =>
-      implicit authContext =>
-        ???
+      implicit authContext => {
+        for {
+          activities <- businessMatchingService.getAdditionalBusinessActivities
+        } yield Ok(new_service_information(activities.head))
+      } getOrElse InternalServerError("Unable to get business activities")
   }
-
 
   def post() = Authorised.async {
     implicit request =>
@@ -43,4 +50,3 @@ class NewServiceInformationController @Inject()(
   }
 
 }
-// $COVERAGE-ON$
