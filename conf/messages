@@ -121,6 +121,7 @@ error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
 
 error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.changeservices = Select one option to show what you want to do
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
@@ -843,6 +844,9 @@ button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
+
+changeservices.title = What do you want to do?
+changeservices.choice.add = Register another service
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
