@@ -2,7 +2,8 @@
 
 GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
 
-GET         /                                                                         controllers.LandingController.start()
+GET         /                                                                         controllers.LandingController.start(allowRedirect: Boolean ?= true)
+GET         /start/bta                                                                controllers.LandingController.start(allowRedirect: Boolean ?= false)
 
 GET         /start                                                                    controllers.LandingController.get()
 

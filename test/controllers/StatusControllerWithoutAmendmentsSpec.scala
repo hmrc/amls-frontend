@@ -20,6 +20,7 @@ import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status._
+import models.withdrawal.WithdrawalStatus
 import models.{Country, FeeResponse}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -30,14 +31,14 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
     val controller = new StatusController {
       override private[controllers] val landingService: LandingService = mock[LandingService]
@@ -50,6 +51,8 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
       override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
+
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
   }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false) )

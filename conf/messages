@@ -115,6 +115,7 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
+error.businessmatching.updateservice.responsiblepeople = Select one option to show which responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
@@ -301,25 +302,25 @@ error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical for
 error.required.countries.msb.most.transactions = Enter an official country name: for example, Holland is Netherlands
 
 ############################### High Value Dealer ###############################
-error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €15,000 or more
+error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €10,000 or more
 error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
 error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
 error.required.hvd.business.sell.other.details = Enter a description of what your business will sell
 error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters
-error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €15,000 or more
-error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €15,000 from customers you’ve not met in person
+error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €10,000 or more
+error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €10,000 from customers you’ve not met in person
 error.required.hvd.describe = Enter details of how you expect to receive these payments
 error.maxlength.hvd.describe = You can’t enter more than 255 characters
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
-error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €15,000
+error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €10,000
 
 
 ################################# Renewal ###################################
 error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
-error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
+error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
 
-error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €15,000 in the last 12 months from customers you’ve not met in person
+error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €10,000 in the last 12 months from customers you’ve not met in person
 error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
 error.required.renewal.hvd.describe = Enter details of how you received these payments
 
@@ -330,7 +331,7 @@ error.required.renewal.ba.business.turnover = Select one option to show the tota
 error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
 error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
 
-error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €15,000 in the last 12 months
+error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
 
 error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
 
@@ -1077,7 +1078,7 @@ businessmatching.registerservices.servicename.lbl.07 = Telephone, digital and IT
 businessmatching.registerservices.servicename.details.01 = Accountancy Service Providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
 businessmatching.registerservices.servicename.details.02 = Bill Payment Service Providers work on behalf of businesses to handle household bill payments from customers.
 businessmatching.registerservices.servicename.details.03 = Estate Agency Businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
-businessmatching.registerservices.servicename.details.04 = High Value Dealers accept cash payments of €15,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
+businessmatching.registerservices.servicename.details.04 = High Value Dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
 businessmatching.registerservices.servicename.details.05 = Money Service Businesses exchange currency, transmit money, or cash cheques for their customers.
 businessmatching.registerservices.servicename.details.06 = Trust or Company Service Providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
 businessmatching.registerservices.servicename.details.07 = Telecommunications, Digital and IT Payment Service Providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
@@ -1129,6 +1130,9 @@ businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 fo
 businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
 businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
+
+businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
@@ -1670,23 +1674,23 @@ msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 hvd.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 hvd.whatyouneed.line_1 = what your business will sell
 hvd.whatyouneed.line_2 = if you’ll be buying or selling duty-suspended excise goods
-hvd.whatyouneed.line_3 = how your business deals with cash payments of €15,000 or more
+hvd.whatyouneed.line_3 = how your business deals with cash payments of €10,000 or more
 
 hvd.how-will-you-sell-goods.title = How will you sell these goods?
 hvd.how-will-you-sell-goods.channels.auction = Auction
 hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
-hvd.cash.payment.title = Has your business already accepted any cash payments of €15,000 or more?
+hvd.cash.payment.title = Has your business already accepted any cash payments of €10,000 or more?
 hvd.cash.payment.convert.currency.text = If you don’t use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 03 2015
 hvd.cash.payment.data.details.summary = What a cash payment is
 hvd.cash.payment.data.details.summary.details = A cash payment is physical money, notes and coins, either paid to you in person or paid directly into a bank account.
 hvd.cash.payment.data.details.summary.details.start = This includes:
-hvd.cash.payment.data.details.summary.details.01 = any single cash payment of €15,000 or more
-hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €15,000 or more including things like payment plans, payments on account and deposits
-hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €15,000 or more in any 90 day period
+hvd.cash.payment.data.details.summary.details.01 = any single cash payment of €10,000 or more
+hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €10,000 or more including things like payment plans, payments on account and deposits
+hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €10,000 or more in any 90 day period
 
 hvd.summary.payment.date.label = Date of first payment
 
@@ -1704,10 +1708,10 @@ hvd.products.option.10 = Mobile phones
 hvd.products.option.11 = Clothing
 hvd.products.option.12 = Other
 
-hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €15,000 or more?
+hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €10,000 or more?
 hvd.identify.linked.cash.payments.subtitle = If you do not use Euros, please convert to the currency you use.
 
-hvd.receiving.title = Do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
+hvd.receiving.title = Do you expect to receive cash payments over €10,000 from customers you’ve not met in person?
 hvd.receiving.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.receiving.expect.to.receive = How do you expect to receive these payments?
 hvd.receiving.option.01 = By courier
@@ -1718,7 +1722,7 @@ hvd.receiving.give.details.lbl = Please give details
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
-hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €15,000?
+hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €10,000?
 hvd.percentage.text = If you do not use Euros, please convert to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%
@@ -1831,7 +1835,7 @@ renewal.customer.outside.uk.title = In the last 12 months did you have customers
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following activities?
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
-renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
 renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
@@ -1857,10 +1861,10 @@ renewal.msb.most.transactions.title = Where did you send the most transactions i
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
 renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
 
-renewal.receiving.title = In the last 12 months did you receive cash payments over €15,000 from customers you’ve not met in person?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
 renewal.receiving.expect.to.receive = How did you receive these payments?
 
-renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €15,000?
+renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €10,000?
 
 renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
 
