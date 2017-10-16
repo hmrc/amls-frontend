@@ -58,6 +58,8 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
     val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
+    val bmEmpty = Some(BusinessMatching())
+
     when(mockCacheConnector.fetchAll(any(), any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -81,8 +83,6 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
       "return OK with change_services view - no activities" in new Fixture {
 
-        val bmEmpty = Some(BusinessMatching())
-
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(bmEmpty)
 
@@ -97,7 +97,18 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
     "post is called" must {
       "redirect to WhichFitAndProperController" when {
-        "request is false" in new Fixture {
+        "request is add" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
+        }
+
+        "request is add with no activities " in new Fixture {
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(bmEmpty)
 
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
@@ -114,6 +125,17 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
           status(result) must be(BAD_REQUEST)
 
         }
+      }
+
+      "return Internal Server Error if the business matching model can't be obtained" in new Fixture {
+        val postRequest = request.withFormUrlEncodedBody()
+
+        when(mockCacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
+          .thenReturn(None)
+
+        val result = controller.post()(postRequest)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
 
