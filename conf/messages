@@ -1127,6 +1127,9 @@ businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
 businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
+businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn’t the place to pay registration fees.
