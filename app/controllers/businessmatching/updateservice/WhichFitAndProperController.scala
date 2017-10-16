@@ -90,23 +90,14 @@ class WhichFitAndProperController @Inject()(
   private def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-      patchResponsiblePeople(data.index.toSeq, responsiblePeople)
+      responsiblePeople.zipWithIndex.map { case (rp, index) =>
+        val updated = if (data.index contains index) {
+          rp.hasAlreadyPassedFitAndProper(true)
+        } else {
+          rp.hasAlreadyPassedFitAndProper(false)
+        }
+        updated.copy(hasAccepted = updated.hasChanged)
+      }
     }
-
-  private def patchResponsiblePeople(indices: Seq[Int], responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
-
-    val index = indices.head
-
-    val patched = responsiblePeople.patch(index, Seq({
-      responsiblePeople(index).hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true)
-    }), 1)
-
-    try {
-      patchResponsiblePeople(indices.tail, patched)
-    } catch {
-      case _: NoSuchElementException => patched
-    }
-
-  }
 
 }
