@@ -81,7 +81,7 @@
     @model.activities.map { activity =>
         @checkYourAnswers(
             question = Messages("businessmatching.registerservices.title"),
-            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString,
+            editUrl = controllers.businessmatching.updateservice.routes.ChangeServicesController.get().toString,
             allowEdit = allowEdit
         ) {
             <ul class="list list--comma">
@@ -103,7 +103,7 @@
             @model.msbServices.map { services =>
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
-                    editUrl = controllers.businessmatching.routes.ChangeServicesController.get(true).toString,
+                    editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
                     allowEdit = allowEdit
                 ) {
                     <ul class="list list--comma">

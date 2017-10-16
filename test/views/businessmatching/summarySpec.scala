@@ -97,7 +97,7 @@ class summarySpec extends GenericTestHelper
           "businessmatching.registerservices.servicename.lbl.05",
           "businessmatching.registerservices.servicename.lbl.06",
           "businessmatching.registerservices.servicename.lbl.07")),
-          controllers.businessmatching.routes.RegisterServicesController.get(true).toString),
+          controllers.businessmatching.updateservice.routes.ChangeServicesController.get().toString),
         ("businessmatching.services.title", checkListContainsItems(_, Set(
           "businessmatching.services.list.lbl.01",
           "businessmatching.services.list.lbl.02",
@@ -162,7 +162,7 @@ class summarySpec extends GenericTestHelper
           "businessmatching.registerservices.servicename.lbl.04",
           "businessmatching.registerservices.servicename.lbl.06",
           "businessmatching.registerservices.servicename.lbl.07")),
-          controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+          controllers.businessmatching.updateservice.routes.ChangeServicesController.get().toString
         )
       )
 
