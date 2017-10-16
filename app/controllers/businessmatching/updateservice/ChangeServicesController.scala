@@ -49,7 +49,7 @@ class ChangeServicesController @Inject()(
               val activities = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
               Ok(change_services(EmptyForm, activities))
 
-            }) getOrElse Ok(change_services(EmptyForm, Set.empty[String]))
+            }) getOrElse InternalServerError("Unable to show the page")
         }
   }
 
@@ -66,7 +66,7 @@ class ChangeServicesController @Inject()(
                 val activities = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
                 BadRequest(change_services(f, activities))
 
-              }) getOrElse BadRequest(change_services(f, Set.empty[String]))
+              }) getOrElse InternalServerError("Unable to show the page")
           }
         }
 
