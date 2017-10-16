@@ -57,12 +57,14 @@ class WhichFitAndProperController @Inject()(
   def post() = Authorised.async {
       implicit authContext =>
         implicit request =>
-        Form2[ResponsiblePeopleFitAndProper](request.body) match {
-          case ValidForm(_, data) => Future.successful(Redirect(routes.NewServiceInformationController.get()))
-          case f: InvalidForm => responsiblePeople map { rp =>
-            BadRequest(views.html.businessmatching.updateservice.which_fit_and_proper(f, rp))
+          filterRequest {
+            Form2[ResponsiblePeopleFitAndProper](request.body) match {
+              case ValidForm(_, data) => Future.successful(Redirect(routes.NewServiceInformationController.get()))
+              case f: InvalidForm => responsiblePeople map { rp =>
+                BadRequest(views.html.businessmatching.updateservice.which_fit_and_proper(f, rp))
+              }
+            }
           }
-        }
   }
 
   private def filterRequest(fn: Future[Result])

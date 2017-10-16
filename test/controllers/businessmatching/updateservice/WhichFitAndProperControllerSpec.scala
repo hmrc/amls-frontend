@@ -143,6 +143,33 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         }
 
       }
+
+
+      "return NOT_FOUND" when {
+        "pre-submission" in new Fixture {
+
+          when {
+            controller.statusService.isPreSubmission(any(), any(), any())
+          } thenReturn Future.successful(true)
+
+          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+          status(result) must be(NOT_FOUND)
+
+        }
+        "without msb or tcsp" in new Fixture {
+
+          when {
+            controller.businessMatchingService.getModel(any(), any(), any())
+          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          ))
+
+          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+
     }
 
   }
