@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.updateservice._
-import models.businessmatching.{AccountancyServices, BusinessActivity, MoneyServiceBusiness}
+import models.businessmatching._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
@@ -79,31 +79,61 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
   }
 
   "post" when {
-    "called" must {
-      "return the page if there was a validation error" in new Fixture {
-        val result = controller.post()(request.withFormUrlEncodedBody())
+    "called" when {
+      "there was a validation error" must {
+        "return to the page with BAD_REQUEST response" in new Fixture {
+          val result = controller.post()(request.withFormUrlEncodedBody())
 
-        status(result) mustBe BAD_REQUEST
+          status(result) mustBe BAD_REQUEST
 
-        val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities")
-        contentAsString(result) must include(expectedError)
+          val expectedError = Messages("error.businessmatching.updateservice.tradingpremisessubmittedactivities")
+          contentAsString(result) must include(expectedError)
+        }
       }
 
-      "progress to the 'registration progress' page if the user chooses 'yes'" in new Fixture {
-        val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+      "the user chooses 'yes'" must {
+        "progress to the 'registration progress' page" when {
+          "fit and proper requirement already exists" in new Fixture {
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+            when {
+              controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+            } thenReturn OptionT.some[Future, Boolean](false)
+
+            val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+
+          }
+        }
+
+        "progress to the 'fit and proper' page" when {
+          "fit and proper requirement is introduced" in new Fixture {
+
+            when {
+              controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+            } thenReturn OptionT.some[Future, Boolean](true)
+
+            val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
+
+          }
+        }
 
       }
 
-      "progress to the 'which trading premises' page if the user chooses 'no'" in new Fixture {
-        val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "false"))
+      "the user chooses 'no'" must {
+        "progress to the 'which trading premises'" in new Fixture {
+          val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "false"))
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
 
+        }
       }
+
     }
   }
 

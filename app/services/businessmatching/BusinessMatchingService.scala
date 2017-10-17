@@ -59,7 +59,7 @@ class BusinessMatchingService @Inject()(
 
   }
 
-  private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
+  def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] = {
     for {
       viewResponse <- OptionT(cache.fetch[ViewResponse](ViewResponse.key))
@@ -74,6 +74,8 @@ class BusinessMatchingService @Inject()(
 
   def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ intersect _)
+
+  def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] = ???
 
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
     OptionT.liftF(statusService.getStatus) flatMap {
