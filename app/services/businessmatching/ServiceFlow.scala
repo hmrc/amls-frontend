@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package services.businessmatching
 
-import models.businessmatching._
+import javax.inject.Inject
+
 import cats.data.OptionT
+import connectors.DataCacheConnector
+import models.businessmatching.BusinessActivity
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import models.businessmatching._
 import cats.implicits._
 import connectors.DataCacheConnector
 
@@ -32,13 +39,11 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext
 import services.businessmatching.BusinessMatchingService
+import scala.concurrent.{ExecutionContext, Future}
 
 case class NextService(url: String, activity: BusinessActivity)
 
-trait NewServiceFlow {
-
-
-  val businessMatchingService: BusinessMatchingService
+class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, cacheConnector: DataCacheConnector) {
 
   private val activityToUrl = Map[BusinessActivity, String](
     MoneyServiceBusiness -> controllers.msb.routes.WhatYouNeedController.get().url,
@@ -56,7 +61,7 @@ trait NewServiceFlow {
     AccountancyServices -> { c => c.getEntry[Asp](Asp.key).fold(false)(_.isComplete) }
   )
 
-  private[controllers] def getNextFlow(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext, cacheMap: CacheMap) = {
+  def next(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext) = {
 
     def redirectUrl(activities: Set[BusinessActivity], cacheMap: CacheMap) = OptionT.fromOption[Future](
       activities collectFirst {
@@ -65,6 +70,7 @@ trait NewServiceFlow {
     )
 
     for {
+      cacheMap <- OptionT(cacheConnector.fetchAll)
       activities <- businessMatchingService.getAdditionalBusinessActivities
       (url, activity) <- redirectUrl(activities, cacheMap)
     } yield NextService(url, activity)

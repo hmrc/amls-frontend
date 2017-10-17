@@ -25,7 +25,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
-import services.businessmatching.BusinessMatchingService
+import services.businessmatching.{BusinessMatchingService, ServiceFlow, NextService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,8 +41,9 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
     val request = addToken(authRequest)
 
     val bmService = mock[BusinessMatchingService]
+    val serviceFlow = mock[ServiceFlow]
 
-    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, mockStatusService, bmService, messagesApi)
+    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, mockStatusService, bmService, serviceFlow, messagesApi)
   }
 
   "GET" when {
@@ -52,11 +53,15 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
           bmService.getAdditionalBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
 
+        when {
+          serviceFlow.next(any(), any(), any())
+        } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
+
         val result = controller.get()(request)
 
         status(result) mustBe OK
 
-        contentAsString(result) must include(MoneyServiceBusiness.getMessage)
+        contentAsString(result) must include(AccountancyServices.getMessage)
       }
     }
   }

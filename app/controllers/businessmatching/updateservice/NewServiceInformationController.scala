@@ -18,12 +18,13 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.Inject
 
+import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import play.api.i18n.MessagesApi
 import services.StatusService
-import services.businessmatching.BusinessMatchingService
+import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.new_service_information
 
@@ -33,15 +34,16 @@ class NewServiceInformationController @Inject()
   val dataCacheConnector: DataCacheConnector,
   val statusService: StatusService,
   val businessMatchingService: BusinessMatchingService,
+  val serviceFlow: ServiceFlow,
   val messages: MessagesApi
-) extends BaseController with NewServiceFlow {
+) extends BaseController {
 
   def get() = Authorised.async {
-    implicit request =>
-      implicit authContext => {
+    implicit request => implicit authContext => {
         for {
-          activities <- businessMatchingService.getAdditionalBusinessActivities
-        } yield Ok(new_service_information(activities.head))
+          cacheMap <- OptionT(dataCacheConnector.fetchAll)
+          nextService <- serviceFlow.next
+        } yield Ok(new_service_information(nextService.activity))
       } getOrElse InternalServerError("Unable to get business activities")
   }
 
