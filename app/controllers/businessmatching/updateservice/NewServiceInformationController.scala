@@ -42,8 +42,8 @@ class NewServiceInformationController @Inject()
     implicit request => implicit authContext => {
         for {
           cacheMap <- OptionT(dataCacheConnector.fetchAll)
-          nextService <- serviceFlow.next
-        } yield Ok(new_service_information(nextService.activity))
+          next <- serviceFlow.next
+        } yield Ok(new_service_information(next.activity, next.url))
       } getOrElse InternalServerError("Unable to get business activities")
   }
 

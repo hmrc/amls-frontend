@@ -62,6 +62,7 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
         status(result) mustBe OK
 
         contentAsString(result) must include(AccountancyServices.getMessage)
+        contentAsString(result) must include("/service")
       }
     }
   }

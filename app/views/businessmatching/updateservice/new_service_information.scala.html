@@ -16,6 +16,8 @@
 
 @import models.businessmatching.BusinessActivity
 
-@(activity: BusinessActivity)(implicit request: Request[_], messages: Messages)
+@(activity: BusinessActivity, flowUrl: String)(implicit request: Request[_], messages: Messages)
 
 @activity.getMessage
+
+<p><a href=@flowUrl>Next step</a></p>
