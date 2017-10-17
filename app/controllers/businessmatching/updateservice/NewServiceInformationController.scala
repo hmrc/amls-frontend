@@ -37,6 +37,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import models.hvd.Hvd
 import models.tcsp.Tcsp
+import scala.concurrent.Future
 
 class NewServiceInformationController @Inject()(
                                        val authConnector: AuthConnector,
@@ -73,12 +74,18 @@ class NewServiceInformationController @Inject()(
   )
 
   private[controllers] def getNextFlow(implicit hc: HeaderCarrier, ac: AuthContext) = {
+
+    def redirectUrl(activities: Set[BusinessActivity], cacheMap: CacheMap) = OptionT.fromOption[Future](
+      activities collectFirst {
+        case act if !activityToData(act)(cacheMap) => Redirect(activityToUrl(act))
+      }
+    )
+
     for {
       cacheMap <- OptionT(dataCacheConnector.fetchAll)
       activities <- businessMatchingService.getAdditionalBusinessActivities
-    } yield (activities collectFirst {
-      case act if !activityToData(act)(cacheMap) => Redirect(activityToUrl(act))
-    }).get
+      url <- redirectUrl(activities, cacheMap)
+    } yield url
   }
 
   def post() = Authorised.async {

@@ -131,6 +131,34 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
 
         result mustBe Some(Redirect(controllers.asp.routes.WhatYouNeedController.get().url))
       }
+
+      "adding two services that are incomplete" in new Fixture {
+        setUpActivities(Set(TrustAndCompanyServices, AccountancyServices))
+
+        val result = await(controller.getNextFlow.value)
+
+        result mustBe Some(Redirect(controllers.tcsp.routes.WhatYouNeedController.get().url))
+      }
+
+      "adding two services, where the first one is complete" in new Fixture {
+        setUpActivities(Set(TrustAndCompanyServices, AccountancyServices))
+
+        when(tcspModel.isComplete) thenReturn true
+
+        val result = await(controller.getNextFlow.value)
+
+        result mustBe Some(Redirect(controllers.asp.routes.WhatYouNeedController.get().url))
+      }
+
+      "adding a service where the service is already complete" in new Fixture {
+        setUpActivities(Set(EstateAgentBusinessService))
+
+        when(eabModel.isComplete) thenReturn true
+
+        val result = await(controller.getNextFlow.value)
+
+        result mustBe None
+      }
     }
   }
 }
