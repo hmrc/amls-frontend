@@ -33,7 +33,10 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext
 import services.businessmatching.BusinessMatchingService
 
+case class NextService(url: String, activity: BusinessActivity)
+
 trait NewServiceFlow {
+
 
   val businessMatchingService: BusinessMatchingService
 
@@ -57,13 +60,13 @@ trait NewServiceFlow {
 
     def redirectUrl(activities: Set[BusinessActivity], cacheMap: CacheMap) = OptionT.fromOption[Future](
       activities collectFirst {
-        case act if !activityToData(act)(cacheMap) => activityToUrl(act)
+        case act if !activityToData(act)(cacheMap) => (activityToUrl(act), act)
       }
     )
 
     for {
       activities <- businessMatchingService.getAdditionalBusinessActivities
-      url <- redirectUrl(activities, cacheMap)
-    } yield url
+      (url, activity) <- redirectUrl(activities, cacheMap)
+    } yield NextService(url, activity)
   }
 }

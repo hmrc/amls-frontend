@@ -39,13 +39,9 @@ import scala.concurrent.Future
 
 class NewServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends DependencyMocks {
+  trait Fixture extends DependencyMocks with NewServiceFlow {
 
-    val bmService = mock[BusinessMatchingService]
-
-    val subject = new NewServiceFlow {
-      override val businessMatchingService = bmService
-    }
+    val businessMatchingService = mock[BusinessMatchingService]
 
     val msbModel = mock[MsbModel]
     when(msbModel.isComplete(any(), any())) thenReturn false
@@ -68,7 +64,7 @@ class NewServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar wi
     mockCacheGetEntry[Asp](Some(aspModel), Asp.key)
 
     def setUpActivities(activities: Set[BusinessActivity]) = when {
-      bmService.getAdditionalBusinessActivities(any(), any(), any())
+      businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](activities)
   }
 
@@ -77,49 +73,49 @@ class NewServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar wi
       "adding the MSB service" in new Fixture {
         setUpActivities(Set(MoneyServiceBusiness))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.msb.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.msb.routes.WhatYouNeedController.get().url, MoneyServiceBusiness))
       }
 
       "adding the HVD service" in new Fixture {
         setUpActivities(Set(HighValueDealing))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.hvd.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.hvd.routes.WhatYouNeedController.get().url, HighValueDealing))
       }
 
       "adding the TSCP service" in new Fixture {
         setUpActivities(Set(TrustAndCompanyServices))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.tcsp.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.tcsp.routes.WhatYouNeedController.get().url, TrustAndCompanyServices))
       }
 
       "adding the EAB service" in new Fixture {
         setUpActivities(Set(EstateAgentBusinessService))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.estateagentbusiness.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.estateagentbusiness.routes.WhatYouNeedController.get().url, EstateAgentBusinessService))
       }
 
       "adding the Accountancy service" in new Fixture {
         setUpActivities(Set(AccountancyServices))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.asp.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.asp.routes.WhatYouNeedController.get().url, AccountancyServices))
       }
 
       "adding two services that are incomplete" in new Fixture {
         setUpActivities(Set(TrustAndCompanyServices, AccountancyServices))
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.tcsp.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.tcsp.routes.WhatYouNeedController.get().url, TrustAndCompanyServices))
       }
 
       "adding two services, where the first one is complete" in new Fixture {
@@ -127,9 +123,9 @@ class NewServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar wi
 
         when(tcspModel.isComplete) thenReturn true
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
-        result mustBe Some(controllers.asp.routes.WhatYouNeedController.get().url)
+        result mustBe Some(NextService(controllers.asp.routes.WhatYouNeedController.get().url, AccountancyServices))
       }
 
       "adding a service where the service is already complete" in new Fixture {
@@ -137,7 +133,7 @@ class NewServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar wi
 
         when(eabModel.isComplete) thenReturn true
 
-        val result = await(subject.getNextFlow.value)
+        val result = await(getNextFlow.value)
 
         result mustBe None
       }
