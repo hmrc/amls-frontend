@@ -19,22 +19,44 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.BooleanFormReadWrite
+
+import scala.concurrent.Future
 
 @Singleton
 class UpdateAnyInformationController @Inject()(
-                                                val authConnector: AuthConnector
+                                                val authConnector: AuthConnector,
+                                                val statusService: StatusService
                                               ) extends BaseController {
+
+  val NAME = "updateAnyInformation"
+
+  implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.updateanyInformation.validationerror")
 
   def get() = Authorised.async{
     implicit authContext => implicit request =>
-      ???
+      statusService.isPreSubmission map {
+        case false => Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
+        case true => NotFound(notFoundView)
+      }
   }
 
 
   def post() = Authorised.async{
     implicit authContext => implicit request =>
-      ???
+      Form2[Boolean](request.body) match {
+        case ValidForm(_, data) => data match {
+          case true => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+          case false => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+        }
+        case f:InvalidForm => Future.successful(
+          BadRequest(views.html.update_any_information(f, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
+        )
+      }
   }
 
 

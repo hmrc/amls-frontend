@@ -14,60 +14,44 @@
  * limitations under the License.
  */
 
-package controllers.renewal
+package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
-import models.registrationprogress.{Completed, Section}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{ProgressService, RenewalService}
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
   trait TestFixture extends AuthorisedFixture { self =>
+
     val request = addToken(self.authRequest)
 
     val cacheMap = CacheMap("", Map.empty)
 
-    val renewalSection = Section("renewal", Completed, true, controllers.renewal.routes.SummaryController.get())
-
     val dataCacheConnector = mock[DataCacheConnector]
-    val renewalService = mock[RenewalService]
-    val progressService = mock[ProgressService]
+    val statusService = mock[StatusService]
+
+    when {
+      controller.statusService.isPreSubmission(any(),any(),any())
+    } thenReturn Future.successful(false)
 
     lazy val controller = new UpdateAnyInformationController(
-      self.authConnector, dataCacheConnector, renewalService, progressService
+      self.authConnector,
+      statusService
     )
-
-    when {
-      controller.dataCacheConnector.fetchAll(any(), any())
-    } thenReturn Future.successful(Some(cacheMap))
-
-    when {
-      controller.renewalService.getSection(any(), any(), any())
-    } thenReturn Future.successful(renewalSection)
-
-    when {
-      controller.progressService.sections(cacheMap)
-    } thenReturn Seq.empty[Section]
 
   }
 
   "UpdateAnyInformationController" when {
     "get is called" must {
       "respond with OK with update_any_information" in new TestFixture {
-
-        when {
-          renewalService.canSubmit(renewalSection, Seq.empty[Section])
-        } thenReturn true
 
         val result = controller.get()(request)
 
@@ -76,11 +60,11 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
       }
 
       "respond with NOT_FOUND" when {
-        "renewal has not been submitted" in new TestFixture {
+        "status is pre-submission" in new TestFixture {
 
           when {
-            renewalService.canSubmit(renewalSection, Seq.empty[Section])
-          } thenReturn false
+            controller.statusService.isPreSubmission(any(),any(),any())
+          } thenReturn Future.successful(true)
 
           val result = controller.get()(request)
 
@@ -91,7 +75,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
     }
 
     "post is called" must {
-      "redirect to RenewalProgressController" when {
+      "redirect to RegistrationProgressController" when {
         "yes is selected" in new TestFixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody(
@@ -99,7 +83,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
           ))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.renewal.routes.RenewalProgressController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
         }
       }

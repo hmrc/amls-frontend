@@ -17,32 +17,32 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], call: Call, subheader: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading(Messages("renewal.updateanyinformation.title"), "summary.renewal")
+    @heading(Messages("updateanyinformation.title"), subheader)
 }
 
 @main(
-    title = Messages("renewal.updateanyinformation.title") + " - " + Messages("summary.renewal"),
+    title = Messages("updateanyinformation.title") + " - " + Messages(subheader),
     heading = header
 ) {
 
-    <p>@Messages("renewal.updateanyinformation.variation")</p>
-    <p>@Messages("renewal.updateanyinformation.example")</p>
+    <p>@Messages("updateanyinformation.variation")</p>
+    <p>@Messages("updateanyinformation.example")</p>
 
     <ul class="list list-bullet">
-        <li>@Messages("renewal.updateanyinformation.example.item1")</li>
-        <li>@Messages("renewal.updateanyinformation.example.item2")</li>
-        <li>@Messages("renewal.updateanyinformation.example.item3")</li>
+        <li>@Messages("updateanyinformation.example.item1")</li>
+        <li>@Messages("updateanyinformation.example.item2")</li>
+        <li>@Messages("updateanyinformation.example.item3")</li>
     </ul>
 
-    @form(f, controllers.renewal.routes.UpdateAnyInformationController.post()) {
+    @form(f, call) {
 
         @fieldset(
             f = f("updateAnyInformation-fieldset"),
-            legend = "renewal.updateanyinformation.title",
+            legend = "updateanyinformation.title",
             legendHidden = true,
             panel = false
         ) {
