@@ -32,7 +32,6 @@ class NewServiceInformationController @Inject()
 (
   val authConnector: AuthConnector,
   val dataCacheConnector: DataCacheConnector,
-  val statusService: StatusService,
   val businessMatchingService: BusinessMatchingService,
   val serviceFlow: ServiceFlow,
   val messages: MessagesApi
@@ -44,13 +43,6 @@ class NewServiceInformationController @Inject()
           cacheMap <- OptionT(dataCacheConnector.fetchAll)
           next <- serviceFlow.next
         } yield Ok(new_service_information(next.activity, next.url))
-      } getOrElse InternalServerError("Unable to get business activities")
+      } getOrElse Redirect(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get())
   }
-
-  def post() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
-        ???
-  }
-
 }

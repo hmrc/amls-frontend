@@ -33,17 +33,13 @@ import scala.concurrent.Future
 
 class NewServiceInformationControllerSpec extends GenericTestHelper with MockitoSugar with FutureAssertions with ScalaFutures {
 
-  //noinspection ScalaStyle
-  implicit val defaultPatience =
-    PatienceConfig(timeout = Span(10, Seconds), interval = Span(1000, Millis))
-
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val bmService = mock[BusinessMatchingService]
     val serviceFlow = mock[ServiceFlow]
 
-    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, mockStatusService, bmService, serviceFlow, messagesApi)
+    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, bmService, serviceFlow, messagesApi)
   }
 
   "GET" when {
@@ -63,6 +59,23 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
 
         contentAsString(result) must include(AccountancyServices.getMessage)
         contentAsString(result) must include("/service")
+      }
+
+      "redirect to the 'update more information' page" when {
+        "there are no services left to update" in new Fixture {
+          when {
+            bmService.getAdditionalBusinessActivities(any(), any(), any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
+
+          when {
+            serviceFlow.next(any(), any(), any())
+          } thenReturn OptionT.none[Future, NextService]
+
+          val result = controller.get()(request)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url)
+        }
       }
     }
   }
