@@ -29,13 +29,11 @@ import uk.gov.hmrc.play.http._
 import play.api.http.Status.OK
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut, HttpResponse, NotFoundException }
+import uk.gov.hmrc.http._
 
 trait AmlsConnector {
 
-  private[connectors] def httpPost: HttpPost
-
-  private[connectors] def httpGet: HttpGet
+  private[connectors] def http: CoreGet with CorePost
 
   private[connectors] def httpPut: HttpPut
 
@@ -60,7 +58,7 @@ trait AmlsConnector {
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
-    httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
+    http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -80,7 +78,7 @@ trait AmlsConnector {
     val prefix = "[AmlsConnector][status]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
-    httpGet.GET[ReadStatusResponse](getUrl) map {
+    http.GET[ReadStatusResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -101,7 +99,7 @@ trait AmlsConnector {
     val prefix = "[AmlsConnector][view]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
-    httpGet.GET[ViewResponse](getUrl) map {
+    http.GET[ViewResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -122,7 +120,7 @@ trait AmlsConnector {
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -142,7 +140,7 @@ trait AmlsConnector {
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -162,7 +160,7 @@ trait AmlsConnector {
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
@@ -181,7 +179,7 @@ trait AmlsConnector {
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
@@ -193,7 +191,7 @@ trait AmlsConnector {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
-    httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
+    http.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
   }
 
   def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest)
@@ -201,7 +199,7 @@ trait AmlsConnector {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 
-    httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
+    http.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String)
@@ -212,7 +210,7 @@ trait AmlsConnector {
 
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
-    httpPost.POSTString[HttpResponse](postUrl, paymentId)
+    http.POSTString[HttpResponse](postUrl, paymentId)
   }
 
   def getPaymentByPaymentReference(paymentReference: String)
@@ -222,7 +220,7 @@ trait AmlsConnector {
 
     Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
 
-    httpGet.GET[Payment](getUrl) map { result =>
+    http.GET[Payment](getUrl) map { result =>
       Some(result)
     } recover {
       case _: NotFoundException => None
@@ -236,7 +234,7 @@ trait AmlsConnector {
 
     Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
 
-    httpGet.GET[Payment](getUrl) map { result =>
+    http.GET[Payment](getUrl) map { result =>
       Some(result)
     } recover {
       case _: NotFoundException => None
@@ -252,11 +250,11 @@ trait AmlsConnector {
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
-  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[RegistrationDetails] = {
+  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
-    httpGet.GET[RegistrationDetails](getUrl)
+    http.GET[RegistrationDetails](getUrl)
   }
 
   def updateBacsStatus(ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = {
@@ -270,14 +268,13 @@ trait AmlsConnector {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$paymentUrl/$accountType/$accountId/bacs"
 
-    httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
+    http.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }
 
 }
 
 object AmlsConnector extends AmlsConnector {
-  override private[connectors] val httpPost = WSHttp
-  override private[connectors] val httpGet = WSHttp
+  override private[connectors] lazy val http = WSHttp
   override private[connectors] val httpPut = WSHttp
   override private[connectors] def url = ApplicationConfig.subscriptionUrl
   override private[connectors] def registrationUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"

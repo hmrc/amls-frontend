@@ -26,7 +26,7 @@ import play.api.mvc.{Filter, RequestHeader, Result}
 import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.HeaderCarrierConverter.fromHeadersAndSession
 
 class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)
                                   (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
@@ -51,7 +51,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     // In this case, the filter should not interfere
     val isFilePath = rh.path.matches(".*\\.[a-zA-Z0-9]+$")
 
-    implicit val headerCarrier = HeaderCarrier.fromHeadersAndSession(rh.headers, Some(rh.session))
+    implicit val headerCarrier = fromHeadersAndSession(rh.headers, Some(rh.session))
 
     if (headerCarrier.sessionId.isEmpty) {
       nextFilter(rh)
