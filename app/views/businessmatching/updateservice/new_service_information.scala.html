@@ -15,9 +15,33 @@
  *@
 
 @import models.businessmatching.BusinessActivity
+@import include._
+@import forms2.anchor
 
 @(activity: BusinessActivity, flowUrl: String)(implicit request: Request[_], messages: Messages)
 
-@activity.getMessage
+@header = {
+    @heading(
+        "businessmatching.updateservice.newserviceinformation.heading",
+        "summary.updateservice"
+    )
+}
 
-<p><a href=@flowUrl>Next step</a></p>
+@main(
+    title = messages("businessmatching.updateservice.newserviceinformation.title"),
+    heading = header
+) {
+
+    <div class="panel-indent panel-indent--gutter">
+        @messages("businessmatching.updateservice.newserviceinformation.info.gutter", activity.getMessage)
+    </div>
+
+    <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
+
+    @anchor(
+        attrHref = flowUrl,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = activity.getMessage
+    )
+}
