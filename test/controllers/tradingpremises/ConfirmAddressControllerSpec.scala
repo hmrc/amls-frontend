@@ -30,7 +30,6 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, RepeatingSection}
 
 import scala.concurrent.Future

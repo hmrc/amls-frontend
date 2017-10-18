@@ -32,9 +32,9 @@ import audit.AddressConversions._
 import cats.data.OptionT
 import cats.implicits._
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{Future, Promise}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
 

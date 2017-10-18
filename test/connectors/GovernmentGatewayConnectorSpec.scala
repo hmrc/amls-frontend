@@ -23,7 +23,6 @@ import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
-import uk.gov.hmrc.play.http.{HttpPost, HttpResponse}
 import org.mockito.Mockito._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
@@ -33,6 +32,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HttpPost, HttpResponse }
 
 class GovernmentGatewayConnectorSpec extends PlaySpec
   with OneAppPerSuite

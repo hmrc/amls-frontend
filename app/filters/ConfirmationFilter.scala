@@ -23,10 +23,10 @@ import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
 import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
-import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)
                                   (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {

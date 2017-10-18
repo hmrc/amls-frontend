@@ -32,9 +32,9 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 

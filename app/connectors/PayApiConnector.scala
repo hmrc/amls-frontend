@@ -25,10 +25,10 @@ import play.api.Logger
 import play.api.http.Status.OK
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 class PayApiConnector @Inject()(
                                  httpPost: HttpPost,

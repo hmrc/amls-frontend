@@ -28,11 +28,11 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with GenericTestHelper with PaymentGenerator {
 

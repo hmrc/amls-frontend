@@ -24,9 +24,9 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.SessionKeys
 
 trait AuthorisedFixture extends MockitoSugar {
 

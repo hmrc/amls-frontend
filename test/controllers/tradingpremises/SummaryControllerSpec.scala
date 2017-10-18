@@ -34,11 +34,11 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 

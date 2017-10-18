@@ -22,11 +22,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
-import uk.gov.hmrc.play.http.{HttpGet, NotFoundException}
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HttpGet, NotFoundException }
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,

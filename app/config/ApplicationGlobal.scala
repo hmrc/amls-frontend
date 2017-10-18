@@ -22,9 +22,10 @@ import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
+import uk.gov.hmrc.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
+import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter}
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
 abstract class ApplicationGlobal extends DefaultFrontendGlobal {

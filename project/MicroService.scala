@@ -45,6 +45,7 @@ trait MicroService {
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
+    .settings(scalaVersion := "2.11.11")
     .settings(routesImport += "models.notifications.ContactType._")
     .settings(
       libraryDependencies ++= appDependencies,

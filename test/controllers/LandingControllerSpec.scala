@@ -53,8 +53,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.{AuditEvent, ExtendedDataEvent}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.logging.Authorization
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
 import models.ReturnLocation
 
@@ -62,6 +60,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 

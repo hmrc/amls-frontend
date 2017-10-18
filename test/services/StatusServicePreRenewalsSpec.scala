@@ -29,10 +29,10 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Call
 import play.api.test.FakeApplication
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class StatusServicePreRenewalsSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
 

@@ -24,9 +24,9 @@ import play.api.Logger.{debug, warn}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 trait GovernmentGatewayConnector {
 

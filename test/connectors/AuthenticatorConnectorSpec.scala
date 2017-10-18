@@ -24,11 +24,11 @@ import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with MockitoSugar {
 

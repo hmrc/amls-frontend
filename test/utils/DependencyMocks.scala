@@ -17,7 +17,7 @@
 package utils
 
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait DependencyMocks extends CacheMocks with StatusMocks {
   implicit val mockAuthContext = mock[AuthContext]

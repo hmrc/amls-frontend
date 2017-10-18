@@ -23,10 +23,10 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, NotFoundException}
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, NotFoundException }
 
 class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneAppPerSuite {
 

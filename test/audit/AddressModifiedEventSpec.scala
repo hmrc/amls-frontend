@@ -19,11 +19,11 @@ package audit
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import cats.implicits._
-import uk.gov.hmrc.play.http.HeaderCarrier
 import audit.AddressConversions._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 

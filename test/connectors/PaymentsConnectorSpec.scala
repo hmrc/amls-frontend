@@ -30,10 +30,10 @@ import play.api.mvc.{AnyContentAsEmpty, Cookie, Cookies, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 

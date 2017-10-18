@@ -31,12 +31,12 @@ import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait RegistrationProgressController extends BaseController {
 

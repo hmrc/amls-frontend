@@ -26,11 +26,11 @@ import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDe
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.ControllerHelper
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait SummaryController extends BaseController {
 

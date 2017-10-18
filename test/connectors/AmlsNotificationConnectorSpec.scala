@@ -31,6 +31,7 @@ import org.joda.time.{DateTimeZone, LocalDateTime}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ BadRequestException, HeaderCarrier, HttpGet, HttpPost, NotFoundException }
 
 class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 

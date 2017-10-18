@@ -29,9 +29,9 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite with MockitoSugar with ScalaFutures {
 

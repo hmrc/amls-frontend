@@ -19,9 +19,9 @@ package services
 import connectors.DataCacheConnector
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier}
 
 import scala.concurrent.{Future, ExecutionContext}
+import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 
 private[services] trait DataCacheService {
 

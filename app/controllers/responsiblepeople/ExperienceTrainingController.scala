@@ -24,11 +24,11 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePeople}
 import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ExperienceTrainingController extends RepeatingSection with BaseController {
 

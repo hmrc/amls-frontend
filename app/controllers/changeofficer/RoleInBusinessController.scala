@@ -28,9 +28,9 @@ import models.businessmatching.BusinessMatching
 import models.changeofficer.{Role, ChangeOfficer, RoleInBusiness}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class RoleInBusinessController @Inject()
 (val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {

@@ -21,10 +21,11 @@ import models.notifications.{NotificationDetails, NotificationResponse, Notifica
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, _}
+import uk.gov.hmrc.play.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, NotFoundException }
 
 trait AmlsNotificationConnector {
 
