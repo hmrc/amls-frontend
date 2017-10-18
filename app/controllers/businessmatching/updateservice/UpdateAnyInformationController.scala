@@ -19,11 +19,13 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
 class UpdateAnyInformationController @Inject()(
-                                                val authConnector: AuthConnector
+                                                val authConnector: AuthConnector,
+                                                val statusService: StatusService
                                               ) extends BaseController {
 
   def get() = Authorised.async{
