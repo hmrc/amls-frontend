@@ -46,7 +46,7 @@ class UpdateAnyInformationController @Inject()(
       } yield {
         val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
         if(renewalService.canSubmit(renewals, variationSections)){
-          Ok(views.html.renewal.update_any_information(EmptyForm))
+          Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.renewal"))
         } else {
           NotFound(notFoundView)
         }
@@ -61,7 +61,9 @@ class UpdateAnyInformationController @Inject()(
           case UpdateAnyInformationYes => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get().url))
           case UpdateAnyInformationNo => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
         }
-        case f:InvalidForm => Future.successful(BadRequest(views.html.renewal.update_any_information(f)))
+        case f:InvalidForm => Future.successful(
+          BadRequest(views.html.update_any_information(f, routes.UpdateAnyInformationController.post(), "summary.renewal"))
+        )
       }
   }
 

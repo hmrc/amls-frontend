@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.EmptyForm
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -30,7 +31,10 @@ class UpdateAnyInformationController @Inject()(
 
   def get() = Authorised.async{
     implicit authContext => implicit request =>
-      ???
+      statusService.isPreSubmission map {
+        case false => Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
+        case true => NotFound(notFoundView)
+      }
   }
 
 
