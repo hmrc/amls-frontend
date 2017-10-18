@@ -18,7 +18,6 @@ package views
 
 import forms.{EmptyForm, Form2, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.UpdateAnyInformation
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.mvc.Call
@@ -33,20 +32,20 @@ class update_any_informationSpec extends GenericTestHelper with MustMatchers  {
   "update_any_information view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: Form2[UpdateAnyInformation] = EmptyForm
+      val form2 = EmptyForm
 
       def view = views.html.update_any_information(form2, mock[Call], "summary.renewal")
 
-      doc.title must startWith(Messages("renewal.updateanyinformation.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("updateanyinformation.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: Form2[UpdateAnyInformation] = EmptyForm
+      val form2 = EmptyForm
 
       def view = views.html.update_any_information(form2, mock[Call], "summary.renewal")
 
-      heading.html must be(Messages("renewal.updateanyinformation.title"))
+      heading.html must be(Messages("updateanyinformation.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

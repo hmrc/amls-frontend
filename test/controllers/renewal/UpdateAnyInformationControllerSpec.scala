@@ -72,7 +72,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
         val result = controller.get()(request)
 
         status(result) mustBe OK
-        contentAsString(result) must include(Messages("renewal.updateanyinformation.title"))
+        contentAsString(result) must include(Messages("updateanyinformation.title"))
       }
 
       "respond with NOT_FOUND" when {
