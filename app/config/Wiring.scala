@@ -23,19 +23,31 @@ import play.api.Play
 import play.api.mvc.Call
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
-import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 import uk.gov.hmrc.whitelist.AkamaiWhitelistFilter
-import uk.gov.hmrc.http.HttpGet
-import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
-import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.hooks.HttpHooks
+import uk.gov.hmrc.play.frontend.config.LoadAuditingConfig
+import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter, MicroserviceFilterSupport}
+
+trait Hooks extends HttpHooks with HttpAuditing {
+  override val hooks = Seq.empty
+  override lazy val auditConnector: AuditConnector = AMLSAuditConnector
+}
+
+trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
+  with Hooks with HttpPatch with WSPatch with AppName with RunMode {
+
+}
+
+object WSHttp extends WSHttp
+
 
 object AMLSControllerConfig extends ControllerConfig {
   override def controllerConfigs: Config = Play.current.configuration.underlying.getConfig("controllers")
@@ -91,10 +103,6 @@ object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSu
     AMLSControllerConfig.paramsForController(controllerName).needsLogging
 }
 
-object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode  with HttpAuditing {
-  override lazy val auditConnector: AuditConnector = AMLSAuditConnector
-  override val hooks = Seq(AuditingHook)
-}
 
 object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever {
   override lazy val httpGet: HttpGet = WSHttp
