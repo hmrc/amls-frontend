@@ -323,8 +323,7 @@ POST        /update-service/fit-and-proper/                                     
 GET         /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.get()
 POST        /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.post()
 
-GET         /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.get()
-POST        /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.post()
+GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.NewServiceInformationController.get()
 
 GET         /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.get()
 POST        /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.post()
