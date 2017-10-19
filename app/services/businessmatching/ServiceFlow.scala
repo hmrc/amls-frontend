@@ -62,10 +62,9 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
   )
 
   def next(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext) = {
-
     def redirectUrl(activities: Set[BusinessActivity], cacheMap: CacheMap) = OptionT.fromOption[Future](
       activities collectFirst {
-        case act if !activityToData(act)(cacheMap) => (activityToUrl(act), act)
+        case act if activityToData.contains(act) && !activityToData(act)(cacheMap) => (activityToUrl(act), act)
       }
     )
 
@@ -75,4 +74,11 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
       (url, activity) <- redirectUrl(activities, cacheMap)
     } yield NextService(url, activity)
   }
+
+  def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    businessMatchingService.getAdditionalBusinessActivities.value map {
+      case Some(set) => set.contains(activity)
+      case _ => false
+    }
+
 }
