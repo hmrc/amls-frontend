@@ -22,7 +22,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Action, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.frontend.filters.MicroserviceFilterSupport
 
 sealed trait FilterSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Results with MicroserviceFilterSupport {
 

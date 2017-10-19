@@ -28,10 +28,10 @@ import uk.gov.hmrc.play.config.inject.ServicesConfig
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 
 class PayApiConnector @Inject()(
-                                 httpPost: HttpPost,
+                                 httpPost: CorePost,
                                  config: ServicesConfig
                                ) extends HttpResponseHelper {
 

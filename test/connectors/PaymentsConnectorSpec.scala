@@ -19,21 +19,20 @@ package connectors
 import models.payments.{PaymentRedirectRequest, PaymentServiceRedirect}
 import models.ReturnLocation
 import org.apache.http.client.HttpResponseException
-import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContentAsEmpty, Cookie, Cookies, Request}
+import play.api.mvc.{Cookie, Cookies}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.crypto.ApplicationCrypto
+
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 
 class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -41,14 +40,14 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   trait TestFixture {
 
-    val http = mock[HttpPost]
+    val http = mock[CorePost]
     val authConnector = mock[AuthConnector]
 
     val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .configure("microservice.services.feature-toggle.payments-url-lookup" -> true)
       .overrides(bind[AuthConnector].to(authConnector))
-      .overrides(bind[HttpPost].to(http))
+      .overrides(bind[CorePost].to(http))
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -62,7 +61,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     def createResponse(f: () => Future[HttpResponse]) = {
       when {
-        http.POST[PaymentRedirectRequest, HttpResponse](any(), any(), any())(any(), any(), any())
+        http.POST[PaymentRedirectRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
       } thenReturn f()
     }
 
@@ -95,7 +94,7 @@ class PaymentsConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         result mustBe Some(PaymentServiceRedirect("http://localhost:9050/pay-online/card-selection", cookies))
 
-        verify(http).POST(any(), any(), any())(any(), any(), any())
+        verify(http).POST(any(), any(), any())(any(), any(), any(), any())
       }
     }
 

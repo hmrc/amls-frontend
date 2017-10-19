@@ -70,7 +70,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.cache(eqTo(oid), eqTo(key), eqTo(model))(any(), any())
+        DataCacheConnector.shortLivedCache.cache(eqTo(oid), eqTo(key), eqTo(model))(any(), any(), any())
       } thenReturn Future.successful(emptyCache)
 
       val result = DataCacheConnector.save(key, model)
@@ -86,7 +86,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.fetchAndGetEntry[Model](eqTo(oid), eqTo(key))(any(), any())
+        DataCacheConnector.shortLivedCache.fetchAndGetEntry[Model](eqTo(oid), eqTo(key))(any(), any(), any())
       } thenReturn Future.successful(Some(model))
 
       val result = DataCacheConnector.fetch[Model](key)
@@ -102,7 +102,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.fetch(eqTo(oid))(any())
+        DataCacheConnector.shortLivedCache.fetch(eqTo(oid))(any(), any())
       } thenReturn Future.successful(Some(emptyCache))
 
       val result = DataCacheConnector.fetchAll
@@ -118,10 +118,10 @@ class DataCacheConnectorSpec
       val response = mock[HttpResponse]
 
       when {
-        DataCacheConnector.shortLivedCache.remove(any())(any())
+        DataCacheConnector.shortLivedCache.remove(any())(any(), any())
       } thenReturn Future.successful(response)
 
-      val result = DataCacheConnector.remove(eqTo(key))(any())
+      val result = DataCacheConnector.shortLivedCache.remove(eqTo(key))(any(), any())
 
       whenReady(result) {
         result =>

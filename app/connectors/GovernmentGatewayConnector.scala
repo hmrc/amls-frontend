@@ -26,11 +26,11 @@ import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.config.AppName
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 
 trait GovernmentGatewayConnector {
 
-  protected[connectors] def http: HttpPost
+  protected[connectors] def http: CorePost
   protected def enrolUrl: String
   private[connectors] def audit: Audit
 
@@ -66,7 +66,7 @@ trait GovernmentGatewayConnector {
 }
 
 object GovernmentGatewayConnector extends GovernmentGatewayConnector {
-  override val http: HttpPost = WSHttp
+  override val http: CorePost = WSHttp
   override val enrolUrl: String = ApplicationConfig.enrolUrl
   override private[connectors] val audit = new Audit(AppName.appName, AMLSAuditConnector)
   private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"

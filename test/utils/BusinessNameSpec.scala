@@ -51,7 +51,7 @@ class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite wi
   "The BusinessName helper utility" must {
     "get the business name from amls" in new Fixture {
       when {
-        amlsConnector.registrationDetails(eqTo(safeId))(any(), any())
+        amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
       whenReady(BusinessName.getName(safeId.some).value) { result =>

@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HttpGet, NotFoundException }
+import uk.gov.hmrc.http.{CoreGet, HttpGet, NotFoundException}
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -65,7 +65,7 @@ object BusinessMatchingReviewDetails {
 }
 
 trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPartialsConverter {
-  val httpGet: HttpGet
+  val http: CoreGet
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
 
@@ -76,7 +76,7 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
 
     Logger.debug(s"$logPrefix Fetching $url..")
 
-    httpGet.GET[BusinessMatchingReviewDetails](url) map { result =>
+    http.GET[BusinessMatchingReviewDetails](url) map { result =>
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       Some(result)
     } recoverWith {
@@ -89,6 +89,6 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
 }
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
-  override val httpGet = WSHttp
+  override val http = WSHttp
   override val crypto = SessionCookieCryptoFilter.encrypt _
 }

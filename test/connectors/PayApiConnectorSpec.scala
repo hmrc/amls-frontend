@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 
 class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience {
 
@@ -55,7 +55,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
-    val httpPost = mock[HttpPost]
+    val httpPost = mock[CorePost]
     val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
@@ -76,7 +76,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     }
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[HttpPost].to(httpPost))
+      .overrides(bind[CorePost].to(httpPost))
       .bindings(bind[ServicesConfig].to(config))
       .build()
 
@@ -88,7 +88,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any())
+            httpPost.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
             HttpResponse(OK,Some(Json.toJson(validResponse)))
           )
@@ -106,7 +106,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           whenReady(connector.createPayment(validRequest)) { r =>
             r must not be defined
 
-            verify(httpPost, never).POST(any(), any(), any())(any(), any(), any())
+            verify(httpPost, never).POST(any(), any(), any())(any(), any(), any(), any())
           }
         }
       }

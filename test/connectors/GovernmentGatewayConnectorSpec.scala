@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HttpPost, HttpResponse }
+import uk.gov.hmrc.http.{CorePost, HttpResponse}
 
 class GovernmentGatewayConnectorSpec extends PlaySpec
   with OneAppPerSuite
@@ -49,7 +49,7 @@ class GovernmentGatewayConnectorSpec extends PlaySpec
 
   trait Fixture extends DependencyMocks {
     val connector = new GovernmentGatewayConnector {
-      override protected[connectors] val http = mock[HttpPost]
+      override protected[connectors] val http = mock[CorePost]
       override protected val enrolUrl = "/testurl"
       override private[connectors] val audit = mock[Audit]
     }
@@ -58,7 +58,7 @@ class GovernmentGatewayConnectorSpec extends PlaySpec
     when(connector.audit.sendDataEvent) thenReturn fn
 
     def mockHttpCall(response: Future[HttpResponse]) = when {
-      connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any())
+      connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
     } thenReturn response
   }
 

@@ -28,10 +28,10 @@ import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost }
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier}
 
 @Singleton
-class PaymentsConnector @Inject()(http: HttpPost, config: ServicesConfig, configuration: Configuration, authConnector: AuthConnector) {
+class PaymentsConnector @Inject()(http: CorePost, config: ServicesConfig, configuration: Configuration, authConnector: AuthConnector) {
 
   val baseUrl = config.baseUrl("payments-frontend")
   lazy val customPaymentId = config.getConfString("payments-frontend.custom-payment-id", "")

@@ -43,7 +43,7 @@ trait AuthorisedFixture extends MockitoSugar {
     SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
-  when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority))
+  when(authConnector.currentAuthority(any(), any())) thenReturn Future.successful(Some(authority))
 }
 
 

@@ -68,7 +68,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "successfully receive feeResponse" in {
 
       when {
-        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any())
+        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
       whenReady(FeeConnector.feeResponse(amlsRegistrationNumber)){

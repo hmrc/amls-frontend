@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, Upstream4xxResponse }
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.controllers.RestFormats
 
 case class Ids(internalId: String)
@@ -54,31 +54,31 @@ trait AuthConnector {
 
   private[connectors] def authUrl: String
 
-  private[connectors] def httpGet: HttpGet
+  private[connectors] val http : CoreGet
 
   def enrollments(uri: String)(implicit
                                headerCarrier: HeaderCarrier,
                                ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
 
-    httpGet.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
+    http.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
 
   }
 
   def getCurrentAuthority(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Authority] = {
-    httpGet.GET[Authority](s"$authUrl/auth/authority").recoverWith {
+    http.GET[Authority](s"$authUrl/auth/authority").recoverWith {
       case (t: Upstream4xxResponse) if t.upstreamResponseCode == HttpStatus.SC_UNAUTHORIZED => Future.failed(new Exception("Bearer token expired"))
 
     }
   }
 
   def getIds(authority: Authority)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Ids] = {
-    httpGet.GET[Ids](s"$authUrl/${authority.normalisedIds}")
+    http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
   }
 }
 
 object AuthConnector extends AuthConnector {
   // $COVERAGE-OFF$
   override private[connectors] lazy val authUrl = ApplicationConfig.authUrl
-  override private[connectors] lazy val httpGet = WSHttp
+  override private[connectors] lazy val http = WSHttp
   // $COVERAGE-ON$
 }

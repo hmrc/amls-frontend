@@ -59,13 +59,13 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       val featureToggleSetting = true
 
-      when(http.POSTEmpty[HttpResponse](any())(any(), any())) thenReturn Future.successful(HttpResponse(200))
+      when(http.POSTEmpty[HttpResponse](any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
 
       val result = Await.result(connector.refreshProfile, 5 seconds)
 
       result.status must be(200)
 
-      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any())
+      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any(), any())
 
     }
 
@@ -77,7 +77,7 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       result.status must be(200)
 
-      verify(http, never).POSTEmpty(any())(any(), any())
+      verify(http, never).POSTEmpty(any())(any(), any(), any())
     }
 
   }

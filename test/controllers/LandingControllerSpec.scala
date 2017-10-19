@@ -34,29 +34,24 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{Country, SubscriptionFees, SubscriptionResponse}
-import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.{ArgumentCaptor, Mockito}
+import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
-import play.api.i18n.Messages
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.{AuditEvent, ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import models.ReturnLocation
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -171,7 +166,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
 
-          verify(controller.auditConnector).sendEvent(any[ExtendedDataEvent])(any(), any())
+          verify(controller.auditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any(), any())
         }
 
         "the landing service has review details with invalid postcode" in new Fixture {
@@ -252,7 +247,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           when(httpResponse.status) thenReturn (NO_CONTENT)
 
-          when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
+          when(controller.shortLivedCache.remove(any())(any(), any())) thenReturn Future.successful(httpResponse)
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
           when(complete.isComplete) thenReturn false
@@ -275,7 +270,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
           when(httpResponse.status) thenReturn (BAD_REQUEST)
 
-          when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
+          when(controller.shortLivedCache.remove(any())(any(), any())) thenReturn Future.successful(httpResponse)
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
           when(complete.isComplete) thenReturn false
