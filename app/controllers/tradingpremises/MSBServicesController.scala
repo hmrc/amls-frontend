@@ -30,7 +30,6 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{DateOfChangeHelper, RepeatingSection}
 import models.tradingpremises.MsbServices._
 

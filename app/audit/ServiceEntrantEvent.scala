@@ -18,10 +18,10 @@ package audit
 
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import play.api.libs.json._
 import play.api.mvc.Request
+import uk.gov.hmrc.http.HeaderCarrier
 
 object ServiceEntrantEvent {
 

@@ -24,9 +24,9 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.SessionKeys
 
 trait AuthorisedFixture extends MockitoSugar {
 
@@ -43,7 +43,7 @@ trait AuthorisedFixture extends MockitoSugar {
     SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
-  when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority))
+  when(authConnector.currentAuthority(any(), any())) thenReturn Future.successful(Some(authority))
 }
 
 

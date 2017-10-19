@@ -27,10 +27,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AmlsRefNumberBrokerSpec extends PlaySpec with MustMatchers with MockitoSugar with PaymentGenerator with ScalaFutures {
 

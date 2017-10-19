@@ -25,9 +25,9 @@ import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait DeclarationController extends BaseController {
 

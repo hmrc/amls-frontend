@@ -45,11 +45,11 @@ import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.http.Status.OK
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
 

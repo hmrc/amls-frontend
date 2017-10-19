@@ -33,10 +33,10 @@ import utils.AuthorisedFixture
 import org.mockito.ArgumentCaptor
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 

@@ -28,11 +28,12 @@ import play.api.mvc.Result
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.businessmatching.updateservice.current_trading_premises
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,

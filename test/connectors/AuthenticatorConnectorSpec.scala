@@ -24,11 +24,11 @@ import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with MockitoSugar {
 
@@ -59,13 +59,13 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       val featureToggleSetting = true
 
-      when(http.POSTEmpty[HttpResponse](any())(any(), any())) thenReturn Future.successful(HttpResponse(200))
+      when(http.POSTEmpty[HttpResponse](any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
 
       val result = Await.result(connector.refreshProfile, 5 seconds)
 
       result.status must be(200)
 
-      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any())
+      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any(), any())
 
     }
 
@@ -77,7 +77,7 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
       result.status must be(200)
 
-      verify(http, never).POSTEmpty(any())(any(), any())
+      verify(http, never).POSTEmpty(any())(any(), any(), any())
     }
 
   }

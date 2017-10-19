@@ -36,10 +36,10 @@ import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 
 class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {

@@ -30,11 +30,11 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
+import uk.gov.hmrc.http.HeaderCarrier
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper with MockitoSugar {
 

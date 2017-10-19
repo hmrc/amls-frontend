@@ -24,10 +24,10 @@ import connectors.AmlsNotificationConnector
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {

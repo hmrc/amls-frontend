@@ -19,16 +19,12 @@ package services.businessmatching
 import javax.inject.Inject
 
 import cats.data.OptionT
-import connectors.DataCacheConnector
 import models.businessmatching.BusinessActivity
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 import models.businessmatching._
 import cats.implicits._
 import connectors.DataCacheConnector
 
-import scala.concurrent.Future
 import models.hvd.Hvd
 import models.tcsp.Tcsp
 import models.estateagentbusiness.EstateAgentBusiness
@@ -36,9 +32,6 @@ import models.asp.Asp
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
-import scala.concurrent.ExecutionContext
-import services.businessmatching.BusinessMatchingService
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NextService(url: String, activity: BusinessActivity)

@@ -28,11 +28,11 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with MockitoSugar {
 

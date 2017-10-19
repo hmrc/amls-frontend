@@ -20,9 +20,9 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.Logger
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 import play.api.http.Status._
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 @Singleton
 class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {

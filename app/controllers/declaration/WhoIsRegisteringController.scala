@@ -30,11 +30,11 @@ import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhoIsRegisteringController extends BaseController {
 

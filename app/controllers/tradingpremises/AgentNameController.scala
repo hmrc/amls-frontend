@@ -29,10 +29,10 @@ import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 

@@ -35,10 +35,10 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 

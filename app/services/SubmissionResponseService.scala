@@ -29,10 +29,10 @@ import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 sealed case class RowEntity(message: String, feePer: BigDecimal)
 

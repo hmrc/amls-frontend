@@ -30,9 +30,9 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
+import uk.gov.hmrc.http.HeaderCarrier
 
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,

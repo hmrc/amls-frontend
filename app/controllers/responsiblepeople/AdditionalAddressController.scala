@@ -30,10 +30,10 @@ import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_address
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait AdditionalAddressController extends RepeatingSection with BaseController {
 

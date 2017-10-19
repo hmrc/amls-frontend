@@ -29,10 +29,10 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Result
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ServicesController extends BaseController {
 

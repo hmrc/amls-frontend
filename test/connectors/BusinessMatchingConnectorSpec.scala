@@ -23,10 +23,10 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, NotFoundException}
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpGet, NotFoundException}
 
 class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneAppPerSuite {
 
@@ -61,7 +61,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
   trait Fixture extends AuthorisedFixture { self =>
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector {
-      override val httpGet = mock[HttpGet]
+      override val http = mock[CoreGet]
       override val crypto = SessionCookieCryptoFilter.encrypt _
     }
 
@@ -89,7 +89,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
     "get the review details" in new Fixture {
 
-      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any()))
+      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.successful(validResponseDetail))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
@@ -99,7 +99,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
     }
 
     "return None when business matching returns 404" in new Fixture {
-      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any()))
+      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.failed(new NotFoundException("The review details were not found")))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
@@ -111,7 +111,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
       val ex = new Exception("Some other exception")
 
       when {
-        TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any())
+        TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any())
       } thenReturn Future.failed(ex)
 
       intercept[Exception] {

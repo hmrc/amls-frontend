@@ -43,10 +43,10 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 import audit.AddressConversions._
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 

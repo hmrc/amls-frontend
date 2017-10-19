@@ -31,7 +31,6 @@ import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AmlsRefNumberBroker, BusinessName}
 import views.html.confirmation._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -39,6 +38,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Right
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ConfirmationController extends BaseController {
 

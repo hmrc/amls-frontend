@@ -33,10 +33,10 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester with ServicesConfig {
 
