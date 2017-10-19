@@ -21,3 +21,4 @@ dist
 ensime-langserver.log
 pc.stdout.log
 .DS_Store
+.jvmopts
