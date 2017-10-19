@@ -48,8 +48,8 @@ POST        /about-the-business/previously-registered                           
 GET         /about-the-business/vat                                                   controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/vat                                                   controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /about-the-business/corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
-POST        /about-the-business/corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+GET         /about-the-business/corporation-tax                                       @controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /about-the-business/corporation-tax                                       @controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
 GET         /about-the-business/confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)

@@ -16,9 +16,10 @@
 
 package controllers.aboutthebusiness
 
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -28,6 +29,7 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.ControllerHelper
 import views.html.aboutthebusiness.corporation_tax_registered
@@ -35,10 +37,13 @@ import views.html.aboutthebusiness.corporation_tax_registered
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait CorporationTaxRegisteredController extends BaseController {
+@Singleton
+class CorporationTaxRegisteredController @Inject()(
+                                                    val authConnector: AuthConnector,
+                                                    val dataCacheConnector: DataCacheConnector,
+                                                    val businessMatchingConnector: BusinessMatchingConnector
+                                                  ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
-  val businessMatchingConnector: BusinessMatchingConnector
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -92,10 +97,4 @@ trait CorporationTaxRegisteredController extends BaseController {
   } else {
     Redirect(routes.ConfirmRegisteredOfficeController.get())
   }
-}
-
-object CorporationTaxRegisteredController extends CorporationTaxRegisteredController {
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val businessMatchingConnector = BusinessMatchingConnector
 }
