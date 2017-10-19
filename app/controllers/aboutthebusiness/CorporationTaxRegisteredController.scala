@@ -43,8 +43,8 @@ trait CorporationTaxRegisteredController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      filterByBusinessType { cacheMap =>
-        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap {
+      filterByBusinessType { cache =>
+        cache.getEntry[AboutTheBusiness](AboutTheBusiness.key) match {
           case Some(response) if response.corporationTaxRegistered.isDefined =>
             Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
           case _ =>
@@ -52,7 +52,7 @@ trait CorporationTaxRegisteredController extends BaseController {
               bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
               details <- OptionT.fromOption[Future](bm.reviewDetails)
               utr <- OptionT.fromOption[Future](details.utr)
-              _ <- updateCache(CorporationTaxRegisteredYes(utr))
+              _ <- updateCache(cache, CorporationTaxRegisteredYes(utr))
             } yield getRedirectLocation(edit)
 
             updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
@@ -67,7 +67,7 @@ trait CorporationTaxRegisteredController extends BaseController {
           case f: InvalidForm =>
             Future.successful(BadRequest(corporation_tax_registered(f, edit)))
           case ValidForm(_, data) =>
-            updateCache(data) map { _ =>
+            updateCache(cache, data) map { _ =>
               getRedirectLocation(edit)
             } getOrElse failedResult
         }
@@ -84,7 +84,7 @@ trait CorporationTaxRegisteredController extends BaseController {
     } getOrElse InternalServerError("Could not retrieve business type")
   }
 
-  private def updateCache(data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
+  private def updateCache(cache: CacheMap, data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
     aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
     cacheMap <- OptionT.liftF(dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.corporationTaxRegistered(data)))
   } yield cacheMap
