@@ -18,11 +18,12 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import models.asp.Asp
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
+import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
@@ -31,10 +32,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mockCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val serviceFlow = mock[ServiceFlow]
+    val controller = new SummaryController(mockCacheConnector, serviceFlow, self.authConnector)
 
     mockCacheSave[Asp]
   }
@@ -69,8 +68,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val result = controller.post()(postRequest)
       status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
       verify(mockCacheConnector).save[Asp](eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
     }
+
+
+
   }
 }

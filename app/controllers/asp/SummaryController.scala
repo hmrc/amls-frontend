@@ -16,17 +16,19 @@
 
 package controllers.asp
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.asp.Asp
 import views.html.asp.summary
 import forms._
+import play.api.Play
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
-
+class SummaryController @Inject()(dataCache: DataCacheConnector, serviceFlow: ServiceFlow, val authConnector: AuthConnector) extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[Asp](Asp.key) map {
@@ -41,17 +43,10 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       for {
         asp <- dataCache.fetch[Asp](Asp.key)
-        _ <- dataCache.save[Asp](Asp.key,
-          asp.copy(hasAccepted = true)
+        _ <- dataCache.save[Asp](Asp.key, asp.copy(hasAccepted = true)
         )
       } yield {
         Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

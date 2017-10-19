@@ -452,8 +452,8 @@ POST        /accountancy-service-provider/agent-scheme                          
 GET         /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.get
 POST        /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
-GET         /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.get()
-POST        /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.post()
+GET         /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.get()
+POST        /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.post()
 
 GET         /trust-company-service-provider/what-you-need                             controllers.tcsp.WhatYouNeedController.get()
 
