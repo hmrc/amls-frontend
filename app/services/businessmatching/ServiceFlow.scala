@@ -30,6 +30,7 @@ import models.tcsp.Tcsp
 import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.HeaderCarrier
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
