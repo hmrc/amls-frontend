@@ -21,7 +21,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness._
-import models.businessmatching.BusinessType.Partnership
+import models.businessmatching.BusinessType.{Partnership, LPrLLP, LimitedCompany}
 import models.businessmatching.BusinessMatching
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
@@ -61,7 +61,7 @@ trait VATRegisteredController extends BaseController {
                   aboutTheBusiness.vatRegistered(data))
                 (businessType, edit) match {
                   case (_,true) => Redirect(routes.SummaryController.get())
-                  case (Partnership, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+                  case ((Partnership | LPrLLP | LimitedCompany), false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
                   case (_, _) => Redirect(routes.CorporationTaxRegisteredController.get(edit))
                 }
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))

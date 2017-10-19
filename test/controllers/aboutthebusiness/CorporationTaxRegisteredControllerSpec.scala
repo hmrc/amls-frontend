@@ -16,158 +16,191 @@
 
 package controllers.aboutthebusiness
 
-import connectors.{BusinessMatchingConnector, DataCacheConnector}
+import connectors.BusinessMatchingConnector
+import models.Country
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
+import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor, UnincorporatedBody}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with DependencyMocks {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
 
+    mockCacheFetchAll
+    mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
+      "BusinessName",
+      Some(LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+    ))), BusinessMatching.key)
+
     val controller = new CorporationTaxRegisteredController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+      override val dataCacheConnector = mockCacheConnector
       override val authConnector = self.authConnector
       override val businessMatchingConnector = mock[BusinessMatchingConnector]
     }
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  "CorporationTaxRegisteredController" when {
 
-  "CorporationTaxRegisteredController" must {
+    "get is called" must {
 
-    "on get display the registered for corporation tax page" in new Fixture {
+      "display the registered for corporation tax page with pre populated data" in new Fixture {
 
-      when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(None)
+        val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
 
-      val result = controller.get()(request)
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
+        document.getElementById("corporationTaxReference").`val` must be("1111111111")
+      }
 
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("aboutthebusiness.registeredforcorporationtax.title"))
+      "display an empty form when no previous entry" in new Fixture {
+
+        val data = AboutTheBusiness(corporationTaxRegistered = None)
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))
+          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+        when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        val content = contentAsString(result)
+
+        content must include(Messages("aboutthebusiness.registeredforcorporationtax.title"))
+
+        val document = Jsoup.parse(content)
+        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(false)
+        document.getElementById("corporationTaxReference").`val` must be("")
+      }
+
+      "respond with NOT_FOUND" must {
+         "business type is UnincorporatedBody" in new Fixture {
+
+           mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
+             "BusinessName",
+             Some(UnincorporatedBody),
+             Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+           ))), BusinessMatching.key)
+
+           val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+
+           when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+             (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+           val result = controller.get()(request)
+           status(result) must be(NOT_FOUND)
+        }
+      }
+
     }
 
-    "on get display the registered for corporation tax page with pre populated data" in new Fixture {
+    "post is called" when {
 
-      val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+      "with valid data" must {
+        "redirect to registered office page" when {
+          "edit is false" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForCorporationTax" -> "true",
+              "corporationTaxReference" -> "1111111111"
+            )
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-      document.getElementById("corporationTaxReference").`val` must be("1111111111")
+            when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
+
+            when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+          }
+        }
+
+        "redirect to summary page" when {
+          "edit is true" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "registeredForCorporationTax" -> "true",
+              "corporationTaxReference" -> "1111111111"
+            )
+
+            when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
+
+            when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
+          }
+        }
+
+      }
+
+      "with invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "registeredForCorporationTax" -> "true",
+            "corporationTaxReference" -> "ABCDEF"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+      "business type is SoleProprietor" must {
+        "respond with NOT_FOUND" in new Fixture {
+
+          mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
+            "BusinessName",
+            Some(SoleProprietor),
+            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          ))), BusinessMatching.key)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "registeredForCorporationTax" -> "true",
+            "corporationTaxReference" -> "1111111111"
+          )
+
+          when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
+
+          when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
     }
 
-    "on get display an empty form when no previous entry" in new Fixture {
-
-      val data = AboutTheBusiness(corporationTaxRegistered = None)
-
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(Some(data)))
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      val result = controller.get()(request)
-
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(false)
-      document.getElementById("corporationTaxReference").`val` must be("")
-    }
-
-    "on post with valid data and edit false continue to registered office page" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> "1111111111"
-      )
-
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
-
-      when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
-    }
-
-    "on post with valid data and edit true redirect to summary page" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> "1111111111"
-      )
-
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
-
-      when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
-    }
-
-    "on post with no yes/no value selected show an error message" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> ""
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#registeredForCorporationTax]").html() must include(Messages("error.required.atb.corporation.tax"))
-    }
-
-    "on post with yes with missing tax number show an error message" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> ""
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.required.atb.corporation.tax.number"))
-    }
-
-    "on post with yes with invalid tax number show an error message" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> "true",
-        "corporationTaxReference" -> "ABCDEF"
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.invalid.atb.corporation.tax.number"))
-    }
   }
 
 }

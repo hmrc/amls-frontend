@@ -18,16 +18,21 @@ package controllers.aboutthebusiness
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership}
+import play.api.mvc.{Request, Result}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.ControllerHelper
 import views.html.aboutthebusiness.corporation_tax_registered
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait CorporationTaxRegisteredController extends BaseController {
@@ -38,33 +43,45 @@ trait CorporationTaxRegisteredController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap {
-        case Some(response) if response.corporationTaxRegistered.isDefined =>
-          Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
+      filterByBusinessType { cacheMap =>
+        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap {
+          case Some(response) if response.corporationTaxRegistered.isDefined =>
+            Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
+          case _ =>
+            val updateUtrResult = for {
+              bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+              details <- OptionT.fromOption[Future](bm.reviewDetails)
+              utr <- OptionT.fromOption[Future](details.utr)
+              _ <- updateCache(CorporationTaxRegisteredYes(utr))
+            } yield getRedirectLocation(edit)
 
-        case _ =>
-          val updateUtrResult = for {
-            bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-            details <- OptionT.fromOption[Future](bm.reviewDetails)
-            utr <- OptionT.fromOption[Future](details.utr)
-            _ <- updateCache(CorporationTaxRegisteredYes(utr))
-          } yield getRedirectLocation(edit)
-
-          updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
+            updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
+        }
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[CorporationTaxRegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(corporation_tax_registered(f, edit)))
-        case ValidForm(_, data) =>
-          updateCache(data) map { _ =>
-            getRedirectLocation(edit)
-          } getOrElse failedResult
+      filterByBusinessType { cache =>
+        Form2[CorporationTaxRegistered](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(corporation_tax_registered(f, edit)))
+          case ValidForm(_, data) =>
+            updateCache(data) map { _ =>
+              getRedirectLocation(edit)
+            } getOrElse failedResult
+        }
       }
     }
+  }
+
+  private def filterByBusinessType(fn: CacheMap => Future[Result])(implicit hc:HeaderCarrier, ac:AuthContext, request: Request[_]): Future[Result] = {
+    OptionT(dataCacheConnector.fetchAll) flatMap { cache =>
+      ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
+        case Some((Partnership | LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
+        case _ => OptionT.pure[Future, Result](NotFound(notFoundView))
+      }
+    } getOrElse InternalServerError("Could not retrieve business type")
   }
 
   private def updateCache(data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
