@@ -350,7 +350,7 @@ error.required.withdrawal.reason.other = You haven’t specified the reason for 
 error.required.deregistration.reason = You must select a reason for de-registering the business
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
-error.renewal.updateanyInformation.validationerror = Select yes if you want to update any other information
+error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -1259,12 +1259,12 @@ submit.registration = Submit registration
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
 
-renewal.updateanyinformation.title = Do you want to update any other information?
-renewal.updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
-renewal.updateanyinformation.example = For example, you’ll need to update if:
-renewal.updateanyinformation.example.item1 = a responsible person leaves your business
-renewal.updateanyinformation.example.item2 = you start trading from a new premises
-renewal.updateanyinformation.example.item3 = your main contact number changes
+updateanyinformation.title = Do you want to update any other information?
+updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
+updateanyinformation.example = For example, you’ll need to update if:
+updateanyinformation.example.item1 = a responsible person leaves your business
+updateanyinformation.example.item2 = you start trading from a new premises
+updateanyinformation.example.item3 = your main contact number changes
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name

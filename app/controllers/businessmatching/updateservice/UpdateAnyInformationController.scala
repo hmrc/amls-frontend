@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.renewal
+package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
-import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessMatching
-import services.{ProgressService, RenewalService}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
 
@@ -33,9 +29,7 @@ import scala.concurrent.Future
 @Singleton
 class UpdateAnyInformationController @Inject()(
                                                 val authConnector: AuthConnector,
-                                                val dataCacheConnector: DataCacheConnector,
-                                                val renewalService: RenewalService,
-                                                val progressService: ProgressService
+                                                val statusService: StatusService
                                               ) extends BaseController {
 
   val NAME = "updateAnyInformation"
@@ -43,33 +37,27 @@ class UpdateAnyInformationController @Inject()(
   implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.updateanyInformation.validationerror")
 
-  def get = Authorised.async {
+  def get() = Authorised.async{
     implicit authContext => implicit request =>
-      (for {
-        cache <- OptionT(dataCacheConnector.fetchAll)
-        renewals <- OptionT.liftF(renewalService.getSection)
-      } yield {
-        val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
-        if(renewalService.canSubmit(renewals, variationSections)){
-          Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.renewal"))
-        } else {
-          NotFound(notFoundView)
-        }
-      }) getOrElse InternalServerError
-
+      statusService.isPreSubmission map {
+        case false => Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
+        case true => NotFound(notFoundView)
+      }
   }
 
-  def post = Authorised.async{
+
+  def post() = Authorised.async{
     implicit authContext => implicit request =>
       Form2[Boolean](request.body) match {
         case ValidForm(_, data) => data match {
-          case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get().url))
+          case true => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
           case false => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
         }
         case f:InvalidForm => Future.successful(
-          BadRequest(views.html.update_any_information(f, routes.UpdateAnyInformationController.post(), "summary.renewal"))
+          BadRequest(views.html.update_any_information(f, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
         )
       }
   }
+
 
 }

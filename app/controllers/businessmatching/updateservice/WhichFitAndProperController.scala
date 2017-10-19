@@ -22,7 +22,8 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
@@ -54,13 +55,22 @@ class WhichFitAndProperController @Inject()(
   }
 
   def post() = Authorised.async {
-    implicit request =>
       implicit authContext =>
-        ???
+        implicit request =>
+          filterRequest {
+            Form2[ResponsiblePeopleFitAndProper](request.body) match {
+              case ValidForm(_, data) => updateResponsiblePeople(data) map { _ =>
+                Redirect(routes.NewServiceInformationController.get())
+              }
+              case f: InvalidForm => responsiblePeople map { rp =>
+                BadRequest(views.html.businessmatching.updateservice.which_fit_and_proper(f, rp))
+              }
+            }
+          }
   }
 
   private def filterRequest(fn: Future[Result])
-                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
+                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] =
     (businessMatchingService.getModel flatMap { bm =>
       OptionT.fromOption[Future](bm.activities)
     } flatMap { ba =>
@@ -69,12 +79,24 @@ class WhichFitAndProperController @Inject()(
         case _ => Future.successful(NotFound(notFoundView))
       })
     }) getOrElse InternalServerError("Cannot retrieve activities")
-  }
 
   private def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
     getData[ResponsiblePeople].map { responsiblePeople =>
       responsiblePeople.zipWithIndex.filterNot { case (rp, _) =>
         rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
+      }
+    }
+
+  private def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
+                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
+      responsiblePeople.zipWithIndex.map { case (rp, index) =>
+        val updated = if (data.index contains index) {
+          rp.hasAlreadyPassedFitAndProper(true)
+        } else {
+          rp.hasAlreadyPassedFitAndProper(false)
+        }
+        updated.copy(hasAccepted = updated.hasChanged)
       }
     }
 

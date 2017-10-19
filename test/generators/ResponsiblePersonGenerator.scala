@@ -46,7 +46,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
   val responsiblePersonGen: Gen[ResponsiblePeople] = for {
     personName <- personNameGen
     positions <- positionsGen
-  } yield ResponsiblePeople(Some(personName), positions = Some(positions))
+  } yield ResponsiblePeople(Some(personName), positions = Some(positions), hasAlreadyPassedFitAndProper = Some(false))
 
   def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePeople] = for {
     person <- responsiblePersonGen
