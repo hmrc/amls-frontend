@@ -25,28 +25,36 @@ import models.asp.Asp
 import views.html.asp.summary
 import forms._
 import play.api.Play
+import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.businessmatching.AccountancyServices
+import cats.implicits._
+import cats.data.OptionT
 
-class SummaryController @Inject()(dataCache: DataCacheConnector, serviceFlow: ServiceFlow, val authConnector: AuthConnector) extends BaseController {
+class SummaryController @Inject()(dataCache: DataCacheConnector, serviceFlow: ServiceFlow, statusService: StatusService, val authConnector: AuthConnector) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetch[Asp](Asp.key) map {
-        case Some(data) =>
-          Ok(summary(EmptyForm, data))
-        case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+    implicit authContext =>
+      implicit request =>
+        dataCache.fetch[Asp](Asp.key) map {
+          case Some(data) =>
+            Ok(summary(EmptyForm, data))
+          case _ =>
+            Redirect(controllers.routes.RegistrationProgressController.get())
+        }
   }
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-      for {
-        asp <- dataCache.fetch[Asp](Asp.key)
-        _ <- dataCache.save[Asp](Asp.key, asp.copy(hasAccepted = true)
-        )
-      } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+    implicit authContext =>
+      implicit request =>
+        for {
+          asp <- dataCache.fetch[Asp](Asp.key)
+          _ <- dataCache.save[Asp](Asp.key, asp.copy(hasAccepted = true))
+          preSubmission <- statusService.isPreSubmission
+          inNewServiceFlow <- serviceFlow.inNewServiceFlow(AccountancyServices)
+        } yield (preSubmission, inNewServiceFlow) match {
+          case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
   }
 }

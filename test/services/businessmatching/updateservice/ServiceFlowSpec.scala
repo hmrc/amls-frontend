@@ -30,17 +30,22 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import models.moneyservicebusiness.{MoneyServiceBusiness => MsbModel}
 import org.scalatest.concurrent.ScalaFutures
-import services.businessmatching.{BusinessMatchingService, ServiceFlow, NextService}
+import services.businessmatching.{BusinessMatchingService, NextService, ServiceFlow}
 import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with ScalaFutures with FutureAssertions {
 
   trait Fixture extends DependencyMocks {
+
+    implicit val hc = HeaderCarrier()
+    implicit val ac = mock[AuthContext]
 
     val businessMatchingService = mock[BusinessMatchingService]
 
@@ -123,6 +128,22 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
         when(eabModel.isComplete) thenReturn true
 
         service.next.returnsNone
+      }
+    }
+  }
+
+  "inNewServiceFlow" when {
+    "called" must {
+      "return true if the specified service exists in the additional business activities" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe true)
+      }
+
+      "return false if the specified service does not exist in the additional business activities" in new Fixture {
+        setUpActivities(Set(TrustAndCompanyServices))
+
+        whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe false)
       }
     }
   }
