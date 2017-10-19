@@ -48,14 +48,12 @@ trait CorporationTaxRegisteredController extends BaseController {
           case Some(response) if response.corporationTaxRegistered.isDefined =>
             Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
           case _ =>
-            val updateUtrResult = for {
-              bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+            (for {
+              bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
               details <- OptionT.fromOption[Future](bm.reviewDetails)
               utr <- OptionT.fromOption[Future](details.utr)
               _ <- updateCache(cache, CorporationTaxRegisteredYes(utr))
-            } yield getRedirectLocation(edit)
-
-            updateUtrResult getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
+            } yield getRedirectLocation(edit)) getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
         }
       }
   }
@@ -85,7 +83,7 @@ trait CorporationTaxRegisteredController extends BaseController {
   }
 
   private def updateCache(cache: CacheMap, data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
-    aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+    aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
     cacheMap <- OptionT.liftF(dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.corporationTaxRegistered(data)))
   } yield cacheMap
 

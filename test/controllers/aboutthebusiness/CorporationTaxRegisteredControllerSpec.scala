@@ -61,11 +61,11 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
         val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+        mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
 
         val result = controller.get()(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
         document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
         document.getElementById("corporationTaxReference").`val` must be("1111111111")
@@ -75,11 +75,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
         val data = AboutTheBusiness(corporationTaxRegistered = None)
 
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
-
-        when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
 
         val result = controller.get()(request)
 
@@ -105,8 +101,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
            val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-           when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-             (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+           mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
 
            val result = controller.get()(request)
            status(result) must be(NOT_FOUND)
@@ -126,9 +121,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
               "corporationTaxReference" -> "1111111111"
             )
 
-            when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
-
             when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
               (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
@@ -145,9 +137,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
               "registeredForCorporationTax" -> "true",
               "corporationTaxReference" -> "1111111111"
             )
-
-            when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
             when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
               (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
@@ -187,9 +176,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
             "registeredForCorporationTax" -> "true",
             "corporationTaxReference" -> "1111111111"
           )
-
-          when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(mock[AboutTheBusiness])))
 
           when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
