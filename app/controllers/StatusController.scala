@@ -29,8 +29,8 @@ import org.joda.time.LocalDate
 import play.api.Play
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
@@ -96,8 +96,7 @@ trait StatusController extends BaseController {
                                    fromDuplicateSubmission: Boolean,
                                    withdrawalStatus: Option[WithdrawalStatus],
                                    responsible: ResponsiblePeople)
-                                  (implicit request: Request[AnyContent],
-                                   authContext: AuthContext) = {
+                                  (implicit request: Request[AnyContent], authContext: AuthContext) = {
 
     if (withdrawalStatus.contains(WithdrawalStatus(true))) {
       Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption, responsible))
