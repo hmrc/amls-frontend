@@ -20,7 +20,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, allowDeRegister: Boolean, showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, allowDeRegister: Boolean, showChangeOfficer: Boolean = true, name: String)(implicit request: Request[_],m:Messages)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 
@@ -51,6 +51,7 @@
                     }
                     @if(showChangeOfficer){
                         <p class="heading-small">@Messages("changeofficer.changelink.heading")</p>
+                        <p>@name</p>
                         <p><a href="@controllers.changeofficer.routes.StillEmployedController.get.url">@Messages("changeofficer.changelink.text")</a></p>
                     }
                     <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>

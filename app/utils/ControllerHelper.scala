@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 object ControllerHelper {
 
@@ -101,6 +102,16 @@ object ControllerHelper {
     eventualMaybePeoples map {
       case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
       case _ =>  false
+    }
+  }
+
+  def getNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[ResponsiblePeople] = {
+    eventualMaybePeoples map {
+      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).filterNot{ rp =>
+        rp.positions.fold(false){ pos =>
+          pos.positions.contains(NominatedOfficer)
+        }
+      }.head
     }
   }
 
