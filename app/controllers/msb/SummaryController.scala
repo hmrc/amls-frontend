@@ -16,6 +16,8 @@
 
 package controllers.msb
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
@@ -24,15 +26,20 @@ import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import utils.ControllerHelper
 import views.html.msb.summary
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
-  implicit val statusService:StatusService
+class SummaryController @Inject()
+(
+  val dataCache: DataCacheConnector,
+  implicit val statusService: StatusService,
+  val authConnector: AuthConnector,
+  val serviceFlow: ServiceFlow
+) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -54,14 +61,12 @@ trait SummaryController extends BaseController {
       (for {
         model <- OptionT(dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key))
         _ <- OptionT.liftF(dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key, model.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
+        preSubmission <- OptionT.liftF(statusService.isPreSubmission)
+        isNewActivity <- OptionT.liftF(serviceFlow.inNewServiceFlow(models.businessmatching.MoneyServiceBusiness))
+      } yield (preSubmission, isNewActivity) match {
+        case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
   }
 
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
 }

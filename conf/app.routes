@@ -485,8 +485,8 @@ POST        /supervision/check-your-answers                                     
 
 GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
 
-GET         /money-service-business/check-your-answers                                controllers.msb.SummaryController.get()
-POST        /money-service-business/check-your-answers                                controllers.msb.SummaryController.post()
+GET         /money-service-business/check-your-answers                                @controllers.msb.SummaryController.get()
+POST        /money-service-business/check-your-answers                                @controllers.msb.SummaryController.post()
 
 GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
 POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)

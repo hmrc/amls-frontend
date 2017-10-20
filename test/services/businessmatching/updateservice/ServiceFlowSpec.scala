@@ -36,7 +36,7 @@ import utils.{DependencyMocks, FutureAssertions}
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 

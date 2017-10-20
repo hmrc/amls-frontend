@@ -30,7 +30,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
-
+import services.businessmatching.ServiceFlow
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
@@ -38,11 +38,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val serviceFlow = mock[ServiceFlow]
+
+    val controller = new SummaryController(mock[DataCacheConnector], mock[StatusService], self.authConnector, serviceFlow)
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -63,9 +61,16 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
     )
 
-  }
+    val mockCacheMap = mock[CacheMap]
 
-  val mockCacheMap = mock[CacheMap]
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
+
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
+  }
 
   "Get" must {
 
@@ -207,6 +212,30 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
         verify(controller.dataCache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any(),any())
+      }
+    }
+
+    "redirect to NewServiceInformationController" when {
+      "status is not pre-submission and activity has just been added" in new Fixture {
+        when {
+          controller.dataCache.fetch[MoneyServiceBusiness](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(completeModel))
+
+        when {
+          controller.dataCache.save[MoneyServiceBusiness](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(mockCacheMap)
+
+        when {
+          serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+        } thenReturn Future.successful(true)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
 
       }
     }
