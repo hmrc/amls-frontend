@@ -37,6 +37,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
+
 class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {

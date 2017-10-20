@@ -16,7 +16,7 @@
 
 package controllers.aboutthebusiness
 
-import connectors.BusinessMatchingConnector
+import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import models.Country
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
@@ -46,11 +46,11 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
     ))), BusinessMatching.key)
 
-    val controller = new CorporationTaxRegisteredController(
-      self.authConnector,
-      mockCacheConnector,
-      mock[BusinessMatchingConnector]
-    )
+    val controller = new CorporationTaxRegisteredController {
+      override val dataCacheConnector = mockCacheConnector
+      override val authConnector = self.authConnector
+      override val businessMatchingConnector = mock[BusinessMatchingConnector]
+    }
   }
 
   "CorporationTaxRegisteredController" when {
