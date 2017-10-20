@@ -20,21 +20,24 @@ import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
+import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
+import models.registrationdetails.RegistrationDetails
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
-import models.{FeeResponse, ReadStatusResponse}
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Play
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, Call, Request, Result}
 import services._
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{BusinessName, ControllerHelper}
+import utils.{BusinessName, ControllerHelper, DeclarationHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 
 trait StatusController extends BaseController {
 
@@ -160,7 +163,7 @@ trait StatusController extends BaseController {
             renewalFlow = false,
             allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
             showChangeOfficer = ApplicationConfig.showChangeOfficerLink,
-            ControllerHelper.rpTitleName(Some(responsible.personName))
+            ControllerHelper.rpTitleName(Some(responsible))
           )
         }
 
@@ -203,7 +206,8 @@ trait StatusController extends BaseController {
               renewalDate,
               true,
               ApplicationConfig.allowDeRegisterToggle,
-              ApplicationConfig.showChangeOfficerLink)))
+              ApplicationConfig.showChangeOfficerLink,
+              "")))
         }
       }
     }
