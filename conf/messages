@@ -828,6 +828,7 @@ summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
 summary.submit.renewal = Submit renewal
+summary.updateservice = Update information
 summary.updateinformation = Update information
 
 summary.checkyouranswers.title = Check your answers
@@ -1133,6 +1134,11 @@ businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform 
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+
+businessmatching.updateservice.newserviceinformation.title = We need to ask you about the new service you’ve added
+businessmatching.updateservice.newserviceinformation.heading = We need to ask you about the new service you’ve added
+businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for: {0}
+businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need

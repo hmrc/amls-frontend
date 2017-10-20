@@ -20,9 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait AmlsRefNumberBroker {
   private[utils] val statusService: StatusService

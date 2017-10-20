@@ -16,7 +16,6 @@
 
 package controllers.bankdetails
 
-import audit.AddBankAccountEvent.BankAccountAuditDetail
 import connectors.DataCacheConnector
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -31,12 +30,14 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.audit.model.{AuditEvent, DataEvent}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
+
 
 class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -264,7 +265,7 @@ class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
 
-        val captor = ArgumentCaptor.forClass(classOf[AuditEvent])
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
 
         captor.getValue match {

@@ -29,9 +29,9 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
@@ -51,7 +51,7 @@ class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite wi
   "The BusinessName helper utility" must {
     "get the business name from amls" in new Fixture {
       when {
-        amlsConnector.registrationDetails(eqTo(safeId))(any(), any())
+        amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
       whenReady(BusinessName.getName(safeId.some).value) { result =>

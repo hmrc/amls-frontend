@@ -33,9 +33,9 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
 import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
 

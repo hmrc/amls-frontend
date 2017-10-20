@@ -25,7 +25,6 @@ import forms.EmptyForm
 import models.bankdetails.{BankAccount, BankDetails}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
 import scala.concurrent.Future

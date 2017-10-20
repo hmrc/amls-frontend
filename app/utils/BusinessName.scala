@@ -22,9 +22,9 @@ import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 object BusinessName {
 

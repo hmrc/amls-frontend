@@ -40,10 +40,10 @@ import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import services.AuthService
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait LandingController extends BaseController {
 
@@ -100,7 +100,7 @@ trait LandingController extends BaseController {
         } yield (reviewDetails, amlsRef) match {
           case (Some(rd), None) =>
             landingService.updateReviewDetails(rd) map { _ => {
-              auditConnector.sendEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse("")))
+              auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse("")))
 
               FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
                 case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())

@@ -37,11 +37,11 @@ import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 
 class SubmissionResponseServiceSpec extends PlaySpec

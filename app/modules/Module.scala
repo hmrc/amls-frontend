@@ -21,8 +21,8 @@ import config.{AMLSAuditConnector, WSHttp}
 import connectors._
 import services.{AuthEnrolmentsService, ProgressService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.http.HttpPost
 import utils.AmlsRefNumberBroker
+import uk.gov.hmrc.http.HttpPost
 
 class Module extends AbstractModule {
 

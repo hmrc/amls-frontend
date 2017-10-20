@@ -20,8 +20,8 @@ import models.governmentgateway.EnrolmentRequest
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.AuditExtensions._
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 object EnrolEvent {
   def apply

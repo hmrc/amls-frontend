@@ -41,7 +41,6 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -105,7 +104,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
     "respond with OK and show business name on the status page" in new Fixture {
       when {
-        controller.amlsConnector.registrationDetails(any())(any(), any())
+        controller.amlsConnector.registrationDetails(any())(any(), any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
       when(controller.landingService.cacheMap(any(), any(), any()))
@@ -247,7 +246,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
@@ -280,7 +279,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -309,7 +308,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -339,7 +338,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -368,7 +367,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -396,7 +395,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -428,7 +427,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -457,7 +456,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any(), any(), any()))
@@ -492,7 +491,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)
@@ -530,7 +529,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
@@ -586,7 +585,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)
@@ -704,7 +703,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
@@ -741,7 +740,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some("amlsRegNo")))
 
-        when(authConnector.currentAuthority(any()))
+        when(authConnector.currentAuthority(any(), any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)

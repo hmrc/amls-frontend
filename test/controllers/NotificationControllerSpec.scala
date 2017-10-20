@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{AmlsConnector, AmlsNotificationConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import generators.AmlsReferenceNumberGenerator
 import models.{Country, ReadStatusResponse}
 import models.businesscustomer.{Address, ReviewDetails}
@@ -27,15 +27,14 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReadyForReview
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
-import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
@@ -116,7 +115,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     )
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any())
+      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
     } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 
@@ -527,7 +526,7 @@ class NotificationControllerWithoutNotificationsSpec extends GenericTestHelper w
     )
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any())
+      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
     } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 
@@ -604,7 +603,7 @@ class NotificationControllerWithoutBusinessNameLookupSpec extends GenericTestHel
     )
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any())
+      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
     } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 

@@ -27,10 +27,10 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost }
 
 class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
@@ -68,7 +68,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "successfully receive feeResponse" in {
 
       when {
-        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any())
+        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
       whenReady(FeeConnector.feeResponse(amlsRegistrationNumber)){

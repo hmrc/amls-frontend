@@ -323,8 +323,7 @@ POST        /update-service/fit-and-proper/                                     
 GET         /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.get()
 POST        /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.post()
 
-GET         /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.get()
-POST        /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.post()
+GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.NewServiceInformationController.get()
 
 GET         /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.get()
 POST        /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.post()
@@ -453,8 +452,8 @@ POST        /accountancy-service-provider/agent-scheme                          
 GET         /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.get
 POST        /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
-GET         /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.get()
-POST        /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.post()
+GET         /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.get()
+POST        /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.post()
 
 GET         /trust-company-service-provider/what-you-need                             controllers.tcsp.WhatYouNeedController.get()
 
@@ -486,8 +485,8 @@ POST        /supervision/check-your-answers                                     
 
 GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
 
-GET         /money-service-business/check-your-answers                                controllers.msb.SummaryController.get()
-POST        /money-service-business/check-your-answers                                controllers.msb.SummaryController.post()
+GET         /money-service-business/check-your-answers                                @controllers.msb.SummaryController.get()
+POST        /money-service-business/check-your-answers                                @controllers.msb.SummaryController.post()
 
 GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
 POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)

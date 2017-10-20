@@ -33,11 +33,11 @@ import play.api.Play
 import play.api.mvc.{AnyContent, Call, Request, Result}
 import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 import utils.{BusinessName, ControllerHelper, DeclarationHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 
 trait StatusController extends BaseController {
 

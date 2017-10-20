@@ -23,8 +23,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.tcsp.Tcsp
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.tcsp.summary
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait SummaryController extends BaseController {
 

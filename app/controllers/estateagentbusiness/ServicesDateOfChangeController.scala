@@ -24,10 +24,10 @@ import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.estateagentbusiness.EstateAgentBusiness
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.date_of_change
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ServicesDateOfChangeController extends BaseController {
 
