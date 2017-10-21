@@ -18,14 +18,15 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
-import models.status.{SubmissionDecisionRejected, SubmissionDecisionApproved, NotCompleted}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -41,7 +42,12 @@ class TransactionsInNext12MonthsControllerSpec extends GenericTestHelper with Mo
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
       override val statusService: StatusService = mock[StatusService]
+      override val serviceFlow = mock[ServiceFlow]
     }
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)

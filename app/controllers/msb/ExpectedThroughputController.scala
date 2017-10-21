@@ -20,10 +20,13 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{MoneyServiceBusiness, ExpectedThroughput}
+import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import services.StatusService
 import utils.ControllerHelper
 import views.html.msb.expected_throughput
+import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
+import play.api.Play
+import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
@@ -31,10 +34,11 @@ trait ExpectedThroughputController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
   implicit val statusService: StatusService
+  implicit val serviceFlow: ServiceFlow
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
+      ControllerHelper.allowedToEdit(MsbActivity) flatMap {
         case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[ExpectedThroughput] = (for {
@@ -71,4 +75,5 @@ object ExpectedThroughputController extends ExpectedThroughputController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
   override val statusService: StatusService = StatusService
+  override lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }
