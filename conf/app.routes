@@ -526,8 +526,8 @@ GET         /high-value-dealer/what-you-need                                    
 GET         /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.get()
-POST        /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.post()
+GET         /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.get()
+POST        /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.post()
 
 GET         /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
@@ -542,11 +542,11 @@ GET         /high-value-dealer/excise-goods                                     
 POST        /high-value-dealer/excise-goods                                           controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
-GET         /high-value-dealer/percentage                                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /high-value-dealer/percentage                                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /high-value-dealer/percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/receiving                                              controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/receiving                                              controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.get
 POST        /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.post

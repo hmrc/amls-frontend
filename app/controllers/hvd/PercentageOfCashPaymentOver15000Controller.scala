@@ -16,24 +16,34 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.hvd.{ReceiveCashPayments, Hvd, PercentageOfCashPaymentOver15000}
+import models.businessmatching.HighValueDealing
+import models.hvd.{Hvd, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
+import play.api.Play
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
-import views.html.hvd.{receiving, percentage}
+import views.html.hvd.{percentage, receiving}
+
 import scala.concurrent.Future
 
-trait PercentageOfCashPaymentOver15000Controller extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
+class PercentageOfCashPaymentOver15000Controller @Inject()
+(
+  val dataCacheConnector: DataCacheConnector,
+  implicit val serviceFlow: ServiceFlow,
+  implicit val statusService: StatusService,
+  val authConnector: AuthConnector
+) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
+      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
         case true =>
           dataCacheConnector.fetch[Hvd](Hvd.key) map {
           response =>
@@ -61,11 +71,4 @@ trait PercentageOfCashPaymentOver15000Controller extends BaseController {
       }
     }
   }
-}
-
-object PercentageOfCashPaymentOver15000Controller extends PercentageOfCashPaymentOver15000Controller {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService: StatusService = StatusService
 }
