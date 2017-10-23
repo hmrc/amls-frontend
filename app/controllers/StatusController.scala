@@ -21,6 +21,7 @@ import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
 import models.{FeeResponse, ReadStatusResponse}
@@ -30,7 +31,7 @@ import play.api.mvc.{AnyContent, Request, Result}
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.BusinessName
+import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
