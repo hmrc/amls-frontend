@@ -25,6 +25,7 @@ import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Request
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -95,6 +96,16 @@ object ControllerHelper {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
     }
+  }
+
+  def allowedToEdit(activity: BusinessActivity)
+                   (implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
+    status <- statusService.getStatus
+    isInFlow <- serviceFlow.inNewServiceFlow(activity)
+  } yield (status, isInFlow) match {
+    case (_, true) => true
+    case (SubmissionReady | NotCompleted | SubmissionReadyForReview, false) => true
+    case _ => false
   }
 
   def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
