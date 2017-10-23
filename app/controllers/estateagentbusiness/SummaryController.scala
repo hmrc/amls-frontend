@@ -25,13 +25,18 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.estateagentbusiness.EstateAgentBusiness
+import models.businessmatching.{EstateAgentBusinessService}
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.estateagentbusiness._
+import services.StatusService
 
 class SummaryController @Inject()
 (
   val dataCache: DataCacheConnector,
-  val authConnector: AuthConnector
+  val authConnector: AuthConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow
 ) extends BaseController {
 
   def get() = Authorised.async {
@@ -48,11 +53,12 @@ class SummaryController @Inject()
     implicit authContext => implicit request =>
       (for {
         eab <- OptionT(dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key))
-        _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key,
-          eab.copy(hasAccepted = true))
-        )
-      } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key, eab.copy(hasAccepted = true)))
+        preSubmission <- OptionT.liftF(statusService.isPreSubmission)
+        inServiceFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(EstateAgentBusinessService))
+      } yield (preSubmission, inServiceFlow) match {
+        case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }) getOrElse InternalServerError("Could not update EstateAgentBusiness")
 
   }
