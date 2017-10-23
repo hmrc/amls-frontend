@@ -19,11 +19,14 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness.EstateAgentBusiness
+import models.tcsp.Tcsp
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.test.Helpers._
+import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -34,23 +37,22 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mock[ServiceFlow])
 
     val model = EstateAgentBusiness(None, None)
+
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(false)
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
   }
 
   "Get" must {
 
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
-
     "load the summary page when section data is available" in new Fixture {
-
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
@@ -59,7 +61,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -89,6 +90,33 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
+    }
+
+    "redirect to NewServiceInformationController" when {
+      "status is not pre-submission and activity has just been added" in new Fixture {
+        val cache = mock[CacheMap]
+
+        when {
+          controller.dataCache.fetch[EstateAgentBusiness](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(model))
+
+        when {
+          controller.dataCache.save[EstateAgentBusiness](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(cache)
+
+        when {
+          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+        } thenReturn Future.successful(true)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+
+      }
     }
   }
 }

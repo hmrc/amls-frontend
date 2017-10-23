@@ -16,6 +16,8 @@
 
 package controllers.estateagentbusiness
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
@@ -23,11 +25,19 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.estateagentbusiness.EstateAgentBusiness
+import models.businessmatching.{EstateAgentBusinessService}
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.estateagentbusiness._
+import services.StatusService
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
+class SummaryController @Inject()
+(
+  val dataCache: DataCacheConnector,
+  val authConnector: AuthConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow
+) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -43,18 +53,13 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         eab <- OptionT(dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key))
-        _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key,
-          eab.copy(hasAccepted = true))
-        )
-      } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key, eab.copy(hasAccepted = true)))
+        preSubmission <- OptionT.liftF(statusService.isPreSubmission)
+        inServiceFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(EstateAgentBusinessService))
+      } yield (preSubmission, inServiceFlow) match {
+        case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }) getOrElse InternalServerError("Could not update EstateAgentBusiness")
 
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
