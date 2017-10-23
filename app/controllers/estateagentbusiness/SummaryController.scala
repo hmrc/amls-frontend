@@ -16,6 +16,8 @@
 
 package controllers.estateagentbusiness
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
@@ -23,11 +25,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.estateagentbusiness.EstateAgentBusiness
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.estateagentbusiness._
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
+class SummaryController @Inject()
+(
+  val dataCache: DataCacheConnector,
+  val authConnector: AuthConnector
+) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -51,10 +56,4 @@ trait SummaryController extends BaseController {
       }) getOrElse InternalServerError("Could not update EstateAgentBusiness")
 
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

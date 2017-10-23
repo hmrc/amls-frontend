@@ -34,23 +34,14 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new SummaryController(mock[DataCacheConnector], self.authConnector)
 
     val model = EstateAgentBusiness(None, None)
   }
 
   "Get" must {
 
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
-
     "load the summary page when section data is available" in new Fixture {
-
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
@@ -59,7 +50,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-
       when(controller.dataCache.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
