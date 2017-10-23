@@ -37,7 +37,6 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-
 class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
@@ -108,6 +107,9 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
           }
+        }
+
+        "redirect to CorporationTaxRegistered" when {
           "customer is a LLP" in new Fixture {
 
             val llp = ReviewDetails("BusinessName", Some(LPrLLP),
@@ -131,7 +133,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get().url))
           }
           "customer is a Limited Company" in new Fixture {
 
@@ -142,34 +144,6 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(Some(details))))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-              .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
-
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
-            )
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
-          }
-        }
-
-        "redirect to CorporationTaxRegistered" when {
-          "customer is not a partnership" in new Fixture {
-
-            val partnership = ReviewDetails("BusinessName", Some(UnincorporatedBody),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(Some(partnership))))
 
             when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
               .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
