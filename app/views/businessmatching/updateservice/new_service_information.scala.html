@@ -16,8 +16,9 @@
 
 @import models.businessmatching.BusinessActivity
 @import include._
-@import forms2.anchor
+@import forms2._
 
+@import forms.EmptyForm
 @(activity: BusinessActivity, flowUrl: String)(implicit request: Request[_], messages: Messages)
 
 @header = {
@@ -38,10 +39,8 @@
 
     <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
 
-    @anchor(
-        attrHref = flowUrl,
-        attrRole = true,
-        linkText = Messages("button.continue"),
-        visuallyhidden = activity.getMessage
-    )
+    @form(EmptyForm, controllers.businessmatching.updateservice.routes.NewServiceInformationController.post()) {
+        <input type="hidden" name="redirectUrl" value="@flowUrl">
+        @submit(false, Some("Continue"), false)
+    }
 }

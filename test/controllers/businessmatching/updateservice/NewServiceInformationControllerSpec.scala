@@ -20,13 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{when, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow, NextService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import models.businessmatching.updateservice.UpdateService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -76,6 +77,24 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url)
         }
+      }
+    }
+  }
+
+  "POST" when {
+    "called" must {
+      "update UpdateService with isInNewFlow = true" in new Fixture {
+        val url = "/service"
+
+        mockCacheFetch(Some(UpdateService()), Some(UpdateService.key))
+        mockCacheSave[UpdateService]
+
+        val result = controller.post()(request.withFormUrlEncodedBody("redirectUrl" -> url))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(url)
+
+        verify(controller.dataCacheConnector).save[UpdateService](eqTo(UpdateService.key), eqTo(UpdateService(inNewServiceFlow = true)))(any(), any(), any())
       }
     }
   }
