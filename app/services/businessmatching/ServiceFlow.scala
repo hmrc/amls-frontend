@@ -34,6 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
+import models.businessmatching.updateservice.UpdateService
 
 case class NextService(url: String, activity: BusinessActivity)
 
@@ -76,10 +77,11 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     } yield NextService(url, activity)
   }
 
-  def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    businessMatchingService.getAdditionalBusinessActivities.value map {
-      case Some(set) => set.contains(activity)
-      case _ => false
-    }
-
+  def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = (for {
+    updateService <- OptionT(cacheConnector.fetch[UpdateService](UpdateService.key))
+    additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
+  } yield (updateService.inNewServiceFlow, additionalActivities.contains(activity)) match {
+    case (true, true) => true
+    case _ => false
+  }) getOrElse false
 }
