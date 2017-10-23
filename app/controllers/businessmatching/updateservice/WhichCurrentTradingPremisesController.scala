@@ -63,10 +63,10 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
             (tp, _, act) <- formData
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
             fitAndProperRequired <- businessMatchingService.fitAndProperRequired
-          } yield if(fitAndProperRequired){
+          } yield if(fitAndProperRequired) {
             Redirect(routes.FitAndProperController.get())
           } else {
-            Redirect(controllers.routes.RegistrationProgressController.get())
+            Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
           }
         } getOrElse failure
       }
