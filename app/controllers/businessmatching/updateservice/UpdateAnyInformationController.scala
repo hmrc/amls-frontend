@@ -23,28 +23,39 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
-
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
+import models.businessmatching.updateservice.UpdateService
 import scala.concurrent.Future
 
 @Singleton
-class UpdateAnyInformationController @Inject()(
-                                                val authConnector: AuthConnector,
-                                                val statusService: StatusService
-                                              ) extends BaseController {
+class UpdateAnyInformationController @Inject()
+(
+  val dataCacheConnector: DataCacheConnector,
+  val authConnector: AuthConnector,
+  val statusService: StatusService
+) extends BaseController {
 
   val NAME = "updateAnyInformation"
 
   implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.updateanyInformation.validationerror")
 
-  def get() = Authorised.async{
-    implicit authContext => implicit request =>
-      statusService.isPreSubmission map {
-        case false => Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
-        case true => NotFound(notFoundView)
-      }
+  def get() = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        (for {
+          updateService <- OptionT(dataCacheConnector.fetch[UpdateService] (UpdateService.key))
+          _ <- OptionT.liftF(
+            dataCacheConnector.save(UpdateService.key, updateService.copy(inNewServiceFlow = false))
+          )
+          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
+        } yield isPreSubmission match {
+          case false => Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.updateinformation"))
+          case true => NotFound(notFoundView)
+        }) getOrElse InternalServerError("Unable to configure UpdateService")
   }
-
 
   def post() = Authorised.async{
     implicit authContext => implicit request =>
