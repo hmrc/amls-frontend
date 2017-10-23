@@ -93,7 +93,7 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
 
       "the user chooses 'yes'" must {
         "progress to the 'registration progress' page" when {
-          "fit and proper requirement already exists" in new Fixture {
+          "fit and proper is not required" in new Fixture {
 
             when {
               controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
@@ -102,7 +102,7 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
             val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
 
           }
         }

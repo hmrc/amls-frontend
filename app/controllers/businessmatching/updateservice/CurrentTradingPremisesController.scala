@@ -64,7 +64,7 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
       case SubmittedActivitiesAtTradingPremisesYes =>
         (businessMatchingService.fitAndProperRequired map {
           case true => Redirect(routes.FitAndProperController.get())
-          case false => Redirect(controllers.routes.RegistrationProgressController.get())
+          case false => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
         }) getOrElse InternalServerError("Cannot retrieve activities")
       case SubmittedActivitiesAtTradingPremisesNo =>
         Future.successful(Redirect(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get()))
