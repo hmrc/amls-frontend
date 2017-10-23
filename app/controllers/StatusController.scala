@@ -67,8 +67,8 @@ trait StatusController extends BaseController {
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
           withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
-        responsible <- ControllerHelper.getNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]] (ResponsiblePeople.key))
-          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission, withdrawalStatus, responsible)
+          nominatedOfficer <- ControllerHelper.getNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]] (ResponsiblePeople.key))
+          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission, withdrawalStatus, nominatedOfficer)
         } yield page
   }
 
@@ -98,11 +98,10 @@ trait StatusController extends BaseController {
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
                                    withdrawalStatus: Option[WithdrawalStatus],
-                                   responsible: ResponsiblePeople)
+                                   nominatedOfficer: Option[ResponsiblePeople])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
-
     if (withdrawalStatus.contains(WithdrawalStatus(true))) {
-      Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption, responsible))
+      Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption, nominatedOfficer))
     } else {
       statusInfo match {
         case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
@@ -110,7 +109,7 @@ trait StatusController extends BaseController {
         case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
              (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
              (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsible))
+          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, nominatedOfficer))
         case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
           getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
         case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
@@ -149,7 +148,7 @@ trait StatusController extends BaseController {
   private def getDecisionPage(mlrRegNumber: Option[String],
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
-                              responsible: ResponsiblePeople)(implicit request: Request[AnyContent]) = {
+                              responsible: Option[ResponsiblePeople])(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) =>
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
@@ -162,8 +161,8 @@ trait StatusController extends BaseController {
             endDate,
             renewalFlow = false,
             allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
-            showChangeOfficer = ApplicationConfig.showChangeOfficerLink,
-            ControllerHelper.rpTitleName(Some(responsible))
+            Some(ControllerHelper.rpTitleName(responsible)),
+            showChangeOfficer = ApplicationConfig.showChangeOfficerLink
           )
         }
 
@@ -206,8 +205,8 @@ trait StatusController extends BaseController {
               renewalDate,
               true,
               ApplicationConfig.allowDeRegisterToggle,
-              ApplicationConfig.showChangeOfficerLink,
-              "")))
+              None,
+              ApplicationConfig.showChangeOfficerLink)))
         }
       }
     }

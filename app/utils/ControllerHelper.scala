@@ -16,6 +16,10 @@
 
 package utils
 
+import java.util.NoSuchElementException
+
+import cats.data.OptionT
+import cats.implicits._
 import models.businessmatching._
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople}
@@ -99,18 +103,16 @@ object ControllerHelper {
 
   def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
     eventualMaybePeoples map {
-      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
-      case _ =>  false
+      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.isNominatedOfficer)
+      case _ => false
     }
   }
 
-  def getNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[ResponsiblePeople] = {
-    eventualMaybePeoples map {
-      case Some(rps) =>  rps.filterNot(_.status.contains(StatusConstants.Deleted)).filter{ rp =>
-        rp.positions.fold(false){ pos =>
-          pos.positions.contains(NominatedOfficer)
-        }
-      }.head
+  def getNominatedOfficer(responsiblePeople: Future[Option[Seq[ResponsiblePeople]]]): Future[Option[ResponsiblePeople]] = {
+    (OptionT(responsiblePeople) map { rps =>
+      rps.filterNot(_.status.contains(StatusConstants.Deleted)).filter(_.isNominatedOfficer).head
+    }).value recoverWith {
+      case _:NoSuchElementException => Future.successful(None)
     }
   }
 
