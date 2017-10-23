@@ -77,7 +77,7 @@ trait CorporationTaxRegisteredController extends BaseController {
   private def filterByBusinessType(fn: CacheMap => Future[Result])(implicit hc:HeaderCarrier, ac:AuthContext, request: Request[_]): Future[Result] = {
     OptionT(dataCacheConnector.fetchAll) flatMap { cache =>
       ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
-        case Some((Partnership | LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
+        case Some((LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
         case _ => OptionT.pure[Future, Result](NotFound(notFoundView))
       }
     } getOrElse InternalServerError("Could not retrieve business type")
