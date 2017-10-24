@@ -28,7 +28,7 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
-    implicit override val request = FakeRequest()
+    implicit override val request = addToken(FakeRequest())
 
     val nextPageUrl = controllers.asp.routes.WhatYouNeedController.get().url
 
@@ -43,7 +43,7 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
     }
 
     "displays the correct url on the button link" in new ViewFixture {
-      doc.select("a.button").attr("href") mustBe nextPageUrl
+      doc.select("input[name=\"redirectUrl\"]").attr("value") mustBe nextPageUrl
     }
   }
 

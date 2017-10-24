@@ -17,25 +17,23 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
-import org.mockito.Matchers._
+import models.businessmatching.updateservice.UpdateService
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
 class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(self.authRequest)
 
-    val cacheMap = CacheMap("", Map.empty)
-
-    val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
     when {
@@ -43,20 +41,26 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
     } thenReturn Future.successful(false)
 
     lazy val controller = new UpdateAnyInformationController(
+      mockCacheConnector,
       self.authConnector,
       statusService
     )
 
+    mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)))
+    mockCacheSave[UpdateService]
   }
 
   "UpdateAnyInformationController" when {
     "get is called" must {
       "respond with OK with update_any_information" in new TestFixture {
-
         val result = controller.get()(request)
 
         status(result) mustBe OK
         contentAsString(result) must include(Messages("updateanyinformation.title"))
+
+        verify(mockCacheConnector).save[UpdateService](
+          eqTo(UpdateService.key),
+          eqTo(UpdateService(inNewServiceFlow = false)))(any(), any(), any())
       }
 
       "respond with NOT_FOUND" when {

@@ -32,7 +32,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => MsbModel}
 import org.scalatest.concurrent.ScalaFutures
 import services.businessmatching.{BusinessMatchingService, NextService, ServiceFlow}
 import utils.{DependencyMocks, FutureAssertions}
-
+import models.businessmatching.updateservice.UpdateService
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -52,9 +52,11 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     val service = new ServiceFlow(businessMatchingService, mockCacheConnector)
 
     val businessMatching = mock[BusinessMatching]
+
     when(businessMatching.msbServices) thenReturn Some(
       MsbServices(Set(TransmittingMoney, CurrencyExchange))
     )
+
     mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
     val msbModel = mock[MsbModel]
@@ -80,6 +82,8 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     def setUpActivities(activities: Set[BusinessActivity]) = when {
       businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](activities)
+
+    mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)), Some(UpdateService.key))
   }
 
   "getNextFlow" must {
@@ -144,6 +148,14 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
         setUpActivities(Set(AccountancyServices))
 
         whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe true)
+      }
+
+      "return false if the user is not in the new service flow" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        mockCacheFetch(Some(UpdateService(inNewServiceFlow = false)), Some(UpdateService.key))
+
+        whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe false)
       }
 
       "return false if the specified service does not exist in the additional business activities" in new Fixture {
