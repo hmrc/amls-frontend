@@ -16,19 +16,16 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
 import models.hvd.Hvd
-import models.status.SubmissionReady
+import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import services.StatusService
-import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
+import services.businessmatching.ServiceFlow
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -65,6 +62,51 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
         val content = contentAsString(result)
 
         Jsoup.parse(content).title() must include(Messages("hvd.expect.to.receive.title"))
+      }
+      "return NOT_FOUND" when {
+        "registration is supervised" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get()(request)
+
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+    }
+
+    "post is called" when {
+      "request is valid" must {
+        "redirect to PercentageOfCashPaymentOver15000Controller" when {
+          "edit is false" in new Fixture {
+
+            val result = controller.post()(request.withFormUrlEncodedBody("paymentMethods.courier" -> "true"))
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get()))
+
+          }
+        }
+        "redirect to SummaryController" when {
+          "edit is true" in new Fixture {
+
+            val result = controller.post(true)(request.withFormUrlEncodedBody("paymentMethods.courier" -> "true"))
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get()))
+
+          }
+        }
+      }
+      "request is invalid" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
       }
     }
 
