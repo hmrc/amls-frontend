@@ -29,16 +29,16 @@
     heading = header
 ) {
 
-    <p>@Messages("hvd.receiving.convert.currency.text")</p>
-
     @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
+
+        <p>@Messages("lbl.select.all")</p>
 
         @fieldset(
             f = f("paymentMethods-fieldset"),
             legend = "hvd.receiving.expect.to.receive",
-            legendHidden = false,
-            classes = Seq("paymentMethods-fieldset"),
-            hint = "lbl.select.all"
+            legendHidden = true,
+            panel = false,
+            classes = Seq("paymentMethods-fieldset")
         ) {
             @errorGroup(
                 classes = Seq("form-group"),
@@ -58,15 +58,12 @@
                     f = f("paymentMethods.other"),
                     labelText = "hvd.receiving.option.03",
                     value = "true",
-                    target = s"#paymentMethods-details-fieldset"
+                    target = s"#paymentMethods-details"
                 )
             }
-
             @panel(
-                field = Some(f("paymentMethods-details-fieldset")),
-                jsHidden = true,
-                panel = false
-            ) {
+                field = Some(f("paymentMethods-details"))
+            ){
                 @input(
                     field = f("paymentMethods.details"),
                     labelText = "hvd.receiving.give.details.lbl"
