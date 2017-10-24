@@ -19,6 +19,7 @@ package controllers
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
 import models.{Country, FeeResponse}
@@ -48,11 +49,12 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
       override private[controllers] val progressService: ProgressService = mock[ProgressService]
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
       override private[controllers] val amlsConnector = mock[AmlsConnector]
     }
 
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))(controller.dataCache)
+    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())), Some(ResponsiblePeople.key))
   }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.notifications" -> false) )
