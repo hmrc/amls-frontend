@@ -16,27 +16,33 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, ReceiveCashPayments}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.hvd.receiving
+import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-trait ReceiveCashPaymentsController extends BaseController {
-
-  def cacheConnector: DataCacheConnector
-
-  implicit val statusService: StatusService
+class ReceiveCashPaymentsController @Inject()
+(
+  val cacheConnector: DataCacheConnector,
+  implicit val serviceFlow: ServiceFlow,
+  implicit val statusService: StatusService,
+  val authConnector: AuthConnector
+) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
+      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
         case true =>
           cacheConnector.fetch[Hvd](Hvd.key) map {
             response =>
@@ -68,11 +74,4 @@ trait ReceiveCashPaymentsController extends BaseController {
       }
     }
   }
-}
-
-object ReceiveCashPaymentsController extends ReceiveCashPaymentsController {
-  // $COVERAGE-OFF$
-  override val cacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
 }

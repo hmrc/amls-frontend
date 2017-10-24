@@ -24,10 +24,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -42,7 +43,13 @@ class ExpectedThroughputControllerSpec extends GenericTestHelper with MockitoSug
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService: StatusService = mock[StatusService]
+      override val serviceFlow = mock[ServiceFlow]
     }
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)

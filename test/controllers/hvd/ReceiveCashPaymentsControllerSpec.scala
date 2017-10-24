@@ -18,14 +18,15 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.Hvd
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import services.StatusService
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
@@ -35,17 +36,16 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController {
-      override val cacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new ReceiveCashPaymentsController(mock[DataCacheConnector], mock[ServiceFlow], mock[StatusService], self.authConnector)
 
     when(controller.cacheConnector.fetch[Hvd](eqTo(Hvd.key))(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
     when(controller.cacheConnector.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+    when(controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any()))
+      .thenReturn(Future.successful(false))
   }
 
   "ReceiveCashPaymentsController" must {

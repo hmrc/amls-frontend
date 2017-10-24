@@ -118,7 +118,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
 
         val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
 
@@ -149,7 +149,7 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         val result = controller.post()(request.withFormUrlEncodedBody(form))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
 
         val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
         verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())

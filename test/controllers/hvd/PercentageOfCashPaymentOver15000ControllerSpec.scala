@@ -21,13 +21,14 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import models.hvd.{PercentageOfCashPaymentOver15000, Hvd}
+import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -38,11 +39,13 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new PercentageOfCashPaymentOver15000Controller {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new PercentageOfCashPaymentOver15000Controller(
+      mock[DataCacheConnector], mock[ServiceFlow], mock[StatusService], self.authConnector
+    )
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)

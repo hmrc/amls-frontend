@@ -16,6 +16,8 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
@@ -26,36 +28,42 @@ import services.StatusService
 import utils.ControllerHelper
 import views.html.hvd.summary
 import forms.EmptyForm
+import models.businessmatching.HighValueDealing
+import play.api.Play
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
-
-  implicit val statusService: StatusService
+class SummaryController @Inject()
+(
+  val dataCache: DataCacheConnector,
+  val authConnector: AuthConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow
+) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      for {
-        hvd <- dataCache.fetch[Hvd](Hvd.key)
-        isEditable <- ControllerHelper.allowedToEdit
-      } yield hvd match {
-        case Some(data) => Ok(summary(EmptyForm, data, isEditable))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+    implicit authContext =>
+      implicit request =>
+        for {
+          hvd <- dataCache.fetch[Hvd](Hvd.key)
+          isEditable <- ControllerHelper.allowedToEdit
+        } yield hvd match {
+          case Some(data) => Ok(summary(EmptyForm, data, isEditable))
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
   }
 
   def post = Authorised.async {
-    implicit authContext => implicit request => (for {
-      hvd <- OptionT(dataCache.fetch[Hvd](Hvd.key))
-      _ <- OptionT.liftF(dataCache.save[Hvd](Hvd.key, hvd.copy(hasAccepted = true)))
-    } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
+    implicit authContext =>
+      implicit request =>
+        (for {
+          hvd <- OptionT(dataCache.fetch[Hvd](Hvd.key))
+          _ <- OptionT.liftF(dataCache.save[Hvd](Hvd.key, hvd.copy(hasAccepted = true)))
+          preSubmission <- OptionT.liftF(statusService.isPreSubmission)
+          isNewActivity <- OptionT.liftF(serviceFlow.inNewServiceFlow(HighValueDealing))
+        } yield (preSubmission, isNewActivity) match {
+          case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get)
+        }) getOrElse InternalServerError("Could not update HVD")
   }
-
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override implicit val statusService: StatusService = StatusService
 }

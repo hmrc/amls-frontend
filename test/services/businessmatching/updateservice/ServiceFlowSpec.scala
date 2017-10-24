@@ -51,6 +51,12 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
 
     val service = new ServiceFlow(businessMatchingService, mockCacheConnector)
 
+    val businessMatching = mock[BusinessMatching]
+    when(businessMatching.msbServices) thenReturn Some(
+      MsbServices(Set(TransmittingMoney, CurrencyExchange))
+    )
+    mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+
     val msbModel = mock[MsbModel]
     when(msbModel.isComplete(any(), any())) thenReturn false
     mockCacheGetEntry[MsbModel](Some(msbModel), MsbModel.key)
