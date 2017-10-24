@@ -24,6 +24,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.hvd.{Hvd, ReceiveCashPayments}
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.hvd.expect_to_receive
@@ -34,7 +35,8 @@ import scala.concurrent.Future
 class ExpectToReceiveCashPaymentsController @Inject()(
                                                        val authConnector: AuthConnector = AMLSAuthConnector,
                                                        val cacheConnector: DataCacheConnector,
-                                                       implicit val statusService: StatusService
+                                                       implicit val statusService: StatusService,
+                                                       implicit val serviceFlow: ServiceFlow
                                                      ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
