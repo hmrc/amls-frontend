@@ -1,0 +1,63 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("hvd.expect.to.receive.title", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.expect.to.receive.title") + " - " + Messages("summary.hvd"),
+    heading = header
+) {
+
+    <p>@Messages("hvd.receiving.convert.currency.text")</p>
+
+    @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
+
+        @fieldset(
+            f = f("paymentMethods-fieldset"),
+            legend = "hvd.receiving.expect.to.receive",
+            legendHidden = false,
+            classes = Seq("paymentMethods-fieldset"),
+            hint = "lbl.select.all"
+        ) {
+            @errorGroup(
+                classes = Seq("form-group"),
+                field = f("paymentMethods")
+            ) {
+                @checkbox(
+                    f = f("paymentMethods.courier"),
+                    labelText = "hvd.receiving.option.01",
+                    value = "true"
+                )
+                @checkbox(
+                    f = f("paymentMethods.direct"),
+                    labelText = "hvd.receiving.option.02",
+                    value = "true"
+                )
+                @checkbox(
+                    f = f("paymentMethods.other"),
+                    labelText = "hvd.receiving.option.03",
+                    value = "true",
+                    target = s"#paymentMethods-details-fieldset"
+                )
+            }
+
+            @panel(
+                field = Some(f("paymentMethods-details-fieldset")),
+                jsHidden = true,
+                panel = false
+            ) {
+                @input(
+                    field = f("paymentMethods.details"),
+                    labelText = "hvd.receiving.give.details.lbl"
+                )
+            }
+        }
+
+        @submit(edit)
+    }
+}

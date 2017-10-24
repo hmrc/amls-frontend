@@ -1726,6 +1726,8 @@ hvd.receiving.option.03 = Other
 hvd.receiving.give.details = Please give details
 hvd.receiving.give.details.lbl = Please give details
 
+hvd.expect.to.receive.title = How do you expect to receive these payments?
+
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
 hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €10,000?
