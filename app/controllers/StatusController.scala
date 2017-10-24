@@ -64,8 +64,19 @@ trait StatusController extends BaseController {
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
           withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
-          nominatedOfficer <- ControllerHelper.getNominatedOfficer(dataCache.fetch[Seq[ResponsiblePeople]] (ResponsiblePeople.key))
-          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission, withdrawalStatus, nominatedOfficer)
+          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          page <- if (withdrawalStatus.contains(WithdrawalStatus(true))) {
+            Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), maybeBusinessName, responsiblePeople))
+          } else {
+            getPageBasedOnStatus(
+              mlrRegNumber,
+              statusInfo,
+              maybeBusinessName,
+              feeResponse,
+              fromDuplicateSubmission,
+              responsiblePeople
+            )
+          }
         } yield page
   }
 
@@ -94,24 +105,19 @@ trait StatusController extends BaseController {
                                    businessNameOption: Option[String],
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
-                                   withdrawalStatus: Option[WithdrawalStatus],
-                                   nominatedOfficer: Option[ResponsiblePeople])
+                                   responsiblePeople: Option[Seq[ResponsiblePeople]])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
-    if (withdrawalStatus.contains(WithdrawalStatus(true))) {
-      Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption, nominatedOfficer))
-    } else {
       statusInfo match {
         case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
           getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
         case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
              (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
              (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, nominatedOfficer))
+          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople))
         case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-          getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
+          getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople)
         case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
       }
-    }
   }
 
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
@@ -145,7 +151,7 @@ trait StatusController extends BaseController {
   private def getDecisionPage(mlrRegNumber: Option[String],
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
-                              responsible: Option[ResponsiblePeople])(implicit request: Request[AnyContent]) = {
+                              responsiblePeople: Option[Seq[ResponsiblePeople]])(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) =>
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
@@ -158,7 +164,7 @@ trait StatusController extends BaseController {
             endDate,
             renewalFlow = false,
             allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
-            Some(ControllerHelper.rpTitleName(responsible)),
+            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
             showChangeOfficer = ApplicationConfig.showChangeOfficerLink
           )
         }
@@ -179,7 +185,8 @@ trait StatusController extends BaseController {
 
   private def getRenewalFlowPage(mlrRegNumber: Option[String],
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
-                                 businessNameOption: Option[String])
+                                 businessNameOption: Option[String],
+                                 responsiblePeople: Option[Seq[ResponsiblePeople]])
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
 
@@ -202,7 +209,7 @@ trait StatusController extends BaseController {
               renewalDate,
               true,
               ApplicationConfig.allowDeRegisterToggle,
-              None,
+              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
               ApplicationConfig.showChangeOfficerLink)))
         }
       }

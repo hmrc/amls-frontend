@@ -119,11 +119,16 @@ object ControllerHelper {
     }
   }
 
-  def getNominatedOfficer(responsiblePeople: Future[Option[Seq[ResponsiblePeople]]]): Future[Option[ResponsiblePeople]] = {
-    (OptionT(responsiblePeople) map { rps =>
-      rps.filterNot(_.status.contains(StatusConstants.Deleted)).filter(_.isNominatedOfficer).head
-    }).value recoverWith {
-      case _:NoSuchElementException => Future.successful(None)
+  def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePeople]): Option[ResponsiblePeople] = {
+    responsiblePeople.filterNot(_.status.contains(StatusConstants.Deleted)).filter(_.isNominatedOfficer) match {
+      case rps@_::_ => Some(rps.head)
+      case _ => None
+    }
+  }
+
+  def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePeople]]): Option[String] = {
+    responsiblePeople map { rps =>
+      rpTitleName(getNominatedOfficer(rps))
     }
   }
 
