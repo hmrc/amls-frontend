@@ -31,7 +31,6 @@ import org.scalatest.MustMatchers
 sealed trait HvdTestFixture {
   val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-  private val DefaultReceiveCashPayments = ReceiveCashPayments(Some(paymentMethods))
 
   val NewCashPayment = CashPaymentNo
 
@@ -41,7 +40,7 @@ sealed trait HvdTestFixture {
     Some(HowWillYouSellGoods(Seq(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
     Some(true),
-    receiveCashPayments = Some(DefaultReceiveCashPayments),
+    Some(paymentMethods),
     Some(LinkedCashPayments(false)),
     Some(DateOfChange(new LocalDate("2016-02-24"))))
 }
@@ -175,7 +174,8 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
       val tests = Seq[(Hvd => Hvd, String)](
         (_.cashPayment(CashPaymentNo), "cashPayment"),
         (_.products(Products(Set(ScrapMetals))), "products"),
-        (_.receiveCashPayments(ReceiveCashPayments(Some(PaymentMethods(false, false, None)))), "receiveCashPayments"),
+        (_.receiveCashPayments(true), "receiveCashPayments"),
+        (_.cashPaymentMethods(PaymentMethods(false, false, None)), "receiveCashPayments"),
         (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
         (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
         (_.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))), "howWillYouSellGoods"),

@@ -45,27 +45,27 @@
                 field = f("paymentMethods")
             ) {
                 @checkbox(
-                    f = f("paymentMethods.courier"),
+                    f = f("courier"),
                     labelText = "hvd.receiving.option.01",
                     value = "true"
                 )
                 @checkbox(
-                    f = f("paymentMethods.direct"),
+                    f = f("direct"),
                     labelText = "hvd.receiving.option.02",
                     value = "true"
                 )
                 @checkbox(
-                    f = f("paymentMethods.other"),
+                    f = f("other"),
                     labelText = "hvd.receiving.option.03",
                     value = "true",
-                    target = s"#paymentMethods-details"
+                    target = s"#paymentMethods-details-fieldset"
                 )
             }
             @panel(
                 field = Some(f("paymentMethods-details-fieldset"))
             ){
                 @input(
-                    field = f("paymentMethods.details"),
+                    field = f("details"),
                     labelText = "hvd.receiving.give.details.lbl"
                 )
             }

@@ -28,8 +28,8 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 exciseGoods:  Option[ExciseGoods] = None,
                 howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
                 percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-                receiveCashPaymentsNotInPerson: Option[Boolean] = None,
-                receiveCashPayments: Option[ReceiveCashPayments] = None,
+                receiveCashPayments: Option[Boolean] = None,
+                cashPaymentMethods: Option[PaymentMethods] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
                 dateOfChange: Option[DateOfChange] = None,
                 hasChanged: Boolean = false,
@@ -41,11 +41,19 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def products(p: Products): Hvd =
     this.copy(products = Some(p), hasChanged = hasChanged || !this.products.contains(p), hasAccepted = hasAccepted && this.products.contains(p))
 
-  def receiveCashPayments(p: ReceiveCashPayments): Hvd =
+  def receiveCashPayments(p: Boolean): Hvd =
     this.copy(
       receiveCashPayments = Some(p),
       hasChanged = hasChanged || !this.receiveCashPayments.contains(p),
-      hasAccepted = hasAccepted && this.receiveCashPayments.contains(p))
+      hasAccepted = hasAccepted && this.receiveCashPayments.contains(p)
+    )
+
+  def cashPaymentMethods(p: PaymentMethods): Hvd =
+    this.copy(
+      cashPaymentMethods = Some(p),
+      hasChanged = hasChanged || !this.cashPaymentMethods.contains(p),
+      hasAccepted = hasAccepted && this.cashPaymentMethods.contains(p)
+    )
 
   def exciseGoods(p: ExciseGoods): Hvd =
     this.copy(exciseGoods = Some(p),
@@ -75,9 +83,9 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     Logger.debug(s"[Hvd][isComplete] $this")
 
     def isCompleteWithoutHasAccepted = this match {
-      case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _)
+      case Hvd(Some(_), Some(pr), _, Some(_),  Some(_), Some(_), Some(_), Some(_), _, _, _)
         if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-      case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
+      case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
       case _ => false
     }
 
@@ -116,8 +124,8 @@ object Hvd {
         (__ \ "exciseGoods").readNullable[ExciseGoods] and
         (__ \ "howWillYouSellGoods").readNullable[HowWillYouSellGoods] and
         (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
-        (__ \ "receiveCashPaymentsNotInPerson").readNullable[Boolean] and
-        (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
+        (__ \ "receiveCashPayments").readNullable[Boolean] and
+        (__ \ "paymentMethods").readNullable[PaymentMethods] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "dateOfChange").readNullable[DateOfChange] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
@@ -130,5 +138,3 @@ object Hvd {
   implicit def default(hvd: Option[Hvd]): Hvd =
     hvd.getOrElse(Hvd())
 }
-
-

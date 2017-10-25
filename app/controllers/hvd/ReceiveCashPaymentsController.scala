@@ -32,13 +32,15 @@ import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject()
-(
-  val cacheConnector: DataCacheConnector,
-  implicit val serviceFlow: ServiceFlow,
-  implicit val statusService: StatusService,
-  val authConnector: AuthConnector
-) extends BaseController {
+class ReceiveCashPaymentsController @Inject()(
+                                               val cacheConnector: DataCacheConnector,
+                                               implicit val serviceFlow: ServiceFlow,
+                                               implicit val statusService: StatusService,
+                                               val authConnector: AuthConnector) extends BaseController {
+
+  val NAME = "receivePayments"
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -46,10 +48,10 @@ class ReceiveCashPaymentsController @Inject()
         case true =>
           cacheConnector.fetch[Hvd](Hvd.key) map {
             response =>
-              val form: Form2[ReceiveCashPayments] = (for {
+              val form: Form2[Boolean] = (for {
                 hvd <- response
                 receivePayments <- hvd.receiveCashPayments
-              } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
+              } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
               Ok(receiving(form, edit))
           }
         case false => Future.successful(NotFound(notFoundView))
@@ -58,21 +60,21 @@ class ReceiveCashPaymentsController @Inject()
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-
-      val NAME = "receivePayments"
-      implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-      implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
-
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(receiving(f, edit)))
         case ValidForm(_, data) => {
-          if(edit){
-            Future.successful(Redirect(routes.SummaryController.get()))
-          } else if(data){
-           Future.successful(Redirect(routes.ExpectToReceiveCashPaymentsController.get()))
-          } else {
-            Future.successful(Redirect(routes.PercentageOfCashPaymentOver15000Controller.get()))
+          for {
+            hvd <- cacheConnector.fetch[Hvd](Hvd.key)
+            _ <- cacheConnector.save[Hvd](Hvd.key, hvd.receiveCashPayments(data))
+          } yield {
+            if(edit){
+              Redirect(routes.SummaryController.get())
+            } else if(data){
+              Redirect(routes.ExpectToReceiveCashPaymentsController.get())
+            } else {
+              Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+            }
           }
         }
       }

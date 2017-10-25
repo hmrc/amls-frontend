@@ -87,7 +87,8 @@ class summarySpec extends GenericTestHelper
           exciseGoods = Some(ExciseGoods(true)),
           howWillYouSellGoods = Some(HowWillYouSellGoods(List(Retail, Wholesale, Auction))),
           percentageOfCashPaymentOver15000 = Some(Third),
-          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("Other payment method"))))),
+          receiveCashPayments = Some(true),
+          cashPaymentMethods = Some(PaymentMethods(true, true, Some("Other payment method"))),
           linkedCashPayment = Some(LinkedCashPayments(true))
         )
 

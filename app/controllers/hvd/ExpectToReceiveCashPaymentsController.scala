@@ -22,7 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.hvd.{Hvd, ReceiveCashPayments}
+import models.hvd.{Hvd, PaymentMethods, ReceiveCashPayments}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -45,10 +45,13 @@ class ExpectToReceiveCashPaymentsController @Inject()(
         case true =>
           cacheConnector.fetch[Hvd](Hvd.key) map {
             response =>
-              val form: Form2[ReceiveCashPayments] = (for {
+              val form: Form2[PaymentMethods] = (for {
                 hvd <- response
-                receivePayments <- hvd.receiveCashPayments
-              } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
+                receivePayments <- hvd.cashPaymentMethods
+              } yield {
+                Form2[PaymentMethods](receivePayments)
+              }).getOrElse(EmptyForm)
+
               Ok(expect_to_receive(form, edit))
           }
         case false => Future.successful(NotFound(notFoundView))
@@ -57,14 +60,14 @@ class ExpectToReceiveCashPaymentsController @Inject()(
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[ReceiveCashPayments](request.body) match {
+      Form2[PaymentMethods](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(expect_to_receive(f, edit)))
         case ValidForm(_, data) =>
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
             _ <- cacheConnector.save[Hvd](Hvd.key,
-              hvd.receiveCashPayments(data)
+              hvd.cashPaymentMethods(data)
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
