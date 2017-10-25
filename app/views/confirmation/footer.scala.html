@@ -17,11 +17,11 @@
 @import include._
 @import forms2._
 
-@()(implicit messages: Messages, request: Request[_])
+@(infoText: String = "confirmation.payment.info.keep_up_to_date")(implicit messages: Messages, request: Request[_])
 
 <h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
 
-<p>@messages("confirmation.payment.info.keep_up_to_date")</p>
+<p>@messages(Messages(infoText))</p>
 
 <ul class="list list-bullet">
     <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
