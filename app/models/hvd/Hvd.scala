@@ -28,6 +28,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 exciseGoods:  Option[ExciseGoods] = None,
                 howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
                 percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+                receiveCashPaymentsNotInPerson: Option[Boolean] = None,
                 receiveCashPayments: Option[ReceiveCashPayments] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
                 dateOfChange: Option[DateOfChange] = None,
@@ -72,20 +73,18 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
   def isComplete: Boolean = {
     Logger.debug(s"[Hvd][isComplete] $this")
+
+    def isCompleteWithoutHasAccepted = this match {
+      case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _)
+        if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
+      case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
+      case _ => false
+    }
+
     if (ApplicationConfig.hasAcceptedToggle) {
-      this match {
-        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _, _, true)
-          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-        case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) => true
-        case _ => false
-      }
+      isCompleteWithoutHasAccepted & this.hasAccepted
     } else {
-      this match {
-        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _, _, _)
-          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-        case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
-        case _ => false
-      }
+      isCompleteWithoutHasAccepted
     }
   }
 }
@@ -117,6 +116,7 @@ object Hvd {
         (__ \ "exciseGoods").readNullable[ExciseGoods] and
         (__ \ "howWillYouSellGoods").readNullable[HowWillYouSellGoods] and
         (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
+        (__ \ "receiveCashPaymentsNotInPerson").readNullable[Boolean] and
         (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "dateOfChange").readNullable[DateOfChange] and

@@ -60,6 +60,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       Some(ExciseGoods(true)),
       Some(HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))),
       Some(PercentageOfCashPaymentOver15000.Fifth),
+      Some(true),
       Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))))),
       Some(LinkedCashPayments(true))
     )

@@ -40,6 +40,7 @@ sealed trait HvdTestFixture {
     None,
     Some(HowWillYouSellGoods(Seq(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
+    Some(true),
     receiveCashPayments = Some(DefaultReceiveCashPayments),
     Some(LinkedCashPayments(false)),
     Some(DateOfChange(new LocalDate("2016-02-24"))))
@@ -63,6 +64,7 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "percentageOfCashPaymentOver15000" -> Json.obj(
         "percentage" -> "01"
       ),
+      "receiveCashPaymentsNotInPerson" -> true,
       "receiveCashPayments" -> Json.obj(
         "receivePayments" -> true,
         "paymentMethods" -> Json.obj(
