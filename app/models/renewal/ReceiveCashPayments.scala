@@ -100,7 +100,7 @@ object ReceiveCashPayments {
 
   implicit def convert(model: ReceiveCashPayments): models.hvd.ReceiveCashPayments = model.paymentMethods match {
     case Some(paymentMethods) =>
-      models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)))
-    case None => models.hvd.ReceiveCashPayments(None)
+      models.hvd.ReceiveCashPayments(Some(true), Some(models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)))
+    case None => models.hvd.ReceiveCashPayments(Some(false), None)
   }
 }
