@@ -58,19 +58,23 @@ class ReceiveCashPaymentsController @Inject()
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[ReceiveCashPayments](request.body) match {
+
+      val NAME = "receivePayments"
+      implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
+      implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
+
+      Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(receiving(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key,
-              hvd.receiveCashPayments(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+        case ValidForm(_, data) => {
+          if(edit){
+            Future.successful(Redirect(routes.SummaryController.get()))
+          } else if(data){
+           Future.successful(Redirect(routes.ExpectToReceiveCashPaymentsController.get()))
+          } else {
+            Future.successful(Redirect(routes.PercentageOfCashPaymentOver15000Controller.get()))
           }
+        }
       }
     }
   }

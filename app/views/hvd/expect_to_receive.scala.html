@@ -29,7 +29,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
+    @form(f, controllers.hvd.routes.ExpectToReceiveCashPaymentsController.post(edit)) {
 
         <p>@Messages("lbl.select.all")</p>
 
@@ -62,7 +62,7 @@
                 )
             }
             @panel(
-                field = Some(f("paymentMethods-details"))
+                field = Some(f("paymentMethods-details-fieldset"))
             ){
                 @input(
                     field = f("paymentMethods.details"),
