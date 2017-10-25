@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.ApplicationConfig
+import config.{ApplicationConfig, WSHttp}
 import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -30,11 +30,11 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 
 class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience {
 
@@ -55,7 +55,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val paymentsToggleValue = true
-    val httpPost = mock[CorePost]
+    val http = mock[WSHttp]
     val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
@@ -76,7 +76,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     }
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[CorePost].to(httpPost))
+      .overrides(bind[WSHttp].to(http))
       .bindings(bind[ServicesConfig].to(config))
       .build()
 
@@ -88,7 +88,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            httpPost.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
+            http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
             HttpResponse(OK,Some(Json.toJson(validResponse)))
           )
@@ -106,7 +106,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           whenReady(connector.createPayment(validRequest)) { r =>
             r must not be defined
 
-            verify(httpPost, never).POST(any(), any(), any())(any(), any(), any(), any())
+            verify(http, never).POST(any(), any(), any())(any(), any(), any(), any())
           }
         }
       }

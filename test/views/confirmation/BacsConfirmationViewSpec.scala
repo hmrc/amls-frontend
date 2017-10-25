@@ -46,7 +46,7 @@ class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=${controllers.routes.LandingController.get()}").text mustBe Messages("confirmation.payment.status_button.text")
+      doc.select(s".button[href=${controllers.routes.LandingController.get()}").text mustBe Messages("confirmation.payment.continue_button.text")
     }
 
   }

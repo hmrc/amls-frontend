@@ -746,6 +746,7 @@ confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves yo
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
 confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
 confirmation.payment.status_button.text = View your current status
+confirmation.payment.continue_button.text = Continue
 
 confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
