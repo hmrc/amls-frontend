@@ -18,9 +18,8 @@ package models.hvd
 
 import jto.validation._
 import jto.validation.forms._
+import models.renewal.{PaymentMethods => RPaymentMethods, ReceiveCashPayments => RReceiveCashPayments}
 import play.api.libs.json.{Writes, _}
-import cats.data.Validated.{Invalid, Valid}
-import models.renewal.{ReceiveCashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
@@ -28,15 +27,8 @@ sealed trait ReceiveCashPayments0 {
 
 
   implicit val formRule: Rule[UrlFormEncoded, ReceiveCashPayments] = From[UrlFormEncoded] { __ =>
-    import utils.MappingUtils.Implicits.RichRule
-
     import jto.validation.forms.Rules._
-
-    (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
-      case true =>
-        (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
-      case false => Rule.fromMapping { _ => Valid(ReceiveCashPayments(None)) }
-    }
+    (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
   }
 
   implicit val jsonReads: Reads[ReceiveCashPayments] =
@@ -62,14 +54,10 @@ sealed trait ReceiveCashPayments0 {
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
-    import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
-    import cats.implicits._
-    import utils.MappingUtils.MonoidImplicits.urlMonoid
-    import jto.validation.forms.Writes._
     implicitly
   }
   val jsonR: Reads[ReceiveCashPayments] = {

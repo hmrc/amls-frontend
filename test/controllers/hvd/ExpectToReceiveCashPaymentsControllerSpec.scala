@@ -84,7 +84,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
             val result = controller.post()(request.withFormUrlEncodedBody("paymentMethods.courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get()))
+            redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
 
           }
         }
@@ -94,7 +94,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
             val result = controller.post(true)(request.withFormUrlEncodedBody("paymentMethods.courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get()))
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
           }
         }

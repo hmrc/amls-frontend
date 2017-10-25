@@ -16,14 +16,12 @@
 
 package models.hvd
 
-
 import config.ApplicationConfig
 import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.Logger
 import play.api.libs.json.{Json, Reads, Writes}
 import uk.gov.hmrc.http.cache.client.CacheMap
-
 
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
