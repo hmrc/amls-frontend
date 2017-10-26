@@ -22,9 +22,11 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.hvd.products
@@ -35,7 +37,8 @@ class ProductsController @Inject()
 (
   val dataCacheConnector: DataCacheConnector,
   val statusService: StatusService,
-  val authConnector: AuthConnector
+  val authConnector: AuthConnector,
+  val serviceFlow: ServiceFlow
 ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -63,11 +66,10 @@ class ProductsController @Inject()
               for {
                 hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
                 status <- statusService.getStatus
-                _ <- dataCacheConnector.save[Hvd](Hvd.key,
-                  hvd.products(data)
-                )
+                _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.products(data))
+                inServiceFlow <- serviceFlow.inNewServiceFlow(HighValueDealing)
               } yield {
-                if (redirectToDateOfChange[Products](status, hvd.products, data)) {
+                if (!inServiceFlow && redirectToDateOfChange[Products](status, hvd.products, data)) {
                   Redirect(routes.HvdDateOfChangeController.get())
                 } else {
                   if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {

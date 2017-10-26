@@ -18,6 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
+import models.businessmatching.HighValueDealing
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -28,9 +29,10 @@ import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, ServiceFlowMocks}
 
 import scala.concurrent.Future
 
@@ -38,14 +40,18 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new ProductsController(
-      mock[DataCacheConnector],
-      mock[StatusService],
-      self.authConnector
+      mockCacheConnector,
+      mockStatusService,
+      self.authConnector,
+      mockServiceFlow
     )
+
+    setupInServiceFlow(false)
+    mockCacheSave[Hvd]
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,8 +60,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "load the 'What will your business sell?' page" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      mockCacheFetch[Hvd](None)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -65,8 +70,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "pre-populate the 'What will your business sell?' page" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))
+      mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -84,14 +88,8 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "products[1]" -> "02"
       )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Hvd](None)
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -105,14 +103,8 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "products[1]" -> "04"
       )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Hvd](None)
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -128,14 +120,8 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "otherDetails" -> "test"
       )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Hvd](None)
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -150,11 +136,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "otherDetails" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Hvd](None)
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -172,11 +154,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "otherDetails" -> "g"*256
       )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Hvd](None)
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -193,14 +171,8 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "otherDetails" -> "test"
       )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
+      mockApplicationStatus(SubmissionDecisionApproved)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -215,18 +187,50 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
         "otherDetails" -> "test"
       )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(ReadyForRenewal(None)))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
+      mockApplicationStatus(ReadyForRenewal(None))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
+    }
+  }
+
+  "Calling POST" when {
+    "the submission is approved" when {
+      "the sector has just been added" must {
+        "redirect to the next page" when {
+          "the user selectes 'alcohol' or 'tobacco" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "products[0]" -> "01",
+              "products[1]" -> "02"
+            )
+
+            setupInServiceFlow(true, Some(HighValueDealing))
+            mockCacheFetch[Hvd](None)
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
+          }
+
+          "the user selects something other than alcohol or tobacco" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "products[0]" -> "03",
+              "products[1]" -> "04"
+            )
+
+            setupInServiceFlow(true, Some(HighValueDealing))
+            mockCacheFetch[Hvd](None)
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
+          }
+        }
+      }
     }
   }
 
