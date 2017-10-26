@@ -125,7 +125,7 @@ object Hvd {
         (__ \ "howWillYouSellGoods").readNullable[HowWillYouSellGoods] and
         (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
         (__ \ "receiveCashPayments").readNullable[Boolean] and
-        (__ \ "paymentMethods").readNullable[PaymentMethods] and
+        (__ \ "cashPaymentMethods").readNullable[PaymentMethods] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "dateOfChange").readNullable[DateOfChange] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and

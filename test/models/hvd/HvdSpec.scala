@@ -34,12 +34,13 @@ sealed trait HvdTestFixture {
 
   val NewCashPayment = CashPaymentNo
 
-  val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
+  val completeModel = Hvd(
+    cashPayment = Some(DefaultCashPayment),
     Some(Products(Set(Cars))),
     None,
     Some(HowWillYouSellGoods(Seq(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
-    Some(false),
+    Some(true),
     Some(paymentMethods),
     Some(LinkedCashPayments(false)),
     Some(DateOfChange(new LocalDate("2016-02-24"))))
@@ -63,15 +64,12 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "percentageOfCashPaymentOver15000" -> Json.obj(
         "percentage" -> "01"
       ),
-      "receiveCashPaymentsNotInPerson" -> true,
-      "receiveCashPayments" -> Json.obj(
-        "receivePayments" -> true,
-        "paymentMethods" -> Json.obj(
-          "courier" -> true,
-          "direct" -> true,
-          "other" -> true,
-          "details" -> "foo")
-      ),
+      "receiveCashPayments" -> true,
+      "cashPaymentMethods" -> Json.obj(
+        "courier" -> true,
+        "direct" -> true,
+        "other" -> true,
+        "details" -> "foo"),
       "linkedCashPayment" -> Json.obj(
         "linkedCashPayments" -> false
       ),
@@ -174,7 +172,7 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
       val tests = Seq[(Hvd => Hvd, String)](
         (_.cashPayment(CashPaymentNo), "cashPayment"),
         (_.products(Products(Set(ScrapMetals))), "products"),
-        (_.receiveCashPayments(true), "receiveCashPayments"),
+        (_.receiveCashPayments(false), "receiveCashPayments"),
         (_.cashPaymentMethods(PaymentMethods(false, false, None)), "cashPaymentMethods"),
         (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
         (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
