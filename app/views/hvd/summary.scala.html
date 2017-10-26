@@ -137,6 +137,27 @@
         }
     }
 
+    @model.cashPaymentMethods.map { pm =>
+        @checkYourAnswers(
+            question = Messages("hvd.receiving.expect.to.receive"),
+            editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
+        ) {
+            <ul class="list list--comma">
+                <li>@pm match {
+                    case PaymentMethods(false, false, None) => { Unknown }
+                    case PaymentMethods(false, false, Some(txt)) => { @txt }
+                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                    case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                    case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                    case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                    }</li>
+            </ul>
+        }
+
+    }
+
     @model.percentageOfCashPaymentOver15000.map { p =>
         @checkYourAnswers(
             question = Messages("hvd.percentage.title"),

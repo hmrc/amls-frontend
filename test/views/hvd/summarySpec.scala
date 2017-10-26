@@ -99,7 +99,7 @@ class summarySpec extends GenericTestHelper
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }}
