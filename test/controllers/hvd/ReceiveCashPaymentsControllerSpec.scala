@@ -88,8 +88,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" which {
-      "will save ReceiveCashPayments" in new Fixture {
+    "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "receivePayments" -> "false"
@@ -101,16 +100,27 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
 
       }
-    }
 
-    "redirect to ExpectToReceiveCashPaymentsController on form equals yes" which {
-      "will not save ReceiveCashPayments" in new Fixture {
+    "redirect to ExpectToReceiveCashPaymentsController on form equals yes" when {
+      "edit is true and hvd cashPaymentMethods is not defined" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
-        val result = controller.post(false)(newRequest)
+        val result = controller.post(true)(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)
+
+      }
+      "edit is false" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receivePayments" -> "true"
+        )
+
+        val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)

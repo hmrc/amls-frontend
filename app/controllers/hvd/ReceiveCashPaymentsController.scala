@@ -67,17 +67,19 @@ class ReceiveCashPaymentsController @Inject()(
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
             _ <- cacheConnector.save[Hvd](Hvd.key, hvd.receiveCashPayments(data))
-          } yield {
-            if(edit){
-              Redirect(routes.SummaryController.get())
-            } else if(data){
-              Redirect(routes.ExpectToReceiveCashPaymentsController.get())
-            } else {
-              Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-            }
-          }
+          } yield redirectTo(data, hvd, edit)
         }
       }
+    }
+  }
+
+  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) = {
+    if((data & !edit) | (data & edit & hvd.cashPayment.isEmpty)){
+      Redirect(routes.ExpectToReceiveCashPaymentsController.get())
+    } else if (edit) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
     }
   }
 }

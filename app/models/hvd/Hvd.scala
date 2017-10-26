@@ -81,19 +81,15 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
   def isComplete: Boolean = {
     Logger.debug(s"[Hvd][isComplete] $this")
-
-    def isCompleteWithoutHasAccepted = this match {
-      case Hvd(Some(_), Some(pr), _, Some(_),  Some(_), Some(_), Some(_), Some(_), _, _, _)
-        if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-      case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _) => true
-      case _ => false
-    }
-
-    if (ApplicationConfig.hasAcceptedToggle) {
-      isCompleteWithoutHasAccepted & this.hasAccepted
-    } else {
-      isCompleteWithoutHasAccepted
-    }
+    this match {
+        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
+        case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true) => true
+        case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(false), _, Some(_), _, _, true)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
+        case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(false), _, Some(_), _, _, true) => true
+        case _ => false
+      }
   }
 }
 
@@ -125,9 +121,7 @@ object Hvd {
     }
 
   def oldCashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
-    (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] map { rcp =>
-      rcp flatMap { _.paymentMethods }
-    } orElse constant(None)
+    (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] map { _ flatMap { _.paymentMethods } } orElse constant(None)
 
   def cashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
     (__ \ "cashPaymentMethods").readNullable[PaymentMethods] flatMap {
