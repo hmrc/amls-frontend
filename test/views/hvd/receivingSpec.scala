@@ -57,20 +57,15 @@ class receivingSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "receivePayments") -> Seq(ValidationError("not a message Key")),
-          (Path \ "paymentMethods") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "paymentMethods-details-fieldset") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "receivePayments") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.hvd.receiving(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
 
       doc.getElementById("receivePayments").html() must include("not a message Key")
-      doc.getElementById("paymentMethods").html() must include("second not a message Key")
-      doc.getElementById("paymentMethods-details-fieldset").html() must include("third not a message Key")
+
     }
   }
 }

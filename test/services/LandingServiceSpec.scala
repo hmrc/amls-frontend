@@ -266,8 +266,12 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
     val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
 
-    val hvdSection  = Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-    receiveCashPayments = Some(ReceiveCashPayments(Some(paymentMethods))), hasAccepted = true)
+    val hvdSection  = Hvd(
+      percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+      receiveCashPayments = Some(true),
+      cashPaymentMethods = Some(paymentMethods),
+      hasAccepted = true
+    )
 
     val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),

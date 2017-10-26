@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import models.hvd.Hvd
+import models.hvd.{Hvd, ReceiveCashPayments}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
@@ -50,7 +50,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
 
   "ReceiveCashPaymentsController" must {
 
-    "load the page" in new Fixture {
+    "load the view" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
@@ -59,7 +59,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       status(result) mustEqual OK
     }
 
-    "redirect to Page not found" when {
+    "respond with not found" when {
       "application is in variation mode" in new Fixture {
 
         when(controller.statusService.getStatus(any(), any(), any()))
@@ -69,13 +69,14 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         status(result) must be(NOT_FOUND)
       }
     }
-    "show a bad request with an invalid request" in new Fixture {
+
+    "respond with bad request with an invalid request" in new Fixture {
 
       val result = controller.post()(request)
       status(result) mustEqual BAD_REQUEST
     }
 
-    "redirect to summary on successful edit" in new Fixture {
+    "redirect to summary on edit" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "receivePayments" -> "false"
@@ -87,16 +88,34 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "redirect to next page on successful submission" in new Fixture {
+    "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" which {
+      "will save ReceiveCashPayments" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "receivePayments" -> "false"
-      )
+        val newRequest = request.withFormUrlEncodedBody(
+          "receivePayments" -> "false"
+        )
 
-      val result = controller.post(false)(newRequest)
+        val result = controller.post(false)(newRequest)
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+
+      }
+    }
+
+    "redirect to ExpectToReceiveCashPaymentsController on form equals yes" which {
+      "will not save ReceiveCashPayments" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receivePayments" -> "true"
+        )
+
+        val result = controller.post(false)(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)
+
+      }
     }
   }
 }

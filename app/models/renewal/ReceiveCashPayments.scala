@@ -98,9 +98,7 @@ object ReceiveCashPayments {
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
-  implicit def convert(model: ReceiveCashPayments): models.hvd.ReceiveCashPayments = model.paymentMethods match {
-    case Some(paymentMethods) =>
-      models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)))
-    case None => models.hvd.ReceiveCashPayments(None)
+  implicit def convert(model: ReceiveCashPayments): Option[models.hvd.PaymentMethods] = model.paymentMethods map { paymentMethods =>
+    models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)
   }
 }

@@ -31,16 +31,17 @@ import org.scalatest.MustMatchers
 sealed trait HvdTestFixture {
   val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-  private val DefaultReceiveCashPayments = ReceiveCashPayments(Some(paymentMethods))
 
   val NewCashPayment = CashPaymentNo
 
-  val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
+  val completeModel = Hvd(
+    cashPayment = Some(DefaultCashPayment),
     Some(Products(Set(Cars))),
     None,
     Some(HowWillYouSellGoods(Seq(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
-    receiveCashPayments = Some(DefaultReceiveCashPayments),
+    Some(true),
+    Some(paymentMethods),
     Some(LinkedCashPayments(false)),
     Some(DateOfChange(new LocalDate("2016-02-24"))))
 }
@@ -63,14 +64,12 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "percentageOfCashPaymentOver15000" -> Json.obj(
         "percentage" -> "01"
       ),
-      "receiveCashPayments" -> Json.obj(
-        "receivePayments" -> true,
-        "paymentMethods" -> Json.obj(
-          "courier" -> true,
-          "direct" -> true,
-          "other" -> true,
-          "details" -> "foo")
-      ),
+      "receiveCashPayments" -> true,
+      "cashPaymentMethods" -> Json.obj(
+        "courier" -> true,
+        "direct" -> true,
+        "other" -> true,
+        "details" -> "foo"),
       "linkedCashPayment" -> Json.obj(
         "linkedCashPayments" -> false
       ),
@@ -79,11 +78,50 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "hasAccepted" -> false
     )
 
-    "Serialise as expected" in new HvdTestFixture {
+    "Serialise" in new HvdTestFixture {
       Json.toJson(completeModel) must be(completeJson)
     }
-    "Deserialise as expected" in new HvdTestFixture {
-      completeJson.as[Hvd] must be(completeModel)
+    "Deserialise" when {
+      "current format json" in new HvdTestFixture {
+        completeJson.as[Hvd] must be(completeModel)
+      }
+      "old format json" when {
+        "receiveCashPayments is in old format json" in new HvdTestFixture {
+
+          val completeJson = Json.obj(
+            "cashPayment" -> Json.obj(
+              "acceptedAnyPayment" -> true,
+              "paymentDate" -> new LocalDate(1956, 2, 15)
+            ),
+            "products" -> Json.obj(
+              "products" -> Seq("04")
+            ),
+            "howWillYouSellGoods" -> Json.obj(
+              "salesChannels" -> Seq("Retail")
+            ),
+            "percentageOfCashPaymentOver15000" -> Json.obj(
+              "percentage" -> "01"
+            ),
+            "receiveCashPayments" -> Json.obj(
+              "receivePayments" -> true,
+              "paymentMethods" -> Json.obj(
+                "courier" -> true,
+                "direct" -> true,
+                "other" -> true,
+                "details" -> "foo")
+            ),
+            "linkedCashPayment" -> Json.obj(
+              "linkedCashPayments" -> false
+            ),
+            "dateOfChange" -> "2016-02-24",
+            "hasChanged" -> false,
+            "hasAccepted" -> false
+          )
+
+          completeJson.as[Hvd] must be(completeModel)
+
+        }
+      }
     }
 
     "Update how will you sell goods correctly" in new HvdTestFixture {
@@ -173,7 +211,8 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
       val tests = Seq[(Hvd => Hvd, String)](
         (_.cashPayment(CashPaymentNo), "cashPayment"),
         (_.products(Products(Set(ScrapMetals))), "products"),
-        (_.receiveCashPayments(ReceiveCashPayments(Some(PaymentMethods(false, false, None)))), "receiveCashPayments"),
+        (_.receiveCashPayments(false), "receiveCashPayments"),
+        (_.cashPaymentMethods(PaymentMethods(false, false, None)), "cashPaymentMethods"),
         (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
         (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
         (_.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))), "howWillYouSellGoods"),

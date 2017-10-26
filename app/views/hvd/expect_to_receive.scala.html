@@ -1,0 +1,76 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("hvd.expect.to.receive.title", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.expect.to.receive.title") + " - " + Messages("summary.hvd"),
+    heading = header
+) {
+
+    @form(f, controllers.hvd.routes.ExpectToReceiveCashPaymentsController.post(edit)) {
+
+        <p>@Messages("lbl.select.all")</p>
+
+        @fieldset(
+            f = f("paymentMethods-fieldset"),
+            legend = "hvd.receiving.expect.to.receive",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("paymentMethods-fieldset")
+        ) {
+            @errorGroup(
+                classes = Seq("form-group"),
+                field = f("paymentMethods")
+            ) {
+                @checkbox(
+                    f = f("courier"),
+                    labelText = "hvd.receiving.option.01",
+                    value = "true"
+                )
+                @checkbox(
+                    f = f("direct"),
+                    labelText = "hvd.receiving.option.02",
+                    value = "true"
+                )
+                @checkbox(
+                    f = f("other"),
+                    labelText = "hvd.receiving.option.03",
+                    value = "true",
+                    target = s"#paymentMethods-details-fieldset"
+                )
+            }
+            @panel(
+                field = Some(f("paymentMethods-details-fieldset"))
+            ){
+                @input(
+                    field = f("details"),
+                    labelText = "hvd.receiving.give.details.lbl"
+                )
+            }
+        }
+
+        @submit(edit)
+    }
+}

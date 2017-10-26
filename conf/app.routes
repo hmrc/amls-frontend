@@ -41,7 +41,6 @@ POST        /about-the-business/contacting-you                                  
 GET         /about-the-business/contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
 
-
 GET         /about-the-business/previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
@@ -548,6 +547,9 @@ POST        /high-value-dealer/percentage                                       
 
 GET         /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.get
 POST        /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.post

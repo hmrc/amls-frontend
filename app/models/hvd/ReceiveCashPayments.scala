@@ -98,10 +98,19 @@ object ReceiveCashPayments {
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
 
-  def convert(model: ReceiveCashPayments) : RReceiveCashPayments = {
-    model.paymentMethods match {
-      case Some(paymentMtd) => RReceiveCashPayments(Some(RPaymentMethods(paymentMtd.courier, paymentMtd.direct, paymentMtd.other)))
-      case _ => RReceiveCashPayments(None)
+  def convert(model: Hvd) : RReceiveCashPayments = {
+    if(model.receiveCashPayments.contains(false)){
+      RReceiveCashPayments(None)
+    } else {
+      model.cashPaymentMethods.fold(RReceiveCashPayments(None)){ methods =>
+        RReceiveCashPayments(Some(
+          RPaymentMethods(
+            methods.courier,
+            methods.direct,
+            methods.other
+          )
+        ))
+      }
     }
   }
 }
