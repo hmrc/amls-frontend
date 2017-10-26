@@ -78,11 +78,50 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "hasAccepted" -> false
     )
 
-    "Serialise as expected" in new HvdTestFixture {
+    "Serialise" in new HvdTestFixture {
       Json.toJson(completeModel) must be(completeJson)
     }
-    "Deserialise as expected" in new HvdTestFixture {
-      completeJson.as[Hvd] must be(completeModel)
+    "Deserialise" when {
+      "current format json" in new HvdTestFixture {
+        completeJson.as[Hvd] must be(completeModel)
+      }
+      "old format json" when {
+        "receiveCashPayments is in old format json" in new HvdTestFixture {
+
+          val completeJson = Json.obj(
+            "cashPayment" -> Json.obj(
+              "acceptedAnyPayment" -> true,
+              "paymentDate" -> new LocalDate(1956, 2, 15)
+            ),
+            "products" -> Json.obj(
+              "products" -> Seq("04")
+            ),
+            "howWillYouSellGoods" -> Json.obj(
+              "salesChannels" -> Seq("Retail")
+            ),
+            "percentageOfCashPaymentOver15000" -> Json.obj(
+              "percentage" -> "01"
+            ),
+            "receiveCashPayments" -> Json.obj(
+              "receivePayments" -> true,
+              "paymentMethods" -> Json.obj(
+                "courier" -> true,
+                "direct" -> true,
+                "other" -> true,
+                "details" -> "foo")
+            ),
+            "linkedCashPayment" -> Json.obj(
+              "linkedCashPayments" -> false
+            ),
+            "dateOfChange" -> "2016-02-24",
+            "hasChanged" -> false,
+            "hasAccepted" -> false
+          )
+
+          completeJson.as[Hvd] must be(completeModel)
+
+        }
+      }
     }
 
     "Update how will you sell goods correctly" in new HvdTestFixture {
