@@ -72,7 +72,8 @@ class summarySpec extends GenericTestHelper
       ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
       ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
       ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
-      ("hvd.receiving.title", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
+      ("hvd.receiving.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("hvd.receiving.expect.to.receive", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
       ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
     )
 
