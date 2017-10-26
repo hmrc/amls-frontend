@@ -16,6 +16,8 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -23,16 +25,18 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.hvd.excise_goods
 
 import scala.concurrent.Future
 
-trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
-
+class ExciseGoodsController @Inject()
+(
+  dataCacheConnector: DataCacheConnector,
+  statusService: StatusService,
+  val authConnector: AuthConnector
+) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) =
     Authorised.async {
@@ -47,7 +51,6 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
               Ok(excise_goods(form, edit))
           }
     }
-
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -75,11 +78,4 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
         }
       }
   }
-}
-
-object ExciseGoodsController extends ExciseGoodsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }

@@ -27,7 +27,7 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
@@ -35,13 +35,17 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
-    val controller = new ExciseGoodsController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+
+    val controller = new ExciseGoodsController(
+      mockCacheConnector,
+      mockStatusService,
+      self.authConnector
+    )
+
+    mockCacheFetch[Hvd](None)
+    mockCacheSave[Hvd]
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -49,9 +53,6 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
   "ExciseGoodsController" must {
 
     "successfully load UI for the first time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -61,8 +62,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
 
     "successfully load UI from save4later" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Hvd(exciseGoods = Some(ExciseGoods(true))))))
+      mockCacheFetch(Some(Hvd(exciseGoods = Some(ExciseGoods(true)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -77,14 +77,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -95,14 +88,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -110,11 +96,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-
-      )
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      val newRequest = request.withFormUrlEncodedBody()
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -124,17 +106,10 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
     "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture{
 
       val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
-
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(hvd)))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      mockApplicationStatus(SubmissionDecisionApproved)
+      mockCacheFetch(Some(hvd))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -144,17 +119,10 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
     "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture{
 
       val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
-
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(ReadyForRenewal(None)))
-
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(hvd)))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      mockApplicationStatus(ReadyForRenewal(None))
+      mockCacheFetch(Some(hvd))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
