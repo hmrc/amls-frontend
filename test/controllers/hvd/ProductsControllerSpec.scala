@@ -41,12 +41,11 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ProductsController {
-
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override protected def authConnector: AuthConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new ProductsController(
+      mock[DataCacheConnector],
+      mock[StatusService],
+      self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
