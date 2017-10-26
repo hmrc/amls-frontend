@@ -59,7 +59,7 @@ class ExpectToReceiveCashPaymentsController @Inject()(
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext => implicit request =>
       Form2[PaymentMethods](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(expect_to_receive(f, edit)))
@@ -74,6 +74,5 @@ class ExpectToReceiveCashPaymentsController @Inject()(
             case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
           }
       }
-    }
   }
 }
