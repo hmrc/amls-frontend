@@ -192,15 +192,33 @@ trait StatusController extends BaseController {
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+        Future.successful(Ok(status_renewal_submitted(
+          mlrRegNumber.getOrElse(""),
+          businessNameOption,
+          renewalDate,
+          ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+          ApplicationConfig.showChangeOfficerLink)
+        ))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
           case Some(r) =>
             renewalService.isRenewalComplete(r) flatMap { complete =>
               if (complete) {
-                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+                Future.successful(Ok(status_renewal_not_submitted(
+                  mlrRegNumber.getOrElse(""),
+                  businessNameOption,
+                  renewalDate,
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+                  ApplicationConfig.showChangeOfficerLink)
+                ))
               } else {
-                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+                Future.successful(Ok(status_renewal_incomplete(
+                  mlrRegNumber.getOrElse(""),
+                  businessNameOption,
+                  renewalDate,
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+                  ApplicationConfig.showChangeOfficerLink
+                )))
               }
             }
           case _ => Future.successful(Ok(

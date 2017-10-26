@@ -36,7 +36,7 @@ class status_renewal_incompleteSpec extends GenericTestHelper with MustMatchers 
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), None)
+      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), None, None)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -48,7 +48,7 @@ class status_renewal_incompleteSpec extends GenericTestHelper with MustMatchers 
       val endDate = new LocalDate(2017,1,1)
       val endDateFormatted = DateHelper.formatDate(endDate)
 
-      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate))
+      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate), None)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -72,7 +72,7 @@ class status_renewal_incompleteSpec extends GenericTestHelper with MustMatchers 
     "not contain the link to change the nominated officer" in new ViewFixture {
 
       val endDate = new LocalDate(2017,1,1)
-      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate), false)
+      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate), None, false)
 
       html must not include controllers.changeofficer.routes.StillEmployedController.get.url
     }
