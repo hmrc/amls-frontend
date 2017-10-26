@@ -127,7 +127,7 @@ object Hvd {
   def oldCashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
     (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] map { rcp =>
       rcp flatMap { _.paymentMethods }
-    }
+    } orElse constant(None)
 
   def cashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
     (__ \ "cashPaymentMethods").readNullable[PaymentMethods] flatMap {
