@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import models.businessmatching.HighValueDealing
 
 import scala.concurrent.Future
 
@@ -41,11 +42,13 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
     val controller = new ExciseGoodsController(
       mockCacheConnector,
       mockStatusService,
-      self.authConnector
+      self.authConnector,
+      mockServiceFlow
     )
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
+    setupInServiceFlow(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -130,4 +133,21 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
     }
   }
 
+  "Calling POST" when {
+    "the submission is approved" when {
+      "the sector has just been added" must {
+        "progress to the next page" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          setupInServiceFlow(true, Some(HighValueDealing))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.hvd.routes.HowWillYouSellGoodsController.get().url))
+        }
+      }
+    }
+  }
 }
