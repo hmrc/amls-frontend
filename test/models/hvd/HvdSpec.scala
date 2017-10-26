@@ -39,7 +39,7 @@ sealed trait HvdTestFixture {
     None,
     Some(HowWillYouSellGoods(Seq(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
-    Some(true),
+    Some(false),
     Some(paymentMethods),
     Some(LinkedCashPayments(false)),
     Some(DateOfChange(new LocalDate("2016-02-24"))))
@@ -175,7 +175,7 @@ class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSu
         (_.cashPayment(CashPaymentNo), "cashPayment"),
         (_.products(Products(Set(ScrapMetals))), "products"),
         (_.receiveCashPayments(true), "receiveCashPayments"),
-        (_.cashPaymentMethods(PaymentMethods(false, false, None)), "receiveCashPayments"),
+        (_.cashPaymentMethods(PaymentMethods(false, false, None)), "cashPaymentMethods"),
         (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
         (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
         (_.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))), "howWillYouSellGoods"),
