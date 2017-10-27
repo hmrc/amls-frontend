@@ -85,10 +85,11 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext
   ): SubscriptionRequest = {
 
-    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key) map { _.filterNot {
-      case r@ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
-      case _ => false
-    }}
+    def filteredResponsiblePeople =
+      cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key) map { _.filterNot {
+        case _@ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
+        case _ => false
+      }}
 
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),

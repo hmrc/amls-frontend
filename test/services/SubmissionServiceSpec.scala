@@ -18,6 +18,8 @@ package services
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
+import generators.ResponsiblePersonGenerator
+import models._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
@@ -28,26 +30,25 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
-import models._
+import models.responsiblepeople.ResponsiblePeople
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.http.Status._
 import play.api.test.FakeApplication
-import play.api.test.Helpers.{OK => _, _}
+import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
-class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
+class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite with ResponsiblePersonGenerator {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.amounts.registration" -> 100))
 
@@ -136,6 +137,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       cache.getEntry[Seq[BankDetails]](BankDetails.key)
     } thenReturn Some(mock[Seq[BankDetails]])
     when {
+      cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+    } thenReturn Some(Seq(responsiblePersonGen.sample.get))
+    when {
       cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
     } thenReturn Some(amendmentResponse)
   }
@@ -144,6 +148,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "subscribe is called" must {
       "subscribe and enrol" in new Fixture {
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -172,6 +180,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "submit amendment" in new Fixture {
 
         when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(responsiblePersonGen.sample.get))
+
+        when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
         } thenReturn Future.successful(Some(cache))
 
@@ -197,6 +209,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "return failed future when no enrolment" in new Fixture {
 
         when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(responsiblePersonGen.sample.get))
+
+        when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
         } thenReturn Future.successful(Some(cache))
 
@@ -214,6 +230,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "variation is called" must {
       "submit variation" in new Fixture {
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -240,6 +260,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     }
 
     "submit a renewal" in new Fixture {
+
+      when {
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
       when {
         cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
@@ -312,8 +336,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       submission.hvdSection.get.receiveCashPayments mustBe defined
     }
 
-
     "submit a renewal amendment" in new Fixture {
+
+      when {
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
       when {
         cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
