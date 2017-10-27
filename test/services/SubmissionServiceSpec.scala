@@ -16,8 +16,10 @@
 
 package services
 
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.AmlsConnector
 import exceptions.NoEnrolmentException
+import generators.ResponsiblePersonGenerator
+import models._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
@@ -28,45 +30,40 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
-import models._
+import models.responsiblepeople.ResponsiblePeople
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.http.Status._
 import play.api.test.FakeApplication
-import play.api.test.Helpers.{OK => _, _}
+import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.HttpResponse
+import utils.DependencyMocks
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
+class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite with ResponsiblePersonGenerator {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.amounts.registration" -> 100))
 
-  trait Fixture {
+  trait Fixture extends DependencyMocks {
 
     val TestSubmissionService = new SubmissionService {
-      override private[services] val cacheConnector = mock[DataCacheConnector]
+      override private[services] val cacheConnector = mockCacheConnector
       override private[services] val amlsConnector = mock[AmlsConnector]
       override private[services] val ggService = mock[GovernmentGatewayService]
       override private[services] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
-    implicit val authContext = mock[AuthContext]
-    val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
     when {
-      authContext.principal
-    }.thenReturn(principle)
-
-    implicit val headerCarrier = HeaderCarrier()
+      mockAuthContext.principal
+    } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     val enrolmentResponse = HttpResponse(OK)
 
@@ -103,7 +100,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
     val aboutTheBusiness = mock[AboutTheBusiness]
-    val cache = mock[CacheMap]
+
+    mockCacheFetchAll
+    mockCacheSave[SubscriptionResponse]
+    mockCacheSave[AmendVariationRenewalResponse]
 
     when {
       reviewDetails.safeId
@@ -123,35 +123,23 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       activities.businessActivities
     } thenReturn Set[BusinessActivity]()
-    when {
-      cache.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(businessMatching)
-    when {
-      cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)
-    } thenReturn Some(mock[EstateAgentBusiness])
-    when {
-      cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-    } thenReturn Some(aboutTheBusiness)
-    when {
-      cache.getEntry[Seq[BankDetails]](BankDetails.key)
-    } thenReturn Some(mock[Seq[BankDetails]])
-    when {
-      cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-    } thenReturn Some(amendmentResponse)
+
+    mockCacheGetEntry[BusActivities](Some(BusActivities()), BusActivities.key)
+    mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
+    mockCacheGetEntry[Hvd](Some(Hvd()), Hvd.key)
+    mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
+    mockCacheGetEntry[EstateAgentBusiness](Some(mock[EstateAgentBusiness]), EstateAgentBusiness.key)
+    mockCacheGetEntry[AboutTheBusiness](Some(aboutTheBusiness), AboutTheBusiness.key)
+    mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
+    mockCacheGetEntry[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePeople.key)
+    mockCacheGetEntry[AmendVariationRenewalResponse](Some(amendmentResponse), AmendVariationRenewalResponse.key)
+
   }
 
   "SubmissionService" when {
 
     "subscribe is called" must {
       "subscribe and enrol" in new Fixture {
-
-        when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
 
         when {
           TestSubmissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
@@ -172,21 +160,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "submit amendment" in new Fixture {
 
         when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
           TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
         when {
           TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
 
         whenReady(TestSubmissionService.update) {
           result =>
@@ -197,13 +176,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "return failed future when no enrolment" in new Fixture {
 
         when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
           TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(None))
-
 
         whenReady(TestSubmissionService.update.failed) {
           result =>
@@ -216,21 +190,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "submit variation" in new Fixture {
 
         when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
           TestSubmissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
         when {
           TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
 
         whenReady(TestSubmissionService.variation) {
           result =>
@@ -242,28 +207,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "submit a renewal" in new Fixture {
 
       when {
-        cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
-      } thenReturn Some(BusActivities())
-
-      when {
-        cache.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any())
-      } thenReturn Some(MoneyServiceBusiness())
-
-      when {
-        cache.getEntry[Hvd](eqTo(Hvd.key))(any())
-      } thenReturn Some(Hvd())
-
-      when {
-        TestSubmissionService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(Some(cache))
-
-      when {
         TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-      when {
-        TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-      } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
         TestSubmissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
@@ -312,32 +257,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       submission.hvdSection.get.receiveCashPayments mustBe defined
     }
 
-
     "submit a renewal amendment" in new Fixture {
-
-      when {
-        cache.getEntry[BusActivities](eqTo(BusActivities.key))(any())
-      } thenReturn Some(BusActivities())
-
-      when {
-        cache.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any())
-      } thenReturn Some(MoneyServiceBusiness())
-
-      when {
-        cache.getEntry[Hvd](eqTo(Hvd.key))(any())
-      } thenReturn Some(Hvd())
-
-      when {
-        TestSubmissionService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(Some(cache))
 
       when {
         TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-      when {
-        TestSubmissionService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-      } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
         TestSubmissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
