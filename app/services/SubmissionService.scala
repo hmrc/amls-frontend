@@ -38,6 +38,8 @@ import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRe
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.tradingpremises.TradingPremises.FilterUtils
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
@@ -85,15 +87,9 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext
   ): SubscriptionRequest = {
 
-    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key) map { _.filterNot {
-      case _@ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
-      case _ => false
-    }}
+    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
 
-    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map { _.filterNot {
-      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, None, _, None, _) => true
-      case _ => false
-    }}
+    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),

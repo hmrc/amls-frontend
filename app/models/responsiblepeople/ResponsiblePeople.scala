@@ -258,4 +258,11 @@ object ResponsiblePeople {
   def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())
 
+  implicit class FilterUtils(people: Seq[ResponsiblePeople]) {
+    def filterEmpty: Seq[ResponsiblePeople] = people.filterNot {
+      case _@ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
+      case _ => false
+    }
+  }
+
 }
