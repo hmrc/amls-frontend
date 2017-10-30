@@ -90,10 +90,15 @@ trait SubmissionService extends DataCacheService {
       case _ => false
     }}
 
+    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key) map { _.filterNot {
+      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, None, _, None, _) => true
+      case _ => false
+    }}
+
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
-      tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
+      tradingPremisesSection = filteredTradingPremises,
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),

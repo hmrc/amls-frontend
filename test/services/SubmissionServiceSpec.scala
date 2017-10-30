@@ -19,6 +19,7 @@ package services
 import connectors.AmlsConnector
 import exceptions.NoEnrolmentException
 import generators.ResponsiblePersonGenerator
+import generators.tradingpremises.TradingPremisesGenerator
 import models._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
@@ -31,9 +32,11 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
 import models.responsiblepeople.ResponsiblePeople
+import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -48,7 +51,9 @@ import utils.DependencyMocks
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite with ResponsiblePersonGenerator {
+class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite
+  with ResponsiblePersonGenerator
+  with TradingPremisesGenerator {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.amounts.registration" -> 100))
 
@@ -133,6 +138,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
     mockCacheGetEntry[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePeople.key)
     mockCacheGetEntry[AmendVariationRenewalResponse](Some(amendmentResponse), AmendVariationRenewalResponse.key)
+    mockCacheGetEntry[Seq[TradingPremises]](Gen.listOf(tradingPremisesGen).sample, TradingPremises.key)
 
   }
 
