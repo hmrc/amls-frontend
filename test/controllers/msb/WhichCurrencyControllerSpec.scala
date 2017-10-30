@@ -34,6 +34,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 import play.api.test.Helpers._
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.http.HeaderNames.LOCATION
+import services.businessmatching.ServiceFlow
 import views.html.msb.which_currencies
 
 import scala.concurrent.Future
@@ -57,11 +58,15 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new WhichCurrenciesController {
-
       override def cache: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
       override implicit val statusService: StatusService = mock[StatusService]
+      override val serviceFlow = mock[ServiceFlow]
     }
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
   }
 
   "WhichCurrencyController" when {

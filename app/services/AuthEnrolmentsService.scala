@@ -19,9 +19,9 @@ package services
 import connectors.AuthConnector
 import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait AuthEnrolmentsService {
 

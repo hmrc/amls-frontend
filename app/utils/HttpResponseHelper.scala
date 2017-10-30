@@ -17,7 +17,7 @@
 package utils
 
 import play.api.libs.json.{JsNull, JsResult, Json, Reads}
-import uk.gov.hmrc.play.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 
 trait HttpResponseHelper {
 

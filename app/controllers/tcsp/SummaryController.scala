@@ -16,19 +16,29 @@
 
 package controllers.tcsp
 
+import javax.inject.Inject
+
 import cats.implicits._
 import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.TrustAndCompanyServices
 import models.tcsp.Tcsp
+import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.tcsp.summary
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
+class SummaryController @Inject()
+(
+  val dataCache: DataCacheConnector,
+  val authConnector: AuthConnector,
+  val serviceFlow: ServiceFlow,
+  val statusService: StatusService
+) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext =>
@@ -45,17 +55,13 @@ trait SummaryController extends BaseController {
         (for {
           model <- OptionT(fetchModel)
           _ <- OptionT.liftF(dataCache.save[Tcsp](Tcsp.key, model.copy(hasAccepted = true)))
-        } yield {
-          Redirect(controllers.routes.RegistrationProgressController.get())
+          preSubmission <- OptionT.liftF(statusService.isPreSubmission)
+          inNewFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(TrustAndCompanyServices))
+        } yield (preSubmission, inNewFlow) match {
+          case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) = dataCache.fetch[Tcsp](Tcsp.key)
-
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

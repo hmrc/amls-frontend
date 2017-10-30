@@ -24,7 +24,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 object PaymentConfirmationEvent {
   def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit

@@ -16,12 +16,10 @@
 
 package models.hvd
 
-import jto.validation._
-import jto.validation.forms._
-import jto.validation.ValidationError
-import play.api.libs.json.{Json, Reads, Writes}
-import utils.JsonMapping
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, _}
+import jto.validation.forms._
+import play.api.libs.json.{Json, Reads, Writes}
 
 
 case class PaymentMethods(
@@ -32,8 +30,6 @@ case class PaymentMethods(
 
 sealed trait PaymentMethods0 {
 
-  import JsonMapping._
-  import utils.MappingUtils.MonoidImplicits._
   import models.FormTypes._
 
   private implicit def rule[A]
@@ -78,20 +74,15 @@ sealed trait PaymentMethods0 {
           case false =>
             Rule(_ => Valid(None))
         }
-      )(PaymentMethods.apply _).validateWith("error.required.hvd.choose.option"){
+      )(PaymentMethods.apply).validateWith("error.required.hvd.choose.option"){
         methods =>
           methods.courier || methods.direct || methods.other.isDefined
       }
     }
 
-  private implicit def write
-  (implicit
-   mon: cats.Monoid[UrlFormEncoded],
-   s: Path => WriteLike[Option[String], UrlFormEncoded],
-   b: Path => WriteLike[Boolean, UrlFormEncoded]
-  ): Write[PaymentMethods, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
-      (
+  private implicit def write: Write[PaymentMethods, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Writes._
+    (
         (__ \ "courier").write[Boolean] ~
         (__ \ "direct").write[Boolean] ~
         (__ \ "other").write[Boolean].contramap[Option[_]] {
@@ -108,14 +99,12 @@ sealed trait PaymentMethods0 {
   }
 
   val jsonR: Reads[PaymentMethods] = {
-    import utils.JsonMapping._
     import jto.validation.playjson.Rules.{pickInJson => _, _}
+    import utils.JsonMapping._
     implicitly
   }
 
   val formW: Write[PaymentMethods, UrlFormEncoded] = {
-    import cats.implicits._
-    import jto.validation.forms.Writes._
     implicitly[Write[PaymentMethods, UrlFormEncoded]]
   }
 

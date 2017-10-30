@@ -23,10 +23,10 @@ import models.responsiblepeople.ResponsiblePeople
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait DetailedAnswersController extends BaseController with RepeatingSection {
 

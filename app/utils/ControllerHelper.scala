@@ -16,6 +16,10 @@
 
 package utils
 
+import java.util.NoSuchElementException
+
+import cats.data.OptionT
+import cats.implicits._
 import models.businessmatching._
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople}
@@ -25,11 +29,12 @@ import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Request
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 object ControllerHelper {
 
@@ -97,10 +102,33 @@ object ControllerHelper {
     }
   }
 
+  def allowedToEdit(activity: BusinessActivity)
+                   (implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
+    status <- statusService.getStatus
+    isInFlow <- serviceFlow.inNewServiceFlow(activity)
+  } yield (status, isInFlow) match {
+    case (_, true) => true
+    case (SubmissionReady | NotCompleted | SubmissionReadyForReview, false) => true
+    case _ => false
+  }
+
   def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
     eventualMaybePeoples map {
-      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.positions.fold(false)(_.positions.contains(NominatedOfficer)))
-      case _ =>  false
+      case Some(rps) =>  rps.filter(!_.status.contains(StatusConstants.Deleted)).exists(_.isNominatedOfficer)
+      case _ => false
+    }
+  }
+
+  def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePeople]): Option[ResponsiblePeople] = {
+    responsiblePeople.filterNot(_.status.contains(StatusConstants.Deleted)).filter(_.isNominatedOfficer) match {
+      case rps@_::_ => Some(rps.head)
+      case _ => None
+    }
+  }
+
+  def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePeople]]): Option[String] = {
+    responsiblePeople map { rps =>
+      rpTitleName(getNominatedOfficer(rps))
     }
   }
 

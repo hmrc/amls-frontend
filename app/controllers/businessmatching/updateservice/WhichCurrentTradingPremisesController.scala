@@ -30,13 +30,13 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
+import uk.gov.hmrc.http.HeaderCarrier
 
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
-                                                       businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
+                                                      businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
 
   private val failure = InternalServerError("Could not get form data")
 
@@ -62,7 +62,12 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
           for {
             (tp, _, act) <- formData
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
-          } yield Redirect(controllers.routes.RegistrationProgressController.get())
+            fitAndProperRequired <- businessMatchingService.fitAndProperRequired
+          } yield if(fitAndProperRequired) {
+            Redirect(routes.FitAndProperController.get())
+          } else {
+            Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+          }
         } getOrElse failure
       }
   }

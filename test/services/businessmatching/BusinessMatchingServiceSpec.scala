@@ -21,7 +21,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BillPaymentServices, BusinessMatching, HighValueDealing, BusinessActivities => BMActivities}
+import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -33,7 +33,6 @@ import org.scalatestplus.play.PlaySpec
 import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class BusinessMatchingServiceSpec extends PlaySpec
 with GenericTestHelper
@@ -346,6 +345,172 @@ with GenericTestHelper
       "reset the variation model back to nothing" in new Fixture {
         whenReady(service.clearVariation.value) { _ =>
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+        }
+      }
+    }
+  }
+
+  "fitAndProperRequired" must {
+    "return true" when {
+      "existing activities does not contain msb and tcsp" when {
+        "current activities contains msb" in new Fixture {
+
+          val existing = BusinessMatching(
+            activities = Some(BMActivities(
+              Set(BillPaymentServices)
+            ))
+          )
+          val current = BusinessMatching(
+            activities = Some(BMActivities(
+              Set(MoneyServiceBusiness)
+            ))
+          )
+
+          val viewResponse = ViewResponse(
+            "",
+            businessMatchingSection = existing,
+            aboutTheBusinessSection = AboutTheBusiness(),
+            bankDetailsSection = Seq.empty,
+            businessActivitiesSection = BusinessActivities(),
+            eabSection = None,
+            aspSection = None,
+            tcspSection = None,
+            responsiblePeopleSection = None,
+            tradingPremisesSection = None,
+            msbSection = None,
+            hvdSection = None,
+            supervisionSection = None,
+            aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+          )
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+          mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+          whenReady(service.fitAndProperRequired.value) { result =>
+            result must be(Some(true))
+          }
+        }
+
+        "current activities contains tcsp" in new Fixture {
+
+          val existing = BusinessMatching(
+            activities = Some(BMActivities(
+              Set(BillPaymentServices)
+            ))
+          )
+          val current = BusinessMatching(
+            activities = Some(BMActivities(
+              Set(TrustAndCompanyServices)
+            ))
+          )
+
+          val viewResponse = ViewResponse(
+            "",
+            businessMatchingSection = existing,
+            aboutTheBusinessSection = AboutTheBusiness(),
+            bankDetailsSection = Seq.empty,
+            businessActivitiesSection = BusinessActivities(),
+            eabSection = None,
+            aspSection = None,
+            tcspSection = None,
+            responsiblePeopleSection = None,
+            tradingPremisesSection = None,
+            msbSection = None,
+            hvdSection = None,
+            supervisionSection = None,
+            aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+          )
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+          mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+          whenReady(service.fitAndProperRequired.value) { result =>
+            result must be(Some(true))
+          }
+        }
+      }
+    }
+    "return false" when {
+      "existing activities contains msb" in new Fixture {
+
+        val existing = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(MoneyServiceBusiness)
+          ))
+        )
+        val current = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(TrustAndCompanyServices)
+          ))
+        )
+
+        val viewResponse = ViewResponse(
+          "",
+          businessMatchingSection = existing,
+          aboutTheBusinessSection = AboutTheBusiness(),
+          bankDetailsSection = Seq.empty,
+          businessActivitiesSection = BusinessActivities(),
+          eabSection = None,
+          aspSection = None,
+          tcspSection = None,
+          responsiblePeopleSection = None,
+          tradingPremisesSection = None,
+          msbSection = None,
+          hvdSection = None,
+          supervisionSection = None,
+          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+        )
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+
+        mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+        whenReady(service.fitAndProperRequired.value) { result =>
+          result must be(Some(false))
+        }
+      }
+      "existing activities contains tcsp" in new Fixture {
+
+        val existing = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(TrustAndCompanyServices)
+          ))
+        )
+        val current = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(BillPaymentServices)
+          ))
+        )
+
+        val viewResponse = ViewResponse(
+          "",
+          businessMatchingSection = existing,
+          aboutTheBusinessSection = AboutTheBusiness(),
+          bankDetailsSection = Seq.empty,
+          businessActivitiesSection = BusinessActivities(),
+          eabSection = None,
+          aspSection = None,
+          tcspSection = None,
+          responsiblePeopleSection = None,
+          tradingPremisesSection = None,
+          msbSection = None,
+          hvdSection = None,
+          supervisionSection = None,
+          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+        )
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+
+        mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+        whenReady(service.fitAndProperRequired.value) { result =>
+          result must be(Some(false))
         }
       }
     }

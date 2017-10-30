@@ -25,11 +25,11 @@ import services.StatusService
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.DeclarationHelper._
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 
 class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar {

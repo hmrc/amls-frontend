@@ -18,29 +18,48 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{Form2, ValidForm}
+import jto.validation.{From, Rule, Valid}
+import jto.validation.forms.UrlFormEncoded
+import models.businessmatching.updateservice.UpdateService
+import play.api.i18n.MessagesApi
 import services.StatusService
+import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.new_service_information
+import scala.concurrent.Future
 
-// $COVERAGE-OFF$
-class NewServiceInformationController @Inject()(
-                                       val authConnector: AuthConnector,
-                                       val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService)() extends BaseController {
+
+class NewServiceInformationController @Inject()
+(
+  val authConnector: AuthConnector,
+  val dataCacheConnector: DataCacheConnector,
+  val businessMatchingService: BusinessMatchingService,
+  val serviceFlow: ServiceFlow,
+  val messages: MessagesApi
+) extends BaseController {
 
   def get() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
-        ???
+    implicit authContext => implicit request => {
+        for {
+          cacheMap <- OptionT(dataCacheConnector.fetchAll)
+          next <- serviceFlow.next
+        } yield Ok(new_service_information(next.activity, next.url))
+      } getOrElse Redirect(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get())
   }
-
 
   def post() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
-        ???
+    implicit authContext => implicit request => {
+      for {
+        model <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key)) orElse OptionT.some(UpdateService())
+        _ <- OptionT.liftF(dataCacheConnector.save(UpdateService.key, model.copy(inNewServiceFlow = true)))
+        form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
+        url <- OptionT.fromOption[Future](form.get("redirectUrl"))
+      } yield Redirect(url.head)
+    } getOrElse InternalServerError("Unable to configure UpdateService")
   }
-
 }
-// $COVERAGE-ON$

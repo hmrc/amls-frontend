@@ -23,14 +23,15 @@ case class UpdateService(
                           areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
                           tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
                           areSubmittedActivitiesAtTradingPremises: Option[AreSubmittedActivitiesAtTradingPremises] = None,
-                          tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
+                          tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
+                          inNewServiceFlow: Boolean = false
                         ) {
 
   def isComplete: Boolean = this match {
-    case UpdateService(Some(_), Some(_), Some(_), Some(_)) => true
-    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(_), Some(_)) => true
-    case UpdateService(Some(_), Some(_), Some(SubmittedActivitiesAtTradingPremisesYes), _) => true
-    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(SubmittedActivitiesAtTradingPremisesYes), _) => true
+    case UpdateService(Some(_), Some(_), Some(_), Some(_), false) => true
+    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(_), Some(_), false) => true
+    case UpdateService(Some(_), Some(_), Some(SubmittedActivitiesAtTradingPremisesYes), _, false) => true
+    case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(SubmittedActivitiesAtTradingPremisesYes), _, false) => true
     case _ => false
   }
 
@@ -48,7 +49,8 @@ object UpdateService{
     (__ \ "areNewActivitiesAtTradingPremises").readNullable[AreNewActivitiesAtTradingPremises] and
       (__ \ "tradingPremisesNewActivities").readNullable[TradingPremisesActivities] and
       (__ \ "areSubmittedActivitiesAtTradingPremises").readNullable[AreSubmittedActivitiesAtTradingPremises] and
-      (__ \ "tradingPremisesSubmittedActivities").readNullable[TradingPremisesActivities]
+      (__ \ "tradingPremisesSubmittedActivities").readNullable[TradingPremisesActivities] and
+      (__ \ "inNewServiceFlow").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(UpdateService.apply _)
 
 }

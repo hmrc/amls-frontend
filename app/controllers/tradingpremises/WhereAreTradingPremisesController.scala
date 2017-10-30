@@ -34,9 +34,9 @@ import cats.data._
 import cats.implicits._
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 

@@ -20,9 +20,9 @@ import config.{AmlsSessionCache, BusinessCustomerSessionCache}
 import models.businesscustomer.ReviewDetails
 import models.status.ConfirmationStatus
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait KeystoreConnector {
 

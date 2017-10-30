@@ -72,7 +72,8 @@ class summarySpec extends GenericTestHelper
       ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
       ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
       ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
-      ("hvd.receiving.title", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
+      ("hvd.receiving.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("hvd.receiving.expect.to.receive", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
       ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
     )
 
@@ -87,7 +88,8 @@ class summarySpec extends GenericTestHelper
           exciseGoods = Some(ExciseGoods(true)),
           howWillYouSellGoods = Some(HowWillYouSellGoods(List(Retail, Wholesale, Auction))),
           percentageOfCashPaymentOver15000 = Some(Third),
-          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("Other payment method"))))),
+          receiveCashPayments = Some(true),
+          cashPaymentMethods = Some(PaymentMethods(true, true, Some("Other payment method"))),
           linkedCashPayment = Some(LinkedCashPayments(true))
         )
 
@@ -98,7 +100,7 @@ class summarySpec extends GenericTestHelper
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }}

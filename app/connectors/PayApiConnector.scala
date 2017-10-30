@@ -19,19 +19,18 @@ package connectors
 import javax.inject.Inject
 
 import cats.implicits._
-import config.ApplicationConfig
+import config.{ApplicationConfig, WSHttp}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logger
-import play.api.http.Status.OK
 import play.api.libs.json.{JsSuccess, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
-                                 httpPost: HttpPost,
+                                 http: WSHttp,
                                  config: ServicesConfig
                                ) extends HttpResponseHelper {
 
@@ -44,7 +43,7 @@ class PayApiConnector @Inject()(
 
     if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {
       log(s"Creating payment: ${Json.toJson(request)}")
-      httpPost.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
+      http.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
         case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) => body.copy(
           paymentId = response.header("Location").map(_.split("/").last)
         ).some

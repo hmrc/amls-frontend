@@ -24,18 +24,17 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
-import models.businessmatching.updateservice.{PassedFitAndProper, PassedFitAndProperNo, PassedFitAndProperYes}
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
-
-import scala.concurrent.{ExecutionContext, Future}
+import utils.BooleanFormReadWrite
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class FitAndProperController @Inject()(
@@ -43,6 +42,11 @@ class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService: StatusService)() extends BaseController with RepeatingSection {
+
+  val NAME = "passedFitAndProper"
+
+  implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.businessmatching.updateservice.fitandproper")
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -52,18 +56,17 @@ class FitAndProperController @Inject()(
         }
   }
 
-
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
       filterRequest {
-        Form2[PassedFitAndProper](request.body) match {
+        Form2[Boolean](request.body) match {
           case ValidForm(_, data) => data match {
-            case PassedFitAndProperYes =>
+            case true =>
               updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
                 responsiblePeople.map(_.hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true))
               } map { _ => Redirect(routes.NewServiceInformationController.get()) }
-            case PassedFitAndProperNo => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+            case false => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
           }
           case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f)))
         }
@@ -71,7 +74,7 @@ class FitAndProperController @Inject()(
   }
 
   private def filterRequest(fn: Future[Result])
-                                 (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
+                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
     (businessMatchingService.getModel flatMap { bm =>
       OptionT.fromOption[Future](bm.activities)
     } flatMap { ba =>
@@ -81,6 +84,5 @@ class FitAndProperController @Inject()(
       })
     }) getOrElse InternalServerError("Cannot retrieve activities")
   }
-
 
 }

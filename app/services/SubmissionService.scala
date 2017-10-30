@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.play.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 //noinspection ScalaStyle
 trait SubmissionService extends DataCacheService {

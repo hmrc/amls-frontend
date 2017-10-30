@@ -20,7 +20,7 @@ import models.bankdetails._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AddBankAccountEventSpec extends PlaySpec with OneAppPerSuite {
 

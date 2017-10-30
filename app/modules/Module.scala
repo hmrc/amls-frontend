@@ -21,8 +21,8 @@ import config.{AMLSAuditConnector, WSHttp}
 import connectors._
 import services.{AuthEnrolmentsService, ProgressService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.http.HttpPost
 import utils.AmlsRefNumberBroker
+import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 
 class Module extends AbstractModule {
 
@@ -30,6 +30,7 @@ class Module extends AbstractModule {
 
   override def configure() = {
     bind(classOf[HttpPost]).toInstance(WSHttp)
+    bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])

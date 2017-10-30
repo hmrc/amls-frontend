@@ -45,11 +45,11 @@ import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.http.Status.OK
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
 
@@ -266,8 +266,12 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
     val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
 
-    val hvdSection  = Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-    receiveCashPayments = Some(ReceiveCashPayments(Some(paymentMethods))), hasAccepted = true)
+    val hvdSection  = Hvd(
+      percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+      receiveCashPayments = Some(true),
+      cashPaymentMethods = Some(paymentMethods),
+      hasAccepted = true
+    )
 
     val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),

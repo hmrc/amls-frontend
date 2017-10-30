@@ -29,16 +29,6 @@
         </p>
     </div>
 
-    <h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
-
-    <p>@messages("confirmation.payment.amendvariation.info.keep_up_to_date")</p>
-
-    <ul class="list list-bullet">
-        <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
-        <li>@messages("confirmation.payment.info.keep_up_to_date.item2")</li>
-        <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
-    </ul>
-
-    <a class="button" href="@controllers.routes.LandingController.get()" role="button">@Messages("confirmation.payment.status_button.text")</a>
+    @footer("confirmation.payment.amendvariation.info.keep_up_to_date")
 
 }

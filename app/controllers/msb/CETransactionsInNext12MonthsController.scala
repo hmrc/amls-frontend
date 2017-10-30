@@ -22,20 +22,23 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.msb.ce_transaction_in_next_12_months
-
+import play.api.Play
+import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
 import scala.concurrent.Future
 
 trait CETransactionsInNext12MonthsController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
   implicit val statusService: StatusService
+  implicit val serviceFlow: ServiceFlow
 
   def get(edit:Boolean = false) = Authorised.async {
    implicit authContext => implicit request =>
-     ControllerHelper.allowedToEdit flatMap {
+     ControllerHelper.allowedToEdit(MsbActivity) flatMap {
        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
          response =>
            val form: Form2[CETransactionsInNext12Months] = (for {
@@ -75,4 +78,5 @@ object CETransactionsInNext12MonthsController extends CETransactionsInNext12Mont
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val statusService: StatusService = StatusService
+  override lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

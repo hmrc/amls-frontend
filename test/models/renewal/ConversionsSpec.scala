@@ -133,11 +133,13 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'HVD receive cash payments' model" in new Fixture {
+
       val model = ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))
       val renewal = Renewal(receiveCashPayments = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.hvdSection.get.receiveCashPayments mustBe Some(models.hvd.ReceiveCashPayments(Some(models.hvd.PaymentMethods(true,true,Some("other")))))
+      converted.hvdSection.get.receiveCashPayments mustBe Some(true)
+      converted.hvdSection.get.cashPaymentMethods mustBe Some(models.hvd.PaymentMethods(true,true,Some("other")))
 
     }
 

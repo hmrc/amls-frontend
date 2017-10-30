@@ -21,6 +21,8 @@ import models.tcsp._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
+import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper}
 
@@ -32,9 +34,10 @@ class SummaryControllerSpec extends GenericTestHelper {
     self => val request = addToken(authRequest)
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+
     val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
       CompanyFormationAgent(true, false)))
-    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
 
     val model = Tcsp(
       Some(defaultCompanyServiceProviders),
@@ -42,10 +45,20 @@ class SummaryControllerSpec extends GenericTestHelper {
       Some(defaultServicesOfAnotherTCSP)
     )
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new SummaryController(
+      mock[DataCacheConnector],
+      self.authConnector,
+      mock[ServiceFlow],
+      mock[StatusService]
+    )
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
+
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(false)
   }
 
   "Get" must {
@@ -93,5 +106,31 @@ class SummaryControllerSpec extends GenericTestHelper {
       }
     }
 
+    "redirect to NewServiceInformationController" when {
+      "status is not pre-submission and activity has just been added" in new Fixture {
+        val cache = mock[CacheMap]
+
+        when {
+          controller.dataCache.fetch[Tcsp](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(model))
+
+        when {
+          controller.dataCache.save[Tcsp](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(cache)
+
+        when {
+          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+        } thenReturn Future.successful(true)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+
+      }
+    }
   }
 }

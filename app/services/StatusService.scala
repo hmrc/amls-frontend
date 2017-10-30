@@ -24,9 +24,9 @@ import models.status._
 import org.joda.time.LocalDate
 import play.api.{Mode, Play}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait StatusService {
 

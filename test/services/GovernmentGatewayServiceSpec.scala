@@ -22,11 +22,11 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import play.api.http.Status._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 

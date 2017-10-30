@@ -27,11 +27,11 @@ import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import cats.implicits._
 import utils.StatusConstants
+import uk.gov.hmrc.http.HeaderCarrier
 
 class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
 

@@ -58,47 +58,6 @@
         }
     }
 
-    @fieldset(
-          f = f("paymentMethods-fieldset"),
-          legend = "hvd.receiving.expect.to.receive",
-          legendHidden = false,
-          classes = Seq("paymentMethods-fieldset"),
-          hint = "lbl.select.all"
-      ) {
-        @errorGroup(
-            classes = Seq("form-group"),
-            field = f("paymentMethods")
-        ) {
-            @checkbox(
-                f = f("paymentMethods.courier"),
-                labelText = "hvd.receiving.option.01",
-                value = "true"
-            )
-            @checkbox(
-                f = f("paymentMethods.direct"),
-                labelText = "hvd.receiving.option.02",
-                value = "true"
-            )
-            @checkbox(
-                f = f("paymentMethods.other"),
-                labelText = "hvd.receiving.option.03",
-                value = "true",
-                target = s"#paymentMethods-details-fieldset"
-            )
-        }
-
-        @panel(
-            field = Some(f("paymentMethods-details-fieldset")),
-            jsHidden = true,
-            panel = false
-        ) {
-            @input(
-                field = f("paymentMethods.details"),
-                labelText = "hvd.receiving.give.details.lbl"
-            )
-        }
-    }
-
     @submit(edit)
   }
 }

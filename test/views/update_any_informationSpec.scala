@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package views.renewal
+package views
 
 import forms.{EmptyForm, Form2, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.UpdateAnyInformation
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import utils.GenericTestHelper
-import views.Fixture
 
 class update_any_informationSpec extends GenericTestHelper with MustMatchers  {
 
@@ -30,23 +29,23 @@ class update_any_informationSpec extends GenericTestHelper with MustMatchers  {
     implicit val requestWithToken = addToken(request)
   }
 
-  "vupdate_any_information view" must {
+  "update_any_information view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: Form2[UpdateAnyInformation] = EmptyForm
+      val form2 = EmptyForm
 
-      def view = views.html.renewal.update_any_information(form2)
+      def view = views.html.update_any_information(form2, mock[Call], "summary.renewal")
 
-      doc.title must startWith(Messages("renewal.updateanyinformation.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("updateanyinformation.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: Form2[UpdateAnyInformation] = EmptyForm
+      val form2 = EmptyForm
 
-      def view = views.html.renewal.update_any_information(form2)
+      def view = views.html.update_any_information(form2, mock[Call], "summary.renewal")
 
-      heading.html must be(Messages("renewal.updateanyinformation.title"))
+      heading.html must be(Messages("updateanyinformation.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }
@@ -58,7 +57,7 @@ class update_any_informationSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "updateAnyInformation") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.update_any_information(form2)
+      def view = views.html.update_any_information(form2, mock[Call], "summary.renewal")
 
       errorSummary.html() must include("not a message Key")
 

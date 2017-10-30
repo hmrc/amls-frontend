@@ -36,11 +36,11 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateMethodTester {
 

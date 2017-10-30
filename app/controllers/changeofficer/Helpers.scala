@@ -21,10 +21,10 @@ import connectors.DataCacheConnector
 import models.changeofficer.NewOfficer
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 object Helpers {
 

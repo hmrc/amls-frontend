@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers.businessmatching.updateservice
+@(name: Option[String])(implicit request: Request[_], m:Messages)
 
-import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
-
-class NewServiceInformationSpec extends GenericTestHelper with MockitoSugar {
-
-}
+<p class="heading-small">@Messages("changeofficer.changelink.heading")</p>@name
+<p><a href="@controllers.changeofficer.routes.StillEmployedController.get.url">@Messages("changeofficer.changelink.text")</a></p>

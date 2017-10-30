@@ -24,11 +24,11 @@ import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
 import views.html.date_of_change
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with BaseController {
 

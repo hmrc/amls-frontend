@@ -41,7 +41,6 @@ POST        /about-the-business/contacting-you                                  
 GET         /about-the-business/contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
 
-
 GET         /about-the-business/previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
@@ -159,8 +158,8 @@ POST        /estate-agents/date-change                                          
 GET         /estate-agents/redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
 POST        /estate-agents/redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.get()
-POST        /estate-agents/check-your-answers                                         controllers.estateagentbusiness.SummaryController.post()
+GET         /estate-agents/check-your-answers                                         @controllers.estateagentbusiness.SummaryController.get()
+POST        /estate-agents/check-your-answers                                         @controllers.estateagentbusiness.SummaryController.post()
 
 GET         /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type                                          controllers.businessmatching.BusinessTypeController.post()
@@ -287,6 +286,9 @@ POST        /declaration/add-person                                             
 
 GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
 
+GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
+POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
+
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
 
@@ -320,8 +322,11 @@ POST        /update-service/fit-and-proper/                                     
 GET         /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.get()
 POST        /update-service/which-fit-and-proper/                                     @controllers.businessmatching.updateservice.WhichFitAndProperController.post()
 
-GET         /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.get()
-POST        /update-service/new-service-information/                                  @controllers.businessmatching.updateservice.NewServiceInformationController.post()
+GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.NewServiceInformationController.get()
+POST        /update-service/new-service-information                                   @controllers.businessmatching.updateservice.NewServiceInformationController.post()
+
+GET         /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.get()
+POST        /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
@@ -447,8 +452,8 @@ POST        /accountancy-service-provider/agent-scheme                          
 GET         /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.get
 POST        /accountancy-service-provider/date-change                                 controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
-GET         /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.get()
-POST        /accountancy-service-provider/check-your-answers                          controllers.asp.SummaryController.post()
+GET         /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.get()
+POST        /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.post()
 
 GET         /trust-company-service-provider/what-you-need                             controllers.tcsp.WhatYouNeedController.get()
 
@@ -461,8 +466,8 @@ POST        /trust-company-service-provider/service-type                        
 GET         /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/check-your-answers                        controllers.tcsp.SummaryController.get()
-POST        /trust-company-service-provider/check-your-answers                       controllers.tcsp.SummaryController.post()
+GET         /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.get()
+POST        /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.post()
 
 GET         /supervision/what-you-need                                                controllers.supervision.WhatYouNeedController.get()
 
@@ -480,8 +485,8 @@ POST        /supervision/check-your-answers                                     
 
 GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
 
-GET         /money-service-business/check-your-answers                                controllers.msb.SummaryController.get()
-POST        /money-service-business/check-your-answers                                controllers.msb.SummaryController.post()
+GET         /money-service-business/check-your-answers                                @controllers.msb.SummaryController.get()
+POST        /money-service-business/check-your-answers                                @controllers.msb.SummaryController.post()
 
 GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
 POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
@@ -521,8 +526,8 @@ GET         /high-value-dealer/what-you-need                                    
 GET         /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.get()
-POST        /high-value-dealer/check-your-answers                                     controllers.hvd.SummaryController.post()
+GET         /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.get()
+POST        /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.post()
 
 GET         /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
@@ -537,11 +542,14 @@ GET         /high-value-dealer/excise-goods                                     
 POST        /high-value-dealer/excise-goods                                           controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
-GET         /high-value-dealer/percentage                                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /high-value-dealer/percentage                                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /high-value-dealer/percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/receiving                                              controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/receiving                                              controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/receiving                                              @controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.get
 POST        /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.post

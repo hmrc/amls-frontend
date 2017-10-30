@@ -27,13 +27,13 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
 import exceptions._
 import views.ParagraphHelpers
 import org.jsoup._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HttpResponse, Upstream5xxResponse }
 
 class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 

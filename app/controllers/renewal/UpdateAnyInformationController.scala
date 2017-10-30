@@ -24,9 +24,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessMatching
-import models.renewal.{UpdateAnyInformation, UpdateAnyInformationNo, UpdateAnyInformationYes}
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.BooleanFormReadWrite
 
 import scala.concurrent.Future
 
@@ -38,6 +38,11 @@ class UpdateAnyInformationController @Inject()(
                                                 val progressService: ProgressService
                                               ) extends BaseController {
 
+  val NAME = "updateAnyInformation"
+
+  implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.updateanyInformation.validationerror")
+
   def get = Authorised.async {
     implicit authContext => implicit request =>
       (for {
@@ -46,7 +51,7 @@ class UpdateAnyInformationController @Inject()(
       } yield {
         val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
         if(renewalService.canSubmit(renewals, variationSections)){
-          Ok(views.html.renewal.update_any_information(EmptyForm))
+          Ok(views.html.update_any_information(EmptyForm, routes.UpdateAnyInformationController.post(), "summary.renewal"))
         } else {
           NotFound(notFoundView)
         }
@@ -56,12 +61,14 @@ class UpdateAnyInformationController @Inject()(
 
   def post = Authorised.async{
     implicit authContext => implicit request =>
-      Form2[UpdateAnyInformation](request.body) match {
+      Form2[Boolean](request.body) match {
         case ValidForm(_, data) => data match {
-          case UpdateAnyInformationYes => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get().url))
-          case UpdateAnyInformationNo => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+          case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get().url))
+          case false => Future.successful(Redirect(controllers.declaration.routes.WhoIsRegisteringController.get().url))
         }
-        case f:InvalidForm => Future.successful(BadRequest(views.html.renewal.update_any_information(f)))
+        case f:InvalidForm => Future.successful(
+          BadRequest(views.html.update_any_information(f, routes.UpdateAnyInformationController.post(), "summary.renewal"))
+        )
       }
   }
 

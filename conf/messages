@@ -115,11 +115,13 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
+error.businessmatching.updateservice.responsiblepeople = Select one option to show which responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
 
 error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.changeservices = Select one option to show what you want to do
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
@@ -348,7 +350,7 @@ error.required.withdrawal.reason.other = You haven’t specified the reason for 
 error.required.deregistration.reason = You must select a reason for de-registering the business
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
-error.renewal.updateanyInformation.validationerror = Select yes if you want to update any other information
+error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select your nominated officer or register a new one
@@ -744,6 +746,7 @@ confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves yo
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
 confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
 confirmation.payment.status_button.text = View your current status
+confirmation.payment.continue_button.text = Continue
 
 confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
@@ -826,6 +829,7 @@ summary.status = Your registration
 summary.visuallyhidden.answer = Answer
 summary.visuallyhidden.your.answer.for = your answer for
 summary.submit.renewal = Submit renewal
+summary.updateservice = Update information
 summary.updateinformation = Update information
 
 summary.checkyouranswers.title = Check your answers
@@ -842,6 +846,9 @@ button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
+
+changeservices.title = What do you want to do?
+changeservices.choice.add = Register another service
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
@@ -1126,6 +1133,14 @@ businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
 businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
+businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+
+businessmatching.updateservice.newserviceinformation.title = We need to ask you about the new service you’ve added
+businessmatching.updateservice.newserviceinformation.heading = We need to ask you about the new service you’ve added
+businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for: {0}
+businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn’t the place to pay registration fees.
@@ -1251,12 +1266,12 @@ submit.registration = Submit registration
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
 
-renewal.updateanyinformation.title = Do you want to update any other information?
-renewal.updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
-renewal.updateanyinformation.example = For example, you’ll need to update if:
-renewal.updateanyinformation.example.item1 = a responsible person leaves your business
-renewal.updateanyinformation.example.item2 = you start trading from a new premises
-renewal.updateanyinformation.example.item3 = your main contact number changes
+updateanyinformation.title = Do you want to update any other information?
+updateanyinformation.variation = If something has changed in your business that’s relevant to Money Laundering Regulations you must update your information.
+updateanyinformation.example = For example, you’ll need to update if:
+updateanyinformation.example.item1 = a responsible person leaves your business
+updateanyinformation.example.item2 = you start trading from a new premises
+updateanyinformation.example.item3 = your main contact number changes
 
 declaration.addperson.title = What’s your name?
 declaration.addperson.firstname = First name
@@ -1711,6 +1726,8 @@ hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
 hvd.receiving.give.details = Please give details
 hvd.receiving.give.details.lbl = Please give details
+
+hvd.expect.to.receive.title = How do you expect to receive these payments?
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 

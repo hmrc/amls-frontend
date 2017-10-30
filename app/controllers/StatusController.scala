@@ -20,21 +20,18 @@ import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
-import models.{FeeResponse, ReadStatusResponse}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.Partnership
-import models.registrationdetails.RegistrationDetails
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
-import org.joda.time.{LocalDate, LocalDateTime}
+import models.{FeeResponse, ReadStatusResponse}
+import org.joda.time.LocalDate
 import play.api.Play
-import play.api.mvc.{AnyContent, Call, Request, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import services._
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
-import utils.{BusinessName, ControllerHelper, DeclarationHelper}
+import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +64,19 @@ trait StatusController extends BaseController {
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
           withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
-          page <- getPageBasedOnStatus(mlrRegNumber, statusInfo, maybeBusinessName, feeResponse, fromDuplicateSubmission, withdrawalStatus)
+          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          page <- if (withdrawalStatus.contains(WithdrawalStatus(true))) {
+            Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), maybeBusinessName, responsiblePeople))
+          } else {
+            getPageBasedOnStatus(
+              mlrRegNumber,
+              statusInfo,
+              maybeBusinessName,
+              feeResponse,
+              fromDuplicateSubmission,
+              responsiblePeople
+            )
+          }
         } yield page
   }
 
@@ -96,25 +105,19 @@ trait StatusController extends BaseController {
                                    businessNameOption: Option[String],
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
-                                   withdrawalStatus: Option[WithdrawalStatus])
-                                  (implicit request: Request[AnyContent],
-                                   authContext: AuthContext) = {
-
-    if (withdrawalStatus.contains(WithdrawalStatus(true))) {
-      Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), businessNameOption))
-    } else {
+                                   responsiblePeople: Option[Seq[ResponsiblePeople]])
+                                  (implicit request: Request[AnyContent], authContext: AuthContext) = {
       statusInfo match {
         case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
           getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
         case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
              (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
              (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption))
+          Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople))
         case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-          getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption)
+          getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople)
         case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
       }
-    }
   }
 
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
@@ -147,19 +150,23 @@ trait StatusController extends BaseController {
 
   private def getDecisionPage(mlrRegNumber: Option[String],
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
-                              businessNameOption: Option[String])(implicit request: Request[AnyContent]) = {
+                              businessNameOption: Option[String],
+                              responsiblePeople: Option[Seq[ResponsiblePeople]])(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) =>
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
 
         Ok {
           //noinspection ScalaStyle
-          status_supervised(mlrRegNumber.getOrElse(""),
+          status_supervised(
+            mlrRegNumber.getOrElse(""),
             businessNameOption,
             endDate,
             renewalFlow = false,
             allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
-            showChangeOfficer = ApplicationConfig.showChangeOfficerLink)
+            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+            showChangeOfficer = ApplicationConfig.showChangeOfficerLink
+          )
         }
 
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
@@ -178,21 +185,40 @@ trait StatusController extends BaseController {
 
   private def getRenewalFlowPage(mlrRegNumber: Option[String],
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
-                                 businessNameOption: Option[String])
+                                 businessNameOption: Option[String],
+                                 responsiblePeople: Option[Seq[ResponsiblePeople]])
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+        Future.successful(Ok(status_renewal_submitted(
+          mlrRegNumber.getOrElse(""),
+          businessNameOption,
+          renewalDate,
+          ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+          ApplicationConfig.showChangeOfficerLink)
+        ))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
           case Some(r) =>
             renewalService.isRenewalComplete(r) flatMap { complete =>
               if (complete) {
-                Future.successful(Ok(status_renewal_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+                Future.successful(Ok(status_renewal_not_submitted(
+                  mlrRegNumber.getOrElse(""),
+                  businessNameOption,
+                  renewalDate,
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+                  ApplicationConfig.showChangeOfficerLink)
+                ))
               } else {
-                Future.successful(Ok(status_renewal_incomplete(mlrRegNumber.getOrElse(""), businessNameOption, renewalDate, ApplicationConfig.showChangeOfficerLink)))
+                Future.successful(Ok(status_renewal_incomplete(
+                  mlrRegNumber.getOrElse(""),
+                  businessNameOption,
+                  renewalDate,
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+                  ApplicationConfig.showChangeOfficerLink
+                )))
               }
             }
           case _ => Future.successful(Ok(
@@ -201,6 +227,7 @@ trait StatusController extends BaseController {
               renewalDate,
               true,
               ApplicationConfig.allowDeRegisterToggle,
+              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
               ApplicationConfig.showChangeOfficerLink)))
         }
       }

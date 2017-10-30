@@ -25,7 +25,6 @@ import play.api.test.Helpers._
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,7 +71,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
         val result = controller.get()(request)
 
         status(result) mustBe OK
-        contentAsString(result) must include(Messages("renewal.updateanyinformation.title"))
+        contentAsString(result) must include(Messages("updateanyinformation.title"))
       }
 
       "respond with NOT_FOUND" when {

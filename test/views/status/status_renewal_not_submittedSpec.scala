@@ -36,7 +36,7 @@ class status_renewal_not_submittedSpec extends GenericTestHelper with MustMatche
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_renewal_not_submitted("XAML00000567890", Some("business Name"), None)
+      def view = views.html.status.status_renewal_not_submitted("XAML00000567890", Some("business Name"), None, None)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -48,7 +48,7 @@ class status_renewal_not_submittedSpec extends GenericTestHelper with MustMatche
       val endDate = new LocalDate(2017,1,1)
       val endDateFormatted = DateHelper.formatDate(endDate)
 
-      def view = views.html.status.status_renewal_not_submitted("XAML00000567890", Some("business Name"), Some(endDate))
+      def view = views.html.status.status_renewal_not_submitted("XAML00000567890", Some("business Name"), Some(endDate), None)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)

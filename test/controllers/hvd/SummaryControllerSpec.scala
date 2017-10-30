@@ -18,6 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -33,10 +34,11 @@ import utils.AuthorisedFixture
 import org.mockito.ArgumentCaptor
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import play.api.mvc.Results.Redirect
+import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
@@ -47,11 +49,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    lazy val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mock[ServiceFlow])
 
     val day = 15
     val month = 2
@@ -62,9 +60,18 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       Some(ExciseGoods(true)),
       Some(HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))),
       Some(PercentageOfCashPaymentOver15000.Fifth),
-      Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))))),
+      Some(true),
+      Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),
       Some(LinkedCashPayments(true))
     )
+
+    when {
+      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+    } thenReturn Future.successful(false)
+
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
   }
 
   "Get" must {
@@ -157,6 +164,33 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       val captor = ArgumentCaptor.forClass(classOf[Hvd])
       verify(controller.dataCache).save[Hvd](eqTo(Hvd.key), captor.capture())(any(), any(), any())
       captor.getValue.hasAccepted mustBe true
+    }
+
+    "redirect to NewServiceInformationController" when {
+      "status is not pre-submission and activity has just been added" in new Fixture {
+        val cache = mock[CacheMap]
+
+        when {
+          controller.dataCache.fetch[Hvd](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(completeModel))
+
+        when {
+          controller.dataCache.save[Hvd](any(), any())(any(),any(),any())
+        } thenReturn Future.successful(cache)
+
+        when {
+          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+        } thenReturn Future.successful(true)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(request)
+
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+
+      }
     }
   }
 }

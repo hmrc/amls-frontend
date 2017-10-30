@@ -22,15 +22,15 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.ViewResponse
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.businessmatching._
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
@@ -59,21 +59,29 @@ class BusinessMatchingService @Inject()(
 
   }
 
-  private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
-                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] = {
+  private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     for {
       viewResponse <- OptionT(cache.fetch[ViewResponse](ViewResponse.key))
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
-    } yield fn(current.businessActivities, submitted.businessActivities)
-  }
+    } yield (current.businessActivities, submitted.businessActivities)
+
+  private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
+                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    fetchActivitySet map fn.tupled
 
   def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ diff _)
 
   def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ intersect _)
+
+  def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
+    fetchActivitySet map { case (current, existing) =>
+      !((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
+        (current contains TrustAndCompanyServices) | (current contains MoneyServiceBusiness)
+    }
 
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
     OptionT.liftF(statusService.getStatus) flatMap {

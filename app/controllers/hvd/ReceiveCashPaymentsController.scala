@@ -16,34 +16,42 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, ReceiveCashPayments}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.hvd.receiving
+import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-trait ReceiveCashPaymentsController extends BaseController {
+class ReceiveCashPaymentsController @Inject()(
+                                               val cacheConnector: DataCacheConnector,
+                                               implicit val serviceFlow: ServiceFlow,
+                                               implicit val statusService: StatusService,
+                                               val authConnector: AuthConnector) extends BaseController {
 
-  def cacheConnector: DataCacheConnector
-
-  implicit val statusService: StatusService
+  val NAME = "receivePayments"
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
+      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
         case true =>
           cacheConnector.fetch[Hvd](Hvd.key) map {
             response =>
-              val form: Form2[ReceiveCashPayments] = (for {
+              val form: Form2[Boolean] = (for {
                 hvd <- response
                 receivePayments <- hvd.receiveCashPayments
-              } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
+              } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
               Ok(receiving(form, edit))
           }
         case false => Future.successful(NotFound(notFoundView))
@@ -52,27 +60,26 @@ trait ReceiveCashPaymentsController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[ReceiveCashPayments](request.body) match {
+      Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(receiving(f, edit)))
-        case ValidForm(_, data) =>
+        case ValidForm(_, data) => {
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key,
-              hvd.receiveCashPayments(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-          }
+            _ <- cacheConnector.save[Hvd](Hvd.key, hvd.receiveCashPayments(data))
+          } yield redirectTo(data, hvd, edit)
+        }
       }
     }
   }
-}
 
-object ReceiveCashPaymentsController extends ReceiveCashPaymentsController {
-  // $COVERAGE-OFF$
-  override val cacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
+  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) = {
+    if((data & !edit) | (data & edit & hvd.cashPayment.isEmpty)){
+      Redirect(routes.ExpectToReceiveCashPaymentsController.get())
+    } else if (edit) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+    }
+  }
 }

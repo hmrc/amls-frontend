@@ -55,7 +55,7 @@ case class AboutTheBusiness(
     this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = hasAccepted && this.contactingYou.contains(v))
 
   def altCorrespondenceAddress(v: Boolean): AboutTheBusiness =
-    this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || this.altCorrespondenceAddress != Some(v))
+    this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
     this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))

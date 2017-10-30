@@ -20,25 +20,23 @@ import jto.validation.{From, Rule, Write}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.forms.Rules._
 
-import utils.MappingUtils.Implicits._
 
-sealed trait PassedFitAndProper
+sealed trait ChangeServices
 
-case object PassedFitAndProperYes extends PassedFitAndProper
-case object PassedFitAndProperNo extends PassedFitAndProper
+case object ChangeServicesAdd extends ChangeServices
+case object ChangeServicesRemove extends ChangeServices
+case object ChangeServicesReplace extends ChangeServices
 
-object PassedFitAndProper {
+object ChangeServices {
+  import jto.validation._
+  import utils.MappingUtils.Implicits._
 
-  implicit val formReads: Rule[UrlFormEncoded, PassedFitAndProper] = From[UrlFormEncoded] { __ =>
-    (__ \ "passedFitAndProper").read[Boolean].withMessage("error.businessmatching.updateservice.fitandproper") map {
-      case true => PassedFitAndProperYes
-      case false => PassedFitAndProperNo
+  implicit val formReads: Rule[UrlFormEncoded, ChangeServices] = From[UrlFormEncoded] { __ =>
+    (__ \ "changeServices").read[String].withMessage("error.businessmatching.updateservice.changeservices") map {
+      case "add" => ChangeServicesAdd
+      case "remove" => ChangeServicesRemove
+      case "replace" => ChangeServicesReplace
     }
-  }
-
-  implicit val formWrites: Write[PassedFitAndProper, UrlFormEncoded] = Write {
-    case PassedFitAndProperYes => "passedFitAndProper" -> "true"
-    case PassedFitAndProperNo => "passedFitAndProper" -> "false"
   }
 
 }

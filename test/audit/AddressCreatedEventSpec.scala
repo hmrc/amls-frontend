@@ -20,13 +20,13 @@ import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import cats.implicits._
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import audit.AddressConversions._
 import models.Country
 import models.aboutthebusiness.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
 
