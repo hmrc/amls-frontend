@@ -33,10 +33,11 @@ import scala.concurrent.Future
 
 class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
@@ -102,7 +103,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
     contentAsString(result) must include(Messages("error.required.hvd.how-will-you-sell-goods"))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture{
+  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture {
 
     val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
@@ -126,6 +127,23 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
     redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+  }
+
+  "Calling POST" when {
+    "the status is approved" when {
+      "the service has just been added" must {
+        "redirect to the next page in the flow" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          setupInServiceFlow(true, Some(HighValueDealing))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
+        }
+      }
+    }
   }
 
 }
