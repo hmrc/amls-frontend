@@ -18,6 +18,8 @@ package controllers
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
+import generators.tradingpremises.TradingPremisesGenerator
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
@@ -25,6 +27,7 @@ import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{AgentCompanyDetails, TradingPremises}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
+import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -33,28 +36,26 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester with ServicesConfig {
+class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester with ServicesConfig
+  with ResponsiblePersonGenerator
+  with TradingPremisesGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-
-    val mockDataCacheConnector = mock[DataCacheConnector]
-
-    val mockCacheMap = mock[CacheMap]
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val authContext: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new FeeGuidanceController(
-      dataCacheConnector = mockDataCacheConnector,
+      dataCacheConnector = mockCacheConnector,
       authConnector = self.authConnector
     )
 
@@ -62,7 +63,7 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
       .disable[com.kenshoo.play.metrics.PlayModule]
       .build()
 
-    val nonEmptyTradingPremises = TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))
+    val nonEmptyTradingPremises = tradingPremisesGen.sample.get
 
     val submissionFee = ApplicationConfig.regFee
     val premisesFee = ApplicationConfig.premisesFee
@@ -73,10 +74,6 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
       BreakdownRow(Messages("summary.responsiblepeople"), 3, Currency(peopleFee), Currency(peopleFee * 3)),
       BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
     )
-
-    when(mockDataCacheConnector.fetchAll(any(), any()))
-      .thenReturn(Future.successful(Some(mockCacheMap)))
-
   }
 
   "FeeGuidanceController" when {
@@ -84,18 +81,12 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
     "get is called" must {
 
       "show fee guidance page" in new Fixture {
-
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-          .thenReturn(None)
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-          .thenReturn(None)
+        mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
+        mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
       }
-
     }
 
     "getBreakdownRows is called" must {
@@ -106,16 +97,16 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
 
           "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
 
-            val aboutthebusiness = AboutTheBusiness(
+            val aboutTheBusiness = AboutTheBusiness(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
-            val tradingpremises = Seq(
+            val tradingPremises = Seq(
               nonEmptyTradingPremises,
               nonEmptyTradingPremises
             )
 
-            val responsiblepeople = Seq(
+            val responsiblePeople = Seq(
               ResponsiblePeople(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
@@ -127,21 +118,14 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
               )
             )
 
-            val businessmatching = BusinessMatching(
+            val businessMatching = BusinessMatching(
               activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
             )
 
-            when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-              .thenReturn(Some(tradingpremises))
-
-            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-              .thenReturn(Some(responsiblepeople))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any()))
-              .thenReturn(Some(aboutthebusiness))
-
-            when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-              .thenReturn(Some(businessmatching))
+            mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
 
@@ -157,16 +141,16 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
 
           "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
 
-            val aboutthebusiness = AboutTheBusiness(
+            val aboutTheBusiness = AboutTheBusiness(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
-            val tradingpremises = Seq(
+            val tradingPremises = Seq(
               nonEmptyTradingPremises,
               nonEmptyTradingPremises
             )
 
-            val responsiblepeople = Seq(
+            val responsiblePeople = Seq(
               ResponsiblePeople(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
@@ -178,32 +162,50 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
               )
             )
 
-            val businessmatching = BusinessMatching(
+            val businessMatching = BusinessMatching(
               activities = Some(BusinessActivities(Set(TrustAndCompanyServices)))
             )
 
-            when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-              .thenReturn(Some(tradingpremises))
-
-            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-              .thenReturn(Some(responsiblepeople))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any()))
-              .thenReturn(Some(aboutthebusiness))
-
-            when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-              .thenReturn(Some(businessmatching))
+            mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
-
             val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
 
             await(result) must be(breakdownRows)
-
           }
-
         }
+      }
 
+      "filter out empty responsible people" in new Fixture {
+        val people = Seq(
+          responsiblePersonGen.sample.get,
+          ResponsiblePeople()
+        )
+
+        val aboutTheBusiness = AboutTheBusiness(
+          previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
+        )
+
+        val businessMatching = BusinessMatching(
+          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+        )
+
+        override val breakdownRows = Seq(
+          BreakdownRow(Messages("summary.responsiblepeople"), 1, Currency(peopleFee), Currency(peopleFee))
+        )
+
+        mockCacheGetEntry(Some(people), ResponsiblePeople.key)
+        mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+        mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+        mockCacheGetEntry(Some(Seq.empty[TradingPremises]), TradingPremises.key)
+
+        val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
+        val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
+
+        await(result) must be(breakdownRows)
 
       }
 
@@ -216,36 +218,22 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
           )
 
-          val tradingpremises = Seq(
-            nonEmptyTradingPremises,
-            nonEmptyTradingPremises
-          )
+          val tradingPremises = Gen.listOfN(2, tradingPremisesGen).sample.get
 
-          val responsiblepeople = Seq(
-            ResponsiblePeople(),
-            ResponsiblePeople(),
-            ResponsiblePeople()
-          )
+          val responsiblePeople = responsiblePeopleGen(3).sample.get
 
-          val aboutthebusiness = AboutTheBusiness(
+          val aboutTheBusiness = AboutTheBusiness(
             previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
           )
 
-          val businessmatching = BusinessMatching(
+          val businessMatching = BusinessMatching(
             activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-            .thenReturn(Some(tradingpremises))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-            .thenReturn(Some(responsiblepeople))
-
-          when(mockCacheMap.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any()))
-            .thenReturn(Some(aboutthebusiness))
-
-          when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(businessmatching))
+          mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
 
@@ -266,16 +254,16 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
           )
 
-          val aboutthebusiness = AboutTheBusiness(
+          val aboutTheBusiness = AboutTheBusiness(
             previouslyRegistered = Some(PreviouslyRegisteredNo)
           )
 
-          val tradingpremises = Seq(
+          val tradingPremises = Seq(
             nonEmptyTradingPremises,
             nonEmptyTradingPremises
           )
 
-          val responsiblepeople = Seq(
+          val responsiblePeople = Seq(
             ResponsiblePeople(
               hasAlreadyPassedFitAndProper = Some(true)
             ),
@@ -287,29 +275,19 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             )
           )
 
-          val businessmatching = BusinessMatching(
+          val businessMatching = BusinessMatching(
             activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-            .thenReturn(Some(tradingpremises))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-            .thenReturn(Some(responsiblepeople))
-
-          when(mockCacheMap.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any()))
-            .thenReturn(Some(aboutthebusiness))
-
-          when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(businessmatching))
+          mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
-
           val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
 
           await(result) must be(breakdownRows)
-
-
         }
 
         "the business type does not include msb or tcsp" in new Fixture {
@@ -319,16 +297,16 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
           )
 
-          val aboutthebusiness = AboutTheBusiness(
+          val aboutTheBusiness = AboutTheBusiness(
             previouslyRegistered = Some(PreviouslyRegisteredNo)
           )
 
-          val tradingpremises = Seq(
+          val tradingPremiseses = Seq(
             nonEmptyTradingPremises,
             nonEmptyTradingPremises
           )
 
-          val responsiblepeople = Seq(
+          val responsiblePeople = Seq(
             ResponsiblePeople(
               hasAlreadyPassedFitAndProper = Some(false)
             ),
@@ -340,21 +318,14 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
             )
           )
 
-          val businessmatching = BusinessMatching(
+          val businessMatching = BusinessMatching(
             activities = Some(BusinessActivities(Set(HighValueDealing)))
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
-            .thenReturn(Some(tradingpremises))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any()))
-            .thenReturn(Some(responsiblepeople))
-
-          when(mockCacheMap.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any()))
-            .thenReturn(Some(aboutthebusiness))
-
-          when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(businessmatching))
+          mockCacheGetEntry(Some(tradingPremiseses), TradingPremises.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
 

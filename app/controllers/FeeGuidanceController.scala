@@ -29,7 +29,8 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.tradingpremises.TradingPremises.FilterUtils
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -54,8 +55,8 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
     dataCacheConnector.fetchAll map { optCacheMap =>
       (for {
         cacheMap <- optCacheMap
-        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-        tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key)
+        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
+        tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
         aboutthebusiness <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
         businessmatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
         previouslyRegistered <- aboutthebusiness.previouslyRegistered
