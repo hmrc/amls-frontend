@@ -78,13 +78,10 @@ class ReceiveCashPaymentsController @Inject()(
     }
   }
 
-  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) = {
-    if((data & !edit) | (data & edit & hvd.cashPayment.isEmpty)){
-      Redirect(routes.ExpectToReceiveCashPaymentsController.get())
-    } else if (edit) {
-      Redirect(routes.SummaryController.get())
-    } else {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =
+    (data, edit, hvd.cashPaymentMethods.isDefined) match {
+      case (true, _, false) => Redirect(routes.ExpectToReceiveCashPaymentsController.get(edit))
+      case (_, true, _) => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
     }
-  }
 }

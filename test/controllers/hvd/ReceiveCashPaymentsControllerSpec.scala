@@ -85,7 +85,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
           "receivePayments" -> "false"
         )
 
-        val result = controller.post(false)(newRequest)
+        val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
@@ -102,7 +102,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         val result = controller.post(true)(newRequest)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)
+        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get(true).url)
 
       }
       "edit is false" in new Fixture {
