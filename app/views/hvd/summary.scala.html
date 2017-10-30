@@ -140,7 +140,7 @@
     @model.cashPaymentMethods.map { pm =>
         @checkYourAnswers(
             question = Messages("hvd.receiving.expect.to.receive"),
-            editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
+            editUrl = if(isEditable){controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString} else ""
         ) {
             <ul class="list list--comma">
                 <li>@pm match {

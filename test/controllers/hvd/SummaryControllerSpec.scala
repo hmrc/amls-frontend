@@ -42,8 +42,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self =>
+  trait Fixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
 
     implicit val authContext = mock[AuthContext]

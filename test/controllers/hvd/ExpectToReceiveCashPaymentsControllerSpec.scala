@@ -49,7 +49,6 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
       .thenReturn(Future.successful(false))
   }
 
-
   "ExpectToReceiveCashPaymentsController" when {
 
     "get is called" must {
