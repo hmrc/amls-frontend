@@ -66,7 +66,12 @@ class ReceiveCashPaymentsController @Inject()(
         case ValidForm(_, data) => {
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key, hvd.receiveCashPayments(data))
+            _ <- cacheConnector.save[Hvd](Hvd.key, {
+              (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
+                case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
+                case _ => hvd.receiveCashPayments(data)
+              }
+            })
           } yield redirectTo(data, hvd, edit)
         }
       }

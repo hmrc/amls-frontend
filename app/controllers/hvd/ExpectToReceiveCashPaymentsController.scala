@@ -61,8 +61,7 @@ class ExpectToReceiveCashPaymentsController @Inject()(
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[PaymentMethods](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(expect_to_receive(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(expect_to_receive(f, edit)))
         case ValidForm(_, data) =>
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
