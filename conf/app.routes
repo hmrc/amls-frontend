@@ -463,8 +463,11 @@ POST        /trust-company-service-provider/services                            
 GET         /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+
+GET         /trust-company-service-provider/other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.post(edit: Boolean ?= false)
 
 GET         /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.get()
 POST        /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.post()
