@@ -1,0 +1,87 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String])(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("responsiblepeople.legalName.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.legalName.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+    @form(f, controllers.responsiblepeople.routes.LegalNameController.post(index, edit, flow)) {
+
+        @fieldset(
+            f = f("hasPreviousName-fieldset"),
+            legend = "responsiblepeople.legalName.heading",
+            panel=false
+        ) {
+            @errorGroup(
+                field = f("hasPreviousName")
+            ) {
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = "#previous-panel",
+                    inline = true
+                )
+                @radio(
+                    f = f("hasPreviousName"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f("previous-panel")),
+            panel = false,
+            jsHidden = true
+        ) {
+            @fieldset(
+                f = f("previous-fieldset"),
+                legend = "responsiblepeople.personName.isknownbyothernames",
+                legendHidden = true,
+                panel = false
+            ) {
+                @errorGroup(
+                    f("previous"),
+                    classes = Seq("section")
+                ) {
+                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                }
+            }
+            @date(
+                f = f,
+                p = "previous.date",
+                labelText = "responsiblepeople.personName.previous.date.lbl"
+            )
+        }
+
+        @submit(edit)
+    }
+}
