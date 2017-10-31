@@ -206,7 +206,40 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
         val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
 
         await(result) must be(breakdownRows)
+      }
 
+      "filter out empty trading premises" in new Fixture {
+        val people = Seq(
+          responsiblePersonGen.sample.get
+        )
+
+        val aboutTheBusiness = AboutTheBusiness(
+          previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
+        )
+
+        val businessMatching = BusinessMatching(
+          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+        )
+
+        val tradingPremises = Seq(
+          tradingPremisesGen.sample.get,
+          TradingPremises()
+        )
+
+        override val breakdownRows = Seq(
+          BreakdownRow(Messages("summary.responsiblepeople"), 1, Currency(peopleFee), Currency(peopleFee)),
+          BreakdownRow(Messages("summary.tradingpremises"), 1, Currency(premisesFee), Currency(premisesFee))
+        )
+
+        mockCacheGetEntry(Some(people), ResponsiblePeople.key)
+        mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+        mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+        mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+
+        val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
+        val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
+
+        await(result) must be(breakdownRows)
       }
 
       "return a breakdown showing no submission fee" when {
