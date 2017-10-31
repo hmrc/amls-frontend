@@ -22,35 +22,39 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDec
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-
+import models.businessmatching.HighValueDealing
 import scala.concurrent.Future
 
 class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-    val controller = new HowWillYouSellGoodsController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
+
+    val controller = new HowWillYouSellGoodsController(
+      mockCacheConnector,
+      mockStatusService,
+      self.authConnector,
+      mockServiceFlow
+    )
+
+    mockCacheFetch[Hvd](None)
+    mockCacheSave[Hvd]
+
+    setupInServiceFlow(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "load UI for the first time" in new Fixture {
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
     val result = controller.get()(request)
     status(result) must be(OK)
 
@@ -59,8 +63,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
   }
 
   "load UI from save4later" in new Fixture {
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail)))))))
+    mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -74,14 +77,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    when(controller.statusService.getStatus(any(),any(),any()))
-      .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-    when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(emptyCache))
+    mockApplicationStatus(SubmissionDecisionRejected)
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
@@ -92,14 +88,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    when(controller.statusService.getStatus(any(),any(),any()))
-      .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-    when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(emptyCache))
+    mockApplicationStatus(SubmissionDecisionRejected)
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
@@ -108,52 +97,53 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
   "fail with validation error when mandatory field is missing" in new Fixture {
     val newRequest = request.withFormUrlEncodedBody()
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
     contentAsString(result) must include(Messages("error.required.hvd.how-will-you-sell-goods"))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture{
+  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture {
 
     val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
-
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    when(controller.statusService.getStatus(any(),any(),any()))
-      .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(hvd)))
-
-    when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(emptyCache))
+    mockApplicationStatus(SubmissionDecisionApproved)
+    mockCacheFetch(Some(hvd))
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
     redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture{
+  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture {
 
     val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
-
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    when(controller.statusService.getStatus(any(),any(),any()))
-      .thenReturn(Future.successful(ReadyForRenewal(None)))
-
-    when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(hvd)))
-
-    when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(emptyCache))
+    mockApplicationStatus(ReadyForRenewal(None))
+    mockCacheFetch(Some(hvd))
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
     redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+  }
+
+  "Calling POST" when {
+    "the status is approved" when {
+      "the service has just been added" must {
+        "redirect to the next page in the flow" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          setupInServiceFlow(true, Some(HighValueDealing))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
+        }
+      }
+    }
   }
 
 }

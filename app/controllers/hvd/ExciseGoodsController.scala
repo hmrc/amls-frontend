@@ -16,23 +16,30 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.hvd.excise_goods
 
 import scala.concurrent.Future
 
-trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
-
+class ExciseGoodsController @Inject()
+(
+  dataCacheConnector: DataCacheConnector,
+  statusService: StatusService,
+  val authConnector: AuthConnector,
+  serviceFlow: ServiceFlow
+) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) =
     Authorised.async {
@@ -48,7 +55,6 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
           }
     }
 
-
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
@@ -59,11 +65,10 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
             for {
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
               status <- statusService.getStatus
-              _ <- dataCacheConnector.save[Hvd](Hvd.key,
-                hvd.exciseGoods(data)
-              )
+              _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.exciseGoods(data))
+              inNewServiceFlow <- serviceFlow.inNewServiceFlow(HighValueDealing)
             } yield {
-              if (redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)) {
+              if (!inNewServiceFlow && redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)) {
                 Redirect(routes.HvdDateOfChangeController.get())
               } else {
                 edit match {
@@ -75,11 +80,4 @@ trait ExciseGoodsController extends BaseController with DateOfChangeHelper {
         }
       }
   }
-}
-
-object ExciseGoodsController extends ExciseGoodsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }
