@@ -66,18 +66,22 @@ class ReceiveCashPaymentsController @Inject()(
         case ValidForm(_, data) => {
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key, hvd.receiveCashPayments(data))
-          } yield {
-            if(edit){
-              Redirect(routes.SummaryController.get())
-            } else if(data){
-              Redirect(routes.ExpectToReceiveCashPaymentsController.get())
-            } else {
-              Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-            }
-          }
+            _ <- cacheConnector.save[Hvd](Hvd.key, {
+              (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
+                case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
+                case _ => hvd.receiveCashPayments(data)
+              }
+            })
+          } yield redirectTo(data, hvd, edit)
         }
       }
     }
   }
+
+  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =
+    (data, edit, hvd.cashPaymentMethods.isDefined) match {
+      case (true, _, false) => Redirect(routes.ExpectToReceiveCashPaymentsController.get(edit))
+      case (_, true, _) => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+    }
 }

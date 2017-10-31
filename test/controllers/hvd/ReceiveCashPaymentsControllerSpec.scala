@@ -16,33 +16,26 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
-import models.hvd.{Hvd, ReceiveCashPayments}
+import models.hvd.{Hvd, PaymentMethods}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
-import services.StatusService
-import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
 class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController(mock[DataCacheConnector], mock[ServiceFlow], mock[StatusService], self.authConnector)
+    val controller = new ReceiveCashPaymentsController(mockCacheConnector, mock[ServiceFlow], mockStatusService, self.authConnector)
 
-    when(controller.cacheConnector.fetch[Hvd](eqTo(Hvd.key))(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    when(controller.cacheConnector.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any()))
-      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+    mockCacheFetch[Hvd](None, Some(Hvd.key))
+    mockCacheSave[Hvd]
 
     when(controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any()))
       .thenReturn(Future.successful(false))
@@ -52,8 +45,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
 
     "load the view" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
       status(result) mustEqual OK
@@ -62,8 +54,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
     "respond with not found" when {
       "application is in variation mode" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(NOT_FOUND)
@@ -88,33 +79,67 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" which {
-      "will save ReceiveCashPayments" in new Fixture {
+    "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "receivePayments" -> "false"
         )
 
-        val result = controller.post(false)(newRequest)
+        val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
 
       }
-    }
 
-    "redirect to ExpectToReceiveCashPaymentsController on form equals yes" which {
-      "will not save ReceiveCashPayments" in new Fixture {
+    "redirect to ExpectToReceiveCashPaymentsController on form equals yes" when {
+      "edit is true and hvd cashPaymentMethods is not defined" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
-        val result = controller.post(false)(newRequest)
+        val result = controller.post(true)(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get(true).url)
+
+      }
+      "edit is false" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receivePayments" -> "true"
+        )
+
+        val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)
 
+      }
+    }
+  }
+
+  it must {
+    "remove data from paymentMethods" when {
+      "request is edit from yes to no" in new Fixture {
+
+        mockCacheFetch[Hvd](Some(Hvd(
+          receiveCashPayments = Some(true),
+          cashPaymentMethods = Some(PaymentMethods(true,true,Some("")))
+        )), Some(Hvd.key))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receivePayments" -> "false"
+        )
+
+        val result = controller.post(true)(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        verify(controller.cacheConnector).save[Hvd](any(), eqTo(Hvd(
+          receiveCashPayments = Some(false),
+          hasChanged = true
+        )))(any(),any(),any())
       }
     }
   }
