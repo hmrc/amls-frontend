@@ -349,7 +349,10 @@ GET         /responsible-people/legal-name/:index                               
 POST        /responsible-people/legal-name/:index                                     controllers.responsiblepeople.LegalNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/legal-name-change-date/:index                         controllers.responsiblepeople.LegalNameChangeDateController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/legal-name-cahnge-date/:index                         controllers.responsiblepeople.LegalNameChangeDateController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/legal-name-change-date/:index                         controllers.responsiblepeople.LegalNameChangeDateController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /responsible-people/known-by/:index                                       controllers.responsiblepeople.KnownByController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/known-by/:index                                       controllers.responsiblepeople.KnownByController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/self-assessment/:index                                controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
