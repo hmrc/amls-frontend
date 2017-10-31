@@ -1,0 +1,64 @@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("mlrRefNumber").id}-fieldset"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("tcsp.anothertcspsupervision.header", "summary.tcsp")
+}
+
+@main(
+    title = Messages("tcsp.anothertcspsupervision.title") + " - " + Messages("summary.tcsp"),
+    heading = header
+) {
+
+    @form(f, controllers.tcsp.routes.AnotherTCSPSupervisionController.post(edit)) {
+
+        @fieldset(
+            f = f("servicesOfAnotherTCSP-fieldset"),
+            legend = "tcsp.anothertcspsupervision.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("servicesOfAnotherTCSP")
+            ) {
+                @radio(
+                    f = f("servicesOfAnotherTCSP"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("servicesOfAnotherTCSP"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @fieldset(
+            f = f(target),
+            legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+            legendHidden = true
+        ) {
+            @input(f("mlrRefNumber"),
+                labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+                hintText = "hint.8.digits",
+                bold = false,
+                attrMaxlength = "15",
+                attrPattern = "[0-9a-z-A-Z]{1,15}"
+           )
+        }
+
+        @submit(edit)
+    }
+}
