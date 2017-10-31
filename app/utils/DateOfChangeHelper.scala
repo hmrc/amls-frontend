@@ -33,7 +33,7 @@ trait DateOfChangeHelper {
     }
   }
 
-  def redirectToDateOfChange[A](status: SubmissionStatus,a: Option[A], b: A) = {
+  def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A) = {
     ApplicationConfig.release7 && !a.contains(b) && isEligibleForDateOfChange(status)
   }
 

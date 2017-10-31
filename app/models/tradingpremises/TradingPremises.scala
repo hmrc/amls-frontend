@@ -193,4 +193,11 @@ object TradingPremises {
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())
+
+  implicit class FilterUtils(x: Seq[TradingPremises]) {
+    def filterEmpty: Seq[TradingPremises] = x.filterNot {
+      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, None, _, None, _) => true
+      case _ => false
+    }
+  }
 }
