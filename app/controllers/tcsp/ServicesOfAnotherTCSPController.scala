@@ -56,8 +56,12 @@ class ServicesOfAnotherTCSPController @Inject()(
         case ValidForm(_, data) =>
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.doesServicesOfAnotherTCSP(data)
-            )
+            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, {
+              (data, tcsp.flatMap(t => t.doesServicesOfAnotherTCSP).contains(true)) match {
+                case (false, true) => tcsp.doesServicesOfAnotherTCSP(data).copy(servicesOfAnotherTCSP = None)
+                case _ => tcsp.doesServicesOfAnotherTCSP(data)
+              }
+            })
           } yield redirectTo(data, edit, tcsp)
       }
   }

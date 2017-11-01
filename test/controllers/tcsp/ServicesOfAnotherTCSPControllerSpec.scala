@@ -19,11 +19,13 @@ package controllers.tcsp
 import generators.AmlsReferenceNumberGenerator
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.scalatest.concurrent.ScalaFutures
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator{
+class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
@@ -82,7 +84,7 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
           }
 
           "edit is false" when {
-            "servicesOfAnotherTCSP is false" in new Fixture {
+            "request equals false" in new Fixture {
 
               mockCacheFetch[Tcsp](None)
               mockCacheSave[Tcsp]
@@ -150,6 +152,30 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
         }
       }
 
+    }
+
+  }
+
+  it must {
+
+    "remove data from ServicesOfAnotherTCSP" when {
+      "request is edit from true to false" in new Fixture {
+
+        mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
+        mockCacheSave[Tcsp]
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "servicesOfAnotherTCSP" -> "false"
+        )
+
+        val result = controller.post(true)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+        verify(controller.dataCacheConnector).save(any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any(),any())
+
+      }
     }
 
   }
