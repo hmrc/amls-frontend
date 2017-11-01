@@ -49,7 +49,7 @@ class ServicesOfAnotherTCSPController @Inject()(
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext => implicit request =>
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(services_of_another_tcsp(f, edit)))
@@ -58,8 +58,14 @@ class ServicesOfAnotherTCSPController @Inject()(
             tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
             _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.doesServicesOfAnotherTCSP(data)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield redirectTo(data, edit, tcsp)
       }
+  }
+
+  def redirectTo(data: Boolean, edit: Boolean, tcsp: Tcsp) = {
+    (data, edit, tcsp.servicesOfAnotherTCSP.isDefined) match {
+      case (true, _, false) => Redirect(routes.AnotherTCSPSupervisionController.get(edit))
+      case _ => Redirect(routes.SummaryController.get())
     }
   }
 }

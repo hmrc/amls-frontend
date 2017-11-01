@@ -16,14 +16,14 @@
 
 package controllers.tcsp
 
+import generators.AmlsReferenceNumberGenerator
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
-import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator{
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
@@ -58,41 +58,80 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
     }
 
-    "post is called" must {
+    "post is called" when {
 
-      "redirect to SummaryController" when {
+      "valid data" must {
 
-        "valid data" when {
+        "redirect to SummaryController" when {
+
+          "edit is true" when {
+            "further action is not required in AnotherTCSPSupervisionController" in new Fixture {
+
+              mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
+              mockCacheSave[Tcsp]
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "servicesOfAnotherTCSP" -> "true"
+              )
+
+              val result = controller.post(true)(newRequest)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            }
+          }
+
+          "edit is false" when {
+            "servicesOfAnotherTCSP is false" in new Fixture {
+
+              mockCacheFetch[Tcsp](None)
+              mockCacheSave[Tcsp]
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "servicesOfAnotherTCSP" -> "false"
+              )
+
+              val result = controller.post()(newRequest)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            }
+          }
+
+        }
+
+        "redirect to AnotherTCSPSupervisionController" when {
+
           "edit is false" in new Fixture {
 
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
             val newRequest = request.withFormUrlEncodedBody(
-              "servicesOfAnotherTCSP" -> "true",
-              "mlrRefNumber" -> "12345678"
+              "servicesOfAnotherTCSP" -> "true"
             )
 
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.AnotherTCSPSupervisionController.get().url))
           }
 
-          "edit is true" in new Fixture {
+          "edit is true" when {
+            "servicesOfAnotherTCSP is changed from false to true" in new Fixture {
 
-            mockCacheFetch[Tcsp](None)
-            mockCacheSave[Tcsp]
+              mockCacheFetch[Tcsp](None)
+              mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
-              "servicesOfAnotherTCSP" -> "true",
-              "mlrRefNumber" -> "12345678"
-            )
+              val newRequest = request.withFormUrlEncodedBody(
+                "servicesOfAnotherTCSP" -> "true"
+              )
 
-            val result = controller.post(true)(newRequest)
+              val result = controller.post()(newRequest)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.AnotherTCSPSupervisionController.get().url))
+            }
           }
 
         }
