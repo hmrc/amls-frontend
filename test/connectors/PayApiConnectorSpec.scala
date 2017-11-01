@@ -31,6 +31,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -78,6 +79,7 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[WSHttp].to(http))
       .bindings(bind[ServicesConfig].to(config))
+      .bindings(bind[AuditConnector].to(mock[AuditConnector]))
       .build()
 
     lazy val connector = injector.instanceOf[PayApiConnector]
