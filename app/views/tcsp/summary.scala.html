@@ -98,6 +98,16 @@
         question = Messages("tcsp.servicesOfAnotherTcsp.title"),
         editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
     ) {
+        <p>@model.doesServicesOfAnotherTCSP.map {
+            case true => { @Messages("lbl.yes") }
+            case false => { @Messages("lbl.no") }
+        }</p>
+    }
+
+    @checkYourAnswers(
+        question = Messages("tcsp.anothertcspsupervision.title"),
+        editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
+    ) {
         <p>@model.servicesOfAnotherTCSP.map {
             case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
             case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }

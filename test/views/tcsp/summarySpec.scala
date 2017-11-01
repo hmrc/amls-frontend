@@ -16,20 +16,18 @@
 
 package views.tcsp
 
+import generators.AmlsReferenceNumberGenerator
 import models.tcsp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
+
 import scala.collection.JavaConversions._
 
-
-class summarySpec extends GenericTestHelper
-                  with MustMatchers
-                  with HtmlAssertions
-                  with TableDrivenPropertyChecks{
+class summarySpec extends GenericTestHelper with MustMatchers with HtmlAssertions with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -55,7 +53,6 @@ class summarySpec extends GenericTestHelper
                                                                             "tcsp.service.provider.lbl.03",
                                                                             "tcsp.service.provider.lbl.04",
                                                                             "tcsp.service.provider.lbl.05"))),
-
       ("tcsp.provided_services.title", checkListContainsItems(_, Set("tcsp.provided_services.service.lbl.01",
                                                                      "tcsp.provided_services.service.lbl.02",
                                                                      "tcsp.provided_services.service.lbl.03",
@@ -64,7 +61,8 @@ class summarySpec extends GenericTestHelper
                                                                      "tcsp.provided_services.service.lbl.06",
                                                                      "tcsp.provided_services.service.lbl.07",
                                                                      "Other:sfasfasef"))),
-      ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "Money Laundering Regulation reference number: 789oinhytrd4567"))
+      ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("tcsp.anothertcspsupervision.title", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -75,7 +73,7 @@ class summarySpec extends GenericTestHelper
             PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
           ))),
           Some(true),
-          Some(ServicesOfAnotherTCSPYes("789oinhytrd4567"))
+          Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
         )
 
         views.html.tcsp.summary(testdata)
