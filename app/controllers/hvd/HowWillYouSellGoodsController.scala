@@ -66,9 +66,9 @@ class HowWillYouSellGoodsController @Inject()
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
               status <- statusService.getStatus
               _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.howWillYouSellGoods(model))
-              inNewServiceFlow <- serviceFlow.inNewServiceFlow(HighValueDealing)
+              isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
             } yield {
-              if (!inNewServiceFlow && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
+              if (!isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
                 Redirect(routes.HvdDateOfChangeController.get())
               } else {
                 edit match {

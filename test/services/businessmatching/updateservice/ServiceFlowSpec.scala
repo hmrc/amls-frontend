@@ -142,6 +142,22 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     }
   }
 
+  "isNewService" when {
+    "called" must {
+      "return true if the service appears in the additionalBusinessActivities collection" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        whenReady(service.isNewActivity(AccountancyServices))(_ mustBe true)
+      }
+
+      "return false if the service does not appear in the additionaBusinessActivities collection" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        whenReady(service.isNewActivity(HighValueDealing))(_ mustBe false)
+      }
+    }
+  }
+
   "inNewServiceFlow" when {
     "called" must {
       "return true if the specified service exists in the additional business activities" in new Fixture {

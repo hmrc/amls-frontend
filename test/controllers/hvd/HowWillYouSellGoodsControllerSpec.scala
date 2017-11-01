@@ -48,8 +48,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-
-    setupInServiceFlow(false)
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -136,7 +135,7 @@ class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
           val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          setupInServiceFlow(true, Some(HighValueDealing))
+          mockIsNewActivity(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
