@@ -1563,6 +1563,9 @@ tcsp.provided_services.service.lbl.07 = Conference rooms
 tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
 
+tcsp.anothertcspsupervision.title = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
+tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
+
 #ASP
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
 asp.whatyouneed.line_1 = what services you provide

@@ -18,27 +18,26 @@ package controllers.tcsp
 
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class AnotherTCSPSupervisionControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new ServicesOfAnotherTCSPController (
+    val controller = new AnotherTCSPSupervisionController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector
     )
   }
 
-  "ServicesOfAnotherTCSPController" when {
+  "AnotherTCSPSupervisionController" when {
 
     "get is called" must {
 
-      "display the Does your business use the services of another Trust or Company Service Provider page" in new Fixture {
+      "display another_tcsp_supervision view without pre-filled input" in new Fixture {
 
         mockCacheFetch[Tcsp](None)
 
@@ -47,7 +46,7 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
       }
 
-      "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
+      "display another_tcsp_supervision view with pre-filled input" in new Fixture {
 
         val mlrRefNumber = "12345678"
 
