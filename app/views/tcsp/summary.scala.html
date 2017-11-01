@@ -104,14 +104,20 @@
         }</p>
     }
 
-    @checkYourAnswers(
-        question = Messages("tcsp.anothertcspsupervision.title"),
-        editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
-    ) {
-        <p>@model.servicesOfAnotherTCSP.map {
-            case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
-            case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
-        }</p>
+    @model.servicesOfAnotherTCSP.map { s =>
+
+        @checkYourAnswers(
+            question = Messages("tcsp.anothertcspsupervision.title"),
+            editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
+        ) {
+            <p>
+                @s match {
+                    case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
+                    case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
+                }
+            </p>
+        }
+
     }
 
     @if(ApplicationConfig.hasAcceptedToggle) {
