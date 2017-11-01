@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-
+import models.businessmatching.HighValueDealing
 import scala.concurrent.Future
 
 class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSugar {
@@ -38,15 +38,14 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
       self.authConnector,
       mockCacheConnector,
       mockStatusService,
-      mock[ServiceFlow]
+      mockServiceFlow
     )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
     mockApplicationStatus(SubmissionReady)
 
-    when(controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any()))
-      .thenReturn(Future.successful(false))
+    setupInServiceFlow(false)
   }
 
   "ExpectToReceiveCashPaymentsController" when {
@@ -62,6 +61,19 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
 
         Jsoup.parse(content).title() must include(Messages("hvd.expect.to.receive.title"))
       }
+
+      "display the view when supervised, but in the new service flow" in new Fixture {
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        setupInServiceFlow(true, Some(HighValueDealing))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("hvd.expect.to.receive.title"))
+      }
+
       "return NOT_FOUND" when {
         "registration is supervised" in new Fixture {
 

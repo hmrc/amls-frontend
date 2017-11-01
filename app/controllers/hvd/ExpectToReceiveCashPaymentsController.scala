@@ -22,6 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, PaymentMethods, ReceiveCashPayments}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -41,7 +42,7 @@ class ExpectToReceiveCashPaymentsController @Inject()(
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
+      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
         case true =>
           cacheConnector.fetch[Hvd](Hvd.key) map {
             response =>
