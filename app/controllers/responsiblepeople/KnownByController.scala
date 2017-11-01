@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-
+// $COVERAGE-OFF$
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   val authConnector: AuthConnector) extends RepeatingSection with BaseController {
