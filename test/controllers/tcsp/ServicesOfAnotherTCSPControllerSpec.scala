@@ -49,15 +49,11 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
 
       "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
 
-        val mlrRefNumber = "12345678"
-
-        mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(mlrRefNumber)))))
+        mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val content = Jsoup.parse(contentAsString(result))
-        content.getElementById("mlrRefNumber").`val`() must be(mlrRefNumber)
       }
 
     }
@@ -107,8 +103,7 @@ class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with Mockito
         "invalid data" in new Fixture {
 
           val newRequestInvalid = request.withFormUrlEncodedBody(
-            "servicesOfAnotherTCSP" -> "true",
-            "mlrRefNumber" -> "adbg1233"
+            "servicesOfAnotherTCSP" -> ""
           )
 
           val result = controller.post()(newRequestInvalid)

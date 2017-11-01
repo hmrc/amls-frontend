@@ -48,7 +48,7 @@ class summarySpec extends GenericTestHelper
       subHeading.html must include(Messages("summary.tcsp"))
     }
 
-    val sectionChecks = Table[String, Element=>Boolean](
+    val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
       ("tcsp.kind.of.service.provider.title", checkListContainsItems(_, Set("tcsp.service.provider.lbl.01",
                                                                             "tcsp.service.provider.lbl.02",
@@ -71,8 +71,10 @@ class summarySpec extends GenericTestHelper
       def view = {
         val testdata = Tcsp(
           Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true,false)))),
-          Some(ProvidedServices(Set(PhonecallHandling,EmailHandling,EmailServer,
-                                    SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")))),
+          Some(ProvidedServices(Set(
+            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
+          ))),
+          Some(true),
           Some(ServicesOfAnotherTCSPYes("789oinhytrd4567"))
         )
 
@@ -83,7 +85,7 @@ class summarySpec extends GenericTestHelper
         val hTwos = doc.select("section.check-your-answers h2")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }}
@@ -91,7 +93,6 @@ class summarySpec extends GenericTestHelper
       doc.getElementsMatchingOwnText(Messages("tcsp.off-the-shelf.companies.lbl")).first().nextElementSibling().nextElementSibling().text() must be("Yes")
       doc.getElementsMatchingOwnText(Messages("tcsp.create.complex.corporate.structures.lbl")).first().nextElementSibling().nextElementSibling().text() must be("No")
     }
-
 
   }
 }

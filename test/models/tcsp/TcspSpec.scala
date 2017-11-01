@@ -63,6 +63,7 @@ trait TcspValues {
       "services" -> Seq("01", "08"),
       "details" -> "other service"
     ),
+    "doesServicesOfAnotherTCSP" -> true,
     "servicesOfAnotherTCSP" -> Json.obj(
       "servicesOfAnotherTCSP" -> true,
       "mlrRefNumber" -> "12345678"
@@ -74,6 +75,7 @@ trait TcspValues {
   val completeModel = Tcsp(
     Some(DefaultValues.DefaultCompanyServiceProviders),
     Some(DefaultValues.DefaultProvidedServices),
+    Some(true),
     Some(DefaultValues.DefaultServicesOfAnotherTCSP),
     hasAccepted = true
   )
