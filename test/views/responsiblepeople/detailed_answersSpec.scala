@@ -339,7 +339,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some("firstName"),
     Some("middleName"),
     Some("lastName"),
-    new LocalDate(1990, 2, 24)
+    Some(new LocalDate(1990, 2, 24))
   )
 
   val personName = PersonName(

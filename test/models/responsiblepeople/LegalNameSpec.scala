@@ -31,21 +31,15 @@ class LegalNameSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("oldFirst"),
-          "previous.middleName" -> Seq("oldMiddle"),
-          "previous.lastName" -> Seq("oldLast")
+          "firstName" -> Seq("oldFirst"),
+          "middleName" -> Seq("oldMiddle"),
+          "lastName" -> Seq("oldLast")
         )
 
         val validPerson = LegalName(
-          previousName = Some(
-            PreviousName(
-              firstName = Some("oldFirst"),
+              firstName = "oldFirst",
               middleName = Some("oldMiddle"),
-              lastName = Some("oldLast"),
-              // scalastyle:off magic.number
-              date = new LocalDate(1990, 2, 24)
-            )
-          )
+              lastName = "oldLast"
         )
 
         LegalName.formRule.validate(data) must equal(Valid(validPerson))
@@ -68,10 +62,14 @@ class LegalNameSpec extends PlaySpec with MockitoSugar {
         "fields have been selected" in {
 
           LegalName.formRule.validate(Map(
-            "hasPreviousName" -> Seq("true")
+            "hasPreviousName" -> Seq("true"),
+            "firstName" -> Seq(""),
+            "middleName" -> Seq(""),
+            "lastName" -> Seq("")
           )) must
             equal(Invalid(Seq(
-              (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid"))
+              (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
+              (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name"))
             )))
         }
       }
@@ -80,16 +78,16 @@ class LegalNameSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("oldFirst" * 36),
-          "previous.middleName" -> Seq("oldMiddle" * 36),
-          "previous.lastName" -> Seq("oldLast" * 36)
+          "firstName" -> Seq("oldFirst" * 36),
+          "middleName" -> Seq("oldMiddle" * 36),
+          "lastName" -> Seq("oldLast" * 36)
         )
 
         LegalName.formRule.validate(data) must
           equal(Invalid(Seq(
-            (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
           )))
       }
 
@@ -97,14 +95,14 @@ class LegalNameSpec extends PlaySpec with MockitoSugar {
 
         LegalName.formRule.validate(Map(
           "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("($£*£$"),
-          "previous.middleName" -> Seq(")£(@$)$( "),
-          "previous.lastName" -> Seq("$&£@$*&$%&$")
+          "firstName" -> Seq("($£*£$"),
+          "middleName" -> Seq(")£(@$)$( "),
+          "lastName" -> Seq("$&£@$*&$%&$")
         )) must
           equal(Invalid(Seq(
-            (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
-            (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
-            (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
           )))
       }
 
