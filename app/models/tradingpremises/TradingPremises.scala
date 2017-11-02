@@ -80,7 +80,6 @@ case class TradingPremises(
           if w.activities.nonEmpty => true
         case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true)
           if w.activities.nonEmpty => true
-        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, true) => true //This code part of fix for the issue AMLS-1549 back button issue
         case tp if !tp.hasAccepted => false
         case _ => false
       }
@@ -90,7 +89,6 @@ case class TradingPremises(
           if w.activities.nonEmpty => true
         case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, _)
           if w.activities.nonEmpty => true
-        case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
         case _ => false
       }
     }

@@ -27,7 +27,7 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.tradingpremises._
-
+import models.tradingpremises.TradingPremises.FilterUtils
 import scala.concurrent.Future
 import cats.implicits._
 import forms.EmptyForm
@@ -40,7 +40,7 @@ trait SummaryController extends RepeatingSection with BaseController {
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
     tradingPremises match {
       case Some(tpSeq) => {
-        val updatedList = tpSeq.map { premises =>
+        val updatedList = tpSeq.filterEmpty.map { premises =>
           premises.copy(hasAccepted = true)
         }
         Future.successful(Some(updatedList))
