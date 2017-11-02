@@ -16,6 +16,8 @@
 
 package controllers.responsiblepeople
 
+import config.AMLSAuthConnector
+import generators.ResponsiblePersonGenerator
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.Country
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
@@ -33,7 +35,7 @@ import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
@@ -50,7 +52,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[SummaryController]
 
-    val model = ResponsiblePeople(None, None)
+    val model = responsiblePersonGen.sample.get
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(model)), Some(ResponsiblePeople.key))
 
@@ -118,8 +120,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+        }
 
+        "will strip out empty responsible people models" in new Fixture {
+          when {
+            controller.dataCacheConnector.save(any(),any())(any(),any(),any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          val models = Seq(
+            responsiblePersonGen.sample.get,
+            ResponsiblePeople()
+          )
+
+          when {
+            controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+          } thenReturn Future.successful(Some(models))
+
+          val result = controller.post()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+          verify(controller.dataCacheConnector)
+            .save[Seq[ResponsiblePeople]](any(), eqTo(Seq(models.head.copy(hasAccepted = true))))(any(),any(),any())
         }
       }
     }
