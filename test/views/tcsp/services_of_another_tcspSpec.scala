@@ -48,20 +48,15 @@ class services_of_another_tcspSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("not a message Key")),
-          (Path \ "mlrRefNumber") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.tcsp.services_of_another_tcsp(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
 
       doc.getElementById("servicesOfAnotherTCSP")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("mlrRefNumber").parent()
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
   }

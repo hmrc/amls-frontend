@@ -19,10 +19,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
-@target = @{
-    s"""${f("mlrRefNumber").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
     @heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
@@ -48,7 +44,6 @@
                     f = f("servicesOfAnotherTCSP"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
                     inline = true
                 )
                 @radio(
@@ -58,20 +53,6 @@
                     inline = true
                 )
             }
-        }
-
-        @fieldset(
-            f = f(target),
-            legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-            legendHidden = true
-        ) {
-            @input(f("mlrRefNumber"),
-                labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-                hintText = "hint.8.digits",
-                bold = false,
-                attrMaxlength = "15",
-                attrPattern = "[0-9a-z-A-Z]{1,15}"
-            )
         }
 
         @submit(edit)
