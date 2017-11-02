@@ -164,12 +164,16 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "has a completed model, an empty one and an incomplete one" when {
         "return the correct index" in {
           val mockCacheMap = mock[CacheMap]
-          val rp = Seq(completeModelNonUkResidentNonUkPassport, ResponsiblePeople(), incompleteResponsiblePeople) map (_.copy(hasAccepted = true))
+          val rp = Seq(
+            completeModelNonUkResidentNonUkPassport,
+            ResponsiblePeople(),
+            incompleteResponsiblePeople
+          ) map (_.copy(hasAccepted = true))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
             .thenReturn(Some(rp))
 
-          ResponsiblePeople.section(mockCacheMap).call.url must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3).url)
+          ResponsiblePeople.section(mockCacheMap).call.url mustBe controllers.responsiblepeople.routes.WhoMustRegisterController.get(2).url
         }
       }
     }
@@ -282,8 +286,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
+            .thenReturn(Some(Seq(
+              ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true),
               ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true))))
+
           val section = ResponsiblePeople.section(mockCacheMap)
 
           section.hasChanged must be(true)
@@ -298,10 +304,11 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
             .thenReturn(Some(Seq(
-              ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-              ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+              completeModelUkResident.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+              completeModelUkResident.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
               ResponsiblePeople(Some(DefaultValues.personName), hasAccepted = true))
             ))
+
           val section = ResponsiblePeople.section(mockCacheMap)
 
           section.hasChanged must be(true)
@@ -316,9 +323,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
             .thenReturn(Some(Seq(
-              ResponsiblePeople(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+              completeModelUkResident.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
               completeModelNonUkResidentNonUkPassport.copy(hasAccepted = true)
             )))
+
           val section = ResponsiblePeople.section(mockCacheMap)
 
           section.hasChanged must be(true)
