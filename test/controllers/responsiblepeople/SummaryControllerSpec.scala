@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
 import models.Country
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.responsiblepeople._
@@ -34,7 +35,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
@@ -45,7 +46,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       override val statusService = mock[StatusService]
     }
 
-    val model = ResponsiblePeople(None, None)
+    val model = responsiblePersonGen.sample.get
 
     when {
       controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
@@ -110,7 +111,6 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'registration progress page'" when {
       "'flow flag is not defined" which {
         "will update hasAccepted flag" in new Fixture {
-
           when {
             controller.dataCacheConnector.save(any(),any())(any(),any(),any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
@@ -119,8 +119,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+        }
 
+        "will strip out empty responsible people models" in new Fixture {
+          when {
+            controller.dataCacheConnector.save(any(),any())(any(),any(),any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          val models = Seq(
+            responsiblePersonGen.sample.get,
+            ResponsiblePeople()
+          )
+
+          when {
+            controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+          } thenReturn Future.successful(Some(models))
+
+          val result = controller.post()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+
+          verify(controller.dataCacheConnector)
+            .save[Seq[ResponsiblePeople]](any(), eqTo(Seq(models.head.copy(hasAccepted = true))))(any(),any(),any())
         }
       }
     }
