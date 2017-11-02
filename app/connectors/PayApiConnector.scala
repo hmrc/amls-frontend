@@ -18,7 +18,7 @@ package connectors
 
 import javax.inject.Inject
 
-import audit.CreatePaymentFailureEvent
+import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
 import config.{ApplicationConfig, WSHttp}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
@@ -48,11 +48,15 @@ class PayApiConnector @Inject()(
     if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {
       logDebug(s"Creating payment: ${Json.toJson(request)}")
       http.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
-        case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) => body.copy(
-          paymentId = response.header("Location").map(_.split("/").last)
-        ).some
+        case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
+          val responseModel = body.copy(
+            paymentId = response.header("Location").map(_.split("/").last)
+          )
+
+          auditConnector.sendExtendedEvent(CreatePaymentEvent(request, responseModel))
+          responseModel.some
+
         case response: HttpResponse =>
-          println(auditConnector)
           auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
           logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
           None

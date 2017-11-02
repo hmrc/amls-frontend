@@ -29,10 +29,10 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -94,12 +94,13 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           when {
             http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
-            HttpResponse(OK,Some(Json.toJson(validResponse)))
+            HttpResponse(OK, Some(Json.toJson(validResponse)))
           )
 
-          whenReady(connector.createPayment(validRequest)) {
-            case Some(response) => response.links.nextUrl mustBe paymentUrl
-          }
+          val result = await(connector.createPayment(validRequest))
+
+          result mustBe Some(validResponse)
+          verify(auditConnector).sendExtendedEvent(any())(any(), any())
         }
       }
 
@@ -107,11 +108,10 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
         "return no result" in new TestFixture {
           override val paymentsToggleValue = false
 
-          whenReady(connector.createPayment(validRequest)) { r =>
-            r must not be defined
+          val result = await(connector.createPayment(validRequest))
 
-            verify(http, never).POST(any(), any(), any())(any(), any(), any(), any())
-          }
+          result must not be defined
+          verify(http, never).POST(any(), any(), any())(any(), any(), any(), any())
         }
       }
 
