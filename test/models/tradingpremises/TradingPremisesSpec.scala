@@ -172,9 +172,10 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
           val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), None)
           tradingPremises.isComplete must be(false)
         }
+
         "tradingPremises no data" in {
           val tradingPremises = TradingPremises(None, None, hasAccepted = true)
-          tradingPremises.isComplete must be(true)
+          tradingPremises.isComplete mustBe false
         }
       }
 
@@ -193,8 +194,11 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
-            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true))))
+          .thenReturn(Some(Seq(
+            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true)
+          )))
+
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -208,9 +212,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true))))
+          .thenReturn(Some(Seq(
+            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+            TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
+          )))
+        
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -224,8 +231,10 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+          .thenReturn(Some(Seq(
+            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
             completeModel)))
+
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -253,8 +262,11 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(TradingPremises(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true),
-            TradingPremises(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true))))
+          .thenReturn(Some(Seq(
+            completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true),
+            completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true))
+          ))
+
         val section = TradingPremises.section(mockCacheMap)
 
         section.hasChanged must be(true)
@@ -289,13 +301,13 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     }
 
     "the section consists of a complete model followed by an empty one" must {
-      "return a result indicating completeness" in {
+      "return a result indicating partial completeness" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, TradingPremises(hasAccepted = true))))
 
-        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Started)
       }
     }
 
@@ -304,9 +316,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(completeModel, TradingPremises(hasAccepted = true), incompleteModel)))
+          .thenReturn(Some(Seq(
+            completeModel,
+            TradingPremises(hasAccepted = true),
+            incompleteModel)))
 
-        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.WhatYouNeedController.get(3).url)
+        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.WhatYouNeedController.get(2).url)
       }
     }
 
