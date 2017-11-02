@@ -51,9 +51,10 @@ class PayApiConnector @Inject()(
         case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) => body.copy(
           paymentId = response.header("Location").map(_.split("/").last)
         ).some
-        case response =>
+        case response: HttpResponse =>
+          println(auditConnector)
           auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
-          logError("Failed to create payment using pay-api, reverting to old payments page")
+          logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
           None
       }
     } else {
