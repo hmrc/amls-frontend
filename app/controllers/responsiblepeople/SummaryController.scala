@@ -28,7 +28,7 @@ import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.ControllerHelper
 import views.html.responsiblepeople._
-
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -55,7 +55,7 @@ trait SummaryController extends BaseController {
         case None => {
           (for {
             model <- OptionT(fetchModel)
-            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model map (_.copy(hasAccepted = true))))
+            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update ResponsiblePeople")
         }
       }
