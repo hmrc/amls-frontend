@@ -28,10 +28,10 @@ case class PreviousName(
                        firstName: Option[String],
                        middleName: Option[String],
                        lastName: Option[String],
-                       date: LocalDate
+                       date: Option[LocalDate] = None
                        ) {
 
-  val formattedDate = DateHelper.formatDate(date)
+  val formattedDate = date.map(v => DateHelper.formatDate(v))
 
   def formattedPreviousName(that: PersonName): String = that match {
       case PersonName(first, middle, last, _, _) =>
@@ -66,7 +66,7 @@ object PreviousName {
       // Defining this here because it helps out the compiler with typechecking
       val builder: (I, LocalDate) => PreviousName = {
         case ((first, middle, last), date) =>
-          PreviousName(first, middle, last, date)
+          PreviousName(first, middle, last, Some(date))
       }
 
       (((
@@ -85,7 +85,7 @@ object PreviousName {
         (__ \ "firstName").write[Option[String]] ~
         (__ \ "middleName").write[Option[String]] ~
         (__ \ "lastName").write[Option[String]] ~
-        (__ \ "date").write(localDateWrite)
+        (__ \ "date").write(optionW(localDateWrite))
       )(unlift(PreviousName.unapply))
     }
 

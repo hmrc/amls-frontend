@@ -85,7 +85,7 @@ class PersonRegisteredControllerSpec extends GenericTestHelper with MockitoSugar
       }
 
       "load the Person Registered page with a count of 2 when there are two complete responsible people" in new Fixture {
-        val previousName = PreviousName(Some("first1"), Some("middle1"), Some("last1"), new LocalDate(1990, 2, 24))
+        val previousName = PreviousName(Some("first1"), Some("middle1"), Some("last1"), Some(new LocalDate(1990, 2, 24)))
         val personName = PersonName("first2", Some("middle2"), "last2", Some(previousName), Some("name"))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

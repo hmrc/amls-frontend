@@ -16,12 +16,9 @@
 
 package models.tcsp
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
-
-import scala.collection.Seq
 
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  providedServices: Option[ProvidedServices] = None,
@@ -52,7 +49,6 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
 
 object Tcsp {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   implicit val formatOption = Reads.optionWithNull[Tcsp]
@@ -78,10 +74,24 @@ object Tcsp {
 
   implicit val jsonWrites = Json.writes[Tcsp]
 
+  def constant[A](x: A): Reads[A] = new Reads[A] {
+    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+  }
+
+  def doesServicesOfAnotherTCSPReader: Reads[Option[Boolean]] = {
+    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap {
+      case None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s => Some(s.isDefined) }
+      case p => constant(p)
+    }
+  }
+
   implicit val jsonReads : Reads[Tcsp] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
     (__ \ "tcspTypes").readNullable[TcspTypes] and
       (__ \ "providedServices").readNullable[ProvidedServices] and
-      (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] and
+      doesServicesOfAnotherTCSPReader and
       (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))

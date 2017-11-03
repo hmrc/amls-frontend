@@ -29,9 +29,9 @@ class PreviousNameSpec extends PlaySpec {
     "have the formattedPreviousName function correctly return the value" in {
 
       // scalastyle:off magic.number
-      val first = PreviousName(Some("oldfirst"), None, None, new LocalDate(1990, 2, 24))
-      val middle = PreviousName(None, Some("oldmiddle"), None, new LocalDate(1990, 2, 24))
-      val last = PreviousName(None, None, Some("oldlast"), new LocalDate(1990, 2, 24))
+      val first = PreviousName(Some("oldfirst"), None, None, Some(new LocalDate(1990, 2, 24)))
+      val middle = PreviousName(None, Some("oldmiddle"), None, Some(new LocalDate(1990, 2, 24)))
+      val last = PreviousName(None, None, Some("oldlast"), Some(new LocalDate(1990, 2, 24)))
 
       val personName = PersonName("First", Some("Middle"), "Last", None, None)
 
@@ -59,7 +59,7 @@ class PreviousNameSpec extends PlaySpec {
             middleName = Some("oldMiddle"),
             lastName = Some("oldLast"),
             // scalastyle:off magic.number
-            date = new LocalDate(1990, 2, 24)
+            date = Some(new LocalDate(1990, 2, 24))
           )
         ))
     }
@@ -82,7 +82,7 @@ class PreviousNameSpec extends PlaySpec {
             middleName = None,
             lastName = None,
             // scalastyle:off magic.number
-            date = new LocalDate(1990, 2, 24)
+            date = Some(new LocalDate(1990, 2, 24))
           )
         ))
     }
@@ -103,7 +103,7 @@ class PreviousNameSpec extends PlaySpec {
             middleName = Some("oldMiddle"),
             lastName = None,
             // scalastyle:off magic.number
-            date = new LocalDate(1990, 2, 24)
+            date = Some(new LocalDate(1990, 2, 24))
           )
         ))
     }
@@ -124,7 +124,7 @@ class PreviousNameSpec extends PlaySpec {
             middleName = None,
             lastName = Some("oldLast"),
             // scalastyle:off magic.number
-            date = new LocalDate(1990, 2, 24)
+            date = Some(new LocalDate(1990, 2, 24))
           )
         ))
     }
@@ -202,7 +202,7 @@ class PreviousNameSpec extends PlaySpec {
         middleName = Some("oldMiddle"),
         lastName = Some("oldLast"),
         // scalastyle:off magic.number
-        date = new LocalDate(1990, 2, 24)
+        date = Some(new LocalDate(1990, 2, 24))
       )
 
       implicitly[Write[PreviousName, UrlFormEncoded]].writes(model) mustEqual data

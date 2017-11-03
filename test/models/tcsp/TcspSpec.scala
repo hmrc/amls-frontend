@@ -143,12 +143,37 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
       }
     }
 
-    "Serialise as expected" in {
+    "Serialise" in {
       Json.toJson(completeModel) must be(completeJson)
     }
 
-    "Deserialise as expected" in {
-      completeJson.as[Tcsp] must be(completeModel)
+    "Deserialise" when {
+      "complete json is present"in {
+        completeJson.as[Tcsp] must be(completeModel)
+      }
+      "doesServicesOfAnotherTCSP is absent"in {
+
+        val completeJson = Json.obj(
+          "tcspTypes" -> Json.obj(
+            "serviceProviders" -> Seq("01", "02", "04", "05"),
+            "onlyOffTheShelfCompsSold" -> true,
+            "complexCorpStructureCreation" -> false
+          ),
+          "providedServices" -> Json.obj(
+            "services" -> Seq("01", "08"),
+            "details" -> "other service"
+          ),
+          "servicesOfAnotherTCSP" -> Json.obj(
+            "servicesOfAnotherTCSP" -> true,
+            "mlrRefNumber" -> "12345678"
+          ),
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        completeJson.as[Tcsp] must be(completeModel)
+      }
+
     }
 
     "None" when {
