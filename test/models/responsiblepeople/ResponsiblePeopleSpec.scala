@@ -648,7 +648,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(OneToThreeYears))
     val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
-    val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), new LocalDate(1990, 2, 24))
+    val previousName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"), Some(new LocalDate(1990, 2, 24)))
     val personName = PersonName("first", Some("middle"), "last", Some(previousName), Some("name"))
     val personResidenceTypeNonUk = PersonResidenceType(residenceNonUk, Some(residenceCountry), Some(residenceNationality))
     val personResidenceTypeUk = PersonResidenceType(residenceUk, Some(residenceCountry), Some(residenceNationality))

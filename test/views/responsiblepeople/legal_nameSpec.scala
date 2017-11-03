@@ -40,17 +40,17 @@ class legal_nameSpec extends GenericTestHelper with MustMatchers {
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "hasPreviousName") must not be empty
-      doc.getElementsByAttributeValue("name", "previous.firstName") must not be empty
-      doc.getElementsByAttributeValue("name", "previous.middleName") must not be empty
-      doc.getElementsByAttributeValue("name", "previous.lastName") must not be empty
+      doc.getElementsByAttributeValue("name", "firstName") must not be empty
+      doc.getElementsByAttributeValue("name", "middleName") must not be empty
+      doc.getElementsByAttributeValue("name", "lastName") must not be empty
     }
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "hasPreviousName") -> Seq(ValidationError("not a message Key")),
-          (Path \ "previous.firstName") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "previous.middleName") -> Seq(ValidationError("third not a message Key")),
-          (Path \ "previous.lastName") -> Seq(ValidationError("fourth not a message Key"))
+          (Path \ "firstName") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "middleName") -> Seq(ValidationError("third not a message Key")),
+          (Path \ "lastName") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
       def view = views.html.responsiblepeople.legal_name(form2, true, 1, None)

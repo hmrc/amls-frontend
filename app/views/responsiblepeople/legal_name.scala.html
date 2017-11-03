@@ -70,16 +70,12 @@
                     f("previous"),
                     classes = Seq("section")
                 ) {
-                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
-                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
-                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                    @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
                 }
             }
-            @date(
-                f = f,
-                p = "previous.date",
-                labelText = "responsiblepeople.personName.previous.date.lbl"
-            )
+
         }
 
         @submit(edit)

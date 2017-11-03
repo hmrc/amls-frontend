@@ -54,7 +54,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
               middleName = Some("oldMiddle"),
               lastName = Some("oldLast"),
               // scalastyle:off magic.number
-              date = new LocalDate(1990, 2, 24)
+              date = Some(new LocalDate(1990, 2, 24))
             )
           ),
           otherNames = Some("Doc")

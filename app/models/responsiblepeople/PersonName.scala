@@ -16,20 +16,20 @@
 
 package models.responsiblepeople
 
+import cats.data.Validated.Valid
+import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms._
-import jto.validation._
+import models.FormTypes._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
-import models.FormTypes._
-import cats.data.Validated.{Invalid, Valid}
 
 case class PersonName(
                        firstName: String,
                        middleName: Option[String],
                        lastName: String,
-                       previousName: Option[PreviousName],
-                       otherNames: Option[String]
+                       previousName: Option[PreviousName] = None,
+                       otherNames: Option[String] = None
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
@@ -44,14 +44,14 @@ object PersonName {
 
   implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 
-      val otherNamesLength = 140
-      val otherNamesType = notEmptyStrip andThen
-        notEmpty.withMessage("error.required.rp.otherNames") andThen
-        maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
-        basicPunctuationPattern()
+    val otherNamesLength = 140
+    val otherNamesType = notEmptyStrip andThen
+      notEmpty.withMessage("error.required.rp.otherNames") andThen
+      maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
+      basicPunctuationPattern()
 
-      (
-        (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~
+    (
+      (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~
         (__ \ "middleName").read(optionR(genericNameRule())) ~
         (__ \ "lastName").read(genericNameRule("error.required.rp.last_name")) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
@@ -67,7 +67,7 @@ object PersonName {
             Rule(_ => Valid(None))
         }
       )(PersonName.apply _)
-    }
+  }
 
   implicit val formWrite = Write[PersonName, UrlFormEncoded] {
     model =>
@@ -86,11 +86,11 @@ object PersonName {
             "previous.middleName" -> Seq(previous.middleName getOrElse ""),
             "previous.lastName" -> Seq(previous.lastName getOrElse "")
           ) ++ (
-            localDateWrite.writes(previous.date) map {
+            localDateWrite.writes(previous.date.get) map {
               case (path, value) =>
                 s"previous.date.$path" -> value
             }
-          )
+            )
         case None =>
           Map("hasPreviousName" -> Seq("false"))
       }

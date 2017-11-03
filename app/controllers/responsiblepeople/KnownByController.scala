@@ -16,14 +16,16 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
-trait KnownByController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                  val authConnector: AuthConnector) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
@@ -35,10 +37,4 @@ trait KnownByController extends RepeatingSection with BaseController {
       implicit request => ???
   }
 
-}
-
-object KnownByController extends KnownByController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
