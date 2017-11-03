@@ -25,10 +25,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 object ServiceEntrantEvent {
 
-  def apply(companyName: String, utr: String)(implicit hc: HeaderCarrier, request: Request[_]) = {
+  def apply(companyName: String, utr: String, safeId: String)(implicit hc: HeaderCarrier, request: Request[_]) = {
     val data = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(
       "companyName" -> companyName,
-      "utr" -> utr
+      "utr" -> utr,
+      "safeId"-> safeId
     )
 
     ExtendedDataEvent(
