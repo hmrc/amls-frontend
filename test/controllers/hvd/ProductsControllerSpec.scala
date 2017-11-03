@@ -50,7 +50,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
       mockServiceFlow
     )
 
-    setupInServiceFlow(false)
+    mockIsNewActivity(false)
     mockCacheSave[Hvd]
   }
 
@@ -206,7 +206,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
               "products[1]" -> "02"
             )
 
-            setupInServiceFlow(true, Some(HighValueDealing))
+            mockIsNewActivity(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
             mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -221,7 +221,7 @@ class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
               "products[1]" -> "04"
             )
 
-            setupInServiceFlow(true, Some(HighValueDealing))
+            mockIsNewActivity(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
             mockApplicationStatus(SubmissionDecisionApproved)
 

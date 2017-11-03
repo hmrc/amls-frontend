@@ -67,9 +67,9 @@ class ProductsController @Inject()
                 hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
                 status <- statusService.getStatus
                 _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.products(data))
-                inServiceFlow <- serviceFlow.inNewServiceFlow(HighValueDealing)
+                isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
               } yield {
-                if (!inServiceFlow && redirectToDateOfChange[Products](status, hvd.products, data)) {
+                if (!isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)) {
                   Redirect(routes.HvdDateOfChangeController.get())
                 } else {
                   if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
