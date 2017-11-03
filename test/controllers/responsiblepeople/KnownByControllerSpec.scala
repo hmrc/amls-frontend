@@ -40,7 +40,7 @@ class KnownByControllerSpec extends GenericTestHelper with ScalaFutures {
       .overrides(bind[DataCacheConnector].to(cache))
       .build()
 
-    lazy val controller = injector.instanceOf[LegalNameController]
+    lazy val controller = injector.instanceOf[KnownByController]
 
   }
 

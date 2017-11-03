@@ -40,7 +40,7 @@ class LegalNameChangeDateControllerSpec extends GenericTestHelper with ScalaFutu
       .overrides(bind[DataCacheConnector].to(cache))
       .build()
 
-    lazy val controller = injector.instanceOf[LegalNameController]
+    lazy val controller = injector.instanceOf[LegalNameChangeDateController]
 
   }
 

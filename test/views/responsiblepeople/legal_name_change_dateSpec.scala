@@ -39,17 +39,17 @@ class legal_name_change_dateSpec extends GenericTestHelper with MustMatchers {
       heading.html must be(Messages("responsiblepeople.legalnamechangedate.heading"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
-      doc.getElementsByAttributeValue("name", "previous.date.day") must not be empty
-      doc.getElementsByAttributeValue("name", "previous.date.month") must not be empty
-      doc.getElementsByAttributeValue("name", "previous.date.year") must not be empty
+      doc.getElementsByAttributeValue("name", "date.day") must not be empty
+      doc.getElementsByAttributeValue("name", "date.month") must not be empty
+      doc.getElementsByAttributeValue("name", "date.year") must not be empty
 
     }
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "previous.date.day") -> Seq(ValidationError("not a message Key")),
-          (Path \ "previous.date.month") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "previous.date.year") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "date.day") -> Seq(ValidationError("not a message Key")),
+          (Path \ "date.month") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "date.year") -> Seq(ValidationError("third not a message Key"))
         ))
 
       def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None)
