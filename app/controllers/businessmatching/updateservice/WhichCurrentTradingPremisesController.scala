@@ -24,15 +24,16 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessmatching.updateservice.{UpdateService, TradingPremisesActivities => TradingPremisesForm}
+import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
-import uk.gov.hmrc.http.HeaderCarrier
+import routes._
 
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
@@ -40,16 +41,14 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
 
   private val failure = InternalServerError("Could not get form data")
 
-  def get() = Authorised.async {
+  def get(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
-      {
-        for {
-          (tp, _, act) <- formData
-        } yield Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
+      formData map { case (tp, _, act) =>
+        Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
       } getOrElse failure
   }
 
-  def post() = Authorised.async {
+  def post(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[TradingPremisesForm](request.body) match {
         case f: InvalidForm => {
@@ -64,9 +63,9 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
             fitAndProperRequired <- businessMatchingService.fitAndProperRequired
           } yield if(fitAndProperRequired) {
-            Redirect(routes.FitAndProperController.get())
+            Redirect(FitAndProperController.get())
           } else {
-            Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+            Redirect(NewServiceInformationController.get())
           }
         } getOrElse failure
       }
@@ -75,7 +74,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
     case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
       updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity)
-    case (m, i) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
+    case (m, _) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
       updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities + activity)
     case (m, _) => m
   }
