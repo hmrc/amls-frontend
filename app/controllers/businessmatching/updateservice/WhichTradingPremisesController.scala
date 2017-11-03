@@ -36,6 +36,7 @@ import utils.{RepeatingSection, StatusConstants}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import routes._
 
 @Singleton
 class WhichTradingPremisesController @Inject()(
@@ -82,9 +83,9 @@ class WhichTradingPremisesController @Inject()(
                   case ValidForm(_, data) =>
                     updateTradingPremises(data, activity) map { _ =>
                       if (activitiesToIterate(index, additionalActivities)) {
-                        Redirect(routes.TradingPremisesController.get(index + 1))
+                        Redirect(TradingPremisesController.get(index + 1))
                       } else {
-                        Redirect(routes.CurrentTradingPremisesController.get())
+                        Redirect(CurrentTradingPremisesController.get(0))
                       }
                     }
                   case f: InvalidForm =>
