@@ -19,6 +19,7 @@ package controllers
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
 import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.auth.{CredentialRole, UserDetailsResponse}
@@ -34,6 +35,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
+import play.api.libs.json.JsResultException
 import play.api.{Logger, Play}
 import play.api.mvc.{Action, Call, DiscardingCookie, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
@@ -56,6 +58,8 @@ trait LandingController extends BaseController {
   private[controllers] def authService: AuthService
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+
+  private[controllers] val cacheConnector: DataCacheConnector
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -156,7 +160,7 @@ trait LandingController extends BaseController {
 
   }
 
-  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
+  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String)
                                                    (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
     landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber, cacheMap) map {
@@ -212,19 +216,31 @@ trait LandingController extends BaseController {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
-        case Some(cacheMap) => {
-          //there is data in S4l
-          if (dataHasChanged(cacheMap)) {
-            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
-              cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
-              case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-              case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-              case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+        case Some(c) => {
+          import play.api.libs.json._
 
+          val cacheMapF = try {
+            c.getEntry[Seq[TradingPremises]](TradingPremises.key)
+            Future.successful(c)
+          } catch {
+            case e: JsResultException =>
+              cacheConnector.save[Seq[TradingPremises]](TradingPremises.key, Seq.empty[TradingPremises])
+          }
+
+          //there is data in S4l
+          cacheMapF flatMap { cacheMap =>
+            if (dataHasChanged(cacheMap)) {
+              (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
+                cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
+                case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+                case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+                case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber)
+
+              }
+            } else {
+              //DataHasNotChanged
+              refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
             }
-          } else {
-            //DataHasNotChanged
-            refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
           }
         }
         case _ => refreshAndRedirect(amlsRegistrationNumber, None)
@@ -241,7 +257,7 @@ object LandingController extends LandingController {
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
-
+  override val cacheConnector = DataCacheConnector
   override private[controllers] def auditConnector = AMLSAuditConnector
 
   override private[controllers] lazy val authService = Play.current.injector.instanceOf[AuthService]

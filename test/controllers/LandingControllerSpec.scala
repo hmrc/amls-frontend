@@ -19,6 +19,7 @@ package controllers
 import java.net.URLEncoder
 
 import config.ApplicationConfig
+import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -48,14 +49,14 @@ import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
 import models.ReturnLocation
 import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
@@ -73,6 +74,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
       override val shortLivedCache = mock[ShortLivedCache]
       override val auditConnector = mock[AuditConnector]
       override val authService = mock[AuthService]
+      override lazy val cacheConnector = mock[DataCacheConnector]
     }
 
     when {
@@ -302,6 +304,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override def auditConnector = mock[AuditConnector]
       override lazy val authService = mock[AuthService]
+      override lazy val cacheConnector = mock[DataCacheConnector]
     }
 
     when {
