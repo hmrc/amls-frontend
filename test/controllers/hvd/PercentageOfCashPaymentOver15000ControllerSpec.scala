@@ -24,28 +24,26 @@ import org.mockito.Mockito._
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import models.businessmatching.HighValueDealing
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
+class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new PercentageOfCashPaymentOver15000Controller(
-      mock[DataCacheConnector], mock[ServiceFlow], mock[StatusService], self.authConnector
+      mock[DataCacheConnector], mockServiceFlow, mock[StatusService], self.authConnector
     )
 
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -53,7 +51,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
-
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
@@ -66,7 +63,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
     }
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
@@ -82,12 +78,27 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper w
 
     "redirect to Page not found" when {
       "application is in variation mode" in new Fixture {
-
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
         status(result) must be(NOT_FOUND)
+      }
+    }
+
+    "continue to show the correct view" when {
+      "application is in variation mode but the service has just been added" in new Fixture {
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        mockIsNewActivity(true, Some(HighValueDealing))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("hvd.percentage.title"))
       }
     }
 

@@ -30,13 +30,13 @@ import org.scalatestplus.play.OneAppPerSuite
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.http.HeaderNames.LOCATION
 import services.businessmatching.ServiceFlow
 import views.html.msb.which_currencies
-
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import scala.concurrent.Future
 
 class WhichCurrencyControllerSpec extends GenericTestHelper
@@ -46,7 +46,7 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
@@ -61,22 +61,32 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
       override def cache: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
       override implicit val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mock[ServiceFlow]
+      override val serviceFlow = mockServiceFlow
     }
 
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
+    mockIsNewActivity(false)
   }
 
   "WhichCurrencyController" when {
     "get is called" should {
-      "succeed" in new Fixture {
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
+      "succeed" when {
+        "status is pre-submission" in new Fixture {
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(NotCompleted))
 
-        val resp = controller.get(false).apply(request)
-        status(resp) must be(200)
+          val resp = controller.get(false).apply(request)
+          status(resp) must be(200)
+        }
+
+        "status is approved but the service has just been added" in new Fixture {
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+
+          val resp = controller.get(false).apply(request)
+          status(resp) must be(200)
+        }
       }
 
       "show a pre-populated form when model contains data" in new Fixture {
@@ -90,7 +100,6 @@ class WhichCurrencyControllerSpec extends GenericTestHelper
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
-
 
         when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))

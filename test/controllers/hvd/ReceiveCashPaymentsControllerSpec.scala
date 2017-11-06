@@ -24,6 +24,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import models.businessmatching.HighValueDealing
 
 import scala.concurrent.Future
 
@@ -32,23 +33,31 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController(mockCacheConnector, mock[ServiceFlow], mockStatusService, self.authConnector)
+    val controller = new ReceiveCashPaymentsController(mockCacheConnector, mockServiceFlow, mockStatusService, self.authConnector)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
-
-    when(controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any()))
-      .thenReturn(Future.successful(false))
+    mockIsNewActivity(false)
   }
 
   "ReceiveCashPaymentsController" must {
 
-    "load the view" in new Fixture {
+    "load the view" when {
+     "status is pre-submission" in new Fixture {
 
-      mockApplicationStatus(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
-      val result = controller.get()(request)
-      status(result) mustEqual OK
+        val result = controller.get()(request)
+        status(result) mustBe OK
+      }
+
+      "status is approved but the service has just been added" in new Fixture {
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockIsNewActivity(true, Some(HighValueDealing))
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+      }
     }
 
     "respond with not found" when {
@@ -57,14 +66,14 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
+        status(result) mustBe NOT_FOUND
       }
     }
 
     "respond with bad request with an invalid request" in new Fixture {
 
       val result = controller.post()(request)
-      status(result) mustEqual BAD_REQUEST
+      status(result) mustBe BAD_REQUEST
     }
 
     "redirect to summary on edit" in new Fixture {
@@ -76,7 +85,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
       val result = controller.post(true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
@@ -88,7 +97,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+        redirectLocation(result) mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
 
       }
 
@@ -102,7 +111,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         val result = controller.post(true)(newRequest)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get(true).url)
+        redirectLocation(result) mustBe Some(routes.ExpectToReceiveCashPaymentsController.get(true).url)
 
       }
       "edit is false" in new Fixture {
@@ -114,7 +123,7 @@ class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSu
         val result = controller.post()(newRequest)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.ExpectToReceiveCashPaymentsController.get().url)
+        redirectLocation(result) mustBe Some(routes.ExpectToReceiveCashPaymentsController.get().url)
 
       }
     }

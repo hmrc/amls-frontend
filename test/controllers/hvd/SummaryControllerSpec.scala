@@ -64,7 +64,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       Some(LinkedCashPayments(true))
     )
 
-    setupInServiceFlow(false)
+    mockIsNewActivity(false)
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
@@ -146,7 +146,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        setupInServiceFlow(true, Some(HighValueDealing))
+        mockIsNewActivity(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -173,6 +173,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
         controller.dataCache.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
       } thenReturn Future.successful(cache)
 
+      setupInServiceFlow(false, Some(HighValueDealing))
+
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
@@ -195,9 +197,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
           controller.dataCache.save[Hvd](any(), any())(any(),any(),any())
         } thenReturn Future.successful(cache)
 
-        when {
-          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
+        setupInServiceFlow(true, Some(HighValueDealing))
 
         when {
           controller.statusService.isPreSubmission(any(), any(), any())
