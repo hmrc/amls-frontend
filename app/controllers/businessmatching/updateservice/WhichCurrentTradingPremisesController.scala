@@ -35,6 +35,8 @@ import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
 import routes._
 
+import scala.collection.immutable.SortedSet
+
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
                                                       businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
@@ -44,7 +46,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   def get(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
       formData map { case (tp, _, act) =>
-        Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act.toSeq(index))))
+        Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act.toSeq(index)), index))
       } getOrElse failure
   }
 
@@ -54,13 +56,13 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
         case f: InvalidForm => {
           for {
             (tradingPremises, _, act) <- formData
-          } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act.toSeq(index))))
+          } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act.toSeq(index)), index))
         } getOrElse failure
 
         case ValidForm(_, data) => {
           for {
             (tp, _, act) <- formData
-            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act.toSeq(index))))
+            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act.toList(index))))
             fitAndProperRequired <- businessMatchingService.fitAndProperRequired
           } yield if(activitiesToIterate(index, act)) {
             Redirect(CurrentTradingPremisesController.get(index + 1))
@@ -75,7 +77,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
 
   private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
     case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
-      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities - activity)
+      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities.filter(_.equals(activity)))
     case (m, _) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
       updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities + activity)
     case (m, _) => m
