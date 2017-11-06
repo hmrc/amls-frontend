@@ -135,8 +135,8 @@ trait LandingService {
                                  ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
       cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
-        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true))
-        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
+        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
       })
     }
   }
@@ -147,8 +147,8 @@ trait LandingService {
                                                                        ec: ExecutionContext
   ): Future[CacheMap] = {
     cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
-      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true))
-      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false))
+      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     })
   }
 
