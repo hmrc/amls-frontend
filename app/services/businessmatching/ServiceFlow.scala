@@ -87,4 +87,13 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     case (true, true) => true
     case _ => false
   }) getOrElse false
+
+  def setInServiceFlowFlag(value: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+    val modelToSave: Option[UpdateService] => UpdateService =
+      m => m.fold(UpdateService(inNewServiceFlow = value))(_.copy(inNewServiceFlow = value))
+
+    cacheConnector.fetch[UpdateService](UpdateService.key) flatMap { maybeModel =>
+      cacheConnector.save(UpdateService.key, modelToSave(maybeModel))
+    }
+  }
 }
