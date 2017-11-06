@@ -44,8 +44,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
     mockApplicationStatus(SubmissionReady)
-
-    setupInServiceFlow(false)
+    mockIsNewActivity(false)
   }
 
   "ExpectToReceiveCashPaymentsController" when {
@@ -65,7 +64,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends GenericTestHelper with M
       "display the view when supervised, but in the new service flow" in new Fixture {
 
         mockApplicationStatus(SubmissionDecisionApproved)
-        setupInServiceFlow(true, Some(HighValueDealing))
+        mockIsNewActivity(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
 

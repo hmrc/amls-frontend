@@ -48,7 +48,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    setupInServiceFlow(false)
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -140,7 +140,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
           val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          setupInServiceFlow(true, Some(HighValueDealing))
+          mockIsNewActivity(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
 

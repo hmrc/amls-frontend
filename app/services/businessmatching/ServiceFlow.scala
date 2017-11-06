@@ -77,6 +77,9 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     } yield NextService(url, activity)
   }
 
+  def isNewActivity(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    businessMatchingService.getAdditionalBusinessActivities map {_.contains(activity)} getOrElse false
+
   def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = (for {
     updateService <- OptionT(cacheConnector.fetch[UpdateService](UpdateService.key))
     additionalActivities <- businessMatchingService.getAdditionalBusinessActivities

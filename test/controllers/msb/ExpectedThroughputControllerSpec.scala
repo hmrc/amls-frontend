@@ -24,32 +24,28 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import scala.concurrent.Future
 
 class ExpectedThroughputControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new ExpectedThroughputController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mock[ServiceFlow]
+      override val serviceFlow = mockServiceFlow
     }
 
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
-
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -82,6 +78,20 @@ class ExpectedThroughputControllerSpec extends GenericTestHelper with MockitoSug
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[value=01]").hasAttr("checked") must be(true)
+    }
+
+    "on get display the Throughput Expected In next 12Months page when approved and the service has just been added" in new Fixture {
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include(Messages("msb.throughput.title"))
     }
 
     "redirect to Page not found" when {

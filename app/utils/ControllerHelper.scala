@@ -105,8 +105,8 @@ object ControllerHelper {
   def allowedToEdit(activity: BusinessActivity)
                    (implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
     status <- statusService.getStatus
-    isInFlow <- serviceFlow.inNewServiceFlow(activity)
-  } yield (status, isInFlow) match {
+    isNewActivity <- serviceFlow.isNewActivity(activity)
+  } yield (status, isNewActivity) match {
     case (_, true) => true
     case (SubmissionReady | NotCompleted | SubmissionReadyForReview, false) => true
     case _ => false
