@@ -46,7 +46,7 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
   def get(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
       val result = getActivity(index) map { activity =>
-        Ok(current_trading_premises(EmptyForm, activity))
+        Ok(current_trading_premises(EmptyForm, activity, index))
       }
 
       result getOrElse failure()
@@ -55,7 +55,7 @@ class CurrentTradingPremisesController @Inject()(val authConnector: AuthConnecto
   def post(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[AreSubmittedActivitiesAtTradingPremises](request.body) match {
-          case f: InvalidForm => getActivity(index) map { a => BadRequest(current_trading_premises(f, a)) } getOrElse failure()
+          case f: InvalidForm => getActivity(index) map { a => BadRequest(current_trading_premises(f, a, index)) } getOrElse failure()
           case ValidForm(_, data) =>
             (for {
               act <- activities

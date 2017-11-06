@@ -44,7 +44,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   def get(index: Int = 0) = Authorised.async {
     implicit authContext => implicit request =>
       formData map { case (tp, _, act) =>
-        Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act)))
+        Ok(which_current_trading_premises(EmptyForm, tp, BusinessActivities.getValue(act.toSeq(index))))
       } getOrElse failure
   }
 
@@ -54,15 +54,17 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
         case f: InvalidForm => {
           for {
             (tradingPremises, _, act) <- formData
-          } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act)))
+          } yield BadRequest(which_current_trading_premises(f, tradingPremises, BusinessActivities.getValue(act.toSeq(index))))
         } getOrElse failure
 
         case ValidForm(_, data) => {
           for {
             (tp, _, act) <- formData
-            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act)))
+            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act.toSeq(index))))
             fitAndProperRequired <- businessMatchingService.fitAndProperRequired
-          } yield if(fitAndProperRequired) {
+          } yield if(activitiesToIterate(index, act)) {
+            Redirect(CurrentTradingPremisesController.get(index + 1))
+          } else if(fitAndProperRequired) {
             Redirect(FitAndProperController.get())
           } else {
             Redirect(NewServiceInformationController.get())
@@ -82,10 +84,13 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def updateActivities(tp: TradingPremises, activities: Set[BusinessActivity]) =
     tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities, tp.whatDoesYourBusinessDoAtThisAddress.fold(none[DateOfChange])(_.dateOfChange)))
 
+  private def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) =
+    activities.size > index + 1
+
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises
     activities <- businessMatchingService.getSubmittedBusinessActivities
-    } yield (tp, activities, activities.head)
+    } yield (tp, activities, activities)
 
   private def getTradingPremises(implicit hc: HeaderCarrier, ac: AuthContext) =
     OptionT.liftF(getData[TradingPremises].map{ tradingpremises =>
