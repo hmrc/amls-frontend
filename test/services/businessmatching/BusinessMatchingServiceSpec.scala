@@ -588,5 +588,21 @@ with GenericTestHelper
         }
       }
     }
+    "mark the trading premises as incomplete if there are no activities left" in new Fixture {
+
+      val models = Seq(
+        tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
+        tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
+      )
+
+      val result = service.patchTradingPremises(Seq(1), models, AccountancyServices, true)
+
+      result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
+      result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+
+      result.head.isComplete mustBe false
+      result.head.hasChanged mustBe true
+
+    }
   }
 }

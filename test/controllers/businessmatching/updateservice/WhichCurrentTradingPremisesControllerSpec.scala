@@ -190,35 +190,6 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         }
       }
 
-      "mark the trading premises as incomplete if there are no activities left" in new Fixture {
-        val models = Seq(
-          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
-        )
-
-        mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
-
-        when {
-          bmService.fitAndProperRequired(any(),any(),any())
-        } thenReturn OptionT.some[Future, Boolean](false)
-
-        val form = "tradingPremises[]" -> "1"
-        val result = controller.post()(request.withFormUrlEncodedBody(form))
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
-
-        val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())
-
-        tpCaptor.getValue.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
-        tpCaptor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-
-        tpCaptor.getValue.head.isComplete mustBe false
-        tpCaptor.getValue.head.hasChanged mustBe true
-
-      }
-
     }
   }
 }
