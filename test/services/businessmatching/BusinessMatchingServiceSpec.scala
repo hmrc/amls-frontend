@@ -18,19 +18,22 @@ package services.businessmatching
 
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
-import models.ViewResponse
+import generators.tradingpremises.TradingPremisesGenerator
+import models.{DateOfChange, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
+import utils.{DependencyMocks, FutureAssertions, GenericTestHelper, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,6 +42,7 @@ with GenericTestHelper
   with MockitoSugar
   with ScalaFutures
   with FutureAssertions
+  with TradingPremisesGenerator
   with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
@@ -513,6 +517,92 @@ with GenericTestHelper
           result must be(Some(false))
         }
       }
+    }
+  }
+
+  "activitiesToIterate" must {
+    "return true" when {
+      "index is less than the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(0, Set(AccountancyServices, HighValueDealing))
+
+        result must be(true)
+      }
+    }
+    "return false" when {
+      "index is greater than the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(3, Set(AccountancyServices, HighValueDealing))
+
+        result must be(false)
+      }
+      "index is equal to the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(2, Set(AccountancyServices, HighValueDealing))
+
+        result must be(false)
+      }
+    }
+  }
+
+  "patchTradingPremises" must {
+    "update activity of the trading premises identified by index in request data" when {
+      "there is a single index" which {
+        "will leave activity given remove equals false" in new Fixture {
+
+          val models = Seq(
+            tradingPremisesGen.sample.get.copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(new LocalDate(2001,10,31)))))
+            ),
+            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get.copy(status = Some(StatusConstants.Deleted)),
+            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
+            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
+            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
+          )
+
+          val result = service.patchTradingPremises(Seq(4), models, AccountancyServices, false)
+
+          result.head mustBe models.head
+          result(1) mustBe models(1)
+          result(2) mustBe models(2)
+          result(3) mustBe models(3)
+          result.lift(4).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices), None))
+
+        }
+      }
+      "there are multiple indices" which {
+        "will remove activity if existing in trading premises given remove equals true" in new Fixture {
+
+          val models = Seq(
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+          )
+
+          val result = service.patchTradingPremises(Seq(0,2), models, AccountancyServices, true)
+
+          result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+          result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
+          result.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
+
+          result.head.isComplete mustBe true
+          result.head.hasChanged mustBe true
+
+        }
+      }
+    }
+    "mark the trading premises as incomplete if there are no activities left" in new Fixture {
+
+      val models = Seq(
+        tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
+        tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
+      )
+
+      val result = service.patchTradingPremises(Seq(1), models, AccountancyServices, true)
+
+      result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
+      result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+
+      result.head.isComplete mustBe false
+      result.head.hasChanged mustBe true
+
     }
   }
 }

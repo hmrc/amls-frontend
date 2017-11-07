@@ -24,22 +24,25 @@ import connectors.DataCacheConnector
 import models.ViewResponse
 import models.businessmatching._
 import models.status.{NotCompleted, SubmissionReady}
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.RepeatingSection
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.{ExecutionContext, Future}
+
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
-                                         cache: DataCacheConnector
+                                         dataCacheConnector: DataCacheConnector
                                        ) {
 
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
-    lazy val originalModel = OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-    lazy val variationModel = OptionT(cache.fetch[BusinessMatching](BusinessMatching.variationKey))
+    lazy val originalModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+    lazy val variationModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.variationKey))
 
     OptionT.liftF(statusService.getStatus) flatMap {
       case NotCompleted | SubmissionReady => originalModel
@@ -53,15 +56,15 @@ class BusinessMatchingService @Inject()(
                  (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
 
     OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, model))
-      case _ => OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, model))
+      case NotCompleted | SubmissionReady => OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
+      case _ => OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.variationKey, model))
     }
 
   }
 
   private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     for {
-      viewResponse <- OptionT(cache.fetch[ViewResponse](ViewResponse.key))
+      viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](ViewResponse.key))
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
@@ -85,25 +88,44 @@ class BusinessMatchingService @Inject()(
 
   def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
     OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => OptionT(cache.fetchAll)
+      case NotCompleted | SubmissionReady => OptionT(dataCacheConnector.fetchAll)
       case _ =>
         for {
-          cacheMap <- OptionT(cache.fetchAll)
+          cacheMap <- OptionT(dataCacheConnector.fetchAll)
           primaryModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey)) if variationModel != BusinessMatching()
-          _ <- OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.key, updateBusinessMatching(primaryModel, variationModel)))
+          _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, updateBusinessMatching(primaryModel, variationModel)))
           result <- clearVariation
         } yield result
     }
   }
 
   def clearVariation(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
-    OptionT.liftF(cache.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
+    OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
 
   private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
     variationModel.activities match {
       case Some(BusinessActivities(existing, Some(additional))) => variationModel.activities(BusinessActivities(existing ++ additional, None))
       case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
+    }
+
+  def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
+
+  def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity, remove: Boolean): Seq[TradingPremises] =
+    tradingPremises.zipWithIndex map { case (tp, index) =>
+      tp.whatDoesYourBusinessDoAtThisAddress(
+        tradingPremises(index).whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
+          wdybd.copy({
+            if(indices contains index){
+              wdybd.activities + activity
+            } else if (remove){
+              wdybd.activities - activity
+            } else {
+              wdybd.activities
+            }
+          })
+        }
+      ).copy(hasAccepted = true)
     }
 
 }
