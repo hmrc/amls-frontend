@@ -109,29 +109,23 @@ class BusinessMatchingService @Inject()(
       case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
     }
 
-
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
 
-  def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity): Seq[TradingPremises] = {
-
-    val index = indices.head
-
-    val patched = tradingPremises.patch(index, Seq({
-      tradingPremises(index).whatDoesYourBusinessDoAtThisAddress(
+  def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity, remove: Boolean): Seq[TradingPremises] =
+    tradingPremises.zipWithIndex map { case (tp, index) =>
+      tp.whatDoesYourBusinessDoAtThisAddress(
         tradingPremises(index).whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
-          wdybd.copy(
-            wdybd.activities + activity
-          )
+          wdybd.copy({
+            if(indices contains index){
+              wdybd.activities + activity
+            } else if (remove){
+              wdybd.activities - activity
+            } else {
+              wdybd.activities
+            }
+          })
         }
       ).copy(hasAccepted = true)
-    }), 1)
-
-    try {
-      patchTradingPremises(indices.tail, patched, activity)
-    } catch {
-      case _: NoSuchElementException => patched
     }
-
-  }
 
 }

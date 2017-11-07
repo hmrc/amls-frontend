@@ -24,10 +24,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.DateOfChange
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -80,11 +79,8 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def updateTradingPremises(data: TradingPremisesForm, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity)
+      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity, true)
     }
-
-  private def updateActivities(tp: TradingPremises, activities: Set[BusinessActivity]) =
-    tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities, tp.whatDoesYourBusinessDoAtThisAddress.fold(none[DateOfChange])(_.dateOfChange)))
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises
