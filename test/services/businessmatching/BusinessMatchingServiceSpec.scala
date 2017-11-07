@@ -515,4 +515,26 @@ with GenericTestHelper
       }
     }
   }
+
+  "activitiesToIterate" must {
+    "return true" when {
+      "index is less than the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(0, Set(AccountancyServices, HighValueDealing))
+
+        result must be(true)
+      }
+    }
+    "return false" when {
+      "index is greater than the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(3, Set(AccountancyServices, HighValueDealing))
+
+        result must be(false)
+      }
+      "index is equal to the amount of activities" in new Fixture {
+        val result = service.activitiesToIterate(2, Set(AccountancyServices, HighValueDealing))
+
+        result must be(false)
+      }
+    }
+  }
 }
