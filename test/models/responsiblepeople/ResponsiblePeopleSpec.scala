@@ -1164,6 +1164,15 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "middle",
       "lastName" -> "last"
     ),
+    "legalName" -> Json.obj(
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "LegalNameChangeDate" -> "1990-02-24"
+    ,
+    "KnownBy" -> "KnownByName"
+    ,
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "false",
       "countryOfBirth" -> "GB",
@@ -1224,14 +1233,14 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "training" -> true,
       "information" -> "test"
     ),
-    "soleProprietorOfAnotherBusiness" -> Json.obj(
-      "soleProprietorOfAnotherBusiness" -> true
-    ),
     "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "hasAccepted" -> false,
     "lineId" -> 1,
-    "status" -> "Unchanged"
+    "status" -> "Unchanged",
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    )
   )
 
   val completeJsonPresentNonUkResidentNoPassport = Json.obj(
@@ -1240,6 +1249,15 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "middle",
       "lastName" -> "last"
     ),
+    "legalName" -> Json.obj(
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "LegalNameChangeDate" -> "1990-02-24"
+    ,
+    "KnownBy" -> "KnownByName"
+    ,
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "false",
       "countryOfBirth" -> "GB",

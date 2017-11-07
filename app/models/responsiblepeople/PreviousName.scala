@@ -35,9 +35,9 @@ case class PreviousName(
   def formattedPreviousName(that: PersonName): String = that match {
       case PersonName(first, middle, last) =>
         Seq(
-          firstName,
+          firstName orElse Some(first),
           middleName orElse middle,
-          lastName
+          lastName orElse Some(last)
         ).flatten[String].mkString(" ")
   }
 
@@ -51,11 +51,22 @@ object PreviousName {
 
       import jto.validation.forms.Rules._
 
-      (
+      type I = (Option[String], Option[String], Option[String])
+
+      val iR = Rule[I, I] {
+        case names @ (first, middle, last) if names.productIterator.collectFirst {
+          case Some(_) => true
+        }.isDefined =>
+          Valid(names)
+        case _ =>
+          Invalid(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
+      }
+
+      ((
         (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name"))) ~
         (__ \ "middleName").read(optionR(genericNameRule())) ~
         (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
-      )(PreviousName.apply _)
+      ).tupled andThen iR).map(t => PreviousName(t._1, t._2, t._3))
     }
 
   implicit val formW: Write[PreviousName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>

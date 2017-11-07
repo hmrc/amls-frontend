@@ -29,11 +29,15 @@ class PreviousNameSpec extends PlaySpec {
     "have the formattedPreviousName function correctly return the value" in {
 
       // scalastyle:off magic.number
-      val first = PreviousName(Some("oldfirst"), Some("oldmiddle"), Some("oldlast"))
+      val first = PreviousName(Some("oldfirst"), None, None)
+      val middle = PreviousName(None, Some("oldmiddle"), None)
+      val last = PreviousName(None, None, Some("oldlast"))
 
       val personName = PersonName("First", Some("Middle"), "Last")
 
       first.formattedPreviousName(personName) must be ("oldfirst Middle Last")
+      middle.formattedPreviousName(personName) must be ("First oldmiddle Last")
+      last.formattedPreviousName(personName) must be ("First Middle oldlast")
 
     }
 
@@ -118,10 +122,7 @@ class PreviousNameSpec extends PlaySpec {
       val data: UrlFormEncoded = Map(
         "firstName" -> Seq(""),
         "middleName" -> Seq(""),
-        "lastName" -> Seq(""),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "lastName" -> Seq("")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -129,44 +130,6 @@ class PreviousNameSpec extends PlaySpec {
           Invalid(Seq(
             Path -> Seq(ValidationError("error.rp.previous.invalid"))
           ))
-        )
-    }
-
-    "fail to validate with missing date" in {
-
-      val data: UrlFormEncoded = Map(
-        "firstName" -> Seq(""),
-        "middleName" -> Seq(""),
-        "lastName" -> Seq("oldLast"),
-        "date.day" -> Seq(""),
-        "date.month" -> Seq(""),
-        "date.year" -> Seq("")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Invalid(Seq(
-            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-          ))
-        )
-    }
-
-    "fail to validate with both" in {
-
-      val data: UrlFormEncoded = Map(
-        "firstName" -> Seq(""),
-        "middleName" -> Seq(""),
-        "lastName" -> Seq(""),
-        "date.day" -> Seq(""),
-        "date.month" -> Seq(""),
-        "date.year" -> Seq("")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Invalid(Seq(
-            (Path) -> Seq(ValidationError("error.rp.previous.invalid")),
-            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
         )
     }
 

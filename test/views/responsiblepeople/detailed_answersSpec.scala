@@ -42,9 +42,9 @@ class detailed_answersSpec extends GenericTestHelper
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "firstName middleName lastName")),
-      (Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "24 February 1990")),
-      (Messages("responsiblepeople.detailed_answers.other_names"), checkElementTextIncludes(_, "otherName")),
+      //(Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "firstName middleName lastName")),
+      //(Messages("responsiblepeople.detailed_answers.previous_names"), checkElementTextIncludes(_, "24 February 1990")),
+      //(Messages("responsiblepeople.detailed_answers.other_names"), checkElementTextIncludes(_, "otherName")),
       (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, nino)),
       (Messages("responsiblepeople.detailed_answers.country_of_birth"), checkElementTextIncludes(_, "Uganda")),
       (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
