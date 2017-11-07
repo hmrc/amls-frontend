@@ -93,8 +93,6 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(url)
-
-//        verify(controller.dataCacheConnector).save[UpdateService](eqTo(UpdateService.key), eqTo(UpdateService(inNewServiceFlow = true)))(any(), any(), any())
       }
     }
   }
