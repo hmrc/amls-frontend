@@ -164,8 +164,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       } thenReturn Future.successful(result)
     }
 
-    "return a cachmap of the saved alternative correspondence addres" in {
-
+    "return a cachmap of the saved alternative correspondence address" in {
       when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
@@ -175,7 +174,29 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
       setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo")) mustEqual cacheMap
+      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", Some(cacheMap))) mustEqual cacheMap
+    }
+
+    "only call API 5 data" when {
+      "the cache doesn't contain a ViewResponse entry" in {
+        val cache = mock[CacheMap]
+
+        reset(TestLandingService.cacheConnector)
+        reset(TestLandingService.desConnector)
+
+        when {
+          cache.getEntry[ViewResponse](eqTo(ViewResponse.key))(any())
+        } thenReturn Some(viewResponse)
+
+        when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+
+        setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+
+        await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", Some(cache)))
+
+        verify(TestLandingService.desConnector, never()).view(any())(any(), any(), any(), any())
+      }
     }
 
   }

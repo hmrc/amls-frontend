@@ -16,6 +16,8 @@
 
 package services
 
+import cats.data.OptionT
+import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
@@ -41,15 +43,15 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 trait LandingService {
 
-  private[services] def cacheConnector: DataCacheConnector
-  private[services] def keyStore: KeystoreConnector
-  private[services] def desConnector: AmlsConnector
-  private[services] def statusService: StatusService
-  private[services] def businessMatchingConnector: BusinessMatchingConnector
+  private[services] val cacheConnector: DataCacheConnector
+  private[services] val keyStore: KeystoreConnector
+  private[services] val desConnector: AmlsConnector
+  private[services] val statusService: StatusService
+  private[services] val businessMatchingConnector: BusinessMatchingConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -127,18 +129,27 @@ trait LandingService {
 
   }
 
-  def setAlCorrespondenceAddressWithRegNo (amlsRefNumber: String)
+  def setAlCorrespondenceAddressWithRegNo (amlsRefNumber: String, cacheMap: Option[CacheMap])
                                  (implicit
                                   authContext: AuthContext,
                                   hc: HeaderCarrier,
                                   ec: ExecutionContext
                                  ): Future[CacheMap] = {
-    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-      cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
-        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true))
-        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
-      })
-    }
+
+    val cachedViewResponse = for {
+      cache <- OptionT.fromOption[Future](cacheMap)
+      viewResponse <- OptionT.fromOption[Future](cache.getEntry[ViewResponse](ViewResponse.key))
+    } yield viewResponse
+
+    lazy val etmpViewResponse = OptionT.liftF(desConnector.view(amlsRefNumber))
+
+    (for {
+      viewResponse <- cachedViewResponse orElse etmpViewResponse
+      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
+        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
+      }))
+    } yield cacheMap) getOrElse(throw new Exception("Unable to update alt correspondence address"))
   }
 
   def setAltCorrespondenceAddress (aboutTheBusiness: AboutTheBusiness)(implicit
@@ -147,8 +158,8 @@ trait LandingService {
                                                                        ec: ExecutionContext
   ): Future[CacheMap] = {
     cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
-      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true))
-      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false))
+      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     })
   }
 
@@ -221,10 +232,10 @@ trait LandingService {
 
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
-  override private[services] def cacheConnector = DataCacheConnector
-  override private[services] def keyStore = KeystoreConnector
-  override private[services] def desConnector = AmlsConnector
-  override private[services] def statusService = StatusService
-  override private[services] def businessMatchingConnector = BusinessMatchingConnector
+  override private[services] lazy val cacheConnector = DataCacheConnector
+  override private[services] lazy val keyStore = KeystoreConnector
+  override private[services] lazy val desConnector = AmlsConnector
+  override private[services] lazy val statusService = StatusService
+  override private[services] lazy val businessMatchingConnector = BusinessMatchingConnector
   // $COVERAGE-ON$
 }

@@ -159,7 +159,7 @@ trait LandingController extends BaseController {
   private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
                                                    (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber) map {
+    landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber, cacheMap) map {
       _ => Redirect(controllers.routes.StatusController.get())
     }
   }

@@ -485,7 +485,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
               } thenReturn None
 
               when {
-                controller.landingService.setAlCorrespondenceAddressWithRegNo(any())(any(),any(),any())
+                controller.landingService.setAlCorrespondenceAddressWithRegNo(any(), any())(any(),any(),any())
               } thenReturn Future.successful(testCacheMap)
 
               setUpMocksForAnEnrolmentExists(controller)
