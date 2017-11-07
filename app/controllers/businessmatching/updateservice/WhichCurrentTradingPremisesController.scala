@@ -22,6 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
@@ -33,9 +34,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_current_trading_premises
-import routes._
 
-import scala.collection.immutable.SortedSet
+import scala.concurrent.Future
 
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
@@ -60,34 +60,31 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
         } getOrElse failure
 
         case ValidForm(_, data) => {
-          for {
-            (tp, _, act) <- formData
-            _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, fixActivities(tp.map(_._1), data.index, act.toList(index))))
+          (for {
+            activities <- businessMatchingService.getSubmittedBusinessActivities
             fitAndProperRequired <- businessMatchingService.fitAndProperRequired
-          } yield if(activitiesToIterate(index, act)) {
-            Redirect(CurrentTradingPremisesController.get(index + 1))
-          } else if(fitAndProperRequired) {
-            Redirect(FitAndProperController.get())
-          } else {
-            Redirect(NewServiceInformationController.get())
-          }
-        } getOrElse failure
+            _ <- OptionT.liftF(updateTradingPremises(data, activities.toList(index)))
+          } yield {
+            if (businessMatchingService.activitiesToIterate(index, activities)) {
+              Redirect(CurrentTradingPremisesController.get(index + 1))
+            } else if(fitAndProperRequired) {
+              Redirect(FitAndProperController.get())
+            } else {
+              Redirect(NewServiceInformationController.get())
+            }
+          }) getOrElse failure
+        }
       }
   }
 
-  private def fixActivities(tp: Seq[TradingPremises], selected: Set[Int], activity: BusinessActivity): Seq[TradingPremises] = tp.zipWithIndex.collect {
-    case (m, i) if !selected.contains(i) && m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
-      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities.filter(_.equals(activity)))
-    case (m, _) if m.whatDoesYourBusinessDoAtThisAddress.isDefined =>
-      updateActivities(m, m.whatDoesYourBusinessDoAtThisAddress.get.activities + activity)
-    case (m, _) => m
-  }
+  private def updateTradingPremises(data: TradingPremisesForm, activity: BusinessActivity)
+                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
+      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity)
+    }
 
   private def updateActivities(tp: TradingPremises, activities: Set[BusinessActivity]) =
     tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities, tp.whatDoesYourBusinessDoAtThisAddress.fold(none[DateOfChange])(_.dateOfChange)))
-
-  private def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) =
-    activities.size > index + 1
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     tp <- getTradingPremises

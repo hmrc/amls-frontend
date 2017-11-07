@@ -22,21 +22,21 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.updateservice.{UpdateService, TradingPremisesActivities => TradingPremises$}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
 import models.status.{NotCompleted, SubmissionReady}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.TradingPremises
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import routes._
 
 @Singleton
 class WhichTradingPremisesController @Inject()(
@@ -82,7 +82,7 @@ class WhichTradingPremisesController @Inject()(
                 Form2[TradingPremises$](request.body) match {
                   case ValidForm(_, data) =>
                     updateTradingPremises(data, activity) map { _ =>
-                      if (activitiesToIterate(index, additionalActivities)) {
+                      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
                         Redirect(TradingPremisesController.get(index + 1))
                       } else {
                         Redirect(CurrentTradingPremisesController.get(0))
@@ -106,39 +106,11 @@ class WhichTradingPremisesController @Inject()(
       }
   }
 
-  private def activitiesToIterate(index: Int, additionalActivities: Set[BusinessActivity]) =
-    additionalActivities.size > index + 1
-
   private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
-                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
-
+                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      patchTradingPremises(data.index.toSeq, tradingPremises, activity)
+      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity)
     }
-
-  }
-
-  private def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity): Seq[TradingPremises] = {
-
-    val index = indices.head
-
-    val patched = tradingPremises.patch(index, Seq({
-      tradingPremises(index).whatDoesYourBusinessDoAtThisAddress(
-        tradingPremises(index).whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
-          wdybd.copy(
-            wdybd.activities + activity
-          )
-        }
-      ).copy(hasAccepted = true)
-    }), 1)
-
-    try {
-      patchTradingPremises(indices.tail, patched, activity)
-    } catch {
-      case _: NoSuchElementException => patched
-    }
-
-  }
 
   private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
     getData[TradingPremises].map { tradingpremises =>
