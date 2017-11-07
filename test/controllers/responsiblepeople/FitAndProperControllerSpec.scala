@@ -43,6 +43,8 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val personName = PersonName("first name", None, "last name")
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -56,7 +58,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = testFitAndProper)))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName), hasAlreadyPassedFitAndProper = testFitAndProper)))))
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
@@ -70,7 +72,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = Some(false))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName), hasAlreadyPassedFitAndProper = Some(false))))))
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
@@ -84,7 +86,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = None)))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName), hasAlreadyPassedFitAndProper = None)))))
           val result = controller.get(1)(request)
           status(result) must be(OK)
 

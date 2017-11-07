@@ -59,8 +59,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
       "business is a partnership and there are 2 partners and 1 nominated officer" in {
 
         val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None,None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -89,8 +89,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
 
       "business is not a prtnership and at least one of the person in responsible people is the nominated officer" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -120,8 +120,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
     "return register partners url" when {
       "business is a partnership and there are less than 2 partners" in {
         val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -151,8 +151,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
     "return who is registering url" when {
       "status is amendment and there is a nominated officer" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -180,8 +180,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
 
       "status is variation and there is a nominated officer" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -209,8 +209,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
 
       "status is renewal and there is a nominated officer" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -240,8 +240,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
     "return Who is the business’s nominated officer? url" when {
       "there is no selected nominated officer" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -269,8 +269,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
 
       "there is no selected nominated officer and status is amendment" in {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(

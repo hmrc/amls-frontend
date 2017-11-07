@@ -70,8 +70,8 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     }
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-    val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-    val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+    val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None,None, None, None, None, None, None, None, Some(positions))
+    val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
     val responsiblePeople = Seq(rp1, rp2)
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))

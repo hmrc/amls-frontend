@@ -29,15 +29,11 @@ class PreviousNameSpec extends PlaySpec {
     "have the formattedPreviousName function correctly return the value" in {
 
       // scalastyle:off magic.number
-      val first = PreviousName(Some("oldfirst"), None, None, Some(new LocalDate(1990, 2, 24)))
-      val middle = PreviousName(None, Some("oldmiddle"), None, Some(new LocalDate(1990, 2, 24)))
-      val last = PreviousName(None, None, Some("oldlast"), Some(new LocalDate(1990, 2, 24)))
+      val first = PreviousName(Some("oldfirst"), Some("oldmiddle"), Some("oldlast"))
 
-      val personName = PersonName("First", Some("Middle"), "Last", None, None)
+      val personName = PersonName("First", Some("Middle"), "Last")
 
       first.formattedPreviousName(personName) must be ("oldfirst Middle Last")
-      middle.formattedPreviousName(personName) must be ("First oldmiddle Last")
-      last.formattedPreviousName(personName) must be ("First Middle oldlast")
 
     }
 
@@ -46,10 +42,7 @@ class PreviousNameSpec extends PlaySpec {
       val data: UrlFormEncoded = Map(
         "firstName" -> Seq("oldFirst"),
         "middleName" -> Seq("oldMiddle"),
-        "lastName" -> Seq("oldLast"),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "lastName" -> Seq("oldLast")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -57,22 +50,19 @@ class PreviousNameSpec extends PlaySpec {
           Valid(PreviousName(
             firstName = Some("oldFirst"),
             middleName = Some("oldMiddle"),
-            lastName = Some("oldLast"),
-            // scalastyle:off magic.number
-            date = Some(new LocalDate(1990, 2, 24))
+            lastName = Some("oldLast")
           )
         ))
     }
 
 
 
-    "successfully validate with just firstName" in {
+    "successfully validate with firstName and lastname" in {
 
       val data: UrlFormEncoded = Map(
         "firstName" -> Seq("oldFirst"),
         "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "date.month" -> Seq("2")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -80,9 +70,7 @@ class PreviousNameSpec extends PlaySpec {
           Valid(PreviousName(
             firstName = Some("oldFirst"),
             middleName = None,
-            lastName = None,
-            // scalastyle:off magic.number
-            date = Some(new LocalDate(1990, 2, 24))
+            lastName = None
           )
         ))
     }
@@ -101,9 +89,7 @@ class PreviousNameSpec extends PlaySpec {
           Valid(PreviousName(
             firstName = None,
             middleName = Some("oldMiddle"),
-            lastName = None,
-            // scalastyle:off magic.number
-            date = Some(new LocalDate(1990, 2, 24))
+            lastName = None
           )
         ))
     }
@@ -122,9 +108,7 @@ class PreviousNameSpec extends PlaySpec {
           Valid(PreviousName(
             firstName = None,
             middleName = None,
-            lastName = Some("oldLast"),
-            // scalastyle:off magic.number
-            date = Some(new LocalDate(1990, 2, 24))
+            lastName = Some("oldLast")
           )
         ))
     }
@@ -191,18 +175,13 @@ class PreviousNameSpec extends PlaySpec {
       val data: UrlFormEncoded = Map(
         "firstName" -> Seq("oldFirst"),
         "middleName" -> Seq("oldMiddle"),
-        "lastName" -> Seq("oldLast"),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "lastName" -> Seq("oldLast")
       )
 
       val model = PreviousName(
         firstName = Some("oldFirst"),
         middleName = Some("oldMiddle"),
-        lastName = Some("oldLast"),
-        // scalastyle:off magic.number
-        date = Some(new LocalDate(1990, 2, 24))
+        lastName = Some("oldLast")
       )
 
       implicitly[Write[PreviousName, UrlFormEncoded]].writes(model) mustEqual data

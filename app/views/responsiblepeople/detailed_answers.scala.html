@@ -89,32 +89,7 @@
             }
         </h2>
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.previous_names"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
-            dataItem = person.personName
-        ) { pn =>
-                @pn.previousName match {
-                case None => {<p>@Messages("lbl.no")</p>}
-                case Some(name) => {
-                <ul class="list">
-                    <li>@name.formattedPreviousName(pn)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.previous_names.since"): @name.formattedDate</li>
-                </ul>
-                }
-            }
-        }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.other_names"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
-            dataItem = person.personName
-        ) { pn =>
-            <p>@pn.otherNames match {
-                case None => {@Messages("lbl.no")}
-                case Some(name) => {@name}
-            }</p>
-        }
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),

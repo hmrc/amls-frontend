@@ -50,7 +50,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
   "NationalityController" must {
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "load nationality page" in new Fixture {
 
@@ -89,7 +89,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
     "load nationality page when nationality is none" in new Fixture {
 
       val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
-      val responsiblePeople = ResponsiblePeople(personName, Some(pResidenceType))
+      val responsiblePeople = ResponsiblePeople(personName, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -109,11 +109,10 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
           personName,
-          Some(PersonResidenceType(
+          personResidenceType = Some(PersonResidenceType(
             NonUKResidence,
             Some(Country("United Kingdom", "GB")),
-            Some(Country("France", "FR")))),
-          None
+            Some(Country("France", "FR"))))
         )))))
 
       val result = controller.get(1)(request)
@@ -186,13 +185,13 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
       )
 
       val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
-      val responsiblePeople = ResponsiblePeople(None, Some(pResidenceType))
+      val responsiblePeople = ResponsiblePeople(None, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val prt = pResidenceType.copy(nationality = Some(Country("France", "FR")))
-      val responsiblePeople1 = ResponsiblePeople(None, Some(pResidenceType))
+      val responsiblePeople1 = ResponsiblePeople(None, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))

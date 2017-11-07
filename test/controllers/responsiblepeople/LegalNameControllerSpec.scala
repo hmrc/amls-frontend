@@ -23,6 +23,7 @@ import generators.ResponsiblePersonGenerator
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
 import models.responsiblepeople._
 import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
 import play.api.inject.bind
@@ -30,7 +31,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -44,15 +45,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val cache = mock[DataCacheConnector]
-
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[DataCacheConnector].to(cache))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     lazy val controller = injector.instanceOf[LegalNameController]
@@ -61,15 +60,42 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
   "The LegalNameController" when {
     "get is called" must {
-      "prepopulate the view with data" in new TestFixture {
+      "load the page" in new TestFixture {
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
 
         val result = controller.get(RecordId)(request)
 
-        //status(result) mustBe OK
+        status(result) must be(OK)
 
-        //val html = Jsoup.parse(contentAsString(result))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstName]").`val` must be("")
+        document.select("input[name=middleName]").`val` must be("")
+        document.select("input[name=lastName]").`val` must be("")
+      }
 
-        //html.select("input[type=radio][value=TestPerson]").hasAttr("checked") mustBe true
+      "prepopulate the view with data" in new TestFixture {
+
+        val addPerson = PreviousName(
+          firstName = Some("first"),
+          middleName = Some("middle"),
+          lastName = Some("last")
+        )
+
+        val responsiblePeople = ResponsiblePeople(legalName = Some(addPerson))
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+
+
+        val result = controller.get(RecordId)(request)
+
+        status(result) mustBe OK
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.select("input[name=firstName]").`val` must be("first")
+        document.select("input[name=middleName]").`val` must be("middle")
+        document.select("input[name=lastName]").`val` must be("last")
       }
 
     }

@@ -29,6 +29,11 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val people = Seq(
+      ResponsiblePeople(PersonName("Test", None, "Person1").some),
+      ResponsiblePeople(PersonName("Test", None, "Person2").some)
+    )
   }
 
   "select_business_nominated_officer view" must {
@@ -44,10 +49,7 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
 
     "have a list of responsible people" in new ViewFixture {
 
-      val people = Seq(
-        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
-      )
+
 
       def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, people)
 
@@ -65,11 +67,6 @@ class select_business_nominated_officerSpec extends GenericTestHelper with MustM
     }
 
     "prepopulate the selected nominated officer" in new ViewFixture {
-
-      val people = Seq(
-        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
-      )
 
       val f = Form2(BusinessNominatedOfficer("TestPerson1"))
 

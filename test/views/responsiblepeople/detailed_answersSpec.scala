@@ -338,16 +338,13 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val previousName = PreviousName(
     Some("firstName"),
     Some("middleName"),
-    Some("lastName"),
-    Some(new LocalDate(1990, 2, 24))
+    Some("lastName")
   )
 
   val personName = PersonName(
     "firstName",
     Some("middleName"),
-    "lastName",
-    Some(previousName),
-    Some("otherName")
+    "lastName"
   )
 
   val residenceType = PersonResidenceType(

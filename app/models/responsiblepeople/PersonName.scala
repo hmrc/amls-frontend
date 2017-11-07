@@ -27,9 +27,7 @@ import utils.MappingUtils.Implicits._
 case class PersonName(
                        firstName: String,
                        middleName: Option[String],
-                       lastName: String,
-                       previousName: Option[PreviousName] = None,
-                       otherNames: Option[String] = None
+                       lastName: String
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
@@ -44,68 +42,21 @@ object PersonName {
 
   implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 
-    val otherNamesLength = 140
-    val otherNamesType = notEmptyStrip andThen
-      notEmpty.withMessage("error.required.rp.otherNames") andThen
-      maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
-      basicPunctuationPattern()
-
     (
       (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~
         (__ \ "middleName").read(optionR(genericNameRule())) ~
-        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name")) ~
-        (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
-          case true =>
-            (__ \ "previous").read[PreviousName] map Some.apply
-          case false =>
-            Rule(_ => Valid(None))
-        } ~
-        (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
-          case true =>
-            (__ \ "otherNames").read(otherNamesType) map Some.apply
-          case false =>
-            Rule(_ => Valid(None))
-        }
+        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name"))
       )(PersonName.apply _)
   }
 
   implicit val formWrite = Write[PersonName, UrlFormEncoded] {
     model =>
 
-      val name = Map(
+      Map(
         "firstName" -> Seq(model.firstName),
         "middleName" -> Seq(model.middleName getOrElse ""),
         "lastName" -> Seq(model.lastName)
       )
-
-      val previousName = model.previousName match {
-        case Some(previous) =>
-          Map(
-            "hasPreviousName" -> Seq("true"),
-            "previous.firstName" -> Seq(previous.firstName getOrElse ""),
-            "previous.middleName" -> Seq(previous.middleName getOrElse ""),
-            "previous.lastName" -> Seq(previous.lastName getOrElse "")
-          ) ++ (
-            localDateWrite.writes(previous.date.get) map {
-              case (path, value) =>
-                s"previous.date.$path" -> value
-            }
-            )
-        case None =>
-          Map("hasPreviousName" -> Seq("false"))
-      }
-
-      val otherNames = model.otherNames match {
-        case Some(otherNames) =>
-          Map(
-            "hasOtherNames" -> Seq("true"),
-            "otherNames" -> Seq(otherNames)
-          )
-        case None =>
-          Map("hasOtherNames" -> Seq("false"))
-      }
-
-      name ++ previousName ++ otherNames
   }
 
   implicit val format = Json.format[PersonName]

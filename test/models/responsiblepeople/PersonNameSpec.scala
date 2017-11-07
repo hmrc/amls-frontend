@@ -32,32 +32,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         val data = Map(
           "firstName" -> Seq("first"),
           "middleName" -> Seq("middle"),
-          "lastName" -> Seq("last"),
-          "hasPreviousName" -> Seq("true"),
-          "previous.firstName" -> Seq("oldFirst"),
-          "previous.middleName" -> Seq("oldMiddle"),
-          "previous.lastName" -> Seq("oldLast"),
-          "previous.date.year" -> Seq("1990"),
-          "previous.date.month" -> Seq("02"),
-          "previous.date.day" -> Seq("24"),
-          "hasOtherNames" -> Seq("true"),
-          "otherNames" -> Seq("Doc")
+          "lastName" -> Seq("last")
         )
 
         val validPerson = PersonName(
           firstName = "first",
           middleName = Some("middle"),
-          lastName = "last",
-          previousName = Some(
-            PreviousName(
-              firstName = Some("oldFirst"),
-              middleName = Some("oldMiddle"),
-              lastName = Some("oldLast"),
-              // scalastyle:off magic.number
-              date = Some(new LocalDate(1990, 2, 24))
-            )
-          ),
-          otherNames = Some("Doc")
+          lastName = "last"
         )
 
         PersonName.formRule.validate(data) must equal(Valid(validPerson))
@@ -67,17 +48,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "firstName" -> Seq("first"),
-          "lastName" -> Seq("last"),
-          "hasPreviousName" -> Seq("false"),
-          "hasOtherNames" -> Seq("false")
+          "lastName" -> Seq("last")
         )
 
         val validPerson = PersonName(
           firstName = "first",
           middleName = None,
-          lastName = "last",
-          previousName = None,
-          otherNames = None
+          lastName = "last"
         )
 
         PersonName.formRule.validate(data) must equal(Valid(validPerson))
@@ -209,8 +186,8 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
   "fullName" must {
     "return a correctly formatted name" in {
-      PersonName("first", Some("middle"), "last", None, None).fullName must be("first middle last")
-      PersonName("first", None, "last", None, None).fullName must be("first last")
+      PersonName("first", Some("middle"), "last").fullName must be("first middle last")
+      PersonName("first", None, "last").fullName must be("first last")
     }
   }
 }

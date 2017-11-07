@@ -27,18 +27,17 @@ import cats.data.Validated.{Invalid, Valid}
 case class PreviousName(
                        firstName: Option[String],
                        middleName: Option[String],
-                       lastName: Option[String],
-                       date: Option[LocalDate] = None
+                       lastName: Option[String]
                        ) {
 
-  val formattedDate = date.map(v => DateHelper.formatDate(v))
+  //val formattedDate = date.map(v => DateHelper.formatDate(v))
 
   def formattedPreviousName(that: PersonName): String = that match {
-      case PersonName(first, middle, last, _, _) =>
+      case PersonName(first, middle, last) =>
         Seq(
-          firstName orElse Some(first),
+          firstName,
           middleName orElse middle,
-          lastName orElse Some(last)
+          lastName
         ).flatten[String].mkString(" ")
   }
 
@@ -52,28 +51,11 @@ object PreviousName {
 
       import jto.validation.forms.Rules._
 
-      type I = (Option[String], Option[String], Option[String])
-
-      val iR = Rule[I, I] {
-        case names @ (first, middle, last) if names.productIterator.collectFirst {
-          case Some(_) => true
-        }.isDefined =>
-          Valid(names)
-        case _ =>
-          Invalid(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
-      }
-
-      // Defining this here because it helps out the compiler with typechecking
-      val builder: (I, LocalDate) => PreviousName = {
-        case ((first, middle, last), date) =>
-          PreviousName(first, middle, last, Some(date))
-      }
-
-      (((
+      (
         (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name"))) ~
         (__ \ "middleName").read(optionR(genericNameRule())) ~
         (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
-      ).tupled andThen iR) ~ (__ \ "date").read(localDateFutureRule))(builder)
+      )(PreviousName.apply _)
     }
 
   implicit val formW: Write[PreviousName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -84,8 +66,7 @@ object PreviousName {
       (
         (__ \ "firstName").write[Option[String]] ~
         (__ \ "middleName").write[Option[String]] ~
-        (__ \ "lastName").write[Option[String]] ~
-        (__ \ "date").write(optionW(localDateWrite))
+        (__ \ "lastName").write[Option[String]]
       )(unlift(PreviousName.unapply))
     }
 

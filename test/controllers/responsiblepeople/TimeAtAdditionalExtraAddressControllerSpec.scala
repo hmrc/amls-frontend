@@ -59,7 +59,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
 
   "TimeAtAdditionalExtraAddressController" when {
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
       "display status 200" when {
@@ -83,7 +83,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends GenericTestHelper with 
 
         "with existing data" in new Fixture {
 
-          val personName = Some(PersonName("firstname", None, "lastname", None, None))
+          val personName = Some(PersonName("firstname", None, "lastname"))
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))

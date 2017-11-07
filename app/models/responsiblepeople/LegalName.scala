@@ -45,14 +45,17 @@ object LegalName {
     }
 
   implicit val formWrite = Write[LegalName, UrlFormEncoded] {
-        case a: LegalName =>
-          Map(
-            "hasPreviousName" -> Seq("true"),
-            "firstName" -> Seq(a.firstName),
-            "middleName" -> Seq(a.middleName getOrElse ""),
-            "lastName" -> Seq(a.lastName)
-          )
-        case _ =>
-          Map("hasPreviousName" -> Seq("false"))
+    model =>
+        model.firstName match {
+          case previous =>
+            Map(
+              "hasPreviousName" -> Seq("true"),
+              "firstName" -> Seq(model.firstName),
+              "middleName" -> Seq(model.middleName getOrElse ""),
+              "lastName" -> Seq(model.lastName)
+            )
+          case _ =>
+            Map("hasPreviousName" -> Seq("false"))
+        }
       }
 }

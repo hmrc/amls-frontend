@@ -68,17 +68,6 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         document.select("input[name=firstName]").`val` must be("")
         document.select("input[name=middleName]").`val` must be("")
         document.select("input[name=lastName]").`val` must be("")
-        document.getElementById("hasPreviousName-true").hasAttr("checked") must be(false)
-        document.getElementById("hasPreviousName-false").hasAttr("checked") must be(false)
-        document.select("input[name=previous.firstName]").`val` must be("")
-        document.select("input[name=previous.middleName]").`val` must be("")
-        document.select("input[name=previous.lastName]").`val` must be("")
-        document.select("input[name=previous.date.day]").`val` must be("")
-        document.select("input[name=previous.date.month]").`val` must be("")
-        document.select("input[name=previous.date.year]").`val` must be("")
-        document.getElementById("hasOtherNames-true").hasAttr("checked") must be(false)
-        document.getElementById("hasOtherNames-false").hasAttr("checked") must be(false)
-        document.select("input[name=otherNames]").`val` must be("")
       }
 
       "display the persons page with fields populated" in new Fixture {
@@ -86,17 +75,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         val addPerson = PersonName(
           firstName = "first",
           middleName = Some("middle"),
-          lastName = "last",
-          previousName = Some(
-            PreviousName(
-              firstName = Some("oldFirst"),
-              middleName = Some("oldMiddle"),
-              lastName = Some("oldLast"),
-              // scalastyle:off magic.number
-              date = Some(new LocalDate(1990, 2, 24))
-            )
-          ),
-          otherNames = Some("Doc")
+          lastName = "last"
         )
 
         val responsiblePeople = ResponsiblePeople(Some(addPerson))
@@ -112,17 +91,6 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         document.select("input[name=firstName]").`val` must be("first")
         document.select("input[name=middleName]").`val` must be("middle")
         document.select("input[name=lastName]").`val` must be("last")
-        document.getElementById("hasPreviousName-true").hasAttr("checked") must be(true)
-        document.getElementById("hasPreviousName-false").hasAttr("checked") must be(false)
-        document.select("input[name=previous.firstName]").`val` must be("oldFirst")
-        document.select("input[name=previous.middleName]").`val` must be("oldMiddle")
-        document.select("input[name=previous.lastName]").`val` must be("oldLast")
-        document.select("input[name=previous.date.day]").`val` must be("24")
-        document.select("input[name=previous.date.month]").`val` must be("2")
-        document.select("input[name=previous.date.year]").`val` must be("1990")
-        document.getElementById("hasOtherNames-true").hasAttr("checked") must be(true)
-        document.getElementById("hasOtherNames-false").hasAttr("checked") must be(false)
-        document.select("input[name=otherNames]").`val` must be("Doc")
       }
 
       "display Not Found" when {
@@ -145,16 +113,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
             val requestWithParams = request.withFormUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
-              "lastName" -> "last",
-              "hasPreviousName" -> "true",
-              "previous.firstName" -> "oldFirst",
-              "previous.middleName" -> "oldMiddle",
-              "previous.lastName" -> "oldLast",
-              "previous.date.year" -> "1990",
-              "previous.date.month" -> "02",
-              "previous.date.day" -> "24",
-              "hasOtherNames" -> "true",
-              "otherNames" -> "Doc"
+              "lastName" -> "last"
             )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -174,16 +133,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
             val requestWithParams = request.withFormUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
-              "lastName" -> "last",
-              "hasPreviousName" -> "true",
-              "previous.firstName" -> "oldFirst",
-              "previous.middleName" -> "oldMiddle",
-              "previous.lastName" -> "oldLast",
-              "previous.date.year" -> "1990",
-              "previous.date.month" -> "02",
-              "previous.date.day" -> "24",
-              "hasOtherNames" -> "true",
-              "otherNames" -> "Doc"
+              "lastName" -> "last"
             )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -221,9 +171,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "firstName" -> "first",
-            "lastName" -> "last",
-            "hasPreviousName" -> "false",
-            "hasOtherNames" -> "false"
+            "lastName" -> "last"
           )
 
           when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

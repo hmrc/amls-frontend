@@ -20,8 +20,11 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2}
+import models.responsiblepeople.{PreviousName, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import views.html.responsiblepeople.legal_name
 
 @Singleton
 class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -29,7 +32,15 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(_,Some(previous),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          => Ok(legal_name(Form2[PreviousName](previous), edit, index, flow))
+          case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          => Ok(legal_name(EmptyForm, edit, index, flow))
+          case _
+          => NotFound(notFoundView)
+        }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
