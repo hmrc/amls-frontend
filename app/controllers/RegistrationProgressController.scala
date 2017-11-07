@@ -26,7 +26,7 @@ import models.renewal.Renewal
 import models.status._
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
-import services.businessmatching.BusinessMatchingService
+import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -41,13 +41,24 @@ import uk.gov.hmrc.http.HeaderCarrier
 trait RegistrationProgressController extends BaseController {
 
   protected[controllers] def progressService: ProgressService
+
   protected[controllers] def dataCache: DataCacheConnector
+
   protected[controllers] def enrolmentsService: AuthEnrolmentsService
+
   protected[controllers] def statusService: StatusService
+
   protected[controllers] def businessMatchingService: BusinessMatchingService
 
+  protected[controllers] val serviceFlow: ServiceFlow
+
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
+
+        // Reset the service flow flag here, don't worry about the result
+        serviceFlow.setInServiceFlowFlag(false)
+
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ => {
@@ -66,8 +77,8 @@ trait RegistrationProgressController extends BaseController {
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
 
                 completePreApp match {
-                    case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission, Some(newSections)))
-                    case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
+                  case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission, Some(newSections)))
+                  case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
             }) getOrElse Redirect(controllers.routes.LandingController.get())
@@ -115,7 +126,7 @@ trait RegistrationProgressController extends BaseController {
       case (_, true) | (false, _) =>
         enrolmentsService.amlsRegistrationNumber map {
           case Some(_) => status match {
-            case  NotCompleted | SubmissionReady => Some(false)
+            case NotCompleted | SubmissionReady => Some(false)
             case _ => Some(true)
           }
           case None => Some(false)
@@ -145,4 +156,5 @@ object RegistrationProgressController extends RegistrationProgressController {
   override protected[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected[controllers] val statusService = StatusService
   override protected[controllers] val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
+  override protected[controllers] lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

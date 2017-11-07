@@ -28,7 +28,7 @@ import play.api.test.Helpers._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow, NextService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 import models.businessmatching.updateservice.UpdateService
-
+import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,9 +38,8 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
     val request = addToken(authRequest)
 
     val bmService = mock[BusinessMatchingService]
-    val serviceFlow = mock[ServiceFlow]
 
-    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, bmService, serviceFlow, messagesApi)
+    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, bmService, mockServiceFlow, messagesApi)
   }
 
   "GET" when {
@@ -51,7 +50,7 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
 
         when {
-          serviceFlow.next(any(), any(), any())
+          mockServiceFlow.next(any(), any(), any())
         } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
 
         val result = controller.get()(request)
@@ -69,7 +68,7 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
           } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
 
           when {
-            serviceFlow.next(any(), any(), any())
+            mockServiceFlow.next(any(), any(), any())
           } thenReturn OptionT.none[Future, NextService]
 
           val result = controller.get()(request)
@@ -86,15 +85,14 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
       "update UpdateService with isInNewFlow = true" in new Fixture {
         val url = "/service"
 
-        mockCacheFetch(Some(UpdateService()), Some(UpdateService.key))
-        mockCacheSave[UpdateService]
+        when {
+          mockServiceFlow.setInServiceFlowFlag(eqTo(true))(any(), any(), any())
+        } thenReturn Future.successful(mock[CacheMap])
 
         val result = controller.post()(request.withFormUrlEncodedBody("redirectUrl" -> url))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(url)
-
-        verify(controller.dataCacheConnector).save[UpdateService](eqTo(UpdateService.key), eqTo(UpdateService(inNewServiceFlow = true)))(any(), any(), any())
       }
     }
   }

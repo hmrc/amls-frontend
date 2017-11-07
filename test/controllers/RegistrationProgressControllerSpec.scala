@@ -64,6 +64,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
       override protected[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override protected[controllers] val statusService: StatusService = mockStatusService
       override protected[controllers] val businessMatchingService = mockBusinessMatchingService
+      override protected[controllers] val serviceFlow = mockServiceFlow
     }
 
     when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionReady)
@@ -71,6 +72,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
+    when(mockServiceFlow.setInServiceFlowFlag(eqTo(false))(any(), any(), any())) thenReturn Future.successful(mockCacheMap)
 
     when {
       controller.progressService.sectionsFromBusinessActivities(any(), any())(any())
@@ -104,6 +106,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
             Messages("title.amls") + " - " + Messages("title.gov")
 
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+
+          verify(mockServiceFlow).setInServiceFlowFlag(eqTo(false))(any(), any(), any())
         }
       }
 
