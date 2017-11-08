@@ -31,19 +31,23 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import models.tradingpremises.TradingPremises.FilterUtils
+
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.FeatureToggle
 
 @Singleton
 class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
                                       val dataCacheConnector: DataCacheConnector) extends BaseController with ServicesConfig {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      getBreakdownRows() map { rows =>
-        val total = getTotal(rows)
-        Ok(views.html.fee_guidance(total, rows))
-      }
+  def get = FeatureToggle(ApplicationConfig.paymentsUrlLookupToggle) { Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          getBreakdownRows() map { rows =>
+            val total = getTotal(rows)
+            Ok(views.html.fee_guidance(total, rows))
+          }
+    }
   }
 
   private def getBreakdownRows()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Seq[BreakdownRow]] = {

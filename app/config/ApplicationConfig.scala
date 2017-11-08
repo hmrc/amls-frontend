@@ -50,6 +50,8 @@ trait ApplicationConfig {
   def hasAcceptedToggle: Boolean
 
   def businessMatchingVariationToggle: Boolean
+
+  def showFeesToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -144,4 +146,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
   override def businessMatchingVariationToggle = getConfBool("feature-toggle.business-matching-variation", false)
+
+  override def showFeesToggle = getConfBool("feature-toggle.show-fees", false)
 }
