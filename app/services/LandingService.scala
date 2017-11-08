@@ -129,6 +129,12 @@ trait LandingService {
 
   }
 
+  private def fixAddress(model: AboutTheBusiness) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
+    case (Some(_), None) => model.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+    case (None, None) => model.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
+    case _ => model
+  }
+
   def setAlCorrespondenceAddressWithRegNo(amlsRefNumber: String, cacheMap: Option[CacheMap])
                                          (implicit
                                           authContext: AuthContext,
@@ -142,15 +148,9 @@ trait LandingService {
 
     lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
 
-    val fix: AboutTheBusiness => AboutTheBusiness = m => (m.correspondenceAddress, m.altCorrespondenceAddress) match {
-      case (Some(_), None) => m.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
-      case (None, None) => m.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
-      case _ => m
-    }
-
     (for {
       aboutTheBusiness <- cachedModel orElse etmpModel
-      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fix(aboutTheBusiness)))
+      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness)))
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
@@ -159,10 +159,7 @@ trait LandingService {
                                                                       hc: HeaderCarrier,
                                                                       ec: ExecutionContext
   ): Future[CacheMap] = {
-    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
-      case true => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
-      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
-    })
+    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness))
   }
 
   def refreshCache(amlsRefNumber: String)
