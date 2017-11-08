@@ -81,9 +81,9 @@ trait LandingService {
   }
 
   private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
-                                                 authContext: AuthContext,
-                                                 hc: HeaderCarrier,
-                                                 ec: ExecutionContext
+                                                                              authContext: AuthContext,
+                                                                              hc: HeaderCarrier,
+                                                                              ec: ExecutionContext
   ): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
@@ -101,7 +101,7 @@ trait LandingService {
           percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
             (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
 
-          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None){ hvd =>
+          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None) { hvd =>
             hvd.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(hvd))
           },
 
@@ -123,42 +123,44 @@ trait LandingService {
         ))
         cacheConnector.save[Renewal](Renewal.key, renewal)
       }
-      case _=> Future.successful(cacheMap)
+      case _ => Future.successful(cacheMap)
 
     }
 
   }
 
-  def setAlCorrespondenceAddressWithRegNo (amlsRefNumber: String, cacheMap: Option[CacheMap])
-                                 (implicit
-                                  authContext: AuthContext,
-                                  hc: HeaderCarrier,
-                                  ec: ExecutionContext
-                                 ): Future[CacheMap] = {
-
-    val cachedViewResponse = for {
+  def setAlCorrespondenceAddressWithRegNo(amlsRefNumber: String, cacheMap: Option[CacheMap])
+                                         (implicit
+                                          authContext: AuthContext,
+                                          hc: HeaderCarrier,
+                                          ec: ExecutionContext
+                                         ): Future[CacheMap] = {
+    val cachedModel = for {
       cache <- OptionT.fromOption[Future](cacheMap)
-      viewResponse <- OptionT.fromOption[Future](cache.getEntry[ViewResponse](ViewResponse.key))
-    } yield viewResponse
+      entry <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+    } yield entry
 
-    lazy val etmpViewResponse = OptionT.liftF(desConnector.view(amlsRefNumber))
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
+
+    val fix: AboutTheBusiness => AboutTheBusiness = m => (m.correspondenceAddress, m.altCorrespondenceAddress) match {
+      case (Some(_), None) => m.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+      case (None, None) => m.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
+      case _ => m
+    }
 
     (for {
-      viewResponse <- cachedViewResponse orElse etmpViewResponse
-      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
-        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
-        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
-      }))
-    } yield cacheMap) getOrElse(throw new Exception("Unable to update alt correspondence address"))
+      aboutTheBusiness <- cachedModel orElse etmpModel
+      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fix(aboutTheBusiness)))
+    } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress (aboutTheBusiness: AboutTheBusiness)(implicit
-                                                                       authContext: AuthContext,
-                                                                       hc: HeaderCarrier,
-                                                                       ec: ExecutionContext
+  def setAltCorrespondenceAddress(aboutTheBusiness: AboutTheBusiness)(implicit
+                                                                      authContext: AuthContext,
+                                                                      hc: HeaderCarrier,
+                                                                      ec: ExecutionContext
   ): Future[CacheMap] = {
     cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
-      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+      case true => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
       case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     })
   }
