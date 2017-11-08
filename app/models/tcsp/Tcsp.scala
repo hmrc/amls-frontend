@@ -40,8 +40,8 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.servicesOfAnotherTCSP.contains(p))
 
   def isComplete: Boolean = this match {
-    case Tcsp(Some(_), Some(_), Some(true), Some(_), _, accepted) => accepted
-    case Tcsp(Some(_), Some(_), Some(false), _, _, accepted) => accepted
+    case Tcsp(Some(s), t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
     case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case _ => false
   }
@@ -79,9 +79,18 @@ object Tcsp {
   }
 
   def doesServicesOfAnotherTCSPReader: Reads[Option[Boolean]] = {
-    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap {
-      case None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s => Some(s.isDefined) }
-      case p => constant(p)
+
+    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap { d =>
+      d match {
+        case None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s =>
+
+          (d, s) match {
+            case (None, None) => None
+            case _ => Some(s.isDefined)
+          }
+        }
+        case p => constant(p)
+      }
     }
   }
 
