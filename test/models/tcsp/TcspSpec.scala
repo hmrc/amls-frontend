@@ -229,110 +229,113 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
           completeModel.isComplete must be(true)
         }
       }
-      val initial: Option[Tcsp] = None
 
-      "return false" when {
-        "the model is empty" in {
-          val incompleteModel = initial.copy(providedServices = None)
-          incompleteModel.isComplete must be(false)
-        }
-        "providedServices is not defined" when {
-          "tcspTypes does contain RegisteredOfficeEtc" in {
-            val completeModel = Tcsp(
-              Some(DefaultValues.DefaultCompanyServiceProviders),
-              None,
-              Some(true),
-              Some(DefaultValues.DefaultServicesOfAnotherTCSP),
-              hasAccepted = true
-            )
-            completeModel.isComplete must be(true)
-          }
-        }
-        "servicesOfAnotherTCSP is not defined" when {
-          "doesServicesOfAnotherTCSP is true" in {
-            val completeModel = Tcsp(
-              Some(DefaultValues.DefaultCompanyServiceProviders),
-              Some(DefaultValues.DefaultProvidedServices),
-              Some(true),
-              None,
-              hasAccepted = true
-            )
-            completeModel.isComplete must be(false)
-          }
-        }
-      }
     }
+    val initial: Option[Tcsp] = None
 
-    "TCSP class" when {
-      "tcspTypes value is set" which {
-        "is the same as before" must {
-          "leave the object unchanged" in {
-            val res = completeModel.tcspTypes(DefaultValues.DefaultCompanyServiceProviders)
-            res.hasChanged must be(false)
-            res must be(completeModel)
-          }
-        }
-
-        "is different" must {
-          "set the hasChanged & previouslyRegisterd Properties" in {
-            val res = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
-            res.hasChanged must be(true)
-            res.tcspTypes must be(Some(NewValues.NewCompanyServiceProviders))
-          }
-        }
+    "return false" when {
+      "the model is empty" in {
+        val incompleteModel = initial.copy(providedServices = None)
+        incompleteModel.isComplete must be(false)
       }
-      "providedServices value is set" which {
-        "is the same as before" must {
-          "leave the object unchanged" in {
-            val res = completeModel.providedServices(DefaultValues.DefaultProvidedServices)
-            res.hasChanged must be(false)
-            res must be(completeModel)
-          }
-        }
-
-        "is different" must {
-          "set the hasChanged & previouslyRegisterd Properties" in {
-            val res = completeModel.providedServices(NewValues.NewProvidedServices)
-            res.hasChanged must be(true)
-            res.providedServices must be(Some(NewValues.NewProvidedServices))
-          }
-        }
-      }
-      "servicesOfAnotherTCSP value is set" which {
-        "is the same as before" must {
-          "leave the object unchanged" in {
-            val res = completeModel.servicesOfAnotherTCSP(DefaultValues.DefaultServicesOfAnotherTCSP)
-            res.hasChanged must be(false)
-            res must be(completeModel)
-          }
-        }
-
-        "is different" must {
-          "set the hasChanged & previouslyRegisterd Properties" in {
-            val res = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
-            res.hasChanged must be(true)
-            res.servicesOfAnotherTCSP must be(Some(NewValues.NewServicesOfAnotherTCSP))
-          }
-        }
-      }
-    }
-  }
-
-  class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
-
-    override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
-
-    "Tcsp" must {
-
-      "isComplete" must {
-        "return true if the model is accepted" in {
+      "providedServices is not defined" when {
+        "tcspTypes does contain RegisteredOfficeEtc" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            None,
+            Some(true),
+            Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
           completeModel.isComplete must be(true)
         }
+      }
+      "servicesOfAnotherTCSP is not defined" when {
+        "doesServicesOfAnotherTCSP is true" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(DefaultValues.DefaultProvidedServices),
+            Some(true),
+            None,
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(false)
+        }
+      }
+    }
+  }
 
-        "return false if the model is not accepted" in {
-          completeModel.copy(hasAccepted = false).isComplete must be(false)
+  "TCSP class" when {
+    "tcspTypes value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.tcspTypes(DefaultValues.DefaultCompanyServiceProviders)
+          res.hasChanged must be(false)
+          res must be(completeModel)
         }
       }
 
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
+          res.hasChanged must be(true)
+          res.tcspTypes must be(Some(NewValues.NewCompanyServiceProviders))
+        }
+      }
+    }
+    "providedServices value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.providedServices(DefaultValues.DefaultProvidedServices)
+          res.hasChanged must be(false)
+          res must be(completeModel)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.providedServices(NewValues.NewProvidedServices)
+          res.hasChanged must be(true)
+          res.providedServices must be(Some(NewValues.NewProvidedServices))
+        }
+      }
+    }
+    "servicesOfAnotherTCSP value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.servicesOfAnotherTCSP(DefaultValues.DefaultServicesOfAnotherTCSP)
+          res.hasChanged must be(false)
+          res must be(completeModel)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
+          res.hasChanged must be(true)
+          res.servicesOfAnotherTCSP must be(Some(NewValues.NewServicesOfAnotherTCSP))
+        }
+      }
     }
   }
+}
+
+
+class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+
+  "Tcsp" must {
+
+    "isComplete" must {
+      "return true if the model is accepted" in {
+        completeModel.isComplete must be(true)
+      }
+
+      "return false if the model is not accepted" in {
+        completeModel.copy(hasAccepted = false).isComplete must be(false)
+      }
+    }
+
+  }
+}
