@@ -217,18 +217,14 @@ trait LandingController extends BaseController {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
         case Some(c) => {
-          import play.api.libs.json._
 
-          val cacheMapF = try {
-            c.getEntry[Seq[TradingPremises]](TradingPremises.key)
-            Future.successful(c)
-          } catch {
-            case e: JsResultException =>
-              cacheConnector.save[Seq[TradingPremises]](TradingPremises.key, Seq.empty[TradingPremises])
-          }
+          val fix = for {
+            c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
+            c2 <- fixEmptyRecords[ResponsiblePeople](c, ResponsiblePeople.key)
+          } yield c2
 
           //there is data in S4l
-          cacheMapF flatMap { cacheMap =>
+          fix flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
               (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
                 cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
@@ -243,10 +239,23 @@ trait LandingController extends BaseController {
             }
           }
         }
+
         case _ => refreshAndRedirect(amlsRegistrationNumber, None)
       }
 
       case _ => getWithoutAmendments //no enrolment exists
+    }
+  }
+
+  private def fixEmptyRecords[T](cache: CacheMap, key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
+    import play.api.libs.json._
+    try {
+      cache.getEntry[Seq[T]](key)
+      Future.successful(cache)
+    } catch {
+      case e: JsResultException =>
+        println("Exception!")
+        cacheConnector.save[Seq[T]](key, Seq.empty[T])
     }
   }
 }
@@ -258,6 +267,7 @@ object LandingController extends LandingController {
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
   override val cacheConnector = DataCacheConnector
+
   override private[controllers] def auditConnector = AMLSAuditConnector
 
   override private[controllers] lazy val authService = Play.current.injector.instanceOf[AuthService]

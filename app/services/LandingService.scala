@@ -186,7 +186,7 @@ trait LandingService {
   } yield cache2
 
   def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
-    viewResponse.map(seq => seq.map(rp => rp.copy(hasAccepted = true)))
+    Some(viewResponse.fold(Seq.empty[ResponsiblePeople])(_.map(rp => rp.copy(hasAccepted = true))))
 
   def tradingPremisesSection(viewResponse: Option[Seq[TradingPremises]]): Option[Seq[TradingPremises]] =
     Some(viewResponse.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))
