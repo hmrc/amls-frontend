@@ -165,16 +165,25 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     }
 
     "return a cachmap of the saved alternative correspondence address" in {
+
+      val cache = mock[CacheMap]
+
       when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        (any(), any(), any())).thenReturn(Future.successful(cache))
+
+      when {
+        cache.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any())
+      } thenReturn None
 
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", Some(cacheMap))) mustEqual cacheMap
+      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", None)) mustEqual cache
+
+      verify(TestLandingService.desConnector).view(any())(any(), any(), any(), any())
     }
 
     "only call API 5 data" when {
@@ -184,9 +193,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
         reset(TestLandingService.cacheConnector)
         reset(TestLandingService.desConnector)
 
+        val model = AboutTheBusiness()
+
         when {
-          cache.getEntry[ViewResponse](eqTo(ViewResponse.key))(any())
-        } thenReturn Some(viewResponse)
+          cache.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any())
+        } thenReturn Some(model)
 
         when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
