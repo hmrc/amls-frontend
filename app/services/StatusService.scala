@@ -32,7 +32,7 @@ trait StatusService {
 
   private[services] def amlsConnector: AmlsConnector
 
-  private[services] def progressService: ProgressService
+  private[services] def progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
 
   private[services] def enrolmentsService: AuthEnrolmentsService
 
@@ -153,8 +153,6 @@ trait StatusService {
 object StatusService extends StatusService {
 
   override private[services] val amlsConnector: AmlsConnector = AmlsConnector
-
-  override private[services] val progressService: ProgressService = ProgressService
 
   override private[services] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
 }

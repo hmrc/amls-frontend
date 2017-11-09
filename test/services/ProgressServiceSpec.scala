@@ -17,6 +17,7 @@
 package services
 
 import connectors.{AmlsConnector, DataCacheConnector, PayApiConnector}
+import controllers.FeeGuidanceController
 import models.ReadStatusResponse
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -35,28 +36,33 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
-  object TestProgressService extends ProgressService {
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    override private[services] val cacheConnector: DataCacheConnector = mock[DataCacheConnector]
-    override private[services] val statusService: StatusService = mock [StatusService]
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val service = app.injector.instanceOf[ProgressService]
+
   }
-
-  implicit val hc = mock[HeaderCarrier]
-  implicit val ac = mock[AuthContext]
-  implicit val ec = mock[ExecutionContext]
-
 
   "Progress Service" must {
     "return fee guidance url" when {
-      "business is a partnership and there are 2 partners and 1 nominated officer" in {
+      "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
         val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
@@ -72,22 +78,18 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockApplicationStatus(SubmissionReady)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.routes.FeeGuidanceController.get())
         }
 
       }
 
-      "business is not a prtnership and at least one of the person in responsible people is the nominated officer" in {
+      "business is not a prtnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -102,23 +104,19 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockApplicationStatus(SubmissionReady)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.routes.FeeGuidanceController.get())
         }
       }
     }
 
     "return register partners url" when {
-      "business is a partnership and there are less than 2 partners" in {
+      "business is a partnership and there are less than 2 partners" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -133,23 +131,19 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockApplicationStatus(SubmissionReady)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
       }
     }
 
     "return who is registering url" when {
-      "status is amendment and there is a nominated officer" in {
+      "status is amendment and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -164,21 +158,17 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+        mockApplicationStatus(SubmissionReadyForReview)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
 
-      "status is variation and there is a nominated officer" in {
+      "status is variation and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -193,21 +183,17 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
 
-      "status is renewal and there is a nominated officer" in {
+      "status is renewal and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -222,23 +208,19 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(ReadyForRenewal(None)))
+        mockApplicationStatus(ReadyForRenewal(None))
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
     }
 
     "return Who is the business’s nominated officer? url" when {
-      "there is no selected nominated officer" in {
+      "there is no selected nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -253,21 +235,17 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockApplicationStatus(SubmissionReady)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
         }
       }
 
-      "there is no selected nominated officer and status is amendment" in {
+      "there is no selected nominated officer and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
@@ -282,26 +260,21 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(responsiblePeople)))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
         }
 
       }
 
-
     }
 
     "respond with NOT_FOUND" when {
-      "there are no responsible people" in {
+      "there are no responsible people" in new Fixture {
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
             "Business Name",
@@ -312,16 +285,12 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           )
         ))
 
-        when(TestProgressService.cacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        mockApplicationStatus(SubmissionReady)
 
-        when(TestProgressService.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockCacheFetch[Seq[ResponsiblePeople]](None, Some(ResponsiblePeople.key))
+        mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        when(TestProgressService.cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        whenReady(TestProgressService.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect) {
           _ mustEqual None
         }
       }

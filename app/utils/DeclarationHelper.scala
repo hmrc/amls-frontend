@@ -16,16 +16,15 @@
 
 package utils
 
-import cats.data.OptionT
 import controllers.{declaration, routes}
-import models.responsiblepeople.{ResponsiblePeople, Partner}
+import models.responsiblepeople.{Partner, ResponsiblePeople}
 import models.status._
-import play.api.mvc.{AnyContent, Request}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 object DeclarationHelper {
