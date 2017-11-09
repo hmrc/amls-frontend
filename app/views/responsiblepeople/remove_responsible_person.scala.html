@@ -18,7 +18,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: forms.Form2[_],index: Int, personName:String, complete:Boolean, showDateField:Boolean, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, personName: String, complete:Boolean, showDateField:Boolean, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName, flow)) {
+    @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, flow)) {
 
         @panel(
             jsHidden = false,
