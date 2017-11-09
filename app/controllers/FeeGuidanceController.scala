@@ -18,29 +18,30 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import config.ApplicationConfig
+import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import models.tradingpremises.TradingPremises
+import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.i18n.Messages
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.responsiblepeople.ResponsiblePeople.FilterUtils
-import models.tradingpremises.TradingPremises.FilterUtils
+import utils.FeatureToggle
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.FeatureToggle
 
 @Singleton
 class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
-                                      val dataCacheConnector: DataCacheConnector) extends BaseController with ServicesConfig {
+                                      val dataCacheConnector: DataCacheConnector,
+                                      appConfig: AppConfig) extends BaseController {
 
-  def get = FeatureToggle(ApplicationConfig.paymentsUrlLookupToggle) { Authorised.async {
+  def get = FeatureToggle(appConfig.showFeesToggle) {
+    Authorised.async {
       implicit authContext =>
         implicit request =>
           getBreakdownRows() map { rows =>

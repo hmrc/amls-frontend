@@ -54,7 +54,7 @@ class FeeGuidanceControllerSpec extends GenericTestHelper
     val request = addToken(authRequest)
 
     def defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.payments-url-lookup" -> false)
+      .configure("microservice.services.feature-toggle.show-fees" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
@@ -82,8 +82,7 @@ class FeeGuidanceControllerSpec extends GenericTestHelper
 
       "show fee guidance page" in new Fixture {
 
-
-        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.payments-url-lookup" -> false)
+        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> true)
 
         mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
         mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
@@ -96,7 +95,7 @@ class FeeGuidanceControllerSpec extends GenericTestHelper
         mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
         mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
 
-        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.payments-url-lookup" -> false)
+        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
         val result = controller.get()(request)
 
