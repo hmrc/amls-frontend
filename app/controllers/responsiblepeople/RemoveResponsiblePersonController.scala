@@ -74,22 +74,25 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
             _ <- updateDataStrict[ResponsiblePeople](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
           } yield redirectAppropriately
           case _ =>
-            getData[ResponsiblePeople](index) flatMap { people =>
-              val extraFields = Map(
-                "positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString("yyyy-MM-dd")),
-                "userName" -> Seq(personName)
-              )
-              Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
-                case f: InvalidForm if people.get.lineId.isDefined =>
-                  Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true, flow)))
-                case ValidForm(_, data) => {
-                  for {
-                    _ <- updateDataStrict[ResponsiblePeople](index) { tp =>
-                      tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+            getData[ResponsiblePeople](index) flatMap { _ match {
+                case Some(person) if person.lineId.isEmpty => removeWithoutDate
+                case Some(person) =>
+                  val extraFields = Map(
+                    "positionStartDate" -> Seq(person.positions.get.startDate.get.toString("yyyy-MM-dd")),
+                    "userName" -> Seq(personName)
+                  )
+                  Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
+                    case f: InvalidForm =>
+                      Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true, flow)))
+                    case ValidForm(_, data) => {
+                      for {
+                        _ <- updateDataStrict[ResponsiblePeople](index) {
+                          _.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                        }
+                      } yield redirectAppropriately
                     }
-                  } yield redirectAppropriately
-                }
-                case _ => removeWithoutDate
+                    case _ => removeWithoutDate
+                  }
               }
             }
         }
