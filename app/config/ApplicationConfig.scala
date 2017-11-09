@@ -16,8 +16,11 @@
 
 package config
 
+import javax.inject.Inject
+
 import play.api.{Logger, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 import play.api.Play.current
 
 trait ApplicationConfig {
@@ -50,6 +53,7 @@ trait ApplicationConfig {
   def hasAcceptedToggle: Boolean
 
   def businessMatchingVariationToggle: Boolean
+
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -144,4 +148,11 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
   override def businessMatchingVariationToggle = getConfBool("feature-toggle.business-matching-variation", false)
+
+}
+
+class AppConfig @Inject()(
+                           config: iServicesConfig
+                         ) {
+  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", false)
 }

@@ -24,44 +24,44 @@ import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, Previo
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.{AgentCompanyDetails, TradingPremises}
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import models.tradingpremises.TradingPremises
+import org.mockito.Matchers.{eq => eqTo}
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
 
-class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester with ServicesConfig
+class FeeGuidanceControllerSpec extends GenericTestHelper
+  with MockitoSugar
+  with PrivateMethodTester
+  with ServicesConfig
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
-
-    val controller = new FeeGuidanceController(
-      dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
-    )
-
-    lazy val app = new GuiceApplicationBuilder()
+    def defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .build()
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[FeeGuidanceController]
 
     val nonEmptyTradingPremises = tradingPremisesGen.sample.get
 
@@ -81,11 +81,26 @@ class FeeGuidanceControllerSpec extends GenericTestHelper with MockitoSugar with
     "get is called" must {
 
       "show fee guidance page" in new Fixture {
+
+        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> true)
+
         mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
         mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
 
         val result = controller.get()(request)
         status(result) must be(OK)
+      }
+
+      "return notFound if show-fees toggle is off" in new Fixture {
+        mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
+        mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
+
+        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
+
+        val result = controller.get()(request)
+
+        status(result) must be(NOT_FOUND)
+
       }
     }
 
