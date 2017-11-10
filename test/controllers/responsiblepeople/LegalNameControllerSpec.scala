@@ -56,6 +56,8 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
     lazy val controller = injector.instanceOf[LegalNameController]
 
+    val emptyCache = CacheMap("", Map.empty)
+
   }
 
   "The LegalNameController" when {
@@ -101,11 +103,84 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and" in new TestFixture {
+      "form is valid" must {
+        "go to LegalNameController" when {
+          "edit is false" in new TestFixture {
 
-        val result = controller.post(RecordId)(request.withFormUrlEncodedBody("firstName" -> "testName"))
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last"
+            )
 
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
+            when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(RecordId)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit is true" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last"
+            )
+
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+            when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+        }
+      }
+
+      "form is invalid" must {
+        "return BAD_REQUEST" in new TestFixture {
+
+          val NameMissingInRequest = request.withFormUrlEncodedBody(
+            "hasPreviousName" -> "true"
+          )
+
+          when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(RecordId)(NameMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+
+      "model cannot be found with given index" must {
+        "return NOT_FOUND" in new TestFixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "hasPreviousName" -> "true",
+            "firstName" -> "first",
+            "lastName" -> "last"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(2)(requestWithParams)
+          status(result) must be(NOT_FOUND)
+        }
       }
 
     }

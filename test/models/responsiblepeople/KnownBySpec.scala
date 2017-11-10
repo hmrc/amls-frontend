@@ -35,7 +35,7 @@ class KnownBySpec extends PlaySpec with MockitoSugar {
         )
 
         val validPerson = KnownBy(
-          otherNames = "otherName"
+          otherNames = Some("otherName")
         )
 
         KnownBy.formRule.validate(data) must equal(Valid(validPerson))

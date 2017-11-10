@@ -650,8 +650,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     //scalastyle:off magic.number
     val personName = PersonName("first", Some("middle"), "last")
     val legalName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"))
-    val legalNameChangeDate = new LocalDate(1990, 2, 24)
-    val knownBy = "knowByName"
     val personResidenceTypeNonUk = PersonResidenceType(residenceNonUk, Some(residenceCountry), Some(residenceNationality))
     val personResidenceTypeUk = PersonResidenceType(residenceUk, Some(residenceCountry), Some(residenceNationality))
     val saRegistered = SaRegisteredYes("0123456789")
@@ -682,10 +680,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
     private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
-    val personName = PersonName("first", Some("middle"), "last")
+    val personName = PersonName("firstnew", Some("middle"), "last")
     val legalName = PreviousName(Some("oldFirst"), Some("oldMiddle"), Some("oldLast"))
-    val legalNameChangeDate = new LocalDate(1990, 2, 24)
-    val knownBy = "knowByName"
     val contactDetails = ContactDetails("07000000000", "new@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
     val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
@@ -699,8 +695,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelUkResident = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
-    Some(DefaultValues.legalNameChangeDate),
-    Some(DefaultValues.knownBy),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
     Some(DefaultValues.personResidenceTypeUk),
     None,
     None,
@@ -724,8 +720,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelNonUkResidentNonUkPassport = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
-    Some(DefaultValues.legalNameChangeDate),
-    Some(DefaultValues.knownBy),
+    Some(new LocalDate(1990, 2, 24)),
+    Some("knownByName"),
     Some(DefaultValues.personResidenceTypeNonUk),
     Some(DefaultValues.ukPassportNo),
     Some(DefaultValues.nonUKPassportYes),
@@ -749,8 +745,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelNonUkResidentNoPassport = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
-    Some(DefaultValues.legalNameChangeDate),
-    Some(DefaultValues.knownBy),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
     Some(DefaultValues.personResidenceTypeNonUk),
     Some(DefaultValues.ukPassportNo),
     Some(DefaultValues.nonUKPassportNo),
@@ -774,8 +770,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelNonUkResidentUkPassport = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
-    Some(DefaultValues.legalNameChangeDate),
-    Some(DefaultValues.knownBy),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
     Some(DefaultValues.personResidenceTypeNonUk),
     Some(DefaultValues.ukPassportYes),
     None,
@@ -805,8 +801,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val incompleteResponsiblePeople = ResponsiblePeople(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
-    Some(DefaultValues.legalNameChangeDate),
-    Some(DefaultValues.knownBy),
+    Some(new LocalDate(1990, 2, 24)),
+    Some("knownByName"),
     Some(DefaultValues.personResidenceTypeNonUk),
     None,
     None,
@@ -1092,6 +1088,13 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "middle",
       "lastName" -> "last"
     ),
+    "legalName" -> Json.obj(
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24"
+    ,
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "false",
       "countryOfBirth" -> "GB",
@@ -1169,9 +1172,9 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "oldMiddle",
       "lastName" -> "oldLast"
     ),
-    "LegalNameChangeDate" -> "1990-02-24"
+    "legalNameChangeDate" -> "1990-02-24"
     ,
-    "KnownBy" -> "KnownByName"
+    "knownBy" -> "knownByName"
     ,
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "false",
@@ -1254,9 +1257,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "oldMiddle",
       "lastName" -> "oldLast"
     ),
-    "LegalNameChangeDate" -> "1990-02-24"
-    ,
-    "KnownBy" -> "KnownByName"
+    "legalNameChangeDate" -> "1990-02-24"
     ,
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "false",
@@ -1333,6 +1334,13 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "middle",
       "lastName" -> "last"
     ),
+    "legalName" -> Json.obj(
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24",
+    "KnownBy" -> "knownByName",
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "true",
       "nino" -> "AA111111A",

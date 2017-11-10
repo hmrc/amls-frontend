@@ -107,7 +107,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
     "post is called" when {
 
       "form is valid" must {
-        "go to PersonResidentTypeController" when {
+        "go to LegalNameController" when {
           "edit is false" in new Fixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
@@ -124,7 +124,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
             val result = personNameController.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PersonResidentTypeController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.LegalNameController.get(RecordId).url))
           }
         }
         "go to DetailedAnswersController" when {
@@ -152,8 +152,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
         "return BAD_REQUEST" in new Fixture {
 
           val firstNameMissingInRequest = request.withFormUrlEncodedBody(
-            "lastName" -> "last",
-            "isKnownByOtherNames" -> "false"
+            "lastName" -> "last"
           )
 
           when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))

@@ -421,7 +421,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     "allow a payment to be retried" in new Fixture {
 
       val paymentsRedirectUrl = "/payments"
-      val amountInPence = (paymentAmountGen.sample.get * 100).toInt
+      val amountInPence = 87654
       val postData = "paymentRef" -> paymentReferenceNumber
       val payment = paymentGen.sample.get
 

@@ -58,7 +58,7 @@ trait PersonNameController extends RepeatingSection with BaseController {
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
+              case false => Redirect(routes.LegalNameController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

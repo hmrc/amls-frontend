@@ -60,7 +60,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     this.copy(legalName = Some(p), hasChanged = hasChanged || !this.legalName.contains(p),
       hasAccepted = hasAccepted && this.legalName.contains(p))
 
-  def legalNamechangeDate(p: LocalDate): ResponsiblePeople =
+  def legalNameChangeDate(p: LocalDate): ResponsiblePeople =
     this.copy(legalNameChangeDate = Some(p), hasChanged = hasChanged || !this.legalNameChangeDate.contains(p),
       hasAccepted = hasAccepted && this.legalNameChangeDate.contains(p))
 
@@ -246,7 +246,7 @@ object ResponsiblePeople {
     (
       (__ \ "personName").readNullable[PersonName] and
         (__ \ "legalName").readNullable[PreviousName] and
-        (__ \ "legalNamechangeDate").readNullable[LocalDate] and
+        (__ \ "legalNameChangeDate").readNullable[LocalDate] and
         (__ \ "knownBy").readNullable[String] and
         (__ \ "personResidenceType").readNullable[PersonResidenceType] and
         (__ \ "ukPassport").readNullable[UKPassport] and

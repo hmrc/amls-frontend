@@ -17,16 +17,18 @@
 package models.responsiblepeople
 
 import cats.data.Validated.Valid
+import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule}
 import models.FormTypes._
-import play.api.libs.json.{Json, Writes => _}
+import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 
-case class KnownBy(otherNames: String)
+case class KnownBy(otherNames: Option[String])
 
 object KnownBy {
+
+  import play.api.libs.json._
 
   implicit val formats = Json.format[KnownBy]
 
@@ -39,8 +41,19 @@ object KnownBy {
   implicit val formRule: Rule[UrlFormEncoded, KnownBy] =
     From[UrlFormEncoded] { __ =>
       (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames") flatMap  {
-        case true => (__ \ "otherNames").read(otherNamesType) map KnownBy.apply
-        case false => Rule.fromMapping { _ => Valid(KnownBy("")) }
+        case true => (__ \ "otherNames").read(otherNamesType) map { x => KnownBy(Some(x))}
+        case false => Rule.fromMapping { _ => Valid(KnownBy(None)) }
       }
     }
+
+  implicit val formWrite: Write[KnownBy, UrlFormEncoded] =
+    Write {
+        case KnownBy(b) =>
+          Map(
+            "hasOtherNames" -> Seq("true"),
+            "otherNames" -> Seq(b.toString)
+          )
+        case _ =>
+          Map("hasOtherNames" -> Seq("false"))
+      }
 }

@@ -18,11 +18,11 @@
 @import include._
 @import forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.knownby.heading", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.knownby.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -34,7 +34,8 @@
 
         @fieldset(
             f = f("hasOtherNames-fieldset"),
-            legend = "responsiblepeople.knownby.heading",
+            legend = "responsiblepeople.knownby.title",
+            legendHidden = true,
             panel = false
 
         ) {
@@ -54,13 +55,6 @@
                     value = "false",
                     inline = true
                 )
-            }
-
-            @panel(
-                jsHidden = true,
-                classes = Seq("otherNames-panel")
-            ) {
-                @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
             }
         }
 
