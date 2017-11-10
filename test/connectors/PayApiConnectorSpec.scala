@@ -55,17 +55,11 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       ReturnLocation("/confirmation", "http://localhost:9222"))
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
-    val paymentsToggleValue = true
     val http = mock[WSHttp]
     val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
       override protected def environment = mock[play.api.Environment]
-
-      override def getConfBool(confKey: String, defBool: => Boolean) = confKey match {
-        case ApplicationConfig.paymentsUrlLookupToggleName => paymentsToggleValue
-        case _ => super.getConfBool(confKey, defBool)
-      }
 
       override def getConfString(confKey: String, defString: => String) = confKey match {
         case _ => super.getConfString(confKey, defString)
@@ -101,17 +95,6 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
           result mustBe Some(validResponse)
           verify(auditConnector).sendExtendedEvent(any())(any(), any())
-        }
-      }
-
-      "the payments feature is toggled off" must {
-        "return no result" in new TestFixture {
-          override val paymentsToggleValue = false
-
-          val result = await(connector.createPayment(validRequest))
-
-          result must not be defined
-          verify(http, never).POST(any(), any(), any())(any(), any(), any(), any())
         }
       }
 

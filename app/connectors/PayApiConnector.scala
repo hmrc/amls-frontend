@@ -45,25 +45,20 @@ class PayApiConnector @Inject()(
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
 
-    if (config.getConfBool(ApplicationConfig.paymentsUrlLookupToggleName, defBool = false)) {
-      logDebug(s"Creating payment: ${Json.toJson(request)}")
-      http.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
-        case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
-          val responseModel = body.copy(
-            paymentId = response.header("Location").map(_.split("/").last)
-          )
+    logDebug(s"Creating payment: ${Json.toJson(request)}")
+    http.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
+      case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
+        val responseModel = body.copy(
+          paymentId = response.header("Location").map(_.split("/").last)
+        )
 
-          auditConnector.sendExtendedEvent(CreatePaymentEvent(request, responseModel))
-          responseModel.some
+        auditConnector.sendExtendedEvent(CreatePaymentEvent(request, responseModel))
+        responseModel.some
 
-        case response: HttpResponse =>
-          auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
-          logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
-          None
-      }
-    } else {
-      Future.successful(None)
+      case response: HttpResponse =>
+        auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
+        logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
+        None
     }
   }
-
 }
