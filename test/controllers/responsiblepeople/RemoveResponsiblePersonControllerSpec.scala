@@ -17,12 +17,14 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -30,7 +32,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import play.api.test.Helpers._
+import play.api.test.Helpers.{status, _}
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
@@ -38,7 +40,7 @@ import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
-  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil {
+  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -218,7 +220,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          val result = controller.remove(1, false, "first middle last")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
@@ -239,7 +241,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, false, "first middle last")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
@@ -260,7 +262,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, true, "first middle last")(request)
+          val result = controller.remove(1, true)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
 
@@ -282,7 +284,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, false, "first middle last")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
@@ -309,8 +311,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-
-          val result = controller.remove(1, complete = false, "first middle last")(newRequest)
+          val result = controller.remove(1, complete = false)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
@@ -320,6 +321,35 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
+        }
+
+        "removing a new incomplete responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+          val newRequest = request.withFormUrlEncodedBody()
+
+          val people = Seq(
+            responsiblePersonGen.sample.get.copy(lineId = None, positions = Some(positionsGen.sample.get.copy(startDate = None)))
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(people)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, complete = false)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+
+          val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePeople]])
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), captor.capture())(any(), any(), any())
+
+          captor.getValue mustBe Seq.empty[ResponsiblePeople]
         }
 
         "removing a responsible person from an application with no date" in new Fixture {
@@ -338,7 +368,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
 
         }
@@ -362,7 +392,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -384,7 +414,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -406,7 +436,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -428,7 +458,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.future.date"))
 
@@ -454,7 +484,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "person Name")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
           //contentAsString(result) must include(Messages("error.expected.future.date.after.start"))
 
