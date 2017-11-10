@@ -48,10 +48,6 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        request.body.asFormUrlEncoded map { form =>
-          form.get("hasPreviousName") map { list => list.head == "true" }
-        }
-
         Form2[PreviousName](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePeople](index) map { rp =>

@@ -63,8 +63,17 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
   "The LegalNameController" when {
     "get is called" must {
       "load the page" in new TestFixture {
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last"
+        )
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+
 
         val result = controller.get(RecordId)(request)
 
@@ -78,13 +87,19 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
       "prepopulate the view with data" in new TestFixture {
 
-        val addPerson = PreviousName(
-          firstName = Some("first"),
+        val addPerson = PersonName(
+          firstName = "first",
           middleName = Some("middle"),
-          lastName = Some("last")
+          lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePeople(legalName = Some(addPerson))
+        val previousPerson = PreviousName(
+          firstName = Some("firstPrevious"),
+          middleName = Some("middlePrevious"),
+          lastName = Some("lastPrevious")
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson), legalName = Some(previousPerson))
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
 
@@ -95,29 +110,27 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=firstName]").`val` must be("first")
-        document.select("input[name=middleName]").`val` must be("middle")
-        document.select("input[name=lastName]").`val` must be("last")
+        document.select("input[name=firstName]").`val` must be("firstPrevious")
+        document.select("input[name=middleName]").`val` must be("middlePrevious")
+        document.select("input[name=lastName]").`val` must be("lastPrevious")
       }
 
     }
 
     "post is called" must {
       "form is valid" must {
-        "go to LegalNameController" when {
+        "go to LegalNameChangeDateController" when {
           "edit is false" in new TestFixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-            when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
@@ -129,16 +142,14 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
           "edit is true" in new TestFixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-            when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId, true)(requestWithParams)
             status(result) must be(SEE_OTHER)
@@ -153,8 +164,8 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
             "hasPreviousName" -> "true"
           )
 
-          when(controller.dataCacheConnector.save[PreviousName](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[PreviousName]
 
           val result = controller.post(RecordId)(NameMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -172,11 +183,8 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
             "lastName" -> "last"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
-
-          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[PreviousName]
 
           val result = controller.post(2)(requestWithParams)
           status(result) must be(NOT_FOUND)

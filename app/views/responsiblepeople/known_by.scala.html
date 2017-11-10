@@ -58,6 +58,14 @@
             }
         }
 
+
+        @panel(
+            jsHidden = true,
+            classes = Seq("otherNames-panel")
+        ) {
+            @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+        }
+
         @submit(edit)
     }
 }
