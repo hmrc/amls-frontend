@@ -19,6 +19,7 @@ package controllers.tradingpremises
 import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -28,12 +29,9 @@ import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTra
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import cats.implicits._
-import models.DateOfChange
-import org.joda.time.LocalDate
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,

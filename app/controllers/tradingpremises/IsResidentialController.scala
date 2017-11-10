@@ -18,33 +18,60 @@ package controllers.tradingpremises
 
 import javax.inject.{Inject, Singleton}
 
+import cats.implicits._
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import models.Country
+import models.businesscustomer.Address
+import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import models.businesscustomer.{ReviewDetails, Address => BCAddress}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class  IsResidentialController @Inject()(override val messagesApi: MessagesApi,
                                          val authConnector: AuthConnector,
                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
+
+  def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Address]= {
+
+    def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
+      businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))
+
+    dataCacheConnector.fetchAll map { cacheO =>
+      (for {
+        cache <- cacheO
+        bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        address <- getAddress(bm)
+      } yield {
+        address
+      }) getOrElse Address("address", "", None, None, None, Country("United Kingdom", "UK"))
+    }
+  }
+
   def get(index: Int, edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        getData[TradingPremises](index) map {
+        getData[TradingPremises](index) flatMap {
           case Some(tp) => {
             val form = tp.yourTradingPremises match {
               case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
               case _ => EmptyForm
             }
-            Ok(views.html.tradingpremises.is_residential(form, index, edit))
+            getResidentialAddress map { address =>
+              Ok(views.html.tradingpremises.is_residential(form, address, index, edit))
+            }
           }
-          case None => NotFound(notFoundView)
+          case None => Future.successful(NotFound(notFoundView))
         }
   }
 
@@ -53,7 +80,9 @@ class  IsResidentialController @Inject()(override val messagesApi: MessagesApi,
       implicit request =>
         Form2[IsResidential](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.is_residential(f, index, edit)))
+            getResidentialAddress map { address =>
+              BadRequest(views.html.tradingpremises.is_residential(f, address, index, edit))
+            }
           case ValidForm(_, data) =>
             for {
               _ <- updateDataStrict[TradingPremises](index) { tp =>
