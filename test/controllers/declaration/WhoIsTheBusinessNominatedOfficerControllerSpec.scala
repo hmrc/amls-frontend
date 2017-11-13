@@ -18,37 +18,39 @@ package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.declaration.BusinessNominatedOfficer
+import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, StatusConstants}
-
-import scala.concurrent.Future
-import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-    val controller = new  WhoIsTheBusinessNominatedOfficerController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val amlsConnector = mock[AmlsConnector]
-      override val statusService: StatusService = mock[StatusService]
-    }
-  }
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-  val emptyCache = CacheMap("", Map.empty)
+    val request = addToken(authRequest)
+
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[WhoIsTheBusinessNominatedOfficerController]
+
+  }
 
   "WhoIsTheBusinessNominatedOfficerController" must {
 
@@ -72,22 +74,13 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
     )
     val responsiblePeoples = Seq(rp, rp1, rp2)
 
-    val mockCacheMap = mock[CacheMap]
-      "load 'Who is the business’s nominated officer?' page successfully" when {
+    "load 'Who is the business’s nominated officer?' page successfully" when {
 
         "status is pre-submission" in new Fixture {
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(responsiblePeoples))
-
-          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
-            .thenReturn(None)
+          mockApplicationStatus(SubmissionReady)
+          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -97,17 +90,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         "status is pending" in new Fixture {
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(responsiblePeoples))
-
-          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
-            .thenReturn(None)
+          mockApplicationStatus(SubmissionReadyForReview)
+          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -117,17 +102,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         "status is approved" in new Fixture {
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(responsiblePeoples))
-
-          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
-            .thenReturn(None)
+          mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -137,17 +114,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         "status is ready for renewal" in new Fixture {
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(responsiblePeoples))
-
-          when(mockCacheMap.getEntry[BusinessNominatedOfficer](BusinessNominatedOfficer.key))
-            .thenReturn(None)
+          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -162,17 +131,13 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
         val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeoples)))
+        val updatedList = Seq(rp.copy(
+          positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+        ), rp2)
 
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReady))
-
-        val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
-          = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
-
-        when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReady)
+        mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -183,23 +148,19 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
     "redirect to 'Who is registering this business?' page" when {
 
-      "making an amendment" when {
+      "post submission" when {
 
         "selected option is a valid responsible person in amendment mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+          val updatedList = Seq(rp.copy(
+            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+          ), rp2)
 
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
-            = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
-
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -210,17 +171,13 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
           val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
-            = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))), rp2)
+          val updatedList = Seq(rp.copy(
+            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+          ), rp2)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(responsiblePeoples)))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockApplicationStatus(SubmissionReadyForReview)
+          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -228,17 +185,24 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
         }
 
       }
+
+      "pre-submission" when {
+
+        "show-fees is toggled off" in new Fixture {
+
+        }
+
+      }
+
+
     }
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
       "selected option is 'Register someone else'" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReady))
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(responsiblePeoples)))
+        mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -249,14 +213,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReady))
-
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

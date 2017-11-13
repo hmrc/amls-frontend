@@ -263,10 +263,9 @@ GET         /update-information/who-is-registering-renewal                      
 GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
 
-GET         /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
-POST        /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
-
-GET         /update-information/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
+GET         /update-information/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+POST        /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
 GET         /submit-application/fee-guidance                                          @controllers.FeeGuidanceController.get()
 
