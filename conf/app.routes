@@ -387,8 +387,8 @@ POST        /responsible-people/date-of-birth/:index                            
 GET         /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
-POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
+GET         /responsible-people/check-your-answers                                    @controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
+POST        /responsible-people/check-your-answers                                    @controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
 
 GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)

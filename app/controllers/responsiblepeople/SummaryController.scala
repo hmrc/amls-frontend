@@ -16,26 +16,31 @@
 
 package controllers.responsiblepeople
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait SummaryController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService : StatusService
+class SummaryController @Inject()(
+                                   val dataCacheConnector: DataCacheConnector,
+                                   val authConnector: AuthConnector,
+                                   val statusService: StatusService,
+                                   config: AppConfig
+                                 ) extends BaseController {
 
   def get(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
@@ -66,15 +71,16 @@ trait SummaryController extends BaseController {
       status <- statusService.getStatus
       hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
     } yield status match {
-      case SubmissionReady | NotCompleted => redirectReadyOrNotCompleted(hasNominatedOfficer)
-      case SubmissionReadyForReview => redirectReadyForReview(hasNominatedOfficer)
-      case _ => redirectOtherStatus(hasNominatedOfficer)
+        case SubmissionReady | NotCompleted => redirectReadyOrNotCompleted(hasNominatedOfficer)
+        case SubmissionReadyForReview => redirectReadyForReview(hasNominatedOfficer)
+        case _ => redirectOtherStatus(hasNominatedOfficer)
     }
   }
 
   private def redirectReadyOrNotCompleted(hasNominatedOfficer: Boolean) = {
     hasNominatedOfficer match {
-      case true => Redirect(controllers.routes.FeeGuidanceController.get())
+      case true if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
+      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
       case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
     }
   }
@@ -93,11 +99,4 @@ trait SummaryController extends BaseController {
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }

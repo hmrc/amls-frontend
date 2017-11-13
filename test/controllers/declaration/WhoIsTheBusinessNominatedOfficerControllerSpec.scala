@@ -210,7 +210,6 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
 
       }
 
-
     }
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
