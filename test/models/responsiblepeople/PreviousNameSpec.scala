@@ -44,6 +44,7 @@ class PreviousNameSpec extends PlaySpec {
     "successfully validate with all fields" in {
 
       val data: UrlFormEncoded = Map(
+        "hasPreviousName" -> Seq("true"),
         "firstName" -> Seq("oldFirst"),
         "middleName" -> Seq("oldMiddle"),
         "lastName" -> Seq("oldLast")
@@ -64,6 +65,7 @@ class PreviousNameSpec extends PlaySpec {
     "successfully validate with firstName and lastname" in {
 
       val data: UrlFormEncoded = Map(
+        "hasPreviousName" -> Seq("true"),
         "firstName" -> Seq("oldFirst"),
         "date.day" -> Seq("24"),
         "date.month" -> Seq("2")
@@ -82,10 +84,8 @@ class PreviousNameSpec extends PlaySpec {
     "successfully validate with just middleName" in {
 
       val data: UrlFormEncoded = Map(
-        "middleName" -> Seq("oldMiddle"),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "hasPreviousName" -> Seq("true"),
+        "middleName" -> Seq("oldMiddle")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -101,10 +101,8 @@ class PreviousNameSpec extends PlaySpec {
     "successfully validate with just lastName" in {
 
       val data: UrlFormEncoded = Map(
-        "lastName" -> Seq("oldLast"),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2"),
-        "date.year" -> Seq("1990")
+        "hasPreviousName" -> Seq("true"),
+        "lastName" -> Seq("oldLast")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -120,6 +118,7 @@ class PreviousNameSpec extends PlaySpec {
     "fail to validate with no names" in {
 
       val data: UrlFormEncoded = Map(
+        "hasPreviousName" -> Seq("true"),
         "firstName" -> Seq(""),
         "middleName" -> Seq(""),
         "lastName" -> Seq("")

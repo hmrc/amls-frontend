@@ -89,6 +89,29 @@
             }
         </h2>
 
+        @detailedAnswers(
+            question = Messages("responsiblepeople.personName.title"),
+            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
+            dataItem = person.personName
+        ) { pn =>
+                <p>@pn.fullName</p>
+        }
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.legalName.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
+            dataItem = person.legalName
+            ) { ln =>
+                @ln.isDefined(ln) match {
+                    case false => {<p>@Messages("lbl.no")</p>}
+                    case true => {
+                        <ul class="list">
+                            <li>@ln.fullName</li>
+                        </ul>
+                    }
+                }
+        }
+
 
 
         @detailedAnswers(

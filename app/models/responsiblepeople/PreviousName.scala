@@ -21,6 +21,8 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{ValidationError, _}
 import play.api.libs.json.{Json, Writes => _}
 import utils.MappingUtils.Implicits._
+import jto.validation.forms.Writes._
+import play.api.libs.functional.syntax._
 
 case class PreviousName(
                          firstName: Option[String],
@@ -28,17 +30,11 @@ case class PreviousName(
                          lastName: Option[String]
                        ) {
 
-  def formattedPreviousName(that: PersonName): String = that match {
-    case PersonName(first, middle, last) =>
-      Seq(
-        firstName orElse Some(first),
-        middleName orElse middle,
-        lastName orElse Some(last)
-      ).flatten[String].mkString(" ")
-  }
+  val fullName = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
 
-  def isDefined = {
-    true
+  def isDefined(pn: PreviousName): Boolean = pn match {
+    case PreviousName(None, None, None) => false
+    case _ => true
   }
 
 }
@@ -46,6 +42,8 @@ case class PreviousName(
 object PreviousName {
 
   import models.FormTypes._
+  import utils.MappingUtils.Implicits._
+
 
   implicit val formR: Rule[UrlFormEncoded, PreviousName] = From[UrlFormEncoded] { __ =>
 
@@ -73,17 +71,19 @@ object PreviousName {
     }
   }
 
-  implicit val formW: Write[PreviousName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formW: Write[PreviousName, UrlFormEncoded] = Write {
 
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax._
+      case PreviousName(None, None, None) =>
+        Map("hasPreviousName" -> Seq("false"))
+      case PreviousName(a, b, c) =>
+        Map(
+          "hasPreviousName" -> Seq("true"),
+          "firstName" -> Seq(a.toString),
+          "middleName" -> Seq(b.toString),
+          "lastName" -> Seq(c.toString)
+        )
 
-    (
-      (__ \ "firstName").write[Option[String]] ~
-        (__ \ "middleName").write[Option[String]] ~
-        (__ \ "lastName").write[Option[String]]
-      ) (unlift(PreviousName.unapply))
-  }
+    }
 
   implicit val format = Json.format[PreviousName]
 }
