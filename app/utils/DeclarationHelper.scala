@@ -54,16 +54,16 @@ object DeclarationHelper {
     }
   }
 
-  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus) = {
+  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus, showFees: Boolean) = {
     hasNominatedOfficer match {
-      case true => routeWithNominatedOfficer(status)
+      case true => routeWithNominatedOfficer(status, showFees)
       case false => routeWithoutNominatedOfficer(status)
     }
   }
 
-  private def routeWithNominatedOfficer(status: SubmissionStatus) = {
+  private def routeWithNominatedOfficer(status: SubmissionStatus, showFees: Boolean) = {
     status match {
-      case SubmissionReady | NotCompleted => routes.FeeGuidanceController.get()
+      case SubmissionReady | NotCompleted if showFees => routes.FeeGuidanceController.get()
       case _ => declaration.routes.WhoIsRegisteringController.get()
     }
   }

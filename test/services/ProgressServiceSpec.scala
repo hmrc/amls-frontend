@@ -48,7 +48,7 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.show-fees" -> false)
+      .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
@@ -217,6 +217,66 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
+
+      "show fees is false" when {
+        "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
+
+          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
+
+          val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+          val responsiblePeople = Seq(rp1, rp2)
+          val businessMatching = BusinessMatching(reviewDetails = Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.Partnership),
+              mock[Address],
+              "safeId",
+              None
+            )
+          ))
+
+          mockApplicationStatus(SubmissionReady)
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
+
+          whenReady(service.getSubmitRedirect) {
+            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          }
+
+        }
+
+        "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
+
+          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
+
+          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+          val responsiblePeople = Seq(rp1, rp2)
+          val businessMatching = BusinessMatching(reviewDetails = Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
+          ))
+
+          mockApplicationStatus(SubmissionReady)
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
+
+          whenReady(service.getSubmitRedirect) {
+            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          }
+        }
+      }
+
     }
 
     "return Who is the business’s nominated officer? url" when {

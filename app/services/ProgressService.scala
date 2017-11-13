@@ -47,7 +47,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 class ProgressService @Inject()(
                                  val cacheConnector: DataCacheConnector,
                                  val statusService: StatusService,
-                                 appConfig: AppConfig
+                                 config: AppConfig
                                ){
 
   def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[MsbServices])(implicit cache: CacheMap) =
@@ -112,15 +112,10 @@ class ProgressService @Inject()(
       businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-    } yield {
-
-      businessType match {
-        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
-          Some(controllers.declaration.routes.RegisterPartnersController.get())
-        }
-        case _ =>
-          Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
-      }
+    } yield businessType match {
+      case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
+        Some(controllers.declaration.routes.RegisterPartnersController.get())
+      case _ => Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
     }
     result getOrElse none[Call]
   }
