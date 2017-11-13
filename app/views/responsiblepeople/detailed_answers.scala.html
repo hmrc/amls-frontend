@@ -112,6 +112,14 @@
                 }
         }
 
+        @detailedAnswers(
+            question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
+            dataItem = person.legalNameChangeDate
+            ) { lncd =>
+                <p>@DateHelper.formatDate(lncd)</p>
+            }
+
 
 
         @detailedAnswers(
