@@ -25,12 +25,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
@@ -66,36 +65,11 @@ class SummaryController @Inject()(
       }
     }
 
-  private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) = {
+  private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
     for {
       status <- statusService.getStatus
       hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-    } yield status match {
-        case SubmissionReady | NotCompleted => redirectReadyOrNotCompleted(hasNominatedOfficer)
-        case SubmissionReadyForReview => redirectReadyForReview(hasNominatedOfficer)
-        case _ => redirectOtherStatus(hasNominatedOfficer)
-    }
-  }
-
-  private def redirectReadyOrNotCompleted(hasNominatedOfficer: Boolean) = {
-    hasNominatedOfficer match {
-      case true if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
-      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
-      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-    }
-  }
-  private def redirectReadyForReview(hasNominatedOfficer: Boolean) = {
-    hasNominatedOfficer match {
-      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
-      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
-    }
-  }
-  private def redirectOtherStatus(hasNominatedOfficer: Boolean) = {
-    hasNominatedOfficer match {
-      case true => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
-      case false => Redirect(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
-    }
-  }
+    } yield Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
