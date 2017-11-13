@@ -53,7 +53,7 @@ class FeeGuidanceControllerSpec extends GenericTestHelper
 
     val request = addToken(authRequest)
 
-    def defaultBuilder = new GuiceApplicationBuilder()
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))

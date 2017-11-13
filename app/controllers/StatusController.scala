@@ -242,11 +242,11 @@ object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
-  override private[controllers] val progressService: ProgressService = ProgressService
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
+  override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val dataCache = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
   // $COVERAGE-ON$
