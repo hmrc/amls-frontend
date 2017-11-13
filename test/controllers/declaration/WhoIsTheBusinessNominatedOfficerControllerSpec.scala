@@ -39,7 +39,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.show-fees" -> false)
+      .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
@@ -189,6 +189,22 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends GenericTestHelper w
       "pre-submission" when {
 
         "show-fees is toggled off" in new Fixture {
+
+          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
+
+          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+
+          val updatedList = Seq(rp.copy(
+            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+          ), rp2)
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockApplicationStatus(SubmissionReady)
+          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
 
         }
 

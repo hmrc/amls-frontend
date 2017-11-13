@@ -18,6 +18,7 @@ package controllers.declaration
 
 import javax.inject.Inject
 
+import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -40,7 +41,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val amlsConnector: AmlsConnector,
                                                              val dataCacheConnector: DataCacheConnector,
                                                              val authConnector: AuthConnector,
-                                                             val statusService: StatusService) extends BaseController {
+                                                             val statusService: StatusService,
+                                                             config: AppConfig) extends BaseController {
 
   def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
@@ -97,7 +99,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
               rp <- updateNominatedOfficer(responsiblePeople, data)
               _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
             } yield serviceStatus match {
-              case SubmissionReady | NotCompleted => Redirect(controllers.routes.FeeGuidanceController.get())
+              case SubmissionReady | NotCompleted if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
               case _ => Redirect(routes.WhoIsRegisteringController.get())
             }
           }
