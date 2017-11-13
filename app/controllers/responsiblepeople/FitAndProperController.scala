@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.DataCacheConnector
@@ -28,6 +28,7 @@ import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
+@Singleton
 class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         val authConnector: AuthConnector,

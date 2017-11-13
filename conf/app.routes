@@ -132,8 +132,8 @@ POST        /trading-premises/what-does-your-business-do/date-of-change/:index  
 GET         /trading-premises/who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/premises-registered/:index                              controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
-POST        /trading-premises/premises-registered/:index                              controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
+GET         /trading-premises/premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
+POST        /trading-premises/premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
 
 GET         /trading-premises/remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
 POST        /trading-premises/remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)

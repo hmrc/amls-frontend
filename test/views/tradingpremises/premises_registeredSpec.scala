@@ -39,7 +39,7 @@ class premises_registeredSpec extends GenericTestHelper with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.premises_registered(form2, 1)
+      def view = views.html.tradingpremises.premises_registered(form2, 1, true)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.premises.registered.title"))
@@ -51,6 +51,21 @@ class premises_registeredSpec extends GenericTestHelper with MustMatchers {
       doc.select("input[type=radio]").size mustBe 2
     }
 
+    "have the correct content" when {
+      "fees are being shown" in new ViewFixture {
+        def view = views.html.tradingpremises.premises_registered(EmptyForm, 1, true)
+
+        doc.body().html() must include(Messages("tradingpremises.have.registered.premises.text3"))
+
+      }
+      "fees are being hidden" in new ViewFixture {
+        def view = views.html.tradingpremises.premises_registered(EmptyForm, 1, false)
+
+        doc.body().html() must include(Messages("tradingpremises.have.registered.premises.text3.no.fees"))
+
+      }
+    }
+
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
@@ -58,7 +73,7 @@ class premises_registeredSpec extends GenericTestHelper with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.premises_registered(form2, 1)
+      def view = views.html.tradingpremises.premises_registered(form2, 1, true)
 
       errorSummary.html() must include("not a message Key")
     }

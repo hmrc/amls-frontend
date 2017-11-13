@@ -16,49 +16,46 @@
 
 package controllers.tradingpremises
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.{PremisesRegistered, PersonRegistered, VATRegistered, ResponsiblePeople}
+import models.responsiblepeople.PremisesRegistered
 import models.tradingpremises.TradingPremises
-import utils.{StatusConstants, RepeatingSection}
-
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.StatusConstants
 
 import scala.concurrent.Future
 
-trait PremisesRegisteredController extends BaseController {
+@Singleton
+class PremisesRegisteredController @Inject()(
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector,
+                                            config: AppConfig
+                                            ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  def get(index: Int) = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
+        case Some(data) => Ok(views.html.tradingpremises.premises_registered(
+          EmptyForm, data.count(x => !x.status.contains(StatusConstants.Deleted) && x != TradingPremises()), config.showFeesToggle))
+        case _ => Ok(views.html.tradingpremises.premises_registered(EmptyForm, index, config.showFeesToggle))
+      }
+  }
 
-  def get(index: Int) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
-          case Some(data) => Ok(views.html.tradingpremises.premises_registered(EmptyForm,
-            data.count(x => !x.status.contains(StatusConstants.Deleted) && x != TradingPremises())))
-          case _ => Ok(views.html.tradingpremises.premises_registered(EmptyForm, index))
-        }
-    }
+  def post(index: Int) = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[PremisesRegistered](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(views.html.tradingpremises.premises_registered(f, index, config.showFeesToggle)))
+        case ValidForm(_, data) =>
+          data.registerAnotherPremises match {
+            case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
+            case false => Future.successful(Redirect(routes.SummaryController.get()))
+          }
+      }
+  }
 
-  def post(index: Int) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        Form2[PremisesRegistered](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.premises_registered(f, index)))
-          case ValidForm(_, data) =>
-            data.registerAnotherPremises match {
-              case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
-              case false => Future.successful(Redirect(routes.SummaryController.get()))
-            }
-        }
-    }
-
-}
-
-object PremisesRegisteredController extends PremisesRegisteredController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }
