@@ -25,7 +25,7 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
-  "TransactionType" must {
+  "TransactionRecord" must {
 
     import jto.validation.forms.Rules._
 

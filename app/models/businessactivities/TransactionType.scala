@@ -17,11 +17,9 @@
 package models.businessactivities
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.Rules.{maxLength, notEmpty}
-import jto.validation.{From, Path, Rule, ValidationError}
 import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Path, Rule, ValidationError}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
-import models.businessactivities.KeepTransactionRecords.softwareNameType
 import utils.TraversableValidators.minLengthR
 
 sealed trait TransactionType {
@@ -37,27 +35,30 @@ case object Paper extends TransactionType
 case object DigitalSpreadsheet extends TransactionType
 case class DigitalSoftware(name: String) extends TransactionType
 
-object TransactionType {
+case class TransactionTypes(types: Set[TransactionType])
 
-  import utils.MappingUtils.Implicits._
+object TransactionTypes {
+
   import jto.validation.forms.Rules._
+  import utils.MappingUtils.Implicits._
 
   private val maxSoftwareNameLength = 40
 
-  private val softwareNameType =  notEmptyStrip andThen
+  private val softwareNameType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.ba.software.package.name") andThen
     maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
     basicPunctuationPattern()
 
-  implicit val formRule: Rule[UrlFormEncoded, Set[TransactionType]] = From[UrlFormEncoded] { __ =>
-    (__ \ "transactions").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { r => r.map {
+  implicit val formRule: Rule[UrlFormEncoded, TransactionTypes] = From[UrlFormEncoded] { __ =>
+    (__ \ "types").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { r =>
+      r.map {
         case "01" => toSuccessRule(Paper)
         case "02" => toSuccessRule(DigitalSpreadsheet)
         case "03" =>
           (__ \ "name").read(softwareNameType) map DigitalSoftware.apply
         case _ =>
           Rule[UrlFormEncoded, TransactionType] { _ =>
-            Invalid(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid"))))
+            Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.invalid"))))
           }
       }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
         Set.empty[TransactionType]
@@ -69,6 +70,6 @@ object TransactionType {
             }
           }
       }
-    }
+    } map TransactionTypes.apply
   }
 }

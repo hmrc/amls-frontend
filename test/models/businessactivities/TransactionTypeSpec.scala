@@ -26,68 +26,67 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
     "pass validation" when {
       "yes is selected and a few check boxes are selected" in {
         val model = Map(
-          "transactions[]" -> Seq("01", "02", "03"),
+          "types[]" -> Seq("01", "02", "03"),
           "name" -> Seq("test")
         )
 
-        TransactionType.formRule.validate(model) must
-          be(Valid(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test"))))
+        TransactionTypes.formRule.validate(model) must
+          be(Valid(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
       }
     }
 
     "fail validation" when {
       "software is selected but software name is empty, represented by an empty string" in {
         val model = Map(
-          "transactions[]" -> Seq("01", "02", "03"),
+          "types[]" -> Seq("01", "02", "03"),
           "name" -> Seq("")
         )
 
-        TransactionType.formRule.validate(model) must
+        TransactionTypes.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("error.required.ba.software.package.name"))))))
       }
 
       "software name exceeds max length" in {
         val model = Map(
-          "transactions[]" -> Seq("01", "02", "03"),
+          "types[]" -> Seq("01", "02", "03"),
           "name" -> Seq("a" * 41)
         )
 
-        TransactionType.formRule.validate(model) must
+        TransactionTypes.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("error.invalid.maxlength.40"))))))
       }
 
       "software name contains invalid characters" in {
         val model = Map(
-          "isRecorded" -> Seq("true"),
-          "transactions[]" -> Seq("01", "02", "03"),
+          "types[]" -> Seq("01", "02", "03"),
           "name" -> Seq("abc{}abc")
         )
 
-        TransactionType.formRule.validate(model) must
+        TransactionTypes.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("err.text.validation"))))))
       }
 
       "no check boxes are selected in transactions" in {
         val model = Map(
-          "transactions[]" -> Seq()
+          "types[]" -> Seq()
         )
 
-        TransactionType.formRule.validate(model) must
-          be(Invalid(List((Path \ "transactions", Seq(ValidationError("error.required.ba.atleast.one.transaction.record"))))))
+        TransactionTypes.formRule.validate(model) must
+          be(Invalid(List((Path \ "types", Seq(ValidationError("error.required.ba.atleast.one.transaction.record"))))))
       }
 
       "given an empty Map" in {
-        TransactionType.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "transactions") -> Seq(ValidationError("error.required.ba.atleast.one.transaction.record")))))
+        TransactionTypes.formRule.validate(Map.empty) must
+          be(Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.required.ba.atleast.one.transaction.record")))))
       }
 
       "given invalid enum value in transactions" in {
         val model = Map(
-          "transactions[]" -> Seq("01, 10")
+          "types[]" -> Seq("01, 10")
         )
 
-        TransactionType.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid")))))
+        TransactionTypes.formRule.validate(model) must
+          be(Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.invalid")))))
       }
     }
   }
