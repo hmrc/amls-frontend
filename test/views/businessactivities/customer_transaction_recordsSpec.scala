@@ -17,7 +17,7 @@
 package views.businessactivities
 
 import forms.{InvalidForm, ValidForm, Form2}
-import models.businessactivities.{TransactionRecordNo, TransactionRecord}
+import models.businessactivities.{TransactionRecordNo, KeepTransactionRecords}
 import org.scalatest.{MustMatchers}
 import utils.GenericTestHelper
 import jto.validation.Path
@@ -35,7 +35,7 @@ class customer_transaction_recordsSpec extends GenericTestHelper with MustMatche
   "customer_transaction_records view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[TransactionRecord] = Form2(TransactionRecordNo)
+      val form2: ValidForm[KeepTransactionRecords] = Form2(TransactionRecordNo)
 
       def view = views.html.businessactivities.customer_transaction_records(form2, true)
 
@@ -44,7 +44,7 @@ class customer_transaction_recordsSpec extends GenericTestHelper with MustMatche
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[TransactionRecord] = Form2(TransactionRecordNo)
+      val form2: ValidForm[KeepTransactionRecords] = Form2(TransactionRecordNo)
 
       def view = views.html.businessactivities.customer_transaction_records(form2, true)
 

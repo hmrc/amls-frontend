@@ -25,7 +25,7 @@ case class BusinessActivities(
                                expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
                                expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None,
-                               transactionRecord: Option[TransactionRecord] = None,
+                               transactionRecord: Option[KeepTransactionRecords] = None,
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
@@ -58,7 +58,7 @@ case class BusinessActivities(
     this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p),
       hasAccepted = hasAccepted && this.identifySuspiciousActivity.contains(p))
 
-  def transactionRecord(p: TransactionRecord): BusinessActivities =
+  def transactionRecord(p: KeepTransactionRecords): BusinessActivities =
     this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p),
       hasAccepted = hasAccepted && this.transactionRecord.contains(p))
 
@@ -139,7 +139,7 @@ object BusinessActivities {
       __.read(Reads.optionNoError[ExpectedBusinessTurnover]) and
       __.read(Reads.optionNoError[ExpectedAMLSTurnover]) and
       __.read(Reads.optionNoError[BusinessFranchise]) and
-      __.read(Reads.optionNoError[TransactionRecord]) and
+      __.read(Reads.optionNoError[KeepTransactionRecords]) and
       __.read(Reads.optionNoError[CustomersOutsideUK]) and
       __.read(Reads.optionNoError[NCARegistered]) and
       __.read(Reads.optionNoError[AccountantForAMLSRegulations]) and

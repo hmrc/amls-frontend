@@ -26,11 +26,11 @@ import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
 
-sealed trait TransactionRecord
+sealed trait KeepTransactionRecords
 
-case class TransactionRecordYes(transactionType: Set[TransactionType]) extends TransactionRecord
+case class TransactionRecordYes(transactionType: Set[TransactionType]) extends KeepTransactionRecords
 
-case object TransactionRecordNo extends TransactionRecord
+case object TransactionRecordNo extends KeepTransactionRecords
 
 
 sealed trait TransactionType {
@@ -48,7 +48,7 @@ case object DigitalSpreadsheet extends TransactionType
 
 case class DigitalSoftware(name: String) extends TransactionType
 
-object TransactionRecord {
+object KeepTransactionRecords {
 
   import utils.MappingUtils.Implicits._
 
@@ -58,7 +58,7 @@ object TransactionRecord {
                           maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
                           basicPunctuationPattern()
 
-  implicit val formRule: Rule[UrlFormEncoded, TransactionRecord] =
+  implicit val formRule: Rule[UrlFormEncoded, KeepTransactionRecords] =
     From[UrlFormEncoded] { __ =>
       (__ \ "isRecorded").read[Boolean].withMessage("error.required.ba.select.transaction.record") flatMap {
         case true =>
@@ -88,7 +88,7 @@ object TransactionRecord {
       }
     }
 
-  implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
+  implicit def formWrites = Write[KeepTransactionRecords, UrlFormEncoded] {
     case TransactionRecordNo => Map("isRecorded" -> "false")
     case TransactionRecordYes(transactions) =>
       Map(
@@ -102,7 +102,7 @@ object TransactionRecord {
       }
   }
 
-  implicit val jsonReads: Reads[TransactionRecord] =
+  implicit val jsonReads: Reads[KeepTransactionRecords] =
     (__ \ "isRecorded").read[Boolean] flatMap {
       case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
         x.map {
@@ -126,7 +126,7 @@ object TransactionRecord {
       case false => Reads(_ => JsSuccess(TransactionRecordNo))
     }
 
-  implicit val jsonWrite = Writes[TransactionRecord] {
+  implicit val jsonWrite = Writes[KeepTransactionRecords] {
     case TransactionRecordNo => Json.obj("isRecorded" -> false)
     case TransactionRecordYes(transactions) =>
       Json.obj(

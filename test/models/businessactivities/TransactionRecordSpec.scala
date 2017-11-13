@@ -38,7 +38,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "name" -> Seq("test")
         )
 
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Valid(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
 
       }
@@ -49,7 +49,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "isRecorded" -> Seq("false")
         )
 
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Valid(TransactionRecordNo))
 
       }
@@ -63,7 +63,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "name" -> Seq("")
         )
 
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(List((Path \ "isRecorded", Seq(ValidationError("error.required.ba.select.transaction.record"))))))
 
       }
@@ -75,7 +75,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "transactions[]" -> Seq("01", "02", "03"),
           "name" -> Seq("")
         )
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("error.required.ba.software.package.name"))))))
       }
 
@@ -86,7 +86,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "transactions[]" -> Seq("01", "02", "03"),
           "name" -> Seq("a" * 41)
         )
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("error.invalid.maxlength.40"))))))
       }
 
@@ -97,7 +97,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "transactions[]" -> Seq("01", "02", "03"),
           "name" -> Seq("abc{}abc")
         )
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(List((Path \ "name", Seq(ValidationError("err.text.validation"))))))
       }
 
@@ -108,13 +108,13 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "transactions[]" -> Seq(),
           "name" -> Seq("test")
         )
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(List((Path \ "transactions", Seq(ValidationError("error.required.ba.atleast.one.transaction.record"))))))
       }
 
       "given an empty Map" in {
 
-        TransactionRecord.formRule.validate(Map.empty) must
+        KeepTransactionRecords.formRule.validate(Map.empty) must
           be(Invalid(Seq((Path \ "isRecorded") -> Seq(ValidationError("error.required.ba.select.transaction.record")))))
 
       }
@@ -125,7 +125,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           "isRecorded" -> Seq("true"),
           "transactions[]" -> Seq("01, 10")
         )
-        TransactionRecord.formRule.validate(model) must
+        KeepTransactionRecords.formRule.validate(model) must
           be(Invalid(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid")))))
 
       }
@@ -142,7 +142,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = TransactionRecordYes(Set(DigitalSoftware("test"), Paper))
-      TransactionRecord.formWrites.writes(model) must be(map)
+      KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
     "validate form write for option No" in {
@@ -151,7 +151,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "isRecorded" -> Seq("false")
       )
       val model = TransactionRecordNo
-      TransactionRecord.formWrites.writes(model) must be(map)
+      KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
     "validate form write for option Yes" in {
@@ -162,7 +162,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = TransactionRecordYes(Set(DigitalSpreadsheet, Paper))
-      TransactionRecord.formWrites.writes(model) must be(map)
+      KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
     "form write test" in {
@@ -171,7 +171,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       )
       val model = TransactionRecordNo
 
-      TransactionRecord.formWrites.writes(model) must be(map)
+      KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
   }
 
@@ -181,14 +181,14 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       val json =  Json.obj("isRecorded" -> true,
         "transactions" -> Seq("01","02"))
 
-      Json.fromJson[TransactionRecord](json) must
+      Json.fromJson[KeepTransactionRecords](json) must
         be(JsSuccess(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)), JsPath))
     }
 
     "successfully validate given values with option No" in {
       val json =  Json.obj("isRecorded" -> false)
 
-      Json.fromJson[TransactionRecord](json) must
+      Json.fromJson[KeepTransactionRecords](json) must
         be(JsSuccess(TransactionRecordNo, JsPath))
     }
 
@@ -197,30 +197,30 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "transactions" -> Seq("03", "02"),
       "digitalSoftwareName" -> "test")
 
-      Json.fromJson[TransactionRecord](json) must
+      Json.fromJson[KeepTransactionRecords](json) must
         be(JsSuccess(TransactionRecordYes(Set(DigitalSoftware("test"), DigitalSpreadsheet)), JsPath))
     }
 
     "fail when on path is missing" in {
-      Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,
+      Json.fromJson[KeepTransactionRecords](Json.obj("isRecorded" -> true,
         "transaction" -> Seq("01"))) must
         be(JsError((JsPath \ "transactions") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "fail when on invalid data" in {
-      Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,"transactions" -> Seq("40"))) must
+      Json.fromJson[KeepTransactionRecords](Json.obj("isRecorded" -> true,"transactions" -> Seq("40"))) must
         be(JsError(((JsPath) \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
     "write valid data in using json write" in {
-      Json.toJson[TransactionRecord](TransactionRecordYes(Set(Paper, DigitalSoftware("test657")))) must be (Json.obj("isRecorded" -> true,
+      Json.toJson[KeepTransactionRecords](TransactionRecordYes(Set(Paper, DigitalSoftware("test657")))) must be (Json.obj("isRecorded" -> true,
       "transactions" -> Seq("01", "03"),
         "digitalSoftwareName" -> "test657"
       ))
     }
 
     "write valid data in using json write with Option No" in {
-      Json.toJson[TransactionRecord](TransactionRecordNo) must be (Json.obj("isRecorded" -> false))
+      Json.toJson[KeepTransactionRecords](TransactionRecordNo) must be (Json.obj("isRecorded" -> false))
     }
   }
 }
