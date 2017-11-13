@@ -16,18 +16,24 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import javax.inject.Inject
+
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.responsiblepeople.ResponsiblePeople
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait FitAndProperController extends RepeatingSection with BaseController {
+class FitAndProperController @Inject()(
+                                        val dataCacheConnector: DataCacheConnector,
+                                        val authConnector: AuthConnector,
+                                        config: AppConfig
+                                      ) extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.fit_and_proper")
@@ -35,24 +41,23 @@ trait FitAndProperController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_))
-              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
-            case _
-              => NotFound(notFoundView)
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
+              Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, config.showFeesToggle))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+              Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, config.showFeesToggle))
+            case _ => NotFound(notFoundView)
           }
       }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
       Authorised.async {
-        implicit authContext => implicit request => {
+        implicit authContext => implicit request =>
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map {rp =>
-                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              getData[ResponsiblePeople](index) map { rp =>
+                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), config.showFeesToggle))
               }
-            case ValidForm(_, data) =>{
+            case ValidForm(_, data) => {
               for {
                 _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   rp.hasAlreadyPassedFitAndProper(data)
@@ -61,17 +66,10 @@ trait FitAndProperController extends RepeatingSection with BaseController {
                 case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
                 case false => Redirect(routes.PersonRegisteredController.get(index, flow))
               }
-            }.recoverWith {
+            } recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
           }
-        }
       }
 
-}
-
-object FitAndProperController extends FitAndProperController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
