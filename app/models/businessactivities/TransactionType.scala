@@ -18,8 +18,9 @@ package models.businessactivities
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError}
+import jto.validation.{From, Path, Rule, To, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+import play.api.libs.json.{JsArray, JsString, Json, Writes}
 import utils.TraversableValidators.minLengthR
 
 sealed trait TransactionType {
@@ -41,6 +42,14 @@ object TransactionTypes {
 
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
+
+  implicit val writes = Writes[TransactionTypes] { t =>
+    Json.obj(
+      "types" -> t.types.map(_.value)
+    ) ++ (t.types.collectFirst {
+      case DigitalSoftware(name) => Json.obj("name" -> name)
+    } getOrElse Json.obj())
+  }
 
   private val maxSoftwareNameLength = 40
 
@@ -72,4 +81,13 @@ object TransactionTypes {
       }
     } map TransactionTypes.apply
   }
+
+  implicit val formWriter = Write[TransactionTypes, UrlFormEncoded] { t =>
+    Map(
+      "types[]" -> t.types.map(_.value).toSeq
+    ) ++ t.types.collectFirst {
+      case DigitalSoftware(name) => name
+    }.fold(Map[String, Seq[String]]())(n => Map("name" -> Seq(n)))
+  }
+
 }

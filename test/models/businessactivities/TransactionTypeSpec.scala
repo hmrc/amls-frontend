@@ -19,6 +19,7 @@ package models.businessactivities
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class TransactionTypeSpec extends PlaySpec with MustMatchers {
 
@@ -88,6 +89,33 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         TransactionTypes.formRule.validate(model) must
           be(Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.invalid")))))
       }
+    }
+
+    "write values to the form " in {
+      val model = TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))
+      val output = TransactionTypes.formWriter.writes(model)
+
+      output mustBe Map(
+        "types[]" -> Seq("01", "02", "03"),
+        "name" -> Seq("test")
+      )
+    }
+
+    "write values to the form without the name" in {
+      val model = TransactionTypes(Set(Paper))
+
+      TransactionTypes.formWriter.writes(model) mustBe Map(
+        "types[]" -> Seq("01")
+      )
+    }
+
+    "write values to JSON" in {
+      val model = TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))
+
+      Json.toJson(model) mustBe Json.obj(
+        "types" -> Seq("01", "02", "03"),
+        "name" -> "test"
+      )
     }
   }
 }
