@@ -32,31 +32,15 @@ case class KeepTransactionRecordYes(transactionType: Set[TransactionType]) exten
 
 case object KeepTransactionRecordNo extends KeepTransactionRecords
 
-
-sealed trait TransactionType {
-  val value: String =
-    this match {
-      case Paper => "01"
-      case DigitalSpreadsheet => "02"
-      case DigitalSoftware(_) => "03"
-    }
-}
-
-case object Paper extends TransactionType
-
-case object DigitalSpreadsheet extends TransactionType
-
-case class DigitalSoftware(name: String) extends TransactionType
-
 object KeepTransactionRecords {
 
   import utils.MappingUtils.Implicits._
 
   val maxSoftwareNameLength = 40
   val softwareNameType =  notEmptyStrip andThen
-                          notEmpty.withMessage("error.required.ba.software.package.name") andThen
-                          maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
-                          basicPunctuationPattern()
+    notEmpty.withMessage("error.required.ba.software.package.name") andThen
+    maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
+    basicPunctuationPattern()
 
   implicit val formRule: Rule[UrlFormEncoded, KeepTransactionRecords] =
     From[UrlFormEncoded] { __ =>
