@@ -33,7 +33,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
   val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultTransactionRecord = KeepTransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
@@ -53,7 +53,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val NewInvolvedInOther = InvolvedInOtherYes(NewInvolvedInOtherDetails)
   val NewBusinessTurnover = ExpectedBusinessTurnover.Second
   val NewAMLSTurnover = ExpectedAMLSTurnover.Second
-  val NewTransactionRecord = TransactionRecordNo
+  val NewTransactionRecord = KeepTransactionRecordNo
   val NewCustomersOutsideUK = CustomersOutsideUK(None)
   val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)

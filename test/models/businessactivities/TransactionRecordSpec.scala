@@ -39,7 +39,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         )
 
         KeepTransactionRecords.formRule.validate(model) must
-          be(Valid(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
+          be(Valid(KeepTransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
 
       }
 
@@ -50,7 +50,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         )
 
         KeepTransactionRecords.formRule.validate(model) must
-          be(Valid(TransactionRecordNo))
+          be(Valid(KeepTransactionRecordNo))
 
       }
     }
@@ -141,7 +141,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test")
       )
 
-      val model = TransactionRecordYes(Set(DigitalSoftware("test"), Paper))
+      val model = KeepTransactionRecordYes(Set(DigitalSoftware("test"), Paper))
       KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
@@ -150,7 +150,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       val map = Map(
         "isRecorded" -> Seq("false")
       )
-      val model = TransactionRecordNo
+      val model = KeepTransactionRecordNo
       KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
@@ -161,7 +161,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "transactions[]" -> Seq("02", "01")
       )
 
-      val model = TransactionRecordYes(Set(DigitalSpreadsheet, Paper))
+      val model = KeepTransactionRecordYes(Set(DigitalSpreadsheet, Paper))
       KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
 
@@ -169,7 +169,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       val map = Map(
         "isRecorded" -> Seq("false")
       )
-      val model = TransactionRecordNo
+      val model = KeepTransactionRecordNo
 
       KeepTransactionRecords.formWrites.writes(model) must be(map)
     }
@@ -182,14 +182,14 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "transactions" -> Seq("01","02"))
 
       Json.fromJson[KeepTransactionRecords](json) must
-        be(JsSuccess(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)), JsPath))
+        be(JsSuccess(KeepTransactionRecordYes(Set(Paper, DigitalSpreadsheet)), JsPath))
     }
 
     "successfully validate given values with option No" in {
       val json =  Json.obj("isRecorded" -> false)
 
       Json.fromJson[KeepTransactionRecords](json) must
-        be(JsSuccess(TransactionRecordNo, JsPath))
+        be(JsSuccess(KeepTransactionRecordNo, JsPath))
     }
 
     "successfully validate given values with option Digital software" in {
@@ -198,7 +198,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       "digitalSoftwareName" -> "test")
 
       Json.fromJson[KeepTransactionRecords](json) must
-        be(JsSuccess(TransactionRecordYes(Set(DigitalSoftware("test"), DigitalSpreadsheet)), JsPath))
+        be(JsSuccess(KeepTransactionRecordYes(Set(DigitalSoftware("test"), DigitalSpreadsheet)), JsPath))
     }
 
     "fail when on path is missing" in {
@@ -213,14 +213,14 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
     }
 
     "write valid data in using json write" in {
-      Json.toJson[KeepTransactionRecords](TransactionRecordYes(Set(Paper, DigitalSoftware("test657")))) must be (Json.obj("isRecorded" -> true,
+      Json.toJson[KeepTransactionRecords](KeepTransactionRecordYes(Set(Paper, DigitalSoftware("test657")))) must be (Json.obj("isRecorded" -> true,
       "transactions" -> Seq("01", "03"),
         "digitalSoftwareName" -> "test657"
       ))
     }
 
     "write valid data in using json write with Option No" in {
-      Json.toJson[KeepTransactionRecords](TransactionRecordNo) must be (Json.obj("isRecorded" -> false))
+      Json.toJson[KeepTransactionRecords](KeepTransactionRecordNo) must be (Json.obj("isRecorded" -> false))
     }
   }
 }

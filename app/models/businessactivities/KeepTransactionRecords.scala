@@ -28,9 +28,9 @@ import cats.data.Validated.{Invalid, Valid}
 
 sealed trait KeepTransactionRecords
 
-case class TransactionRecordYes(transactionType: Set[TransactionType]) extends KeepTransactionRecords
+case class KeepTransactionRecordYes(transactionType: Set[TransactionType]) extends KeepTransactionRecords
 
-case object TransactionRecordNo extends KeepTransactionRecords
+case object KeepTransactionRecordNo extends KeepTransactionRecords
 
 
 sealed trait TransactionType {
@@ -81,16 +81,16 @@ object KeepTransactionRecords {
                       _ + x
                     }
                   }
-            } map TransactionRecordYes.apply
+            } map KeepTransactionRecordYes.apply
           }
 
-        case false => Rule.fromMapping { _ => Valid(TransactionRecordNo) }
+        case false => Rule.fromMapping { _ => Valid(KeepTransactionRecordNo) }
       }
     }
 
   implicit def formWrites = Write[KeepTransactionRecords, UrlFormEncoded] {
-    case TransactionRecordNo => Map("isRecorded" -> "false")
-    case TransactionRecordYes(transactions) =>
+    case KeepTransactionRecordNo => Map("isRecorded" -> "false")
+    case KeepTransactionRecordYes(transactions) =>
       Map(
         "isRecorded" -> Seq("true"),
         "transactions[]" -> (transactions map { _.value }).toSeq
@@ -122,13 +122,13 @@ object KeepTransactionRecords {
              }
            }
         }
-      } map TransactionRecordYes.apply
-      case false => Reads(_ => JsSuccess(TransactionRecordNo))
+      } map KeepTransactionRecordYes.apply
+      case false => Reads(_ => JsSuccess(KeepTransactionRecordNo))
     }
 
   implicit val jsonWrite = Writes[KeepTransactionRecords] {
-    case TransactionRecordNo => Json.obj("isRecorded" -> false)
-    case TransactionRecordYes(transactions) =>
+    case KeepTransactionRecordNo => Json.obj("isRecorded" -> false)
+    case KeepTransactionRecordYes(transactions) =>
       Json.obj(
         "isRecorded" -> true,
         "transactions" -> (transactions map {

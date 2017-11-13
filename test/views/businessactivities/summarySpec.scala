@@ -83,7 +83,7 @@ class summarySpec extends GenericTestHelper
           Some(ExpectedBusinessTurnover.First),
           Some(ExpectedAMLSTurnover.First),
           Some(BusinessFranchiseYes("FranchiseName")),
-          Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName")))),
+          Some(KeepTransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName")))),
           None, // This is only present in renewal
           Some(NCARegistered(true)),
           Some(AccountantForAMLSRegulations(true)),
