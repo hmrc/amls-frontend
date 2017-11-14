@@ -16,8 +16,9 @@
 
 package utils
 
-import play.api.http.{Status, DefaultHttpErrorHandler}
 import play.api.mvc._
+
+import scala.concurrent.Future
 
 case class FeatureToggle(feature: Boolean) {
   def apply(action: Action[AnyContent]): Action[AnyContent] =
@@ -26,7 +27,7 @@ case class FeatureToggle(feature: Boolean) {
 
 object FeatureToggle {
   val notFound = Action.async {
-    request =>
-      DefaultHttpErrorHandler.onClientError(request, Status.NOT_FOUND, "")
+    implicit request =>
+      Future.successful(Results.NotFound(ControllerHelper.notFoundView(request)))
   }
 }
