@@ -20,19 +20,28 @@ import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
 import forms.EmptyForm
+import models.businessmatching.BusinessActivities
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
 
 @Singleton
 class RemoveActivitiesController @Inject()(
-                                          val authConnector: AuthConnector
+                                          val authConnector: AuthConnector,
+                                          val businessMatchingService: BusinessMatchingService
                                           ) extends BaseController {
 
   def get = Authorised.async{
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok(views.html.businessmatching.updateservice.remove_activities(EmptyForm)))
+        businessMatchingService.getModel.value map { bm =>
+          (for {
+            businessMatching <- bm
+            businessActivities <- businessMatching.activities
+          } yield {
+            val activities = businessActivities.businessActivities map BusinessActivities.getValue
+            Ok(views.html.businessmatching.updateservice.remove_activities(EmptyForm, activities))
+          }) getOrElse InternalServerError("Could not retrieve activities")
+        }
   }
 
   def post = Authorised.async{

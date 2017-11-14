@@ -16,8 +16,15 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
+import models.businessmatching.BusinessMatching
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -25,8 +32,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 
-class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar {
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with BusinessMatchingGenerator{
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -36,6 +47,7 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[BusinessMatchingService].to(mock[BusinessMatchingService]))
       .build()
 
     val controller = app.injector.instanceOf[RemoveActivitiesController]
@@ -47,6 +59,10 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
     "get is called" must {
 
       "display the view" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
 
         val result = controller.get()(request)
 
