@@ -36,9 +36,9 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,Some(otherName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(known_by(Form2[KnownBy](KnownBy(Some(otherName))), edit, index, flow, personName.titleName ))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName), _, _, Some(otherName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(known_by(Form2[KnownBy](otherName), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(known_by(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -55,18 +55,25 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                rp.knownBy(data.otherNames.get)
+              _ <- {
+                data.isDefined(data) match {
+                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.knownBy(data)
+                  }
+                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.knownBy(KnownBy(None))
+                  }
+                }
               }
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
-            }
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+        case true => Redirect (routes.DetailedAnswersController.get (index, edit, flow) )
+        case false => Redirect (routes.PersonResidentTypeController.get (index, edit, flow) )
+        }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
   }
+}
 
 }

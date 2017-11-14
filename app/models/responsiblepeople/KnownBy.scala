@@ -24,13 +24,23 @@ import models.FormTypes._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 
-case class KnownBy(otherNames: Option[String])
+case class KnownBy(otherNames: Option[String]) {
+
+  val otherName = Seq(otherNames).flatten[String].mkString(" ")
+
+  def isDefined(kb: KnownBy): Boolean = kb match {
+    case KnownBy(None) => false
+    case _ => true
+  }
+}
 
 object KnownBy {
 
   import play.api.libs.json._
 
   implicit val formats = Json.format[KnownBy]
+
+
 
   val otherNamesLength = 140
   val otherNamesType = notEmptyStrip andThen
@@ -46,14 +56,16 @@ object KnownBy {
       }
     }
 
-  implicit val formWrite: Write[KnownBy, UrlFormEncoded] =
-    Write {
-        case KnownBy(b) =>
+  implicit val formWrite = Write[KnownBy, UrlFormEncoded] {
+    model =>
+      model.isDefined(model) match {
+        case true =>
           Map(
             "hasOtherNames" -> Seq("true"),
-            "otherNames" -> Seq(b.toString)
+            "otherNames" -> Seq(model.otherNames getOrElse "")
           )
         case _ =>
           Map("hasOtherNames" -> Seq("false"))
       }
+  }
 }

@@ -21,8 +21,6 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{ValidationError, _}
 import play.api.libs.json.{Json, Writes => _}
 import utils.MappingUtils.Implicits._
-import jto.validation.forms.Writes._
-import play.api.libs.functional.syntax._
 
 case class PreviousName(
                          firstName: Option[String],
@@ -71,19 +69,20 @@ object PreviousName {
     }
   }
 
-  implicit val formW: Write[PreviousName, UrlFormEncoded] = Write {
-
-      case PreviousName(None, None, None) =>
-        Map("hasPreviousName" -> Seq("false"))
-      case PreviousName(a, b, c) =>
-        Map(
-          "hasPreviousName" -> Seq("true"),
-          "firstName" -> Seq(a.toString),
-          "middleName" -> Seq(b.toString),
-          "lastName" -> Seq(c.toString)
-        )
-
-    }
+  implicit val formWrite = Write[PreviousName, UrlFormEncoded] {
+    model =>
+      model.isDefined(model) match {
+        case true =>
+          Map(
+            "hasPreviousName" -> Seq("true"),
+            "firstName" -> Seq(model.firstName getOrElse ""),
+            "middleName" -> Seq(model.middleName getOrElse ""),
+            "lastName" -> Seq(model.lastName getOrElse "")
+          )
+        case _ =>
+          Map("hasPreviousName" -> Seq("false"))
+      }
+  }
 
   implicit val format = Json.format[PreviousName]
 }

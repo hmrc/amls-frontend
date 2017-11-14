@@ -36,9 +36,9 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),Some(previous),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(legal_name(Form2[PreviousName](previous), edit, index, flow, personName.titleName ))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName), Some(previous), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(legal_name(Form2[PreviousName](previous), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(legal_name(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -55,12 +55,20 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                rp.legalName(data)
+              _ <- {
+                data.isDefined(data) match {
+                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.legalName(data)
+                  }
+                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.legalName(PreviousName(None, None, None)).copy(legalNameChangeDate = None)
+                  }
+                }
               }
             } yield edit match {
+              case true if data.isDefined(data) => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false if data.firstName.isDefined || data.middleName.isDefined || data.lastName.isDefined =>
+              case false if data.isDefined(data) =>
                 Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case _ => Redirect(routes.KnownByController.get(index, edit, flow))
             }

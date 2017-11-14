@@ -35,10 +35,6 @@ class PreviousNameSpec extends PlaySpec {
 
       val personName = PersonName("First", Some("Middle"), "Last")
 
-      first.formattedPreviousName(personName) must be ("oldfirst Middle Last")
-      middle.formattedPreviousName(personName) must be ("First oldmiddle Last")
-      last.formattedPreviousName(personName) must be ("First Middle oldlast")
-
     }
 
     "successfully validate with all fields" in {
@@ -66,9 +62,7 @@ class PreviousNameSpec extends PlaySpec {
 
       val data: UrlFormEncoded = Map(
         "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq("oldFirst"),
-        "date.day" -> Seq("24"),
-        "date.month" -> Seq("2")
+        "firstName" -> Seq("oldFirst")
       )
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
@@ -135,6 +129,7 @@ class PreviousNameSpec extends PlaySpec {
     "correctly serialise" in {
 
       val data: UrlFormEncoded = Map(
+        "hasPreviousName" -> Seq("true"),
         "firstName" -> Seq("oldFirst"),
         "middleName" -> Seq("oldMiddle"),
         "lastName" -> Seq("oldLast")

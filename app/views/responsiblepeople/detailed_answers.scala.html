@@ -112,13 +112,32 @@
                 }
         }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
-            dataItem = person.legalNameChangeDate
-            ) { lncd =>
-                <p>@DateHelper.formatDate(lncd)</p>
+        @person.legalNameChangeDate.map { legalNameChangeDate =>
+            @detailedAnswers(
+                question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+                editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
+                dataItem = person.legalNameChangeDate
+                ) { lncd =>
+                    <p>@DateHelper.formatDate(lncd)</p>
             }
+        }
+
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.knownby.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
+            dataItem = person.knownBy
+        ) { other =>
+                @other.isDefined(other) match {
+                    case true => {
+                    <ul class="list">
+                        <li>@other.otherName</li>
+                    </ul>
+                    }
+                    case false => {<p>@Messages("lbl.no")</p>}
+                }
+        }
+
 
 
 
