@@ -16,10 +16,8 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.{From, Rule, Write}
-import jto.validation.forms.UrlFormEncoded
 import jto.validation.forms.Rules._
-
+import jto.validation.forms.UrlFormEncoded
 
 sealed trait ChangeServices
 

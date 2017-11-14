@@ -849,6 +849,10 @@ summary.linetext = Please check all the information you have provided.
 
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
+changeservices.choice.remove = Remove a service
+
+updateservice.removeactivities.title = What do you need to remove?
+updateservice.removeactivities.header = What do you need to remove?
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
