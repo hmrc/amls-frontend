@@ -288,7 +288,6 @@ GET         /update-information/activities-remove                               
 POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.RemoveActivitiesController.post()
 
 GET         /update-information/activities-remove-information                         @controllers.businessmatching.updateservice.RemoveActivitiesInformationController.get()
-POST        /update-information/activities-remove-information                         @controllers.businessmatching.updateservice.RemoveActivitiesInformationController.post()
 
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()

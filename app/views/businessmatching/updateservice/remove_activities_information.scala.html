@@ -1,0 +1,41 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import utils.HtmlElementHelpers._
+
+@(activity: String)(implicit request: Request[_], m:Messages)
+
+@header = {
+    @headingWithPlaceholder(
+        ("updateservice.removeactivitiesinformation.header", Messages(s"businessmatching.registerservices.servicename.lbl.$activity")),
+        "summary.updateinformation"
+    )
+}
+
+@main(
+    title = Messages("updateservice.removeactivitiesinformation.title") + " - " + Messages("summary.updateinformation"),
+    heading = header
+)  {
+
+
+    @anchor(
+        attrRole = true,
+        attrHref = controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url,
+        linkText = Messages("button.continue")
+    )
+}

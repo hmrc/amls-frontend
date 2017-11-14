@@ -19,23 +19,43 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import models.businessmatching.BusinessActivities
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
 class RemoveActivitiesInformationController @Inject()(
-                                                     val authConnector: AuthConnector
+                                                     val authConnector: AuthConnector,
+                                                     val businessMatchingService: BusinessMatchingService
                                                      ) extends BaseController {
 
-  def get() = Authorised.async{
+  def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-      ???
+        titlePlaceholder map { activity =>
+          Ok(views.html.businessmatching.updateservice.remove_activities_information(activity))
+        }
   }
 
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
       ???
+  }
+
+  private def titlePlaceholder(implicit hc: HeaderCarrier, ac: AuthContext) = businessMatchingService.getModel.value map { bm =>
+    val activities = for {
+      businessMatching <- bm
+      businessActivities <- businessMatching.activities
+    } yield businessActivities.businessActivities map BusinessActivities.getValue
+
+    activities match {
+      case Some(act) if act.size equals 1 => act.head
+      case _ => ""
+    }
+
   }
 
 }
