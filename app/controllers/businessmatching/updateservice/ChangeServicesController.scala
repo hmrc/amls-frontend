@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.change_services
+import routes._
 
 import scala.concurrent.Future
 
@@ -56,7 +57,15 @@ class ChangeServicesController @Inject()(
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) => data match {
             case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
-            case ChangeServicesRemove => Future.successful(Redirect(routes.RemoveActivitiesController.get()))
+            case ChangeServicesRemove => {
+              OptionT(getActivities) map { activities =>
+                if (activities.size < 2) {
+                  Redirect(RemoveActivitiesInformationController.get())
+                } else {
+                  Redirect(RemoveActivitiesController.get())
+                }
+              } getOrElse InternalServerError("Unable to show the page")
+            }
           }
         }
       }

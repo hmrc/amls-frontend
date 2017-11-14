@@ -86,7 +86,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
   }
 
-
   "RegisterServicesController" when {
 
     "get is called" must {

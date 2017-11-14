@@ -854,6 +854,9 @@ changeservices.choice.remove = Remove a service
 updateservice.removeactivities.title = What do you need to remove?
 updateservice.removeactivities.header = What do you need to remove?
 
+updateservice.removeactivitiesinformation.title = Unable to remove services
+updateservice.removeactivitiesinformation.header = Unable to remove {0} services
+
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 

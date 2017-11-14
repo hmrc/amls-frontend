@@ -37,7 +37,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
+class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -113,6 +113,22 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesController.get().url))
+
+        }
+      }
+
+      "redirect to RemoveActivitiesInformationController" when {
+        "there is a single service" in new Fixture{
+
+          mockCacheGetEntry[BusinessMatching](
+            Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
+            BusinessMatching.key
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesInformationController.get().url))
 
         }
       }

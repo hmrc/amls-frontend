@@ -38,7 +38,7 @@ import services.businessmatching.BusinessMatchingService
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with BusinessMatchingGenerator{
+class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
