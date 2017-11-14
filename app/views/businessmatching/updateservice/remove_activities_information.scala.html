@@ -18,11 +18,11 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(activity: String)(implicit request: Request[_], m:Messages)
+@(placeholder: String)(implicit request: Request[_], m:Messages)
 
 @header = {
     @headingWithPlaceholder(
-        ("updateservice.removeactivitiesinformation.header", Messages(s"businessmatching.registerservices.servicename.lbl.$activity")),
+        ("updateservice.removeactivitiesinformation.header", placeholder),
         "summary.updateinformation"
     )
 }

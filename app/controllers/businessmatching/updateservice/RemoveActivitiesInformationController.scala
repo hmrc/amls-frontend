@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
 import models.businessmatching.BusinessActivities
+import play.api.i18n.Messages
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -34,15 +35,9 @@ class RemoveActivitiesInformationController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        titlePlaceholder map { activity =>
-          Ok(views.html.businessmatching.updateservice.remove_activities_information(activity))
+        titlePlaceholder map { placeholder =>
+          Ok(views.html.businessmatching.updateservice.remove_activities_information(placeholder))
         }
-  }
-
-  def post() = Authorised.async{
-    implicit authContext =>
-      implicit request =>
-      ???
   }
 
   private def titlePlaceholder(implicit hc: HeaderCarrier, ac: AuthContext) = businessMatchingService.getModel.value map { bm =>
@@ -52,8 +47,8 @@ class RemoveActivitiesInformationController @Inject()(
     } yield businessActivities.businessActivities map BusinessActivities.getValue
 
     activities match {
-      case Some(act) if act.size equals 1 => act.head
-      case _ => ""
+      case Some(act) if act.size equals 1 => Messages(s"businessmatching.registerservices.servicename.lbl.${act.head}")
+      case _ => "services"
     }
 
   }

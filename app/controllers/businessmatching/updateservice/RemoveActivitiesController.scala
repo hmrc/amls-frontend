@@ -54,12 +54,17 @@ class RemoveActivitiesController @Inject()(
     implicit authContext =>
       implicit request =>
         import jto.validation.forms.Rules._
-        Form2[BusinessActivities](request.body) match {
-          case ValidForm(_, data) => Future.successful(Redirect(UpdateAnyInformationController.get()))
-          case f:InvalidForm => OptionT(getActivities) map { activities =>
-            BadRequest(views.html.businessmatching.updateservice.remove_activities(f, activities))
-          } getOrElse InternalServerError("Could not retrieve activities")
-        }
+        OptionT(getActivities) map { activities =>
+          Form2[BusinessActivities](request.body) match {
+            case ValidForm(_, data) =>
+              if (data.businessActivities.size < activities.size) {
+                Redirect(UpdateAnyInformationController.get())
+              } else {
+                Redirect(RemoveActivitiesInformationController.get())
+              }
+            case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.remove_activities(f, activities))
+          }
+        } getOrElse InternalServerError("Could not retrieve activities")
   }
 
   private def getActivities(implicit hc: HeaderCarrier, ac: AuthContext) = businessMatchingService.getModel.value map { bm =>

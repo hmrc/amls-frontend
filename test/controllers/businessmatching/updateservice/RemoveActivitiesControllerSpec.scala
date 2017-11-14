@@ -19,8 +19,8 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
+import generators.businessmatching.{BusinessActivitiesGenerator, BusinessMatchingGenerator}
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -38,7 +38,7 @@ import services.businessmatching.BusinessMatchingService
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with BusinessMatchingGenerator {
+class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -54,6 +54,12 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
 
     val controller = app.injector.instanceOf[RemoveActivitiesController]
 
+    when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+      activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))
+    ))
+
   }
 
   "RemoveActivitiesController" when {
@@ -65,10 +71,6 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
         when {
           controller.statusService.isPreSubmission(any(),any(),any())
         } thenReturn Future.successful(false)
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
 
         val result = controller.get()(request)
 
@@ -94,7 +96,7 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
     "post is called" must {
 
       "redirect to UpdateAnyInformationController" when {
-        "service can be deleted" in new Fixture {
+        "service can be removed" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("businessActivities[]" -> "03"))
 
@@ -104,12 +106,22 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
 
+      "redirect to RemoveActivitiesInformationController" when {
+        "all services are selected to be removed" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "businessActivities[]" -> "03",
+            "businessActivities[]" -> "04"
+          ))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.RemoveActivitiesInformationController.get().url))
+
+        }
+      }
+
       "respond with BAD_REQUEST" when {
         "request is invalid" in new Fixture {
-
-          when {
-            controller.businessMatchingService.getModel(any(),any(),any())
-          } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
 
           val result = controller.post()(request)
 
