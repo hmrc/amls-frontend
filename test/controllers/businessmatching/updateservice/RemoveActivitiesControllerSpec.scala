@@ -32,6 +32,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
@@ -46,6 +47,7 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[BusinessMatchingService].to(mock[BusinessMatchingService]))
       .build()
@@ -61,6 +63,10 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
       "display the view" in new Fixture {
 
         when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(false)
+
+        when {
           controller.businessMatchingService.getModel(any(),any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
 
@@ -71,6 +77,18 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
 
+      "return NOT_FOUND" when {
+        "status is pre-submission" in new Fixture {
+
+          when {
+            controller.statusService.isPreSubmission(any(),any(),any())
+          } thenReturn Future.successful(true)
+
+          val result = controller.get()(request)
+
+          status(result) must be(NOT_FOUND)
+        }
+      }
     }
 
   }
