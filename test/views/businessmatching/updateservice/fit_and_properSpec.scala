@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package views.responsiblepeople
+package views.businessmatching.updateservice
 
-import forms.{EmptyForm, InvalidForm, ValidForm, Form2}
-import org.scalatest.{MustMatchers}
-import utils.GenericTestHelper
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{EmptyForm, Form2, InvalidForm}
+import jto.validation.{Path, ValidationError}
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.GenericTestHelper
 import views.Fixture
 
 class fit_and_properSpec extends GenericTestHelper with MustMatchers {
@@ -35,13 +34,13 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
 
       doc.title must be(
-        Messages("responsiblepeople.fit_and_proper.title", "PersonName")
-        + " - " + Messages("summary.responsiblepeople")+
-        " - " + Messages("title.amls") +
-        " - " + Messages("title.gov")
+        Messages("businessmatching.updateservice.fitandproper.title")
+          + " - " + Messages("summary.updateinformation") +
+          " - " + Messages("title.amls") +
+          " - " + Messages("title.gov")
       )
     }
 
@@ -49,10 +48,10 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
 
-      heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
-      subHeading.html must include(Messages("summary.responsiblepeople"))
+      heading.html must be(Messages("businessmatching.updateservice.fitandproper.header"))
+      subHeading.html must include(Messages("summary.updateinformation"))
 
     }
 
@@ -61,18 +60,18 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+        def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
 
-        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details"))
+        doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info"))
 
       }
       "fees are being hidden" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false)
+        def view = views.html.businessmatching.updateservice.fit_and_proper(form2, false)
 
-        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details.no.fees"))
+        doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info.no.fees"))
       }
     }
 
@@ -80,16 +79,17 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))
+          (Path \ "passedFitAndProper") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("hasAlreadyPassedFitAndProper")
+      doc.getElementById("passedFitAndProper")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
   }
+
 }

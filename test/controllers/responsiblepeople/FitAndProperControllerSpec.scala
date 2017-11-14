@@ -18,34 +18,33 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo, VATRegisteredYes}
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
-
-import scala.concurrent.Future
-
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new FitAndProperController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
-  }
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> true)
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
-  val emptyCache = CacheMap("", Map.empty)
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[FitAndProperController]
+
+  }
 
   val testFitAndProper = Some(true)
 
@@ -55,8 +54,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
       "respond with OK" when {
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = testFitAndProper)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = testFitAndProper
+          ))), Some(ResponsiblePeople.key))
+
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
@@ -69,8 +70,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = Some(false))))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = Some(false)
+          ))), Some(ResponsiblePeople.key))
+
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
@@ -83,8 +86,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = None)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = None
+          ))), Some(ResponsiblePeople.key))
+
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
@@ -99,8 +104,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
       "respond with NOT_FOUND" when {
         "there is no PersonName present" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = None, hasAlreadyPassedFitAndProper = None)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            personName = None, hasAlreadyPassedFitAndProper = None
+          ))), Some(ResponsiblePeople.key))
+
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
 
@@ -111,15 +118,16 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     "post is called" must {
       "respond with NOT_FOUND" when {
         "the index is out of bounds" in new Fixture {
+
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = testFitAndProper)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            hasAlreadyPassedFitAndProper = testFitAndProper
+          ))), Some(ResponsiblePeople.key))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          mockCacheSave[Seq[ResponsiblePeople]]
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -131,8 +139,10 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "invalid"
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = testFitAndProper)))))
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            hasAlreadyPassedFitAndProper = testFitAndProper
+          ))), Some(ResponsiblePeople.key))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -146,11 +156,11 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = testFitAndProper)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            hasAlreadyPassedFitAndProper = testFitAndProper
+          ))), Some(ResponsiblePeople.key))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          mockCacheSave[Seq[ResponsiblePeople]]
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -163,11 +173,11 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = testFitAndProper)))))
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+            hasAlreadyPassedFitAndProper = testFitAndProper
+          ))), Some(ResponsiblePeople.key))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          mockCacheSave[Seq[ResponsiblePeople]]
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
