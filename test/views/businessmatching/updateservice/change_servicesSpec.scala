@@ -26,7 +26,6 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-
 class change_servicesSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
