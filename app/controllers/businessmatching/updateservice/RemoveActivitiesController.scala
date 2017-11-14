@@ -19,7 +19,10 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
+import forms.EmptyForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
 
 @Singleton
 class RemoveActivitiesController @Inject()(
@@ -29,7 +32,7 @@ class RemoveActivitiesController @Inject()(
   def get = Authorised.async{
     implicit authContext =>
       implicit request =>
-        ???
+        Future.successful(Ok(views.html.businessmatching.updateservice.remove_activities(EmptyForm)))
   }
 
   def post = Authorised.async{
