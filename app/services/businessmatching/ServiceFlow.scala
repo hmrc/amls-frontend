@@ -77,6 +77,9 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     } yield NextService(url, activity)
   }
 
+  def isNewActivity(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    businessMatchingService.getAdditionalBusinessActivities map {_.contains(activity)} getOrElse false
+
   def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = (for {
     updateService <- OptionT(cacheConnector.fetch[UpdateService](UpdateService.key))
     additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
@@ -84,4 +87,13 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     case (true, true) => true
     case _ => false
   }) getOrElse false
+
+  def setInServiceFlowFlag(value: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+    val modelToSave: Option[UpdateService] => UpdateService =
+      m => m.fold(UpdateService(inNewServiceFlow = value))(_.copy(inNewServiceFlow = value))
+
+    cacheConnector.fetch[UpdateService](UpdateService.key) flatMap { maybeModel =>
+      cacheConnector.save(UpdateService.key, modelToSave(maybeModel))
+    }
+  }
 }

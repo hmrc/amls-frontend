@@ -16,31 +16,33 @@
 
 package controllers.declaration
 
-import config.AMLSAuthConnector
+import javax.inject.Inject
+
+import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessNominatedOfficer
+import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
 import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.StatusConstants
 import views.html.declaration.select_business_nominated_officer
-import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
-
-  private[controllers] def amlsConnector: AmlsConnector
-
-  private[controllers] def dataCacheConnector: DataCacheConnector
-
-  private[controllers] def statusService: StatusService
+class WhoIsTheBusinessNominatedOfficerController @Inject ()(
+                                                             val amlsConnector: AmlsConnector,
+                                                             val dataCacheConnector: DataCacheConnector,
+                                                             val authConnector: AuthConnector,
+                                                             val statusService: StatusService,
+                                                             config: AppConfig) extends BaseController {
 
   def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
@@ -51,8 +53,6 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
-
-  def getWithAmendment = get
 
   def get = Authorised.async {
     implicit authContext =>
@@ -66,6 +66,8 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
               ) getOrElse businessNominatedOfficerView(Ok, EmptyForm, Seq.empty)
         }
   }
+
+  def getWithAmendment() = get
 
   def updateNominatedOfficer(eventualMaybePeoples: Option[Seq[ResponsiblePeople]],
                              data: BusinessNominatedOfficer): Future[Option[Seq[ResponsiblePeople]]] = {
@@ -88,12 +90,7 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[BusinessNominatedOfficer](request.body) match {
-        case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-          case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
-          case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
-        }
-        case ValidForm(_, data) => {
+      validateRequest(Form2[BusinessNominatedOfficer](request.body)){ data =>
           data.value match {
             case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ => for {
@@ -102,20 +99,22 @@ trait WhoIsTheBusinessNominatedOfficerController extends BaseController {
               rp <- updateNominatedOfficer(responsiblePeople, data)
               _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
             } yield serviceStatus match {
-              case SubmissionReady | NotCompleted => Redirect(controllers.routes.FeeGuidanceController.get())
-              case SubmissionReadyForReview => Redirect(routes.WhoIsRegisteringController.get())
+              case SubmissionReady | NotCompleted if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
               case _ => Redirect(routes.WhoIsRegisteringController.get())
             }
           }
-        }
       }
   }
-}
 
-object WhoIsTheBusinessNominatedOfficerController extends WhoIsTheBusinessNominatedOfficerController {
-  // $COVERAGE-OFF$
-  override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
-  override private[controllers] val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
-  override private[controllers] val statusService: StatusService = StatusService
+  def validateRequest(form: Form2[BusinessNominatedOfficer])
+                     (fn: BusinessNominatedOfficer => Future[Result])
+                     (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
+    form match {
+      case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+        case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
+        case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
+      }
+      case ValidForm(_, data) => fn(data)
+    }
+  }
 }

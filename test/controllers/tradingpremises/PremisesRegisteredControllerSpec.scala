@@ -17,32 +17,34 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{StatusConstants, AuthorisedFixture}
-
-import scala.concurrent.Future
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
 class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-    val controller = new PremisesRegisteredController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
-  }
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-  val emptyCache = CacheMap("", Map.empty)
+    val request = addToken(authRequest)
+
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> true)
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[PremisesRegisteredController]
+
+  }
 
   "PremisesRegisteredController" must {
 
@@ -50,8 +52,7 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
 
       "load the Premises Registered page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        mockCacheFetch[Seq[TradingPremises]](None, Some(TradingPremises.key))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -67,9 +68,14 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
         val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
           Some(true), Some(new LocalDate(1990, 2, 24)))
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(registeringAgentPremises = None,
-            yourTradingPremises = Some(ytp), status =  Some(StatusConstants.Deleted))))))
+        mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises(
+          None,
+          Some(ytp)),
+          TradingPremises(
+            registeringAgentPremises = None,
+            yourTradingPremises = Some(ytp),
+            status = Some(StatusConstants.Deleted))
+        )), Some(TradingPremises.key))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -84,11 +90,8 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
 
         val newRequest = request.withFormUrlEncodedBody("registerAnotherPremises" -> "true")
 
-        when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        mockCacheFetch[TradingPremises](None, Some(TradingPremises.key))
+        mockCacheSave[TradingPremises]
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -98,11 +101,8 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
       "successfully redirect to the page on selection of 'no'" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("registerAnotherPremises" -> "false")
 
-        when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        mockCacheFetch[TradingPremises](None, Some(TradingPremises.key))
+        mockCacheSave[TradingPremises]
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -113,8 +113,8 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
     "on post invalid data show error" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+
+      mockCacheFetch[TradingPremises](None, Some(TradingPremises.key))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -126,8 +126,8 @@ class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSug
       val newRequest = request.withFormUrlEncodedBody(
         "registerAnotherPremises" -> ""
       )
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+
+      mockCacheFetch[TradingPremises](None, Some(TradingPremises.key))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)

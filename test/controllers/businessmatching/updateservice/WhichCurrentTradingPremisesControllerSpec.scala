@@ -97,69 +97,36 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
         status(result) mustBe BAD_REQUEST
       }
 
-      "update the trading premises with the selected services" in new Fixture {
-        val models = Seq(
-          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
-          tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
-        )
+      "go to 'current trading premises'" when {
+        "more activities are to be checked" in new Fixture {
 
-        mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
+          val models = Seq(
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+          )
 
-        when {
-          bmService.fitAndProperRequired(any(),any(),any())
-        } thenReturn OptionT.some[Future, Boolean](false)
+          mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
 
-        val form = Seq(
-          "tradingPremises[]" -> "0",
-          "tradingPremises[]" -> "2"
-        )
+          when {
+            bmService.fitAndProperRequired(any(),any(),any())
+          } thenReturn OptionT.some[Future, Boolean](false)
 
-        val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
+          when {
+            bmService.activitiesToIterate(any(),any())
+          } thenReturn true
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+          val form = Seq(
+            "tradingPremises[]" -> "0",
+            "tradingPremises[]" -> "2"
+          )
 
-        val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+          val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
 
-        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get(1).url)
 
-        tpCaptor.getValue.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-        tpCaptor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
-        tpCaptor.getValue.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
-
-        tpCaptor.getValue.head.isComplete mustBe true
-        tpCaptor.getValue.head.hasChanged mustBe true
-
-      }
-
-      "mark the trading premises as incomplete if there are no activities left" in new Fixture {
-        val models = Seq(
-          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
-        )
-
-        mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
-
-        when {
-          bmService.fitAndProperRequired(any(),any(),any())
-        } thenReturn OptionT.some[Future, Boolean](false)
-
-        val form = "tradingPremises[]" -> "1"
-        val result = controller.post()(request.withFormUrlEncodedBody(form))
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
-
-        val tpCaptor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), tpCaptor.capture())(any(), any(), any())
-
-        tpCaptor.getValue.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
-        tpCaptor.getValue.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-
-        tpCaptor.getValue.head.isComplete mustBe false
-        tpCaptor.getValue.head.hasChanged mustBe true
-
+        }
       }
 
       "go to 'fit and proper'" when {
@@ -190,6 +157,39 @@ class WhichCurrentTradingPremisesControllerSpec extends GenericTestHelper
 
         }
       }
+
+      "go to 'new service information'" when {
+        "fit and proper is not required and there are no activities left to iterate" in new Fixture {
+
+          val models = Seq(
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
+            tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+          )
+
+          mockCacheFetch[Seq[TradingPremises]](Some(models), Some(TradingPremises.key))
+
+          when {
+            bmService.fitAndProperRequired(any(),any(),any())
+          } thenReturn OptionT.some[Future, Boolean](false)
+
+          when {
+            bmService.activitiesToIterate(any(),any())
+          } thenReturn false
+
+          val form = Seq(
+            "tradingPremises[]" -> "0",
+            "tradingPremises[]" -> "2"
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+
+        }
+      }
+
     }
   }
 }

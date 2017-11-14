@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -32,16 +33,19 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import utils.BooleanFormReadWrite
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
+import routes._
 
 @Singleton
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
                                         val businessMatchingService: BusinessMatchingService,
-                                        val statusService: StatusService)() extends BaseController with RepeatingSection {
+                                        val statusService: StatusService,
+                                        config: AppConfig) extends BaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 
@@ -52,7 +56,7 @@ class FitAndProperController @Inject()(
     implicit authContext =>
       implicit request =>
         filterRequest {
-          Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm)))
+          Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, config.showFeesToggle)))
         }
   }
 
@@ -65,10 +69,10 @@ class FitAndProperController @Inject()(
             case true =>
               updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
                 responsiblePeople.map(_.hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true))
-              } map { _ => Redirect(routes.NewServiceInformationController.get()) }
-            case false => Future.successful(Redirect(routes.WhichFitAndProperController.get()))
+              } map { _ => Redirect(NewServiceInformationController.get()) }
+            case false => Future.successful(Redirect(WhichFitAndProperController.get()))
           }
-          case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f)))
+          case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f, config.showFeesToggle)))
         }
       }
   }

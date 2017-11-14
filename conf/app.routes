@@ -68,7 +68,6 @@ POST        /about-the-business/activities                                      
 GET         /about-the-business/letters-address                                       controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
 POST        /about-the-business/letters-address                                       controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
 
-
 GET         /about-the-business/what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /about-the-business/check-your-answers                                    controllers.aboutthebusiness.SummaryController.get()
@@ -97,7 +96,6 @@ POST        /trading-premises/premises/date-of-change/:index                    
 GET         /trading-premises/crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
 
-
 GET         /trading-premises/crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
@@ -105,7 +103,6 @@ GET         /trading-premises/agent-name/:index                                 
 POST        /trading-premises/agent-name/:index                                       controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
 GET         /trading-premises/agent-name/date-of-change/:index                        controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
 POST        /trading-premises/agent-name/date-of-change/:index                        controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
-
 
 GET         /trading-premises/partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
@@ -132,8 +129,8 @@ POST        /trading-premises/what-does-your-business-do/date-of-change/:index  
 GET         /trading-premises/who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/premises-registered/:index                              controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
-POST        /trading-premises/premises-registered/:index                              controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
+GET         /trading-premises/premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
+POST        /trading-premises/premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
 
 GET         /trading-premises/remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
 POST        /trading-premises/remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
@@ -244,7 +241,6 @@ POST        /business-activities/employees                                      
 GET         /business-activities/employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
 POST        /business-activities/employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
-
 GET         /business-activities/accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
@@ -263,10 +259,9 @@ GET         /update-information/who-is-registering-renewal                      
 GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
 
-GET         /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
-POST        /submit-application/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
-
-GET         /update-information/nominated-officer                                     controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
+GET         /update-information/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+POST        /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
 GET         /submit-application/fee-guidance                                          @controllers.FeeGuidanceController.get()
 
@@ -289,6 +284,9 @@ GET         /update-information/add-person                                      
 GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
 POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
 
+GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.RemoveActivitiesController.get()
+POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.RemoveActivitiesController.post()
+
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
 
@@ -310,11 +308,11 @@ POST        /update-service/trading-premises/:index                             
 GET         /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.get(index: Int)
 POST        /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.post(index: Int)
 
-GET         /update-service/current-trading-premises                                  @controllers.businessmatching.updateservice.CurrentTradingPremisesController.get()
-POST        /update-service/current-trading-premises                                  @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post()
+GET         /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.get(index: Int)
+POST        /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post(index: Int)
 
-GET         /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get()
-POST        /update-service/which-current-trading-premises                            @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post()
+GET         /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get(index: Int)
+POST        /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post(index: Int)
 
 GET         /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.get()
 POST        /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.post()
@@ -388,8 +386,8 @@ POST        /responsible-people/date-of-birth/:index                            
 GET         /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/nationality/:index                                    controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
-POST        /responsible-people/check-your-answers                                    controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
+GET         /responsible-people/check-your-answers                                    @controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
+POST        /responsible-people/check-your-answers                                    @controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
 
 GET         /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
@@ -433,8 +431,8 @@ POST        /responsible-people/experience-training/:index                      
 GET         /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/training/:index                                       controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /responsible-people/fit-and-proper/:index                                 controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /responsible-people/fit-and-proper/:index                                 @controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /responsible-people/fit-and-proper/:index                                 @controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -443,7 +441,7 @@ GET         /responsible-people/responsible-person-registered/:index            
 POST        /responsible-people/responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, flow: Option[String] ?= None)
 
 GET         /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean, flow: Option[String] ?= None)
-POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String, flow: Option[String] ?= None)
+POST        /responsible-people/remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, flow: Option[String] ?= None)
 
 GET         /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /responsible-people/country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -472,8 +470,11 @@ POST        /trust-company-service-provider/services                            
 GET         /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/other-trust-provider                      controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+
+GET         /trust-company-service-provider/other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.post(edit: Boolean ?= false)
 
 GET         /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.get()
 POST        /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.post()
@@ -538,17 +539,17 @@ POST        /high-value-dealer/cash-payments                                    
 GET         /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.get()
 POST        /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.post()
 
-GET         /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/how-will-you-sell                                      controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/selling                                                controllers.hvd.ProductsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/selling                                                controllers.hvd.ProductsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/selling                                                @controllers.hvd.ProductsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/selling                                                @controllers.hvd.ProductsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/linked-cash-payments                                   controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/linked-cash-payments                                   controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/excise-goods                                           controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/excise-goods                                           controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/excise-goods                                           @controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/excise-goods                                           @controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
 GET         /high-value-dealer/percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)

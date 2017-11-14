@@ -23,8 +23,8 @@ import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.tcsp.Tcsp
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Mockito.{when, verify}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -142,6 +142,22 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     }
   }
 
+  "isNewService" when {
+    "called" must {
+      "return true if the service appears in the additionalBusinessActivities collection" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        whenReady(service.isNewActivity(AccountancyServices))(_ mustBe true)
+      }
+
+      "return false if the service does not appear in the additionaBusinessActivities collection" in new Fixture {
+        setUpActivities(Set(AccountancyServices))
+
+        whenReady(service.isNewActivity(HighValueDealing))(_ mustBe false)
+      }
+    }
+  }
+
   "inNewServiceFlow" when {
     "called" must {
       "return true if the specified service exists in the additional business activities" in new Fixture {
@@ -162,6 +178,26 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
         setUpActivities(Set(TrustAndCompanyServices))
 
         whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe false)
+      }
+    }
+  }
+
+  "setInServiceFlowFlag" must {
+    "update the data with the specified value" in new Fixture {
+      mockCacheFetch(Some(UpdateService(inNewServiceFlow = false)), Some(UpdateService.key))
+      mockCacheSave[UpdateService]
+
+      whenReady(service.setInServiceFlowFlag(true)) { _ =>
+        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), eqTo(UpdateService(inNewServiceFlow = true)))(any(), any(), any())
+      }
+    }
+
+    "update the value even when no value previously existed" in new Fixture {
+      mockCacheFetch(None, Some(UpdateService.key))
+      mockCacheSave[UpdateService]
+
+      whenReady(service.setInServiceFlowFlag(true)) { _ =>
+        verify(mockCacheConnector).save[UpdateService](eqTo(UpdateService.key), eqTo(UpdateService(inNewServiceFlow = true)))(any(), any(), any())
       }
     }
   }

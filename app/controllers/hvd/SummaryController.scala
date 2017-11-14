@@ -46,7 +46,7 @@ class SummaryController @Inject()
       implicit request =>
         for {
           hvd <- dataCache.fetch[Hvd](Hvd.key)
-          isEditable <- ControllerHelper.allowedToEdit
+          isEditable <- ControllerHelper.allowedToEdit(HighValueDealing)
         } yield hvd match {
           case Some(data) => Ok(summary(EmptyForm, data, isEditable))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())

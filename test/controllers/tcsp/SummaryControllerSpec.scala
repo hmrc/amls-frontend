@@ -24,14 +24,15 @@ import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+
+    val request = addToken(authRequest)
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
@@ -42,14 +43,15 @@ class SummaryControllerSpec extends GenericTestHelper {
     val model = Tcsp(
       Some(defaultCompanyServiceProviders),
       Some(defaultProvidedServices),
+      Some(true),
       Some(defaultServicesOfAnotherTCSP)
     )
 
     val controller = new SummaryController(
-      mock[DataCacheConnector],
+      mockCacheConnector,
       self.authConnector,
       mock[ServiceFlow],
-      mock[StatusService]
+      mockStatusService
     )
 
     when {
@@ -65,8 +67,7 @@ class SummaryControllerSpec extends GenericTestHelper {
 
     "load the summary page when section data is available" in new Fixture {
 
-      when(controller.dataCache.fetch[Tcsp](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      mockCacheFetch[Tcsp](Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -75,8 +76,7 @@ class SummaryControllerSpec extends GenericTestHelper {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[Tcsp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      mockCacheFetch[Tcsp](None)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -89,13 +89,8 @@ class SummaryControllerSpec extends GenericTestHelper {
 
       "the model has been updated with hasAccepted" in new Fixture {
 
-        when {
-          controller.dataCache.fetch[Tcsp](any())(any(), any(), any())
-        } thenReturn Future.successful(Some(model))
-
-        when {
-          controller.dataCache.save[Tcsp](any(),any())(any(),any(),any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
+        mockCacheFetch[Tcsp](Some(model))
+        mockCacheSave[Tcsp]
 
         val result = controller.post()(request)
 
@@ -108,15 +103,9 @@ class SummaryControllerSpec extends GenericTestHelper {
 
     "redirect to NewServiceInformationController" when {
       "status is not pre-submission and activity has just been added" in new Fixture {
-        val cache = mock[CacheMap]
 
-        when {
-          controller.dataCache.fetch[Tcsp](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(model))
-
-        when {
-          controller.dataCache.save[Tcsp](any(), any())(any(),any(),any())
-        } thenReturn Future.successful(cache)
+        mockCacheFetch[Tcsp](Some(model))
+        mockCacheSave[Tcsp]
 
         when {
           controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())

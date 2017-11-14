@@ -24,7 +24,6 @@ import play.api.libs.json.Json
 import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-
 trait TcspValues {
 
   object DefaultValues {
@@ -33,7 +32,8 @@ trait TcspValues {
     private val complexStructure = false
 
     val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
+    val DefaultCompanyServiceProviders = TcspTypes(Set(
+      NomineeShareholdersProvider,
       TrusteeProvider,
       CompanyDirectorEtc,
       CompanyFormationAgent(offTheShelf, complexStructure)))
@@ -63,6 +63,7 @@ trait TcspValues {
       "services" -> Seq("01", "08"),
       "details" -> "other service"
     ),
+    "doesServicesOfAnotherTCSP" -> true,
     "servicesOfAnotherTCSP" -> Json.obj(
       "servicesOfAnotherTCSP" -> true,
       "mlrRefNumber" -> "12345678"
@@ -74,6 +75,7 @@ trait TcspValues {
   val completeModel = Tcsp(
     Some(DefaultValues.DefaultCompanyServiceProviders),
     Some(DefaultValues.DefaultProvidedServices),
+    Some(true),
     Some(DefaultValues.DefaultServicesOfAnotherTCSP),
     hasAccepted = true
   )
@@ -141,12 +143,36 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
       }
     }
 
-    "Serialise as expected" in {
+    "Serialise" in {
       Json.toJson(completeModel) must be(completeJson)
     }
 
-    "Deserialise as expected" in {
-      completeJson.as[Tcsp] must be(completeModel)
+    "Deserialise" when {
+      "complete json is present" in {
+        completeJson.as[Tcsp] must be(completeModel)
+      }
+      "doesServicesOfAnotherTCSP is absent" in {
+
+        val completeJson = Json.obj(
+          "tcspTypes" -> Json.obj(
+            "serviceProviders" -> Seq("01", "02", "04", "05"),
+            "onlyOffTheShelfCompsSold" -> true,
+            "complexCorpStructureCreation" -> false
+          ),
+          "providedServices" -> Json.obj(
+            "services" -> Seq("01", "08"),
+            "details" -> "other service"
+          ),
+          "servicesOfAnotherTCSP" -> Json.obj(
+            "servicesOfAnotherTCSP" -> true,
+            "mlrRefNumber" -> "12345678"
+          ),
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        completeJson.as[Tcsp] must be(completeModel)
+      }
     }
 
     "None" when {
@@ -175,14 +201,67 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
   }
 
   "isComplete" must {
-    "return true if the model is complete" in {
-      completeModel.isComplete must be(true)
+    "return true" when {
+      "all fields are defined" in {
+        completeModel.isComplete must be(true)
+      }
+      "providedServices is not defined" when {
+        "tcspTypes does not contain RegisteredOfficeEtc" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            None,
+            Some(true),
+            Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(true)
+        }
+      }
+      "servicesOfAnotherTCSP is not defined" when {
+        "doesServicesOfAnotherTCSP is false" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(DefaultValues.DefaultProvidedServices),
+            Some(false),
+            None,
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(true)
+        }
+      }
+
     }
     val initial: Option[Tcsp] = None
 
-    "return false if the model is incomplete" in {
-      val incompleteModel = initial.copy(providedServices = None)
-      incompleteModel.isComplete must be(false)
+    "return false" when {
+      "the model is empty" in {
+        val incompleteModel = initial.copy(providedServices = None)
+        incompleteModel.isComplete must be(false)
+      }
+      "providedServices is not defined" when {
+        "tcspTypes does contain RegisteredOfficeEtc" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            None,
+            Some(true),
+            Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(true)
+        }
+      }
+      "servicesOfAnotherTCSP is not defined" when {
+        "doesServicesOfAnotherTCSP is true" in {
+          val completeModel = Tcsp(
+            Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(DefaultValues.DefaultProvidedServices),
+            Some(true),
+            None,
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(false)
+        }
+      }
     }
   }
 
@@ -240,6 +319,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
     }
   }
 }
+
 
 class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
 

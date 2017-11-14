@@ -19,14 +19,13 @@ package utils
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.libs.Crypto
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.SessionKeys
 
 trait AuthorisedFixture extends MockitoSugar {
 

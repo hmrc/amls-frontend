@@ -16,15 +16,13 @@
 
 package models.tcsp
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.collection.Seq
-
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  providedServices: Option[ProvidedServices] = None,
+                 doesServicesOfAnotherTCSP: Option[Boolean] = None,
                  servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None,
                  hasChanged:Boolean = false,
                  hasAccepted:Boolean = false) {
@@ -35,29 +33,22 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
   def providedServices(ps: ProvidedServices): Tcsp =
     this.copy(providedServices = Some(ps), hasChanged = hasChanged || !this.providedServices.contains(ps), hasAccepted = hasAccepted && this.providedServices.contains(ps))
 
+  def doesServicesOfAnotherTCSP(p: Boolean): Tcsp =
+    this.copy(doesServicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.doesServicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.doesServicesOfAnotherTCSP.contains(p))
+
   def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.servicesOfAnotherTCSP.contains(p))
 
-  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
-    this match {
-      case Tcsp(Some(_), Some(_), Some(_), _, true) => true
-      case Tcsp(Some(_), Some(_), Some(_), _, false) => false
-      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, false) if !serviceProviders.contains(RegisteredOfficeEtc) => false
-      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, true) if !serviceProviders.contains(RegisteredOfficeEtc) => true
-      case _ => false
-    }
-  } else {
-    this match {
-      case Tcsp(Some(_), Some(_), Some(_), _, _) => true
-      case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), _, _) if !serviceProviders.contains(RegisteredOfficeEtc) => true
-      case _ => false
-    }
+  def isComplete: Boolean = this match {
+    case Tcsp(Some(s), t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+    case _ => false
   }
 }
 
 object Tcsp {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   implicit val formatOption = Reads.optionWithNull[Tcsp]
@@ -83,9 +74,33 @@ object Tcsp {
 
   implicit val jsonWrites = Json.writes[Tcsp]
 
+  def constant[A](x: A): Reads[A] = new Reads[A] {
+    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+  }
+
+  def doesServicesOfAnotherTCSPReader: Reads[Option[Boolean]] = {
+
+    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap { d =>
+      d match {
+        case None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s =>
+
+          (d, s) match {
+            case (None, None) => None
+            case _ => Some(s.isDefined)
+          }
+        }
+        case p => constant(p)
+      }
+    }
+  }
+
   implicit val jsonReads : Reads[Tcsp] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
     (__ \ "tcspTypes").readNullable[TcspTypes] and
       (__ \ "providedServices").readNullable[ProvidedServices] and
+      doesServicesOfAnotherTCSPReader and
       (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))

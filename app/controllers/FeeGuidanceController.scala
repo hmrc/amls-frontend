@@ -18,31 +18,37 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import config.ApplicationConfig
+import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import models.tradingpremises.TradingPremises
+import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.i18n.Messages
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.FeatureToggle
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
-                                      val dataCacheConnector: DataCacheConnector) extends BaseController with ServicesConfig {
+                                      val dataCacheConnector: DataCacheConnector,
+                                      appConfig: AppConfig) extends BaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      getBreakdownRows() map { rows =>
-        val total = getTotal(rows)
-        Ok(views.html.fee_guidance(total, rows))
-      }
+  def get = FeatureToggle(appConfig.showFeesToggle) {
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          getBreakdownRows() map { rows =>
+            val total = getTotal(rows)
+            Ok(views.html.fee_guidance(total, rows))
+          }
+    }
   }
 
   private def getBreakdownRows()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Seq[BreakdownRow]] = {
@@ -54,8 +60,8 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
     dataCacheConnector.fetchAll map { optCacheMap =>
       (for {
         cacheMap <- optCacheMap
-        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-        tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key)
+        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
+        tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
         aboutthebusiness <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
         businessmatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
         previouslyRegistered <- aboutthebusiness.previouslyRegistered

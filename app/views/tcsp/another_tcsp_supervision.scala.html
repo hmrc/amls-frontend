@@ -16,49 +16,64 @@
 
 @import include._
 @import forms2._
-@import utils.HtmlElementHelpers._
-@import models.businessmatching.BusinessActivity
 
-@(f: forms.Form2[_], activity: BusinessActivity, index: Int)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("mlrRefNumber").id}-fieldset"""
+}
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder((Messages("businessmatching.updateservice.currenttradingpremises.header", activity.getMessage), "progress.update.registration"))
+    @heading("tcsp.anothertcspsupervision.header", "summary.tcsp")
 }
 
 @main(
-    title = Messages("businessmatching.updateservice.currenttradingpremises.title") + " - " + Messages("progress.update.registration"),
+    title = Messages("tcsp.anothertcspsupervision.title") + " - " + Messages("summary.tcsp"),
     heading = header
-)  {
+) {
 
-    @form(f, controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.post(index)) {
+    @form(f, controllers.tcsp.routes.AnotherTCSPSupervisionController.post(edit)) {
 
         @fieldset(
-            f = f("submittedActivities-fieldset"),
-            legend = "businessmatching.updateservice.currenttradingpremises.title",
+            f = f("servicesOfAnotherTCSP-fieldset"),
+            legend = "tcsp.anothertcspsupervision.title",
             legendHidden = true,
             panel = false
         ) {
-
             @errorGroup(
-                field = f("submittedActivities")
+                field = f("servicesOfAnotherTCSP")
             ) {
                 @radio(
-                    f = f("submittedActivities"),
+                    f = f("servicesOfAnotherTCSP"),
                     labelText = "lbl.yes",
                     value = "true",
+                    target = s"#$target",
                     inline = true
                 )
                 @radio(
-                    f = f("submittedActivities"),
+                    f = f("servicesOfAnotherTCSP"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
                 )
             }
-
         }
 
-        @submit(returnLink = false)
+        @fieldset(
+            f = f(target),
+            legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+            legendHidden = true
+        ) {
+            @input(f("mlrRefNumber"),
+                labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+                hintText = "hint.8.digits",
+                bold = false,
+                attrMaxlength = "15",
+                attrPattern = "[0-9a-z-A-Z]{1,15}"
+           )
+        }
+
+        @submit(edit)
     }
 }

@@ -92,6 +92,17 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
       }
 
       "the user chooses 'yes'" must {
+
+        "redirect to CurrentTradingPremisesController" when {
+          "there are additional existing services to iterate" in new Fixture {
+            val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.CurrentTradingPremisesController.get(1).url)
+
+          }
+        }
+
         "progress to the 'registration progress' page" when {
           "fit and proper is not required" in new Fixture {
 
@@ -99,10 +110,10 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
               controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
             } thenReturn OptionT.some[Future, Boolean](false)
 
-            val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+            val result = controller.post(1)(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+            redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
 
           }
         }
@@ -114,7 +125,7 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
               controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
             } thenReturn OptionT.some[Future, Boolean](true)
 
-            val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+            val result = controller.post(1)(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
 
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
@@ -129,7 +140,7 @@ class CurrentTradingPremisesControllerSpec extends GenericTestHelper with MustMa
           val result = controller.post()(request.withFormUrlEncodedBody("submittedActivities" -> "false"))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.WhichCurrentTradingPremisesController.get().url)
+          redirectLocation(result) mustBe Some(routes.WhichCurrentTradingPremisesController.get(0).url)
 
         }
       }

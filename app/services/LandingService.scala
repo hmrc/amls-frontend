@@ -16,6 +16,8 @@
 
 package services
 
+import cats.data.OptionT
+import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
@@ -41,15 +43,15 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 trait LandingService {
 
-  private[services] def cacheConnector: DataCacheConnector
-  private[services] def keyStore: KeystoreConnector
-  private[services] def desConnector: AmlsConnector
-  private[services] def statusService: StatusService
-  private[services] def businessMatchingConnector: BusinessMatchingConnector
+  private[services] val cacheConnector: DataCacheConnector
+  private[services] val keyStore: KeystoreConnector
+  private[services] val desConnector: AmlsConnector
+  private[services] val statusService: StatusService
+  private[services] val businessMatchingConnector: BusinessMatchingConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -79,9 +81,9 @@ trait LandingService {
   }
 
   private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
-                                                 authContext: AuthContext,
-                                                 hc: HeaderCarrier,
-                                                 ec: ExecutionContext
+                                                                              authContext: AuthContext,
+                                                                              hc: HeaderCarrier,
+                                                                              ec: ExecutionContext
   ): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
@@ -99,7 +101,7 @@ trait LandingService {
           percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
             (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
 
-          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None){ hvd =>
+          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None) { hvd =>
             hvd.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(hvd))
           },
 
@@ -121,35 +123,43 @@ trait LandingService {
         ))
         cacheConnector.save[Renewal](Renewal.key, renewal)
       }
-      case _=> Future.successful(cacheMap)
+      case _ => Future.successful(cacheMap)
 
     }
 
   }
 
-  def setAlCorrespondenceAddressWithRegNo (amlsRefNumber: String)
-                                 (implicit
-                                  authContext: AuthContext,
-                                  hc: HeaderCarrier,
-                                  ec: ExecutionContext
-                                 ): Future[CacheMap] = {
-    desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-      cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.correspondenceAddress.isDefined match {
-        case true  => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true))
-        case _ => viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(false))
-      })
-    }
+  private def fixAddress(model: AboutTheBusiness) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
+    case (Some(_), None) => model.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
+    case (None, None) => model.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
+    case _ => model
   }
 
-  def setAltCorrespondenceAddress (aboutTheBusiness: AboutTheBusiness)(implicit
-                                                                       authContext: AuthContext,
-                                                                       hc: HeaderCarrier,
-                                                                       ec: ExecutionContext
+  def setAlCorrespondenceAddressWithRegNo(amlsRefNumber: String, cacheMap: Option[CacheMap])
+                                         (implicit
+                                          authContext: AuthContext,
+                                          hc: HeaderCarrier,
+                                          ec: ExecutionContext
+                                         ): Future[CacheMap] = {
+    val cachedModel = for {
+      cache <- OptionT.fromOption[Future](cacheMap)
+      entry <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+    } yield entry
+
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
+
+    (for {
+      aboutTheBusiness <- cachedModel orElse etmpModel
+      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness)))
+    } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
+  }
+
+  def setAltCorrespondenceAddress(aboutTheBusiness: AboutTheBusiness)(implicit
+                                                                      authContext: AuthContext,
+                                                                      hc: HeaderCarrier,
+                                                                      ec: ExecutionContext
   ): Future[CacheMap] = {
-    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress.isDefined match {
-      case true  => aboutTheBusiness.copy(altCorrespondenceAddress = Some(true))
-      case _ => aboutTheBusiness.copy(altCorrespondenceAddress = Some(false))
-    })
+    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness))
   }
 
   def refreshCache(amlsRefNumber: String)
@@ -221,10 +231,10 @@ trait LandingService {
 
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
-  override private[services] def cacheConnector = DataCacheConnector
-  override private[services] def keyStore = KeystoreConnector
-  override private[services] def desConnector = AmlsConnector
-  override private[services] def statusService = StatusService
-  override private[services] def businessMatchingConnector = BusinessMatchingConnector
+  override private[services] lazy val cacheConnector = DataCacheConnector
+  override private[services] lazy val keyStore = KeystoreConnector
+  override private[services] lazy val desConnector = AmlsConnector
+  override private[services] lazy val statusService = StatusService
+  override private[services] lazy val businessMatchingConnector = BusinessMatchingConnector
   // $COVERAGE-ON$
 }

@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
+import models.businessmatching.HighValueDealing
 import models.hvd._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -26,11 +27,10 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, ServiceFlowMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
-import utils.AuthorisedFixture
 import org.mockito.ArgumentCaptor
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -42,13 +42,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture with ServiceFlowMocks { self =>
     val request = addToken(authRequest)
 
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    lazy val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mock[ServiceFlow])
+    lazy val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mockServiceFlow)
 
     val day = 15
     val month = 2
@@ -64,9 +64,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       Some(LinkedCashPayments(true))
     )
 
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
+    mockIsNewActivity(false)
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
@@ -140,6 +138,26 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
           elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
         }
       }
+
+      "in variation mode and also in the new service flow" in new Fixture {
+        when(controller.dataCache.fetch[Hvd](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        mockIsNewActivity(true, Some(HighValueDealing))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        val elements = document.getElementsByTag("section").iterator
+
+        while (elements.hasNext) {
+          elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
+        }
+      }
     }
   }
 
@@ -154,6 +172,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
       when {
         controller.dataCache.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
       } thenReturn Future.successful(cache)
+
+      setupInServiceFlow(false, Some(HighValueDealing))
 
       val result = controller.post()(request)
 
@@ -177,9 +197,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Sca
           controller.dataCache.save[Hvd](any(), any())(any(),any(),any())
         } thenReturn Future.successful(cache)
 
-        when {
-          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
+        setupInServiceFlow(true, Some(HighValueDealing))
 
         when {
           controller.statusService.isPreSubmission(any(), any(), any())

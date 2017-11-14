@@ -16,8 +16,11 @@
 
 package services
 
+import javax.inject.Inject
+
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -41,10 +44,11 @@ import utils.{ControllerHelper, DeclarationHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait ProgressService {
-
-  private[services] def cacheConnector: DataCacheConnector
-  private[services] def statusService: StatusService
+class ProgressService @Inject()(
+                                 val cacheConnector: DataCacheConnector,
+                                 val statusService: StatusService,
+                                 config: AppConfig
+                               ){
 
   def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[MsbServices])(implicit cache: CacheMap) =
     activities.foldLeft[Set[Section]](Set.empty) {
@@ -108,21 +112,11 @@ trait ProgressService {
       businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-    } yield {
-
-      businessType match {
-        case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 => {
-          Some(controllers.declaration.routes.RegisterPartnersController.get())
-        }
-        case _ =>
-          Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
-      }
+    } yield businessType match {
+      case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
+        Some(controllers.declaration.routes.RegisterPartnersController.get())
+      case _ => Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
     }
     result getOrElse none[Call]
   }
-}
-
-object ProgressService extends ProgressService {
-  override private[services] val cacheConnector = DataCacheConnector
-  override private[services] val statusService = StatusService
 }

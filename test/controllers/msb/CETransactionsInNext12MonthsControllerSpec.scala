@@ -22,32 +22,30 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 
 import scala.concurrent.Future
 
 class CETransactionsInNext12MonthsControllerSpec extends GenericTestHelper with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new CETransactionsInNext12MonthsController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
       override implicit val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mock[ServiceFlow]
+      override val serviceFlow = mockServiceFlow
     }
 
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -87,7 +85,21 @@ class CETransactionsInNext12MonthsControllerSpec extends GenericTestHelper with 
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include("12345678963")
+    }
 
+    "load the page when the application status is approved and the service has just been added" in new Fixture {
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+      contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
     "redirect to Page not found" when {

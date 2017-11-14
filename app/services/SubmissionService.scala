@@ -38,6 +38,8 @@ import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRe
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.tradingpremises.TradingPremises.FilterUtils
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
@@ -84,15 +86,20 @@ trait SubmissionService extends DataCacheService {
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): SubscriptionRequest = {
+
+    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
+
+    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
+
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
-      tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
+      tradingPremisesSection = filteredTradingPremises,
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
-      responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),
+      responsiblePeopleSection = filteredResponsiblePeople,
       tcspSection = cache.getEntry[Tcsp](Tcsp.key),
       aspSection = cache.getEntry[Asp](Asp.key),
       msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),

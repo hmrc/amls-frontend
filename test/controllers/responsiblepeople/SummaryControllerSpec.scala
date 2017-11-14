@@ -16,8 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.Country
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.responsiblepeople._
@@ -27,37 +26,41 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
-
-import scala.concurrent.Future
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .configure("microservice.services.feature-toggle.show-fees" -> true)
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[SummaryController]
 
     val model = ResponsiblePeople(None, None)
 
-    when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
-    } thenReturn Future.successful(Some(Seq(model)))
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(model)), Some(ResponsiblePeople.key))
 
   }
 
   "Get" must {
 
     "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCacheConnector must be(DataCacheConnector)
+      controller.authConnector must be(authConnector)
+      controller.dataCacheConnector must be(mockCacheConnector)
     }
 
     "load the summary page when section data is available" in new Fixture {
@@ -66,8 +69,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+
+      mockCacheFetch[Seq[ResponsiblePeople]](None, Some(ResponsiblePeople.key))
 
       val result = controller.get()(request)
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
@@ -78,15 +81,14 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val personName = Some(PersonName("firstname", None, "lastname"))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
-          personName,
-          personResidenceType = Some(PersonResidenceType(
-            NonUKResidence,
-            Some(Country("United Kingdom", "GB")),
-            Some(Country("France", "FR")))
-          )
-        )))))
+      mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+        personName,
+        personResidenceType = Some(PersonResidenceType(
+          NonUKResidence,
+          Some(Country("United Kingdom", "GB")),
+          Some(Country("France", "FR")))
+        )
+      ))), Some(ResponsiblePeople.key))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -110,9 +112,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       "'flow flag is not defined" which {
         "will update hasAccepted flag" in new Fixture {
 
-          when {
-            controller.dataCacheConnector.save(any(),any())(any(),any(),any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+          mockCacheSave[Seq[ResponsiblePeople]]
 
           val result = controller.post()(request)
           status(result) must be(SEE_OTHER)
@@ -125,33 +125,27 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to 'Who is the business’s nominated officer?'" when {
-      "'flow flag set to Some('fromDeclaration') and status is pending'" in new Fixture {
+      s"'flow flag set to Some($flowFromDeclaration) and status is pending'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get.url))
       }
-      "'flow flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
+      s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None,None,None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -160,37 +154,31 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "redirect to 'Fee Guidance'" when {
-      "'flow flag set to Some('fromDeclaration') and status is pre amendment'" in new Fixture {
+      s"'flow flag set to Some($flowFromDeclaration) and status is pre amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
       }
     }
 
     "redirect to 'Who is registering this business?'" when {
-      "'flow flag set to Some('fromDeclaration') and status is SubmissionDecisionApproved'" in new Fixture {
+      s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -203,16 +191,33 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None,None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(responsiblePeople)))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReadyForReview)
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+      }
+
+      s"'flow flag set to Some($flowFromDeclaration) and status is pre amendment'" when {
+        "show-fees toggle is off" in new Fixture {
+
+          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
+
+          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions))
+          val responsiblePeople = Seq(rp1, rp2)
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockApplicationStatus(SubmissionReady)
+
+          val result = controller.post(Some(flowFromDeclaration))(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+        }
       }
     }
   }

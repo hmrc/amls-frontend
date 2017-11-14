@@ -14,50 +14,53 @@
  * limitations under the License.
  */
 
-package views.tcsp
+package views.businessmatching.updateservice
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.GenericTestHelper
 import views.Fixture
 
-
-class services_of_another_tcspSpec extends GenericTestHelper with MustMatchers {
+class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+
+    implicit override val request = addToken(FakeRequest())
+
   }
 
-  "services_of_another_tcsp view" must {
-    "have correct title, correct heading and subheading" in new ViewFixture {
+  "remove_activities view" must {
 
-      val form2 = EmptyForm
+    "display the correct headings and title" in new ViewFixture {
 
-      def view = views.html.tcsp.services_of_another_tcsp(form2, true)
+      def view = views.html.businessmatching.updateservice.remove_activities(EmptyForm, Set.empty)
 
-      val title = Messages("tcsp.servicesOfAnotherTcsp.title") + " - " + Messages("summary.tcsp") + " - " +
-                  Messages("title.amls") + " - " + Messages("title.gov")
-      doc.title must be(title)
-      heading.html must be(Messages("tcsp.servicesOfAnotherTcsp.title"))
-      subHeading.html must include(Messages("summary.tcsp"))
+      doc.title() must include(Messages("updateservice.removeactivities.title"))
+      heading.html() must include(Messages("updateservice.removeactivities.header"))
+      subHeading.html() must include(Messages("summary.updateservice"))
+
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("not a message Key"))
-        ))
+      val form2: InvalidForm = InvalidForm(Map.empty, Seq(
+        (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
+      ))
 
-      def view = views.html.tcsp.services_of_another_tcsp(form2, true)
+      def view = views.html.businessmatching.updateservice.remove_activities(form2, Set.empty)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("servicesOfAnotherTCSP")
+      doc.getElementById("businessActivities")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
+
   }
+
+
 }

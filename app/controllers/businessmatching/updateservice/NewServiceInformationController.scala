@@ -55,8 +55,7 @@ class NewServiceInformationController @Inject()
   def post() = Authorised.async {
     implicit authContext => implicit request => {
       for {
-        model <- OptionT(dataCacheConnector.fetch[UpdateService](UpdateService.key)) orElse OptionT.some(UpdateService())
-        _ <- OptionT.liftF(dataCacheConnector.save(UpdateService.key, model.copy(inNewServiceFlow = true)))
+        _ <- OptionT.liftF(serviceFlow.setInServiceFlowFlag(true))
         form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
         url <- OptionT.fromOption[Future](form.get("redirectUrl"))
       } yield Redirect(url.head)

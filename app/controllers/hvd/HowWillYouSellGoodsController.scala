@@ -16,27 +16,31 @@
 
 package controllers.hvd
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd, SalesChannel}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import play.api.Logger
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.hvd.how_will_you_sell_goods
 
 import scala.concurrent.Future
 
-
-trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelper {
-
-  protected def dataCacheConnector: DataCacheConnector
-
-  protected def statusService: StatusService
-
+class HowWillYouSellGoodsController @Inject()
+(
+  dataCacheConnector: DataCacheConnector,
+  statusService: StatusService,
+  val authConnector: AuthConnector,
+  serviceFlow: ServiceFlow
+) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -61,11 +65,10 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
             for {
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
               status <- statusService.getStatus
-              _ <- dataCacheConnector.save[Hvd](Hvd.key,
-                hvd.howWillYouSellGoods(model)
-              )
+              _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.howWillYouSellGoods(model))
+              isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
             } yield {
-              if (redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
+              if (!isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
                 Redirect(routes.HvdDateOfChangeController.get())
               } else {
                 edit match {
@@ -77,12 +80,4 @@ trait HowWillYouSellGoodsController extends BaseController with DateOfChangeHelp
         }
       }
   }
-}
-
-object HowWillYouSellGoodsController extends HowWillYouSellGoodsController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-
-  override protected def dataCacheConnector: DataCacheConnector = DataCacheConnector
-
-  override protected def statusService: StatusService = StatusService
 }

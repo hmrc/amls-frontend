@@ -849,6 +849,10 @@ summary.linetext = Please check all the information you have provided.
 
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
+changeservices.choice.remove = Remove a service
+
+updateservice.removeactivities.title = What do you need to remove?
+updateservice.removeactivities.header = What do you need to remove?
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
@@ -1006,6 +1010,7 @@ tradingpremises.premises.registered.title = Do you want to register another trad
 tradingpremises.have.registered.premises.text = You have added {0} trading premises.
 tradingpremises.have.registered.premises.text2 = You need to register every premises where you trade in activities that are supervised under the Money Laundering Regulations.
 tradingpremises.have.registered.premises.text3 = You’ll need to pay £115 for each trading premises you register.
+tradingpremises.have.registered.premises.text3.no.fees = You’ll need to pay a fee for each trading premises you register.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
 tradingpremises.remove.trading.premises.title = Remove trading premises
 tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
@@ -1129,6 +1134,7 @@ businessmatching.updateservice.whichtradingpremises.header = Which premises will
 businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.fitandproper.header = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
+businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
 businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
@@ -1476,6 +1482,7 @@ responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you 
 responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
+responsiblepeople.fit_and_proper.text.details.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
 responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
 responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
@@ -1562,6 +1569,9 @@ tcsp.provided_services.service.lbl.06 = Receptionist
 tcsp.provided_services.service.lbl.07 = Conference rooms
 tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
+
+tcsp.anothertcspsupervision.title = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
+tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
 
 #ASP
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:

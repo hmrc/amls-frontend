@@ -16,7 +16,6 @@
 
 package models.hvd
 
-import config.ApplicationConfig
 import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.Logger

@@ -179,6 +179,10 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
             controller.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
           } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
 
+          when {
+            controller.businessMatchingService.activitiesToIterate(any(),any())
+          } thenReturn true
+
           val result = controller.post()(request.withFormUrlEncodedBody(
             "tradingPremises[]" -> "1"
           ))
@@ -203,7 +207,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           ))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.CurrentTradingPremisesController.get().url))
+          redirectLocation(result) must be(Some(routes.CurrentTradingPremisesController.get(0).url))
 
         }
       }
@@ -282,146 +286,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
     }
 
-  }
-
-  "activitiesToIterate" must {
-    "return true" when {
-      "index is at first of many" in new Fixture {
-
-        val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
-
-        controller invokePrivate activitiesToIterate(0, Set(HighValueDealing, MoneyServiceBusiness)) must be(true)
-
-      }
-    }
-    "return false" when {
-      "there is a single additional activity" in new Fixture {
-
-        val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
-
-        controller invokePrivate activitiesToIterate(0, Set(HighValueDealing)) must be(false)
-
-      }
-      "index is at the last activity" in new Fixture {
-
-        val activitiesToIterate = PrivateMethod[Boolean]('activitiesToIterate)
-
-        controller invokePrivate activitiesToIterate(1, Set(HighValueDealing, MoneyServiceBusiness)) must be(false)
-
-      }
-    }
-  }
-
-  "activity should be saved to trading premises in request" when {
-
-    "a single trading premises is selected" in new Fixture {
-
-      mockApplicationStatus(SubmissionDecisionApproved)
-      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-
-      when {
-        controller.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
-      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-      val result = controller.post()(request.withFormUrlEncodedBody(
-        "tradingPremises[]" -> "4"
-      ))
-
-      status(result) must be(SEE_OTHER)
-
-      verify(
-        controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(Seq(
-        TradingPremises(
-          yourTradingPremises = Some(ytp),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name2", Address("add2Line1", "add2Line2", None, None, "ps22de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities),
-          status = Some(StatusConstants.Deleted)
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name3", Address("add3Line1", "add3Line2", None, None, "ps33de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1", "add4Line2", None, None, "ps44de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1", "add5Line2", None, None, "ps55de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ).copy(
-          whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
-            activities.activities + HighValueDealing
-          )),
-          hasAccepted = true,
-          hasChanged = true
-        ))
-      ))(any(), any(), any())
-
-    }
-
-    "multiple trading premises are selected" in new Fixture {
-
-      mockApplicationStatus(SubmissionDecisionApproved)
-      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-
-      when {
-        controller.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
-      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-      val result = controller.post()(request.withFormUrlEncodedBody(
-        "tradingPremises[]" -> "0",
-        "tradingPremises[]" -> "2",
-        "tradingPremises[]" -> "3"
-      ))
-
-      status(result) must be(SEE_OTHER)
-
-      verify(
-        controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(Seq(
-        TradingPremises(
-          yourTradingPremises = Some(ytp),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ).copy(
-          whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
-            activities.activities + HighValueDealing
-          )),
-          hasAccepted = true,
-          hasChanged = true
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name2", Address("add2Line1", "add2Line2", None, None, "ps22de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities),
-          status = Some(StatusConstants.Deleted)
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name3", Address("add3Line1", "add3Line2", None, None, "ps33de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ).copy(
-          whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
-            activities.activities + HighValueDealing
-          )),
-          hasAccepted = true,
-          hasChanged = true
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name4", Address("add4Line1", "add4Line2", None, None, "ps44de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ).copy(
-          whatDoesYourBusinessDoAtThisAddress = Some(activities.copy(
-            activities.activities + HighValueDealing
-          )),
-          hasAccepted = true,
-          hasChanged = true
-        ),
-        TradingPremises(
-          yourTradingPremises = Some(ytp.copy("name5", Address("add5Line1", "add5Line2", None, None, "ps55de"))),
-          whatDoesYourBusinessDoAtThisAddress = Some(activities)
-        ))
-      ))(any(), any(), any())
-    }
   }
 
 }
