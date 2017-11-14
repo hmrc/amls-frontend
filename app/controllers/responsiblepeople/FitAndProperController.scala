@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms._
+import forms.{Form2, _}
 import models.responsiblepeople.ResponsiblePeople
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
@@ -40,38 +40,37 @@ class FitAndProperController @Inject()(
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.fit_and_proper")
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-        implicit authContext => implicit request =>
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_))
-              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName))
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
-            case _
-              => NotFound(notFoundView)
-          }
+    implicit authContext => implicit request =>
+      getData[ResponsiblePeople](index) map {
+        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
+          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, config.showFeesToggle))
+        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, config.showFeesToggle))
+        case _ => NotFound(notFoundView)
       }
+  }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-      Authorised.async {
-        implicit authContext => implicit request =>
-          Form2[Boolean](request.body) match {
-            case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map { rp =>
-                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), config.showFeesToggle))
-              }
-            case ValidForm(_, data) => {
-              for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.hasAlreadyPassedFitAndProper(data)
-                }
-              } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-                case false => Redirect(routes.PersonRegisteredController.get(index, flow))
-              }
-            } recoverWith {
-              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+    Authorised.async {
+      implicit authContext => implicit request =>
+        Form2[Boolean](request.body) match {
+          case f: InvalidForm =>
+            getData[ResponsiblePeople](index) map { rp =>
+              BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), config.showFeesToggle))
             }
+          case ValidForm(_, data) => {
+            for {
+              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                rp.hasAlreadyPassedFitAndProper(data)
+              }
+            } yield edit match {
+              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              case false => Redirect(routes.PersonRegisteredController.get(index, flow))
+            }
+          } recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-      }
+        }
+    }
 
 }

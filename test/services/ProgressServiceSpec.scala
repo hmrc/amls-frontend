@@ -224,8 +224,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
           val businessMatching = BusinessMatching(reviewDetails = Some(
             ReviewDetails(
@@ -253,8 +253,8 @@ class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with Scala
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1", None, None)), None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2", None, None)), None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
           val businessMatching = BusinessMatching(reviewDetails = Some(
             ReviewDetails(
