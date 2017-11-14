@@ -18,7 +18,7 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_])(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], activities: Set[String])(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -32,5 +32,32 @@
     title = Messages("updateservice.removeactivities.title") + " - " + Messages("summary.updateinformation"),
     heading = header
 )  {
+
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.businessmatching.updateservice.routes.RemoveActivitiesController.post()) {
+
+        <div class="form-group">
+            @fieldset(
+                f = f("businessActivities-fieldset"),
+                legend = "businessmatching.registerservices.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("businessActivities")
+                ) {
+                    @{activities map( value => checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
+                        value = value
+                    ))}
+                }
+            }
+        </div>
+
+        @submit(returnLink = false)
+
+    }
 
 }
