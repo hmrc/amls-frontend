@@ -91,6 +91,35 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
 
+    "post is called" must {
+
+      "redirect to UpdateAnyInformationController" when {
+        "service can be deleted" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("businessActivities[]" -> "03"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.UpdateAnyInformationController.get().url))
+
+        }
+      }
+
+      "respond with BAD_REQUEST" when {
+        "request is invalid" in new Fixture {
+
+          when {
+            controller.businessMatchingService.getModel(any(),any(),any())
+          } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
+
+          val result = controller.post()(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
+    }
+
   }
 
 }
