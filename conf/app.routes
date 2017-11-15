@@ -226,6 +226,9 @@ POST        /business-activities/business-turnover                              
 GET         /business-activities/records                                              controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
 POST        /business-activities/records                                              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
+GET         /business-activities/record-transactions                                  @controllers.businessactivities.TransactionTypesController.get()
+POST        /business-activities/record-transactions                                  @controllers.businessactivities.TransactionTypesController.post()
+
 GET         /business-activities/crime-agency                                         controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
 POST        /business-activities/crime-agency                                         controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
