@@ -19,7 +19,7 @@ package models.businessactivities
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsPath, Json}
 
 class TransactionTypeSpec extends PlaySpec with MustMatchers {
 
@@ -116,6 +116,45 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         "types" -> Seq("01", "02", "03"),
         "name" -> "test"
       )
+    }
+
+    "read values from JSON" in {
+      val json = Json.obj(
+        "types" -> Seq("01", "02", "03"),
+        "software" -> "example software"
+      )
+
+      json.asOpt[TransactionTypes] mustBe Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
+    }
+
+    "read values from JSON without software" in {
+      val json = Json.obj(
+        "types" -> Seq("01", "02")
+      )
+
+      json.asOpt[TransactionTypes] mustBe Some(TransactionTypes(Set(Paper, DigitalSpreadsheet)))
+    }
+
+    "fail when the name not supplied in the Json" in {
+      val json = Json.obj(
+        "types" -> Seq("01", "02", "03")
+      )
+
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "software" -> play.api.data.validation.ValidationError("error.missing"))
+    }
+
+    "fail when an invalid value was given" in {
+      val json = Json.obj(
+        "types" -> Seq("01", "10")
+      )
+
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.data.validation.ValidationError("error.invalid"))
+    }
+
+    "fail when no values are given" in {
+      val json = Json.obj()
+
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.data.validation.ValidationError("error.missing"))
     }
   }
 }
