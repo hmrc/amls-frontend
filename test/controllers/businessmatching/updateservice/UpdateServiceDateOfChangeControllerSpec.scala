@@ -74,6 +74,14 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
 
         }
       }
+      "respond with BAD_REQUEST" when {
+        "request is invalid" in new Fixture {
+
+          val result = controller.post(request)
+
+          status(result) must be(BAD_REQUEST)
+        }
+      }
     }
 
   }
