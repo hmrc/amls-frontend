@@ -59,10 +59,21 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       }
     }
 
-    "post is called" in new Fixture {
+    "post is called" must {
+      "redirect to UpdateAnyInformationController" when {
+        "request is valid" in new Fixture {
 
-      val result = controller.post(request)
+          val result = controller.post(request.withFormUrlEncodedBody(
+            "dateOfChange.day" -> "13",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.year" -> "2017"
+          ))
 
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.UpdateAnyInformationController.get().url))
+
+        }
+      }
     }
 
   }
