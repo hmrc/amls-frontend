@@ -19,8 +19,9 @@ package controllers.businessmatching.updateservice
 import javax.inject.{Inject, Singleton}
 
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
+import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
 
@@ -34,7 +35,7 @@ class UpdateServiceDateOfChangeController @Inject()(
   def get = Authorised.async{
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok(views.html.date_of_change(EmptyForm, "summary.updateservice", UpdateServiceDateOfChangeController.post())))
+        Future.successful(Ok(view(EmptyForm)))
   }
 
   def post = Authorised.async{
@@ -42,7 +43,11 @@ class UpdateServiceDateOfChangeController @Inject()(
       implicit request =>
       Form2[DateOfChange](request.body) match {
         case ValidForm(_, _) => Future.successful(Redirect(UpdateAnyInformationController.get()))
+        case f:InvalidForm => Future.successful(BadRequest(view(f)))
       }
   }
+
+  private def view(f: Form2[_])(implicit request: Request[_]) =
+    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post())
 
 }
