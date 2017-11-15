@@ -19,8 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import generators.businessmatching.{BusinessActivitiesGenerator, BusinessMatchingGenerator}
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -29,14 +28,14 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
@@ -96,12 +95,29 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
     "post is called" must {
 
       "redirect to UpdateServiceDateOfChangeController" when {
-        "service can be removed" in new Fixture {
+        "service is removed" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("businessActivities[]" -> "03"))
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get().url))
+
+        }
+        "mutliple services are removed" in new Fixture {
+
+          when {
+            controller.businessMatchingService.getModel(any(),any(),any())
+          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+            activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing, TrustAndCompanyServices)))
+          ))
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "businessActivities[]" -> "03",
+            "businessActivities[]" -> "04"
+          ))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get("03", "04").url))
 
         }
       }
