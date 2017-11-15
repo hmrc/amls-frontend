@@ -69,7 +69,7 @@ object TransactionTypes {
     Json.obj(
       "types" -> t.types.map(_.value)
     ) ++ (t.types.collectFirst {
-      case DigitalSoftware(name) => Json.obj("name" -> name)
+      case DigitalSoftware(name) => Json.obj("software" -> name)
     } getOrElse Json.obj())
   }
 

@@ -114,7 +114,7 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
 
       Json.toJson(model) mustBe Json.obj(
         "types" -> Seq("01", "02", "03"),
-        "name" -> "test"
+        "software" -> "test"
       )
     }
 
